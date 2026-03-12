@@ -73,6 +73,7 @@ use App\Models\Page;
 use App\Models\ShareRequest;
 use App\Models\User;
 use App\Services\MemberSuggestionService;
+use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -452,23 +453,23 @@ class SocialController extends Controller
                 $files = [$files];
             }
 
-            $directory = public_path('uploads/imagens/posts');
-            if (!is_dir($directory)) {
-                mkdir($directory, 0755, true);
-            }
-
             foreach ($files as $file) {
                 if (!$file || !$file->isValid()) {
                     continue;
                 }
 
                 $filename = 'post_' . $post->id . '_' . uniqid('', true) . '.' . $file->getClientOriginalExtension();
-                $file->move($directory, $filename);
+                $path = app(WatermarkService::class)->processPublicImage(
+                    $file,
+                    'uploads/imagens/posts',
+                    $filename,
+                    ['prefix' => 'post-' . $post->id]
+                );
 
                 PostMedia::create([
                     'post_id' => $post->id,
                     'type' => 'image',
-                    'path' => 'uploads/imagens/posts/' . $filename,
+                    'path' => $path,
                 ]);
             }
         }

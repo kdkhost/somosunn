@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Services\PointsService;
+use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -103,13 +104,12 @@ class ProfileController extends Controller
 
             $file = $request->file('photo');
             $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $directory = public_path('uploads/imagens/avatars');
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true);
-            }
-
-            $path = 'uploads/imagens/avatars/' . $filename;
-            $file->move($directory, $filename);
+            $path = app(WatermarkService::class)->processPublicImage(
+                $file,
+                'uploads/imagens/avatars',
+                $filename,
+                ['prefix' => 'avatar-' . $user->id]
+            );
 
             if (file_exists(public_path($path))) {
                 $data['photo'] = $path;
@@ -124,13 +124,12 @@ class ProfileController extends Controller
 
             $file = $request->file('cover_photo');
             $filename = 'cover_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $directory = public_path('uploads/imagens/covers');
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true);
-            }
-
-            $path = 'uploads/imagens/covers/' . $filename;
-            $file->move($directory, $filename);
+            $path = app(WatermarkService::class)->processPublicImage(
+                $file,
+                'uploads/imagens/covers',
+                $filename,
+                ['prefix' => 'cover-' . $user->id]
+            );
 
             if (file_exists(public_path($path))) {
                 $data['cover_photo'] = $path;

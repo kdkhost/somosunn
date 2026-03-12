@@ -69,13 +69,26 @@ class UploadChunkControllerTest extends TestCase
             mkdir($chunkDir, 0777, true);
         }
 
-        file_put_contents($chunkDir . '/chunk_0', 'abc');
-        file_put_contents($chunkDir . '/chunk_1', 'def');
+        $tmpImage = tempnam(sys_get_temp_dir(), 'chunk-img-');
+        $image = imagecreatetruecolor(2, 2);
+        $background = imagecolorallocate($image, 48, 110, 255);
+        imagefilledrectangle($image, 0, 0, 2, 2, $background);
+        imagepng($image, $tmpImage);
+        imagedestroy($image);
+        $pngBytes = file_get_contents($tmpImage);
+        @unlink($tmpImage);
+
+        $this->assertIsString($pngBytes);
+
+        $chunks = str_split($pngBytes, (int) ceil(strlen($pngBytes) / 2));
+        foreach ($chunks as $index => $chunk) {
+            file_put_contents($chunkDir . '/chunk_' . $index, $chunk);
+        }
 
         $request = Request::create('/upload/assemble', 'POST', [
             'upload_id' => $uploadId,
             'filename' => 'banner.png',
-            'total_chunks' => 2,
+            'total_chunks' => count($chunks),
         ]);
 
         $response = app(UploadChunkController::class)->assemble($request);

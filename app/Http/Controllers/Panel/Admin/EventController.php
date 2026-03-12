@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel\Admin;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -131,7 +132,12 @@ class EventController extends Controller
         $data = $this->serializeRequest($request);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('event-images', 'public');
+            $data['image'] = app(WatermarkService::class)->processStorageImage(
+                $request->file('image'),
+                'event-images',
+                null,
+                ['prefix' => 'event-cover']
+            );
         }
 
         if ($request->hasFile('certificate_bg')) {
@@ -182,7 +188,12 @@ class EventController extends Controller
                 Storage::disk('public')->delete($event->image);
             }
 
-            $data['image'] = $request->file('image')->store('event-images', 'public');
+            $data['image'] = app(WatermarkService::class)->processStorageImage(
+                $request->file('image'),
+                'event-images',
+                null,
+                ['prefix' => 'event-cover']
+            );
         }
 
         if ($request->hasFile('certificate_bg')) {

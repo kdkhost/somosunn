@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -68,8 +69,12 @@ class CourseController extends Controller
         if ($request->hasFile('thumbnail')) {
             $file = $request->file('thumbnail');
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/course-thumbs'), $fileName);
-            $data['thumbnail'] = 'uploads/course-thumbs/' . $fileName;
+            $data['thumbnail'] = app(WatermarkService::class)->processPublicImage(
+                $file,
+                'uploads/course-thumbs',
+                $fileName,
+                ['prefix' => 'course-thumb']
+            );
         }
 
         $data['user_id'] = Auth::id();
@@ -109,8 +114,12 @@ class CourseController extends Controller
         if ($request->hasFile('thumbnail')) {
             $file = $request->file('thumbnail');
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/course-thumbs'), $fileName);
-            $data['thumbnail'] = 'uploads/course-thumbs/' . $fileName;
+            $data['thumbnail'] = app(WatermarkService::class)->processPublicImage(
+                $file,
+                'uploads/course-thumbs',
+                $fileName,
+                ['prefix' => 'course-thumb']
+            );
         }
 
         if (Schema::hasColumn('courses', 'created_by') && empty($course->created_by)) {

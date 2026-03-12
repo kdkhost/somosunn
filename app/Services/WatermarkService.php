@@ -2,205 +2,533 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Storage;
 use App\Models\Event;
+use App\Models\Setting;
+use App\Support\UploadStorage;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use RuntimeException;
+use Throwable;
 
 class WatermarkService
 {
-    /**
-     * Process an uploaded image, add the watermark and text, and save it using native GD.
-     * 
-     * @param \Illuminate\Http\UploadedFile $file
-     * @param \App\Models\Event $event
-     * @return string The path to the saved watermarked file
-     */
-    public function processEventImage($file, Event $event): string
+    private const SUPPORTED_RASTER_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    private const EXCLUDED_DIRECTORIES = [
+        'uploads/certificates',
+        'uploads/signatures',
+        'uploads/imagens/watermark',
+        'uploads/imagens/administrativo',
+        'uploads/imagens/logins',
+        'uploads/imagens/frontend',
+        'uploads/imagens/pwa',
+        'uploads/imagens/preloader',
+        'uploads/imagens/geral',
+        'uploads/imagens/seo',
+        'uploads/imagens/marketplace',
+    ];
+
+    public function processEventImage(UploadedFile $file, Event $event): string
     {
-        $filename = uniqid('event_media_') . '.jpg'; // Convert to jpg for simplicity
-        $directory = 'events/' . $event->id . '/gallery/';
-        $path = $directory . $filename;
+        return $this->processStorageImage(
+            $file,
+            'events/' . $event->id . '/gallery',
+            null,
+            ['prefix' => 'event-media']
+        );
+    }
 
-        Storage::disk('public')->makeDirectory($directory);
+    public function processStorageImage(
+        UploadedFile $file,
+        string $directory,
+        ?string $filename = null,
+        array $options = []
+    ): string {
+        $directory = $this->normalizeDirectory($directory);
 
-        $sourcePath = $file->getRealPath();
-        $mime = mime_content_type($sourcePath);
-
-        // Load image based on MIME type
-        switch ($mime) {
-            case 'image/jpeg':
-            case 'image/jpg':
-                $img = @imagecreatefromjpeg($sourcePath);
-                break;
-            case 'image/png':
-                $img = @imagecreatefrompng($sourcePath);
-                break;
-            case 'image/gif':
-                $img = @imagecreatefromgif($sourcePath);
-                break;
-            case 'image/webp':
-                $img = @imagecreatefromwebp($sourcePath);
-                break;
-            default:
-                throw new \Exception("Unsupported image format: " . $mime);
+        if (!$file->isValid()) {
+            throw new RuntimeException('Arquivo de imagem invalido ou corrompido.');
         }
 
-        if (!$img) {
-            throw new \Exception("Failed to load image for watermarking.");
+        $extension = $this->resolveExtensionFromUpload($file);
+        $filename = $this->resolveFilename($filename, $extension, (string) ($options['prefix'] ?? 'image'));
+
+        if (!$this->isRasterExtension($extension) || !$this->shouldWatermarkUpload($directory)) {
+            return UploadStorage::storeUploadedFile($file, $directory, $filename, ['watermark' => false]);
         }
 
-        $imgWidth = imagesx($img);
-        $imgHeight = imagesy($img);
+        $tempOutput = $this->makeTempFile($extension);
 
-        // 1. Add Watermark Logo
-        $logoPath = $this->getWatermarkLogo();
-        if ($logoPath && file_exists($logoPath)) {
-            $logoMime = mime_content_type($logoPath);
-            $logo = null;
+        try {
+            $this->applyWatermarkToAbsolutePath($file->getRealPath(), $tempOutput);
 
-            if (strpos($logoMime, 'png') !== false) {
-                $logo = @imagecreatefrompng($logoPath);
-            } elseif (strpos($logoMime, 'jpeg') !== false || strpos($logoMime, 'jpg') !== false) {
-                $logo = @imagecreatefromjpeg($logoPath);
-            }
+            if (UploadStorage::isLocal()) {
+                $root = (string) config(
+                    'filesystems.disks.public.root',
+                    is_dir(public_path('storage')) ? public_path('storage') : storage_path('app/public')
+                );
 
-            if ($logo) {
-                $logoWidth = imagesx($logo);
-                $logoHeight = imagesy($logo);
+                $targetDirectory = $directory !== ''
+                    ? rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $directory)
+                    : rtrim($root, DIRECTORY_SEPARATOR);
 
-                // Resize logo to max 150px width (or proportional to image)
-                $newLogoWidth = min(150, $imgWidth * 0.2);
-                $newLogoHeight = ($logoHeight / $logoWidth) * $newLogoWidth;
-
-                $resizedLogo = imagecreatetruecolor($newLogoWidth, $newLogoHeight);
-                imagealphablending($resizedLogo, false);
-                imagesavealpha($resizedLogo, true);
-                $transparent = imagecolorallocatealpha($resizedLogo, 255, 255, 255, 127);
-                imagefilledrectangle($resizedLogo, 0, 0, $newLogoWidth, $newLogoHeight, $transparent);
-
-                imagecopyresampled($resizedLogo, $logo, 0, 0, 0, 0, $newLogoWidth, $newLogoHeight, $logoWidth, $logoHeight);
-
-                // Calculate position based on settings
-                $pos = \App\Models\Setting::get('watermark_position', 'bottom-right');
-                $margin = 20;
-
-                switch ($pos) {
-                    case 'top-left':
-                        $destX = $margin;
-                        $destY = $margin;
-                        break;
-                    case 'top-right':
-                        $destX = $imgWidth - $newLogoWidth - $margin;
-                        $destY = $margin;
-                        break;
-                    case 'bottom-left':
-                        $destX = $margin;
-                        $destY = $imgHeight - $newLogoHeight - $margin;
-                        break;
-                    case 'center':
-                        $destX = ($imgWidth / 2) - ($newLogoWidth / 2);
-                        $destY = ($imgHeight / 2) - ($newLogoHeight / 2);
-                        break;
-                    case 'bottom-right':
-                    default:
-                        $destX = $imgWidth - $newLogoWidth - $margin;
-                        $destY = $imgHeight - $newLogoHeight - $margin;
-                        break;
+                if (!is_dir($targetDirectory) && !@mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
+                    throw new RuntimeException('Nao foi possivel preparar o diretorio para salvar a imagem com marca d\'agua.');
                 }
 
-                $opacity = (int) \App\Models\Setting::get('watermark_opacity', 50);
+                $targetPath = $targetDirectory . DIRECTORY_SEPARATOR . $filename;
 
-                // For a more robust opacity control with GD
-                imagealphablending($img, true);
-                $this->imagecopymerge_alpha($img, $resizedLogo, $destX, $destY, 0, 0, $newLogoWidth, $newLogoHeight, $opacity);
+                if (!@rename($tempOutput, $targetPath)) {
+                    if (!@copy($tempOutput, $targetPath)) {
+                        throw new RuntimeException('Nao foi possivel mover a imagem processada para o destino final.');
+                    }
 
-                imagedestroy($logo);
-                imagedestroy($resizedLogo);
+                    @unlink($tempOutput);
+                }
+            } else {
+                $targetPath = ltrim(($directory !== '' ? $directory . '/' : '') . $filename, '/');
+                $stream = fopen($tempOutput, 'rb');
+
+                if ($stream === false) {
+                    throw new RuntimeException('Nao foi possivel abrir a imagem processada para envio ao storage.');
+                }
+
+                try {
+                    Storage::disk('public')->put($targetPath, $stream, ['visibility' => 'public']);
+                } finally {
+                    fclose($stream);
+                    @unlink($tempOutput);
+                }
             }
+        } catch (Throwable $exception) {
+            @unlink($tempOutput);
+            throw $exception;
         }
 
-        // 2. Add Text (Bottom Right or opposite to logo)
-        // ... (texto pode ficar fixo ou seguir uma lógica oposta)
-        // Mantendo o texto como estava mas com opacidade dinâmica se desejar, 
-        // mas o foco principal do usuário era a marca d'água (logo/imagem).
+        return ltrim(($directory !== '' ? $directory . '/' : '') . $filename, '/');
+    }
 
-        $text = sprintf(
-            "%s | %s\nOrg: %s",
-            $event->title,
-            \Carbon\Carbon::parse($event->start_at)->format('d/m/Y'),
-            $event->user ? $event->user->name : 'N/A'
+    public function processPublicImage(
+        UploadedFile $file,
+        string $relativeDirectory,
+        ?string $filename = null,
+        array $options = []
+    ): string {
+        $relativeDirectory = $this->normalizeDirectory($relativeDirectory);
+
+        if (!$file->isValid()) {
+            throw new RuntimeException('Arquivo de imagem invalido ou corrompido.');
+        }
+
+        $extension = $this->resolveExtensionFromUpload($file);
+        $filename = $this->resolveFilename($filename, $extension, (string) ($options['prefix'] ?? 'image'));
+        $targetDirectory = public_path($relativeDirectory);
+
+        if (!is_dir($targetDirectory) && !@mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
+            throw new RuntimeException('Nao foi possivel preparar o diretorio publico para salvar a imagem.');
+        }
+
+        $targetPath = rtrim($targetDirectory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
+
+        if (!$this->isRasterExtension($extension) || !$this->shouldWatermarkUpload($relativeDirectory)) {
+            $file->move($targetDirectory, $filename);
+
+            return ltrim($relativeDirectory . '/' . $filename, '/');
+        }
+
+        $tempOutput = $this->makeTempFile($extension);
+
+        try {
+            $this->applyWatermarkToAbsolutePath($file->getRealPath(), $tempOutput);
+
+            if (!@rename($tempOutput, $targetPath)) {
+                if (!@copy($tempOutput, $targetPath)) {
+                    throw new RuntimeException('Nao foi possivel salvar a imagem com marca d\'agua no diretorio publico.');
+                }
+
+                @unlink($tempOutput);
+            }
+        } catch (Throwable $exception) {
+            @unlink($tempOutput);
+            throw $exception;
+        }
+
+        return ltrim($relativeDirectory . '/' . $filename, '/');
+    }
+
+    public function applyWatermarkToAbsolutePath(string $sourcePath, string $destinationPath): void
+    {
+        [$image, $width, $height] = $this->loadRasterImage($sourcePath);
+        $logoPath = $this->resolveWatermarkLogoPath();
+        $settings = $this->imageWatermarkSettings();
+        $logo = null;
+        $resizedLogo = null;
+
+        if ($logoPath !== null) {
+            [$logo, $logoWidth, $logoHeight] = $this->loadRasterImage($logoPath);
+            $sizePercent = max(1, min(60, (int) $settings['size_percent']));
+            $margin = max(0, min(300, (int) $settings['margin']));
+            $opacity = max(5, min(100, (int) $settings['opacity']));
+
+            $targetLogoWidth = max(24, (int) round($width * ($sizePercent / 100)));
+            $targetLogoHeight = max(24, (int) round(($logoHeight / max(1, $logoWidth)) * $targetLogoWidth));
+
+            if ($targetLogoHeight > $height * 0.6) {
+                $targetLogoHeight = (int) round($height * 0.6);
+                $targetLogoWidth = max(24, (int) round(($logoWidth / max(1, $logoHeight)) * $targetLogoHeight));
+            }
+
+            $resizedLogo = imagecreatetruecolor($targetLogoWidth, $targetLogoHeight);
+            imagealphablending($resizedLogo, false);
+            imagesavealpha($resizedLogo, true);
+            $transparent = imagecolorallocatealpha($resizedLogo, 0, 0, 0, 127);
+            imagefilledrectangle($resizedLogo, 0, 0, $targetLogoWidth, $targetLogoHeight, $transparent);
+            imagecopyresampled(
+                $resizedLogo,
+                $logo,
+                0,
+                0,
+                0,
+                0,
+                $targetLogoWidth,
+                $targetLogoHeight,
+                $logoWidth,
+                $logoHeight
+            );
+
+            [$destX, $destY] = $this->resolvePosition(
+                (string) $settings['position'],
+                $width,
+                $height,
+                $targetLogoWidth,
+                $targetLogoHeight,
+                $margin
+            );
+
+            imagealphablending($image, true);
+            $this->imagecopymergeAlpha(
+                $image,
+                $resizedLogo,
+                $destX,
+                $destY,
+                0,
+                0,
+                $targetLogoWidth,
+                $targetLogoHeight,
+                $opacity
+            );
+        } else {
+            $this->applyTextWatermark($image, $width, $height, $settings);
+        }
+
+        $destinationDirectory = dirname($destinationPath);
+        if (!is_dir($destinationDirectory) && !@mkdir($destinationDirectory, 0755, true) && !is_dir($destinationDirectory)) {
+            imagedestroy($image);
+            imagedestroy($logo);
+            imagedestroy($resizedLogo);
+            throw new RuntimeException('Nao foi possivel preparar o destino da imagem com marca d\'agua.');
+        }
+
+        $extension = strtolower((string) pathinfo($destinationPath, PATHINFO_EXTENSION));
+        $saved = match ($extension) {
+            'jpg', 'jpeg' => imagejpeg($image, $destinationPath, 88),
+            'png' => imagepng($image, $destinationPath, 6),
+            'gif' => imagegif($image, $destinationPath),
+            'webp' => function_exists('imagewebp') ? imagewebp($image, $destinationPath, 88) : false,
+            default => imagejpeg($image, $destinationPath, 88),
+        };
+
+        imagedestroy($image);
+        if (is_resource($logo) || $logo instanceof \GdImage) {
+            imagedestroy($logo);
+        }
+        if (is_resource($resizedLogo) || $resizedLogo instanceof \GdImage) {
+            imagedestroy($resizedLogo);
+        }
+
+        if (!$saved || !is_file($destinationPath)) {
+            throw new RuntimeException('Nao foi possivel gravar a imagem final com marca d\'agua.');
+        }
+    }
+
+    public function shouldWatermarkUpload(?string $directory = null): bool
+    {
+        $enabled = $this->toBoolean(
+            Setting::get('image_watermark_enabled', Setting::get('video_watermark_enabled', '1'))
         );
 
-        $fontPath = public_path('fonts/Roboto-Bold.ttf');
-        if (file_exists($fontPath)) {
-            $fontSize = 24;
-            $opacity = (int) \App\Models\Setting::get('watermark_opacity', 50);
-            $alpha = 127 - (int) ($opacity * 1.27); // Convert 0-100 to 127-0
+        if (!$enabled) {
+            return false;
+        }
 
-            $color = imagecolorallocatealpha($img, 255, 255, 255, max(0, min(127, $alpha)));
-            $shadowColor = imagecolorallocatealpha($img, 0, 0, 0, 100);
+        $directory = $this->normalizeDirectory((string) $directory);
+        if ($directory === '') {
+            return true;
+        }
 
-            $lines = explode("\n", $text);
-            $y = $imgHeight - 40 - (count($lines) * ($fontSize + 5));
-
-            foreach ($lines as $line) {
-                imagettftext($img, $fontSize, 0, 22, $y + 2, $shadowColor, $fontPath, $line);
-                imagettftext($img, $fontSize, 0, 20, $y, $color, $fontPath, $line);
-                $y += $fontSize + 10;
+        foreach (self::EXCLUDED_DIRECTORIES as $excluded) {
+            if ($directory === $excluded || str_starts_with($directory, $excluded . '/')) {
+                return false;
             }
         }
 
-        // 3. Save Image
-        $fullPath = storage_path('app/public/' . $path);
-        imagejpeg($img, $fullPath, 85);
-
-        // Cleanup
-        imagedestroy($img);
-
-        return $path;
+        return true;
     }
 
-    /**
-     * Helper to merge images with alpha channel and opacity
-     */
-    private function imagecopymerge_alpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $pct)
+    public function isWatermarkableImage(UploadedFile|string $file): bool
     {
-        if ($pct >= 100) {
-            imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
-            return;
+        if ($file instanceof UploadedFile) {
+            return $this->isRasterExtension($this->resolveExtensionFromUpload($file));
         }
 
-        $cut = imagecreatetruecolor($src_w, $src_h);
-        imagecopy($cut, $dst_im, 0, 0, $dst_x, $dst_y, $src_w, $src_h);
-        imagecopy($cut, $src_im, 0, 0, $src_x, $src_y, $src_w, $src_h);
-        imagecopymerge($dst_im, $cut, $dst_x, $dst_y, 0, 0, $src_w, $src_h, $pct);
-        imagedestroy($cut);
+        return $this->isRasterExtension(strtolower((string) pathinfo($file, PATHINFO_EXTENSION)));
     }
 
-    private function getWatermarkLogo(): ?string
+    private function loadRasterImage(string $absolutePath): array
     {
-        // Tenta primeiro a logo específica da marca d'água
-        $setting = \App\Models\Setting::where('key', 'watermark_image')->first();
-        if ($setting && $setting->value) {
-            $path = storage_path('app/public/' . $setting->value);
-            if (file_exists($path)) {
+        if (!is_file($absolutePath)) {
+            throw new RuntimeException('Arquivo de imagem nao encontrado para aplicacao da marca d\'agua.');
+        }
+
+        $imageInfo = @getimagesize($absolutePath);
+        if (!is_array($imageInfo) || !isset($imageInfo[0], $imageInfo[1], $imageInfo[2])) {
+            throw new RuntimeException('Nao foi possivel ler os metadados da imagem enviada.');
+        }
+
+        $image = match ((int) $imageInfo[2]) {
+            IMAGETYPE_JPEG => @imagecreatefromjpeg($absolutePath),
+            IMAGETYPE_PNG => @imagecreatefrompng($absolutePath),
+            IMAGETYPE_GIF => @imagecreatefromgif($absolutePath),
+            IMAGETYPE_WEBP => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($absolutePath) : false,
+            default => false,
+        };
+
+        if (!$image) {
+            throw new RuntimeException('Formato de imagem nao suportado para marca d\'agua.');
+        }
+
+        imagealphablending($image, true);
+        imagesavealpha($image, true);
+
+        return [$image, (int) $imageInfo[0], (int) $imageInfo[1]];
+    }
+
+    private function resolveWatermarkLogoPath(): ?string
+    {
+        $candidates = [
+            Setting::get('watermark_image'),
+            Setting::get('site_logo_light'),
+            Setting::get('logo_front'),
+            Setting::get('logo_image'),
+        ];
+
+        foreach ($candidates as $candidate) {
+            $path = $this->resolvePhysicalPath((string) $candidate);
+            if ($path !== null && $this->isRasterExtension((string) pathinfo($path, PATHINFO_EXTENSION))) {
                 return $path;
             }
         }
 
-        // Fallback para a logo do site light
-        $setting = \App\Models\Setting::where('key', 'site_logo_light')->first();
-        if ($setting && $setting->value) {
-            $path = storage_path('app/public/' . $setting->value);
-            if (file_exists($path)) {
-                return $path;
+        foreach ([
+            public_path('img/logo.png'),
+            public_path('images/logo.png'),
+        ] as $fallback) {
+            if (is_file($fallback)) {
+                return $fallback;
             }
-        }
-
-        $fallback = public_path('images/logo.png');
-        if (file_exists($fallback)) {
-            return $fallback;
         }
 
         return null;
+    }
+
+    private function applyTextWatermark($image, int $width, int $height, array $settings): void
+    {
+        $text = trim((string) (
+            Setting::get('company_name')
+            ?: Setting::get('app_name')
+            ?: config('app.name', 'SOMOS UNN')
+        ));
+
+        if ($text === '') {
+            $text = 'SOMOS UNN';
+        }
+
+        $font = match (true) {
+            $width >= 1600 => 5,
+            $width >= 1000 => 4,
+            default => 3,
+        };
+
+        $textWidth = imagefontwidth($font) * strlen($text);
+        $textHeight = imagefontheight($font);
+        $margin = max(0, min(300, (int) $settings['margin']));
+        $opacity = max(5, min(100, (int) $settings['opacity']));
+        [$x, $y] = $this->resolvePosition(
+            (string) $settings['position'],
+            $width,
+            $height,
+            $textWidth,
+            $textHeight,
+            $margin
+        );
+
+        $alpha = 127 - (int) round(($opacity / 100) * 127);
+        $shadow = imagecolorallocatealpha($image, 0, 0, 0, min(127, $alpha + 20));
+        $color = imagecolorallocatealpha($image, 255, 255, 255, max(0, min(127, $alpha)));
+
+        imagestring($image, $font, $x + 1, $y + 1, $text, $shadow);
+        imagestring($image, $font, $x, $y, $text, $color);
+    }
+
+    private function resolvePhysicalPath(string $value): ?string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return null;
+        }
+
+        $normalized = UploadStorage::normalizePath($value);
+        $candidates = array_filter(array_unique([
+            public_path(ltrim($value, '/')),
+            $normalized ? public_path($normalized) : null,
+            $normalized ? public_path('storage/' . $normalized) : null,
+            $normalized ? storage_path('app/public/' . $normalized) : null,
+            $normalized ? storage_path('app/' . $normalized) : null,
+        ]));
+
+        foreach ($candidates as $candidate) {
+            if (is_file($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private function imageWatermarkSettings(): array
+    {
+        $position = trim((string) Setting::get('image_watermark_position', Setting::get('watermark_position', 'bottom-right')));
+        $allowedPositions = ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'];
+        if (!in_array($position, $allowedPositions, true)) {
+            $position = 'bottom-right';
+        }
+
+        $opacity = (int) Setting::get('image_watermark_opacity', Setting::get('watermark_opacity', 55));
+        $sizePercent = (int) Setting::get('image_watermark_size_percent', 18);
+        $margin = (int) Setting::get('image_watermark_margin', 24);
+
+        return [
+            'position' => $position,
+            'opacity' => max(5, min(100, $opacity)),
+            'size_percent' => max(1, min(60, $sizePercent)),
+            'margin' => max(0, min(300, $margin)),
+        ];
+    }
+
+    private function resolvePosition(
+        string $position,
+        int $imageWidth,
+        int $imageHeight,
+        int $logoWidth,
+        int $logoHeight,
+        int $margin
+    ): array {
+        return match ($position) {
+            'top-left' => [$margin, $margin],
+            'top-right' => [$imageWidth - $logoWidth - $margin, $margin],
+            'bottom-left' => [$margin, $imageHeight - $logoHeight - $margin],
+            'center' => [
+                (int) round(($imageWidth - $logoWidth) / 2),
+                (int) round(($imageHeight - $logoHeight) / 2),
+            ],
+            default => [$imageWidth - $logoWidth - $margin, $imageHeight - $logoHeight - $margin],
+        };
+    }
+
+    private function imagecopymergeAlpha(
+        $destinationImage,
+        $sourceImage,
+        int $destinationX,
+        int $destinationY,
+        int $sourceX,
+        int $sourceY,
+        int $sourceWidth,
+        int $sourceHeight,
+        int $opacityPercent
+    ): void {
+        if ($opacityPercent >= 100) {
+            imagecopy(
+                $destinationImage,
+                $sourceImage,
+                $destinationX,
+                $destinationY,
+                $sourceX,
+                $sourceY,
+                $sourceWidth,
+                $sourceHeight
+            );
+
+            return;
+        }
+
+        $cut = imagecreatetruecolor($sourceWidth, $sourceHeight);
+        imagealphablending($cut, false);
+        imagesavealpha($cut, true);
+        $transparent = imagecolorallocatealpha($cut, 0, 0, 0, 127);
+        imagefilledrectangle($cut, 0, 0, $sourceWidth, $sourceHeight, $transparent);
+
+        imagecopy($cut, $destinationImage, 0, 0, $destinationX, $destinationY, $sourceWidth, $sourceHeight);
+        imagecopy($cut, $sourceImage, 0, 0, $sourceX, $sourceY, $sourceWidth, $sourceHeight);
+        imagecopymerge($destinationImage, $cut, $destinationX, $destinationY, 0, 0, $sourceWidth, $sourceHeight, $opacityPercent);
+        imagedestroy($cut);
+    }
+
+    private function normalizeDirectory(string $directory): string
+    {
+        return trim(str_replace('\\', '/', $directory), '/');
+    }
+
+    private function resolveFilename(?string $filename, string $extension, string $prefix): string
+    {
+        $filename = trim((string) $filename);
+        if ($filename !== '') {
+            $base = pathinfo($filename, PATHINFO_FILENAME);
+            $currentExtension = strtolower((string) pathinfo($filename, PATHINFO_EXTENSION));
+            $resolvedExtension = $this->isRasterExtension($currentExtension) ? $currentExtension : $extension;
+
+            return $base . '.' . $resolvedExtension;
+        }
+
+        return trim($prefix, '-_ ') . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $extension;
+    }
+
+    private function resolveExtensionFromUpload(UploadedFile $file): string
+    {
+        return strtolower((string) ($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin'));
+    }
+
+    private function isRasterExtension(string $extension): bool
+    {
+        return in_array(strtolower(trim($extension)), self::SUPPORTED_RASTER_EXTENSIONS, true);
+    }
+
+    private function makeTempFile(string $extension): string
+    {
+        $extension = $this->isRasterExtension($extension) ? $extension : 'jpg';
+        $directory = storage_path('app/tmp-watermarks');
+
+        if (!is_dir($directory) && !@mkdir($directory, 0755, true) && !is_dir($directory)) {
+            throw new RuntimeException('Nao foi possivel preparar o diretorio temporario da marca d\'agua.');
+        }
+
+        return $directory . DIRECTORY_SEPARATOR . uniqid('wm_', true) . '.' . $extension;
+    }
+
+    private function toBoolean(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return in_array(strtolower(trim((string) $value)), ['1', 'true', 'on', 'yes'], true);
     }
 }

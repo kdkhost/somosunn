@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel\Admin;
 use App\Http\Controllers\Concerns\HandlesPlanFormData;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
+use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -41,7 +42,12 @@ class PlanController extends Controller
         $data = $this->validatePlanData($request);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('plan-images', 'public');
+            $data['image'] = app(WatermarkService::class)->processStorageImage(
+                $request->file('image'),
+                'plan-images',
+                null,
+                ['prefix' => 'plan']
+            );
         }
 
         DB::transaction(function () use ($data) {
@@ -77,7 +83,12 @@ class PlanController extends Controller
 
         if ($request->hasFile('image')) {
             $this->deletePlanImageIfExists($plan);
-            $data['image'] = $request->file('image')->store('plan-images', 'public');
+            $data['image'] = app(WatermarkService::class)->processStorageImage(
+                $request->file('image'),
+                'plan-images',
+                null,
+                ['prefix' => 'plan']
+            );
         }
 
         DB::transaction(function () use ($plan, $data) {

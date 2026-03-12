@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Enrollment;
 use App\Models\OrderItem;
+use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Course;
@@ -158,8 +159,12 @@ class CourseController extends Controller
         if ($request->hasFile('thumbnail')) {
             $file = $request->file('thumbnail');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/course-thumbs'), $fileName);
-            $data['thumbnail'] = 'uploads/course-thumbs/' . $fileName;
+            $data['thumbnail'] = app(WatermarkService::class)->processPublicImage(
+                $file,
+                'uploads/course-thumbs',
+                $fileName,
+                ['prefix' => 'course-thumb']
+            );
         }
 
         $course = Course::create($data + ['user_id' => auth()->id()]);
@@ -266,8 +271,12 @@ class CourseController extends Controller
         if ($request->hasFile('thumbnail')) {
             $file = $request->file('thumbnail');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/course-thumbs'), $fileName);
-            $data['thumbnail'] = 'uploads/course-thumbs/' . $fileName;
+            $data['thumbnail'] = app(WatermarkService::class)->processPublicImage(
+                $file,
+                'uploads/course-thumbs',
+                $fileName,
+                ['prefix' => 'course-thumb']
+            );
         }
 
         // Handle Instructor Signature Upload

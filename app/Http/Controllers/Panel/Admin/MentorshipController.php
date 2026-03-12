@@ -6,6 +6,7 @@ use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Mentorship;
 use App\Models\User;
+use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use App\Services\PointsService;
 use Illuminate\Http\Request;
@@ -65,8 +66,12 @@ class MentorshipController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $fileName = 'mentorship_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/mentorship-images'), $fileName);
-            $data['image'] = 'uploads/mentorship-images/' . $fileName;
+            $data['image'] = app(WatermarkService::class)->processPublicImage(
+                $file,
+                'uploads/mentorship-images',
+                $fileName,
+                ['prefix' => 'mentorship']
+            );
         }
 
         if ($request->hasFile('certificate_bg')) {
@@ -143,8 +148,12 @@ class MentorshipController extends Controller
             $this->deletePublicImageIfExists($mentorship->image);
             $file = $request->file('image');
             $fileName = 'mentorship_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/mentorship-images'), $fileName);
-            $data['image'] = 'uploads/mentorship-images/' . $fileName;
+            $data['image'] = app(WatermarkService::class)->processPublicImage(
+                $file,
+                'uploads/mentorship-images',
+                $fileName,
+                ['prefix' => 'mentorship']
+            );
         }
 
         if ($request->hasFile('certificate_bg')) {

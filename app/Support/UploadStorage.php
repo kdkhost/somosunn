@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Services\WatermarkService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -69,11 +70,32 @@ class UploadStorage
         return Storage::disk('public');
     }
 
-    public static function storeUploadedFile(UploadedFile $file, string $directory, ?string $filename = null): string
+    public static function storeUploadedFile(
+        UploadedFile $file,
+        string $directory,
+        ?string $filename = null,
+        array $options = []
+    ): string
     {
         $directory = trim(str_replace('\\', '/', $directory), '/');
         if (!$file->isValid()) {
             throw new RuntimeException('Arquivo enviado invalido ou corrompido.');
+        }
+
+        $shouldWatermark = array_key_exists('watermark', $options)
+            ? (bool) $options['watermark']
+            : (
+                app(WatermarkService::class)->isWatermarkableImage($file)
+                && app(WatermarkService::class)->shouldWatermarkUpload($directory)
+            );
+
+        if ($shouldWatermark) {
+            return app(WatermarkService::class)->processStorageImage(
+                $file,
+                $directory,
+                $filename,
+                ['prefix' => (string) ($options['prefix'] ?? 'image')]
+            );
         }
 
         if (self::isLocal()) {

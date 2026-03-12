@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Event;
 use App\Models\Setting;
+use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -199,7 +200,12 @@ class EventController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('event-images', 'public');
+            $validated['image'] = app(WatermarkService::class)->processStorageImage(
+                $request->file('image'),
+                'event-images',
+                null,
+                ['prefix' => 'event-cover']
+            );
         }
 
         // Define o criador do evento
@@ -324,7 +330,12 @@ class EventController extends Controller
 
         if ($request->hasFile('image')) {
             $this->deleteEventImageIfExists($event);
-            $validated['image'] = $request->file('image')->store('event-images', 'public');
+            $validated['image'] = app(WatermarkService::class)->processStorageImage(
+                $request->file('image'),
+                'event-images',
+                null,
+                ['prefix' => 'event-cover']
+            );
         }
 
         $data = $validated;

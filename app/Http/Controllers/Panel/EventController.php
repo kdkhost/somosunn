@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -44,8 +45,12 @@ class EventController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/event-images'), $fileName);
-            $data['image'] = 'uploads/event-images/' . $fileName;
+            $data['image'] = app(WatermarkService::class)->processPublicImage(
+                $file,
+                'uploads/event-images',
+                $fileName,
+                ['prefix' => 'event-cover']
+            );
         }
 
         $data['user_id'] = Auth::id();
@@ -84,8 +89,12 @@ class EventController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/event-images'), $fileName);
-            $data['image'] = 'uploads/event-images/' . $fileName;
+            $data['image'] = app(WatermarkService::class)->processPublicImage(
+                $file,
+                'uploads/event-images',
+                $fileName,
+                ['prefix' => 'event-cover']
+            );
         }
 
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');

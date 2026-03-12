@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\JobVacancy;
 use App\Models\JobApplication;
+use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -47,7 +48,12 @@ class JobController extends Controller
         $data['is_demo'] = $request->has('is_demo');
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('jobs', 'public');
+            $imagePath = app(WatermarkService::class)->processStorageImage(
+                $request->file('image'),
+                'jobs',
+                null,
+                ['prefix' => 'job']
+            );
             $data['image'] = 'storage/' . $imagePath;
         }
 
@@ -89,7 +95,12 @@ class JobController extends Controller
             if ($job->image && file_exists(public_path($job->image))) {
                 @unlink(public_path($job->image));
             }
-            $imagePath = $request->file('image')->store('jobs', 'public');
+            $imagePath = app(WatermarkService::class)->processStorageImage(
+                $request->file('image'),
+                'jobs',
+                null,
+                ['prefix' => 'job']
+            );
             $data['image'] = 'storage/' . $imagePath;
         }
 

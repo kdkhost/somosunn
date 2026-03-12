@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
@@ -206,6 +207,33 @@ class UploadChunkController extends Controller
             @unlink($outPath);
 
             return response()->json(['error' => 'Arquivo excede o limite de tamanho'], 422);
+        }
+
+        if ($isImage && app(WatermarkService::class)->isWatermarkableImage($outPath) && app(WatermarkService::class)->shouldWatermarkUpload('uploads')) {
+            $watermarkedPath = $outPath . '.wm.' . $ext;
+
+            try {
+                app(WatermarkService::class)->applyWatermarkToAbsolutePath($outPath, $watermarkedPath);
+
+                if (!@rename($watermarkedPath, $outPath)) {
+                    if (!@copy($watermarkedPath, $outPath)) {
+                        throw new \RuntimeException('Nao foi possivel substituir o arquivo final pela versao com marca d\'agua.');
+                    }
+
+                    @unlink($watermarkedPath);
+                }
+            } catch (\Throwable $e) {
+                @unlink($watermarkedPath);
+                @unlink($outPath);
+
+                Log::error('Failed to watermark assembled upload.', [
+                    'upload_id' => $uploadId,
+                    'filename' => $filename,
+                    'message' => $e->getMessage(),
+                ]);
+
+                return response()->json(['error' => 'Falha ao aplicar a marca d\'agua obrigatoria na imagem enviada'], 500);
+            }
         }
 
         $finalDisk = $targetDisk;
