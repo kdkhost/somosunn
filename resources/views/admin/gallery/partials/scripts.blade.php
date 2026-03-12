@@ -45,7 +45,7 @@
             $selectedSummary.text(`${files.length} arquivo(s) selecionado(s)`);
             $selectedSize.text(formatBytes(totalBytes));
             $selectedList.html(files.map((file, index) => `
-                <div class="d-flex justify-content-between align-items-center bg-white rounded-lg px-3 py-2 mb-2 border">
+                <div class="d-flex justify-content-between align-items-center bg-white rounded px-3 py-2 mb-2 border">
                     <span class="font-weight-bold text-dark text-truncate pr-3">${index + 1}. ${file.name}</span>
                     <span class="small text-muted font-weight-bold">${formatBytes(file.size || 0)}</span>
                 </div>
