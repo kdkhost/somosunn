@@ -61,8 +61,8 @@ class GalleryController extends Controller
      */
     public function upload(Request $request, WatermarkService $watermarkService)
     {
-        $perFileLimitBytes = UploadStorage::effectiveUploadLimitBytes(10 * 1024 * 1024)
-            ?? (10 * 1024 * 1024);
+        $perFileLimitBytes = UploadStorage::effectiveUploadLimitBytes(20 * 1024 * 1024)
+            ?? (20 * 1024 * 1024);
         $perFileLimitKilobytes = max(1, (int) ceil($perFileLimitBytes / 1024));
         $perFileLimitMegabytes = number_format($perFileLimitBytes / 1024 / 1024, 2, '.', '');
 
