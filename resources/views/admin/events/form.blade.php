@@ -465,6 +465,19 @@
                             <p class="text-muted mb-4">Faça o upload de fotos ou vídeos do evento. As imagens receberão uma marca d'água automaticamente com o nome da plataforma e do organizador.</p>
 
                             {{-- Input real oculto, acionado via JS ao clicar na drop-zone --}}
+                            <div class="alert alert-light border d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+                                <div class="pr-md-4 mb-3 mb-md-0">
+                                    <div class="font-weight-bold text-dark">Armazenamento e gestao rapida</div>
+                                    <small class="text-muted d-block">
+                                        As imagens ficam em <code>storage/app/public/events/{{ $event->id }}/gallery</code> e os videos em <code>storage/app/public/events/{{ $event->id }}/gallery/videos</code>.
+                                    </small>
+                                </div>
+                                <a href="{{ route('admin.gallery.index', ['event_id' => $event->id]) }}"
+                                    class="btn btn-outline-primary rounded-pill px-4">
+                                    <i class="fas fa-images mr-2"></i> Abrir galeria completa do evento
+                                </a>
+                            </div>
+
                             <input type="file" id="adminGalleryInput" multiple accept="image/*,video/*" style="display:none;">
 
                             <div class="premium-upload-box mb-4" id="eventMediaUploadBox">

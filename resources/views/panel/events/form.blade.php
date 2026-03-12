@@ -79,6 +79,20 @@
                 <p class="text-sm text-gray-500 mb-4">Faça o upload de fotos ou vídeos do evento. As imagens receberão uma marca
                     d'água automaticamente com o nome do organizador e a data.</p>
 
+                <div class="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <p class="text-sm font-black text-slate-900">Armazenamento e acesso rapido</p>
+                        <p class="mt-1 text-xs leading-6 text-slate-500">
+                            As imagens ficam em <code>storage/app/public/events/{{ $event->id }}/gallery</code> e os videos em <code>storage/app/public/events/{{ $event->id }}/gallery/videos</code>.
+                        </p>
+                    </div>
+                    <a href="{{ route('panel.gallery.index', ['event_id' => $event->id]) }}"
+                        class="inline-flex items-center justify-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-2 text-sm font-bold text-blue-700 transition hover:border-blue-300 hover:bg-blue-50">
+                        <i class="fas fa-images"></i>
+                        Abrir galeria completa do evento
+                    </a>
+                </div>
+
                 <div class="mb-4">
                     <input type="file" id="galleryInput" multiple accept="image/*,video/*" class="block w-full text-sm text-slate-500
                             file:mr-4 file:py-2 file:px-4
