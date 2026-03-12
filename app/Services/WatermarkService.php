@@ -320,24 +320,12 @@ class WatermarkService
     {
         $candidates = [
             Setting::get('watermark_image'),
-            Setting::get('site_logo_light'),
-            Setting::get('logo_front'),
-            Setting::get('logo_image'),
         ];
 
         foreach ($candidates as $candidate) {
             $path = $this->resolvePhysicalPath((string) $candidate);
             if ($path !== null && $this->isRasterExtension((string) pathinfo($path, PATHINFO_EXTENSION))) {
                 return $path;
-            }
-        }
-
-        foreach ([
-            public_path('img/logo.png'),
-            public_path('images/logo.png'),
-        ] as $fallback) {
-            if (is_file($fallback)) {
-                return $fallback;
             }
         }
 
@@ -416,9 +404,9 @@ class WatermarkService
             $position = 'bottom-right';
         }
 
-        $opacity = (int) Setting::get('image_watermark_opacity', Setting::get('watermark_opacity', 55));
-        $sizePercent = (int) Setting::get('image_watermark_size_percent', 18);
-        $margin = (int) Setting::get('image_watermark_margin', 24);
+        $opacity = (int) Setting::get('image_watermark_opacity', Setting::get('watermark_opacity', 30));
+        $sizePercent = (int) Setting::get('image_watermark_size_percent', 12);
+        $margin = (int) Setting::get('image_watermark_margin', 20);
 
         return [
             'position' => $position,

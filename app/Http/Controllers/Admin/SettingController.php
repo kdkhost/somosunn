@@ -134,6 +134,10 @@ class SettingController extends Controller
             return redirect()->back()->withInput()->with('error', 'A imagem do Twitter precisa ter pelo menos 1200×628px.');
         }
 
+        if ($request->hasFile('watermark_image') && !$this->watermarkFileIsSupported($request->file('watermark_image'))) {
+            return redirect()->back()->withInput()->with('error', 'A marca d\'agua das imagens deve ser enviada em PNG ou WEBP com fundo transparente.');
+        }
+
         $plyrOptionsJson = trim((string) $request->input('video_plyr_options_json', ''));
         if ($plyrOptionsJson !== '') {
             try {
@@ -272,6 +276,7 @@ class SettingController extends Controller
             'appearance' => ['preloader_enabled'],
             'player' => [
                 'video_player_enabled',
+                'image_watermark_enabled',
                 'video_plyr_autoplay',
                 'video_plyr_muted',
                 'video_plyr_click_to_play',
@@ -395,6 +400,9 @@ class SettingController extends Controller
 
         foreach ([
             'video_plyr_seek_time' => ['min' => 0, 'max' => 120],
+            'image_watermark_opacity' => ['min' => 5, 'max' => 100],
+            'image_watermark_size_percent' => ['min' => 1, 'max' => 60],
+            'image_watermark_margin' => ['min' => 0, 'max' => 300],
             'video_plyr_speed_selected' => ['min' => 0, 'max' => 10],
             'video_watermark_size_percent' => ['min' => 1, 'max' => 100],
             'video_watermark_margin' => ['min' => 0, 'max' => 200],
@@ -436,6 +444,12 @@ class SettingController extends Controller
             $allowed = ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'];
             $value = trim((string) $data['video_watermark_position']);
             $data['video_watermark_position'] = in_array($value, $allowed, true) ? $value : 'top-right';
+        }
+
+        if (array_key_exists('image_watermark_position', $data)) {
+            $allowed = ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'];
+            $value = trim((string) $data['image_watermark_position']);
+            $data['image_watermark_position'] = in_array($value, $allowed, true) ? $value : 'bottom-right';
         }
 
         if (array_key_exists('video_watermark_blend', $data)) {
@@ -828,6 +842,17 @@ class SettingController extends Controller
         }
     }
 
+    private function watermarkFileIsSupported($file): bool
+    {
+        if (!$file || !$file->isValid()) {
+            return false;
+        }
+
+        $extension = strtolower((string) ($file->getClientOriginalExtension() ?: $file->extension() ?: ''));
+
+        return in_array($extension, ['png', 'webp'], true);
+    }
+
     private function buildRecaptchaStatus(array $settings): array
     {
         $siteKey = trim((string) ($settings['recaptcha_v3_site_key'] ?? config('services.recaptcha.site_key', '')));
@@ -1163,6 +1188,13 @@ class SettingController extends Controller
 
             $file = $request->file('file');
             $key = $request->input('key');
+
+            if ($key === 'watermark_image' && !$this->watermarkFileIsSupported($file)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Use um arquivo PNG ou WEBP com fundo transparente para a marca d\'agua.'
+                ], 422);
+            }
 
             // Define destination folder by setting key
             $directory = 'uploads/imagens/geral';

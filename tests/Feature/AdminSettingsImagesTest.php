@@ -75,4 +75,40 @@ class AdminSettingsImagesTest extends TestCase
         $this->assertSame('', (string) Setting::where('key', 'logo_image')->value('value'));
         $this->assertFileDoesNotExist(public_path($savedPath));
     }
+
+    public function test_admin_settings_player_persists_image_watermark_controls(): void
+    {
+        $this->withoutMiddleware();
+
+        $response = $this->post(route('admin.settings.update'), [
+            'current_group' => 'player',
+            'image_watermark_enabled' => '1',
+            'image_watermark_position' => 'center',
+            'image_watermark_opacity' => '26',
+            'image_watermark_size_percent' => '11',
+            'image_watermark_margin' => '18',
+        ]);
+
+        $response->assertRedirect();
+
+        $this->assertSame('1', (string) Setting::where('key', 'image_watermark_enabled')->value('value'));
+        $this->assertSame('center', (string) Setting::where('key', 'image_watermark_position')->value('value'));
+        $this->assertSame('26', (string) Setting::where('key', 'image_watermark_opacity')->value('value'));
+        $this->assertSame('11', (string) Setting::where('key', 'image_watermark_size_percent')->value('value'));
+        $this->assertSame('18', (string) Setting::where('key', 'image_watermark_margin')->value('value'));
+    }
+
+    public function test_admin_settings_rejects_non_transparent_watermark_format(): void
+    {
+        $this->withoutMiddleware();
+
+        $file = UploadedFile::fake()->create('watermark.jpg', 64, 'image/jpeg');
+
+        $this->post(route('admin.settings.update'), [
+            'current_group' => 'player',
+            'watermark_image' => $file,
+        ])->assertRedirect()->assertSessionHas('error');
+
+        $this->assertNull(Setting::where('key', 'watermark_image')->value('value'));
+    }
 }
