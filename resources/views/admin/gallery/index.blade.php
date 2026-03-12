@@ -14,6 +14,8 @@
         $selectedEventDate = $selectedEvent?->start_at
             ? \Carbon\Carbon::parse($selectedEvent->start_at)->format('d/m/Y H:i')
             : null;
+        $galleryUploadPerFileLimitBytes = \App\Support\UploadStorage::effectiveUploadLimitBytes(20 * 1024 * 1024) ?? (20 * 1024 * 1024);
+        $galleryUploadPerFileLimitMb = number_format($galleryUploadPerFileLimitBytes / 1024 / 1024, 2, '.', '');
         $selectedCoverUrl = $selectedEvent?->gallery_cover_url ?: asset('img/logo.svg');
         $selectedHasCustomCover = $selectedEvent && !blank($selectedEvent->gallery_cover_image);
         $filteredMediaCount = (int) $media->total();

@@ -1,8 +1,3 @@
-@php
-    $galleryUploadPerFileLimitBytes = \App\Support\UploadStorage::effectiveUploadLimitBytes(20 * 1024 * 1024) ?? (20 * 1024 * 1024);
-    $galleryUploadPerFileLimitMb = number_format($galleryUploadPerFileLimitBytes / 1024 / 1024, 2, '.', '');
-@endphp
-
 <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">

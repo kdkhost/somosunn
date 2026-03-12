@@ -1,3 +1,7 @@
+@php
+    $galleryUploadPerFileLimitBytes = $galleryUploadPerFileLimitBytes ?? (\App\Support\UploadStorage::effectiveUploadLimitBytes(20 * 1024 * 1024) ?? (20 * 1024 * 1024));
+@endphp
+
 <script>
     $(function () {
         const $modal = $('#uploadModal');
