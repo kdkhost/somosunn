@@ -172,6 +172,27 @@
             overflow-y: auto;
         }
 
+        .gallery-admin-selected-item {
+            gap: .85rem;
+        }
+
+        .gallery-admin-selected-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: .75rem;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #e9ecef;
+            border: 1px solid #dee2e6;
+        }
+
+        .gallery-admin-selected-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
         .gallery-admin-pagination .pagination {
             margin-bottom: 0;
         }

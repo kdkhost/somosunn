@@ -17,6 +17,15 @@
         const $selectedList = $('#adminSelectedList');
         const fileInputElement = document.getElementById('adminFileInput');
 
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         function syncSelectedFiles(files) {
             if (!fileInputElement) {
                 return;
@@ -59,12 +68,24 @@
             $selectedFiles.removeClass('d-none');
             $selectedSummary.text(`${files.length} arquivo(s) selecionado(s)`);
             $selectedSize.text(formatBytes(totalBytes));
-            $selectedList.html(files.map((file, index) => `
-                <div class="d-flex justify-content-between align-items-center bg-white rounded px-3 py-2 mb-2 border">
-                    <span class="font-weight-bold text-dark text-truncate pr-3">${index + 1}. ${file.name}</span>
-                    <span class="small text-muted font-weight-bold">${formatBytes(file.size || 0)}</span>
-                </div>
-            `).join(''));
+            $selectedList.html(files.map((file, index) => {
+                const previewUrl = URL.createObjectURL(file);
+
+                return `
+                    <div class="gallery-admin-selected-item d-flex justify-content-between align-items-center bg-white rounded px-3 py-2 mb-2 border">
+                        <div class="d-flex align-items-center gallery-admin-selected-item">
+                            <div class="gallery-admin-selected-preview">
+                                <img src="${previewUrl}" alt="${escapeHtml(file.name)}">
+                            </div>
+                            <div class="min-width-0">
+                                <p class="font-weight-bold text-dark text-truncate mb-1">${index + 1}. ${escapeHtml(file.name)}</p>
+                                <p class="small text-muted mb-0">${formatBytes(file.size || 0)}</p>
+                            </div>
+                        </div>
+                        <span class="badge badge-light text-muted">${(file.type || 'imagem').replace('image/', '').toUpperCase()}</span>
+                    </div>
+                `;
+            }).join(''));
         }
 
         function setProgress(percent, label) {
@@ -164,13 +185,14 @@
                 }
 
                 if (xhr.status >= 200 && xhr.status < 300 && payload && payload.success) {
-                    setProgress(100, 'Upload concluido');
+                    setProgress(100, 'Upload concluido. Fechando modal...');
+                    $('#uploadModal').modal('hide');
 
                     Swal.fire({
                         icon: 'success',
                         title: 'Galeria atualizada',
                         text: payload.message || 'As imagens foram publicadas com sucesso.',
-                        timer: 2200,
+                        timer: 1800,
                         showConfirmButton: false
                     }).then(() => window.location.reload());
 
