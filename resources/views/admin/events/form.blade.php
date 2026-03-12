@@ -459,29 +459,29 @@
                 <!-- TAB GALERIA -->
                 @if($event->exists)
                 <div class="tab-pane fade" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
-                    <div class="card shadow-sm border-0 mt-3" style="overflow:hidden">
+                    <div class="card shadow-sm border-0 mt-3 event-gallery-panel" style="overflow:hidden">
                         <div class="card-body">
                             <h4 class="mb-3">Galeria de Fotos e Vídeos do Evento</h4>
                             <p class="text-muted mb-4">Faça o upload de fotos ou vídeos do evento. As imagens receberão uma marca d'água automaticamente com o nome da plataforma e do organizador.</p>
 
                             {{-- Input real oculto, acionado via JS ao clicar na drop-zone --}}
-                            <div class="alert alert-light border d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
-                                <div class="pr-md-4 mb-3 mb-md-0">
+                            <div class="alert alert-light border d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 event-gallery-toolbar">
+                                <div class="pr-md-4 mb-3 mb-md-0 event-gallery-toolbar__content">
                                     <div class="font-weight-bold text-dark">Armazenamento e gestao rapida</div>
                                     <small class="text-muted d-block">
                                         As imagens ficam em <code>storage/app/public/events/{{ $event->id }}/gallery</code> e os videos em <code>storage/app/public/events/{{ $event->id }}/gallery/videos</code>.
                                     </small>
                                 </div>
                                 <a href="{{ route('admin.gallery.index', ['event_id' => $event->id]) }}"
-                                    class="btn btn-outline-primary rounded-pill px-4">
+                                    class="btn event-gallery-toolbar__action rounded-pill px-4 py-2 font-weight-bold">
                                     <i class="fas fa-images mr-2"></i> Abrir galeria completa do evento
                                 </a>
                             </div>
 
                             <input type="file" id="adminGalleryInput" multiple accept="image/*,video/*" style="display:none;">
 
-                            <div class="premium-upload-box mb-4" id="eventMediaUploadBox">
-                                <div class="drop-zone-area p-5 text-center rounded" id="eventDropZone"
+                            <div class="premium-upload-box mb-4 event-gallery-upload-box" id="eventMediaUploadBox">
+                                <div class="drop-zone-area p-5 text-center rounded event-gallery-drop-zone" id="eventDropZone"
                                     style="border: 2px dashed #d0dae8; background: #f8fafc; cursor:pointer; transition: all 0.2s;">
                                     <div class="drop-zone-content">
                                         <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3 d-block"></i>
@@ -514,9 +514,9 @@
                             <hr>
 
                             <!-- Existing Media -->
-                            <div class="row mt-4" id="adminGalleryContainer">
+                            <div class="row mt-4 event-gallery-media-grid" id="adminGalleryContainer">
                                 @forelse($event->media as $media)
-                                <div class="col-6 col-md-4 col-lg-3 mb-4" id="admin-media-{{ $media->id }}">
+                                <div class="col-6 col-md-4 col-lg-3 mb-4 event-gallery-media-item" id="admin-media-{{ $media->id }}">
                                     <div class="card h-100 position-relative group">
                                         @if($media->type === 'image')
                                             <a href="{{ asset('storage/'.$media->file_path) }}" data-fancybox="gallery">
@@ -565,6 +565,66 @@
             opacity: 0.7;
             z-index: 1000;
             border: 1px solid #007bff !important;
+        }
+
+        .event-gallery-panel,
+        .event-gallery-panel .card-body {
+            overflow-x: hidden;
+        }
+
+        .event-gallery-toolbar {
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .event-gallery-toolbar__content {
+            min-width: 0;
+            flex: 1 1 26rem;
+        }
+
+        .event-gallery-toolbar__action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: min(100%, 360px);
+            white-space: normal;
+            text-align: center;
+            line-height: 1.35;
+            color: #fff !important;
+            background: linear-gradient(135deg, #0d6efd, #1d4ed8);
+            border: 1px solid rgba(29, 78, 216, 0.35);
+            box-shadow: 0 14px 30px rgba(29, 78, 216, 0.2);
+        }
+
+        .event-gallery-toolbar__action:hover,
+        .event-gallery-toolbar__action:focus {
+            color: #fff !important;
+            background: linear-gradient(135deg, #0b5ed7, #1e40af);
+            border-color: rgba(30, 64, 175, 0.45);
+        }
+
+        .event-gallery-upload-box,
+        .event-gallery-drop-zone {
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .event-gallery-media-grid {
+            margin-left: -10px;
+            margin-right: -10px;
+            overflow-x: hidden;
+        }
+
+        .event-gallery-media-grid > [class*="col-"] {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        @media (max-width: 767.98px) {
+            .event-gallery-toolbar__action {
+                width: 100%;
+                min-width: 0;
+            }
         }
     </style>
 @endpush
@@ -676,7 +736,7 @@ async function uploadAdminGallery(files) {
                         : `<div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 150px;"><i class="fas fa-video text-white fa-3x"></i></div>`;
 
                     container.insertAdjacentHTML('afterbegin', `
-                        <div class="col-6 col-md-4 col-lg-3 mb-4" id="admin-media-${media.id}">
+                        <div class="col-6 col-md-4 col-lg-3 mb-4 event-gallery-media-item" id="admin-media-${media.id}">
                             <div class="card h-100 position-relative group">
                                 ${preview}
                                 <button type="button" onclick="deleteAdminMedia(${media.id})" class="btn btn-danger btn-sm position-absolute" style="top: 5px; right: 5px;">
