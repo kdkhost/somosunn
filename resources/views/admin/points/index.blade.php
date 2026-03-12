@@ -130,6 +130,7 @@
                                             @if($r->repeatable)
                                                 <div class="mt-2">
                                                     <span class="badge badge-info">
+                                                        <i class="fas fa-sync-alt mr-1" aria-hidden="true"></i>
                                                         Recorrente{{ $r->max_daily ? ' · max ' . $r->max_daily . '/dia' : '' }}
                                                     </span>
                                                 </div>

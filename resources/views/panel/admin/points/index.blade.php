@@ -188,6 +188,7 @@
                                     </span>
                                     @if($rule->repeatable)
                                         <span class="rounded-full bg-indigo-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">
+                                            <i class="fas fa-sync-alt mr-1" aria-hidden="true"></i>
                                             Repetivel{{ $rule->max_daily ? ' · max ' . $rule->max_daily . '/dia' : '' }}
                                         </span>
                                     @endif

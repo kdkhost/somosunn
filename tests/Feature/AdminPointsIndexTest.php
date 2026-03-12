@@ -81,6 +81,14 @@ class AdminPointsIndexTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::create('events', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->timestamp('start_at')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('key')->unique();
@@ -129,6 +137,7 @@ class AdminPointsIndexTest extends TestCase
             ->assertOk()
             ->assertSee('Login diario')
             ->assertSee('Recorrente')
+            ->assertSee('fa-sync-alt', false)
             ->assertSee('max 1/dia');
     }
 }
