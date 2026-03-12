@@ -11,7 +11,9 @@
                         <h3 class="card-title mb-0">
                             <i class="fas fa-qrcode mr-2"></i> Scanner de Ingresso
                         </h3>
-                        <a href="{{ route('admin.events.show', $event) }}" class="btn btn-sm btn-light">
+                        <a href="{{ route('admin.events.show', $event) }}"
+                            class="btn btn-sm font-weight-bold shadow-sm"
+                            style="background: rgba(255, 255, 255, 0.95); color: #0f172a; border: 1px solid rgba(15, 23, 42, 0.12);">
                             <i class="fas fa-arrow-left"></i> Voltar pro Evento
                         </a>
                     </div>
