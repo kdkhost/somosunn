@@ -27,7 +27,7 @@
         const scopedTotalValue = document.getElementById('adminGalleryScopeCount');
         const resultCountValue = document.getElementById('adminGalleryResultCount');
         const perFileLimitBytes = Math.max(1, parseInt('{{ $galleryUploadPerFileLimitBytes }}', 10) || (20 * 1024 * 1024));
-        const mediaStoreUrlTemplate = '{{ url('/admin/events/__EVENT__/media') }}';
+        const uploadUrl = String($form.attr('action') || '{{ route('admin.gallery.upload') }}');
         let uploadQueue = [];
         let isUploading = false;
         let queueSeed = 0;
@@ -625,6 +625,7 @@
             const formData = new FormData();
             const startedAt = Date.now();
 
+            formData.append('event_id', selectedEventId);
             formData.append('files[]', item.file);
             item.state = 'uploading';
             item.progress = 0;
@@ -637,7 +638,7 @@
 
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
-                xhr.open('POST', mediaStoreUrlTemplate.replace('__EVENT__', selectedEventId), true);
+                xhr.open('POST', uploadUrl, true);
                 xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                 xhr.setRequestHeader('Accept', 'application/json');

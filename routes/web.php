@@ -585,11 +585,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
     Route::get('fonts/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('fonts.api.active');
     Route::resource('fonts', \App\Http\Controllers\Admin\CustomFontController::class);
+    Route::post('gallery/upload', [\App\Http\Controllers\Admin\GalleryController::class, 'upload'])->name('gallery.upload');
+    Route::post('gallery/events/{event}/cover/upload', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadCover'])->name('gallery.cover.upload');
+    Route::post('gallery/media/{media}/cover', [\App\Http\Controllers\Admin\GalleryController::class, 'setCoverFromMedia'])->name('gallery.cover.media');
+    Route::delete('gallery/events/{event}/cover', [\App\Http\Controllers\Admin\GalleryController::class, 'clearCover'])->name('gallery.cover.clear');
     Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
 
     // Media Routes (Standardized)
-    Route::post('events/{event}/media', [\App\Http\Controllers\Panel\EventMediaController::class, 'store'])->name('events.media.store');
-    Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Panel\EventMediaController::class, 'destroy'])->name('events.media.destroy');
+    Route::post('events/{event}/media', [\App\Http\Controllers\Admin\EventMediaController::class, 'store'])->name('events.media.store');
+    Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Admin\EventMediaController::class, 'destroy'])->name('events.media.destroy');
     Route::post('mentorships/{mentorship}/media', [\App\Http\Controllers\Panel\MentorshipMediaController::class, 'store'])->name('mentorships.media.store');
     Route::delete('mentorships/{mentorship}/media/{media}', [\App\Http\Controllers\Panel\MentorshipMediaController::class, 'destroy'])->name('mentorships.media.destroy');
 });
