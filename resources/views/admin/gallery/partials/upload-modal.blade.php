@@ -33,6 +33,7 @@
                                 required
                                 accept="image/jpeg,image/png,image/jpg,image/webp"
                                 id="adminFileInput"
+                                onchange="window.adminGallerySyncSelection && window.adminGallerySyncSelection(this.files)"
                                 class="sr-only">
 
                             <label for="adminFileInput" class="gallery-admin-dropzone-label mb-0 d-flex flex-column align-items-center justify-content-center">
@@ -45,6 +46,10 @@
                                     <i class="fas fa-folder-open mr-1"></i>Selecionar arquivos
                                 </span>
                             </label>
+
+                            <div id="adminInlinePreview" class="gallery-admin-inline-preview d-none">
+                                <div class="gallery-admin-inline-preview-grid" id="adminInlinePreviewGrid"></div>
+                            </div>
                         </div>
                     </div>
 

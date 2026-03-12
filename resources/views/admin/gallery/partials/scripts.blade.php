@@ -15,7 +15,10 @@
         const $selectedSummary = $('#adminSelectedSummary');
         const $selectedSize = $('#adminSelectedSize');
         const $selectedList = $('#adminSelectedList');
+        const $inlinePreview = $('#adminInlinePreview');
+        const $inlinePreviewGrid = $('#adminInlinePreviewGrid');
         const fileInputElement = document.getElementById('adminFileInput');
+        let previewObjectUrls = [];
 
         function escapeHtml(value) {
             return String(value || '')
@@ -54,12 +57,16 @@
 
         function updateSelectedFiles() {
             const files = Array.from(fileInputElement?.files || []);
+            previewObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+            previewObjectUrls = [];
 
             if (files.length === 0) {
                 $selectedFiles.addClass('d-none');
                 $selectedSummary.text('');
                 $selectedSize.text('');
                 $selectedList.html('');
+                $inlinePreview.addClass('d-none');
+                $inlinePreviewGrid.html('');
                 return;
             }
 
@@ -70,6 +77,7 @@
             $selectedSize.text(formatBytes(totalBytes));
             $selectedList.html(files.map((file, index) => {
                 const previewUrl = URL.createObjectURL(file);
+                previewObjectUrls.push(previewUrl);
 
                 return `
                     <div class="gallery-admin-selected-item d-flex justify-content-between align-items-center bg-white rounded px-3 py-2 mb-2 border">
@@ -83,6 +91,16 @@
                             </div>
                         </div>
                         <span class="badge badge-light text-muted">${(file.type || 'imagem').replace('image/', '').toUpperCase()}</span>
+                    </div>
+                `;
+            }).join(''));
+            $inlinePreview.removeClass('d-none');
+            $inlinePreviewGrid.html(files.map((file, index) => {
+                const previewUrl = previewObjectUrls[index];
+
+                return `
+                    <div class="gallery-admin-inline-preview-item" title="${escapeHtml(file.name)}">
+                        <img src="${previewUrl}" alt="${escapeHtml(file.name)}">
                     </div>
                 `;
             }).join(''));
@@ -106,6 +124,16 @@
             updateSelectedFiles();
         }
 
+        window.adminGallerySyncSelection = function(files) {
+            const selected = Array.from(files || []);
+            if (selected.length === 0) {
+                return;
+            }
+
+            syncSelectedFiles(selected);
+            updateSelectedFiles();
+        };
+
         $dropzone.on('click', function(e) {
             if ($(e.target).closest('input, label, button, a').length) {
                 return;
@@ -124,6 +152,7 @@
         });
 
         $fileInput.on('change', updateSelectedFiles);
+        fileInputElement?.addEventListener('change', updateSelectedFiles);
 
         $dropzone.on('dragover dragenter', function(e) {
             e.preventDefault();
@@ -186,15 +215,15 @@
 
                 if (xhr.status >= 200 && xhr.status < 300 && payload && payload.success) {
                     setProgress(100, 'Upload concluido. Fechando modal...');
-                    $('#uploadModal').modal('hide');
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Galeria atualizada',
-                        text: payload.message || 'As imagens foram publicadas com sucesso.',
-                        timer: 1800,
-                        showConfirmButton: false
-                    }).then(() => window.location.reload());
+                    $('#uploadModal').one('hidden.bs.modal', function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Galeria atualizada',
+                            text: payload.message || 'As imagens foram publicadas com sucesso.',
+                            timer: 1800,
+                            showConfirmButton: false
+                        }).then(() => window.location.reload());
+                    }).modal('hide');
 
                     return;
                 }
@@ -226,6 +255,10 @@
             $selectedSummary.text('');
             $selectedSize.text('');
             $selectedList.html('');
+            $inlinePreview.addClass('d-none');
+            $inlinePreviewGrid.html('');
+            previewObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+            previewObjectUrls = [];
             setProgress(0, 'Aguardando selecao dos arquivos.');
             $dropzone.removeClass('dragover');
         });
