@@ -34,6 +34,9 @@ class GalleryController extends Controller
             ->withCount('media')
             ->orderBy('start_at', 'desc')
             ->get();
+        $uploadEvents = $events
+            ->filter(fn (Event $event) => $this->canManageEvent($event))
+            ->values();
 
         $selectedEvent = $request->filled('event_id')
             ? $events->firstWhere('id', (int) $request->event_id)
@@ -50,6 +53,7 @@ class GalleryController extends Controller
         return view('panel.gallery.index', compact(
             'media',
             'events',
+            'uploadEvents',
             'selectedEvent',
             'stats',
             'canManageSelectedEvent'

@@ -38,6 +38,7 @@
                 method="POST"
                 enctype="multipart/form-data"
                 data-panel-upload-progress="false"
+                data-upload-url-template="{{ url('/painel/events/__EVENT__/media') }}"
                 novalidate
                 class="flex min-h-0 flex-1 flex-col">
                 @csrf
@@ -53,11 +54,13 @@
                                     <select id="gallery-upload-event" name="event_id"
                                         class="w-full appearance-none rounded-[1.6rem] border border-slate-200 bg-slate-50 px-5 py-4 pr-12 text-sm font-bold text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-blue-500 dark:focus:ring-blue-500/10">
                                         <option value="">Selecione um evento...</option>
-                                        @foreach($events as $event)
+                                        @forelse(($uploadEvents ?? collect()) as $event)
                                             <option value="{{ $event->id }}" @selected($selectedEventId === (int) $event->id)>
                                                 {{ $event->title }}@if($event->start_at) - {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y') }}@endif
                                             </option>
-                                        @endforeach
+                                        @empty
+                                            <option value="" disabled>Voce ainda nao possui eventos com permissao de envio.</option>
+                                        @endforelse
                                     </select>
                                     <span class="pointer-events-none absolute inset-y-0 right-5 flex items-center text-slate-400">
                                         <i class="fas fa-chevron-down text-xs"></i>

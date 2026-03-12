@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const lightboxTitle = document.getElementById('gallery-lightbox-title');
     const eventField = uploadForm?.querySelector('[name="event_id"]');
     const csrfToken = uploadForm?.querySelector('input[name="_token"]')?.value || '';
+    const uploadUrlTemplate = uploadForm?.dataset.uploadUrlTemplate || '';
     const perFileLimitBytes = Math.max(1, parseInt(@json($galleryUploadPerFileLimitBytes), 10) || @json($galleryUploadPerFileLimitBytes));
     let queue = [];
     let isUploading = false;
@@ -217,6 +218,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!message && xhr.responseText) message = stripHtml(xhr.responseText);
         if (!message) message = 'Falha ao enviar as fotos para a galeria.';
         if (xhr.status === 413) message = `O servidor recusou o arquivo por exceder o limite permitido de ${fmtBytes(perFileLimitBytes)}.`;
+        if (xhr.status === 403 && !payload?.message) message = 'Voce nao tem permissao para enviar fotos para este evento.';
         if (xhr.status === 419) message = 'Sua sessao expirou. Recarregue a pagina e tente novamente.';
         if (xhr.status >= 500 && !payload?.message) message = 'O servidor encontrou um erro interno ao processar o upload.';
         return message;
@@ -225,8 +227,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function sendSingleFile(item, index, total) {
         const formData = new FormData();
         const startedAt = Date.now();
+        const selectedEventId = String(eventField?.value || '').trim();
+        const targetUrl = uploadUrlTemplate && selectedEventId
+            ? uploadUrlTemplate.replace('__EVENT__', selectedEventId)
+            : uploadForm.action;
         if (csrfToken) formData.append('_token', csrfToken);
-        formData.append('event_id', String(eventField?.value || '').trim());
         formData.append('files[]', item.file);
         item.state = 'uploading';
         item.progress = 0;
@@ -235,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
         renderQueue();
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', uploadForm.action, true);
+            xhr.open('POST', targetUrl, true);
             if (csrfToken) xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.setRequestHeader('Accept', 'application/json');
