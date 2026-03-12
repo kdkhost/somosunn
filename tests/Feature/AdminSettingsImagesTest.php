@@ -151,6 +151,33 @@ class AdminSettingsImagesTest extends TestCase
         $this->assertFileExists(public_path($savedPath));
     }
 
+    public function test_admin_settings_ads_accepts_encoded_html_payloads(): void
+    {
+        $this->withoutMiddleware();
+
+        $globalCode = <<<'HTML'
+<script async src="https://example.com/ad.js"></script>
+<div class="ad-slot">Banner</div>
+HTML;
+
+        $feedCode = <<<'HTML'
+<script>console.log("feed-ad");</script>
+HTML;
+
+        $response = $this->post(route('admin.settings.update'), [
+            'current_group' => 'ads',
+            'ads_enabled' => '1',
+            'ads_code_html_encoded' => rtrim(strtr(base64_encode($globalCode), '+/', '-_'), '='),
+            'ads_inter_feed_code_encoded' => rtrim(strtr(base64_encode($feedCode), '+/', '-_'), '='),
+        ]);
+
+        $response->assertRedirect();
+
+        $this->assertSame($globalCode, (string) Setting::where('key', 'ads_code_html')->value('value'));
+        $this->assertSame($feedCode, (string) Setting::where('key', 'ads_inter_feed_code')->value('value'));
+        $this->assertSame('1', (string) Setting::where('key', 'ads_enabled')->value('value'));
+    }
+
     private function makeWatermarkUpload(bool $transparent): UploadedFile
     {
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wm_' . bin2hex(random_bytes(6)) . '.png';
