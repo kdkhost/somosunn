@@ -178,13 +178,26 @@ class EventMediaController extends Controller
     private function serializeMediaCollection(Event $event, array $mediaItems): array
     {
         return array_map(function (EventMedia $media) use ($event) {
+            $media->loadMissing(['event', 'user']);
+            $owner = $media->user;
+
             return [
                 'id' => $media->id,
+                'event_id' => $media->event_id,
                 'type' => $media->type,
                 'url' => UploadStorage::url($media->file_path),
                 'watermarked' => (bool) $media->watermarked,
+                'event_title' => $event->title ?: 'Evento sem titulo',
+                'event_date' => $event->start_at?->format('d/m/Y'),
+                'owner_name' => optional($owner)->name ?: 'Sistema',
+                'owner_avatar' => optional($owner)->profile_photo_url ?: '',
                 'uploaded_at' => $media->created_at?->format('d/m/Y H:i'),
-                'delete_url' => route('admin.events.media.destroy', [$event, $media]),
+                'is_cover' => false,
+                'can_delete' => true,
+                'can_set_cover' => $media->type === 'image',
+                'set_cover_url' => route('admin.gallery.cover.media', $media),
+                'delete_url' => route('admin.gallery.destroy', $media),
+                'event_delete_url' => route('admin.events.media.destroy', [$event, $media]),
             ];
         }, $mediaItems);
     }

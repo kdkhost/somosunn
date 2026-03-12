@@ -46,84 +46,11 @@ class GalleryController extends Controller
     {
         $request->validate([
             'event_id' => 'required|exists:events,id',
-            'files' => 'required|array|min:1',
-            'files.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
         ]);
 
-        $event = Event::findOrFail($request->event_id);
-        $uploadedMedia = [];
-        $failedFiles = [];
+        $event = Event::findOrFail($request->integer('event_id'));
 
-        foreach ($request->file('files', []) as $file) {
-            $targetDirectory = 'events/' . $event->id . '/gallery';
-            $shouldWatermark = $watermarkService->isWatermarkableImage($file)
-                && $watermarkService->shouldWatermarkUpload($targetDirectory);
-
-            try {
-                $path = $watermarkService->processEventImage($file, $event);
-                $uploadedMedia[] = EventMedia::create([
-                    'event_id' => $event->id,
-                    'user_id' => auth()->id(),
-                    'file_path' => $path,
-                    'type' => 'image',
-                    'watermarked' => $shouldWatermark,
-                ]);
-            } catch (\Throwable $exception) {
-                \Log::error('Admin gallery upload error: ' . $exception->getMessage(), [
-                    'event_id' => $event->id,
-                    'file' => $file->getClientOriginalName(),
-                ]);
-
-                try {
-                    $path = UploadStorage::storeUploadedFile(
-                        $file,
-                        $targetDirectory,
-                        null,
-                        ['prefix' => 'gallery-media']
-                    );
-
-                    $uploadedMedia[] = EventMedia::create([
-                        'event_id' => $event->id,
-                        'user_id' => auth()->id(),
-                        'file_path' => $path,
-                        'type' => 'image',
-                        'watermarked' => $shouldWatermark,
-                    ]);
-                } catch (\Throwable $fallbackException) {
-                    \Log::error('Admin gallery upload fallback error: ' . $fallbackException->getMessage(), [
-                        'event_id' => $event->id,
-                        'file' => $file->getClientOriginalName(),
-                    ]);
-
-                    $failedFiles[] = $file->getClientOriginalName();
-                }
-            }
-        }
-
-        if ($uploadedMedia === []) {
-            return $this->galleryResponse(
-                $request,
-                false,
-                'Nenhuma imagem conseguiu ser enviada para a galeria.',
-                [],
-                422,
-                $failedFiles
-            );
-        }
-
-        $message = count($uploadedMedia) . ' imagem(ns) enviada(s) com sucesso.';
-        if ($failedFiles !== []) {
-            $message .= ' ' . count($failedFiles) . ' arquivo(s) falharam.';
-        }
-
-        return $this->galleryResponse(
-            $request,
-            true,
-            $message,
-            $this->serializeMediaCollection($uploadedMedia),
-            200,
-            $failedFiles
-        );
+        return app(EventMediaController::class)->store($request, $event, $watermarkService);
     }
 
     public function uploadCover(Request $request, Event $event, WatermarkService $watermarkService)

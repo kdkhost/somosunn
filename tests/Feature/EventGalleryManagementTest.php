@@ -92,7 +92,7 @@ class EventGalleryManagementTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_admin_gallery_upload_returns_json_for_ajax_requests(): void
+    public function test_admin_gallery_upload_returns_json_for_ajax_requests_with_image_and_video(): void
     {
         $admin = User::create([
             'name' => 'Admin Galeria',
@@ -109,6 +109,16 @@ class EventGalleryManagementTest extends TestCase
 
         $this->app->instance(WatermarkService::class, new class extends WatermarkService
         {
+            public function isWatermarkableImage($file): bool
+            {
+                return true;
+            }
+
+            public function shouldWatermarkUpload(?string $directory = null): bool
+            {
+                return true;
+            }
+
             public function processEventImage($file, Event $event): string
             {
                 return 'events/' . $event->id . '/gallery/capa-processada.jpg';
@@ -122,6 +132,7 @@ class EventGalleryManagementTest extends TestCase
         ], [], [
             'files' => [
                 UploadedFile::fake()->image('album.jpg', 1200, 800),
+                UploadedFile::fake()->create('album.mp4', 1024, 'video/mp4'),
             ],
         ], [
             'HTTP_ACCEPT' => 'application/json',
@@ -134,10 +145,13 @@ class EventGalleryManagementTest extends TestCase
         $payload = $response->getData(true);
 
         $this->assertTrue((bool) ($payload['success'] ?? false));
-        $this->assertSame(1, (int) ($payload['uploaded_count'] ?? 0));
-        $this->assertCount(1, $payload['media'] ?? []);
-        $this->assertSame(1, EventMedia::query()->count());
-        $this->assertTrue((bool) EventMedia::query()->value('watermarked'));
+        $this->assertSame(2, (int) ($payload['uploaded_count'] ?? 0));
+        $this->assertCount(2, $payload['media'] ?? []);
+        $this->assertSame(2, EventMedia::query()->count());
+        $this->assertSame(1, EventMedia::query()->where('type', 'image')->count());
+        $this->assertSame(1, EventMedia::query()->where('type', 'video')->count());
+        $this->assertTrue((bool) EventMedia::query()->where('type', 'image')->value('watermarked'));
+        $this->assertFalse((bool) EventMedia::query()->where('type', 'video')->value('watermarked'));
     }
 
     public function test_panel_organizer_can_define_album_cover_from_existing_media(): void

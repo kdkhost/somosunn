@@ -5,7 +5,7 @@
         </h3>
 
         <div class="card-tools">
-            <span class="badge badge-primary">{{ number_format($media->total(), 0, ',', '.') }} registro(s)</span>
+            <span class="badge badge-primary"><span id="adminGalleryResultCount">{{ number_format($media->total(), 0, ',', '.') }}</span> registro(s)</span>
         </div>
     </div>
 
@@ -32,8 +32,11 @@
                         <div class="gallery-admin-thumb">
                             @if($item->type === 'video')
                                 <a href="{{ $assetUrl }}" target="_blank" rel="noopener" class="gallery-admin-video-link">
-                                    <i class="fas fa-play-circle fa-3x"></i>
-                                    <span class="font-weight-bold">Abrir video</span>
+                                    <video src="{{ $assetUrl }}" muted playsinline preload="metadata"></video>
+                                    <span class="gallery-admin-video-overlay">
+                                        <i class="fas fa-play-circle fa-2x mb-2"></i>
+                                        <span class="font-weight-bold">Abrir video</span>
+                                    </span>
                                 </a>
                             @else
                                 <a href="{{ $assetUrl }}" target="_blank" rel="noopener">
@@ -133,7 +136,7 @@
                 </div>
             @empty
                 <div class="col-12">
-                    <div class="callout callout-info mb-0">
+                    <div class="callout callout-info mb-0" id="adminGalleryEmptyState">
                         <h5><i class="fas fa-camera mr-2"></i>Nenhuma midia encontrada</h5>
                         <p class="mb-0">Ajuste o filtro ou envie novas imagens para popular a galeria do evento.</p>
                     </div>

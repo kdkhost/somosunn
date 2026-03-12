@@ -109,6 +109,16 @@ class EventMediaUploadTest extends TestCase
 
         $this->app->instance(WatermarkService::class, new class extends WatermarkService
         {
+            public function isWatermarkableImage($file): bool
+            {
+                return true;
+            }
+
+            public function shouldWatermarkUpload(?string $directory = null): bool
+            {
+                return true;
+            }
+
             public function processEventImage($file, Event $event): string
             {
                 return 'events/' . $event->id . '/gallery/foto-processada.jpg';

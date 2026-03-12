@@ -27,7 +27,7 @@
             <div class="col-lg-4 col-md-6">
                 <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>{{ number_format($filteredMediaCount, 0, ',', '.') }}</h3>
+                        <h3 id="adminGalleryVisibleTotal">{{ number_format($filteredMediaCount, 0, ',', '.') }}</h3>
                         <p>midia(s) listada(s)</p>
                     </div>
                     <div class="icon">
@@ -51,7 +51,7 @@
             <div class="col-lg-4 col-md-12">
                 <div class="small-box bg-primary">
                     <div class="inner">
-                        <h3>{{ $selectedEvent ? number_format($selectedEventMediaCount, 0, ',', '.') : number_format($events->count(), 0, ',', '.') }}</h3>
+                        <h3 id="adminGalleryScopeCount">{{ $selectedEvent ? number_format($selectedEventMediaCount, 0, ',', '.') : number_format($events->count(), 0, ',', '.') }}</h3>
                         <p>{{ $selectedEvent ? 'item(ns) no album filtrado' : 'album(ns) disponivel(is)' }}</p>
                     </div>
                     <div class="icon">
@@ -104,7 +104,8 @@
 
         .gallery-admin-thumb > img,
         .gallery-admin-thumb > a,
-        .gallery-admin-thumb > .gallery-admin-video-link {
+        .gallery-admin-thumb > .gallery-admin-video-link,
+        .gallery-admin-thumb > .gallery-admin-video-link > video {
             position: absolute;
             inset: 0;
             width: 100%;
@@ -122,10 +123,27 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: .5rem;
-            background: #343a40;
+            background: #0f172a;
             color: #fff;
             text-decoration: none;
+            overflow: hidden;
+        }
+
+        .gallery-admin-video-link > video {
+            object-fit: cover;
+            opacity: .55;
+        }
+
+        .gallery-admin-video-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.15), rgba(15, 23, 42, 0.7));
         }
 
         .gallery-admin-avatar {
@@ -162,15 +180,17 @@
             cursor: pointer;
         }
 
+        .gallery-admin-dropzone-preview {
+            text-align: left;
+        }
+
         .gallery-admin-inline-preview {
-            margin-top: 1.25rem;
-            padding-top: 1.25rem;
-            border-top: 1px dashed #dee2e6;
+            padding-top: .25rem;
         }
 
         .gallery-admin-inline-preview-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: .75rem;
         }
 
@@ -184,11 +204,30 @@
             box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
         }
 
-        .gallery-admin-inline-preview-item img {
+        .gallery-admin-inline-preview-item img,
+        .gallery-admin-inline-preview-item video {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+
+        .gallery-admin-inline-preview-item.is-video::after {
+            content: '\f144';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            inset: auto .6rem .55rem auto;
+            color: #fff;
+            font-size: 1.1rem;
+            text-shadow: 0 3px 12px rgba(15, 23, 42, 0.4);
+        }
+
+        .gallery-admin-inline-badge {
+            position: absolute;
+            top: .6rem;
+            left: .6rem;
+            z-index: 1;
         }
 
         .gallery-admin-dropzone.dragover {
@@ -196,18 +235,24 @@
             background: #eef5ff;
         }
 
+        .gallery-admin-dropzone.is-disabled {
+            opacity: .7;
+            pointer-events: none;
+        }
+
         .gallery-admin-selected-list {
-            max-height: 240px;
+            max-height: 360px;
             overflow-y: auto;
         }
 
         .gallery-admin-selected-item {
             gap: .85rem;
+            border-radius: .85rem;
         }
 
         .gallery-admin-selected-preview {
-            width: 60px;
-            height: 60px;
+            width: 88px;
+            height: 88px;
             border-radius: .75rem;
             overflow: hidden;
             flex-shrink: 0;
@@ -215,11 +260,39 @@
             border: 1px solid #dee2e6;
         }
 
-        .gallery-admin-selected-preview img {
+        .gallery-admin-selected-preview.is-video {
+            background: #dbeafe;
+        }
+
+        .gallery-admin-selected-preview img,
+        .gallery-admin-selected-preview video {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+
+        .gallery-admin-file-progress {
+            height: .55rem;
+            border-radius: 999px;
+            overflow: hidden;
+            background: #e2e8f0;
+        }
+
+        .gallery-admin-item-error {
+            display: block;
+            margin-top: .45rem;
+            color: #dc2626;
+        }
+
+        .gallery-admin-preview-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.6rem;
+            color: #64748b;
         }
 
         .gallery-admin-pagination .pagination {

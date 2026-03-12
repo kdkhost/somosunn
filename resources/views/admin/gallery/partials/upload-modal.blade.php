@@ -1,9 +1,14 @@
+@php
+    $galleryUploadPerFileLimitBytes = \App\Support\UploadStorage::effectiveUploadLimitBytes(20 * 1024 * 1024) ?? (20 * 1024 * 1024);
+    $galleryUploadPerFileLimitMb = number_format($galleryUploadPerFileLimitBytes / 1024 / 1024, 2, '.', '');
+@endphp
+
 <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary">
                 <h4 class="modal-title" id="uploadModalLabel">
-                    <i class="fas fa-cloud-upload-alt mr-2"></i>Adicionar fotos
+                    <i class="fas fa-cloud-upload-alt mr-2"></i>Adicionar midias
                 </h4>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -11,7 +16,7 @@
             </div>
 
             <div class="modal-body">
-                <form action="{{ route('admin.gallery.upload') }}" method="POST" enctype="multipart/form-data" id="adminUploadForm">
+                <form action="{{ route('admin.gallery.upload') }}" method="POST" enctype="multipart/form-data" id="adminUploadForm" data-no-ajax="true" data-upload-progress="false">
                     @csrf
 
                     <div class="form-group">
@@ -30,25 +35,38 @@
                             <input type="file"
                                 name="files[]"
                                 multiple
-                                required
-                                accept="image/jpeg,image/png,image/jpg,image/webp"
+                                accept="image/*,video/*"
                                 id="adminFileInput"
-                                onchange="window.adminGallerySyncSelection && window.adminGallerySyncSelection(this.files)"
                                 class="sr-only">
 
-                            <label for="adminFileInput" class="gallery-admin-dropzone-label mb-0 d-flex flex-column align-items-center justify-content-center">
-                                <div class="mb-3 text-primary">
-                                    <i class="fas fa-cloud-upload-alt fa-3x"></i>
-                                </div>
-                                <h5 class="font-weight-bold mb-2">Clique ou arraste as fotos aqui</h5>
-                                <p class="text-muted mb-3">JPG, PNG e WEBP com ate 10 MB por arquivo.</p>
-                                <span class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-folder-open mr-1"></i>Selecionar arquivos
-                                </span>
-                            </label>
+                            <div id="adminDropzoneEmpty" class="gallery-admin-dropzone-empty">
+                                <label for="adminFileInput" class="gallery-admin-dropzone-label mb-0 d-flex flex-column align-items-center justify-content-center">
+                                    <div class="mb-3 text-primary">
+                                        <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                                    </div>
+                                    <h5 class="font-weight-bold mb-2">Clique ou arraste fotos e videos aqui</h5>
+                                    <p class="text-muted mb-3">Imagens e videos com ate {{ $galleryUploadPerFileLimitMb }} MB por arquivo.</p>
+                                    <span class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-folder-open mr-1"></i>Selecionar arquivos
+                                    </span>
+                                </label>
+                            </div>
 
-                            <div id="adminInlinePreview" class="gallery-admin-inline-preview d-none">
-                                <div class="gallery-admin-inline-preview-grid" id="adminInlinePreviewGrid"></div>
+                            <div id="adminDropzonePreview" class="gallery-admin-dropzone-preview d-none">
+                                <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between mb-3">
+                                    <div class="mb-3 mb-lg-0 text-left">
+                                        <p class="text-uppercase text-muted small font-weight-bold mb-1">Preview do lote</p>
+                                        <h6 class="font-weight-bold mb-0">Antes, durante e depois do envio</h6>
+                                    </div>
+
+                                    <button type="button" class="btn btn-outline-primary btn-sm" id="adminAddMoreFiles">
+                                        <i class="fas fa-plus mr-1"></i>Adicionar mais arquivos
+                                    </button>
+                                </div>
+
+                                <div id="adminInlinePreview" class="gallery-admin-inline-preview">
+                                    <div class="gallery-admin-inline-preview-grid" id="adminInlinePreviewGrid"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -90,7 +108,7 @@
 
             <div class="modal-footer justify-content-between">
                 <small class="text-muted">
-                    <i class="fas fa-magic mr-1"></i>Marca d'agua automatica aplicada quando disponivel.
+                    <i class="fas fa-magic mr-1"></i>Marca d'agua automatica aplicada nas imagens quando disponivel.
                 </small>
 
                 <div>

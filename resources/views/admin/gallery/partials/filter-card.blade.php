@@ -6,7 +6,7 @@
 
         <div class="card-tools">
             <button type="button" class="btn btn-success btn-sm" onclick="$('#uploadModal').modal('show')">
-                <i class="fas fa-plus mr-1"></i>Adicionar fotos
+                <i class="fas fa-plus mr-1"></i>Adicionar midias
             </button>
         </div>
     </div>
