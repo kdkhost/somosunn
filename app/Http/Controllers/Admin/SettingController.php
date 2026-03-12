@@ -591,6 +591,24 @@ class SettingController extends Controller
             }
         }
 
+        foreach (['s3_endpoint', 's3_url'] as $key) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+
+            $raw = trim((string) $data[$key]);
+            if ($raw === '') {
+                $data[$key] = '';
+                continue;
+            }
+
+            if (!preg_match('#^https?://#i', $raw)) {
+                $raw = 'https://' . $raw;
+            }
+
+            $data[$key] = rtrim($raw, '/');
+        }
+
         foreach ([
             'maintenance_title',
             'maintenance_subtitle',

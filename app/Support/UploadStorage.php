@@ -429,15 +429,19 @@ class UploadStorage
 
     private static function s3DiskConfig(array $settings): array
     {
+        $endpoint = self::normalizeS3Endpoint($settings['s3_endpoint'] ?? null);
+        $pathStyle = self::toBoolean($settings['s3_path_style'] ?? false);
+        $bucket = trim((string) ($settings['s3_bucket'] ?? ''));
+
         $config = array_merge((array) config('filesystems.disks.s3', []), [
             'driver' => 's3',
             'key' => trim((string) ($settings['s3_key'] ?? '')),
             'secret' => trim((string) ($settings['s3_secret'] ?? '')),
             'region' => trim((string) ($settings['s3_region'] ?? '')),
-            'bucket' => trim((string) ($settings['s3_bucket'] ?? '')),
-            'endpoint' => self::nullableString($settings['s3_endpoint'] ?? null),
-            'url' => self::nullableString($settings['s3_url'] ?? null),
-            'use_path_style_endpoint' => self::toBoolean($settings['s3_path_style'] ?? false),
+            'bucket' => $bucket,
+            'endpoint' => $endpoint,
+            'url' => self::resolveS3PublicBaseUrl($settings, $endpoint, $bucket, $pathStyle),
+            'use_path_style_endpoint' => $pathStyle,
             'throw' => false,
         ]);
 
@@ -558,6 +562,60 @@ class UploadStorage
         }
 
         return $configured;
+    }
+
+    private static function resolveS3PublicBaseUrl(array $settings, ?string $endpoint, string $bucket, bool $pathStyle): ?string
+    {
+        $configuredUrl = self::normalizeS3Url($settings['s3_url'] ?? null);
+        if ($configuredUrl !== null && !self::matchesAppHost($configuredUrl)) {
+            return $configuredUrl;
+        }
+
+        if ($endpoint === null || $bucket === '') {
+            return null;
+        }
+
+        $baseEndpoint = rtrim($endpoint, '/');
+
+        return $pathStyle
+            ? $baseEndpoint . '/' . rawurlencode($bucket)
+            : preg_replace('#^(https?://)#i', '$1' . $bucket . '.', $baseEndpoint, 1);
+    }
+
+    private static function normalizeS3Endpoint(mixed $value): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        if (!preg_match('#^https?://#i', $value)) {
+            $value = 'https://' . $value;
+        }
+
+        return rtrim($value, '/');
+    }
+
+    private static function normalizeS3Url(mixed $value): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        if (!preg_match('#^https?://#i', $value)) {
+            $value = 'https://' . $value;
+        }
+
+        return rtrim($value, '/');
+    }
+
+    private static function matchesAppHost(string $url): bool
+    {
+        $configuredHost = strtolower((string) parse_url($url, PHP_URL_HOST));
+        $appHost = strtolower((string) parse_url((string) config('app.url', ''), PHP_URL_HOST));
+
+        return $configuredHost !== '' && $appHost !== '' && $configuredHost === $appHost;
     }
 
     private static function joinUrl(string $baseUrl, string $path): string

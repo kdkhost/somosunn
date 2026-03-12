@@ -194,6 +194,7 @@
                                 (Opcional)</label>
                             <input type="text" name="s3_endpoint" value="{{ $settings['s3_endpoint'] ?? '' }}"
                                 class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                            <p class="mt-2 text-[11px] text-slate-400">Ex.: <code>https://s3.ca-east-1.idrivee2.com</code></p>
                         </div>
                     </div>
 
@@ -203,6 +204,7 @@
                         <input type="text" name="s3_url" value="{{ $settings['s3_url'] ?? '' }}"
                             placeholder="https://cdn.seusite.com"
                             class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                        <p class="mt-2 text-[11px] text-slate-400">Para iDrive E2, deixe vazio se não tiver CDN própria; o sistema monta a URL pública do bucket automaticamente.</p>
                     </div>
 
                     <div class="flex items-center gap-3">

@@ -169,7 +169,7 @@
                         <label>Endpoint (Opcional)</label>
                         <input type="text" name="s3_endpoint" class="form-control"
                             value="{{ $settings['s3_endpoint'] ?? '' }}">
-                        <small class="text-muted">Para MinIO ou Spaces.</small>
+                        <small class="text-muted">Para S3 compatível. Ex.: <code>https://s3.ca-east-1.idrivee2.com</code>.</small>
                     </div>
                 </div>
                 <div class="row">

@@ -32,6 +32,30 @@ class UploadStorageUrlTest extends TestCase
         $this->assertSame(asset('storage/certificates/file.pdf'), UploadStorage::url('certificates/file.pdf'));
     }
 
+    public function test_it_derives_direct_idrive_e2_bucket_url_when_same_host_is_configured(): void
+    {
+        config()->set('app.url', 'https://somosunn.com.br');
+        config()->set('uploads.s3_driver_available', true);
+
+        UploadStorage::applyRuntimeConfig([
+            'uploads_storage_disk' => 's3',
+            's3_key' => 'test-key',
+            's3_secret' => 'test-secret',
+            's3_region' => 'ca-east-1',
+            's3_bucket' => 'somosunn',
+            's3_endpoint' => 's3.ca-east-1.idrivee2.com',
+            's3_url' => 'https://somosunn.com.br',
+            's3_path_style' => '1',
+        ]);
+
+        $this->assertSame('https://s3.ca-east-1.idrivee2.com', config('filesystems.disks.public.endpoint'));
+        $this->assertSame('https://s3.ca-east-1.idrivee2.com/somosunn', config('filesystems.disks.public.url'));
+        $this->assertSame(
+            'https://s3.ca-east-1.idrivee2.com/somosunn/events/2/gallery/foto.webp',
+            UploadStorage::url('events/2/gallery/foto.webp')
+        );
+    }
+
     public function test_it_uses_distinct_public_base_url_when_cdn_is_configured(): void
     {
         config()->set('app.url', 'https://somosunn.com.br');
