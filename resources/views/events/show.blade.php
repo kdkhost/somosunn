@@ -431,11 +431,7 @@
         </section>
         @endif
         
-    </div>
-@endsection
-
-
-<!-- TICKET MODAL -->
+        <!-- TICKET MODAL -->
 <div id="ticketModal"
     class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/50 backdrop-blur-sm px-4"
     style="display: none;" aria-hidden="true">
@@ -493,6 +489,8 @@
         </div>
     </div>
 </div>
+    </div>
+@endsection
 
 @push('scripts')
     <!-- Passamos o script do QRCodeJS apenas se preciso -->
