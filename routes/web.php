@@ -540,6 +540,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
 // Marketplace (Público)
 Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace.index');
 
+// Share Product (Compartilhamento de produtos)
+Route::get('/share/{code}', [\App\Http\Controllers\ShareController::class, 'product'])->name('share.product');
+
 // Theme Toggle
 Route::post('/theme/toggle', [\App\Http\Controllers\Panel\ThemeController::class, 'update'])->name('theme.toggle');
 
