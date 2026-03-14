@@ -646,7 +646,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('gallery/events/{event}/cover/upload', [\App\Http\Controllers\Admin\GalleryController::class, 'uploadCover'])->name('gallery.cover.upload');
     Route::post('gallery/media/{media}/cover', [\App\Http\Controllers\Admin\GalleryController::class, 'setCoverFromMedia'])->name('gallery.cover.media');
     Route::delete('gallery/events/{event}/cover', [\App\Http\Controllers\Admin\GalleryController::class, 'clearCover'])->name('gallery.cover.clear');
-    Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
+    Route::delete('gallery/{media}', [\App\Http\Controllers\Admin\GalleryController::class, 'destroy'])->name('gallery.destroy');
+    Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class)->except(['destroy']);
     Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
     Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class)->except(['show']);
     Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class)->except(['show']);
