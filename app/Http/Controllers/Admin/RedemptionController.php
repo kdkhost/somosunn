@@ -60,7 +60,7 @@ class RedemptionController extends Controller
 
         RedeemableItem::create($data);
 
-        return redirect()->route('admin.redemptions.index')->with('success', 'Item de resgate criado com sucesso!');
+        return response()->json(['redirect' => route('admin.redemptions.index'), 'message' => 'Item de resgate criado com sucesso!']);
     }
 
     public function edit(RedeemableItem $redemption)
@@ -98,7 +98,7 @@ class RedemptionController extends Controller
 
         $redemption->update($data);
 
-        return redirect()->route('admin.redemptions.index')->with('success', 'Item atualizado com sucesso!');
+        return response()->json(['redirect' => route('admin.redemptions.index'), 'message' => 'Item atualizado com sucesso!']);
     }
 
     public function approve(Redemption $redemption)
@@ -108,7 +108,7 @@ class RedemptionController extends Controller
         $redemption->update(['status' => 'completed']);
         $redemption->user?->notify(new RedemptionStatusUpdated($redemption));
 
-        return back()->with('success', 'Resgate concluido!');
+        return response()->json(['ok' => true, 'message' => 'Resgate concluido!']);
     }
 
     public function cancel(Redemption $redemption)
@@ -138,7 +138,7 @@ class RedemptionController extends Controller
             ]),
         ]);
 
-        return back()->with('success', 'Resgate cancelado, estoque devolvido e saldo em UNNBIT estornado!');
+        return response()->json(['ok' => true, 'message' => 'Resgate cancelado, estoque devolvido e saldo estornado!']);
     }
 
     private function validatedItemData(Request $request): array

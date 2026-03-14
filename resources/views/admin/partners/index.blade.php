@@ -158,7 +158,7 @@
                         cancelButtonColor: '#6c757d',
                         confirmButtonText: '<i class="fas fa-trash mr-1"></i> Remover',
                         cancelButtonText: 'Cancelar'
-                    }).then(result => { if (result.isConfirmed) form.submit(); });
+                    }).then(result => { if (result.isConfirmed) window.UNNAjaxGlobal.submitForm(form); });
                 });
             });
         </script>

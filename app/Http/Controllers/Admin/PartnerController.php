@@ -55,7 +55,7 @@ class PartnerController extends Controller
 
         Partner::create($data);
 
-        return redirect()->route('admin.partners.index')->with('success', 'Parceiro criado com sucesso!');
+        return response()->json(['redirect' => route('admin.partners.index'), 'message' => 'Parceiro criado com sucesso!']);
     }
 
     public function edit(Partner $partner)
@@ -103,7 +103,7 @@ class PartnerController extends Controller
         unset($data['remove_logo']);
         $partner->update($data);
 
-        return redirect()->route('admin.partners.edit', $partner)->with('success', 'Parceiro atualizado!');
+        return response()->json(['redirect' => route('admin.partners.edit', $partner), 'message' => 'Parceiro atualizado!']);
     }
 
     public function destroy(Partner $partner)
@@ -113,7 +113,7 @@ class PartnerController extends Controller
             Storage::disk('public')->delete($partner->logo);
         }
         $partner->delete();
-        return redirect()->route('admin.partners.index')->with('success', 'Parceiro removido.');
+        return response()->json(['ok' => true, 'message' => 'Parceiro removido.']);
     }
 
     /** Reordenar via AJAX */

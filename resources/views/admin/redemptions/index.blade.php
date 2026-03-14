@@ -49,13 +49,13 @@
                                     <td class="text-right">
                                         <form action="{{ route('admin.redemptions.approve', $redemption) }}" method="POST" style="display:inline-block">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-success mr-1 btn-delete" data-text="Deseja confirmar a entrega deste item?">
+                                            <button type="submit" class="btn btn-sm btn-success mr-1 js-confirm-action" data-text="Deseja confirmar a entrega deste item?">
                                                 <i class="fas fa-check mr-1"></i> Aprovar
                                             </button>
                                         </form>
                                         <form action="{{ route('admin.redemptions.cancel', $redemption) }}" method="POST" style="display:inline-block">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-danger btn-delete" data-text="O saldo em {{ $coinName }} sera devolvido ao usuario. Continuar?">
+                                            <button type="submit" class="btn btn-sm btn-danger js-confirm-action" data-text="O saldo em {{ $coinName }} sera devolvido ao usuario. Continuar?">
                                                 <i class="fas fa-times mr-1"></i> Cancelar
                                             </button>
                                         </form>
@@ -141,3 +141,27 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(function () {
+        $(document).on('click', '.js-confirm-action', function (e) {
+            e.preventDefault();
+            const btn = this;
+            const form = btn.closest('form');
+            const text = btn.dataset.text || 'Confirmar esta acao?';
+            Swal.fire({
+                title: 'Confirmar',
+                text: text,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#28a745'
+            }).then(result => {
+                if (result.isConfirmed) window.UNNAjaxGlobal.submitForm(form);
+            });
+        });
+    });
+</script>
+@endpush

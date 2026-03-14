@@ -11,7 +11,6 @@ use App\Models\User;
 use App\Services\AffiliateShareKitService;
 use App\Services\AffiliateTrackingService;
 use App\Services\ReferralAnalyticsService;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
@@ -108,18 +107,16 @@ class ReferralController extends Controller
         return $this->analytics->exportDetailedEventsCsv($selectedReferrer?->id, $filename);
     }
 
-    public function storeToken(Request $request): RedirectResponse
+    public function storeToken(Request $request)
     {
         if (!$this->hasPersonalAccessTokensTable()) {
-            return back()->withErrors([
-                'api_tokens' => 'A tabela de tokens da API ainda não está disponível. Rode as migrations e tente novamente.',
-            ]);
+            return response()->json(['message' => 'A tabela de tokens da API ainda nao esta disponivel. Rode as migrations e tente novamente.'], 422);
         }
 
         $data = $request->validate([
             'device_name' => 'required|string|max:120',
         ], [
-            'device_name.required' => 'Informe o nome do dispositivo ou integração.',
+            'device_name.required' => 'Informe o nome do dispositivo ou integracao.',
         ]);
 
         /** @var User $user */
@@ -127,14 +124,15 @@ class ReferralController extends Controller
 
         $plainTextToken = $user->createToken($data['device_name'])->plainTextToken;
 
-        return redirect()
-            ->route('admin.referrals.index')
-            ->with('success', 'Token da API gerado com sucesso.')
-            ->with('api_token_plain_text', $plainTextToken)
-            ->with('api_token_device_name', $data['device_name']);
+        return response()->json([
+            'redirect' => route('admin.referrals.index'),
+            'message' => 'Token da API gerado com sucesso.',
+            'api_token_plain_text' => $plainTextToken,
+            'api_token_device_name' => $data['device_name'],
+        ]);
     }
 
-    public function updateToken(Request $request, int $tokenId): RedirectResponse
+    public function updateToken(Request $request, int $tokenId)
     {
         $data = $request->validate([
             'device_name' => 'required|string|max:120',
@@ -150,12 +148,10 @@ class ReferralController extends Controller
             'name' => $data['device_name'],
         ])->save();
 
-        return redirect()
-            ->route('admin.referrals.index')
-            ->with('success', 'Token renomeado com sucesso.');
+        return response()->json(['redirect' => route('admin.referrals.index'), 'message' => 'Token renomeado com sucesso.']);
     }
 
-    public function destroyToken(Request $request, int $tokenId): RedirectResponse
+    public function destroyToken(Request $request, int $tokenId)
     {
         /** @var User $user */
         $user = $request->user();
@@ -163,9 +159,7 @@ class ReferralController extends Controller
 
         $token->delete();
 
-        return redirect()
-            ->route('admin.referrals.index')
-            ->with('success', 'Token revogado com sucesso.');
+        return response()->json(['ok' => true, 'message' => 'Token revogado com sucesso.']);
     }
 
     public function track(Request $request, AffiliateTrackingService $tracking)
@@ -209,9 +203,7 @@ class ReferralController extends Controller
             'reviewed_at' => now(),
         ])->save();
 
-        return redirect()
-            ->route('admin.referrals.index')
-            ->with('success', 'Ticket de sandbox atualizado com sucesso.');
+        return response()->json(['redirect' => route('admin.referrals.index'), 'message' => 'Ticket de sandbox atualizado com sucesso.']);
     }
 
     private function sandboxRequestsCollection()

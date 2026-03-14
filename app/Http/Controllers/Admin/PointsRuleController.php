@@ -62,7 +62,7 @@ class PointsRuleController extends Controller
 
         PointsRule::create($data);
 
-        return redirect()->route('admin.points-rules.index')->with('success', 'Regra criada com sucesso!');
+        return response()->json(['redirect' => route('admin.points-rules.index'), 'message' => 'Regra criada com sucesso!']);
     }
 
     public function edit(PointsRule $points_rule)
@@ -103,14 +103,14 @@ class PointsRuleController extends Controller
 
         $points_rule->update($data);
 
-        return redirect()->route('admin.points-rules.index')->with('success', 'Regra atualizada!');
+        return response()->json(['redirect' => route('admin.points-rules.index'), 'message' => 'Regra atualizada!']);
     }
 
     public function destroy(PointsRule $points_rule)
     {
         $points_rule->delete();
 
-        return redirect()->route('admin.points-rules.index')->with('success', 'Regra removida!');
+        return response()->json(['ok' => true, 'message' => 'Regra removida!']);
     }
 
     public function updateExchangeSettings(Request $request, PointsExchangeService $service)
@@ -141,7 +141,7 @@ class PointsRuleController extends Controller
 
         $service->persist($data);
 
-        return redirect()->route('admin.points-rules.index')->with('success', 'Cotacao do UNNBIT atualizada com sucesso.');
+        return response()->json(['reload' => true, 'message' => 'Cotacao do UNNBIT atualizada com sucesso.']);
     }
 
     private function normalizeDecimalInput(mixed $value): float

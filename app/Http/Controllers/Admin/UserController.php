@@ -62,7 +62,7 @@ class UserController extends Controller
 
         if (!$this->isSuperadmin()) {
             if (($data['role'] ?? '') === 'superadmin') {
-                return redirect()->back()->withInput()->with('error', 'Voce nao tem permissao para criar um Super Admin.');
+                return response()->json(['message' => 'Voce nao tem permissao para criar um Super Admin.'], 422);
             }
 
             if (($data['level'] ?? '') === 'superadmin') {
@@ -75,7 +75,7 @@ class UserController extends Controller
 
         User::create($data);
 
-        return redirect()->route('admin.users.index')->with('success', 'Usuario criado.');
+        return response()->json(['redirect' => route('admin.users.index'), 'message' => 'Usuario criado.']);
     }
 
     public function edit(User $user)
@@ -94,7 +94,7 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         if (!$this->isSuperadmin() && $user->role === 'superadmin') {
-            return redirect()->route('admin.users.index')->with('error', 'Voce nao tem permissao para editar este usuario.');
+            return response()->json(['message' => 'Voce nao tem permissao para editar este usuario.'], 403);
         }
 
         $featureKeys = array_keys($this->userFeatures());
@@ -113,7 +113,7 @@ class UserController extends Controller
 
         if (!$this->isSuperadmin()) {
             if (($data['role'] ?? '') === 'superadmin') {
-                return redirect()->back()->withInput()->with('error', 'Voce nao tem permissao para definir este papel.');
+                return response()->json(['message' => 'Voce nao tem permissao para definir este papel.'], 422);
             }
 
             if (($data['level'] ?? '') === 'superadmin') {
@@ -131,7 +131,7 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('admin.users.index')->with('success', 'Usuario atualizado.');
+        return response()->json(['redirect' => route('admin.users.index'), 'message' => 'Usuario atualizado.']);
     }
 
     public function destroy(User $user)

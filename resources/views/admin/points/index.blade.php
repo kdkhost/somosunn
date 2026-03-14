@@ -195,7 +195,7 @@
                     const message = (form.getAttribute('data-confirm') || 'Confirma a remocao?').toString();
 
                     if (typeof Swal === 'undefined') {
-                        form.submit();
+                        window.UNNAjaxGlobal.submitForm(form);
                         return;
                     }
 
@@ -209,7 +209,7 @@
                         confirmButtonColor: '#d33'
                     }).then((result) => {
                         if (!result.isConfirmed) return;
-                        form.submit();
+                        window.UNNAjaxGlobal.submitForm(form);
                     });
                 });
         });

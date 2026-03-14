@@ -237,14 +237,14 @@
         $(this).closest('form').submit();
     });
 
-    // Recusar (modal SweetAlert)
+    // Recusar (modal SweetAlert) - usa o global AJAX handler
     $(document).on('click', '.btn-reject-testimonial', function () {
         const action = $(this).data('action');
         Swal.fire({
             title: 'Recusar depoimento?',
             input: 'textarea',
             inputLabel: 'Motivo (opcional)',
-            inputPlaceholder: 'Ex.: Linguagem agressiva, spam, fora do contexto…',
+            inputPlaceholder: 'Ex.: Linguagem agressiva, spam, fora do contexto...',
             showCancelButton: true,
             confirmButtonText: 'Recusar',
             cancelButtonText: 'Cancelar',
@@ -258,16 +258,16 @@
                 '<input type="hidden" name="_token" value="{{ csrf_token() }}">' +
                 '<input type="hidden" name="moderation_notes" value="' + (result.value || '').replace(/"/g, '&quot;') + '">';
             document.body.appendChild(form);
-            form.submit();
+            window.UNNAjaxGlobal.submitForm(form);
         });
     });
 
-    // Excluir (confirmação)
+    // Excluir (confirmação) - usa o global AJAX handler
     $(document).on('click', '.btn-delete', function () {
         const action = $(this).data('action');
         Swal.fire({
             title: 'Excluir depoimento?',
-            text: 'Esta ação não pode ser desfeita.',
+            text: 'Esta acao nao pode ser desfeita.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#e74a3b',
@@ -282,7 +282,7 @@
                 '<input type="hidden" name="_token" value="{{ csrf_token() }}">' +
                 '<input type="hidden" name="_method" value="DELETE">';
             document.body.appendChild(form);
-            form.submit();
+            window.UNNAjaxGlobal.submitForm(form);
         });
     });
 </script>

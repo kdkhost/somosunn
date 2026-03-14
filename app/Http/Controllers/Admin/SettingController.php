@@ -139,14 +139,14 @@ class SettingController extends Controller
         }
 
         if ($request->hasFile('seo_og_image') && $this->imageIsSmallerThan($request->file('seo_og_image'), 1200, 630)) {
-            return redirect()->back()->withInput()->with('error', 'A imagem OpenGraph precisa ter pelo menos 1200×630px.');
+            return response()->json(['message' => 'A imagem OpenGraph precisa ter pelo menos 1200x630px.'], 422);
         }
         if ($request->hasFile('seo_twitter_image') && $this->imageIsSmallerThan($request->file('seo_twitter_image'), 1200, 628)) {
-            return redirect()->back()->withInput()->with('error', 'A imagem do Twitter precisa ter pelo menos 1200×628px.');
+            return response()->json(['message' => 'A imagem do Twitter precisa ter pelo menos 1200x628px.'], 422);
         }
 
         if ($request->hasFile('watermark_image') && !$this->watermarkFileIsSupported($request->file('watermark_image'))) {
-            return redirect()->back()->withInput()->with('error', 'A marca d\'agua das imagens deve ser enviada em PNG ou WEBP com fundo transparente.');
+            return response()->json(['message' => 'A marca dagua deve ser PNG ou WEBP com fundo transparente.'], 422);
         }
 
         $plyrOptionsJson = trim((string) $request->input('video_plyr_options_json', ''));
@@ -154,7 +154,7 @@ class SettingController extends Controller
             try {
                 json_decode($plyrOptionsJson, true, 512, JSON_THROW_ON_ERROR);
             } catch (\Throwable $e) {
-                return redirect()->back()->withInput()->with('error', 'Opções avançadas do Plyr: JSON inválido.');
+                return response()->json(['message' => 'Opcoes avancadas do Plyr: JSON invalido.'], 422);
             }
         }
 
@@ -165,7 +165,7 @@ class SettingController extends Controller
             $superadmin = (float) ($data['marketplace_split_superadmin_percent'] ?? 0);
 
             if (round($seller + $platform + $traffic + $superadmin, 2) !== 100.00) {
-                return redirect()->back()->withInput()->with('error', 'A soma dos percentuais de split (Vendedor + Plataforma + Tráfego + Superadmin) deve ser exatamente 100%.');
+                return response()->json(['message' => 'A soma dos percentuais de split deve ser exatamente 100%.'], 422);
             }
         }
 
@@ -688,7 +688,7 @@ class SettingController extends Controller
             return response()->json(['success' => true, 'message' => 'Configurações salvas automaticamente.']);
         }
 
-        return redirect()->back()->with('success', 'Configurações salvas');
+        return response()->json(['reload' => true, 'message' => 'Configuracoes salvas']);
     }
 
     private function storePublic($file, $relativeDir)

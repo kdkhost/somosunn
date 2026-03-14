@@ -26,7 +26,7 @@ class PartnerCouponController extends Controller
         $data['partner_id'] = $partner->id;
         $data['active'] = $request->boolean('active', true);
         PartnerCoupon::create($data);
-        return back()->with('success', 'Cupom adicionado!');
+        return response()->json(['ok' => true, 'reload' => true, 'message' => 'Cupom adicionado!']);
     }
 
     public function update(Request $request, Partner $partner, PartnerCoupon $coupon)
@@ -44,14 +44,14 @@ class PartnerCouponController extends Controller
         ]);
         $data['active'] = $request->boolean('active');
         $coupon->update($data);
-        return back()->with('success', 'Cupom atualizado!');
+        return response()->json(['ok' => true, 'reload' => true, 'message' => 'Cupom atualizado!']);
     }
 
     public function destroy(Partner $partner, PartnerCoupon $coupon)
     {
         $this->ensureAdmin();
         $coupon->delete();
-        return back()->with('success', 'Cupom removido.');
+        return response()->json(['ok' => true, 'message' => 'Cupom removido.']);
     }
 
     protected function ensureAdmin(): void

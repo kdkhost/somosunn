@@ -89,8 +89,7 @@ class TestimonialController extends Controller
 
         Testimonial::create($data);
 
-        return redirect()->route('admin.testimonials.index')
-            ->with('success', 'Depoimento criado e publicado.');
+        return response()->json(['redirect' => route('admin.testimonials.index'), 'message' => 'Depoimento criado e publicado.']);
     }
 
     // ─── Editar ───────────────────────────────────────────────────────────────
@@ -123,8 +122,7 @@ class TestimonialController extends Controller
 
         $testimonial->update($data);
 
-        return redirect()->route('admin.testimonials.index')
-            ->with('success', 'Depoimento atualizado.');
+        return response()->json(['redirect' => route('admin.testimonials.index'), 'message' => 'Depoimento atualizado.']);
     }
 
     // ─── Toggle ativo/inativo (PATCH) ─────────────────────────────────────────
@@ -137,11 +135,7 @@ class TestimonialController extends Controller
 
         $msg = $testimonial->is_active ? 'Depoimento ativado.' : 'Depoimento desativado.';
 
-        if (request()->expectsJson()) {
-            return response()->json(['is_active' => $testimonial->is_active, 'message' => $msg]);
-        }
-
-        return back()->with('success', $msg);
+        return response()->json(['is_active' => $testimonial->is_active, 'message' => $msg]);
     }
 
     // ─── Moderação ────────────────────────────────────────────────────────────
@@ -158,7 +152,7 @@ class TestimonialController extends Controller
             'moderation_notes' => null,
         ]);
 
-        return back()->with('success', 'Depoimento aprovado.');
+        return response()->json(['ok' => true, 'message' => 'Depoimento aprovado.']);
     }
 
     public function reject(Request $request, Testimonial $testimonial)
@@ -177,7 +171,7 @@ class TestimonialController extends Controller
             'moderation_notes' => $data['moderation_notes'] ?? null,
         ]);
 
-        return back()->with('success', 'Depoimento recusado.');
+        return response()->json(['ok' => true, 'message' => 'Depoimento recusado.']);
     }
 
     // ─── Excluir ──────────────────────────────────────────────────────────────
@@ -188,7 +182,7 @@ class TestimonialController extends Controller
 
         $testimonial->delete();
 
-        return back()->with('success', 'Depoimento removido.');
+        return response()->json(['ok' => true, 'message' => 'Depoimento removido.']);
     }
 
     // ─── Importar do Google Meu Negócio ───────────────────────────────────────
