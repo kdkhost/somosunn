@@ -3,22 +3,13 @@
 @section('title', 'Galeria de Eventos - SOMOS UNN')
 
 @php
-    $featuredEvent = $events->first();
-    $featuredCover = $featuredEvent?->gallery_cover_url ?: asset('img/logo.svg');
-    $featuredDate  = $featuredEvent?->start_at
-        ? \Carbon\Carbon::parse($featuredEvent->start_at)->translatedFormat('d \d\e F \d\e Y')
-        : null;
-    $totalAlbums   = method_exists($events, 'total') ? $events->total() : $events->count();
-    $gridEvents    = $events->getCollection()->slice($featuredEvent ? 1 : 0)->values();
+    $totalAlbums = method_exists($events, 'total') ? $events->total() : $events->count();
 @endphp
 
 @section('content')
     {{-- Hero --}}
     <div class="relative overflow-hidden bg-slate-950 pt-28 pb-20 text-white">
         <div class="absolute inset-0">
-            @if($featuredEvent)
-                <img src="{{ $featuredCover }}" alt="{{ $featuredEvent->title }}" class="h-full w-full object-cover opacity-20">
-            @endif
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.22),_transparent_24%),radial-gradient(circle_at_78%_18%,_rgba(59,130,246,0.24),_transparent_28%),linear-gradient(135deg,_rgba(2,6,23,0.96),_rgba(15,23,42,0.94))]"></div>
             <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08),rgba(15,23,42,0.92))]"></div>
         </div>
@@ -39,7 +30,10 @@
             </p>
 
             <div class="mt-6 flex flex-wrap gap-3">
-                <span class="gallery-index-chip"><i class="fas fa-layer-group text-cyan-300"></i> {{ $totalAlbums }} {{ $totalAlbums === 1 ? 'album' : 'albuns' }}</span>
+                <span class="gallery-index-chip">
+                    <i class="fas fa-layer-group text-cyan-300"></i>
+                    {{ $totalAlbums }} {{ $totalAlbums === 1 ? 'album' : 'albuns' }}
+                </span>
             </div>
         </div>
     </div>
@@ -60,84 +54,47 @@
                     </a>
                 </div>
             @else
-                {{-- Album em destaque --}}
-                @if($featuredEvent)
-                    <a href="{{ route('gallery.show', $featuredEvent) }}"
-                        class="group relative mb-8 block overflow-hidden rounded-[2.5rem] border border-slate-200/70 bg-slate-950 shadow-[0_30px_80px_rgba(15,23,42,0.14)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_40px_90px_rgba(15,23,42,0.22)]">
-                        <img src="{{ $featuredCover }}" alt="{{ $featuredEvent->title }}"
-                            class="h-[22rem] w-full object-cover opacity-80 transition duration-700 group-hover:scale-[1.03] group-hover:opacity-100 md:h-[32rem]">
-                        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08),rgba(15,23,42,0.82))]"></div>
-
-                        <div class="absolute left-6 right-6 top-6 flex items-start justify-between gap-4">
-                            <span class="rounded-full border border-white/10 bg-slate-950/60 px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
-                                Album em destaque
-                            </span>
-                            <span class="inline-flex h-12 w-12 items-center justify-center rounded-[1.3rem] border border-white/10 bg-white/10 text-white backdrop-blur transition group-hover:bg-white/20">
-                                <i class="fas fa-arrow-right"></i>
-                            </span>
-                        </div>
-
-                        <div class="absolute inset-x-6 bottom-6">
-                            @if($featuredDate)
-                                <p class="text-xs font-black uppercase tracking-[0.22em] text-cyan-200">{{ $featuredDate }}</p>
-                            @endif
-                            <h2 class="mt-3 text-3xl font-black tracking-tight text-white md:text-4xl">{{ $featuredEvent->title }}</h2>
-                            <p class="mt-3 text-sm text-slate-300">
-                                {{ $featuredEvent->media_count }} {{ $featuredEvent->media_count === 1 ? 'item' : 'itens' }} na cobertura
-                                @if($featuredEvent->location) &bull; {{ $featuredEvent->location }}@endif
-                            </p>
-                        </div>
-                    </a>
-                @endif
-
-                {{-- Grade de albuns --}}
-                @php
-                    $albumsToRender = $gridEvents->isNotEmpty() ? $gridEvents : ($featuredEvent ? collect() : $events->getCollection());
-                @endphp
-
-                @if($albumsToRender->isNotEmpty())
-                    <div id="albuns" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                        @foreach($albumsToRender as $album)
-                            @php
-                                $albumDate  = $album->start_at ? \Carbon\Carbon::parse($album->start_at)->translatedFormat('d \d\e M \d\e Y') : null;
-                                $albumCover = $album->gallery_cover_url ?: asset('img/logo.svg');
-                            @endphp
-                            <a href="{{ route('gallery.show', $album) }}"
-                                class="group block overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_70px_rgba(15,23,42,0.14)]">
-                                <div class="relative overflow-hidden">
-                                    <img src="{{ $albumCover }}" alt="{{ $album->title }}"
-                                        class="h-64 w-full object-cover transition duration-700 group-hover:scale-[1.05]">
-                                    <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.72))]"></div>
-                                    <div class="absolute left-5 top-5">
-                                        <span class="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
-                                            {{ $album->media_count }} {{ $album->media_count === 1 ? 'item' : 'itens' }}
-                                        </span>
-                                    </div>
-                                    <div class="absolute inset-x-5 bottom-5">
-                                        @if($albumDate)
-                                            <p class="text-xs font-black uppercase tracking-[0.2em] text-cyan-200">{{ $albumDate }}</p>
-                                        @endif
-                                        <h3 class="gallery-index-title mt-2 text-xl font-black tracking-tight text-white">{{ $album->title }}</h3>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center justify-between px-5 py-4">
-                                    @if($album->location)
-                                        <span class="inline-flex items-center gap-2 text-xs font-bold text-slate-400">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                            {{ \Illuminate\Support\Str::limit($album->location, 28) }}
-                                        </span>
-                                    @else
-                                        <span></span>
-                                    @endif
-                                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-900 transition group-hover:bg-blue-600 group-hover:text-white">
-                                        <i class="fas fa-arrow-right text-sm"></i>
+                <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    @foreach($events as $album)
+                        @php
+                            $albumDate  = $album->start_at ? \Carbon\Carbon::parse($album->start_at)->translatedFormat('d \d\e M \d\e Y') : null;
+                            $albumCover = $album->gallery_cover_url ?: asset('img/logo.svg');
+                        @endphp
+                        <a href="{{ route('gallery.show', $album) }}"
+                            class="group block overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_70px_rgba(15,23,42,0.14)]">
+                            <div class="relative overflow-hidden">
+                                <img src="{{ $albumCover }}" alt="{{ $album->title }}"
+                                    class="h-64 w-full object-cover transition duration-700 group-hover:scale-[1.05]">
+                                <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.72))]"></div>
+                                <div class="absolute left-5 top-5">
+                                    <span class="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
+                                        {{ $album->media_count }} {{ $album->media_count === 1 ? 'item' : 'itens' }}
                                     </span>
                                 </div>
-                            </a>
-                        @endforeach
-                    </div>
-                @endif
+                                <div class="absolute inset-x-5 bottom-5">
+                                    @if($albumDate)
+                                        <p class="text-xs font-black uppercase tracking-[0.2em] text-cyan-200">{{ $albumDate }}</p>
+                                    @endif
+                                    <h3 class="gallery-index-title mt-2 text-xl font-black tracking-tight text-white">{{ $album->title }}</h3>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between px-5 py-4">
+                                @if($album->location)
+                                    <span class="inline-flex items-center gap-2 text-xs font-bold text-slate-400">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        {{ \Illuminate\Support\Str::limit($album->location, 28) }}
+                                    </span>
+                                @else
+                                    <span></span>
+                                @endif
+                                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-900 transition group-hover:bg-blue-600 group-hover:text-white">
+                                    <i class="fas fa-arrow-right text-sm"></i>
+                                </span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
 
                 @if($events->hasPages())
                     <div class="gallery-index-pagination mt-10">
