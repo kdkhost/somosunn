@@ -11,8 +11,8 @@
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900">Depoimentos</h1>
-                <p class="text-sm text-slate-500 mt-1">Modere os depoimentos enviados pelos usuários e destaque os melhores
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Depoimentos</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Modere os depoimentos enviados pelos usuários e destaque os melhores
                     no portal.</p>
             </div>
         </div>
@@ -73,18 +73,18 @@
         </div>
 
         {{-- Filters --}}
-        <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-200">
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800">
             <form action="{{ route('panel.admin.testimonials.index') }}" method="GET"
                 class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="md:col-span-2 relative">
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
                     <input type="text" name="q" value="{{ $q }}" placeholder="Buscar por autor ou conteúdo..."
-                        class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm">
+                        class="w-full pl-11 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500">
                 </div>
 
                 <div>
                     <select name="status"
-                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm">
+                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all text-sm text-slate-900 dark:text-white">
                         <option value="">Todos os Status</option>
                         <option value="pending" @selected($status === 'pending')>Pendente</option>
                         <option value="approved" @selected($status === 'approved')>Aprovado</option>
@@ -93,7 +93,7 @@
                 </div>
 
                 <button type="submit"
-                    class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-2xl transition-all">
+                    class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-2xl transition-all">
                     Filtrar
                 </button>
             </form>
@@ -125,9 +125,9 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($testimonials as $test)
-                            <tr class="group hover:bg-slate-50/50 transition-all">
+                            <tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-all">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div
@@ -140,13 +140,13 @@
                                             @endif
                                         </div>
                                         <div>
-                                            <p class="text-sm font-bold text-slate-900">{{ $test->author_name }}</p>
-                                            <p class="text-xs text-slate-400">{{ $test->author_title }}</p>
+                                            <p class="text-sm font-bold text-slate-900 dark:text-white">{{ $test->author_name }}</p>
+                                            <p class="text-xs text-slate-400 dark:text-slate-500">{{ $test->author_title }}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 max-w-xs">
-                                    <p class="text-sm text-slate-600 line-clamp-2 italic">"{{ $test->content }}"</p>
+                                    <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 italic">"{{ $test->content }}"</p>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex text-amber-400 text-[10px] gap-0.5">
@@ -158,17 +158,17 @@
                                 <td class="px-6 py-4">
                                     @if($test->status === 'pending')
                                         <span
-                                            class="px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold uppercase rounded-full">Pendente</span>
+                                            class="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-bold uppercase rounded-full">Pendente</span>
                                     @elseif($test->status === 'approved')
                                         <span
-                                            class="px-2 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase rounded-full">Aprovado</span>
+                                            class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase rounded-full">Aprovado</span>
                                     @else
                                         <span
-                                            class="px-2 py-1 bg-red-100 text-red-700 text-[10px] font-bold uppercase rounded-full">Recusado</span>
+                                            class="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[10px] font-bold uppercase rounded-full">Recusado</span>
                                     @endif
 
                                     @if($test->is_featured)
-                                        <div class="mt-1 flex items-center gap-1 text-[10px] font-bold text-blue-600 uppercase">
+                                        <div class="mt-1 flex items-center gap-1 text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase">
                                             <i class="fas fa-star"></i>
                                             <span>Destaque</span>
                                         </div>
@@ -180,7 +180,7 @@
                                             <form action="{{ route('panel.admin.testimonials.approve', $test) }}" method="POST">
                                                 @csrf
                                                 <button
-                                                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shadow-sm shadow-emerald-100"
+                                                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all shadow-sm shadow-emerald-100 dark:shadow-emerald-900/20"
                                                     title="Aprovar">
                                                     <i class="fas fa-check text-xs"></i>
                                                 </button>
@@ -188,7 +188,7 @@
                                         @endif
 
                                         <a href="{{ route('panel.admin.testimonials.edit', $test) }}"
-                                            class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-blue-600 hover:text-white transition-all">
+                                            class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-blue-600 hover:text-white transition-all">
                                             <i class="fas fa-edit text-xs"></i>
                                         </a>
 
@@ -196,7 +196,7 @@
                                             onsubmit="return confirmAction(event, 'Excluir depoimento?', 'Excluir este depoimento?')">
                                             @csrf @method('DELETE')
                                             <button
-                                                class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-400 hover:bg-red-500 hover:text-white transition-all">
+                                                class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-red-500 hover:text-white transition-all">
                                                 <i class="fas fa-trash text-xs"></i>
                                             </button>
                                         </form>
@@ -205,7 +205,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center text-slate-500 italic">
+                                <td colspan="5" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400 italic">
                                     Nenhum depoimento encontrado.
                                 </td>
                             </tr>
@@ -214,7 +214,7 @@
                 </table>
             </div>
             @if($testimonials->hasPages())
-                <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-200">
+                <div class="px-6 py-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700">
                     {{ $testimonials->links() }}
                 </div>
             @endif
