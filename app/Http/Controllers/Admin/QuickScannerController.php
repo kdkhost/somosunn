@@ -27,6 +27,11 @@ class QuickScannerController extends Controller
 
         $todayEvents = $query->get();
 
+        // Se acessado pela rota do instrutor no painel, usa a view do painel
+        if (request()->routeIs('panel.instructor.scanner')) {
+            return view('panel.instructor.scanner', compact('todayEvents'));
+        }
+
         return view('admin.events.quick-scanner', compact('todayEvents'));
     }
 

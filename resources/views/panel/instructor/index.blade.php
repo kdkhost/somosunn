@@ -36,7 +36,7 @@
                     <p class="text-slate-500 dark:text-slate-400 font-medium">Valide entradas de seus eventos hoje usando a câmera do celular.</p>
                 </div>
             </div>
-            <a href="{{ route('panel.admin.quick-scanner') }}" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl shadow-xl shadow-blue-600/20 transition-all text-center flex items-center justify-center gap-2">
+            <a href="{{ route('panel.instructor.scanner') }}" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl shadow-xl shadow-blue-600/20 transition-all text-center flex items-center justify-center gap-2">
                 <i class="fas fa-camera"></i> Abrir Scanner Agora
             </a>
         </div>

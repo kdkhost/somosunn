@@ -442,6 +442,8 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
     // Instructor Area
     Route::prefix('instrutor')->name('instructor.')->middleware([\App\Http\Middleware\EnsureInstructorAccess::class])->group(function () {
         Route::get('/', [\App\Http\Controllers\Panel\InstructorController::class, 'index'])->name('dashboard');
+        Route::get('/scanner', [\App\Http\Controllers\Admin\QuickScannerController::class, 'index'])->name('scanner');
+        Route::post('/scanner/validate', [\App\Http\Controllers\Admin\QuickScannerController::class, 'validateTicket'])->name('scanner.validate');
     });
 
     // Admin Area (Tailwind)
