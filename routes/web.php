@@ -297,6 +297,8 @@ Route::get('courses/{course}', [\App\Http\Controllers\CourseController::class, '
 // Mentorships (Public)
 Route::get('mentorships', [\App\Http\Controllers\MentorshipController::class, 'index'])->name('mentorships.index');
 Route::get('mentorships/{mentorship}', [\App\Http\Controllers\MentorshipController::class, 'show'])->name('mentorships.show');
+Route::get('mentorships/{mentorship}/checkout', [\App\Http\Controllers\MentorshipCheckoutController::class, 'show'])->name('mentorships.checkout.show');
+Route::post('mentorships/{mentorship}/checkout', [\App\Http\Controllers\MentorshipCheckoutController::class, 'process'])->name('mentorships.checkout.process');
 
 // Reviews
 Route::post('courses/{course}/reviews', [\App\Http\Controllers\ItemReviewController::class, 'storeCourse'])->middleware(['auth', 'check.feature:courses_review'])->name('courses.reviews.store');
