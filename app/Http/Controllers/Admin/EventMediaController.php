@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventMedia;
+use App\Services\ImageOptimizer;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 class EventMediaController extends Controller
 {
     public const DIRECT_UPLOAD_MAX_MB = 50;
-    private const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+    private const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic', 'heif'];
 
     public function store(Request $request, Event $event, WatermarkService $watermarkService)
     {
@@ -25,10 +26,21 @@ class EventMediaController extends Controller
 
         $uploadedMedia = [];
         $failedFiles = [];
+        $optimizer = app(ImageOptimizer::class);
 
         foreach ($this->validatedFiles($request->file('files')) as $fileData) {
             $file = $fileData['file'];
             $type = $fileData['type'];
+
+            // otimiza e converte HEIC antes de processar
+            if ($type === 'image') {
+                try {
+                    $file = $optimizer->process($file);
+                } catch (\Throwable $e) {
+                    $failedFiles[] = $fileData['file']->getClientOriginalName() . ' (' . $e->getMessage() . ')';
+                    continue;
+                }
+            }
             $targetDirectory = $type === 'image'
                 ? 'events/' . $event->id . '/gallery'
                 : 'events/' . $event->id . '/gallery/videos';

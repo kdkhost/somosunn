@@ -67,7 +67,7 @@
 
                             <div id="gallery-dropzone"
                                 class="gallery-dropzone rounded-[2rem] border-2 border-dashed border-slate-200 bg-slate-50 p-6 transition dark:border-slate-700 dark:bg-slate-950">
-                                <input id="gallery-files-input" type="file" name="files[]" accept="image/jpeg,image/png,image/jpg,image/webp" multiple
+                                <input id="gallery-files-input" type="file" name="files[]" accept="image/jpeg,image/png,image/jpg,image/webp,image/heic,image/heif,.heic,.heif" multiple
                                     class="hidden" data-filepond-ignore="true">
 
                                 <div class="flex flex-col items-center justify-center text-center">

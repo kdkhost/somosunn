@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Models\Mentorship;
 use App\Models\MentorshipMedia;
+use App\Services\ImageOptimizer;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 class MentorshipMediaController extends Controller
 {
     private const DIRECT_UPLOAD_MAX_MB = 50;
-    private const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+    private const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic', 'heif'];
 
     public function store(Request $request, Mentorship $mentorship, WatermarkService $watermarkService)
     {
@@ -28,11 +29,22 @@ class MentorshipMediaController extends Controller
         ]);
 
         $uploadedMedia = [];
-        $failedFiles = [];
+        $failedFiles   = [];
+        $optimizer     = app(ImageOptimizer::class);
 
         foreach ($this->validatedFiles($request->file('files')) as $fileData) {
             $file = $fileData['file'];
             $type = $fileData['type'];
+
+            // otimiza e converte HEIC antes de processar
+            if ($type === 'image') {
+                try {
+                    $file = $optimizer->process($file);
+                } catch (\Throwable $e) {
+                    $failedFiles[] = $fileData['file']->getClientOriginalName() . ' (' . $e->getMessage() . ')';
+                    continue;
+                }
+            }
             $targetDirectory = $type === 'image'
                 ? 'mentorships/' . $mentorship->id . '/gallery'
                 : 'mentorships/' . $mentorship->id . '/gallery/videos';

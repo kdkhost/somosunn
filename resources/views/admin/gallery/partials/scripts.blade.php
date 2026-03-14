@@ -61,7 +61,7 @@ $(function () {
     }
     function fileKind(file) {
         const t = String(file.type||'').toLowerCase(), n = String(file.name||'').toLowerCase();
-        if (t.startsWith('image/')||/\.(png|jpe?g|gif|webp)$/i.test(n)) return 'image';
+        if (t.startsWith('image/')||/\.(png|jpe?g|gif|webp|heic|heif)$/i.test(n)) return 'image';
         if (t.startsWith('video/')||/\.(mp4|mov|m4v|webm|mkv)$/i.test(n)) return 'video';
         return 'file';
     }

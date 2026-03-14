@@ -34,7 +34,7 @@
                         <small class="float-right text-muted">Arraste varias imagens e videos com preview, progresso e tempo restante por arquivo.</small>
 
                         <div class="gallery-admin-dropzone" id="adminDropzone" role="button" tabindex="0" aria-label="Zona de upload">
-                            <input type="file" name="files[]" multiple accept="image/*,video/*" id="adminFileInput" class="sr-only">
+                            <input type="file" name="files[]" multiple accept="image/*,image/heic,image/heif,video/*" id="adminFileInput" class="sr-only">
 
                             <div id="adminDropzoneEmpty" class="gallery-admin-dropzone-empty text-center p-5">
                                 <div class="mb-3 text-primary">
@@ -45,6 +45,7 @@
                                 <div>
                                     <span class="badge badge-primary">Imagens</span>
                                     <span class="badge badge-info">Videos</span>
+                                    <span class="badge badge-secondary">JPG PNG WEBP HEIC</span>
                                     <span class="badge badge-secondary">Ate {{ $galleryUploadPerFileLimitMb }} MB por arquivo</span>
                                 </div>
                             </div>

@@ -190,7 +190,8 @@ document.addEventListener('DOMContentLoaded', function () {
         incoming.forEach((file) => {
             const mime = String(file.type || '').toLowerCase();
             const name = String(file.name || '').toLowerCase();
-            const isImage = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(mime) || /\.(jpe?g|png|webp)$/i.test(name);
+            const isImage = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/heic', 'image/heif'].includes(mime)
+                || /\.(jpe?g|png|webp|heic|heif)$/i.test(name);
             if (!isImage) {
                 rejected.push(`${file.name} possui formato nao suportado. Use JPG, PNG ou WEBP.`);
                 return;
