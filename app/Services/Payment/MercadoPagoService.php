@@ -140,23 +140,24 @@ class MercadoPagoService
             'first_name' => $firstName,
             'last_name' => $lastName,
         ];
-        if ($cpf !== '') {
+        // Only send identification if CPF is a valid 11-digit string to avoid MP error 2067
+        if (strlen($cpf) === 11) {
             $payer['identification'] = [
-                'type' => 'CPF',
+                'type'   => 'CPF',
                 'number' => $cpf,
             ];
         }
 
         $pixExpirationMinutes = (int) Setting::get('pix_expiration_minutes', 15);
-        $dateOfExpiration = now()->addMinutes($pixExpirationMinutes)->format('Y-m-d\TH:i:s.vP');
+        $dateOfExpiration = now()->addMinutes($pixExpirationMinutes)->format('Y-m-d\\TH:i:s.vP');
 
         $paymentData = [
             'transaction_amount' => $calc['transaction_amount'],
-            'description' => $this->orderDescription($order),
-            'payment_method_id' => 'pix',
-            'payer' => $payer,
+            'description'        => $this->orderDescription($order),
+            'payment_method_id'  => 'pix',
+            'payer'              => $payer,
             'external_reference' => (string) $order->id,
-            'notification_url' => $this->notificationUrl(),
+            'notification_url'   => $this->notificationUrl(),
             'date_of_expiration' => $dateOfExpiration,
         ];
 
@@ -169,9 +170,12 @@ class MercadoPagoService
             ->post("{$this->baseUrl}/v1/payments", $paymentData);
 
         if ($response->failed()) {
-            \Log::error('MercadoPago Pix Error: ' . $response->body(), [
-                'order_id' => $order->id,
-                'status' => $response->status()
+            \Log::error('MercadoPago Pix Error', [
+                'order_id'   => $order->id,
+                'http_status'=> $response->status(),
+                'body'       => $response->json(),
+                'cpf_length' => strlen($cpf),
+                'payer_email'=> $payerEmail,
             ]);
             throw new Exception('Falha ao criar Pix: ' . $response->body());
         }
