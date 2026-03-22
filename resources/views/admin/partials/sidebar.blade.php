@@ -81,8 +81,8 @@
 
                 @if($canMarketplaceSeller)
                     <li class="nav-header">MARKETPLACE</li>
-                    <li class="nav-item has-treeview {{ $open('admin.marketplace.*') }}">
-                        <a href="#" class="nav-link {{ $is('admin.marketplace.*') }}">
+                    <li class="nav-item has-treeview {{ $open(['admin.marketplace.*', 'admin.splits.*']) }}">
+                        <a href="#" class="nav-link {{ $is(['admin.marketplace.*', 'admin.splits.*']) }}">
                             <i class="nav-icon fas fa-store"></i>
                             <p>Marketplace<i class="right fas fa-angle-left"></i></p>
                         </a>
@@ -111,7 +111,7 @@
                             @if(auth()->user()->isAdmin())
                                 <li class="nav-item">
                                     <a href="{{ route('admin.splits.index') }}"
-                                        class="nav-link {{ $is('admin.splits.index') }}">
+                                        class="nav-link {{ $is('admin.splits.*') }}">
                                         <i class="fas fa-money-bill-wave nav-icon text-success"></i>
                                         <p>Extrato de Splits</p>
                                     </a>
