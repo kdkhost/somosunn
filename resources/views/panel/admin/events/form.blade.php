@@ -245,11 +245,11 @@
                                 </div>
                             </div>
                             
-                            <div id="upload-actions" class="{{ $event->image ? 'flex' : 'hidden' }} items-center justify-between px-2 mt-2">
-                                <span class="text-xs font-mono font-medium text-slate-500" id="upload-filename">
+                            <div id="upload-actions" class="{{ $event->image ? 'flex' : 'hidden' }} items-center justify-between gap-3 px-2 mt-3 w-full">
+                                <span class="text-xs font-mono font-medium text-slate-500 truncate min-w-0" id="upload-filename" title="{{ $event->image ? basename($event->image) : '' }}">
                                     {{ $event->image ? basename($event->image) : '' }}
                                 </span>
-                                <button type="button" id="btn-remove-image" class="text-xs font-bold text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                                <button type="button" id="btn-remove-image" class="shrink-0 text-xs font-bold text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
                                     <i class="fas fa-trash-alt"></i> Remover Imagem
                                 </button>
                             </div>
@@ -714,6 +714,7 @@
 
                 // Show basic UI
                 filenameText.textContent = file.name;
+                filenameText.title = file.name;
                 removeInput.value = '0';
                 
                 // Read and set preview immediately
