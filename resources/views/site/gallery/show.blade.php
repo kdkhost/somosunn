@@ -206,23 +206,23 @@
         <div id="event-gallery-lightbox" class="fixed inset-0 z-[120] hidden">
             <div data-gallery-close class="absolute inset-0 bg-slate-950/95 backdrop-blur-md"></div>
 
-            <div class="relative flex min-h-full items-center justify-center p-4 md:p-8">
+            <div class="relative flex min-h-full items-center justify-center py-16 sm:p-4 md:p-8">
                 <button type="button" data-gallery-close
-                    class="absolute right-4 top-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-white transition hover:bg-white/20 md:right-8 md:top-8">
+                    class="absolute right-3 top-3 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white backdrop-blur transition hover:bg-white/20 sm:right-4 sm:top-4 sm:h-12 sm:w-12 md:right-8 md:top-8">
                     <i class="fas fa-xmark text-lg"></i>
                 </button>
 
                 <button type="button" id="event-gallery-prev"
-                    class="absolute left-3 top-1/2 z-10 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-white transition hover:bg-white/20 md:left-8 md:h-14 md:w-14">
+                    class="absolute left-2 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-slate-900/50 text-white backdrop-blur transition hover:bg-slate-900/80 sm:left-4 sm:h-12 sm:w-12 md:left-8 md:h-14 md:w-14">
                     <i class="fas fa-chevron-left"></i>
                 </button>
 
                 <div class="w-full max-w-6xl">
-                    <div class="overflow-hidden rounded-[2.2rem] border border-white/10 bg-slate-950/70 p-3 shadow-[0_30px_90px_rgba(15,23,42,0.55)]">
+                    <div class="overflow-hidden sm:rounded-[2.2rem] sm:border border-white/10 bg-transparent sm:bg-slate-950/70 sm:p-3 sm:shadow-[0_30px_90px_rgba(15,23,42,0.55)]">
                         <img id="event-gallery-lightbox-image" src="" alt=""
-                            class="max-h-[76vh] w-full rounded-[1.7rem] object-contain">
+                            class="max-h-[80vh] sm:max-h-[76vh] w-full rounded-none sm:rounded-[1.7rem] object-contain">
                     </div>
-                    <div class="mt-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                    <div class="mt-4 px-4 sm:px-0 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                         <div>
                             <p id="event-gallery-counter" class="text-xs font-black uppercase tracking-[0.22em] text-slate-400"></p>
                             <p id="event-gallery-caption" class="mt-2 text-sm text-slate-300"></p>
@@ -232,7 +232,7 @@
                 </div>
 
                 <button type="button" id="event-gallery-next"
-                    class="absolute right-3 top-1/2 z-10 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-white transition hover:bg-white/20 md:right-8 md:h-14 md:w-14">
+                    class="absolute right-2 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-slate-900/50 text-white backdrop-blur transition hover:bg-slate-900/80 sm:right-4 sm:h-12 sm:w-12 md:right-8 md:h-14 md:w-14">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
