@@ -54,59 +54,42 @@
                     </div>
                 </div>
 
-                <div class="relative mt-8 lg:mt-0">
-                    <div class="absolute inset-5 rounded-[2rem] bg-gradient-to-br from-blue-200/40 via-white/20 to-cyan-200/30 blur-3xl"></div>
+                <div class="relative mt-12 lg:mt-0 flex flex-col justify-center">
 
-                    @if ($page->get('hero_image'))
-                        <div class="relative mb-6 overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-white/70">
-                            <img
-                                src="{{ asset('storage/' . $page->get('hero_image')) }}"
-                                alt="{{ $page->get('hero_title', 'Sobre a UNN') }}"
-                                class="w-full object-cover"
-                                style="max-height: 260px;"
-                            >
-                            <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/40 to-transparent"></div>
-                        </div>
-                    @endif
-
-                    <div class="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/85 p-5 shadow-[0_30px_70px_-35px_rgba(15,23,42,0.45)] backdrop-blur md:p-8">
-                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(41,171,226,0.16),_transparent_38%),radial-gradient(circle_at_bottom_left,_rgba(46,49,146,0.12),_transparent_34%)]"></div>
-
-                        <div class="relative mb-6 flex items-start justify-between gap-4">
+                        <div class="mb-8 flex items-start justify-between gap-4">
                             <div>
                                 <p class="text-xs font-black uppercase tracking-[0.28em] text-sky-500">UNN em números</p>
-                                <h2 class="mt-2 text-2xl font-black text-slate-900 md:text-3xl">Crescimento real em escala nacional</h2>
-                                <p class="mt-2 max-w-xl text-sm leading-relaxed text-slate-500 md:text-base">
+                                <h2 class="mt-3 text-3xl font-black text-slate-900 md:text-4xl">Crescimento real em escala nacional</h2>
+                                <p class="mt-4 max-w-xl text-base leading-relaxed text-slate-500">
                                     Uma comunidade construída para transformar relacionamento em oportunidade, presença e resultado.
                                 </p>
                             </div>
 
-                            <div class="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2E3192] to-[#29ABE2] text-white shadow-lg md:flex">
-                                <i class="fas fa-chart-pie text-lg"></i>
+                            <div class="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2E3192] to-[#29ABE2] text-white shadow-lg md:flex">
+                                <i class="fas fa-chart-pie text-xl"></i>
                             </div>
                         </div>
 
-                        <div class="relative grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                             @foreach ($stats as $stat)
-                                <div class="group rounded-[1.6rem] border border-slate-200/80 bg-slate-50/90 p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-sky-200 hover:bg-white hover:shadow-xl md:p-6">
-                                    <div class="mb-5 flex items-center justify-between gap-3">
-                                        <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2E3192] to-[#29ABE2] text-white shadow-lg shadow-sky-200/60">
-                                            <i class="fas {{ $stat['icon'] }} text-sm"></i>
+                                <div class="group rounded-[2rem] border border-slate-200/80 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-xl md:p-10">
+                                    <div class="mb-6 flex items-center justify-between gap-3">
+                                        <span class="inline-flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-[#2E3192] to-[#29ABE2] text-white shadow-lg shadow-sky-200/60">
+                                            <i class="fas {{ $stat['icon'] }} text-lg"></i>
                                         </span>
                                         <span class="h-px flex-1 bg-gradient-to-r from-sky-200 via-slate-200 to-transparent"></span>
                                     </div>
 
-                                    <p class="break-words text-3xl font-black leading-none tracking-tight sm:text-4xl" style="color: var(--unn-azul-1)">
+                                    <p class="break-words text-4xl font-black leading-none tracking-tight sm:text-5xl" style="color: var(--unn-azul-1)">
                                         {{ $stat['value'] }}
                                     </p>
 
-                                    <p class="mt-3 text-sm font-medium leading-snug text-slate-600 md:text-base">
+                                    <p class="mt-4 text-sm font-medium leading-snug text-slate-500 md:text-base">
                                         {{ $stat['label'] }}
                                     </p>
                                 </div>
                             @endforeach
                         </div>
-                    </div>
                 </div>
             </div>
         </div>

@@ -672,12 +672,12 @@
 
         <section class="py-12 md:py-16 px-4 md:px-12 lg:px-24 bg-white">
             <div class="max-w-6xl mx-auto">
-                <div class="unn-events-cta rounded-[32px] px-6 md:px-14 py-14 md:py-16 text-center shadow-2xl relative overflow-hidden">
-                    <div class="absolute inset-0 opacity-20"
-                        style="background-image: radial-gradient(rgba(255,255,255,0.45) 1px, transparent 1px); background-size: 42px 42px;"></div>
+                @guest
+                    <div class="unn-events-cta rounded-[32px] px-6 md:px-14 py-14 md:py-16 text-center shadow-2xl relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20"
+                            style="background-image: radial-gradient(rgba(255,255,255,0.45) 1px, transparent 1px); background-size: 42px 42px;"></div>
 
-                    <div class="relative">
-                        @guest
+                        <div class="relative">
                             <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white">
                                 Pronto para transformar sua rede?
                             </h2>
@@ -698,67 +698,76 @@
                                     <i class="fas fa-crown"></i> Ver planos Premium
                                 </a>
                             </div>
-                        @else
-                            @php
-                                $userName = trim((string) (auth()->user()->name ?? ''));
-                                $firstName = $userName !== '' ? explode(' ', $userName)[0] : 'Membro';
-                                $eventsCount = method_exists($events, 'total') ? (int) $events->total() : (is_countable($events) ? count($events) : 0);
-                                $ctaTarget = $featuredEvent ? route('events.show', $featuredEvent) : route('events.index');
-                            @endphp
+                        </div>
+                    </div>
+                @else
+                    @php
+                        $userName = trim((string) (auth()->user()->name ?? ''));
+                        $firstName = $userName !== '' ? explode(' ', $userName)[0] : 'Membro';
+                        $eventsCount = method_exists($events, 'total') ? (int) $events->total() : (is_countable($events) ? count($events) : 0);
+                        $ctaTarget = $featuredEvent ? route('events.show', $featuredEvent) : route('events.index');
+                    @endphp
 
-                            <div class="max-w-5xl mx-auto text-left">
-                                <div class="grid grid-cols-1 lg:grid-cols-[1.35fr_0.95fr] gap-4 md:gap-5">
-                                    <div class="rounded-3xl border border-white/25 bg-white/10 backdrop-blur-md p-6 md:p-8 shadow-[0_20px_55px_rgba(0,0,0,.18)]">
-                                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-[0.16em] bg-white/20 text-white/90">
-                                            <i class="fas fa-sparkles"></i> Seu acesso está ativo
-                                        </span>
+                    <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_0.9fr] gap-6 md:gap-8 items-stretch text-left w-full">
+                        <div class="unn-events-cta rounded-[2rem] p-8 md:p-10 lg:p-12 shadow-2xl relative overflow-hidden flex flex-col justify-center">
+                            <div class="absolute inset-0 opacity-20"
+                                style="background-image: radial-gradient(rgba(255,255,255,0.45) 1px, transparent 1px); background-size: 42px 42px;"></div>
 
-                                        <h2 class="mt-4 text-3xl md:text-4xl font-black text-white leading-tight">
-                                            Bem-vindo de volta, {{ $firstName }}.
-                                        </h2>
-                                        <p class="mt-3 text-white/85 text-base md:text-lg leading-relaxed">
-                                            Sua agenda de networking está pronta. Entre em um evento agora ou avance para o próximo nível.
-                                        </p>
+                            <div class="relative z-10">
+                                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black uppercase tracking-[0.18em] bg-white/15 border border-white/20 text-white/95">
+                                    <i class="fas fa-sparkles"></i> Seu acesso está ativo
+                                </span>
 
-                                        <div class="mt-7 flex flex-col sm:flex-row gap-3">
-                                            <a href="{{ $ctaTarget }}"
-                                                class="inline-flex items-center justify-center gap-3 px-5 py-3 md:px-7 md:py-3.5 rounded-2xl font-black text-sm md:text-base bg-white shadow-xl hover:shadow-2xl transition"
-                                                style="color: var(--unn-azul-1)">
-                                                <i class="fas fa-ticket-alt"></i>
-                                                Quero meu ingresso
-                                            </a>
-                                            <a href="{{ route('planos') }}"
-                                                class="inline-flex items-center justify-center gap-3 px-5 py-3 md:px-7 md:py-3.5 rounded-2xl font-black text-sm md:text-base border-2 border-white text-white bg-white/10 hover:bg-white/20 transition">
-                                                <i class="fas fa-crown"></i> Upgrade Premium
-                                            </a>
-                                        </div>
-                                    </div>
+                                <h2 class="mt-6 text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight">
+                                    Bem-vindo de volta, {{ $firstName }}.
+                                </h2>
+                                <p class="mt-4 text-white/85 text-base md:text-lg leading-relaxed max-w-lg">
+                                    Sua agenda de networking está pronta. Entre em um evento agora ou avance para o próximo nível.
+                                </p>
 
-                                    <div class="rounded-3xl border border-white/20 bg-[#0f3ddf]/55 backdrop-blur-md p-6 shadow-[0_16px_36px_rgba(0,0,0,.18)]">
-                                        <h3 class="text-sm font-bold uppercase tracking-[0.14em] text-white/80">Radar UNN</h3>
-                                        <div class="mt-4 space-y-3">
-                                            <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3">
-                                                <p class="text-[11px] uppercase tracking-[0.12em] font-semibold text-white/70">Eventos disponíveis</p>
-                                                <p class="mt-1 text-2xl font-black text-white">{{ $eventsCount }}</p>
-                                            </div>
-                                            <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3">
-                                                <p class="text-[11px] uppercase tracking-[0.12em] font-semibold text-white/70">Destaque atual</p>
-                                                <p class="mt-1 text-sm font-bold text-white leading-snug">
-                                                    {{ $featuredEvent ? \Illuminate\Support\Str::limit($featuredEvent->title, 42) : 'Novos eventos em breve' }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <a href="{{ route('panel.dashboard') }}"
-                                            class="mt-4 inline-flex w-full items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white/15 hover:bg-white/20 border border-white/30 text-white font-bold transition">
-                                            <i class="fas fa-chart-line"></i> Abrir meu painel
-                                        </a>
-                                    </div>
+                                <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                                    <a href="{{ $ctaTarget }}"
+                                        class="inline-flex items-center justify-center gap-3 px-6 py-4 md:px-8 md:py-4 rounded-full font-black text-sm md:text-base bg-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition"
+                                        style="color: var(--unn-azul-1)">
+                                        <i class="fas fa-ticket-alt"></i>
+                                        Quero meu ingresso
+                                    </a>
+                                    <a href="{{ route('planos') }}"
+                                        class="inline-flex items-center justify-center gap-3 px-6 py-4 md:px-8 md:py-4 rounded-full font-black text-sm md:text-base border-2 border-white text-white bg-white/10 hover:bg-white/20 hover:-translate-y-0.5 transition">
+                                        <i class="fas fa-crown"></i> Upgrade Premium
+                                    </a>
                                 </div>
                             </div>
-                        @endguest
+                        </div>
+
+                        <div class="rounded-[2rem] border border-slate-200/80 bg-white p-8 md:p-10 lg:p-12 shadow-xl flex flex-col justify-center h-full">
+                            <div class="flex items-center gap-3 mb-6">
+                                <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 text-slate-400">
+                                    <i class="fas fa-satellite-dish text-xl"></i>
+                                </span>
+                                <h3 class="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Radar UNN</h3>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-5 transition hover:bg-slate-50">
+                                    <p class="text-[11px] uppercase tracking-[0.16em] font-bold text-slate-400">Eventos disponíveis</p>
+                                    <p class="mt-2 text-3xl font-black text-slate-900 leading-none">{{ $eventsCount }}</p>
+                                </div>
+                                <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-5 transition hover:bg-slate-50">
+                                    <p class="text-[11px] uppercase tracking-[0.16em] font-bold text-slate-400">Destaque atual</p>
+                                    <p class="mt-2 text-base font-bold text-slate-800 leading-snug">
+                                        {{ $featuredEvent ? \Illuminate\Support\Str::limit($featuredEvent->title, 42) : 'Novos eventos em breve' }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <a href="{{ route('panel.dashboard') }}"
+                                class="mt-8 inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full btn-primary text-white font-black transition shadow-lg shadow-blue-500/25 hover:shadow-xl hover:-translate-y-0.5">
+                                <i class="fas fa-chart-line"></i> Abrir meu painel
+                            </a>
+                        </div>
                     </div>
-                </div>
+                @endguest
             </div>
         </section>
     </div>
