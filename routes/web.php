@@ -684,7 +684,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
 
 // Checkout process
 Route::post('/checkout/process-payment', [\App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('checkout.process_payment');
+Route::post('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
 Route::get('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
+Route::get('/checkout/sucesso/{order}', [\App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/pendente/{order}', [\App\Http\Controllers\CheckoutController::class, 'pending'])->name('checkout.pending');
+Route::get('/checkout/falha/{order}', [\App\Http\Controllers\CheckoutController::class, 'failure'])->name('checkout.failure');
 
 // Impersonate Stop
 Route::get('/admin/stop-impersonating', [\App\Http\Controllers\Admin\ImpersonateController::class, 'stop'])->middleware(['auth'])->name('admin.impersonate.stop');

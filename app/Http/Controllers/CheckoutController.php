@@ -357,6 +357,37 @@ class CheckoutController extends Controller
         }
     }
 
+    public function success(Order $order, Request $request)
+    {
+        $this->abortIfOrderNotAccessible($order, $request);
+        return view('checkout.success', compact('order'));
+    }
+
+    public function pending(Order $order, Request $request)
+    {
+        $this->abortIfOrderNotAccessible($order, $request);
+        return view('checkout.pending', compact('order'));
+    }
+
+    public function failure(Order $order, Request $request)
+    {
+        $this->abortIfOrderNotAccessible($order, $request);
+        return view('checkout.failure', compact('order'));
+    }
+
+    private function abortIfOrderNotAccessible(Order $order, Request $request): void
+    {
+        $token = (string) $request->query('token');
+        $storedToken = (string) data_get($order->metadata, 'public_token');
+
+        $canAccess = Auth::check() && Auth::id() === $order->user_id;
+        if (!$canAccess && $token !== '' && $storedToken !== '') {
+            $canAccess = hash_equals($storedToken, $token);
+        }
+
+        abort_unless($canAccess, 403);
+    }
+
     private function findExistingFreeOrder(int $userId, string $itemType, int $itemId): ?Order
     {
         return Order::query()

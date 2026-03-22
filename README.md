@@ -1,5 +1,7 @@
 # UNN — Plataforma de Networking
 
+- **Correção de Rotas de Checkout (22/03):** Resolvidos erros de "rota não definida" no fluxo de compra de cursos. Foram adicionadas as rotas faltantes (`checkout.process`, `checkout.success`, `checkout.pending`, `checkout.failure`) e implementados os métodos de tratamento correspondentes no `CheckoutController`, garantindo a continuidade do fluxo após o pagamento via Mercado Pago.
+- **Validação de CPF no Mercado Pago (22/03):** Implementada trava de segurança no `MercadoPagoService` para garantir que o CPF enviado possua exatamente 11 dígitos, evitando erros de processamento (código 2067) e melhorando o detalhamento dos logs de erro para suporte técnico.
 - **Consolidação de Gateways de Pagamento (11/03):** Removidas as integrações com **SumUp** e **PagSeguro**, consolidando o sistema para utilizar exclusivamente o **MercadoPago**. Esta mudança simplifica a manutenção, elimina códigos obsoletos em diversos controladores (Checkout, Mentorias, Eventos) e otimiza a experiência de configuração para o administrador.
 - **Limpeza de Webhooks e Serviços (11/03):** Excluídas rotas e métodos de webhook redundantes, além de arquivos de serviço órfãos dos gateways removidos, reduzindo a dívida técnica do projeto.
 
