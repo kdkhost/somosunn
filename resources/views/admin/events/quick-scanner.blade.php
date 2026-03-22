@@ -149,7 +149,7 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script>
         let html5QrCode = null;
@@ -423,4 +423,4 @@
             }
         }
     </script>
-@endsection
+@endpush
