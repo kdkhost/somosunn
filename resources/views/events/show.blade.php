@@ -143,8 +143,9 @@
                         @endif
 
                         @if($event->description)
-                            <p class="text-base sm:text-lg text-white/80 leading-relaxed mb-6 md:mb-8 drop-shadow">
-                                {{ $event->description }}</p>
+                            <div class="text-base sm:text-lg text-white/80 leading-relaxed mb-6 md:mb-8 drop-shadow editor-content">
+                                {!! $event->description !!}
+                            </div>
                         @endif
 
                         <div class="grid sm:grid-cols-2 gap-4 mb-8">
@@ -349,6 +350,10 @@
                             <iframe
                                 src="https://www.openstreetmap.org/export/embed.html?bbox={{ $event->longitude - 0.005 }},{{ $event->latitude - 0.005 }},{{ $event->longitude + 0.005 }},{{ $event->latitude + 0.005 }}&layer=mapnik&marker={{ $event->latitude }},{{ $event->longitude }}"
                                 class="w-full h-full border-0" loading="lazy" title="Mapa do evento"></iframe>
+                        @elseif($event->address)
+                            <iframe
+                                src="https://maps.google.com/maps?q={{ urlencode($event->address) }}&output=embed"
+                                class="w-full h-full border-0" loading="lazy" title="Mapa do evento"></iframe>
                         @else
                             <div class="w-full h-full flex items-center justify-center bg-gray-100">
                                 <p class="text-gray-500">Mapa não disponível</p>
@@ -364,8 +369,8 @@
             <div class="max-w-4xl mx-auto">
                 <h2 class="text-3xl font-black text-gray-900 mb-8">Sobre o Evento</h2>
 
-                <div class="prose prose-lg max-w-none">
-                    <p class="text-gray-600 leading-relaxed">{{ $event->description }}</p>
+                <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed editor-content">
+                    {!! $event->description !!}
                 </div>
 
                 <div class="mt-12 grid sm:grid-cols-3 gap-6">

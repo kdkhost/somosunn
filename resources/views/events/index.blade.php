@@ -252,9 +252,9 @@
                                         <h2 class="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
                                             {{ $featuredEvent->title }}
                                         </h2>
-                                        <p class="mt-4 text-slate-600 text-base sm:text-lg leading-relaxed">
-                                            {{ $featuredEvent->description ?: 'Participe de um encontro exclusivo para empreendedores que buscam crescimento através de conexões estratégicas.' }}
-                                        </p>
+                                        <div class="mt-4 text-slate-600 text-base sm:text-lg leading-relaxed editor-content line-clamp-4">
+                                            {!! strip_tags(str_replace(['<br>', '</p>'], ' ', $featuredEvent->description)) ?: 'Participe de um encontro exclusivo para empreendedores que buscam crescimento através de conexões estratégicas.' !!}
+                                        </div>
 
                                         <div class="mt-8 space-y-5">
                                             <div class="flex items-start gap-4">
