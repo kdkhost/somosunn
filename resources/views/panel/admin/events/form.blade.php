@@ -349,47 +349,76 @@
                         <p class="mt-1">Se o evento usar cerca digital, estas coordenadas definem o ponto de leitura do QR Code. Sem latitude e longitude, a restricao de localizacao nao pode ser aplicada.</p>
                     </div>
                 </div>
-            </div>
+               </div>
 
             {{-- Tab: Pricing --}}
             <div x-show="tab === 'pricing'" class="max-w-3xl space-y-6">
-                <div
-                    class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
                     <div>
-                        <label
-                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Preço
-                            do Ingresso (R$)</label>
+                        <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Preço Base do Ingresso (R$)</label>
                         <div class="relative">
-                            <span
-                                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold transition-colors">R$</span>
-                            <input type="text" name="price"
-                                value="{{ old('price', number_format($event->price, 2, ',', '.')) }}"
-                                class="mask-money w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-bold text-lg">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold transition-colors">R$</span>
+                            <input type="text" name="price" value="{{ old('price', number_format($event->price ?: 0, 2, ',', '.')) }}" class="mask-money w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-bold text-lg">
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Valor principal de entrada. Se os lotes estiverem vazios, este valor será usado como entrada.</p>
+                    </div>
+
+                    {{-- Dynamic Batches --}}
+                    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 overflow-hidden text-sm">
+                        <div class="p-4 bg-slate-100 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                            <i class="fas fa-layer-group"></i>
+                            <span>Lotes de Ingressos</span>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            {{-- Batch 1 --}}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-slate-200 dark:border-slate-800">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">1º Lote (R$)</label>
+                                    <input type="text" name="batch_1_price" value="{{ old('batch_1_price', $event->batch_1_price ? number_format($event->batch_1_price, 2, ',', '.') : '') }}" class="mask-money w-full px-4 py-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none text-slate-800 dark:text-white font-semibold" placeholder="0,00">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Até quando?</label>
+                                    <input type="datetime-local" name="batch_1_deadline" value="{{ old('batch_1_deadline', $event->batch_1_deadline ? $event->batch_1_deadline->format('Y-m-d\TH:i') : '') }}" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none text-slate-800 dark:text-white font-semibold">
+                                </div>
+                            </div>
+                            {{-- Batch 2 --}}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-slate-200 dark:border-slate-800">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">2º Lote (R$)</label>
+                                    <input type="text" name="batch_2_price" value="{{ old('batch_2_price', $event->batch_2_price ? number_format($event->batch_2_price, 2, ',', '.') : '') }}" class="mask-money w-full px-4 py-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none text-slate-800 dark:text-white font-semibold" placeholder="0,00">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Até quando?</label>
+                                    <input type="datetime-local" name="batch_2_deadline" value="{{ old('batch_2_deadline', $event->batch_2_deadline ? $event->batch_2_deadline->format('Y-m-d\TH:i') : '') }}" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none text-slate-800 dark:text-white font-semibold">
+                                </div>
+                            </div>
+                            {{-- Batch 3 --}}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">3º Lote / Na hora (R$)</label>
+                                    <input type="text" name="batch_3_price" value="{{ old('batch_3_price', $event->batch_3_price ? number_format($event->batch_3_price, 2, ',', '.') : '') }}" class="mask-money w-full px-4 py-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none text-slate-800 dark:text-white font-semibold" placeholder="0,00">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Até o evento</label>
+                                    <input type="datetime-local" name="batch_3_deadline" value="{{ old('batch_3_deadline', $event->batch_3_deadline ? $event->batch_3_deadline->format('Y-m-d\TH:i') : '') }}" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none text-slate-800 dark:text-white font-semibold">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div
-                        class="p-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/30 space-y-6 transition-colors">
+                    <div class="p-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/30 space-y-6 transition-colors">
                         <div class="flex items-center gap-3 text-emerald-700 dark:text-emerald-400 font-bold">
                             <i class="fas fa-bolt"></i>
                             <span>Preço Promocional Flash</span>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label
-                                    class="block text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 transition-colors">Valor
-                                    Flash</label>
-                                <input type="text" name="flash_sale_price"
-                                    value="{{ old('flash_sale_price', $event->flash_sale_price ? number_format($event->flash_sale_price, 2, ',', '.') : '') }}"
-                                    class="mask-money w-full px-4 py-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-emerald-900 dark:text-white font-bold">
+                                <label class="block text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 transition-colors">Valor Flash (R$)</label>
+                                <input type="text" name="flash_sale_price" value="{{ old('flash_sale_price', $event->flash_sale_price ? number_format($event->flash_sale_price, 2, ',', '.') : '') }}" class="mask-money w-full px-4 py-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-emerald-900 dark:text-white font-bold">
                             </div>
                             <div>
-                                <label
-                                    class="block text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 transition-colors">Expira
-                                    em</label>
-                                <input type="datetime-local" name="flash_sale_ends_at"
-                                    value="{{ old('flash_sale_ends_at', $event->flash_sale_ends_at ? $event->flash_sale_ends_at->format('Y-m-d\TH:i') : '') }}"
-                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-emerald-900 dark:text-white font-medium">
+                                <label class="block text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 transition-colors">Expira em</label>
+                                <input type="datetime-local" name="flash_sale_ends_at" value="{{ old('flash_sale_ends_at', $event->flash_sale_ends_at ? $event->flash_sale_ends_at->format('Y-m-d\TH:i') : '') }}" class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-emerald-900 dark:text-white font-medium">
                             </div>
                         </div>
                     </div>

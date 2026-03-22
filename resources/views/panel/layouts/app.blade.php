@@ -723,32 +723,44 @@
 
                             if(doc.title) document.title = doc.title;
 
-                            const newShell = doc.querySelector('.panel-theme-shell');
-                            const oldShell = document.querySelector('.panel-theme-shell');
+                            // Fallback Graceful: Se a nova página exige scripts/CSS inéditos (ex: Summernote, Leaflet), faremos um hard-reload 
+                            // para garantir que dependencias async carreguem na ordem correta, evitando quebras de UI.
+                            let requiresHardReload = false;
                             
-                            if(newShell && oldShell) {
-                                oldShell.innerHTML = newShell.innerHTML;
-                                oldShell.className = newShell.className; 
-                                oldShell.style.opacity = '1';
+                            // Check Scripts (src)
+                            Array.from(doc.querySelectorAll('script[src]')).forEach(script => {
+                                if(!document.querySelector(`script[src="${script.getAttribute('src')}"]`)) {
+                                    requiresHardReload = true;
+                                }
+                            });
 
-                                // Capturar os scripts do corpo novo que estão FORA do shell e DENTRO do shell,
-                                // Na pratica, capturamos todos os scripts de `doc.body` que nao tenham srs ou que precisem de eval
-                                const newScripts = Array.from(doc.body.querySelectorAll('script'));
-                                newScripts.forEach(oldScript => {
-                                    // Evitar executar redundâncias gigantes se tiver ID/src global (pode ser refinado depois)
-                                    if(oldScript.src && oldScript.src.includes('cdn')) return;
-                                    
-                                    const newScript = document.createElement('script');
-                                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                                    document.body.appendChild(newScript);
-                                    newScript.parentNode.removeChild(newScript); // Executa e remove da árvore pra limpar
-                                });
+                            // Check CSS Links
+                            Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).forEach(link => {
+                                if(!document.querySelector(`link[href="${link.getAttribute('href')}"]`)) {
+                                    requiresHardReload = true;
+                                }
+                            });
 
-                            } else {
+                            if(requiresHardReload || !(newShell && oldShell)) {
                                 window.location.href = url.href;
                                 return;
                             }
+
+                            // Apenas HTML Atualização Leve
+                            oldShell.innerHTML = newShell.innerHTML;
+                            oldShell.className = newShell.className; 
+                            oldShell.style.opacity = '1';
+
+                            // Capturar e executar apenas scripts inlines (já que scripts src foram isolados acima)
+                            const newScripts = Array.from(doc.body.querySelectorAll('script:not([src])'));
+                            newScripts.forEach(oldScript => {
+                                if(oldScript.innerHTML.trim() === '') return;
+                                const newScript = document.createElement('script');
+                                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                                document.body.appendChild(newScript);
+                                newScript.parentNode.removeChild(newScript);
+                            });
 
                             window.initPanelScripts();
                             document.dispatchEvent(new CustomEvent('alpine:init'));
