@@ -114,7 +114,8 @@
                                 </div>
                             @endif
 
-                            <form action="{{ route('events.reserve', $event) }}" method="POST" class="space-y-6">
+                            <form action="{{ route('events.reserve', $event) }}" method="POST" class="space-y-6"
+                                data-no-ajax="true" data-no-spa="true">
                                 @csrf
 
                                 <div class="grid gap-4 sm:grid-cols-2">

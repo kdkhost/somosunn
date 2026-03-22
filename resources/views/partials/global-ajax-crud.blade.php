@@ -16,6 +16,7 @@
             /\/logout(?:\/|$)/i,
             /\/password(?:\/|$)/i,
             /\/checkout(?:\/|$)/i,
+            /\/reservar(?:\/|$)/i,
             /\/payment/i,
             /mercadopago/i,
             /\/subscription/i,

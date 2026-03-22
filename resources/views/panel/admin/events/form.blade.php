@@ -203,22 +203,54 @@
                         <label
                             class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-4 transition-colors">Capa
                             do Evento</label>
-                        <div class="space-y-4">
-                            <input type="hidden" name="remove_image" value="0">
-                            <div class="upload-box premium-upload-box w-full bg-slate-100 dark:bg-slate-950/50 border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-6 transition-all hover:border-blue-500 text-center relative"
-                                data-max-size="5242880"
-                                data-existing-url="{{ $event->image ? asset('storage/' . $event->image) : '' }}"
-                                data-remove-input="[name='remove_image']">
-                                <input type="file" name="image" accept="image/*" class="d-none" {{ $event->image ? '' : 'required' }}>
-                                <div class="upload-preview mb-4 flex items-center justify-center aspect-video w-full rounded-xl overflow-hidden bg-black/5"></div>
-                                <div class="upload-meta text-sm text-slate-500 dark:text-slate-400 font-medium font-mono"></div>
-                                <small class="upload-help block text-xs text-slate-400 mt-2 font-bold uppercase"></small>
+                        <div class="space-y-4" id="event-cover-upload-container">
+                            <input type="hidden" name="remove_image" id="remove_image_input" value="0">
+                            <input type="file" name="image" id="image_upload_input" accept="image/*" class="hidden" {{ $event->image ? '' : 'required' }}>
+                            
+                            <div id="drag-drop-area" class="group relative w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl p-8 transition-all duration-300 ease-out cursor-pointer overflow-hidden bg-slate-50 dark:bg-slate-900/50 hover:border-blue-500 hover:bg-blue-50/50 dark:hover:border-blue-500 dark:hover:bg-blue-900/20" style="min-height: 240px;">
                                 
-                                <div class="progress upload-progress d-none mt-4 w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                                    <div class="progress-bar h-full bg-blue-500 transition-all duration-300 rounded-full" style="width:0%"></div>
+                                <!-- Estado Inicial / Vazio -->
+                                <div id="upload-prompt" class="flex flex-col items-center justify-center pointer-events-none transition-opacity duration-300 z-10 {{ $event->image ? 'opacity-0' : '' }}">
+                                    <div class="w-16 h-16 mb-4 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300">
+                                        <i class="fas fa-cloud-upload-alt text-2xl"></i>
+                                    </div>
+                                    <p class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                        <span class="text-blue-600 dark:text-blue-400">Clique para fazer upload</span> ou arraste a imagem
+                                    </p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">PNG, JPG, WEBP até 5MB. Recomendado: 1920x1080px</p>
                                 </div>
-                                <button type="button" class="upload-remove d-none mt-4 px-4 py-2 bg-red-500/10 text-red-600 hover:bg-red-500/20 hover:text-red-700 dark:text-red-400 font-bold text-xs rounded-xl uppercase transition-colors mx-auto inline-flex items-center">
-                                    <i class="fas fa-trash-alt mr-1"></i> Remover Imagem
+
+                                <!-- Preview ativo -->
+                                <div id="upload-preview-container" class="absolute inset-x-2 inset-y-2 pointer-events-none transition-opacity duration-300 z-0 flex flex-col items-center justify-center rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 {{ $event->image ? 'opacity-100' : 'opacity-0' }}">
+                                    <img id="upload-preview-image" class="w-full h-full object-cover transition-transform duration-700" src="{{ $event->image ? asset('storage/' . $event->image) : '' }}" alt="Preview da Capa">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
+                                    
+                                    <!-- Barra de Progresso Simulação -->
+                                    <div id="upload-progress-wrapper" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-sm flex flex-col items-center opacity-0 transition-opacity duration-300 z-20 pointer-events-none">
+                                        <div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md px-5 py-4 rounded-2xl shadow-2xl w-full flex flex-col gap-3">
+                                            <div class="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300">
+                                                <span class="flex items-center gap-2"><i class="fas fa-spinner fa-spin text-blue-500"></i> Processando...</span>
+                                                <span id="upload-progress-text">0%</span>
+                                            </div>
+                                            <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden relative">
+                                                <div id="upload-progress-bar" class="bg-blue-600 h-full rounded-full transition-all duration-200 absolute left-0 top-0" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Badge de Sucesso após upload simulado -->
+                                    <div id="upload-success-badge" class="absolute top-4 right-4 bg-emerald-500/90 backdrop-blur text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 opacity-0 transition-opacity duration-300 z-20 translate-y-2">
+                                        <i class="fas fa-check-circle"></i> Imagem pronta
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="upload-actions" class="{{ $event->image ? 'flex' : 'hidden' }} items-center justify-between px-2 mt-2">
+                                <span class="text-xs font-mono font-medium text-slate-500" id="upload-filename">
+                                    {{ $event->image ? basename($event->image) : '' }}
+                                </span>
+                                <button type="button" id="btn-remove-image" class="text-xs font-bold text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                                    <i class="fas fa-trash-alt"></i> Remover Imagem
                                 </button>
                             </div>
                         </div>
@@ -605,6 +637,154 @@
     @endpush
 
     @push('scripts')
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropArea = document.getElementById('drag-drop-area');
+            const fileInput = document.getElementById('image_upload_input');
+            const removeInput = document.getElementById('remove_image_input');
+            const previewContainer = document.getElementById('upload-preview-container');
+            const previewImage = document.getElementById('upload-preview-image');
+            const promptArea = document.getElementById('upload-prompt');
+            const progressWrapper = document.getElementById('upload-progress-wrapper');
+            const progressBar = document.getElementById('upload-progress-bar');
+            const progressText = document.getElementById('upload-progress-text');
+            const actionsArea = document.getElementById('upload-actions');
+            const filenameText = document.getElementById('upload-filename');
+            const btnRemove = document.getElementById('btn-remove-image');
+            const successBadge = document.getElementById('upload-success-badge');
+
+            if (!dropArea) return;
+
+            // Open file chooser on click
+            dropArea.addEventListener('click', () => {
+                // Ensure we interact only if not simulating progress
+                if (progressWrapper.style.pointerEvents === 'auto') return;
+                fileInput.click();
+            });
+
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Highlight drop area when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => {
+                    dropArea.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/40');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => {
+                    dropArea.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/40');
+                }, false);
+            });
+
+            // Handle dropped files
+            dropArea.addEventListener('drop', handleDrop, false);
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files.length) handleFiles(this.files);
+            });
+
+            function handleDrop(e) {
+                let dt = e.dataTransfer;
+                let files = dt.files;
+                if (files.length) {
+                    fileInput.files = files; // Sync hidden input for form post
+                    handleFiles(files);
+                }
+            }
+
+            function handleFiles(files) {
+                const file = files[0];
+                if (!file.type.match('image.*')) {
+                    if (typeof toastr !== 'undefined') toastr.error('Por favor, selecione apenas arquivos de imagem.');
+                    return;
+                }
+
+                if (file.size > 5242880) { // 5MB limit
+                    if (typeof toastr !== 'undefined') toastr.error('A imagem excede o tamanho máximo de 5MB.');
+                    return;
+                }
+
+                // Show basic UI
+                filenameText.textContent = file.name;
+                removeInput.value = '0';
+                
+                // Read and set preview immediately
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    showPreviewUi();
+                    simulateFakeUpload();
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function showPreviewUi() {
+                promptArea.classList.add('opacity-0');
+                previewContainer.classList.remove('opacity-0');
+                previewImage.classList.add('scale-105');
+                setTimeout(() => previewImage.classList.remove('scale-105'), 50);
+                
+                actionsArea.classList.remove('hidden');
+                actionsArea.classList.add('flex');
+                
+                successBadge.classList.add('opacity-0', 'translate-y-2');
+                successBadge.classList.remove('opacity-100', 'translate-y-0');
+            }
+
+            function hidePreviewUi() {
+                promptArea.classList.remove('opacity-0');
+                previewContainer.classList.add('opacity-0');
+                previewImage.src = '';
+                
+                actionsArea.classList.add('hidden');
+                actionsArea.classList.remove('flex');
+            }
+
+            function simulateFakeUpload() {
+                progressWrapper.classList.remove('opacity-0');
+                progressWrapper.style.pointerEvents = 'auto'; // block clicks during upload
+                
+                let progress = 0;
+                progressBar.style.width = '0%';
+                progressText.textContent = '0%';
+
+                const interval = setInterval(() => {
+                    progress += Math.random() * 20; 
+                    if (progress >= 100) progress = 100;
+                    
+                    progressBar.style.width = Math.min(progress, 100) + '%';
+                    progressText.textContent = Math.floor(progress) + '%';
+
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            progressWrapper.classList.add('opacity-0');
+                            progressWrapper.style.pointerEvents = 'none';
+                            
+                            // Pop the success badge
+                            successBadge.classList.remove('opacity-0', 'translate-y-2');
+                            successBadge.classList.add('opacity-100', 'translate-y-0');
+                        }, 400); // give user time to see 100%
+                    }
+                }, 100);
+            }
+
+            btnRemove.addEventListener('click', () => {
+                fileInput.value = '';
+                removeInput.value = '1';
+                hidePreviewUi();
+                if (typeof toastr !== 'undefined') toastr.info('Imagem removida.');
+            });
+        });
+        </script>
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
         <script>
         // Money Mask

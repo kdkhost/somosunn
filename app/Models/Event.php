@@ -197,18 +197,18 @@ class Event extends Model
     public function currentBatchLabelFor(?User $user = null): string
     {
         if ($this->hasFirstLotPriority($user) && $this->batch_1_price !== null) {
-            return '1o Lote';
+            return '1° Lote';
         }
 
         $now = now();
         if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline))) {
-            return '1o Lote';
+            return '1° Lote';
         }
         if ($this->batch_2_price && (!$this->batch_2_deadline || $now->lte($this->batch_2_deadline))) {
-            return '2o Lote';
+            return '2° Lote';
         }
         if ($this->batch_3_price) {
-            return '3o Lote';
+            return '3° Lote';
         }
 
         return 'Entrada';
