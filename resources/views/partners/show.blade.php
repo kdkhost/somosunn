@@ -1,7 +1,18 @@
 @extends('layouts.app')
 
 @section('title', $partner->name . ' — Cupons Exclusivos')
-@section('description', 'Acesse cupons e descontos exclusivos de ' . $partner->name . ' para membros da plataforma SOMOS UNN.')
+
+@php
+    $_seoPartnerDesc = trim((string) ($partner->description ?? ''));
+    $_seoPartnerDesc = $_seoPartnerDesc !== '' ? \Illuminate\Support\Str::limit($_seoPartnerDesc, 155) : 'Acesse cupons e descontos exclusivos de ' . $partner->name . ' para membros da plataforma.';
+    $_seoPartnerImg = $partner->logo_url ?? null;
+@endphp
+@section('meta_title', $partner->name . ' — Cupons e Beneficios para Membros')
+@section('meta_description', $_seoPartnerDesc)
+@if($_seoPartnerImg)
+    @section('meta_image', $_seoPartnerImg)
+@endif
+@section('og_type', 'website')
 
 @section('content')
     <div class="min-h-screen" style="background:linear-gradient(135deg,#f0f4ff 0%,#f8fafc 60%,#e8f5ff 100%);">

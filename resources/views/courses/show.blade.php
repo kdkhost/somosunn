@@ -2,6 +2,22 @@
 
 @section('title', $course->title . ' - UNN')
 
+@php
+    $_seoCourseDesc = trim(strip_tags((string) ($course->short_description ?? $course->full_description ?? '')));
+    $_seoCourseDesc = $_seoCourseDesc !== '' ? \Illuminate\Support\Str::limit($_seoCourseDesc, 155) : ($course->title . ' - Aprenda com nosso curso online. Acesso completo, certificado de conclusão e suporte.');
+    $_seoCourseImg = null;
+    if (!empty($course->thumbnail)) {
+        $_p = trim((string) $course->thumbnail);
+        $_seoCourseImg = (str_starts_with($_p, 'http://') || str_starts_with($_p, 'https://')) ? $_p : asset('storage/' . ltrim($_p, '/'));
+    }
+@endphp
+@section('meta_title', $course->title . ' | UNN Cursos')
+@section('meta_description', $_seoCourseDesc)
+@if($_seoCourseImg)
+    @section('meta_image', $_seoCourseImg)
+@endif
+@section('og_type', 'article')
+
 @push('styles')
     <style>
         /* Rating styles managed in partials/reviews/form.blade.php */

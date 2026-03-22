@@ -2,6 +2,14 @@
 
 @section('title', $job->title)
 
+@php
+    $_seoJobDesc = trim(strip_tags((string) ($job->description ?? '')));
+    $_seoJobDesc = $_seoJobDesc !== '' ? \Illuminate\Support\Str::limit($_seoJobDesc, 155) : ($job->title . ' - Vaga aberta em ' . ($job->company_name ?? 'Empresa') . '. Candidate-se agora na UNN.');
+@endphp
+@section('meta_title', $job->title . ' — Vaga de ' . $job->type)
+@section('meta_description', $_seoJobDesc)
+@section('og_type', 'article')
+
 @section('content')
     <style>
         .unn-jobs-hero {

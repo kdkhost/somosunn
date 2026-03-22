@@ -2,6 +2,22 @@
 
 @section('title', ($mentorship->title ?? 'Mentoria') . ' - UNN')
 
+@php
+    $_seoMentDesc = trim(strip_tags((string) ($mentorship->description ?? '')));
+    $_seoMentDesc = $_seoMentDesc !== '' ? \Illuminate\Support\Str::limit($_seoMentDesc, 155) : (($mentorship->title ?? 'Mentoria') . ' - Acompanhamento direto com um mentor especialista. Vagas limitadas.');
+    $_seoMentImg = null;
+    if (!empty($mentorship->image)) {
+        $_mp = trim((string) $mentorship->image);
+        $_seoMentImg = (str_starts_with($_mp, 'http://') || str_starts_with($_mp, 'https://')) ? $_mp : asset('storage/' . ltrim($_mp, '/'));
+    }
+@endphp
+@section('meta_title', ($mentorship->title ?? 'Mentoria') . ' | UNN Mentorias')
+@section('meta_description', $_seoMentDesc)
+@if($_seoMentImg)
+    @section('meta_image', $_seoMentImg)
+@endif
+@section('og_type', 'article')
+
 @push('styles')
     <style>
         .unn-mentorship-show-hero {

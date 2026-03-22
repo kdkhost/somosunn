@@ -2,6 +2,18 @@
 
 @section('title', $event->title . ' - Eventos UNN')
 
+@php
+    $_seoEventDesc = trim(strip_tags((string) ($event->description ?? $event->short_description ?? '')));
+    $_seoEventDesc = $_seoEventDesc !== '' ? \Illuminate\Support\Str::limit($_seoEventDesc, 155) : ($event->title . ' - Confira todos os detalhes do evento e garanta sua vaga.');
+    $_seoEventImg = $event->image_url ?? null;
+@endphp
+@section('meta_title', $event->title . ' | Eventos UNN')
+@section('meta_description', $_seoEventDesc)
+@if($_seoEventImg)
+    @section('meta_image', $_seoEventImg)
+@endif
+@section('og_type', 'article')
+
 @section('content')
     @php
         $suppressFlashErrorToast = true;
