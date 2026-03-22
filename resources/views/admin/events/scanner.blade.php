@@ -11,175 +11,122 @@
 
 @push('styles')
 <style>
-    /* ─── Theme-aware tokens ─────────────────────────────────────────── */
-    :root {
-        --sc-bg:          #f1f5f9;
-        --sc-card:        #ffffff;
-        --sc-card-border: rgba(0,0,0,.08);
-        --sc-text:        #1e293b;
-        --sc-muted:       #64748b;
-        --sc-reader-bg:   #f8fafc;
-        --sc-overlay-bg:  rgba(255,255,255,.95);
-        --sc-header-bg:   linear-gradient(135deg,#1f5edb,#1D3FC4);
+    /* Minimal dark-mode fixes for html5-qrcode internal UI */
+    body.dark-mode #reader button  { background: #374151 !important; color: #e5e7eb !important; border-color: #4b5563 !important; }
+    body.dark-mode #reader select  { background: #1f2937 !important; color: #e5e7eb !important; border-color: #4b5563 !important; }
+    body.dark-mode #reader__scan_region img { filter: invert(1) !important; }
+
+    /* Overlay inside the reader box */
+    .reader-wrapper { position: relative; min-height: 300px; }
+    .scanner-overlay {
+        position: absolute; inset: 0;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background: rgba(255,255,255,.94);
+        z-index: 20;
+        border-radius: .25rem;
+        padding: 1.5rem;
     }
-    body.dark-mode {
-        --sc-bg:          #1a1f2e;
-        --sc-card:        #252d3d;
-        --sc-card-border: rgba(255,255,255,.07);
-        --sc-text:        #e2e8f0;
-        --sc-muted:       #94a3b8;
-        --sc-reader-bg:   #1e2535;
-        --sc-overlay-bg:  rgba(30,37,53,.95);
-        --sc-header-bg:   linear-gradient(135deg,#1D3FC4,#0f1e6e);
+    body.dark-mode .scanner-overlay { background: rgba(30,37,53,.94); }
+    .scanner-overlay.is-visible { display: flex; }
+
+    .overlay-icon-wrap {
+        width: 72px; height: 72px;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: .75rem;
     }
-
-    /* ─── Layout ─────────────────────────────────────────────────────── */
-    .sc-wrapper      { background: var(--sc-bg); min-height: 100%; padding: 1.5rem 0 3rem; }
-    .sc-card         { background: var(--sc-card); border: 1px solid var(--sc-card-border);
-                       border-radius: 1rem; overflow: hidden;
-                       box-shadow: 0 4px 24px rgba(0,0,0,.07); }
-
-    /* ─── Header ─────────────────────────────────────────────────────── */
-    .sc-header       { background: var(--sc-header-bg); padding: 1.25rem 1.5rem;
-                       display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-    .sc-header h3    { color: #fff; margin: 0; font-weight: 800; font-size: 1.1rem; }
-    .sc-back-btn     { background: rgba(255,255,255,.15); color: #fff !important;
-                       border: 1px solid rgba(255,255,255,.3); border-radius: .5rem;
-                       padding: .4rem 1rem; font-weight: 700; font-size: .85rem;
-                       text-decoration: none; transition: background .2s; white-space: nowrap; }
-    .sc-back-btn:hover{ background: rgba(255,255,255,.28); }
-
-    /* ─── Body ───────────────────────────────────────────────────────── */
-    .sc-body         { padding: 1.5rem; color: var(--sc-text); }
-    .sc-event-title  { font-size: 1.15rem; font-weight: 700; color: var(--sc-text); margin: 0 0 .25rem; }
-    .sc-event-date   { font-size: .88rem; color: var(--sc-muted); }
-
-    /* ─── Status badge ───────────────────────────────────────────────── */
-    .sc-status       { display: inline-flex; align-items: center; gap: .45rem;
-                       padding: .5rem 1.1rem; border-radius: 2rem; font-weight: 700;
-                       font-size: .87rem; margin: 1rem 0; }
-    .sc-status.open  { background: #d1fae5; color: #065f46; }
-    .sc-status.closed{ background: #fee2e2; color: #991b1b; }
-    body.dark-mode .sc-status.open  { background: rgba(16,185,129,.18); color: #6ee7b7; }
-    body.dark-mode .sc-status.closed{ background: rgba(239, 68, 68,.18); color: #fca5a5; }
-
-    /* ─── Info chips ─────────────────────────────────────────────────── */
-    .sc-info-grid    { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-bottom: 1.5rem; }
-    @media(max-width:576px){ .sc-info-grid{ grid-template-columns: 1fr; } }
-    .sc-info-chip    { background: var(--sc-reader-bg); border: 1px solid var(--sc-card-border);
-                       border-radius: .75rem; padding: .75rem 1rem; font-size: .83rem; color: var(--sc-muted); }
-    .sc-info-chip strong { display: block; color: var(--sc-text); font-weight: 700; margin-bottom: .2rem; }
-
-    /* ─── Reader box ─────────────────────────────────────────────────── */
-    .sc-reader-box   { background: var(--sc-reader-bg); border: 1px solid var(--sc-card-border);
-                       border-radius: .875rem; overflow: hidden; position: relative; max-width: 500px; margin: 0 auto; }
-    /* html5-qrcode dark-mode adjustments */
-    body.dark-mode #reader         { filter: invert(0); }
-    body.dark-mode #reader button  { background:#334155!important; color:#e2e8f0!important; border-color:#475569!important; }
-    body.dark-mode #reader select  { background:#1e2535!important; color:#e2e8f0!important; border-color:#475569!important; }
-    body.dark-mode #reader__scan_region { background: var(--sc-reader-bg)!important; }
-
-    /* ─── Overlay ────────────────────────────────────────────────────── */
-    .sc-overlay      { position: absolute; inset: 0; display: none; flex-direction: column;
-                       align-items: center; justify-content: center; text-align: center;
-                       padding: 1.5rem; background: var(--sc-overlay-bg);
-                       border-radius: .875rem; z-index: 20; }
-    .sc-overlay.is-visible { display: flex; }
-    .sc-overlay-icon { width: 80px; height: 80px; border-radius: 50%;
-                       display: flex; align-items: center; justify-content: center;
-                       font-size: 2rem; margin-bottom: 1rem;
-                       transition: transform .25s ease; }
-    .sc-overlay-msg  { font-weight: 700; font-size: 1.05rem; color: var(--sc-text); margin: 0 0 .5rem; }
-    .sc-overlay-sub  { font-size: .87rem; color: var(--sc-muted); }
-
-    /* ─── Hint ───────────────────────────────────────────────────────── */
-    .sc-hint         { text-align: center; font-size: .83rem; color: var(--sc-muted); margin-top: .75rem; }
-
-    /* ─── Btn theme-aware ────────────────────────────────────────────── */
-    .btn-sc-primary  { background: linear-gradient(135deg,#1F5EDB,#1D3FC4); color: #fff!important;
-                       border: none; border-radius: .5rem; padding: .55rem 1.4rem;
-                       font-weight: 700; transition: opacity .2s; }
-    .btn-sc-primary:hover { opacity: .88; }
-    .btn-sc-outline  { background: transparent; color: var(--sc-text)!important;
-                       border: 1.5px solid var(--sc-card-border); border-radius: .5rem;
-                       padding: .5rem 1.2rem; font-weight: 700; transition: background .2s; }
-    .btn-sc-outline:hover { background: var(--sc-reader-bg); }
+    .overlay-icon-wrap.is-visible { display: flex; }
 </style>
 @endpush
 
 @section('content')
-<div class="sc-wrapper">
-    <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-12 col-xl-8">
-                <div class="sc-card">
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
 
-                    {{-- ── Header ── --}}
-                    <div class="sc-header">
-                        <h3>
-                            <i class="fas fa-qrcode mr-2"></i>Scanner de Ingressos
-                        </h3>
-                        <a href="{{ route('admin.events.show', $event) }}" class="sc-back-btn">
-                            <i class="fas fa-arrow-left mr-1"></i>Voltar ao Evento
-                        </a>
+            {{-- ── Main card (AdminLTE style) ── --}}
+            <div class="card card-primary card-outline shadow-sm">
+
+                <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-qrcode mr-2"></i>{{ $event->title }}
+                    </h3>
+                    <a href="{{ route('admin.events.show', $event) }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left mr-1"></i>Voltar ao Evento
+                    </a>
+                </div>
+
+                <div class="card-body">
+
+                    {{-- Date --}}
+                    <p class="text-muted mb-3">
+                        <i class="fas fa-calendar-alt mr-1"></i>
+                        {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y \à\s H:i') }}
+                    </p>
+
+                    {{-- Scanner status --}}
+                    <div class="alert {{ $scannerOpen ? 'alert-success' : 'alert-danger' }} mb-3">
+                        <i class="fas {{ $scannerOpen ? 'fa-check-circle' : 'fa-ban' }} mr-1"></i>
+                        <strong>{{ $scannerStatusMessage }}</strong>
                     </div>
 
-                    {{-- ── Body ── --}}
-                    <div class="sc-body">
-
-                        {{-- Event info --}}
-                        <p class="sc-event-title">{{ $event->title }}</p>
-                        <p class="sc-event-date">
-                            <i class="fas fa-calendar-alt mr-1"></i>
-                            {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y \à\s H:i') }}
-                        </p>
-
-                        {{-- Status --}}
-                        <div class="sc-status {{ $scannerOpen ? 'open' : 'closed' }}">
-                            <i class="fas {{ $scannerOpen ? 'fa-check-circle' : 'fa-ban' }}"></i>
-                            {{ $scannerStatusMessage }}
-                        </div>
-
-                        {{-- Info chips --}}
-                        <div class="sc-info-grid">
-                            <div class="sc-info-chip">
-                                <strong><i class="fas fa-map-marker-alt mr-1 text-primary"></i>Regra de localização</strong>
+                    {{-- Info row --}}
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-2 mb-md-0">
+                            <div class="alert alert-info h-100 mb-0">
+                                <i class="fas fa-map-marker-alt mr-1"></i>
+                                <strong>Regra de localização:</strong><br>
                                 {{ $event->scannerLocationMessage() }}
                             </div>
-                            <div class="sc-info-chip">
-                                <strong><i class="fas fa-shield-alt mr-1 text-success"></i>Auditoria</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-secondary h-100 mb-0">
+                                <i class="fas fa-shield-alt mr-1"></i>
+                                <strong>Auditoria:</strong><br>
                                 Toda tentativa de validação fica registrada no sistema.
                             </div>
                         </div>
+                    </div>
 
-                        {{-- Reader --}}
-                        <div class="sc-reader-box">
-                            <div id="reader" style="width:100%;"></div>
+                    {{-- QR Reader --}}
+                    <div class="reader-wrapper border rounded p-2 bg-light mb-3">
+                        <div id="reader" style="width:100%;"></div>
 
-                            {{-- Overlay --}}
-                            <div id="scanner-overlay" class="sc-overlay">
-                                <div class="spinner-border text-primary mb-3" id="overlay-spinner" role="status" style="width:2.5rem;height:2.5rem;"></div>
-                                <div id="overlay-icon-wrap" class="sc-overlay-icon d-none">
-                                    <i id="overlay-icon" class="fas fa-check"></i>
-                                </div>
-                                <p id="overlay-message" class="sc-overlay-msg">Analisando...</p>
-                                <p id="overlay-sub" class="sc-overlay-sub"></p>
-                                <button id="btn-scan-again" class="btn btn-sc-primary mt-2 d-none" onclick="resumeScanning()">
-                                    <i class="fas fa-sync-alt mr-1"></i>Ler próximo ingresso
-                                </button>
+                        {{-- Result overlay --}}
+                        <div id="scanner-overlay" class="scanner-overlay">
+                            <div class="spinner-border text-primary mb-3" id="overlay-spinner"
+                                 role="status" style="width:2.4rem;height:2.4rem;"></div>
+
+                            <div id="overlay-icon-wrap" class="overlay-icon-wrap">
+                                <i id="overlay-icon" class="fas fa-check"></i>
                             </div>
+
+                            <h5 id="overlay-message" class="font-weight-bold mb-1">Analisando...</h5>
+                            <p  id="overlay-sub" class="text-muted mb-3 small"></p>
+
+                            <button id="btn-scan-again" class="btn btn-primary d-none" onclick="resumeScanning()">
+                                <i class="fas fa-sync-alt mr-1"></i>Ler próximo ingresso
+                            </button>
                         </div>
+                    </div>
 
-                        @if($scannerOpen)
-                        <p class="sc-hint mt-3">
-                            <i class="fas fa-info-circle mr-1"></i>
-                            Aponte a câmera para o QR Code do ingresso.
-                        </p>
-                        @endif
+                    @if($scannerOpen)
+                    <div class="alert alert-info text-center mb-0">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Aponte a câmera para o QR Code do ingresso.
+                    </div>
+                    @endif
 
-                    </div>{{-- /sc-body --}}
-                </div>{{-- /sc-card --}}
-            </div>
+                </div>{{-- /card-body --}}
+            </div>{{-- /card --}}
+
         </div>
     </div>
 </div>
@@ -189,12 +136,13 @@
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
     let html5QrcodeScanner = null;
-    let isProcessing = false;
-    let userCoords = { lat: null, lng: null };
-    const scannerOpen           = @json($scannerOpen);
-    const scannerStatusMessage  = @json($scannerStatusMessage);
-    const requiresLocation      = @json($event->hasScannerLocationConstraint());
-    const scannerLocationMsg    = @json($event->scannerLocationMessage());
+    let isProcessing        = false;
+    let userCoords          = { lat: null, lng: null };
+
+    const scannerOpen          = @json($scannerOpen);
+    const scannerStatusMessage = @json($scannerStatusMessage);
+    const requiresLocation     = @json($event->hasScannerLocationConstraint());
+    const scannerLocationMsg   = @json($event->scannerLocationMessage());
 
     document.addEventListener('DOMContentLoaded', function () {
         if (!scannerOpen) return;
@@ -202,7 +150,7 @@
         startScanner();
     });
 
-    /* ── GPS ── */
+    /* ── GPS ─────────────────────────────────────────── */
     function captureUserLocationInBackground() {
         if (!('geolocation' in navigator)) return;
         navigator.geolocation.getCurrentPosition(
@@ -212,7 +160,7 @@
         );
     }
 
-    /* ── Scanner ── */
+    /* ── Scanner ──────────────────────────────────────── */
     function startScanner() {
         if (!scannerOpen) { toastr.error(scannerStatusMessage); return; }
         if (html5QrcodeScanner) html5QrcodeScanner.clear();
@@ -225,7 +173,7 @@
         html5QrcodeScanner.render(onScanSuccess, () => {});
     }
 
-    /* ── Callbacks ── */
+    /* ── Scan callback ────────────────────────────────── */
     function onScanSuccess(decodedText) {
         if (isProcessing) return;
         isProcessing = true;
@@ -243,6 +191,7 @@
         sendValidation(decodedText);
     }
 
+    /* ── Validation request ───────────────────────────── */
     function sendValidation(code) {
         fetch('{{ route('admin.events.scanner.validate', $event) }}', {
             method: 'POST',
@@ -264,7 +213,7 @@
             showOverlay('error', data.message || 'Ingresso inválido.');
             toastr.error(data.message);
             playBeep(false);
-            if (requiresLocation && (userCoords.lat === null || userCoords.lng === null)) {
+            if (requiresLocation && userCoords.lat === null) {
                 toastr.warning(scannerLocationMsg + ' Habilite o GPS.');
             }
         })
@@ -275,39 +224,42 @@
         });
     }
 
-    /* ── Overlay ── */
+    /* ── Overlay helpers ──────────────────────────────── */
     function showOverlay(state, message, sub) {
-        const overlay  = document.getElementById('scanner-overlay');
-        const spinner  = document.getElementById('overlay-spinner');
-        const iconWrap = document.getElementById('overlay-icon-wrap');
-        const icon     = document.getElementById('overlay-icon');
-        const msgEl    = document.getElementById('overlay-message');
-        const subEl    = document.getElementById('overlay-sub');
-        const btn      = document.getElementById('btn-scan-again');
+        const overlay   = document.getElementById('scanner-overlay');
+        const spinner   = document.getElementById('overlay-spinner');
+        const iconWrap  = document.getElementById('overlay-icon-wrap');
+        const icon      = document.getElementById('overlay-icon');
+        const msgEl     = document.getElementById('overlay-message');
+        const subEl     = document.getElementById('overlay-sub');
+        const btn       = document.getElementById('btn-scan-again');
 
         overlay.classList.add('is-visible');
         msgEl.textContent = message;
         subEl.textContent = sub || '';
 
         if (state === 'process') {
-            spinner.classList.remove('d-none');
-            iconWrap.classList.add('d-none');
+            spinner.style.display = 'block';
+            iconWrap.classList.remove('is-visible');
             btn.classList.add('d-none');
+            msgEl.className = 'font-weight-bold mb-1 text-primary';
             return;
         }
 
-        spinner.classList.add('d-none');
-        iconWrap.classList.remove('d-none');
+        spinner.style.display = 'none';
+        iconWrap.classList.add('is-visible');
         btn.classList.remove('d-none');
 
         if (state === 'success') {
-            iconWrap.style.cssText = 'background:#d1fae5;color:#059669;';
+            iconWrap.style.cssText = 'display:flex;background:#d1fae5;color:#059669;';
             icon.className = 'fas fa-check';
+            msgEl.className = 'font-weight-bold mb-1 text-success';
             return;
         }
 
-        iconWrap.style.cssText = 'background:#fee2e2;color:#dc2626;';
+        iconWrap.style.cssText = 'display:flex;background:#fee2e2;color:#dc2626;';
         icon.className = 'fas fa-times';
+        msgEl.className = 'font-weight-bold mb-1 text-danger';
     }
 
     function resumeScanning() {
@@ -316,7 +268,7 @@
         if (html5QrcodeScanner) html5QrcodeScanner.resume();
     }
 
-    /* ── Beep ── */
+    /* ── Beep ─────────────────────────────────────────── */
     function playBeep(success) {
         try {
             const ctx  = new (window.AudioContext || window.webkitAudioContext)();
