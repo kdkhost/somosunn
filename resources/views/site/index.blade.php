@@ -166,9 +166,8 @@
         <!-- Onde o network me levou -->
         <section class="py-16 px-6 md:px-12 lg:px-24">
             <div class="max-w-7xl mx-auto">
-                <div class="home-journey-shell rounded-[2rem] border border-blue-100/80 bg-white p-6 md:p-8 lg:p-10 shadow-xl shadow-blue-100/40">
-                    <div class="grid xl:grid-cols-[0.92fr_1.4fr] gap-6 md:gap-8 items-stretch">
-                        <div class="home-journey-lead rounded-[1.75rem] p-6 md:p-8 text-white overflow-hidden relative">
+                <div class="grid xl:grid-cols-[0.92fr_1.4fr] gap-6 md:gap-8 lg:gap-10 items-stretch">
+                    <div class="home-journey-lead rounded-[2rem] p-8 md:p-10 lg:p-12 text-white overflow-hidden relative flex flex-col justify-center">
                             <div class="relative z-10">
                                 <span class="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/20 px-4 py-2 text-xs font-black tracking-[0.18em] uppercase text-white/90">
                                     <i class="fas fa-route"></i> Resultados reais
@@ -189,8 +188,8 @@
                                     </p>
                                 </div>
 
-                                <a href="{{ route('gallery.index') }}"
-                                    class="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black transition hover:-translate-y-0.5 hover:shadow-xl"
+                                <a href="#url-do-album-exclusivo"
+                                    class="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-sm md:text-base font-black transition hover:-translate-y-0.5 hover:shadow-xl"
                                     style="color: var(--unn-azul-1);">
                                     {{ $homePage->get('journey_cta_text', 'Ver fotos da comunidade') }}
                                     <i class="fas fa-arrow-right"></i>
@@ -198,11 +197,11 @@
                             </div>
                         </div>
 
-                        <div class="grid md:grid-cols-3 gap-5">
+                        <div class="grid md:grid-cols-3 gap-5 lg:gap-6">
                             @foreach($journeyCards as $card)
-                                <article class="home-journey-card rounded-[1.75rem] border border-slate-200/80 bg-slate-50 p-6 md:p-7 h-full">
-                                    <div class="w-14 h-14 rounded-2xl btn-primary flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                                        <i class="{{ $card['icon'] }} text-xl"></i>
+                                <article class="home-journey-card flex flex-col justify-center rounded-[2rem] border border-slate-200/80 bg-white p-8 md:p-10 h-full">
+                                    <div class="w-16 h-16 rounded-2xl btn-primary flex items-center justify-center text-white shadow-lg shadow-blue-500/20 mb-6">
+                                        <i class="{{ $card['icon'] }} text-2xl"></i>
                                     </div>
                                     <p class="mt-5 text-xs font-black uppercase tracking-[0.22em] text-slate-400">
                                         {{ $card['title'] }}
@@ -214,7 +213,6 @@
                                         {{ $card['text'] }}
                                     </p>
                                 </article>
-                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -684,12 +682,6 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .home-journey-shell {
-            background:
-                radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 38%),
-                linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
         }
 
         .home-journey-lead {
