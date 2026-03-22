@@ -184,24 +184,23 @@
                             class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-4 transition-colors">Capa
                             do Evento</label>
                         <div class="space-y-4">
-                            <div
-                                class="aspect-video w-full rounded-2xl bg-slate-100 dark:bg-slate-950 overflow-hidden border border-slate-200 dark:border-slate-800 relative group">
-                                @if($event->image)
-                                    <img src="{{ asset('storage/' . $event->image) }}" class="w-full h-full object-cover">
-                                @else
-                                    <div
-                                        class="w-full h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 transition-colors">
-                                        <i class="fas fa-image text-4xl mb-2"></i>
-                                        <span class="text-xs font-bold text-center px-4 italic">Formatos: JPG, PNG, GIF. Máx:
-                                            5MB</span>
-                                    </div>
-                                @endif
+                            <input type="hidden" name="remove_image" value="0">
+                            <div class="upload-box premium-upload-box w-full bg-slate-100 dark:bg-slate-950/50 border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-6 transition-all hover:border-blue-500 text-center relative"
+                                data-max-size="5242880"
+                                data-existing-url="{{ $event->image ? asset('storage/' . $event->image) : '' }}"
+                                data-remove-input="[name='remove_image']">
+                                <input type="file" name="image" accept="image/*" class="d-none" {{ $event->image ? '' : 'required' }}>
+                                <div class="upload-preview mb-4 flex items-center justify-center aspect-video w-full rounded-xl overflow-hidden bg-black/5"></div>
+                                <div class="upload-meta text-sm text-slate-500 dark:text-slate-400 font-medium font-mono"></div>
+                                <small class="upload-help block text-xs text-slate-400 mt-2 font-bold uppercase"></small>
+                                
+                                <div class="progress upload-progress d-none mt-4 w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="progress-bar h-full bg-blue-500 transition-all duration-300 rounded-full" style="width:0%"></div>
+                                </div>
+                                <button type="button" class="upload-remove d-none mt-4 px-4 py-2 bg-red-500/10 text-red-600 hover:bg-red-500/20 hover:text-red-700 dark:text-red-400 font-bold text-xs rounded-xl uppercase transition-colors mx-auto inline-flex items-center">
+                                    <i class="fas fa-trash-alt mr-1"></i> Remover Imagem
+                                </button>
                             </div>
-                            <input type="file" name="image" {{ $event->image ? '' : 'required' }}
-                                class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50 transition-all cursor-pointer">
-                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">
-                                A imagem do evento é obrigatória.
-                            </p>
                         </div>
                     </div>
 
@@ -546,9 +545,49 @@
         </form>
     </div>
 
+    @push('styles')
+        <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+        <style>
+            .note-editor.note-frame {
+                border: 1px solid #e2e8f0;
+                border-radius: 1rem;
+                overflow: hidden;
+                font-family: inherit;
+            }
+            .dark .note-editor.note-frame {
+                border-color: #1e293b;
+                background: #0f172a;
+            }
+            .dark .note-editor .note-toolbar {
+                background: #1e293b;
+                border-bottom: 1px solid #334155;
+            }
+            .dark .note-editor .note-editing-area .note-editable {
+                color: #f8fafc;
+            }
+            .dark .note-editor .note-editing-area .note-editable p {
+                color: #f8fafc;
+            }
+            .dark .note-editor .note-statusbar {
+                background: #1e293b;
+                border-top: 1px solid #334155;
+            }
+            .upload-preview img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                border-radius: 0.75rem;
+            }
+            .dark .upload-preview img {
+                opacity: 0.9;
+            }
+        </style>
+    @endpush
+
     @push('scripts')
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
         <script>
             $(document).ready(function () {
                 $('#eventDescription').summernote({

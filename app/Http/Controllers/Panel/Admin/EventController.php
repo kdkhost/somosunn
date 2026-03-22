@@ -316,6 +316,12 @@ class EventController extends Controller
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
             'scanner_radius_value' => 'nullable|numeric|min:0.001',
             'scanner_radius_unit' => 'nullable|string|in:m,km',
+            'batch_1_price' => 'nullable|numeric|min:0',
+            'batch_1_deadline' => 'nullable|date',
+            'batch_2_price' => 'nullable|numeric|min:0',
+            'batch_2_deadline' => 'nullable|date',
+            'batch_3_price' => 'nullable|numeric|min:0',
+            'batch_3_deadline' => 'nullable|date',
         ]);
 
         return $this->applyScannerRestrictionPayload($request, $validated);

@@ -47,6 +47,56 @@
                                 value="{{ old('flash_sale_ends_at', $event->flash_sale_ends_at ? $event->flash_sale_ends_at->format('Y-m-d\\TH:i') : '') }}">
                             <small class="text-muted d-block mt-1">Quando expirar, o valor volta ao normal automaticamente.</small>
                         </div>
+                        
+                        <div class="card card-outline card-secondary my-3">
+                            <div class="card-header"><h3 class="card-title font-weight-bold">Preços por Lote</h3></div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Preço Lote 1</label>
+                                            <input name="batch_1_price" class="form-control mask-money" value="{{ old('batch_1_price', $event->batch_1_price) }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Virada Lote 1 (Prazo final)</label>
+                                            <input name="batch_1_deadline" type="datetime-local" class="form-control" value="{{ old('batch_1_deadline', $event->batch_1_deadline ? $event->batch_1_deadline->format('Y-m-d\\TH:i') : '') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Preço Lote 2</label>
+                                            <input name="batch_2_price" class="form-control mask-money" value="{{ old('batch_2_price', $event->batch_2_price) }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Virada Lote 2 (Prazo final)</label>
+                                            <input name="batch_2_deadline" type="datetime-local" class="form-control" value="{{ old('batch_2_deadline', $event->batch_2_deadline ? $event->batch_2_deadline->format('Y-m-d\\TH:i') : '') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-0">
+                                            <label>Preço Lote 3</label>
+                                            <input name="batch_3_price" class="form-control mask-money" value="{{ old('batch_3_price', $event->batch_3_price) }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-0">
+                                            <label>Virada Lote 3 (Prazo final)</label>
+                                            <input name="batch_3_deadline" type="datetime-local" class="form-control" value="{{ old('batch_3_deadline', $event->batch_3_deadline ? $event->batch_3_deadline->format('Y-m-d\\TH:i') : '') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group mb-2">
                             <label>Imagem do evento</label>
                             <input type="hidden" name="remove_image" value="0">
