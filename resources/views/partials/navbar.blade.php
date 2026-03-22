@@ -198,11 +198,6 @@
                                                         }"
                         x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 60000)">
 
-                        <button onclick="window.openQuickUploadModal()"
-                            class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition relative p-2 focus:outline-none"
-                            title="Registrar Fotos">
-                            <i class="fas fa-camera text-xl"></i>
-                        </button>
 
                         <button @click="open = !open; fetchNotifications()"
                             class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition relative p-2 focus:outline-none">
