@@ -131,7 +131,7 @@
                                                             csrfToken: document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || '{{ csrf_token() }}',
                                                             syncState(data) {
                                                                 this.total = Number(data?.total || 0);
-                                                                this.items = (data?.items || []).filter(item => Number(item.count || 0) > 0);
+                                                                this.items = (data?.items || []);
                                                             },
                                                             async fetchNotifications() {
                                                                 try {
@@ -152,25 +152,21 @@
                                                                     this.loading = false;
                                                                 }
                                                             },
-                                                            recalculateTotal() {
-                                                                this.items = this.items.filter(item => Number(item.count || 0) > 0);
-                                                                this.total = this.items.reduce((sum, item) => sum + Number(item.count || 0), 0);
-                                                            },
+
                                                             async acknowledgeAndGo(item) {
                                                                 if (!item?.route) {
                                                                     return;
                                                                 }
 
-                                                                item.count = 0;
-                                                                this.recalculateTotal();
+                                                                // Remove from UI optimistically
+                                                                this.items = this.items.filter(i => i.id !== item.id);
+                                                                this.total = Math.max(0, this.total - 1);
                                                                 this.open = false;
 
                                                                 try {
-                                                                    const response = await fetch('{{ route('notifications.hub.acknowledge') }}', {
+                                                                    const response = await fetch(`/notificacoes/read/${item.id}`, {
                                                                         method: 'POST',
                                                                         credentials: 'same-origin',
-                                                                        cache: 'no-store',
-                                                                        keepalive: true,
                                                                         headers: {
                                                                             'Accept': 'application/json',
                                                                             'Content-Type': 'application/json',
@@ -178,7 +174,7 @@
                                                                             'X-Requested-With': 'XMLHttpRequest',
                                                                         },
                                                                         body: JSON.stringify({
-                                                                            type: item.type,
+                                                                            _token: this.csrfToken,
                                                                         }),
                                                                     });
 
@@ -226,18 +222,17 @@
                                     </div>
                                 </template>
 
-                                <template x-for="item in items" :key="item.type">
+                                <template x-for="item in items" :key="item.id">
                                     <a :href="item.route" @click.prevent="acknowledgeAndGo(item)"
-                                        class="flex items-center gap-4 px-4 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-50 dark:border-slate-800 last:border-0">
+                                        class="flex items-center gap-4 px-4 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-50 dark:border-slate-800 last:border-0 cursor-pointer">
                                         <div :class="item.bg + ' ' + item.color"
                                             class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
                                             <i :class="item.icon"></i>
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-bold text-gray-800 dark:text-white truncate"
-                                                x-text="item.count + ' ' + item.label"></p>
-                                            <p class="text-[11px] text-gray-500 dark:text-slate-400">Clique para visualizar
-                                            </p>
+                                            <p class="text-xs font-bold text-gray-800 dark:text-white line-clamp-2"
+                                                x-text="item.label"></p>
+                                            <p class="text-[10px] text-blue-500 font-semibold mt-0.5" x-text="item.time_ago"></p>
                                         </div>
                                         <i class="fas fa-chevron-right text-[10px] text-gray-300"></i>
                                     </a>
