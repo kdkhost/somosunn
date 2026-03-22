@@ -32,8 +32,15 @@
                         @if($event->exists) @method('PUT') @endif
                         <div class="form-group mb-2"><label>Título</label><input name="title" class="form-control"
                                 value="{{ old('title', $event->title) }}" required></div>
+
+                        <div class="form-group mb-2">
+                            <label>Descrição</label>
+                            <textarea name="description" id="eventDescriptionLegacy" class="form-control" rows="6">{{ old('description', $event->description) }}</textarea>
+                        </div>
+
                         <div class="form-group mb-2"><label>Início</label><input name="start_at" type="datetime-local"
                                 class="form-control" value="{{ old('start_at', $event->start_at) }}"></div>
+
                         <div class="form-group mb-2"><label>Preço</label><input name="price" class="form-control mask-money"
                                 value="{{ old('price', $event->price) }}"></div>
                         <div class="form-group mb-2">
@@ -1639,5 +1646,30 @@ async function deleteAdminMedia(id) {
                 reader.readAsDataURL(input.files[0]);
             }
         }
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        $(function () {
+            // Summernote - Descrição do Evento (Painel Legado)
+            var $desc = $('#eventDescriptionLegacy');
+            if ($desc.length && $.fn.summernote && !$desc.next('.note-editor').length) {
+                $desc.summernote({
+                    height: 300,
+                    placeholder: 'Descreva o evento aqui...',
+                    lang: 'pt-BR',
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'italic', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'video']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ]
+                });
+            }
+        });
     </script>
 @endpush
