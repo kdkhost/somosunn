@@ -10,6 +10,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin/cron')->name('admin.cron.')-
     Route::get('/{task}/logs', [\App\Http\Controllers\Admin\CronController::class, 'logs'])->name('logs');
     Route::post('/{task}/run', [\App\Http\Controllers\Admin\CronController::class, 'run'])->name('run');
 });
+
+// Rotas de upload chunked (admin)
+Route::middleware(['auth', 'admin'])->prefix('admin/upload')->name('admin.upload.')->group(function () {
+    Route::post('/chunk', [\App\Http\Controllers\Admin\ChunkedUploadController::class, 'chunk'])->name('chunk');
+    Route::post('/assemble', [\App\Http\Controllers\Admin\ChunkedUploadController::class, 'assemble'])->name('assemble');
+});
 // Rota para checkout de assinatura (compatível com premium.blade.php) — sempre no início para garantir visibilidade
 Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
 Route::post('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'process'])->name('subscription.process');
