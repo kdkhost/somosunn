@@ -189,10 +189,10 @@
                                     </p>
                                 </div>
 
-                                <a href="{{ route('register') }}"
+                                <a href="{{ route('gallery.index') }}"
                                     class="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black transition hover:-translate-y-0.5 hover:shadow-xl"
                                     style="color: var(--unn-azul-1);">
-                                    {{ $homePage->get('journey_cta_text', 'Quero viver isso também') }}
+                                    {{ $homePage->get('journey_cta_text', 'Ver fotos da comunidade') }}
                                     <i class="fas fa-arrow-right"></i>
                                 </a>
                             </div>
