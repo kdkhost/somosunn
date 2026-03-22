@@ -353,7 +353,8 @@
                         });
                     },
                     onError: (error) => {
-                        console.error('Payment Brick Error:', error);
+                        console.error('Mercado Pago Brick Error:', error);
+                        console.dir(error);
                         toastr.error('Erro ao carregar o gateway de pagamento.');
                     },
                 },

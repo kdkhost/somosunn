@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\PaymentGatewayException;
 use App\Models\Course;
+use App\Models\GatewayAccount;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\User;
@@ -242,10 +243,25 @@ class CheckoutController extends Controller
                 ]),
             ]);
 
+            // Obter conta do vendedor ou global
+            $seller = User::find($order->seller_id);
+            $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
+            $isPlatformOwner = (int) $order->seller_id === (int) $platformOwnerId;
+            
+            $sellerMpAccount = null;
+            if (!$isPlatformOwner) {
+                $sellerMpAccount = GatewayAccount::resolveForSeller($seller->id);
+            }
+
+            $gateways = [
+                'mp' => Setting::get('mp_active') && ($isPlatformOwner || ($sellerMpAccount instanceof GatewayAccount && $sellerMpAccount->active)),
+                'mpPublicKey' => (!$isPlatformOwner && $sellerMpAccount instanceof GatewayAccount) ? $sellerMpAccount->public_key : null,
+            ];
+
             return view('checkout.transparent', [
                 'order' => $order,
                 'preferenceId' => $preference['id'] ?? '',
-                'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key'),
+                'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key') ?: \App\Models\Setting::get('mp_public_key'),
             ]);
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao processar pagamento: ' . $e->getMessage());

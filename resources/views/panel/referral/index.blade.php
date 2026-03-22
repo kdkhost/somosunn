@@ -512,9 +512,10 @@
                     {{ $referredUsers->links() }}
                 </div>
             @endif
-        </div>
+        @endif
     </div>
-    </div>
+</div>
+</div>
 
     {{-- ===== HISTÓRICO DE GANHOS ===== --}}
     @if($referralPointsLogs->isNotEmpty())

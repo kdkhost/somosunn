@@ -673,7 +673,6 @@
                             popup: 'rounded-[32px]'
                         });
                     @endif
-                                });
                 };
 
                 // Executar inicialização normal
