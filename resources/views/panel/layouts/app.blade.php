@@ -637,7 +637,8 @@
                     attachUploadProgressToForms(root);
                 };
 
-                document.addEventListener('DOMContentLoaded', function () {
+                // Funcao global injetada pós-Navegação SPA
+                window.initPanelScripts = function () {
                     window.initializePanelFileUploads(document);
 
                     // Notificações Globais SweetAlert2 (Laravel Flash Messages)
@@ -673,6 +674,99 @@
                         });
                     @endif
                                 });
+                };
+
+                // Executar inicialização normal
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', window.initPanelScripts);
+                } else {
+                    window.initPanelScripts();
+                }
+
+                // --------- INICIO DO SPA ROUTER (VANILLA JS) ---------
+                if (!window.UNNPanelSPA) {
+                    window.UNNPanelSPA = true;
+                    
+                    document.addEventListener('click', function(e) {
+                        const link = e.target.closest('a');
+                        if (!link) return;
+
+                        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+                        const url = new URL(link.href);
+                        if (url.origin !== window.location.origin) return;
+
+                        // Ignorar links marcados ou rotas de auth/externas
+                        if (link.target === '_blank' || link.hasAttribute('download') || link.dataset.noAjax === 'true') return;
+                        if (url.pathname.match(/\/(logout|login|register|adminlte|export|download)/i)) return;
+                        if (url.pathname.startsWith('/admin') && !url.pathname.startsWith('/painel')) return; // ignorar painel legado
+                        
+                        // Ignorar links vazios ou apenas hash (ancoras) na mesma pagina
+                        if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) return;
+                        if (link.getAttribute('href') === '#') return;
+
+                        e.preventDefault();
+
+                        // Efeito visual de loading
+                        const shell = document.querySelector('.panel-theme-shell');
+                        if(shell) shell.style.opacity = '0.4';
+
+                        fetch(url.href, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        }).then(r => {
+                            if(r.redirected) url.href = r.url;
+                            if(!r.ok) throw new Error('Erro na rede');
+                            return r.text();
+                        }).then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+
+                            if(doc.title) document.title = doc.title;
+
+                            const newShell = doc.querySelector('.panel-theme-shell');
+                            const oldShell = document.querySelector('.panel-theme-shell');
+                            
+                            if(newShell && oldShell) {
+                                oldShell.innerHTML = newShell.innerHTML;
+                                oldShell.className = newShell.className; 
+                                oldShell.style.opacity = '1';
+
+                                // Capturar os scripts do corpo novo que estão FORA do shell e DENTRO do shell,
+                                // Na pratica, capturamos todos os scripts de `doc.body` que nao tenham srs ou que precisem de eval
+                                const newScripts = Array.from(doc.body.querySelectorAll('script'));
+                                newScripts.forEach(oldScript => {
+                                    // Evitar executar redundâncias gigantes se tiver ID/src global (pode ser refinado depois)
+                                    if(oldScript.src && oldScript.src.includes('cdn')) return;
+                                    
+                                    const newScript = document.createElement('script');
+                                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                                    document.body.appendChild(newScript);
+                                    newScript.parentNode.removeChild(newScript); // Executa e remove da árvore pra limpar
+                                });
+
+                            } else {
+                                window.location.href = url.href;
+                                return;
+                            }
+
+                            window.initPanelScripts();
+                            document.dispatchEvent(new CustomEvent('alpine:init'));
+
+                            window.history.pushState({}, '', url.href);
+                            window.scrollTo({ top: 0, behavior: 'instant' });
+                        }).catch(err => {
+                            console.error('SPA Nav erro:', err);
+                            window.location.href = url.href; 
+                        });
+                    });
+
+                    window.addEventListener('popstate', function() {
+                        window.location.reload();
+                    });
+                }
+                // --------- FIM DO SPA ROUTER ---------
+
             })();
         </script>
         @include('partials.form-draft-autosave')
