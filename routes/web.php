@@ -578,6 +578,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('/quick-scanner/validate', [\App\Http\Controllers\Admin\QuickScannerController::class, 'validateTicket'])->name('quick-scanner.validate');
     Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])->name('events.feed');
     Route::get('events/list', [\App\Http\Controllers\Admin\EventController::class, 'list'])->name('events.list');
+    Route::post('events/calendar/settings', [\App\Http\Controllers\Admin\EventController::class, 'updateCalendarSettings'])->name('events.calendar.settings');
     Route::get('events/{event}/scanner', [\App\Http\Controllers\Admin\EventScannerController::class, 'index'])->name('events.scanner');
     Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Admin\EventScannerController::class, 'validateTicket'])->name('events.scanner.validate');
     Route::get('users/{user}/impersonate', [\App\Http\Controllers\Admin\ImpersonateController::class, 'impersonate'])->name('users.impersonate');
