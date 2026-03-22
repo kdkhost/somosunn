@@ -1,16 +1,23 @@
-<div id="gallery-lightbox" class="fixed inset-0 z-[95] hidden">
-    <div data-gallery-close-lightbox class="absolute inset-0 bg-slate-950/90 backdrop-blur-md"></div>
+<div id="gallery-lightbox" class="fixed inset-0 z-[95] flex hidden items-center justify-center bg-black opacity-0 transition-opacity duration-300">
+    
+    {{-- Image Track --}}
+    <div id="gallery-track" class="absolute inset-0 flex items-center justify-center transition-transform duration-300 ease-out">
+        <img id="gallery-lightbox-image" src="" alt="" class="max-h-[100dvh] max-w-[100vw] object-contain">
+    </div>
 
-    <div class="relative flex min-h-full items-center justify-center py-16 sm:p-4 md:p-8">
-        <button type="button"
-            data-gallery-close-lightbox
-            class="absolute right-3 top-3 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white backdrop-blur transition hover:bg-white/20 sm:right-4 sm:top-4 sm:h-12 sm:w-12 md:right-8 md:top-8">
-            <i class="fas fa-xmark text-lg"></i>
+    {{-- Top UI --}}
+    <div id="gallery-ui-top" class="absolute left-0 right-0 top-0 z-50 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent px-4 py-4 transition-opacity duration-300 sm:px-6">
+        <div></div> <!-- spacer -->
+        <button type="button" data-gallery-close-lightbox
+            class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/25">
+            <i class="fas fa-xmark text-xl"></i>
         </button>
+    </div>
 
-        <figure class="lightbox-image relative w-full max-w-6xl overflow-hidden sm:rounded-[2.2rem] sm:border border-white/10 bg-transparent sm:bg-slate-950/70 sm:p-3 sm:shadow-[0_30px_90px_rgba(15,23,42,0.55)]">
-            <img id="gallery-lightbox-image" src="" alt="" class="max-h-[82vh] w-full rounded-none sm:rounded-[1.7rem] object-contain">
-            <figcaption id="gallery-lightbox-title" class="px-4 sm:px-3 pb-1 pt-4 text-center text-sm font-bold tracking-wide text-slate-200"></figcaption>
-        </figure>
+    {{-- Bottom UI --}}
+    <div id="gallery-ui-bottom" class="absolute bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-8 pt-12 transition-opacity duration-300 sm:px-6">
+        <div class="mx-auto max-w-6xl">
+            <p id="gallery-lightbox-title" class="text-center text-sm font-medium text-white/90 sm:text-left"></p>
+        </div>
     </div>
 </div>

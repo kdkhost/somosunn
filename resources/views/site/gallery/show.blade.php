@@ -202,42 +202,47 @@
     </div>
 
     {{-- Lightbox --}}
-    @if(count($photoSlides) > 0)
-        <div id="event-gallery-lightbox" class="fixed inset-0 z-[120] hidden">
-            <div data-gallery-close class="absolute inset-0 bg-slate-950/95 backdrop-blur-md"></div>
+        <div id="event-gallery-lightbox" class="fixed inset-0 z-[120] flex hidden touch-none items-center justify-center bg-black opacity-0 transition-opacity duration-300">
+            
+            {{-- Image Track --}}
+            <div id="event-gallery-track" class="absolute inset-0 flex items-center justify-center transition-transform duration-300 ease-out">
+                <img id="event-gallery-lightbox-image" src="" alt=""
+                    class="h-full w-full object-contain transition-transform duration-300"
+                    style="max-width: 100vw; max-height: 100dvh;">
+            </div>
 
-            <div class="relative flex min-h-full items-center justify-center py-16 sm:p-4 md:p-8">
+            {{-- Loader --}}
+            <div id="event-gallery-loader" class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                <i class="fas fa-circle-notch animate-spin text-4xl text-white/50"></i>
+            </div>
+
+            {{-- Top UI --}}
+            <div id="event-gallery-ui-top" class="absolute left-0 right-0 top-0 z-50 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent px-4 py-4 sm:px-6 transition-opacity duration-300">
+                <p id="event-gallery-counter" class="text-sm font-bold tracking-[0.15em] text-white/90"></p>
                 <button type="button" data-gallery-close
-                    class="absolute right-3 top-3 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white backdrop-blur transition hover:bg-white/20 sm:right-4 sm:top-4 sm:h-12 sm:w-12 md:right-8 md:top-8">
-                    <i class="fas fa-xmark text-lg"></i>
-                </button>
-
-                <button type="button" id="event-gallery-prev"
-                    class="absolute left-2 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-slate-900/50 text-white backdrop-blur transition hover:bg-slate-900/80 sm:left-4 sm:h-12 sm:w-12 md:left-8 md:h-14 md:w-14">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-
-                <div class="w-full max-w-6xl">
-                    <div class="overflow-hidden sm:rounded-[2.2rem] sm:border border-white/10 bg-transparent sm:bg-slate-950/70 sm:p-3 sm:shadow-[0_30px_90px_rgba(15,23,42,0.55)]">
-                        <img id="event-gallery-lightbox-image" src="" alt=""
-                            class="max-h-[80vh] sm:max-h-[76vh] w-full rounded-none sm:rounded-[1.7rem] object-contain">
-                    </div>
-                    <div class="mt-4 px-4 sm:px-0 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                        <div>
-                            <p id="event-gallery-counter" class="text-xs font-black uppercase tracking-[0.22em] text-slate-400"></p>
-                            <p id="event-gallery-caption" class="mt-2 text-sm text-slate-300"></p>
-                        </div>
-                        <div id="event-gallery-thumbs" class="flex max-w-full gap-2 overflow-x-auto pb-2"></div>
-                    </div>
-                </div>
-
-                <button type="button" id="event-gallery-next"
-                    class="absolute right-2 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-slate-900/50 text-white backdrop-blur transition hover:bg-slate-900/80 sm:right-4 sm:h-12 sm:w-12 md:right-8 md:h-14 md:w-14">
-                    <i class="fas fa-chevron-right"></i>
+                    class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/25">
+                    <i class="fas fa-xmark text-xl"></i>
                 </button>
             </div>
+
+            {{-- Bottom UI --}}
+            <div id="event-gallery-ui-bottom" class="absolute bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-8 pt-12 sm:px-6 transition-opacity duration-300">
+                <div class="mx-auto max-w-6xl">
+                    <p id="event-gallery-caption" class="mb-4 text-center text-sm font-medium text-white/90 sm:text-left"></p>
+                    <div id="event-gallery-thumbs" class="flex max-w-full gap-2 overflow-x-auto pb-2" style="scrollbar-width: none;"></div>
+                </div>
+            </div>
+
+            {{-- Desktop Arrows --}}
+            <button type="button" id="event-gallery-prev"
+                class="absolute left-6 top-1/2 z-40 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/10 h-14 w-14 text-white backdrop-blur transition hover:bg-white/20 sm:inline-flex">
+                <i class="fas fa-chevron-left text-xl"></i>
+            </button>
+            <button type="button" id="event-gallery-next"
+                class="absolute right-6 top-1/2 z-40 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/10 h-14 w-14 text-white backdrop-blur transition hover:bg-white/20 sm:inline-flex">
+                <i class="fas fa-chevron-right text-xl"></i>
+            </button>
         </div>
-    @endif
 @endsection
 
 @push('styles')
@@ -263,47 +268,134 @@
         const thumbs   = document.getElementById('event-gallery-thumbs');
         const prevBtn  = document.getElementById('event-gallery-prev');
         const nextBtn  = document.getElementById('event-gallery-next');
+        const uiTop    = document.getElementById('event-gallery-ui-top');
+        const uiBottom = document.getElementById('event-gallery-ui-bottom');
+        const loader   = document.getElementById('event-gallery-loader');
         const videos   = Array.from(document.querySelectorAll('[data-gallery-video]'));
         let current    = 0;
+        let uiVisible  = true;
+        let isTransitioning = false;
+
+        // Swipe variables
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
 
         videos.forEach(v => v.addEventListener('play', () => videos.forEach(o => o !== v && o.pause())));
 
         function renderThumbs() {
             if (!thumbs || !slides.length) return;
             thumbs.innerHTML = slides.map((s, i) => `
-                <button type="button" class="event-gallery-thumb shrink-0 overflow-hidden rounded-2xl border ${i === current ? 'border-white' : 'border-white/10 opacity-60'} transition hover:opacity-100" data-gallery-thumb-index="${i}">
-                    <img src="${s.src}" alt="" class="h-16 w-24 object-cover">
+                <button type="button" class="shrink-0 overflow-hidden rounded-lg border-2 ${i === current ? 'border-white' : 'border-transparent opacity-50'} transition-all duration-300 hover:opacity-100" data-gallery-thumb-index="${i}">
+                    <img src="${s.src}" alt="" class="h-14 w-20 object-cover">
                 </button>`).join('');
             thumbs.querySelectorAll('[data-gallery-thumb-index]').forEach(b =>
-                b.addEventListener('click', () => openSlide(Number(b.dataset.galleryThumbIndex))));
+                b.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openSlide(Number(b.dataset.galleryThumbIndex));
+                }));
+            
+            const activeThumb = thumbs.querySelector(`[data-gallery-thumb-index="${current}"]`);
+            if (activeThumb) {
+                activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+
+        function toggleUI() {
+            uiVisible = !uiVisible;
+            const opacity = uiVisible ? '1' : '0';
+            const pointer = uiVisible ? 'auto' : 'none';
+            if (uiTop) { uiTop.style.opacity = opacity; uiTop.style.pointerEvents = pointer; }
+            if (uiBottom) { uiBottom.style.opacity = opacity; uiBottom.style.pointerEvents = pointer; }
+            if (prevBtn) { prevBtn.style.opacity = opacity; prevBtn.style.pointerEvents = pointer; }
+            if (nextBtn) { nextBtn.style.opacity = opacity; nextBtn.style.pointerEvents = pointer; }
         }
 
         function openSlide(index) {
-            if (!lightbox || !slides.length) return;
+            if (!lightbox || !slides.length || isTransitioning) return;
             current = (index + slides.length) % slides.length;
             const s = slides[current];
-            image.src = s.src;
-            image.alt = s.title || '';
-            if (caption) caption.textContent = s.caption || '';
-            if (counter) counter.textContent = `${current + 1} / ${slides.length}`;
-            renderThumbs();
+            
+            isTransitioning = true;
+            image.style.opacity = '0';
+            image.style.transform = 'scale(0.96)';
+            if (loader) loader.style.opacity = '1';
+
+            const newImg = new Image();
+            newImg.src = s.src;
+            newImg.onload = () => {
+                image.src = s.src;
+                image.alt = s.title || '';
+                if (caption) caption.textContent = s.caption || '';
+                if (counter) counter.textContent = `${current + 1} / ${slides.length}`;
+                renderThumbs();
+                
+                requestAnimationFrame(() => {
+                    image.style.opacity = '1';
+                    image.style.transform = 'scale(1)';
+                    if (loader) loader.style.opacity = '0';
+                    setTimeout(() => isTransitioning = false, 300);
+                });
+            };
+
             lightbox.classList.remove('hidden');
+            requestAnimationFrame(() => lightbox.classList.remove('opacity-0'));
             document.body.classList.add('overflow-hidden');
             videos.forEach(v => v.pause());
         }
 
         function closeLightbox() {
             if (!lightbox) return;
-            lightbox.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
+            lightbox.classList.add('opacity-0');
+            setTimeout(() => {
+                lightbox.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }, 300);
+        }
+
+        function handleGesture() {
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+            
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > 60) {
+                    if (diffX > 0) openSlide(current - 1);
+                    else openSlide(current + 1);
+                } else {
+                    toggleUI(); // Small movement = tap
+                }
+            } else {
+                if (diffY > 100) closeLightbox();
+                else if (Math.abs(diffY) < 10) toggleUI(); // Small movement = tap
+            }
+        }
+
+        if (lightbox) {
+            lightbox.addEventListener('touchstart', e => {
+                if (e.target.closest('#event-gallery-ui-bottom') || e.target.closest('#event-gallery-ui-top') || e.target.closest('button')) return;
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, {passive: true});
+
+            lightbox.addEventListener('touchend', e => {
+                if (e.target.closest('#event-gallery-ui-bottom') || e.target.closest('#event-gallery-ui-top') || e.target.closest('button')) return;
+                touchEndX = e.changedTouches[0].screenX;
+                touchEndY = e.changedTouches[0].screenY;
+                handleGesture();
+            });
+            
+            lightbox.addEventListener('click', (e) => {
+                if(e.target === image) toggleUI();
+            });
         }
 
         document.querySelectorAll('[data-gallery-open-slide]').forEach(b =>
-            b.addEventListener('click', () => openSlide(Number(b.dataset.galleryOpenSlide || 0))));
+            b.addEventListener('click', (e) => { e.preventDefault(); openSlide(Number(b.dataset.galleryOpenSlide || 0)); }));
         document.querySelectorAll('[data-gallery-close]').forEach(b =>
             b.addEventListener('click', closeLightbox));
-        if (prevBtn) prevBtn.addEventListener('click', () => openSlide(current - 1));
-        if (nextBtn) nextBtn.addEventListener('click', () => openSlide(current + 1));
+        if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); openSlide(current - 1); });
+        if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); openSlide(current + 1); });
 
         document.addEventListener('keydown', function (e) {
             if (!lightbox || lightbox.classList.contains('hidden')) return;

@@ -22,12 +22,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const submitButton = document.getElementById('gallery-upload-submit');
     const lightboxImage = document.getElementById('gallery-lightbox-image');
     const lightboxTitle = document.getElementById('gallery-lightbox-title');
+    const uiTop = document.getElementById('gallery-ui-top');
+    const uiBottom = document.getElementById('gallery-ui-bottom');
+    const track = document.getElementById('gallery-track');
     const eventField = uploadForm?.querySelector('[name="event_id"]');
     const csrfToken = uploadForm?.querySelector('input[name="_token"]')?.value || '';
     const perFileLimitBytes = Math.max(1, parseInt(@json($galleryUploadPerFileLimitBytes), 10) || @json($galleryUploadPerFileLimitBytes));
     let queue = [];
     let isUploading = false;
     let seed = 0;
+    let uiVisible = true;
+    let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
 
     function lockBody(locked) {
         body.classList.toggle('overflow-hidden', locked);
@@ -113,22 +118,34 @@ document.addEventListener('DOMContentLoaded', function () {
         lockBody(false);
     }
 
+    function toggleUI() {
+        uiVisible = !uiVisible;
+        const opacity = uiVisible ? '1' : '0';
+        const pointer = uiVisible ? 'auto' : 'none';
+        if (uiTop) { uiTop.style.opacity = opacity; uiTop.style.pointerEvents = pointer; }
+        if (uiBottom) { uiBottom.style.opacity = opacity; uiBottom.style.pointerEvents = pointer; }
+    }
+
     function openLightbox(src, title) {
         if (!lightbox || !lightboxImage) return;
         lightboxImage.src = src;
         lightboxImage.alt = title || 'Foto da galeria';
         if (lightboxTitle) lightboxTitle.textContent = title || '';
         lightbox.classList.remove('hidden');
+        requestAnimationFrame(() => lightbox.classList.remove('opacity-0'));
         lockBody(true);
     }
 
     function closeLightbox() {
         if (!lightbox || !lightboxImage) return;
-        lightbox.classList.add('hidden');
-        lightboxImage.src = '';
-        lightboxImage.alt = '';
-        if (lightboxTitle) lightboxTitle.textContent = '';
-        if (!uploadModal || uploadModal.classList.contains('hidden')) lockBody(false);
+        lightbox.classList.add('opacity-0');
+        setTimeout(() => {
+            lightbox.classList.add('hidden');
+            lightboxImage.src = '';
+            lightboxImage.alt = '';
+            if (lightboxTitle) lightboxTitle.textContent = '';
+            if (!uploadModal || uploadModal.classList.contains('hidden')) lockBody(false);
+        }, 300);
     }
 
     function itemBadge(item) {
@@ -269,6 +286,32 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-gallery-close-upload]').forEach((button) => button.addEventListener('click', closeUploadModal));
     document.querySelectorAll('[data-gallery-close-lightbox]').forEach((button) => button.addEventListener('click', closeLightbox));
     document.querySelectorAll('[data-lightbox-src]').forEach((button) => button.addEventListener('click', function () { openLightbox(this.dataset.lightboxSrc || '', this.dataset.lightboxTitle || ''); }));
+    
+    if (lightbox && lightboxImage) {
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightboxImage || e.target === track) toggleUI();
+        });
+
+        lightbox.addEventListener('touchstart', e => {
+            if (e.target.closest('#gallery-ui-bottom') || e.target.closest('#gallery-ui-top') || e.target.closest('button')) return;
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, {passive: true});
+
+        lightbox.addEventListener('touchend', e => {
+            if (e.target.closest('#gallery-ui-bottom') || e.target.closest('#gallery-ui-top') || e.target.closest('button')) return;
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            const diffY = touchEndY - touchStartY;
+            const diffX = touchEndX - touchStartX;
+            if (Math.abs(diffY) > Math.abs(diffX)) {
+                if (diffY > 100) closeLightbox();
+                else if (Math.abs(diffY) < 10) toggleUI();
+            } else if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) {
+                toggleUI();
+            }
+        });
+    }
     document.querySelectorAll('.gallery-delete-form').forEach((form) => {
         form.addEventListener('submit', function (event) {
             const prompt = 'Esta foto sera removida da galeria. Deseja continuar?';
