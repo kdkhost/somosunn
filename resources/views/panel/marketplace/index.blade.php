@@ -14,7 +14,9 @@
     @endphp
 
     <div
-        class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300">
+        class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] border border-white/50 dark:border-slate-800/60 p-6 md:p-8 transition-all duration-500 overflow-hidden relative group/header">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover/header:bg-blue-500/10 transition-all duration-700 pointer-events-none"></div>
+        <div class="relative z-10">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white transition-colors">Marketplace
@@ -37,11 +39,14 @@
                 </a>
             </div>
         </div>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6">
         {{-- Saldo Mercado Pago --}}
-        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl shadow-lg p-5 text-white xl:col-span-2">
+        <div class="bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900 dark:from-blue-900/80 dark:via-indigo-950 dark:to-slate-950 rounded-[2.5rem] p-6 text-white shadow-[0_20px_60px_-15px_rgba(37,99,235,0.4)] dark:shadow-none border border-blue-400/20 dark:border-white/5 xl:col-span-2 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-48 h-48 bg-white/10 dark:bg-blue-500/10 rounded-full blur-[60px] group-hover:bg-white/15 transition-all duration-1000 pointer-events-none"></div>
+            <div class="relative z-10">
             <div class="flex justify-between items-start">
                 <div>
                     <div class="text-xs font-bold opacity-80 uppercase tracking-wider">Saldo Total Mercado Pago</div>
@@ -64,17 +69,23 @@
                     </div>
                 </div>
             </div>
+            </div>
         </div>
 
         <div
-            class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-5 transition-colors duration-300">
+            class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl rounded-[2rem] border border-white/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] hover:-translate-y-1 transition-all duration-300 p-6 relative overflow-hidden group/card1">
+            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5 opacity-0 group-hover/card1:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+            <div class="relative z-10">
             <div class="text-sm font-bold text-slate-500 dark:text-slate-500 transition-colors">Vendas pagas</div>
             <div class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1 transition-colors">{{ $paidCount }}
             </div>
             <div class="text-xs text-slate-500 dark:text-slate-400 mt-2">Total de transações</div>
+            </div>
         </div>
         <div
-            class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-5 transition-colors duration-300">
+            class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl rounded-[2rem] border border-white/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] hover:-translate-y-1 transition-all duration-300 p-6 relative overflow-hidden group/card2">
+            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5 opacity-0 group-hover/card2:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+            <div class="relative z-10">
             <div class="text-sm font-bold text-slate-500 dark:text-slate-500 transition-colors">Total líquido</div>
             <div class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1 transition-colors">R$
                 {{ number_format($netTotal, 2, ',', '.') }}</div>
@@ -82,11 +93,14 @@
                 Bruto: R$ {{ number_format($paidTotal, 2, ',', '.') }} • Comissão: R$
                 {{ number_format($platformFeeTotal, 2, ',', '.') }}
             </div>
+            </div>
         </div>
     </div>
 
     <div
-        class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 mt-6 transition-colors duration-300">
+        class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2.5rem] border border-white/50 dark:border-slate-800/60 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 p-6 md:p-8 mt-6 relative overflow-hidden group/notice">
+        <div class="absolute bottom-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full -mr-16 -mb-16 blur-3xl group-hover/notice:bg-amber-500/10 transition-all duration-700 pointer-events-none"></div>
+        <div class="relative z-10">
         <div class="flex items-start gap-4">
             <div
                 class="w-12 h-12 rounded-2xl {{ $paymentsConfigured ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400' }} flex items-center justify-center transition-colors">

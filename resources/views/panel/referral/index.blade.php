@@ -40,7 +40,7 @@
         @endif
     </div>
 
-    <div class="rounded-3xl border border-slate-200 bg-white/90 p-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/85">
+    <div class="rounded-3xl border border-white/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 backdrop-blur-3xl p-2 shadow-sm">
         <div class="grid gap-2 md:grid-cols-4">
             <button type="button" data-panel-referral-tab-target="programa" class="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black transition {{ $activePanelTab === 'programa' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800' }}">
                 <i class="fas fa-link text-sm"></i>
@@ -64,7 +64,7 @@
     <div data-panel-referral-tab-panel="programa" class="space-y-8 {{ $activePanelTab === 'programa' ? '' : 'hidden' }}">
 
     @if(false)
-        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+        <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-white/50 dark:border-slate-800/60 rounded-3xl p-6 md:p-8 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-all duration-500 space-y-6">
             <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-black text-slate-900 dark:text-white">Rastreio completo do link</h2>
@@ -270,7 +270,8 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
 
         {{-- Total indicados --}}
-        <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-blue-500/20 flex items-center gap-3">
+        <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-blue-500/20 flex items-center gap-3 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(37,99,235,0.3)] transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
                 <i class="fas fa-user-plus text-lg sm:text-xl"></i>
             </div>
@@ -281,7 +282,8 @@
         </div>
 
         {{-- Convertidos (pagaram) --}}
-        <div class="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-emerald-500/20 flex items-center gap-3">
+        <div class="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-emerald-500/20 flex items-center gap-3 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(16,185,129,0.3)] transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
                 <i class="fas fa-check-circle text-lg sm:text-xl"></i>
             </div>
@@ -295,7 +297,8 @@
         </div>
 
         {{-- Pontos ganhos com indicações --}}
-        <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-amber-500/20 flex items-center gap-3">
+        <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-amber-500/20 flex items-center gap-3 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(245,158,11,0.3)] transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
                 <i class="fas fa-coins text-lg sm:text-xl"></i>
             </div>
@@ -306,7 +309,8 @@
         </div>
 
         {{-- Pontos por indicação --}}
-        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex items-center gap-3 shadow-sm">
+        <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border border-white/60 dark:border-slate-800/60 rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex items-center gap-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(37,99,235,0.08)] transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/40 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
                 <i class="fas fa-gift text-green-600 dark:text-green-400 text-lg sm:text-xl"></i>
             </div>
@@ -324,7 +328,9 @@
     </div>
 
     {{-- ===== SEU LINK DE INDICAÇÃO ===== --}}
-    <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm overflow-hidden">
+    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-white/50 dark:border-slate-800/60 rounded-3xl p-6 md:p-8 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-all duration-500 overflow-hidden relative group/link">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover/link:bg-blue-500/10 transition-all duration-700 pointer-events-none"></div>
+        <div class="relative z-10">
         <h2 class="text-xl font-black text-slate-900 dark:text-white mb-1">Seu link de indicação</h2>
         <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Compartilhe este link. O sistema registra automaticamente quem entrou pelo seu convite.</p>
 
@@ -378,9 +384,12 @@
             </p>
         </div>
     </div>
+    </div>
 
     {{-- ===== LISTA DE INDICADOS ===== --}}
-    <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-white/50 dark:border-slate-800/60 rounded-3xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-all duration-500 overflow-hidden relative group/users">
+        <div class="absolute top-0 right-0 w-40 h-40 bg-emerald-500/5 rounded-full -mr-20 -mt-20 blur-3xl group-hover/users:bg-emerald-500/10 transition-all duration-700 pointer-events-none"></div>
+        <div class="relative z-10">
         <div class="p-6 md:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4">
             <div>
                 <h2 class="text-xl font-black text-slate-900 dark:text-white">Pessoas que você indicou</h2>
@@ -503,12 +512,15 @@
                     {{ $referredUsers->links() }}
                 </div>
             @endif
-        @endif
+        </div>
+    </div>
     </div>
 
     {{-- ===== HISTÓRICO DE GANHOS ===== --}}
     @if($referralPointsLogs->isNotEmpty())
-    <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-white/50 dark:border-slate-800/60 rounded-3xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-all duration-500 overflow-hidden relative group/history">
+        <div class="absolute top-0 right-0 w-40 h-40 bg-amber-500/5 rounded-full -mr-20 -mt-20 blur-3xl group-hover/history:bg-amber-500/10 transition-all duration-700 pointer-events-none"></div>
+        <div class="relative z-10">
         <div class="p-6 md:p-8 border-b border-slate-100 dark:border-slate-800">
             <h2 class="text-xl font-black text-slate-900 dark:text-white">Histórico de ganhos</h2>
             <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Cada linha corresponde a um pagamento de plano confirmado de um indicado seu.</p>
@@ -567,10 +579,13 @@
             </table>
         </div>
     </div>
+    </div>
     @endif
 
     {{-- ===== COMO FUNCIONA ===== --}}
-    <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm">
+    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-white/50 dark:border-slate-800/60 rounded-3xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-all duration-500 p-6 md:p-8 relative overflow-hidden group/how">
+        <div class="absolute bottom-0 left-0 w-40 h-40 bg-blue-500/5 rounded-full -ml-20 -mb-20 blur-3xl group-hover/how:bg-blue-500/10 transition-all duration-700 pointer-events-none"></div>
+        <div class="relative z-10">
         <h2 class="text-xl font-black text-slate-900 dark:text-white mb-6">Como funciona</h2>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="flex items-start gap-4">
@@ -625,7 +640,8 @@
             Planos gratuitos não geram pontos · Pontos são creditados somente após confirmação do pagamento pelo sistema · Não há limite de indicações
         </div>
     </div>
-</div>
+    </div>
+    </div>
 
     </div>
 

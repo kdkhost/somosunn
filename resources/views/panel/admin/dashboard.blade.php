@@ -42,7 +42,7 @@
     @endphp
 
     <div class="space-y-8">
-        <div class="bg-gradient-to-br from-blue-600 via-indigo-700 to-violet-800 rounded-[2.5rem] p-10 text-white shadow-2xl shadow-blue-500/20 relative overflow-hidden">
+        <div class="bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900 dark:from-blue-900/80 dark:via-indigo-950 dark:to-slate-950 rounded-[2.5rem] p-10 text-white shadow-[0_20px_60px_-15px_rgba(37,99,235,0.4)] dark:shadow-none border border-blue-400/20 dark:border-white/5 relative overflow-hidden group">
             <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="max-w-2xl">
                     <h2 class="text-3xl font-bold mb-3">Central de Administração</h2>
@@ -57,8 +57,8 @@
                     </a>
                 </div>
             </div>
-            <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-blue-400/20 rounded-full blur-2xl"></div>
+            <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-white/10 dark:bg-blue-500/10 rounded-full blur-[100px] group-hover:bg-white/15 transition-all duration-1000 pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-72 h-72 bg-blue-400/20 dark:bg-purple-500/10 rounded-full blur-[80px] group-hover:bg-blue-400/30 transition-all duration-1000 pointer-events-none"></div>
         </div>
 
         <div class="space-y-6" id="panel-admin-service-visits">
@@ -81,7 +81,8 @@
                         ['id' => 'panel-admin-visits-site', 'label' => 'Site institucional', 'value' => $serviceVisitSummary['site'] ?? 0, 'icon' => 'fa-globe', 'color' => 'violet'],
                         ['id' => 'panel-admin-visits-products', 'label' => 'Produtos monitorados', 'value' => $serviceVisitSummary['monitored_products'] ?? 0, 'icon' => 'fa-layer-group', 'color' => 'amber'],
                     ] as $metric)
-                        <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200/60 dark:border-slate-800 shadow-sm">
+                        <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] dark:hover:shadow-[0_20px_50px_rgba(37,99,235,0.2)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                             <div class="w-12 h-12 rounded-2xl bg-{{ $metric['color'] }}-50 dark:bg-{{ $metric['color'] }}-900/20 text-{{ $metric['color'] }}-600 dark:text-{{ $metric['color'] }}-300 flex items-center justify-center mb-5">
                                 <i class="fas {{ $metric['icon'] }} text-lg"></i>
                             </div>
@@ -105,7 +106,8 @@
                 </div>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800 shadow-sm p-8">
+                    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2.5rem] border border-white/50 dark:border-slate-800/60 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 p-8 relative overflow-hidden group/panel">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover/panel:bg-blue-500/10 transition-all duration-700 pointer-events-none"></div>
                         <div class="flex items-center justify-between mb-6">
                             <div>
                                 <h4 class="text-xl font-bold text-slate-900 dark:text-white">Produtos mais visitados</h4>
@@ -130,7 +132,8 @@
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800 shadow-sm p-8">
+                    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2.5rem] border border-white/50 dark:border-slate-800/60 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 p-8 relative overflow-hidden group/panel">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover/panel:bg-emerald-500/10 transition-all duration-700 pointer-events-none"></div>
                         <div class="flex items-center justify-between mb-6">
                             <div>
                                 <h4 class="text-xl font-bold text-slate-900 dark:text-white">Responsáveis em destaque</h4>
@@ -173,7 +176,8 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($gestao as $item)
-                    <a href="{{ route($item['route']) }}" class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <a href="{{ route($item['route']) }}" class="group relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl p-6 rounded-3xl border border-white/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] dark:hover:shadow-[0_20px_50px_rgba(37,99,235,0.2)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         <div class="w-14 h-14 rounded-2xl bg-{{ $item['color'] }}-50 dark:bg-{{ $item['color'] }}-900/20 text-{{ $item['color'] }}-600 dark:text-{{ $item['color'] }}-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fas {{ $item['icon'] }} text-xl"></i>
                         </div>
@@ -193,7 +197,8 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col items-center text-center">
+                <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/50 dark:border-slate-800/60 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 flex flex-col items-center text-center relative overflow-hidden group/health">
+                    <div class="absolute top-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full -ml-16 -mt-16 blur-3xl group-hover/health:bg-emerald-500/10 transition-all duration-700 pointer-events-none"></div>
                     <div class="relative w-32 h-32 mb-6">
                         <svg class="w-full h-full transform -rotate-90">
                             <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" class="text-slate-100 dark:text-slate-800" />
@@ -210,7 +215,9 @@
                     <p class="text-sm text-slate-500 dark:text-slate-400">Percentual de membros com plano ativo e perfil completo.</p>
                 </div>
 
-                <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800 shadow-sm">
+                <div class="lg:col-span-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/50 dark:border-slate-800/60 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 relative overflow-hidden group/dist">
+                    <div class="absolute bottom-0 right-0 w-40 h-40 bg-blue-500/5 rounded-full -mr-20 -mb-20 blur-3xl group-hover/dist:bg-blue-500/10 transition-all duration-700 pointer-events-none"></div>
+                    <div class="relative z-10">
                     <div class="flex items-center justify-between mb-8">
                         <div>
                             <h4 class="text-xl font-bold text-slate-900 dark:text-white">Status dos Membros</h4>
@@ -255,7 +262,8 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($conteudo as $item)
-                    <a href="{{ route($item['route']) }}" class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <a href="{{ route($item['route']) }}" class="group relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl p-6 rounded-3xl border border-white/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] dark:hover:shadow-[0_20px_50px_rgba(37,99,235,0.2)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         <div class="w-14 h-14 rounded-2xl bg-{{ $item['color'] }}-50 dark:bg-{{ $item['color'] }}-900/20 text-{{ $item['color'] }}-600 dark:text-{{ $item['color'] }}-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fas {{ $item['icon'] }} text-xl"></i>
                         </div>
@@ -275,7 +283,8 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($ajustes as $item)
-                    <a href="{{ route($item['route'], $item['param'] ?? []) }}" class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <a href="{{ route($item['route'], $item['param'] ?? []) }}" class="group relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl p-6 rounded-3xl border border-white/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] dark:hover:shadow-[0_20px_50px_rgba(37,99,235,0.2)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         <div class="w-13 h-13 rounded-2xl bg-{{ $item['color'] }}-50 dark:bg-{{ $item['color'] }}-900/20 text-{{ $item['color'] }}-600 dark:text-{{ $item['color'] }}-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fas {{ $item['icon'] }} text-xl"></i>
                         </div>
@@ -285,7 +294,7 @@
                 @endforeach
 
                 @if(auth()->user()->isSuperAdmin() && $legacyAdminDashboardUrl)
-                    <a href="{{ $legacyAdminDashboardUrl }}" target="_blank" class="group bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 border-dashed hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-all duration-300">
+                    <a href="{{ $legacyAdminDashboardUrl }}" target="_blank" class="group relative bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-3xl p-6 rounded-3xl border border-slate-300/80 dark:border-slate-700/80 border-dashed hover:border-blue-400 dark:hover:border-blue-600 hover:bg-blue-50/50 dark:hover:bg-blue-900/30 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
                         <div class="w-13 h-13 rounded-2xl bg-white dark:bg-slate-900 text-slate-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fas fa-external-link-alt text-lg"></i>
                         </div>
