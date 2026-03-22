@@ -16,6 +16,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin/upload')->name('admin.upload
     Route::post('/chunk', [\App\Http\Controllers\Admin\ChunkedUploadController::class, 'chunk'])->name('chunk');
     Route::post('/assemble', [\App\Http\Controllers\Admin\ChunkedUploadController::class, 'assemble'])->name('assemble');
 });
+
+// Rotas de fontes personalizadas (admin)
+Route::middleware(['auth', 'admin'])->prefix('admin/fonts')->name('admin.fonts.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\CustomFontController::class, 'index'])->name('index');
+    Route::post('/', [\App\Http\Controllers\Admin\CustomFontController::class, 'store'])->name('store');
+    Route::post('/detect-metadata', [\App\Http\Controllers\Admin\CustomFontController::class, 'detectMetadata'])->name('detect-metadata');
+    Route::get('/active', [\App\Http\Controllers\Admin\CustomFontController::class, 'getActiveFonts'])->name('active');
+    Route::delete('/{font}', [\App\Http\Controllers\Admin\CustomFontController::class, 'destroy'])->name('destroy');
+});
 // Rota para checkout de assinatura (compatível com premium.blade.php) — sempre no início para garantir visibilidade
 Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
 Route::post('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'process'])->name('subscription.process');
