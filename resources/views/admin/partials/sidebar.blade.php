@@ -234,6 +234,7 @@
                             'admin.fonts.*',
                             'admin.faqs.*',
                             'admin.pages.*',
+                            'admin.gallery.*',
                         ];
 
                         $systemPatterns = [
@@ -340,7 +341,7 @@
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('admin.gallery.index') }}"
-                                    class="nav-link {{ $is('admin.gallery.index') }}">
+                                    class="nav-link {{ $is('admin.gallery.*') }}">
                                     <i class="fas fa-images nav-icon"></i>
                                     <p>Galeria de Fotos</p>
                                 </a>
