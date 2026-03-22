@@ -32,6 +32,12 @@ class QuickScannerController extends Controller
             return view('panel.instructor.scanner', compact('todayEvents'));
         }
 
+        // Se acessado pela rota de administracao do NOVO painel, usa a view do novo painel
+        if (request()->routeIs('panel.admin.quick-scanner')) {
+            return view('panel.admin.quick-scanner', compact('todayEvents'));
+        }
+
+        // Fallback: painel AdminLTE legado
         return view('admin.events.quick-scanner', compact('todayEvents'));
     }
 
