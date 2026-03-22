@@ -147,6 +147,9 @@ class MercadoPagoService
             ];
         }
 
+        $pixExpirationMinutes = (int) Setting::get('pix_expiration_minutes', 15);
+        $dateOfExpiration = now()->addMinutes($pixExpirationMinutes)->format('Y-m-d\TH:i:s.vP');
+
         $paymentData = [
             'transaction_amount' => $calc['transaction_amount'],
             'description' => $this->orderDescription($order),
@@ -154,6 +157,7 @@ class MercadoPagoService
             'payer' => $payer,
             'external_reference' => (string) $order->id,
             'notification_url' => $this->notificationUrl(),
+            'date_of_expiration' => $dateOfExpiration,
         ];
 
         if (!$config['is_platform'] && $calc['application_fee'] > 0) {
@@ -179,6 +183,7 @@ class MercadoPagoService
             'id' => $body['id'] ?? null,
             'qr_code' => data_get($body, 'point_of_interaction.transaction_data.qr_code'),
             'qr_code_base64' => data_get($body, 'point_of_interaction.transaction_data.qr_code_base64'),
+            'expires_at' => data_get($body, 'date_of_expiration') ?? $dateOfExpiration,
         ];
     }
 

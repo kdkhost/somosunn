@@ -310,6 +310,7 @@ class CheckoutController extends Controller
                     'status' => $paymentResult['status'],
                     'qr_code' => $paymentResult['qr_code'] ?? null,
                     'qr_code_base64' => $paymentResult['qr_code_base64'] ?? null,
+                    'expires_at' => $paymentResult['expires_at'] ?? null,
                     'redirect' => $paymentMethod === 'pix' ? null : route('checkout.pending', $order)
                 ]);
             }

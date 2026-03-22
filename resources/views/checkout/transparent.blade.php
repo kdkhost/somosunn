@@ -160,9 +160,14 @@
     <div id="pix-modal" class="hidden fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
             <h3 class="text-2xl font-bold mb-4">Pagamento via Pix</h3>
-            <p class="text-slate-600 mb-6">Escaneie o QR Code abaixo ou copie o código para pagar.</p>
+            <p id="pix-instruction" class="text-slate-600 mb-6">Escaneie o QR Code abaixo ou copie o código para pagar.</p>
+            
+            <div id="pix-timer-container" class="hidden mb-4 py-2 px-4 bg-amber-50 rounded-lg border border-amber-200 text-amber-800 font-bold text-xl flex items-center justify-center gap-2">
+                <i class="fas fa-clock"></i> <span id="pix-timer">00:00</span>
+            </div>
+
             <div id="pix-qr-container" class="flex justify-center mb-6"></div>
-            <div class="bg-slate-100 p-3 rounded-lg flex items-center space-x-2 mb-6">
+            <div id="pix-code-container" class="bg-slate-100 p-3 rounded-lg flex items-center space-x-2 mb-6">
                 <input type="text" id="pix-code" readonly class="bg-transparent border-none text-xs flex-1 outline-none">
                 <button onclick="copyPixCode()" class="text-unn-azul-2 font-bold px-2">Copiar</button>
             </div>
@@ -199,6 +204,47 @@
             el.select();
             document.execCommand('copy');
             toastr.success('Código Pix copiado!');
+        };
+
+        let pixTimerInterval;
+        const startPixTimer = (expiresAtIso) => {
+            const expiresAt = new Date(expiresAtIso).getTime();
+            const timerContainer = document.getElementById('pix-timer-container');
+            const timerSpan = document.getElementById('pix-timer');
+            const instruction = document.getElementById('pix-instruction');
+            const qrContainer = document.getElementById('pix-qr-container');
+            const codeContainer = document.getElementById('pix-code-container');
+
+            timerContainer.classList.remove('hidden');
+
+            if (pixTimerInterval) clearInterval(pixTimerInterval);
+
+            // Executar imediatamente para não esperar 1s
+            const updateTimer = () => {
+                const now = new Date().getTime();
+                const distance = expiresAt - now;
+
+                if (distance <= 0) {
+                    clearInterval(pixTimerInterval);
+                    timerContainer.classList.replace('bg-amber-50', 'bg-red-50');
+                    timerContainer.classList.replace('border-amber-200', 'border-red-200');
+                    timerContainer.classList.replace('text-amber-800', 'text-red-800');
+                    timerSpan.textContent = "Expirado";
+                    instruction.textContent = "O tempo limite para pagamento deste Pix se esgotou. Feche e tente gerar um novo pedido.";
+                    instruction.classList.add('text-red-600');
+                    qrContainer.innerHTML = '<div class="w-48 h-48 bg-slate-100 flex items-center justify-center rounded-xl text-slate-400"><i class="fas fa-times-circle text-4xl"></i></div>';
+                    if (codeContainer) codeContainer.classList.add('hidden');
+                    return;
+                }
+
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                timerSpan.textContent = minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
+            };
+
+            updateTimer();
+            pixTimerInterval = setInterval(updateTimer, 1000);
         };
 
         const renderPaymentBrick = async (bricksBuilder) => {
@@ -283,6 +329,11 @@
                                         document.getElementById('pix-qr-container').innerHTML = `<img src="data:image/png;base64,${data.qr_code_base64}" alt="Pix QR" class="w-48 h-48">`;
                                         document.getElementById('pix-code').value = data.qr_code;
                                         document.getElementById('pix-modal').classList.remove('hidden');
+                                        
+                                        if (data.expires_at) {
+                                            startPixTimer(data.expires_at);
+                                        }
+
                                         resolve();
                                     } else if (data.redirect) {
                                         window.location.href = data.redirect;

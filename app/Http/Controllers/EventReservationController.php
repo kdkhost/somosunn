@@ -551,12 +551,14 @@ class EventReservationController extends Controller
                 ]),
             ]);
 
-            $initPoint = $preference['init_point'] ?? $preference['sandbox_init_point'] ?? null;
-            if (!$initPoint) {
-                return redirect()->route('events.show', $event)->with('error', 'Pagamento indisponível no momento.');
-            }
+            $sellerId = $event->seller_id ?: $event->user_id;
+            $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $sellerId);
 
-            return redirect()->away($initPoint);
+            return view('checkout.transparent', [
+                'order' => $order,
+                'preferenceId' => $preference['id'] ?? '',
+                'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key'),
+            ]);
         } catch (\Exception $e) {
             \Log::error('Falha ao iniciar pagamento de evento', [
                 'event_id' => $event->id,

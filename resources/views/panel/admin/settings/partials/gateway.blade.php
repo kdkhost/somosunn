@@ -378,6 +378,22 @@
                 </div>
                 <p class="text-[10px] text-slate-400 mt-1.5">Comissão sobre cada venda</p>
             </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-teal-100 dark:bg-teal-900/20 flex items-center justify-center">
+                        <i class="fa-brands fa-pix text-teal-500 text-xs"></i>
+                    </div>
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Expiração do Pix</label>
+                </div>
+                <div class="relative">
+                    <input type="number" name="pix_expiration_minutes"
+                        value="{{ $settings['pix_expiration_minutes'] ?? '15' }}" min="5" max="1440"
+                        class="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-teal-400 focus:ring-4 focus:ring-teal-400/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                    <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-xs pointer-events-none">min</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">Tempo limite para pagamento</p>
+            </div>
         </div>
 
     </div>{{-- /gw-billing --}}
