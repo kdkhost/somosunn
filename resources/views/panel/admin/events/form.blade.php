@@ -586,37 +586,42 @@
 
     @push('scripts')
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
         <script>
-            $(document).ready(function () {
-                $('#eventDescription').summernote({
-                    height: 300,
-                    placeholder: 'Descreva o evento aqui...',
-                    lang: 'pt-BR',
-                    toolbar: [
-                        ['style', ['style']],
-                        ['font', ['bold', 'underline', 'clear']],
-                        ['color', ['color']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                        ['table', ['table']],
-                        ['insert', ['link', 'picture', 'video']],
-                        ['view', ['fullscreen', 'codeview', 'help']]
-                    ]
-                });
-            });
+            (function initEventForm() {
+                // Summernote - inicializa se jQuery e o plugin estiverem disponíveis
+                var $desc = $('#eventDescription');
+                if (window.jQuery && $.fn && $.fn.summernote && $desc.length && !$desc.next('.note-editor').length) {
+                    $desc.summernote({
+                        height: 300,
+                        placeholder: 'Descreva o evento aqui...',
+                        lang: 'pt-BR',
+                        toolbar: [
+                            ['style', ['style']],
+                            ['font', ['bold', 'underline', 'italic', 'clear']],
+                            ['color', ['color']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['table', ['table']],
+                            ['insert', ['link', 'picture', 'video']],
+                            ['view', ['fullscreen', 'codeview', 'help']]
+                        ]
+                    });
+                }
 
-            // Money Mask
-            document.querySelectorAll('.mask-money').forEach(input => {
-                input.addEventListener('input', function (e) {
-                    let value = e.target.value.replace(/\D/g, "");
-                    if (!value) { e.target.value = ""; return; }
-                    value = (value / 100).toFixed(2) + "";
-                    value = value.replace(".", ",");
-                    value = value.replace(/(\d)(\d{3},\d{2})$/g, "$1.$2");
-                    e.target.value = value;
+                // Money Mask
+                document.querySelectorAll('.mask-money').forEach(function(input) {
+                    if (input._maskApplied) return;
+                    input._maskApplied = true;
+                    input.addEventListener('input', function (e) {
+                        let value = e.target.value.replace(/\D/g, "");
+                        if (!value) { e.target.value = ""; return; }
+                        value = (value / 100).toFixed(2) + "";
+                        value = value.replace(".", ",");
+                        value = value.replace(/(\d)(\d{3},\d{2})$/g, "$1.$2");
+                        e.target.value = value;
+                    });
                 });
-            });
+            })();
+
 
             @if($event->exists)
                 @include('panel.admin.partials.certificate-editor-script', [

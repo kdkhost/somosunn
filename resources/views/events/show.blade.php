@@ -325,16 +325,27 @@
                         <p class="text-gray-600 mb-6">{{ $event->address }}</p>
 
                         <div class="space-y-3">
-                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ $event->latitude }},{{ $event->longitude }}"
-                                target="_blank" class="flex items-center gap-3 font-medium transition"
+                            @php
+                                $mapsQuery = ($event->latitude && $event->longitude)
+                                    ? $event->latitude . ',' . $event->longitude
+                                    : urlencode($event->address ?? $event->location ?? '');
+                                $googleMapsUrl = ($event->latitude && $event->longitude)
+                                    ? 'https://www.google.com/maps/dir/?api=1&destination=' . $event->latitude . ',' . $event->longitude
+                                    : 'https://www.google.com/maps/search/?api=1&query=' . urlencode($event->address ?? $event->location ?? '');
+                                $wazeUrl = ($event->latitude && $event->longitude)
+                                    ? 'https://waze.com/ul?ll=' . $event->latitude . ',' . $event->longitude . '&navigate=yes'
+                                    : 'https://waze.com/ul?q=' . urlencode($event->address ?? $event->location ?? '') . '&navigate=yes';
+                            @endphp
+                            <a href="{{ $googleMapsUrl }}"
+                                target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 font-medium transition"
                                 style="color: var(--unn-azul-1)">
                                 <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                                     <i class="fas fa-directions"></i>
                                 </div>
                                 Abrir rota no Google Maps
                             </a>
-                            <a href="https://waze.com/ul?ll={{ $event->latitude }},{{ $event->longitude }}&navigate=yes"
-                                target="_blank"
+                            <a href="{{ $wazeUrl }}"
+                                target="_blank" rel="noopener noreferrer"
                                 class="flex items-center gap-3 text-purple-600 hover:text-purple-700 font-medium transition">
                                 <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
                                     <i class="fab fa-waze"></i>
