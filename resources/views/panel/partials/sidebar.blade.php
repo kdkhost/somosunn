@@ -475,8 +475,8 @@
             </details>
         @endif
 
-        <div class="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800">
-            <button onclick="toggleTheme()"
+        <div class="mt-8 px-4">
+            <button onclick="toggleTheme(this)"
                 class="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 group">
                 <div class="flex items-center gap-3">
                     <i
@@ -485,7 +485,7 @@
                 </div>
                 <div class="w-10 h-5 bg-slate-200 dark:bg-slate-700 rounded-full relative transition-colors">
                     <div
-                        class="absolute top-1 {{ $currentTheme === 'dark' ? 'right-1' : 'left-1' }} w-3 h-3 bg-white dark:bg-blue-400 rounded-full shadow-sm transition-all">
+                        class="absolute top-1 {{ $currentTheme === 'dark' ? 'right-1' : 'left-1' }} w-3 h-3 bg-white dark:bg-blue-400 rounded-full shadow-sm transition-all duration-300">
                     </div>
                 </div>
             </button>
@@ -494,13 +494,30 @@
 </div>
 
 <script>
-    function toggleTheme() {
-        const theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+    function toggleTheme(btn) {
+        const isDark = document.documentElement.classList.contains('dark');
+        const newTheme = isDark ? 'light' : 'dark';
 
-        if (theme === 'dark') {
+        if (newTheme === 'dark') {
             document.documentElement.classList.add('dark');
+            if (btn) {
+                const icon = btn.querySelector('i.fas');
+                if (icon) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
+                const span = btn.querySelector('span');
+                if (span) span.innerText = 'Modo Claro';
+                const knob = btn.querySelector('.absolute.top-1');
+                if (knob) { knob.classList.remove('left-1'); knob.classList.add('right-1'); }
+            }
         } else {
             document.documentElement.classList.remove('dark');
+            if (btn) {
+                const icon = btn.querySelector('i.fas');
+                if (icon) { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
+                const span = btn.querySelector('span');
+                if (span) span.innerText = 'Modo Escuro';
+                const knob = btn.querySelector('.absolute.top-1');
+                if (knob) { knob.classList.remove('right-1'); knob.classList.add('left-1'); }
+            }
         }
 
         fetch('{{ route("theme.toggle") }}', {
@@ -509,9 +526,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({ theme: theme })
-        }).then(r => r.json()).then(() => {
-            window.location.reload();
-        });
+            body: JSON.stringify({ theme: newTheme })
+        }).catch(() => {});
     }
 </script>
