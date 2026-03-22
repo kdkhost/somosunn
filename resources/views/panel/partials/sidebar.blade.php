@@ -14,26 +14,26 @@
     }
 
     $navItemClass = function (bool $active = false) {
-        $base = 'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200';
+        $base = 'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-300 group';
         return $active
-            ? $base . ' bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 shadow-sm border border-blue-600/5 dark:border-blue-500/10'
-            : $base . ' text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200';
+            ? $base . ' bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 shadow-inner border border-blue-600/10 dark:border-blue-500/20 active-nav-glow'
+            : $base . ' text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 hover:translate-x-1.5';
     };
 
     $submenuToggleClass = function (bool $active = false, bool $nested = false) {
-        $base = 'flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 transition-all duration-200 cursor-pointer';
+        $base = 'flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 transition-all duration-300 cursor-pointer group';
         $base .= $nested ? ' text-[13px] font-bold' : ' text-sm font-semibold';
 
         return $active
-            ? $base . ' bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-600/5 dark:border-blue-500/10 shadow-sm'
-            : $base . ' text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200';
+            ? $base . ' bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-600/10 dark:border-blue-500/20 shadow-inner active-nav-glow'
+            : $base . ' text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 hover:translate-x-1.5';
     };
 
     $submenuItemClass = function (bool $active = false) {
-        $base = 'flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200';
+        $base = 'flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-300 group relative overflow-hidden';
         return $active
-            ? $base . ' bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300'
-            : $base . ' text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200';
+            ? $base . ' bg-blue-50/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-l-[3px] border-blue-600 dark:border-blue-500 shadow-sm'
+            : $base . ' text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-slate-200 hover:translate-x-1.5 hover:shadow-sm';
     };
 
     $hasActiveItem = fn(array $items) => collect($items)->contains(fn(array $item) => $item['active']);
@@ -290,42 +290,60 @@
 @endphp
 
 <style>
-    .panel-sidebar summary {
-        list-style: none;
+    .panel-sidebar summary { list-style: none; }
+    .panel-sidebar summary::-webkit-details-marker { display: none; }
+    .panel-sidebar details[open] > summary .submenu-chevron { transform: rotate(180deg); }
+    
+    /* Smooth Accordion Animation */
+    .panel-sidebar details[open] > div {
+        animation: details-show 0.4s ease-out forwards;
+        transform-origin: top;
     }
-
-    .panel-sidebar summary::-webkit-details-marker {
-        display: none;
+    @keyframes details-show {
+        0% { opacity: 0; transform: translateY(-10px) scaleY(0.95); }
+        100% { opacity: 1; transform: translateY(0) scaleY(1); }
     }
-
-    .panel-sidebar details[open]>summary .submenu-chevron {
-        transform: rotate(180deg);
+    
+    /* Active Item Left-Border Glow */
+    .active-nav-glow {
+        box-shadow: inset 4px 0 0 0 currentColor;
     }
+    
+    /* Scrollbar invisible for nested submenus if any */
+    .panel-sidebar::-webkit-scrollbar { width: 0px; background: transparent; }
 </style>
 
-<div
-    class="panel-sidebar {{ ($mobile ?? false) ? '' : 'bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 p-6 sticky top-24 w-full' }} transition-colors duration-300">
-    <div class="flex items-center gap-4 mb-8">
-        <div
-            class="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
-            @if($user->profile_photo_url && !str_contains($user->profile_photo_url, 'default-user.svg'))
-                <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover">
-            @else
-                <i class="fas fa-user text-slate-400 dark:text-slate-500 text-lg"></i>
-            @endif
-        </div>
-        <div class="min-w-0">
-            <div class="font-bold text-slate-900 dark:text-white truncate text-lg">{{ $user->name }}</div>
-            <div
-                class="inline-flex items-center px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tight">
-                {{ $plan?->name ? $plan->name : 'Sem plano' }}
+<div class="panel-sidebar {{ ($mobile ?? false) ? '' : 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_15px_60px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_15px_60px_-15px_rgba(0,0,0,0.4)] border border-slate-100 dark:border-slate-800/80 p-7 sticky top-24 w-full support-[backdrop-filter]:bg-white/80' }} transition-all duration-500 relative overflow-hidden group/sidebar">
+    <!-- Subtle glow background effect on hover -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 dark:bg-blue-400/5 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none transition-opacity duration-1000 opacity-30 group-hover/sidebar:opacity-100"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/5 dark:bg-indigo-400/5 rounded-full blur-[60px] -ml-24 -mb-24 pointer-events-none transition-opacity duration-1000 opacity-20 group-hover/sidebar:opacity-80"></div>
+    
+    <div class="relative z-10 w-full h-full flex flex-col">
+        <!-- User Profile Card -->
+        <div class="relative mb-10 p-5 rounded-[2rem] bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/40 dark:to-slate-900 border border-slate-100/80 dark:border-slate-800/80 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_8px_30px_-15px_rgba(0,0,0,0.1)] group/profile overflow-hidden">
+            <div class="absolute inset-0 rounded-[2rem] bg-gradient-to-tr from-blue-500/5 to-purple-500/5 dark:from-blue-500/10 dark:to-purple-500/10 opacity-0 transition-opacity duration-500 group-hover/profile:opacity-100 pointer-events-none"></div>
+            
+            <div class="relative z-10 flex flex-col xl:flex-row items-center xl:items-start gap-4 text-center xl:text-left">
+                <div class="w-16 h-16 xl:w-14 xl:h-14 rounded-[1.2rem] overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border-[3px] border-white dark:border-slate-700 shadow-md transform transition-all duration-500 group-hover/profile:rotate-3 group-hover/profile:scale-105">
+                    @if($user->profile_photo_url && !str_contains($user->profile_photo_url, 'default-user.svg'))
+                        <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover">
+                    @else
+                        <i class="fas fa-user text-slate-400 dark:text-slate-500 text-xl"></i>
+                    @endif
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="font-black text-slate-900 dark:text-white leading-tight truncate text-lg xl:text-[1.05rem]">{{ $user->name }}</div>
+                    <div class="mt-2 xl:mt-1.5 inline-flex items-center gap-1.5 px-3 py-1 xl:px-2.5 xl:py-0.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 border border-blue-100/50 dark:border-blue-800/50 shadow-inner">
+                        <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.6)]"></div>
+                        <span class="text-[9px] font-black text-blue-700 dark:text-blue-300 uppercase tracking-widest">{{ $plan?->name ? $plan->name : 'Sem plano' }}</span>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
     <div class="space-y-3">
         @if(count($mainItems))
-            <details {{ $mainOpen ? 'open' : '' }}>
+            <details name="sidebar-menu" {{ $mainOpen ? 'open' : '' }}>
                 <summary class="{{ $submenuToggleClass($mainOpen) }}">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-compass w-5 opacity-80"></i>
@@ -345,7 +363,7 @@
         @endif
 
         @if(count($vendorItems))
-            <details {{ $vendorOpen ? 'open' : '' }}>
+            <details name="sidebar-menu" {{ $vendorOpen ? 'open' : '' }}>
                 <summary class="{{ $submenuToggleClass($vendorOpen) }}">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-store w-5 opacity-80"></i>
@@ -365,7 +383,7 @@
         @endif
 
         @if(count($instructorItems))
-            <details {{ $instructorOpen ? 'open' : '' }}>
+            <details name="sidebar-menu" {{ $instructorOpen ? 'open' : '' }}>
                 <summary class="{{ $submenuToggleClass($instructorOpen) }}">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-chalkboard-teacher w-5 opacity-80"></i>
@@ -385,7 +403,7 @@
         @endif
 
         @if($user->isAdmin())
-            <details {{ $adminOpen ? 'open' : '' }}>
+            <details name="sidebar-menu" {{ $adminOpen ? 'open' : '' }}>
                 <summary class="{{ $submenuToggleClass($adminOpen) }}">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-shield-alt w-5 opacity-80"></i>
@@ -400,7 +418,7 @@
                         <span>{{ $adminDashboardItem['label'] }}</span>
                     </a>
 
-                    <details {{ $adminManagementOpen ? 'open' : '' }}>
+                    <details name="admin-submenu" {{ $adminManagementOpen ? 'open' : '' }}>
                         <summary class="{{ $submenuToggleClass($adminManagementOpen, true) }}">
                             <div class="flex items-center gap-3">
                                 <i class="fas fa-sitemap w-4 opacity-80"></i>
@@ -418,7 +436,7 @@
                         </div>
                     </details>
 
-                    <details {{ $adminContentOpen ? 'open' : '' }}>
+                    <details name="admin-submenu" {{ $adminContentOpen ? 'open' : '' }}>
                         <summary class="{{ $submenuToggleClass($adminContentOpen, true) }}">
                             <div class="flex items-center gap-3">
                                 <i class="fas fa-folder-open w-4 opacity-80"></i>
@@ -436,7 +454,7 @@
                         </div>
                     </details>
 
-                    <details {{ $adminSettingsOpen ? 'open' : '' }}>
+                    <details name="admin-submenu" {{ $adminSettingsOpen ? 'open' : '' }}>
                         <summary class="{{ $submenuToggleClass($adminSettingsOpen, true) }}">
                             <div class="flex items-center gap-3">
                                 <i class="fas fa-sliders-h w-4 opacity-80"></i>

@@ -20,43 +20,45 @@
     @endphp
 
     <!-- Welcome Section -->
-    <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-950 p-10 shadow-2xl shadow-blue-900/40 mb-12 group border border-white/10">
+    <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900 dark:from-blue-900/80 dark:via-indigo-950 dark:to-slate-950 p-10 shadow-[0_20px_60px_-15px_rgba(37,99,235,0.4)] dark:shadow-none mb-12 group border border-blue-400/20 dark:border-white/5">
         <!-- Abstract Background Shapes -->
-        <div class="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-white/5 rounded-full blur-[100px] group-hover:bg-white/10 transition-all duration-1000"></div>
-        <div class="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-blue-400/10 rounded-full blur-[80px] group-hover:bg-blue-400/20 transition-all duration-1000"></div>
+        <div class="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-white/10 dark:bg-blue-500/10 rounded-full blur-[100px] group-hover:bg-white/15 transition-all duration-1000"></div>
+        <div class="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-blue-400/20 dark:bg-purple-500/10 rounded-full blur-[80px] group-hover:bg-blue-400/30 transition-all duration-1000"></div>
 
         <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
             <div class="text-center lg:text-left">
-                <div class="flex items-center justify-center lg:justify-start gap-4 mb-4">
-                    <span class="px-4 py-1.5 rounded-full bg-white/15 text-white text-[11px] font-black uppercase tracking-[0.2em] backdrop-blur-md border border-white/10">Painel do Membro</span>
-                    <span class="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <div class="flex items-center justify-center lg:justify-start gap-3 mb-5">
+                    <span class="px-4 py-1.5 rounded-full bg-white/10 text-white text-[11px] font-black uppercase tracking-[0.25em] backdrop-blur-xl border border-white/20 shadow-inner">
+                        Painel VIP
+                    </span>
+                    <span class="inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)] animate-pulse"></span>
                 </div>
-                <h1 class="text-4xl md:text-6xl font-black text-white mb-4 tracking-tighter leading-none">
-                    Olá, {{ explode(' ', auth()->user()->name)[0] }}! <span class="inline-block animate-bounce-slow">✨</span>
+                <h1 class="text-4xl md:text-[3.5rem] font-black text-white mb-4 tracking-tighter leading-tight drop-shadow-md">
+                    Olá, {{ explode(' ', auth()->user()->name)[0] }}! <span class="inline-block animate-bounce-slow text-yellow-300">✨</span>
                 </h1>
-                <p class="text-blue-100/80 text-lg md:text-xl font-medium max-w-2xl leading-relaxed">
+                <p class="text-blue-100/90 text-lg md:text-xl font-medium max-w-2xl leading-relaxed drop-shadow-sm">
                     {{ $plan?->name ? 'Seu acesso ' . $plan->name . ' está liberado. Explore todos os recursos da nossa rede.' : 'Transforme seu potencial em resultados reais. O que vamos conquistar hoje?' }}
                 </p>
             </div>
 
             <div class="flex flex-wrap justify-center lg:justify-end gap-5 w-full lg:w-auto">
                 <button onclick="window.openQuickUploadModal()"
-                    class="group/btn relative px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black backdrop-blur-xl transition-all border border-white/20 overflow-hidden shadow-xl">
+                    class="group/btn relative px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black backdrop-blur-xl transition-all border border-white/20 overflow-hidden shadow-xl hover:shadow-[0_8px_30px_rgba(255,255,255,0.15)] hover:-translate-y-1">
                     <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-shimmer"></div>
                     <span class="relative flex items-center gap-3">
                         <i class="fas fa-camera text-blue-300"></i> Registrar Fotos
                     </span>
                 </button>
                 <a href="{{ route('panel.profile.edit') }}"
-                    class="group/btn relative px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black backdrop-blur-xl transition-all border border-white/20 overflow-hidden shadow-xl">
+                    class="group/btn relative px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black backdrop-blur-xl transition-all border border-white/20 overflow-hidden shadow-xl hover:shadow-[0_8px_30px_rgba(255,255,255,0.15)] hover:-translate-y-1">
                     <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-shimmer"></div>
                     <span class="relative flex items-center gap-3">
                         <i class="fas fa-layer-group text-blue-300"></i> Meu Perfil
                     </span>
                 </a>
                 <a href="{{ route('planos') }}"
-                    class="group/btn relative px-8 py-4 bg-white text-blue-900 rounded-2xl font-black shadow-2xl shadow-blue-950/20 hover:shadow-white/10 hover:-translate-y-1.5 transition-all flex items-center gap-3">
-                    <i class="fas fa-crown text-amber-500 group-hover/btn:rotate-12 transition-transform"></i>
+                    class="group/btn relative px-8 py-4 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-2xl font-black shadow-[0_15px_40px_-10px_rgba(245,158,11,0.5)] hover:shadow-[0_20px_50px_-10px_rgba(245,158,11,0.7)] hover:-translate-y-1 transition-all flex items-center gap-3 border border-orange-300/50">
+                    <i class="fas fa-crown text-yellow-100 group-hover/btn:rotate-12 transition-transform"></i>
                     <span>UPGRADE PREMIUM</span>
                 </a>
             </div>
@@ -74,11 +76,12 @@
             ];
         @endphp
         @foreach($quickLinks as $link)
-            <a href="{{ route($link['route']) }}" class="group bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all flex flex-col items-center justify-center text-center gap-3">
-                <div class="w-12 h-12 rounded-2xl {{ $link['color'] }} text-white flex items-center justify-center text-xl shadow-lg group-hover:scale-110 transition-transform">
+            <a href="{{ route($link['route']) }}" class="group relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl p-5 rounded-[2rem] border border-white/60 dark:border-slate-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] dark:hover:shadow-[0_20px_50px_rgba(37,99,235,0.2)] transition-all duration-300 hover:-translate-y-1 flex flex-col items-center justify-center text-center gap-4 overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                <div class="w-14 h-14 rounded-2xl {{ $link['color'] }} text-white flex items-center justify-center text-xl shadow-lg shadow-{{ explode('-', $link['color'])[1] }}-500/40 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                     <i class="fas {{ $link['icon'] }}"></i>
                 </div>
-                <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">{{ $link['label'] }}</span>
+                <span class="text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-[0.2em] relative z-10">{{ $link['label'] }}</span>
             </a>
         @endforeach
     </div>
@@ -86,34 +89,35 @@
     <!-- Section: Saúde e Visibilidade -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 animate-fade-in-up" style="animation-delay: 100ms;">
         <!-- Card Saúde -->
-        <div class="lg:col-span-4 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 p-10 flex flex-col items-center text-center group/card transition-all relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+        <div class="lg:col-span-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] border border-white/50 dark:border-slate-800/60 p-10 flex flex-col items-center text-center group/card transition-all duration-500 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] hover:-translate-y-1 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-[60px] group-hover/card:bg-blue-500/20 transition-all duration-700"></div>
 
-            <div class="relative w-40 h-40 mb-8">
+            <div class="relative w-40 h-40 mb-8 transform group-hover/card:scale-105 transition-transform duration-500">
+                <div class="absolute inset-0 rounded-full shadow-[inset_0_0_20px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]"></div>
                 <svg class="w-full h-full transform -rotate-90">
-                    <circle cx="80" cy="80" r="72" stroke="currentColor" stroke-width="12" fill="transparent" class="text-slate-100 dark:text-slate-800/50" />
+                    <circle cx="80" cy="80" r="72" stroke="currentColor" stroke-width="12" fill="transparent" class="text-slate-100/50 dark:text-slate-800/30" />
                     <circle cx="80" cy="80" r="72" stroke="currentColor" stroke-width="12" fill="transparent" 
                         stroke-dasharray="{{ (2 * pi() * 72) * (($myHealth['score'] ?? 0) / 100) }} {{ (2 * pi() * 72) }}"
                         stroke-linecap="round"
-                        class="transition-all duration-[1500ms] ease-out shadow-lg" style="color: {{ $myHealth['color'] ?? '#1F5EDB' }}" />
+                        class="transition-all duration-[2000ms] ease-out drop-shadow-lg" style="color: {{ $myHealth['color'] ?? '#1F5EDB' }}" />
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center">
-                    <span class="text-4xl font-black text-slate-900 dark:text-white">{{ $myHealth['score'] ?? 0 }}%</span>
-                    <span class="text-[10px] uppercase font-black text-slate-400 tracking-widest">Score Unn</span>
+                    <span class="text-4xl font-black text-slate-900 dark:text-white drop-shadow-sm">{{ $myHealth['score'] ?? 0 }}%</span>
+                    <span class="text-[10px] uppercase font-black text-slate-400 dark:text-slate-500 tracking-[0.2em] mt-1">Score Único</span>
                 </div>
             </div>
 
             <h4 class="text-2xl font-black text-slate-900 dark:text-white mb-3">Status da Conta</h4>
-            <div class="px-6 py-2 rounded-full text-xs font-black mb-6 border transition-colors" style="background-color: {{ ($myHealth['color'] ?? '#1F5EDB') }}10; border-color: {{ ($myHealth['color'] ?? '#1F5EDB') }}30; color: {{ $myHealth['color'] ?? '#1F5EDB' }}">
+            <div class="px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest mb-6 border transition-colors shadow-inner" style="background-color: {{ ($myHealth['color'] ?? '#1F5EDB') }}10; border-color: {{ ($myHealth['color'] ?? '#1F5EDB') }}20; color: {{ $myHealth['color'] ?? '#1F5EDB' }}">
                 {{ $myHealth['level'] ?? 'MEMBRO INICIANTE' }}
             </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                {{ ($myHealth['score'] ?? 0) < 100 ? 'Sua visibilidade na rede aumenta conforme você completa seu perfil.' : 'Expetacular! Você atingiu o nível máximo de autoridade na UNN.' }}
+            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
+                {{ ($myHealth['score'] ?? 0) < 100 ? 'Sua autoridade no sistema cresce conforme você ativa e preenche o seu perfil.' : 'Expetacular! Você atingiu o nível máximo de autoridade na comunidade.' }}
             </p>
         </div>
 
         <!-- Card Checklist -->
-        <div class="lg:col-span-8 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 p-10 flex flex-col">
+        <div class="lg:col-span-8 bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] border border-white/50 dark:border-slate-800/60 p-10 flex flex-col relative overflow-hidden transition-all duration-500 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)]">
             <div class="flex items-center justify-between mb-10">
                 <div>
                     <h4 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Checklist de Networking</h4>

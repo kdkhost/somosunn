@@ -38,6 +38,10 @@
 - **Ranking Top 10:** Toda semana (domingo a meia-noite), os 10 membros com mais pontos recebem bonus automatico.
 - **Streak de Login:** Logins consecutivos por 7 ou 30 dias concedem bonus progressivos.
 
+## Novidades Recentes (mar/2026)
+
+- **Refatoração Premium do Painel do Membro:** A barra lateral (sidebar) e o dashboard principal receberam um upgrade visual massivo com efeitos de *glassmorphism* (blur e transparência), sombreamentos 3D e animações suaves de expansão. Os menus da barra lateral agora utilizam a tag `<details>` com o atributo `name`, funcionando como um **acordeão exclusivo nativo** (abrir um menu fecha o outro automaticamente), garantindo uma experiência "de dar água na boca" e otimização sem JavaScript extra.
+
 ## Novidades Recentes (fev/2026)
 
 - **Menu mobile 100% responsivo:** Navegação aprimorada em smartphones, com abertura/fechamento suave e acessibilidade total.
