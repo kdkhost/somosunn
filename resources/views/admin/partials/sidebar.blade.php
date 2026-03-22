@@ -151,8 +151,8 @@
                 @endif
 
                 @if(auth()->user()->canAccessFeature('events'))
-                    <li class="nav-item has-treeview {{ $open('admin.events.*') }}">
-                        <a href="#" class="nav-link {{ $is('admin.events.*') }}">
+                    <li class="nav-item has-treeview {{ $open(['admin.events.*', 'admin.quick-scanner']) }}">
+                        <a href="#" class="nav-link {{ $is(['admin.events.*', 'admin.quick-scanner']) }}">
                             <i class="nav-icon fas fa-calendar"></i>
                             <p>Eventos<i class="right fas fa-angle-left"></i></p>
                         </a>
