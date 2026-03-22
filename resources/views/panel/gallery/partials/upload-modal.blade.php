@@ -122,12 +122,7 @@
                                         </span>
                                         O painel publica uma imagem por vez para evitar recusas por lote excessivo.
                                     </li>
-                                    <li class="flex gap-3">
-                                        <span class="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[10px] text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-300">
-                                            <i class="fas fa-check"></i>
-                                        </span>
-                                        As imagens recebem watermark quando o processamento do evento estiver ativo.
-                                    </li>
+
                                 </ul>
                             </div>
 

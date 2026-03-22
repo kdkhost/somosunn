@@ -44,15 +44,18 @@ class EventMediaController extends Controller
             $targetDirectory = $type === 'image'
                 ? 'events/' . $event->id . '/gallery'
                 : 'events/' . $event->id . '/gallery/videos';
-            $shouldWatermark = $type === 'image'
-                && $watermarkService->isWatermarkableImage($file)
-                && $watermarkService->shouldWatermarkUpload($targetDirectory);
+            $shouldWatermark = false; // Watermark feature removed
 
             try {
                 try {
                     if ($type === 'image') {
-                        $path = $watermarkService->processEventImage($file, $event);
-                        $watermarked = $shouldWatermark;
+                        $path = UploadStorage::storeUploadedFile(
+                            $file,
+                            $targetDirectory,
+                            null,
+                            ['prefix' => 'gallery-media']
+                        );
+                        $watermarked = false;
                     } else {
                         $path = UploadStorage::storeUploadedFile(
                             $file,
@@ -69,7 +72,7 @@ class EventMediaController extends Controller
                     ]);
 
                     $path = UploadStorage::storeUploadedFile($file, $targetDirectory);
-                    $watermarked = $shouldWatermark;
+                    $watermarked = false;
                 }
 
                 $uploadedMedia[] = EventMedia::create([

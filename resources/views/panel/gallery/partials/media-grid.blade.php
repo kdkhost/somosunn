@@ -21,7 +21,7 @@
             </div>
         </div>
 
-        <div id="panel-gallery-grid" class="grid gap-6 lg:grid-cols-2 2xl:grid-cols-3">
+        <div id="panel-gallery-grid" class="columns-1 md:columns-2 lg:columns-3 2xl:columns-4 gap-6 space-y-6">
             @foreach($items as $item)
                 @php
                     $imageUrl = \App\Support\UploadStorage::url($item->file_path, asset('img/default-user.svg'));
@@ -38,25 +38,21 @@
                     $eventDate = optional(optional($item->event)->start_at)?->format('d/m/Y');
                 @endphp
 
-                <article class="group overflow-hidden rounded-[2rem] border border-slate-200/70 bg-white shadow-sm shadow-slate-200/60 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
-                    <div class="relative aspect-[4/3] overflow-hidden bg-slate-950">
+                <article class="group break-inside-avoid overflow-hidden rounded-[2rem] border border-slate-200/70 bg-white shadow-sm shadow-slate-200/60 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+                    <div class="relative overflow-hidden bg-slate-950">
                         <button type="button"
                             data-lightbox-src="{{ $imageUrl }}"
                             data-lightbox-title="{{ $eventTitle }}"
-                            class="h-full w-full text-left">
+                            class="block w-full text-left">
                             <img src="{{ $imageUrl }}" alt="{{ $eventTitle }}"
-                                class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                                class="block w-full h-auto object-cover transition duration-500 group-hover:scale-[1.04]">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-transparent opacity-90"></div>
                             <div class="absolute left-5 right-5 top-5 flex items-start justify-between gap-4">
                                 <span class="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
                                     {{ \Illuminate\Support\Str::limit($eventTitle, 28) }}
                                 </span>
                                 <div class="flex flex-col items-end gap-2">
-                                    @if($item->watermarked)
-                                        <span class="rounded-full border border-cyan-400/25 bg-cyan-400/12 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-100 backdrop-blur">
-                                            Watermark
-                                        </span>
-                                    @endif
+
                                     @if($isCover)
                                         <span class="rounded-full border border-amber-300/25 bg-amber-400/20 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-amber-100 backdrop-blur">
                                             Capa do album

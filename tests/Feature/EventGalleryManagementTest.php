@@ -150,7 +150,7 @@ class EventGalleryManagementTest extends TestCase
         $this->assertSame(2, EventMedia::query()->count());
         $this->assertSame(1, EventMedia::query()->where('type', 'image')->count());
         $this->assertSame(1, EventMedia::query()->where('type', 'video')->count());
-        $this->assertTrue((bool) EventMedia::query()->where('type', 'image')->value('watermarked'));
+        $this->assertFalse((bool) EventMedia::query()->where('type', 'image')->value('watermarked'));
         $this->assertFalse((bool) EventMedia::query()->where('type', 'video')->value('watermarked'));
     }
 
@@ -180,7 +180,7 @@ class EventGalleryManagementTest extends TestCase
             'user_id' => $member->id,
             'file_path' => 'events/' . $event->id . '/gallery/foto.jpg',
             'type' => 'image',
-            'watermarked' => true,
+            'watermarked' => false,
         ]);
 
         $this->actingAs($organizer);

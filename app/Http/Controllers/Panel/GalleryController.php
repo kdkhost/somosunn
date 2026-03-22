@@ -90,11 +90,15 @@ class GalleryController extends Controller
 
         foreach ($request->file('files', []) as $file) {
             $targetDirectory = 'events/' . $event->id . '/gallery';
-            $shouldWatermark = $watermarkService->isWatermarkableImage($file)
-                && $watermarkService->shouldWatermarkUpload($targetDirectory);
+            $shouldWatermark = false; // Watermark feature removed
 
             try {
-                $path = $watermarkService->processEventImage($file, $event);
+                $path = UploadStorage::storeUploadedFile(
+                    $file,
+                    $targetDirectory,
+                    null,
+                    ['prefix' => 'gallery-media']
+                );
                 $uploadedMedia[] = EventMedia::create([
                     'event_id' => $event->id,
                     'user_id' => auth()->id(),
