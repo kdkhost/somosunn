@@ -77,7 +77,8 @@ class CourseController extends Controller
     public function create()
     {
         $this->ensurePermission('courses.create');
-        return view('admin.courses.form');
+        $course = new Course();
+        return view('admin.courses.form', compact('course'));
     }
 
     public function show(Course $course)
