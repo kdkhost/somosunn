@@ -847,7 +847,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
 </head>
 
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen layout-{{ \App\Models\Setting::get('site_layout_type', 'boxed') }}">
     @if($preloaderEnabled)
         <div id="preloader"
             class="fixed inset-0 z-[99999] flex items-center justify-center bg-white transition-opacity duration-500">

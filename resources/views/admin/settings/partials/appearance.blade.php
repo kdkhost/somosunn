@@ -79,6 +79,13 @@
             </select>
         </div>
         <div class="col-md-3 form-group">
+            <label>Tipo de Layout (Largura)</label>
+            <select name="site_layout_type" class="form-control">
+                <option value="boxed" {{ ($settings['site_layout_type'] ?? 'boxed') === 'boxed' ? 'selected' : '' }}>Boxed (Centralizado)</option>
+                <option value="full" {{ ($settings['site_layout_type'] ?? '') === 'full' ? 'selected' : '' }}>Full (Tela Cheia)</option>
+            </select>
+        </div>
+        <div class="col-md-3 form-group">
             <label>Cor Primária</label>
             <div class="input-group colorpicker-element">
                 <input name="site_color_primary" class="form-control"

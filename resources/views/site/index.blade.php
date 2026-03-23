@@ -96,7 +96,7 @@
         <!-- Stats Bar -->
         <!-- Stats Bar -->
         <section class="py-6 md:py-8 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
-            <div class="mx-auto">
+            <div class="unn-container">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                     <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
                         <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">
@@ -123,8 +123,8 @@
         </section>
 
         <!-- O que é a UNN -->
-        <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
-            <div class="max-w-7xl mx-auto">
+        <section class="py-16 px-4 md:px-8 lg:px-12 bg-white w-full overflow-x-hidden">
+            <div class="unn-container">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl font-black unn-title-gradient mb-4">{{ $homePage->get('about_title', 'O que é a UNN') }}</h2>
                     <p class="text-gray-600 text-lg max-w-2xl mx-auto">{{ $homePage->get('about_subtitle', 'A UNN nasceu para unir empreendedores que acreditam no crescimento colaborativo.') }}</p>
@@ -221,8 +221,8 @@
         </section>
 
         <!-- Palestras Gratuitas -->
-        <section class="py-16 px-6 md:px-12 lg:px-24">
-            <div class="max-w-7xl mx-auto">
+        <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
+            <div class="mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-black text-gray-900">{{ $homePage->get('events_title', 'Palestras gratuitas') }}</h2>
@@ -296,8 +296,8 @@
         </section>
 
         <!-- Mentorias Premium -->
-        <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
-            <div class="max-w-7xl mx-auto">
+        <section class="py-16 px-4 md:px-8 lg:px-12 bg-white w-full overflow-x-hidden">
+            <div class="mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-black text-gray-900">{{ $homePage->get('mentorships_title', 'Mentorias premium') }}</h2>
@@ -370,8 +370,8 @@
         </section>
 
         <!-- Comunidade por níveis -->
-        <section class="py-16 px-6 md:px-12 lg:px-24">
-            <div class="max-w-6xl mx-auto">
+        <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
+            <div class="mx-auto">
                 <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $homePage->get('community_title', 'Comunidade por níveis') }}</h2>
 
                 <div class="grid md:grid-cols-2 gap-8">
@@ -400,8 +400,8 @@
         </section>
 
         <!-- Ranking -->
-        <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
-            <div class="max-w-7xl mx-auto">
+        <section class="py-16 px-4 md:px-8 lg:px-12 bg-white w-full overflow-x-hidden">
+            <div class="mx-auto">
                 <div class="flex items-center justify-between mb-10">
                     <div>
                         <h2 class="text-3xl font-black text-gray-900">{{ $homePage->get('ranking_title', 'Ranking do networking') }}</h2>
@@ -534,8 +534,8 @@
         </section>
 
         <!-- Depoimentos -->
-        <section class="py-16 px-6 md:px-12 lg:px-24">
-            <div class="max-w-7xl mx-auto">
+        <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
+            <div class="mx-auto">
                 <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $homePage->get('testimonials_title', 'O que dizem nossos membros') }}</h2>
 
                 @php
@@ -586,9 +586,9 @@
         </section>
 
         <!-- CTA Final -->
-        <section class="py-16 px-6 md:px-12 lg:px-24"
+        <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden"
             style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-            <div class="max-w-4xl mx-auto text-center text-white">
+            <div class="mx-auto text-center text-white">
                 <h2 class="text-3xl lg:text-4xl font-black mb-4">{{ $homePage->get('cta_section_title', 'Pronto para transformar sua rede?') }}</h2>
                 <p class="text-lg opacity-90 mb-8">{{ $homePage->get('cta_section_subtitle', 'Junte-se a milhares de empreendedores que já estão crescendo juntos.') }}</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">

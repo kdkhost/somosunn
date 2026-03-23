@@ -5,8 +5,9 @@
 @section('content')
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen pb-16">
         <!-- Hero Section -->
-        <section class="pt-10 md:pt-20 pb-12 px-4 md:px-12 lg:px-24">
-            <div class="max-w-7xl mx-auto text-center">
+        <section class="pt-10 md:pt-20 pb-12 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
+            <div class="unn-container text-center">
+ pockets
                 <h1 class="text-4xl md:text-5xl font-black mb-4 unn-title-gradient">Ranking da Comunidade</h1>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">
                     Conheça os empreendedores que mais interagem e colaboram dentro do nosso ecossistema.
@@ -25,8 +26,8 @@
 
         <!-- Ranking Pódio (Top 3) -->
         @if($podium->isNotEmpty())
-            <section class="px-6 md:px-12 lg:px-24 mb-16">
-                <div class="max-w-5xl mx-auto">
+            <section class="px-4 md:px-8 lg:px-12 mb-16 w-full overflow-x-hidden">
+                <div class="mx-auto">
                     @php
                         $medals = [
                             0 => ['bg' => 'from-yellow-400 to-amber-500', 'ring' => 'ring-yellow-400', 'label' => '🥇 1º lugar', 'icon' => 'fas fa-crown', 'iconColor' => 'text-yellow-400'],
@@ -164,8 +165,8 @@
 
         <!-- Demais Membros da Lista -->
         @if($remaining->isNotEmpty())
-            <section class="px-4 md:px-12 lg:px-24">
-                <div class="max-w-4xl mx-auto">
+            <section class="px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
+                <div class="mx-auto">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                         <i class="fas fa-list-ol text-gray-400"></i> Classificação Geral
                     </h3>

@@ -1,6 +1,6 @@
-@extends('panel.layouts.app')
+﻿@extends('panel.layouts.app')
 
-@section('title', 'Programa de Indicações')
+@section('title', 'Programa de IndicaÃ§Ãµes')
 
 @section('panel_content')
 @php
@@ -26,9 +26,9 @@
     {{-- ===== HEADER ===== --}}
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Programa de Indicações</h1>
+            <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Programa de IndicaÃ§Ãµes</h1>
             <p class="text-slate-500 dark:text-slate-400 mt-1 font-medium">
-                Compartilhe seu link. Quando alguém que você indicou <strong class="text-slate-700 dark:text-slate-300">assinar um plano pago</strong>, você recebe pontos automaticamente.
+                Compartilhe seu link. Quando alguÃ©m que vocÃª indicou <strong class="text-slate-700 dark:text-slate-300">assinar um plano pago</strong>, vocÃª recebe pontos automaticamente.
             </p>
         </div>
         @if($pointsPerReferral && $pendingCount > 0)
@@ -69,13 +69,13 @@
                 <div>
                     <h2 class="text-xl font-black text-slate-900 dark:text-white">Rastreio completo do link</h2>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                        Cliques, visitas únicas, cadastros, checkouts, compras confirmadas e compartilhamentos.
+                        Cliques, visitas Ãºnicas, cadastros, checkouts, compras confirmadas e compartilhamentos.
                     </p>
                 </div>
                 <div id="trackingConversionMeta" class="text-sm text-slate-500 dark:text-slate-400">
-                    Conversão para cadastro: <strong class="text-slate-700 dark:text-slate-200">{{ $trackingConversion }}%</strong>
-                    · Compra: <strong class="text-slate-700 dark:text-slate-200">{{ $purchaseConversion }}%</strong>
-                    · Atualizado às <strong id="trackingUpdatedAtLabel" class="text-slate-700 dark:text-slate-200">{{ $trackingUpdatedAtLabel }}</strong>
+                    ConversÃ£o para cadastro: <strong class="text-slate-700 dark:text-slate-200">{{ $trackingConversion }}%</strong>
+                    Â· Compra: <strong class="text-slate-700 dark:text-slate-200">{{ $purchaseConversion }}%</strong>
+                    Â· Atualizado Ã s <strong id="trackingUpdatedAtLabel" class="text-slate-700 dark:text-slate-200">{{ $trackingUpdatedAtLabel }}</strong>
                 </div>
             </div>
 
@@ -90,23 +90,23 @@
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Cliques no link</p>
                     <p id="trackingClicksValue" class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['clicks']) }}</p>
-                    <p id="trackingClicksMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['visits']) }} visitas únicas · {{ number_format($trackingSummary['pageviews']) }} visualizações</p>
+                    <p id="trackingClicksMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['visits']) }} visitas Ãºnicas Â· {{ number_format($trackingSummary['pageviews']) }} visualizaÃ§Ãµes</p>
                 </div>
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Cadastros atribuídos</p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Cadastros atribuÃ­dos</p>
                     <p id="trackingRegistrationsValue" class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['registrations']) }}</p>
-                    <p id="trackingRegistrationsMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['checkout_starts']) }} checkouts iniciados · {{ $trackingConversion }}% de conversão</p>
+                    <p id="trackingRegistrationsMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ number_format($trackingSummary['checkout_starts']) }} checkouts iniciados Â· {{ $trackingConversion }}% de conversÃ£o</p>
                 </div>
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Compras confirmadas</p>
                     <p id="trackingPurchasesValue" class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['purchases']) }}</p>
-                    <p id="trackingRevenueMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">R$ {{ number_format($trackingSummary['revenue'], 2, ',', '.') }} rastreados · {{ $purchaseConversion }}% de conversão</p>
+                    <p id="trackingRevenueMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">R$ {{ number_format($trackingSummary['revenue'], 2, ',', '.') }} rastreados Â· {{ $purchaseConversion }}% de conversÃ£o</p>
                 </div>
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Compartilhamentos</p>
                     <p id="trackingSharesValue" class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ number_format($trackingSummary['shares'] + $trackingSummary['reshares'] + $trackingSummary['copies']) }}</p>
                     <p id="trackingSharesMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                        {{ number_format($trackingSummary['shares']) }} novos · {{ number_format($trackingSummary['reshares']) }} reenvios · {{ number_format($trackingSummary['copies']) }} cópias
+                        {{ number_format($trackingSummary['shares']) }} novos Â· {{ number_format($trackingSummary['reshares']) }} reenvios Â· {{ number_format($trackingSummary['copies']) }} cÃ³pias
                     </p>
                 </div>
             </div>
@@ -115,8 +115,8 @@
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 p-5">
                     <div class="flex items-start justify-between gap-3">
                         <div>
-                            <h3 class="font-black text-slate-900 dark:text-white">Performance diária</h3>
-                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Últimos 14 dias com visitas, cadastros, checkouts, compras e receita.</p>
+                            <h3 class="font-black text-slate-900 dark:text-white">Performance diÃ¡ria</h3>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Ãšltimos 14 dias com visitas, cadastros, checkouts, compras e receita.</p>
                         </div>
                         <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300">14 dias</span>
                     </div>
@@ -127,15 +127,15 @@
 
                 <div class="space-y-6">
                     <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 p-5">
-                        <h3 class="font-black text-slate-900 dark:text-white">Aquisição por canal</h3>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Origem das visitas, registros e compras atribuídas.</p>
+                        <h3 class="font-black text-slate-900 dark:text-white">AquisiÃ§Ã£o por canal</h3>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Origem das visitas, registros e compras atribuÃ­das.</p>
                         <div class="mt-5 h-[320px]">
                             <canvas id="referralAcquisitionChart"></canvas>
                         </div>
                     </div>
 
                     <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 p-5">
-                        <h3 class="font-black text-slate-900 dark:text-white">Distribuição de compartilhamentos</h3>
+                        <h3 class="font-black text-slate-900 dark:text-white">DistribuiÃ§Ã£o de compartilhamentos</h3>
                         <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Leitura visual dos canais que mais espalham seu link.</p>
                         <div class="mt-5 h-[260px]">
                             <canvas id="referralSharingChart"></canvas>
@@ -147,10 +147,10 @@
             <div class="grid lg:grid-cols-[1.6fr,1fr] gap-6">
                 <div class="rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
                     <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-                        <h3 class="font-black text-slate-900 dark:text-white">Últimas visitas atribuídas</h3>
+                        <h3 class="font-black text-slate-900 dark:text-white">Ãšltimas visitas atribuÃ­das</h3>
                     </div>
                     <div id="trackingVisitsEmpty" class="px-5 py-8 text-sm text-slate-500 dark:text-slate-400 {{ $trackedVisits->isEmpty() ? '' : 'hidden' }}">
-                        Ainda não há visitas rastreadas para este link.
+                        Ainda nÃ£o hÃ¡ visitas rastreadas para este link.
                     </div>
                     <div id="trackingVisitsTableWrapper" class="overflow-x-auto {{ $trackedVisits->isEmpty() ? 'hidden' : '' }}">
                             <table class="w-full text-sm">
@@ -169,9 +169,9 @@
                                         @endphp
                                         <tr>
                                             <td class="px-5 py-4">
-                                                <p class="font-semibold text-slate-900 dark:text-white">{{ $visit->first_visited_at?->format('d/m/Y H:i') ?? '—' }}</p>
+                                                <p class="font-semibold text-slate-900 dark:text-white">{{ $visit->first_visited_at?->format('d/m/Y H:i') ?? 'â€”' }}</p>
                                                 <p class="text-xs text-slate-500 dark:text-slate-400">
-                                                    {{ number_format($visit->clicks_count) }} clique(s) · {{ number_format($visit->pageviews_count) }} página(s)
+                                                    {{ number_format($visit->clicks_count) }} clique(s) Â· {{ number_format($visit->pageviews_count) }} pÃ¡gina(s)
                                                 </p>
                                             </td>
                                             <td class="px-5 py-4">
@@ -212,15 +212,15 @@
                                 </div>
                                 <div class="mt-2 flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
                                     <span>{{ number_format($channel->shares) }} novos</span>
-                                    <span>·</span>
+                                    <span>Â·</span>
                                     <span>{{ number_format($channel->reshares) }} reenvios</span>
-                                    <span>·</span>
-                                    <span>{{ number_format($channel->copies) }} cópias</span>
+                                    <span>Â·</span>
+                                    <span>{{ number_format($channel->copies) }} cÃ³pias</span>
                                 </div>
                             </div>
                         @empty
                             <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-6 text-sm text-slate-500 dark:text-slate-400">
-                                Os compartilhamentos começam a aparecer aqui assim que você usar os botões rápidos ou copiar seu link.
+                                Os compartilhamentos comeÃ§am a aparecer aqui assim que vocÃª usar os botÃµes rÃ¡pidos ou copiar seu link.
                             </div>
                         @endforelse
                     </div>
@@ -236,10 +236,10 @@
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Melhor canal atual</p>
                             @php $topChannel = $trackingChannels->first(); @endphp
                             <p id="trackingTopChannelLabel" class="mt-2 {{ $topChannel ? 'text-xl font-black text-slate-900 dark:text-white' : 'text-sm font-semibold text-slate-500 dark:text-slate-400' }}">
-                                {{ $topChannel->channel ?? 'Sem ações compartilhadas' }}
+                                {{ $topChannel->channel ?? 'Sem aÃ§Ãµes compartilhadas' }}
                             </p>
                             <p id="trackingTopChannelMeta" class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                {{ $topChannel ? number_format($topChannel->total) . ' ação(ões) registradas' : 'Use os botões rápidos ou copie o link para começar a medir os canais.' }}
+                                {{ $topChannel ? number_format($topChannel->total) . ' aÃ§Ã£o(Ãµes) registradas' : 'Use os botÃµes rÃ¡pidos ou copie o link para comeÃ§ar a medir os canais.' }}
                             </p>
                         </div>
                     </div>
@@ -251,7 +251,7 @@
     @include('panel.referral.partials.channel-funnel', [
         'channelFunnels' => $channelFunnels,
         'title' => 'Funil por canal e origem',
-        'subtitle' => 'Veja de onde vieram os cliques, quantas visualizações cada origem gerou e onde realmente converte.',
+        'subtitle' => 'Veja de onde vieram os cliques, quantas visualizaÃ§Ãµes cada origem gerou e onde realmente converte.',
     ])
     </div>
 
@@ -260,8 +260,8 @@
         'detailedEvents' => $detailedEvents,
         'exportUrl' => route('panel.referral.export'),
         'title' => 'Log detalhado de cliques, visitas e compartilhamentos',
-        'subtitle' => 'Inclui URL de origem exata, landing page, dispositivo, navegador, cidade/país e o resultado de cada ação.',
-        'emptyMessage' => 'Ainda não há cliques, visitas ou compartilhamentos detalhados para este afiliado.',
+        'subtitle' => 'Inclui URL de origem exata, landing page, dispositivo, navegador, cidade/paÃ­s e o resultado de cada aÃ§Ã£o.',
+        'emptyMessage' => 'Ainda nÃ£o hÃ¡ cliques, visitas ou compartilhamentos detalhados para este afiliado.',
     ])
     </div>
     @endif
@@ -296,7 +296,7 @@
             </div>
         </div>
 
-        {{-- Pontos ganhos com indicações --}}
+        {{-- Pontos ganhos com indicaÃ§Ãµes --}}
         <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-amber-500/20 flex items-center gap-3 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(245,158,11,0.3)] transition-all duration-300 relative overflow-hidden group">
             <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
@@ -308,30 +308,30 @@
             </div>
         </div>
 
-        {{-- Pontos por indicação --}}
+        {{-- Pontos por indicaÃ§Ã£o --}}
         <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border border-white/60 dark:border-slate-800/60 rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex items-center gap-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(37,99,235,0.08)] transition-all duration-300 relative overflow-hidden group">
             <div class="absolute inset-0 bg-gradient-to-br from-transparent to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/40 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
                 <i class="fas fa-gift text-green-600 dark:text-green-400 text-lg sm:text-xl"></i>
             </div>
             <div class="min-w-0">
-                <p class="text-slate-500 dark:text-slate-400 text-xs font-semibold truncate">Por indicação</p>
+                <p class="text-slate-500 dark:text-slate-400 text-xs font-semibold truncate">Por indicaÃ§Ã£o</p>
                 @if($pointsPerReferral)
                     <p class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-tight">+{{ $pointsPerReferral }}</p>
                     <p class="text-xs text-slate-400 dark:text-slate-500">pontos</p>
                 @else
-                    <p class="text-sm font-bold text-slate-400 dark:text-slate-500 leading-tight">Não config.</p>
+                    <p class="text-sm font-bold text-slate-400 dark:text-slate-500 leading-tight">NÃ£o config.</p>
                 @endif
             </div>
         </div>
 
     </div>
 
-    {{-- ===== SEU LINK DE INDICAÇÃO ===== --}}
+    {{-- ===== SEU LINK DE INDICAÃ‡ÃƒO ===== --}}
     <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-white/50 dark:border-slate-800/60 rounded-3xl p-6 md:p-8 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-all duration-500 overflow-hidden relative group/link">
         <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover/link:bg-blue-500/10 transition-all duration-700 pointer-events-none"></div>
         <div class="relative z-10">
-        <h2 class="text-xl font-black text-slate-900 dark:text-white mb-1">Seu link de indicação</h2>
+        <h2 class="text-xl font-black text-slate-900 dark:text-white mb-1">Seu link de indicaÃ§Ã£o</h2>
         <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Compartilhe este link. O sistema registra automaticamente quem entrou pelo seu convite.</p>
 
         {{-- Input + Copiar --}}
@@ -348,9 +348,9 @@
             </button>
         </div>
 
-        {{-- Compartilhamento rápido --}}
+        {{-- Compartilhamento rÃ¡pido --}}
         <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 mb-6">
-            <a href="https://wa.me/?text={{ urlencode('Ei! Faça parte da maior comunidade de empreendedores e networking do Brasil. Use meu link: ' . $referralLink) }}"
+            <a href="https://wa.me/?text={{ urlencode('Ei! FaÃ§a parte da maior comunidade de empreendedores e networking do Brasil. Use meu link: ' . $referralLink) }}"
                target="_blank" rel="noopener noreferrer"
                class="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all active:scale-95">
                 <i class="fab fa-whatsapp"></i> WhatsApp
@@ -365,22 +365,22 @@
                class="inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all active:scale-95">
                 <i class="fab fa-linkedin"></i> LinkedIn
             </a>
-            <a href="mailto:?subject={{ urlencode('Convite para a comunidade UNN') }}&body={{ urlencode('Olá! Quero te convidar para a maior plataforma de networking para empreendedores. Acesse: ' . $referralLink) }}"
+            <a href="mailto:?subject={{ urlencode('Convite para a comunidade UNN') }}&body={{ urlencode('OlÃ¡! Quero te convidar para a maior plataforma de networking para empreendedores. Acesse: ' . $referralLink) }}"
                class="inline-flex items-center justify-center gap-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all active:scale-95">
                 <i class="fas fa-envelope"></i> E-mail
             </a>
         </div>
 
-        {{-- Código + aviso --}}
+        {{-- CÃ³digo + aviso --}}
         <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
             <div>
-                <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Seu código único</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Seu cÃ³digo Ãºnico</p>
                 <code class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-sm px-3 py-1 rounded-lg">{{ $user->referral_code }}</code>
             </div>
             <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
             <p class="text-xs text-slate-400 dark:text-slate-500">
                 <i class="fas fa-info-circle mr-1 text-blue-400"></i>
-                Pontos são creditados somente após o indicado <strong class="text-slate-600 dark:text-slate-400">assinar um plano pago</strong>.
+                Pontos sÃ£o creditados somente apÃ³s o indicado <strong class="text-slate-600 dark:text-slate-400">assinar um plano pago</strong>.
             </p>
         </div>
     </div>
@@ -392,17 +392,17 @@
         <div class="relative z-10">
         <div class="p-6 md:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4">
             <div>
-                <h2 class="text-xl font-black text-slate-900 dark:text-white">Pessoas que você indicou</h2>
+                <h2 class="text-xl font-black text-slate-900 dark:text-white">Pessoas que vocÃª indicou</h2>
                 <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
                     Cadastros realizados com seu link. &nbsp;
                     <span class="text-emerald-600 dark:text-emerald-400 font-semibold">{{ $convertedCount }} convertido{{ $convertedCount != 1 ? 's' : '' }}</span>
-                    &nbsp;·&nbsp;
+                    &nbsp;Â·&nbsp;
                     <span class="text-slate-500">{{ $pendingCount }} aguardando pagamento</span>
                 </p>
             </div>
             @if($totalReferred > 0)
                 <div class="shrink-0 text-right hidden sm:block">
-                    <p class="text-xs text-slate-400 mb-1">Taxa de conversão</p>
+                    <p class="text-xs text-slate-400 mb-1">Taxa de conversÃ£o</p>
                     <div class="flex items-center gap-2">
                         <div class="w-24 bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
                             <div class="bg-emerald-500 h-2 rounded-full" style="width: {{ $conversionRate }}%"></div>
@@ -418,8 +418,8 @@
                 <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-user-plus text-slate-400 text-2xl"></i>
                 </div>
-                <p class="text-slate-500 dark:text-slate-400 font-semibold mb-1">Nenhuma indicação ainda</p>
-                <p class="text-slate-400 dark:text-slate-500 text-sm">Compartilhe seu link para que amigos se cadastrem e você comece a ganhar pontos!</p>
+                <p class="text-slate-500 dark:text-slate-400 font-semibold mb-1">Nenhuma indicaÃ§Ã£o ainda</p>
+                <p class="text-slate-400 dark:text-slate-500 text-sm">Compartilhe seu link para que amigos se cadastrem e vocÃª comece a ganhar pontos!</p>
             </div>
         @else
             <div class="overflow-x-auto">
@@ -444,7 +444,7 @@
                                 // Status do plano
                                 if ($referred->plan_id) {
                                     if (!$referred->plan_expires_at) {
-                                        $planStatus = ['label' => 'Vitalício', 'dot' => 'bg-purple-500', 'class' => 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'];
+                                        $planStatus = ['label' => 'VitalÃ­cio', 'dot' => 'bg-purple-500', 'class' => 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'];
                                     } elseif (\Carbon\Carbon::parse($referred->plan_expires_at)->isFuture()) {
                                         $planStatus = ['label' => 'Assinante ativo', 'dot' => 'bg-emerald-500', 'class' => 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'];
                                     } else {
@@ -498,7 +498,7 @@
                                     @elseif($referred->plan_id)
                                         <span class="text-xs text-yellow-600 dark:text-yellow-500 font-medium whitespace-nowrap">Aguardando</span>
                                     @else
-                                        <span class="text-slate-400 dark:text-slate-600 text-xs">—</span>
+                                        <span class="text-slate-400 dark:text-slate-600 text-xs">â€”</span>
                                     @endif
                                 </td>
                             </tr>
@@ -517,13 +517,13 @@
 </div>
 </div>
 
-    {{-- ===== HISTÓRICO DE GANHOS ===== --}}
+    {{-- ===== HISTÃ“RICO DE GANHOS ===== --}}
     @if($referralPointsLogs->isNotEmpty())
     <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-white/50 dark:border-slate-800/60 rounded-3xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-all duration-500 overflow-hidden relative group/history">
         <div class="absolute top-0 right-0 w-40 h-40 bg-amber-500/5 rounded-full -mr-20 -mt-20 blur-3xl group-hover/history:bg-amber-500/10 transition-all duration-700 pointer-events-none"></div>
         <div class="relative z-10">
         <div class="p-6 md:p-8 border-b border-slate-100 dark:border-slate-800">
-            <h2 class="text-xl font-black text-slate-900 dark:text-white">Histórico de ganhos</h2>
+            <h2 class="text-xl font-black text-slate-900 dark:text-white">HistÃ³rico de ganhos</h2>
             <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Cada linha corresponde a um pagamento de plano confirmado de um indicado seu.</p>
         </div>
         <div class="overflow-x-auto">
@@ -542,17 +542,17 @@
                         @php $meta = json_decode($log->meta ?? '{}', true); @endphp
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                             <td class="px-3 py-3 sm:px-6 sm:py-4 max-w-[40vw] sm:max-w-none">
-                                <p class="font-semibold text-slate-900 dark:text-white truncate text-xs sm:text-sm">{{ $meta['new_user_name'] ?? '—' }}</p>
+                                <p class="font-semibold text-slate-900 dark:text-white truncate text-xs sm:text-sm">{{ $meta['new_user_name'] ?? 'â€”' }}</p>
                                 <p class="text-xs text-slate-400 sm:hidden">{{ optional($log->created_at)->format('d/m/Y') }}</p>
                             </td>
                             <td class="px-3 py-3 sm:px-6 sm:py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell text-xs">
-                                {{ $meta['plan_name'] ?? '—' }}
+                                {{ $meta['plan_name'] ?? 'â€”' }}
                             </td>
                             <td class="px-3 py-3 sm:px-6 sm:py-4 hidden lg:table-cell">
                                 @if(isset($meta['order_id']))
                                     <code class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs px-2 py-0.5 rounded">#{{ $meta['order_id'] }}</code>
                                 @else
-                                    <span class="text-slate-400">—</span>
+                                    <span class="text-slate-400">â€”</span>
                                 @endif
                             </td>
                             <td class="px-3 py-3 sm:px-6 sm:py-4 text-slate-500 dark:text-slate-400 hidden sm:table-cell">
@@ -595,7 +595,7 @@
                 </div>
                 <div>
                     <p class="font-bold text-slate-900 dark:text-white mb-1">Copie seu link</p>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Cada membro tem um link e código únicos de indicação.</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Cada membro tem um link e cÃ³digo Ãºnicos de indicaÃ§Ã£o.</p>
                 </div>
             </div>
             <div class="flex items-start gap-4">
@@ -621,12 +621,12 @@
                     <span class="text-amber-600 dark:text-amber-400 font-black text-lg">4</span>
                 </div>
                 <div>
-                    <p class="font-bold text-slate-900 dark:text-white mb-1">Você ganha pontos</p>
+                    <p class="font-bold text-slate-900 dark:text-white mb-1">VocÃª ganha pontos</p>
                     <p class="text-sm text-slate-500 dark:text-slate-400">
                         @if($pointsPerReferral)
-                            <strong class="text-amber-600 dark:text-amber-400">+{{ $pointsPerReferral }} pontos</strong> são creditados automaticamente após confirmação do pagamento.
+                            <strong class="text-amber-600 dark:text-amber-400">+{{ $pointsPerReferral }} pontos</strong> sÃ£o creditados automaticamente apÃ³s confirmaÃ§Ã£o do pagamento.
                         @else
-                            Pontos são creditados automaticamente na confirmação do pagamento do plano.
+                            Pontos sÃ£o creditados automaticamente na confirmaÃ§Ã£o do pagamento do plano.
                         @endif
                     </p>
                 </div>
@@ -638,7 +638,7 @@
         <i class="fas fa-info-circle text-blue-500 mt-0.5 shrink-0"></i>
         <div>
             <strong class="text-slate-700 dark:text-slate-300">Regras do programa: </strong>
-            Planos gratuitos não geram pontos · Pontos são creditados somente após confirmação do pagamento pelo sistema · Não há limite de indicações
+            Planos gratuitos nÃ£o geram pontos Â· Pontos sÃ£o creditados somente apÃ³s confirmaÃ§Ã£o do pagamento pelo sistema Â· NÃ£o hÃ¡ limite de indicaÃ§Ãµes
         </div>
     </div>
     </div>
@@ -675,7 +675,7 @@
             @include('panel.referral.partials.channel-funnel', [
                 'channelFunnels' => $channelFunnels,
                 'title' => 'Funil por canal e origem',
-                'subtitle' => 'Veja de onde vieram os cliques, quantas visualizações cada origem gerou e onde realmente converte.',
+                'subtitle' => 'Veja de onde vieram os cliques, quantas visualizaÃ§Ãµes cada origem gerou e onde realmente converte.',
             ])
         </div>
 
@@ -684,8 +684,8 @@
                 'detailedEvents' => $detailedEvents,
                 'exportUrl' => route('panel.referral.export'),
                 'title' => 'Log detalhado de cliques, visitas e compartilhamentos',
-                'subtitle' => 'Inclui URL de origem exata, landing page, dispositivo, navegador, cidade/país e o resultado de cada ação.',
-                'emptyMessage' => 'Ainda não há cliques, visitas ou compartilhamentos detalhados para este afiliado.',
+                'subtitle' => 'Inclui URL de origem exata, landing page, dispositivo, navegador, cidade/paÃ­s e o resultado de cada aÃ§Ã£o.',
+                'emptyMessage' => 'Ainda nÃ£o hÃ¡ cliques, visitas ou compartilhamentos detalhados para este afiliado.',
             ])
         </div>
     </div>
@@ -995,7 +995,7 @@ function renderReferralSharingChart() {
                 },
                 tooltip: {
                     callbacks: {
-                        label: (context) => `${context.label}: ${context.parsed || 0} ação(ões)`,
+                        label: (context) => `${context.label}: ${context.parsed || 0} aÃ§Ã£o(Ãµes)`,
                     },
                 },
             },
@@ -1106,7 +1106,7 @@ function applyTrackingStatusBanner(tone, message) {
         return;
     }
 
-    banner.textContent = message || 'Atualização automática a cada 5 segundos.';
+    banner.textContent = message || 'AtualizaÃ§Ã£o automÃ¡tica a cada 5 segundos.';
     banner.className = `rounded-2xl px-4 py-3 text-sm font-medium ${
         tone === 'success'
             ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300'
@@ -1123,7 +1123,7 @@ function renderTrackingChannelsList(channels) {
     if (!Array.isArray(channels) || channels.length === 0) {
         container.innerHTML = `
             <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 px-4 py-6 text-sm text-slate-500 dark:text-slate-400">
-                Os compartilhamentos começam a aparecer aqui assim que você usar os botões rápidos ou copiar seu link.
+                Os compartilhamentos comeÃ§am a aparecer aqui assim que vocÃª usar os botÃµes rÃ¡pidos ou copiar seu link.
             </div>
         `;
         return;
@@ -1137,10 +1137,10 @@ function renderTrackingChannelsList(channels) {
             </div>
             <div class="mt-2 flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
                 <span>${formatReferralNumber(channel.shares)} novos</span>
-                <span>·</span>
+                <span>Â·</span>
                 <span>${formatReferralNumber(channel.reshares)} reenvios</span>
-                <span>·</span>
-                <span>${formatReferralNumber(channel.copies)} cópias</span>
+                <span>Â·</span>
+                <span>${formatReferralNumber(channel.copies)} cÃ³pias</span>
             </div>
         </div>
     `).join('');
@@ -1167,7 +1167,7 @@ function renderTrackingVisitsRows(visits) {
             <td class="px-5 py-4">
                 <p class="font-semibold text-slate-900 dark:text-white">${escapeReferralHtml(visit.first_visited_at)}</p>
                 <p class="text-xs text-slate-500 dark:text-slate-400">
-                    ${formatReferralNumber(visit.clicks_count)} clique(s) · ${formatReferralNumber(visit.pageviews_count)} página(s)
+                    ${formatReferralNumber(visit.clicks_count)} clique(s) Â· ${formatReferralNumber(visit.pageviews_count)} pÃ¡gina(s)
                 </p>
             </td>
             <td class="px-5 py-4">
@@ -1212,21 +1212,21 @@ function applyReferralTrackingPayload(payload) {
     const conversionMeta = document.getElementById('trackingConversionMeta');
     if (conversionMeta) {
         conversionMeta.innerHTML = `
-            Conversão para cadastro: <strong class="text-slate-700 dark:text-slate-200">${formatReferralNumber(summary.registration_conversion || 0)}%</strong>
-            · Compra: <strong class="text-slate-700 dark:text-slate-200">${formatReferralNumber(summary.purchase_conversion || 0)}%</strong>
-            · Atualizado às <strong id="trackingUpdatedAtLabel" class="text-slate-700 dark:text-slate-200">${escapeReferralHtml(payload.trackingUpdatedAtLabel || '--:--:--')}</strong>
+            ConversÃ£o para cadastro: <strong class="text-slate-700 dark:text-slate-200">${formatReferralNumber(summary.registration_conversion || 0)}%</strong>
+            Â· Compra: <strong class="text-slate-700 dark:text-slate-200">${formatReferralNumber(summary.purchase_conversion || 0)}%</strong>
+            Â· Atualizado Ã s <strong id="trackingUpdatedAtLabel" class="text-slate-700 dark:text-slate-200">${escapeReferralHtml(payload.trackingUpdatedAtLabel || '--:--:--')}</strong>
         `;
     }
 
     const map = {
         trackingClicksValue: formatReferralNumber(summary.clicks),
-        trackingClicksMeta: `${formatReferralNumber(summary.visits)} visitas únicas · ${formatReferralNumber(summary.pageviews)} visualizações`,
+        trackingClicksMeta: `${formatReferralNumber(summary.visits)} visitas Ãºnicas Â· ${formatReferralNumber(summary.pageviews)} visualizaÃ§Ãµes`,
         trackingRegistrationsValue: formatReferralNumber(summary.registrations),
-        trackingRegistrationsMeta: `${formatReferralNumber(summary.checkout_starts)} checkouts iniciados · ${formatReferralNumber(summary.registration_conversion || 0)}% de conversão`,
+        trackingRegistrationsMeta: `${formatReferralNumber(summary.checkout_starts)} checkouts iniciados Â· ${formatReferralNumber(summary.registration_conversion || 0)}% de conversÃ£o`,
         trackingPurchasesValue: formatReferralNumber(summary.purchases),
-        trackingRevenueMeta: `${formatReferralCurrency(summary.revenue)} rastreados · ${formatReferralNumber(summary.purchase_conversion || 0)}% de conversão`,
+        trackingRevenueMeta: `${formatReferralCurrency(summary.revenue)} rastreados Â· ${formatReferralNumber(summary.purchase_conversion || 0)}% de conversÃ£o`,
         trackingSharesValue: formatReferralNumber(totalShares),
-        trackingSharesMeta: `${formatReferralNumber(summary.shares)} novos · ${formatReferralNumber(summary.reshares)} reenvios · ${formatReferralNumber(summary.copies)} cópias`,
+        trackingSharesMeta: `${formatReferralNumber(summary.shares)} novos Â· ${formatReferralNumber(summary.reshares)} reenvios Â· ${formatReferralNumber(summary.copies)} cÃ³pias`,
         trackingRevenueCardValue: formatReferralCurrency(summary.revenue),
         trackingPurchasesCardValue: `${formatReferralNumber(summary.purchases)} compra(s) confirmada(s)`,
     };
@@ -1252,18 +1252,18 @@ function applyReferralTrackingPayload(payload) {
         }
 
         if (topChannelMeta) {
-            topChannelMeta.textContent = `${formatReferralNumber(topChannel.total)} ação(ões) registradas`;
+            topChannelMeta.textContent = `${formatReferralNumber(topChannel.total)} aÃ§Ã£o(Ãµes) registradas`;
             topChannelMeta.className = 'mt-1 text-xs text-slate-500 dark:text-slate-400';
         }
     } else {
         if (topChannelLabel) {
-            topChannelLabel.textContent = 'Sem ações compartilhadas';
+            topChannelLabel.textContent = 'Sem aÃ§Ãµes compartilhadas';
             topChannelLabel.classList.remove('text-xl', 'font-black', 'text-slate-900', 'dark:text-white');
             topChannelLabel.classList.add('text-sm', 'font-semibold', 'text-slate-500', 'dark:text-slate-400');
         }
 
         if (topChannelMeta) {
-            topChannelMeta.textContent = 'Use os botões rápidos ou copie o link para começar a medir os canais.';
+            topChannelMeta.textContent = 'Use os botÃµes rÃ¡pidos ou copie o link para comeÃ§ar a medir os canais.';
             topChannelMeta.className = 'mt-1 text-xs text-slate-500 dark:text-slate-400';
         }
     }
@@ -1312,7 +1312,7 @@ async function refreshReferralTracking() {
         }
     } catch (error) {
         if (error?.name !== 'AbortError') {
-            console.error('Falha ao atualizar o rastreio de indicações.', error);
+            console.error('Falha ao atualizar o rastreio de indicaÃ§Ãµes.', error);
         }
     } finally {
         referralRefreshAbortController = null;
@@ -1490,7 +1490,7 @@ async function runAffiliateSandboxPlayground(button) {
         }
 
         if (metaElement) {
-            metaElement.textContent = `${result.endpoint} · ${result.duration_ms} ms`;
+            metaElement.textContent = `${result.endpoint} Â· ${result.duration_ms} ms`;
         }
 
         if (payloadElement) {
@@ -1501,13 +1501,13 @@ async function runAffiliateSandboxPlayground(button) {
         }
     } catch (error) {
         if (metaElement) {
-            metaElement.textContent = 'Falha na execução';
+            metaElement.textContent = 'Falha na execuÃ§Ã£o';
         }
 
         if (payloadElement) {
             payloadElement.textContent = JSON.stringify({
                 ok: false,
-                message: error?.message || 'Não foi possível executar o playground.',
+                message: error?.message || 'NÃ£o foi possÃ­vel executar o playground.',
                 errors: error?.errors || null,
             }, null, 2);
         }
@@ -1562,3 +1562,4 @@ new MutationObserver(() => {
 @endpush
 
 @endsection
+
