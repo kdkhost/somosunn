@@ -5,134 +5,132 @@
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <!-- Hero Section -->
-    <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
-        <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient unn-title-max">
-                {{ $page->get('hero_title', 'Nosso') }} <span class="unn-title-gradient">{{ $page->get('hero_title_highlight', 'Manifesto') }}</span>
-            </h1>
-            <p class="text-lg sm:text-xl text-gray-600 leading-relaxed">
-                {{ $page->get('hero_subtitle', 'O que acreditamos e por que existimos.') }}
-            </p>
+    <section class="pt-16 md:pt-24 pb-12 overflow-x-hidden">
+        <div class="unn-container">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight mb-6 unn-title-gradient">
+                    {{ $page->get('hero_title', 'Acreditamos no poder das conexões humanas.') }}
+                </h1>
+                <p class="text-lg md:text-xl text-slate-500 leading-relaxed font-medium">
+                    {{ $page->get('hero_subtitle', 'Esse é o nosso manifesto. Leia com o coração.') }}
+                </p>
+            </div>
         </div>
     </section>
 
     <!-- Manifesto Content -->
-    <section class="pb-16 px-4 md:px-12 lg:px-24">
-        <div class="max-w-4xl mx-auto">
-            <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-12">
-                <article class="prose prose-lg max-w-none">
-                    @if($page->get('body'))
-                        {!! $page->get('body') !!}
-                    @else
-                    <p class="text-2xl font-bold mb-8" style="color: var(--unn-azul-1)">
-                        "{{ $page->get('quote_top', 'Acreditamos que ninguém cresce sozinho.') }}"
-                    </p>
+    <section class="pb-16 overflow-x-hidden">
+        <div class="unn-container px-4">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(15,23,42,0.1)] p-8 md:p-16 border border-slate-100">
+                    <article class="prose prose-lg md:prose-xl max-w-none prose-headings:font-black prose-headings:tracking-tight prose-p:text-slate-600 prose-p:leading-relaxed">
+                        @if($page->get('body'))
+                            {!! $page->get('body') !!}
+                        @else
+                            <div class="space-y-12">
+                                <div class="relative">
+                                    <span class="absolute -left-4 md:-left-8 top-0 text-6xl text-blue-100 font-serif opacity-50">"</span>
+                                    <p class="text-2xl md:text-3xl font-black text-slate-900 leading-tight">
+                                        {{ $page->get('quote_top', 'Nenhum empreendedor chega longe sozinho. Por trás de todo grande negócio, existe uma rede de pessoas que acreditaram, apoiaram e abriram portas.') }}
+                                    </p>
+                                </div>
 
-                    <h2 class="text-2xl font-black text-gray-900 mt-8 mb-4">{{ $page->get('section_1_title', 'Sobre Colaboração') }}</h2>
-                    <p class="text-gray-600 mb-6">
-                        {{ $page->get('section_1_text', 'Em um mundo que celebra o individualismo, nós escolhemos o caminho da colaboração. Sabemos que os maiores negócios nascem de parcerias sólidas, construídas sobre confiança e propósito compartilhado.') }}
-                    </p>
+                                <div class="space-y-6">
+                                    <h2 class="text-2xl font-black text-slate-900">{{ $page->get('section_1_title', 'Acreditamos que o networking é uma habilidade.') }}</h2>
+                                    <p>
+                                        {{ $page->get('section_1_text', 'Não um talento inato ou um dom de poucos. É algo que pode ser desenvolvido, praticado e aperfeiçoado. E quando bem feito, transforma trajetórias inteiras.') }}
+                                    </p>
+                                </div>
 
-                    <h2 class="text-2xl font-black text-gray-900 mt-8 mb-4">{{ $page->get('section_2_title', 'Sobre Abundância') }}</h2>
-                    <p class="text-gray-600 mb-6">
-                        {{ $page->get('section_2_text', 'Rejeitamos a mentalidade de escassez. Há espaço para todos crescerem. Quando um membro prospera, a comunidade inteira se fortalece. O sucesso do outro não é ameaça — é inspiração.') }}
-                    </p>
+                                <div class="space-y-6">
+                                    <h2 class="text-2xl font-black text-slate-900">{{ $page->get('section_2_title', 'Acreditamos na generosidade estratégica.') }}</h2>
+                                    <p>
+                                        {{ $page->get('section_2_text', 'A melhor conexão começa quando você pergunta "como posso ajudar?" antes de "o que você pode fazer por mim?". Dar sem esperar retorno imediato é o investimento mais inteligente que um empreendedor pode fazer.') }}
+                                    </p>
+                                </div>
 
-                    <h2 class="text-2xl font-black text-gray-900 mt-8 mb-4">{{ $page->get('section_3_title', 'Sobre Autenticidade') }}</h2>
-                    <p class="text-gray-600 mb-6">
-                        {{ $page->get('section_3_text', 'Valorizamos pessoas reais, com histórias reais. Aqui não há espaço para máscaras ou personagens. As conexões mais poderosas nascem quando nos mostramos vulneráveis e autênticos.') }}
-                    </p>
-
-                    <h2 class="text-2xl font-black text-gray-900 mt-8 mb-4">{{ $page->get('section_4_title', 'Sobre Impacto') }}</h2>
-                    <p class="text-gray-600 mb-6">
-                        {{ $page->get('section_4_text', 'Não buscamos apenas lucro. Acreditamos que empreendedores têm o poder de transformar a sociedade. Cada negócio bem-sucedido gera empregos, melhora vidas e inspira outros a seguirem o mesmo caminho.') }}
-                    </p>
-
-                    <h2 class="text-2xl font-black text-gray-900 mt-8 mb-4">{{ $page->get('section_5_title', 'Nossa Promessa') }}</h2>
-                    <p class="text-gray-600 mb-6">
-                        {{ $page->get('section_5_text', 'Prometemos criar o ambiente ideal para que você encontre as pessoas certas, no momento certo. Prometemos ser facilitadores de conexões genuínas que geram valor real. Prometemos nunca perder a essência do que nos fez começar: a crença inabalável no poder das pessoas.') }}
-                    </p>
-
-                    <div class="mt-12 p-8 rounded-2xl text-center" style="background: linear-gradient(135deg, var(--unn-azul-1)10, var(--unn-azul-3)10)">
-                        <p class="text-xl font-bold text-gray-900 mb-2">
-                            "{{ $page->get('quote_bottom', 'Sozinhos vamos mais rápido. Juntos vamos mais longe.') }}"
-                        </p>
-                        <p class="text-gray-500">{{ $page->get('quote_author', '— Filosofia UNN') }}</p>
-                    </div>
-                    @endif
-                </article>
+                                <div class="mt-16 p-10 rounded-[2rem] text-center relative overflow-hidden group" style="background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <p class="text-xl md:text-2xl font-black text-slate-900 mb-2 relative z-10">
+                                        "{{ $page->get('quote_bottom', 'Sozinhos vamos mais rápido. Juntos vamos mais longe.') }}"
+                                    </p>
+                                    <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px] relative z-10">{{ $page->get('quote_author', 'Filosofia UNN') }}</p>
+                                </div>
+                            </div>
+                        @endif
+                    </article>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Values Preview -->
-    <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
-        <div class="max-w-7xl mx-auto text-center">
-            <h2 class="text-3xl font-black text-gray-900 mb-8">{{ $page->get('pillars_title', 'Nossos Pilares') }}</h2>
-            <div class="grid md:grid-cols-4 gap-6">
-                <div class="p-6">
-                    <div class="w-16 h-16 btn-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-heart text-white text-2xl"></i>
+    <section class="py-24 bg-white border-y border-slate-100">
+        <div class="unn-container">
+            <div class="max-w-3xl mx-auto text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-6">{{ $page->get('pillars_title', 'Nossos Pilares') }}</h2>
+                <div class="w-20 h-1.5 bg-blue-600 mx-auto rounded-full"></div>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                <div class="p-8 rounded-[2rem] bg-slate-50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
+                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-heart text-2xl"></i>
                     </div>
-                    <h3 class="font-bold text-gray-900">{{ $page->get('pillar_1_title', 'Confiança') }}</h3>
+                    <h3 class="font-black text-slate-900 text-lg">{{ $page->get('pillar_1_title', 'Confiança') }}</h3>
                 </div>
-                <div class="p-6">
-                    <div class="w-16 h-16 btn-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-hands-helping text-white text-2xl"></i>
+                <div class="p-8 rounded-[2rem] bg-slate-50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
+                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-hands-helping text-2xl"></i>
                     </div>
-                    <h3 class="font-bold text-gray-900">{{ $page->get('pillar_2_title', 'Generosidade') }}</h3>
+                    <h3 class="font-black text-slate-900 text-lg">{{ $page->get('pillar_2_title', 'Generosidade') }}</h3>
                 </div>
-                <div class="p-6">
-                    <div class="w-16 h-16 btn-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-lightbulb text-white text-2xl"></i>
+                <div class="p-8 rounded-[2rem] bg-slate-50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
+                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-lightbulb text-2xl"></i>
                     </div>
-                    <h3 class="font-bold text-gray-900">{{ $page->get('pillar_3_title', 'Inovação') }}</h3>
+                    <h3 class="font-black text-slate-900 text-lg">{{ $page->get('pillar_3_title', 'Inovação') }}</h3>
                 </div>
-                <div class="p-6">
-                    <div class="w-16 h-16 btn-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-trophy text-white text-2xl"></i>
+                <div class="p-8 rounded-[2rem] bg-slate-50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
+                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-trophy text-2xl"></i>
                     </div>
-                    <h3 class="font-bold text-gray-900">{{ $page->get('pillar_4_title', 'Excelência') }}</h3>
+                    <h3 class="font-black text-slate-900 text-lg">{{ $page->get('pillar_4_title', 'Excelência') }}</h3>
                 </div>
             </div>
-            <a href="{{ route('valores') }}" class="btn-primary text-white px-8 py-3 rounded-full font-semibold inline-flex items-center gap-2 mt-8">
-                {{ $page->get('pillars_link_text', 'Conhecer nossos valores') }} <i class="fas fa-arrow-right"></i>
-            </a>
+            <div class="text-center mt-12">
+                <a href="{{ route('valores') }}" class="btn-primary text-white px-10 py-4 rounded-xl font-black inline-flex items-center gap-3 transition-all hover:scale-105 shadow-lg shadow-blue-500/20">
+                    {{ $page->get('pillars_link_text', 'Conhecer nossos valores') }} <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
         </div>
     </section>
 
     <!-- CTA -->
-    <section class="py-16 px-6 md:px-12 lg:px-24" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-        <div class="max-w-4xl mx-auto text-center text-white">
-            <h2 class="text-3xl lg:text-4xl font-black mb-4">{{ $page->get('cta_title', 'Se identificou com nossa visão?') }}</h2>
-            <p class="text-lg opacity-90 mb-8">{{ $page->get('cta_subtitle', 'Faça parte de uma comunidade que pensa como você.') }}</p>
-            <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition" style="color: var(--unn-azul-1)">
-                <i class="fas fa-rocket"></i>
-                {{ $page->get('cta_btn', 'Quero fazer parte') }}
-            </a>
+    <section class="py-24 overflow-x-hidden">
+        <div class="unn-container">
+            <div class="rounded-[3rem] p-10 md:p-16 text-center text-white relative overflow-hidden" style="background: linear-gradient(135deg, #1A237E 0%, #1F5EDB 50%, #00B0FF 100%);">
+                <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.4&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4v-4H4v4H0v2h4v4h2v-4h4v-2H6zm30 0v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+                
+                <div class="relative z-10 max-w-2xl mx-auto">
+                    <h2 class="text-3xl lg:text-5xl font-black mb-6 leading-tight">{{ $page->get('cta_title', 'Se identificou com nossa visão?') }}</h2>
+                    <p class="text-lg md:text-xl opacity-80 mb-10 font-medium">{{ $page->get('cta_subtitle', 'Faça parte de uma comunidade que pensa como você.') }}</p>
+                    <a href="{{ route('register') }}" class="inline-flex items-center gap-3 bg-white px-10 py-5 rounded-xl font-black transition-all hover:scale-105 hover:shadow-2xl group" style="color: var(--unn-azul-1)">
+                        <i class="fas fa-rocket group-hover:rotate-12 transition-transform"></i>
+                        {{ $page->get('cta_btn', 'Quero fazer parte') }}
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
 </div>
 
-<style>
-.unn-title-gradient {
-    background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-}
-.unn-title-max {
-    max-width: 700px;
-    word-break: break-word;
-    margin-left: auto;
-    margin-right: auto;
-}
-@media (max-width: 640px) {
-    .unn-title-max {
-        font-size: 2.2rem !important;
-        max-width: 95vw;
-    }
-}
-</style>
+    <style>
+        .unn-title-gradient {
+            background: linear-gradient(90deg, #1A237E 0%, #1F5EDB 50%, #00B0FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+    </style>
 @endsection
