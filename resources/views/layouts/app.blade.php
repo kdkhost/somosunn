@@ -507,10 +507,15 @@
             max-width: 100%;
         }
 
+        .unn-container,
         .max-w-7xl,
         .max-w-6xl,
         .max-w-5xl,
         .max-w-4xl {
+            width: 100%;
+            max-width: 80rem; /* 1280px */
+            margin-left: auto;
+            margin-right: auto;
             padding-left: 1rem;
             padding-right: 1rem;
         }
@@ -847,7 +852,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
 </head>
 
-<body class="bg-slate-50 min-h-screen layout-{{ \App\Models\Setting::get('site_layout_type', 'boxed') }}">
+<body class="bg-slate-50 min-h-screen">
     @if($preloaderEnabled)
         <div id="preloader"
             class="fixed inset-0 z-[99999] flex items-center justify-center bg-white transition-opacity duration-500">
