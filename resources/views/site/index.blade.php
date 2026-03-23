@@ -164,9 +164,9 @@
         </section>
 
         <!-- Onde o network me levou -->
-        <section class="py-16 px-6 md:px-12 lg:px-24">
-            <div class="max-w-7xl mx-auto">
-                <div class="grid xl:grid-cols-[0.92fr_1.4fr] gap-6 md:gap-8 lg:gap-10 items-stretch">
+        <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
+            <div class="mx-auto">
+                <div class="grid xl:grid-cols-[0.8fr_1.6fr] 2xl:grid-cols-[0.7fr_1.8fr] gap-6 md:gap-8 lg:gap-10 items-stretch">
                     <div class="home-journey-lead rounded-[2rem] p-8 md:p-10 lg:p-12 text-white overflow-hidden relative flex flex-col justify-center">
                             <div class="relative z-10">
                                 <span class="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/20 px-4 py-2 text-xs font-black tracking-[0.18em] uppercase text-white/90">
