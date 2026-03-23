@@ -140,7 +140,7 @@
 
         <!-- Pricing Section -->
         <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden" id="planos">
-            <div class="mx-auto">
+            <div class="unn-container">
                 <div class="text-center mb-8">
                     <h2 class="text-4xl font-black unn-title-gradient mb-4">{{ ($pageData['plans_title'] ?? null) ?: 'Escolha seu Plano' }}</h2>
                     <p class="text-gray-600 max-w-2xl mx-auto">{{ ($pageData['plans_subtitle'] ?? null) ?: 'Todos os planos incluem acesso à comunidade. Quanto maior o plano, mais recursos exclusivos.' }}</p>
@@ -366,7 +366,7 @@
         @endpush
         <!-- Beneficios -->
         <section class="py-16 px-4 md:px-8 lg:px-12 bg-white w-full overflow-x-hidden">
-            <div class="mx-auto">
+            <div class="unn-container">
                 <h2 class="text-3xl font-black text-gray-900 mb-4 text-center">O que cada plano libera na pratica</h2>
                 <p class="text-gray-600 text-center max-w-3xl mx-auto mb-12">
                     A estrutura abaixo resume os pilares que organizam a experiencia comercial da UNN, mantendo o plano gratuito focado em comunidade e acesso aberto, o Pro focado em consumo e visibilidade, e o Elite focado em criacao e vendas.
@@ -387,7 +387,7 @@
         </section>
         <!-- Comparativo -->
         <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
-            <div class="mx-auto">
+            <div class="unn-container">
                 <h2 class="text-3xl font-black text-gray-900 mb-4 text-center">Compare os planos</h2>
                 <p class="text-gray-600 text-center max-w-3xl mx-auto mb-8">
                     A tabela abaixo espelha as permissoes reais do sistema. O gratuito fica focado em comunidade e acesso aberto; o Pro libera consumo premium; o Elite libera operacao comercial e criacao dentro da plataforma.
@@ -474,7 +474,7 @@
         </section>
         <!-- Depoimentos -->
         <section class="py-16 px-4 md:px-8 lg:px-12 bg-white w-full overflow-x-hidden">
-            <div class="mx-auto">
+            <div class="unn-container">
                 <h2 class="text-3xl font-black text-gray-900 mb-12 text-center">O que dizem nossos membros Premium</h2>
 
                 @if(session('error'))
@@ -738,7 +738,7 @@
         <!-- CTA Final -->
         <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden"
             style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-            <div class="mx-auto text-center text-white">
+            <div class="unn-container text-center text-white">
                 <h2 class="text-3xl lg:text-4xl font-black mb-4">Pronto para acelerar seu crescimento?</h2>
                 <p class="text-lg opacity-90 mb-8">Junte-se a milhares de empreendedores que já transformaram seus negócios.
                 </p>
