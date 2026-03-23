@@ -6,6 +6,41 @@
 
     <h5 class="text-primary mb-3"><i class="fas fa-id-card mr-2"></i> Identidade Visual</h5>
     <div class="row">
+        <!-- Logo Site (Frontend) -->
+        <div class="col-md-3 col-sm-6">
+            <div class="form-group text-center">
+                <label class="font-weight-bold d-block mb-3">Logo Site (Frontend)</label>
+                <div class="upload-box premium-upload-box" data-remove-input="#remove_logo_front"
+                    data-preview-image-class="img-fluid rounded shadow-sm border"
+                    data-preview-image-style="max-height: 80px;" data-existing-url="{{ $getUrl('logo_front') }}">
+                    <input type="file" name="logo_front" class="d-none" accept="image/*">
+                    <input type="hidden" name="remove_logo_front" id="remove_logo_front" value="0">
+
+                    <div class="upload-preview mb-3 drop-zone-area">
+                        @if($url = $getUrl('logo_front'))
+                            <img src="{{ $url }}" class="img-fluid rounded shadow-sm border" style="max-height: 80px;">
+                        @else
+                            <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
+                                style="min-height: 100px;">
+                                <i class="fas fa-home fa-2x mb-2 text-primary opacity-50"></i>
+                                <span class="small font-weight-bold">Logo Front</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="upload-actions d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3">
+                            <i class="fas fa-sync-alt mr-1"></i> Alterar
+                        </button>
+                        <button type="button"
+                            class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ $getUrl('logo_front') ? '' : 'd-none' }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Logo Principal -->
         <div class="col-md-3 col-sm-6">
             <div class="form-group text-center">
@@ -34,6 +69,41 @@
                         </button>
                         <button type="button"
                             class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ $getUrl('logo_image') ? '' : 'd-none' }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo Somos Únicas -->
+        <div class="col-md-3 col-sm-6">
+            <div class="form-group text-center">
+                <label class="font-weight-bold d-block mb-3">Logo Somos Únicas (Pink)</label>
+                <div class="upload-box premium-upload-box" data-remove-input="#remove_logo_somos_unicas"
+                    data-preview-image-class="img-fluid rounded shadow-sm border"
+                    data-preview-image-style="max-height: 80px;" data-existing-url="{{ $getUrl('logo_somos_unicas') }}">
+                    <input type="file" name="logo_somos_unicas" class="d-none" accept="image/*">
+                    <input type="hidden" name="remove_logo_somos_unicas" id="remove_logo_somos_unicas" value="0">
+
+                    <div class="upload-preview mb-3 drop-zone-area">
+                        @if($url = $getUrl('logo_somos_unicas'))
+                            <img src="{{ $url }}" class="img-fluid rounded shadow-sm border" style="max-height: 80px;">
+                        @else
+                            <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
+                                style="min-height: 100px;">
+                                <i class="fas fa-venus fa-2x mb-2 text-primary opacity-50"></i>
+                                <span class="small font-weight-bold">Logo Unicas</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="upload-actions d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3">
+                            <i class="fas fa-sync-alt mr-1"></i> Alterar
+                        </button>
+                        <button type="button"
+                            class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ $getUrl('logo_somos_unicas') ? '' : 'd-none' }}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>

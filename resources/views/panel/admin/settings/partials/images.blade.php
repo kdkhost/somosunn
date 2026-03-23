@@ -3,6 +3,25 @@
     <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-8 space-y-6">
         <div class="flex items-center gap-3 mb-2">
             <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <h3 class="font-bold text-slate-800 dark:text-white text-lg">Identidade Visual</h3>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            @foreach([
+                'logo_front' => ['Logo Site (Frontend)', 'Logo Front', 'fas fa-home'],
+                'logo_image' => ['Logo Principal (Painel)', 'Logo Site', 'fas fa-image'],
+                'logo_somos_unicas' => ['Logo Somos Únicas', 'Logo Unicas', 'fas fa-venus'],
+                'favicon_image' => ['Favicon', 'Favicon', 'fas fa-globe'],
+                'logo_admin' => ['Logo Admin', 'Logo Admin', 'fas fa-cogs'],
+            ] as $name => $data)
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 space-y-4 flex flex-col items-center">
+                <label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-center h-8 flex items-center">{{ $data[0] }}</label>
+                
+                <div class="w-24 h-24 rounded-2xl bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative group">
+                    @if($url = $getUrl($name))
+                        <img id="preview_{{ $name }}" src="{{ $url }}" class="w-full h-full object-contain">
                     @else
                         <div class="text-center p-2">
                             <i class="{{ $data[2] }} text-xl text-slate-300 mb-1"></i>
@@ -59,7 +78,7 @@
 
                 <div class="flex gap-3">
                     <button type="button" onclick="document.getElementById('input_{{ $name }}').click()" 
-                            class="flex-1 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 transition inline-flex items-center justify-center gap-2">
+                            class="flex-1 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-700 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 transition inline-flex items-center justify-center gap-2">
                         <i class="fas fa-upload text-blue-500"></i>
                         <span id="btn_text_{{ $name }}">Selecionar Imagem</span>
                     </button>

@@ -84,6 +84,7 @@ class SettingController extends Controller
             'pwa_banner',
             'preloader_image',
             'logo_image',
+            'logo_somos_unicas',
             'favicon_image',
             'logo_admin',
             'logo_auth',
@@ -98,6 +99,7 @@ class SettingController extends Controller
             'remove_pwa_banner',
             'remove_preloader_image',
             'remove_logo_image',
+            'remove_logo_somos_unicas',
             'remove_favicon_image',
             'remove_logo_admin',
             'remove_logo_auth',
@@ -194,6 +196,7 @@ class SettingController extends Controller
             'pwa_banner',
             'preloader_image',
             'logo_image',
+            'logo_somos_unicas',
             'favicon_image',
             'logo_admin',
             'logo_auth',
@@ -231,6 +234,9 @@ class SettingController extends Controller
         }
         if ($request->hasFile('logo_image')) {
             $this->replaceFile('logo_image', $this->storeUploadedPublicFile($request->file('logo_image'), 'uploads/imagens/geral'));
+        }
+        if ($request->hasFile('logo_somos_unicas')) {
+            $this->replaceFile('logo_somos_unicas', $this->storeUploadedPublicFile($request->file('logo_somos_unicas'), 'uploads/imagens/geral'));
         }
         if ($request->hasFile('favicon_image')) {
             $this->replaceFile('favicon_image', $this->storeUploadedPublicFile($request->file('favicon_image'), 'uploads/imagens/geral'));
@@ -752,6 +758,7 @@ class SettingController extends Controller
         $keyDirs = [
             'preloader_image' => ['uploads/imagens/preloader', 'uploads/imagens/geral', 'uploads/imagens'],
             'logo_image' => ['uploads/imagens/geral', 'uploads/imagens'],
+            'logo_somos_unicas' => ['uploads/imagens/geral', 'uploads/imagens'],
             'favicon_image' => ['uploads/imagens/geral', 'uploads/imagens'],
             'logo_admin' => ['uploads/imagens/administrativo', 'uploads/imagens'],
             'logo_auth' => ['uploads/imagens/logins', 'uploads/imagens'],
