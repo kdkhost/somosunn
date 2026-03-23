@@ -146,11 +146,81 @@
         </div>
         <small class="form-text text-muted">Salve as configurações antes de testar.</small>
     </div>
+    <hr class="my-4">
+
+    <h5 class="text-primary mb-3"><i class="fas fa-palette mr-2"></i> Design do E-mail</h5>
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label>Tipo de Fundo do Cabeçalho</label>
+            <select name="email_header_bg_type" id="email_header_bg_type" class="form-control" onchange="updateEmailPreview()">
+                <option value="solid" {{ ($settings['email_header_bg_type'] ?? 'gradient') === 'solid' ? 'selected' : '' }}>Cor Sólida</option>
+                <option value="gradient" {{ ($settings['email_header_bg_type'] ?? 'gradient') === 'gradient' ? 'selected' : '' }}>Degradê (Linear)</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <div class="p-3 border rounded text-center" id="email_header_preview_container" style="background: #f8f9fa;">
+                <label class="d-block small text-muted mb-2">Pré-visualização do Cabeçalho</label>
+                <div id="email_header_preview" class="mx-auto rounded shadow-sm d-flex align-items-center justify-content-center" style="width: 100%; max-width: 300px; height: 80px; transition: all 0.3s;">
+                    <img src="{{ \App\Models\Setting::getUrl('logo_admin') ?: (\App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg')) }}" alt="Logo" style="max-height: 40px; max-width: 150px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-4 form-group">
+            <label>Cor 1 (Principal)</label>
+            <input type="color" name="email_header_color_1" id="email_header_color_1" class="form-control" value="{{ $settings['email_header_color_1'] ?? $settings['site_color_primary'] ?? '#1F5EDB' }}" oninput="updateEmailPreview()">
+        </div>
+        <div class="col-md-4 form-group" id="wrapper_email_color_2">
+            <label>Cor 2</label>
+            <input type="color" name="email_header_color_2" id="email_header_color_2" class="form-control" value="{{ $settings['email_header_color_2'] ?? $settings['site_color_secondary'] ?? '#177FD6' }}" oninput="updateEmailPreview()">
+        </div>
+        <div class="col-md-4 form-group" id="wrapper_email_color_3">
+            <label>Cor 3 (Opcional)</label>
+            <div class="input-group">
+                <input type="color" name="email_header_color_3" id="email_header_color_3" class="form-control" value="{{ $settings['email_header_color_3'] ?? '' }}" oninput="updateEmailPreview()">
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-outline-danger" onclick="clearColor3()"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
     <script>
+        function updateEmailPreview() {
+            const type = document.getElementById('email_header_bg_type').value;
+            const c1 = document.getElementById('email_header_color_1').value;
+            const c2 = document.getElementById('email_header_color_2').value;
+            const c3 = document.getElementById('email_header_color_3').value;
+            const preview = document.getElementById('email_header_preview');
+            const w2 = document.getElementById('wrapper_email_color_2');
+            const w3 = document.getElementById('wrapper_email_color_3');
+
+            if (type === 'solid') {
+                preview.style.background = c1;
+                if(w2) w2.style.display = 'none';
+                if(w3) w3.style.display = 'none';
+            } else {
+                if(w2) w2.style.display = 'block';
+                if(w3) w3.style.display = 'block';
+                if (c3 && c3 !== '#000000' && c3 !== '') {
+                    preview.style.background = `linear-gradient(135deg, ${c1} 0%, ${c2} 50%, ${c3} 100%)`;
+                } else {
+                    preview.style.background = `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`;
+                }
+            }
+        }
+
+        function clearColor3() {
+            document.getElementById('email_header_color_3').value = '';
+            updateEmailPreview();
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
+            updateEmailPreview();
             // Test SMTP
             $('#btnTestSmtp').click(function () {
                 var btn = $(this);

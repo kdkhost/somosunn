@@ -219,10 +219,100 @@
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Salve as configurações antes de testar.</p>
         </div>
     </div>
+
+    <!-- Email Design -->
+    <div
+        class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 transition-colors shadow-sm">
+        <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2 mb-6">
+            <i class="fas fa-palette text-blue-500"></i> Design do E-mail
+        </h3>
+
+        <div class="space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 transition-colors">Tipo de Fundo do Cabeçalho</label>
+                        <select name="email_header_bg_type" id="email_header_bg_type" onchange="updateEmailPreview()"
+                            class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                            <option value="solid" {{ ($settings['email_header_bg_type'] ?? 'gradient') === 'solid' ? 'selected' : '' }}>Cor Sólida</option>
+                            <option value="gradient" {{ ($settings['email_header_bg_type'] ?? 'gradient') === 'gradient' ? 'selected' : '' }}>Degradê (Linear)</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-colors">Cor 1 (Principal)</label>
+                            <input type="color" name="email_header_color_1" id="email_header_color_1" value="{{ $settings['email_header_color_1'] ?? $settings['site_color_primary'] ?? '#1F5EDB' }}"
+                                oninput="updateEmailPreview()"
+                                class="w-full h-12 p-1 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 cursor-pointer">
+                        </div>
+                        <div id="wrapper_email_color_2" class="{{ ($settings['email_header_bg_type'] ?? 'gradient') === 'solid' ? 'hidden' : '' }}">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-colors">Cor 2</label>
+                            <input type="color" name="email_header_color_2" id="email_header_color_2" value="{{ $settings['email_header_color_2'] ?? $settings['site_color_secondary'] ?? '#177FD6' }}"
+                                oninput="updateEmailPreview()"
+                                class="w-full h-12 p-1 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 cursor-pointer">
+                        </div>
+                        <div id="wrapper_email_color_3" class="{{ ($settings['email_header_bg_type'] ?? 'gradient') === 'solid' ? 'hidden' : '' }}">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-colors">Cor 3 (Opcional)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" name="email_header_color_3" id="email_header_color_3" value="{{ $settings['email_header_color_3'] ?? '' }}"
+                                    oninput="updateEmailPreview()"
+                                    class="w-full h-12 p-1 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 cursor-pointer">
+                                <button type="button" onclick="clearColor3()" title="Remover Cor 3"
+                                    class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Area -->
+                <div class="flex flex-col justify-center items-center p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Pré-visualização do Cabeçalho</span>
+                    <div id="email_header_preview" class="w-full max-w-[300px] h-32 rounded-2xl shadow-lg flex items-center justify-center transition-all duration-500">
+                        <img src="{{ \App\Models\Setting::getUrl('logo_admin') ?: (\App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg')) }}" alt="Logo" class="max-h-12 max-w-[150px]">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
     <script>
+        function updateEmailPreview() {
+            const type = document.getElementById('email_header_bg_type').value;
+            const c1 = document.getElementById('email_header_color_1').value;
+            const c2 = document.getElementById('email_header_color_2').value;
+            const c3 = document.getElementById('email_header_color_3').value;
+            const preview = document.getElementById('email_header_preview');
+            const w2 = document.getElementById('wrapper_email_color_2');
+            const w3 = document.getElementById('wrapper_email_color_3');
+
+            if (type === 'solid') {
+                preview.style.background = c1;
+                if(w2) w2.classList.add('hidden');
+                if(w3) w3.classList.add('hidden');
+            } else {
+                if(w2) w2.classList.remove('hidden');
+                if(w3) w3.classList.remove('hidden');
+                if (c3 && c3 !== '#000000' && c3 !== '') {
+                    preview.style.background = `linear-gradient(135deg, ${c1} 0%, ${c2} 50%, ${c3} 100%)`;
+                } else {
+                    preview.style.background = `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`;
+                }
+            }
+        }
+
+        function clearColor3() {
+            document.getElementById('email_header_color_3').value = '';
+            updateEmailPreview();
+        }
+
+        // Initialize preview
+        document.addEventListener('DOMContentLoaded', updateEmailPreview);
+
         function togglePassword(btn) {
             const input = btn.previousElementSibling;
             const icon = btn.querySelector('i');

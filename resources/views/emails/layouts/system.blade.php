@@ -10,8 +10,21 @@
     @php
         $siteName = $siteName ?? (string) (App\Models\Setting::get('app_name') ?: App\Models\Setting::get('company_name') ?: config('app.name', 'UNN'));
         $logoUrl = $logoUrl ?? (\App\Models\Setting::getUrl('logo_admin') ?: \App\Models\Setting::getUrl('logo_front') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg'));
-        $primaryColor = $primaryColor ?? (string) (App\Models\Setting::get('site_color_primary') ?: '#1F5EDB');
-        $secondaryColor = $secondaryColor ?? (string) (App\Models\Setting::get('site_color_secondary') ?: '#177FD6');
+        
+        $bgType = (string) (App\Models\Setting::get('email_header_bg_type') ?: 'gradient');
+        $c1 = (string) (App\Models\Setting::get('email_header_color_1') ?: App\Models\Setting::get('site_color_primary') ?: '#1F5EDB');
+        $c2 = (string) (App\Models\Setting::get('email_header_color_2') ?: App\Models\Setting::get('site_color_secondary') ?: '#177FD6');
+        $c3 = (string) (App\Models\Setting::get('email_header_color_3') ?: '');
+
+        $headerStyle = "background-color: {$c1};";
+        if ($bgType === 'gradient') {
+            if ($c3 !== '') {
+                $headerStyle = "background: linear-gradient(135deg, {$c1} 0%, {$c2} 50%, {$c3} 100%);";
+            } else {
+                $headerStyle = "background: linear-gradient(135deg, {$c1} 0%, {$c2} 100%);";
+            }
+        }
+
         $year = date('Y');
     @endphp
 
@@ -22,7 +35,7 @@
                     <div
                         style="background-color: #ffffff; max-width: 600px; padding: 0px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
                         <div
-                            style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $secondaryColor }} 100%); padding: 30px 20px; text-align: center;">
+                            style="{{ $headerStyle }} padding: 30px 20px; text-align: center;">
                             <img src="{{ $logoUrl }}" alt="{{ $siteName }}" style="max-height: 60px; max-width: 200px;">
                         </div>
 
