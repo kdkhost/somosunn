@@ -223,20 +223,32 @@ class PaymentWebhookController extends Controller
         ];
 
         foreach ($splits as $split) {
-            if ($split['percent'] <= 0)
+            $percent = (float) $split['percent'];
+            if ($percent <= 0) {
                 continue;
+            }
 
-            $amount = round(($total * $split['percent']) / 100, 2);
-            $receiver = $split['user_id'] ? User::find($split['user_id']) : null;
+            $amount = round(($total * $percent) / 100, 2);
+            $pixKey = null;
 
-            OrderSplit::create([
+            if ($split['type'] === 'seller' && $order->seller) {
+                $pixKey = $order->seller->pix_key;
+            } elseif ($split['type'] === 'superadmin' && $superadmin) {
+                $pixKey = $superadmin->pix_key;
+            } elseif ($split['type'] === 'platform') {
+                $pixKey = Setting::get('marketplace_split_platform_pix');
+            } elseif ($split['type'] === 'traffic') {
+                $pixKey = Setting::get('marketplace_split_traffic_pix');
+            }
+
+            \App\Models\OrderSplit::create([
                 'order_id' => $order->id,
-                'receiver_type' => $split['type'],
                 'receiver_id' => $split['user_id'],
+                'receiver_type' => $split['type'],
+                'percentage' => $percent,
                 'amount' => $amount,
-                'percentage' => $split['percent'],
+                'pix_key' => $pixKey,
                 'status' => 'pending',
-                'pix_key' => $receiver ? $receiver->pix_key : null,
             ]);
         }
     }

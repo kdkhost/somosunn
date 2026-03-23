@@ -1,5 +1,6 @@
 # UNN — Plataforma de Networking
 
+- **Gestão de Split e Chaves PIX (23/03):** Implementada a interface para controle de porcentagens de split e configuração de chaves PIX de destino (Plataforma e Tráfego Pago) em ambos os painéis administrativos. A lógica foi integrada ao Webhook de pagamentos para automatizar o registro de repasses com as chaves corretas em cada pedido, garantindo transparência e agilidade financeira.
 - **Navegação Mobile PWA e Bottom Nav (23/03):** Introduzida uma nova experiência de "App Nativo" para dispositivos móveis. O sistema agora conta com uma barra de navegação inferior (Bottom Nav) com efeitos de desfoque e indicadores de estado ativo. Além disso, o menu lateral (drawer) foi corrigido para destacar visualmente a página atual, proporcionando uma navegação intuitiva e fluida no smartphone.
 - **Verificação de E-mail Obrigatória (23/03):** Implementado o fluxo completo de verificação de e-mail para novos usuários. Inclui bloqueio de funcionalidades via middleware `verified`, página de aviso premium (`verify-email.blade.php`), banner global de notificação e opção de reenvio direto pelo perfil e dashboard. Garante a autenticidade da base de membros e segurança da plataforma.
 
