@@ -167,26 +167,26 @@
         <section class="py-16 w-full overflow-x-hidden">
             <div class="unn-container">
                 <!-- Lead Banner (Blue) -->
-                <div class="home-journey-lead rounded-[3rem] p-8 md:p-12 lg:p-16 text-white overflow-hidden relative mb-12">
-                    <div class="relative z-10 grid lg:grid-cols-[1fr_auto] gap-10 items-center">
+                <div class="home-journey-lead rounded-[2rem] md:rounded-[3rem] px-6 py-10 md:p-12 lg:p-16 text-white overflow-hidden relative mb-12">
+                    <div class="relative z-10 grid lg:grid-cols-[1fr_auto] gap-8 md:gap-10 items-center">
                         <div>
                             <span class="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-2 text-[10px] font-black tracking-[0.2em] uppercase text-white/90 backdrop-blur-md mb-6">
                                 <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
                                 Resultados reais
                             </span>
-                            <h2 class="text-3xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-6">
+                            <h2 class="text-2xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-4 md:mb-6">
                                 {{ $homePage->get('journey_title', 'Onde o network me levou') }}
                             </h2>
                             <p class="text-lg md:text-xl text-white/70 leading-relaxed font-medium max-w-2xl">
                                 {{ $homePage->get('journey_subtitle', 'Conexões que começaram em uma conversa e terminaram em contratos, convites, expansão e crescimento com direção.') }}
                             </p>
                         </div>
-                        <div class="flex flex-col gap-6 min-w-[300px]">
-                            <div class="rounded-[2rem] bg-white/5 border border-white/10 p-6 backdrop-blur-xl">
+                        <div class="flex flex-col gap-4 md:gap-6 min-w-0 md:min-w-[300px]">
+                            <div class="rounded-2xl md:rounded-[2rem] bg-white/5 border border-white/10 p-5 md:p-6 backdrop-blur-xl">
                                 <p class="text-[10px] uppercase tracking-[0.25em] text-white/40 font-black mb-3">
                                     {{ $homePage->get('journey_highlight_label', 'Aceleração de Resultados') }}
                                 </p>
-                                <p class="text-lg md:text-xl font-black text-white leading-tight">
+                                <p class="text-base md:text-xl font-black text-white leading-tight">
                                     {{ $homePage->get('journey_highlight_value', 'Mais visibilidade, novos negócios e acesso exclusivo') }}
                                 </p>
                             </div>
@@ -203,7 +203,7 @@
                 <!-- Cards Row (White) -->
                 <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
                     @foreach($journeyCards as $card)
-                        <article class="home-journey-card flex flex-col justify-between rounded-[2.5rem] border border-slate-100 bg-white p-8 lg:p-10 h-full group relative overflow-hidden transition-all duration-500">
+                        <article class="home-journey-card flex flex-col justify-between rounded-[2.5rem] border border-slate-100 bg-white p-6 md:p-8 lg:p-10 h-full group relative overflow-hidden transition-all duration-500">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-bl-[5rem] -mr-16 -mt-16 transition-all duration-500 group-hover:scale-150 group-hover:bg-blue-100/50"></div>
                             
                             <div class="relative z-10">
