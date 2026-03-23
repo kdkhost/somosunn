@@ -84,10 +84,35 @@
                 </div>
 
                 <div>
-                    <label class="text-sm font-bold text-slate-700 dark:text-slate-300">E-mail *</label>
+                    <label class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                        <span>E-mail *</span>
+                        @if($user->hasVerifiedEmail())
+                            <span class="text-[10px] bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <i class="fas fa-check-circle"></i> Verificado
+                            </span>
+                        @else
+                            <span class="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i> Pendente
+                            </span>
+                        @endif
+                    </label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}" required maxlength="120"
                         placeholder="exemplo@email.com"
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
+                    
+                    @if(!$user->hasVerifiedEmail())
+                        <div class="mt-2 flex items-center justify-between bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 p-3 rounded-xl border-dashed">
+                            <span class="text-xs text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                                <i class="fas fa-info-circle"></i> Não recebeu o e-mail?
+                            </span>
+                            <form method="POST" action="{{ route('verification.send') }}" class="inline">
+                                @csrf
+                                <button type="submit" class="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 underline decoration-dashed">
+                                    Reenviar agora
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Telefone</label>

@@ -90,6 +90,7 @@ class DashboardController extends Controller
         $myHealthDetails = [
             'plano_ativo' => $hasPlan,
             'perfil_completo' => $isProfileComplete,
+            'email_verificado' => $user->hasVerifiedEmail(),
             'telefone' => !blank($user->phone),
             'ocupacao' => !blank($user->occupation),
             'bio' => !blank($user->bio),

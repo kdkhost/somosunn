@@ -2069,6 +2069,8 @@
     @include('partials.global-placeholder-fix')
     @include('partials.global-ajax-crud')
 
+    @include('partials.mobile-bottom-nav')
+
     {{-- scripts empilhados pelas views individuais via @push('scripts') --}}
     @stack('scripts')
 </body>

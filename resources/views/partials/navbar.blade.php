@@ -401,34 +401,39 @@
 
         <nav class="px-4 py-4 flex flex-col gap-1 text-gray-700">
             @foreach($visibleMenuItems as $item)
-            @php($mobileSection = \Illuminate\Support\Str::slug($item['label']))
+            @php
+                $mobileSection = \Illuminate\Support\Str::slug($item['label']);
+                $isMainActive = request()->fullUrlIs($item['href']) || (str_contains($item['href'], '/portal') && request()->is('portal*'));
+            @endphp
             @if(!empty($item['children']))
                 <div data-mobile-section="{{ $mobileSection }}"
-                    class="rounded-2xl border border-slate-100 bg-slate-50/80 px-3 py-3">
+                    class="rounded-2xl border {{ $isMainActive ? 'border-blue-100 bg-blue-50/30' : 'border-slate-100 bg-slate-50/80' }} px-3 py-3">
                     <div class="flex items-center justify-between px-1 pb-2">
                         <a href="{{ $item['href'] }}"
-                            class="text-xs font-extrabold uppercase tracking-[0.24em] text-slate-400 hover:text-[#1F5EDB] transition-colors">
+                            class="text-xs font-extrabold uppercase tracking-[0.24em] {{ $isMainActive ? 'text-blue-600' : 'text-slate-400' }} hover:text-[#1F5EDB] transition-colors">
                             {{ $item['label'] }}
                         </a>
                         <span
-                            class="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-slate-500 shadow-sm">
+                            class="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[10px] font-bold {{ $isMainActive ? 'text-blue-600 shadow-blue-100' : 'text-slate-500' }} shadow-sm">
                             {{ count($item['children']) }} itens
                         </span>
                     </div>
 
                     <div class="flex flex-col gap-1">
                         @foreach($item['children'] as $child)
+                            @php($isChildActive = request()->fullUrlIs($child['href']))
                             <a href="{{ $child['href'] }}"
-                                class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-700 hover:bg-white hover:text-[#1F5EDB] transition-colors">
+                                class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold {{ $isChildActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-700 hover:bg-white hover:text-[#1F5EDB]' }} transition-all">
                                 <span>{{ $child['label'] }}</span>
-                                <i class="fas fa-chevron-right text-[11px] opacity-50"></i>
+                                <i class="fas {{ $isChildActive ? 'fa-check' : 'fa-chevron-right' }} text-[11px] {{ $isChildActive ? 'opacity-100' : 'opacity-50' }}"></i>
                             </a>
                         @endforeach
                     </div>
                 </div>
             @else
+                @php($isItemActive = request()->fullUrlIs($item['href']))
                 <a href="{{ $item['href'] }}" data-mobile-section="{{ $mobileSection }}"
-                    class="block rounded-xl px-4 py-2.5 font-semibold hover:bg-slate-100 transition-colors">
+                    class="block rounded-xl px-4 py-2.5 font-semibold {{ $isItemActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'hover:bg-slate-100' }} transition-all">
                     {{ $item['label'] }}
                 </a>
             @endif
@@ -437,19 +442,20 @@
             @if($isLogged)
                 <div class="border-t border-slate-100 my-2"></div>
 
+                @php($isPanelActive = request()->is('painel*'))
                 <a href="{{ route('panel.dashboard') }}"
-                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
-                    <i class="fas fa-th-large w-4 opacity-70"></i> Painel
+                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold {{ request()->routeIs('panel.dashboard') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-700 hover:bg-slate-100' }} transition-all">
+                    <i class="fas fa-th-large w-4 {{ request()->routeIs('panel.dashboard') ? 'text-white' : 'opacity-70' }}"></i> Painel
                 </a>
 
                 <a href="{{ route('panel.profile.edit') }}"
-                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
-                    <i class="fas fa-user-circle w-4 opacity-70"></i> Meu perfil
+                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold {{ request()->routeIs('panel.profile.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-700 hover:bg-slate-100' }} transition-all">
+                    <i class="fas fa-user-circle w-4 {{ request()->routeIs('panel.profile.*') ? 'text-white' : 'opacity-70' }}"></i> Meu perfil
                 </a>
 
                 <a href="{{ route('marketplace.index') }}"
-                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition">
-                    <i class="fas fa-store w-4 opacity-70"></i> Marketplace
+                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold {{ request()->routeIs('marketplace.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-700 hover:bg-slate-100' }} transition-all">
+                    <i class="fas fa-store w-4 {{ request()->routeIs('marketplace.*') ? 'text-white' : 'opacity-70' }}"></i> Marketplace
                 </a>
 
                 @if($currentUser && method_exists($currentUser, 'isAdmin') && $currentUser->isAdmin())

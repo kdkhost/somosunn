@@ -18,6 +18,36 @@
         $visitMetrics = $visitMetrics ?? ['enabled' => false, 'owned_products_count' => 0, 'total_visits' => 0, 'last_24h' => 0, 'by_type' => [], 'top_items' => []];
         $dashboardRefreshMs = max(3000, (int) config('dashboard.refresh_interval_ms', 10000));
     @endphp
+    
+    @if(!auth()->user()->hasVerifiedEmail())
+        <!-- Verification Alert Banner -->
+        <div class="mb-8 animate-fade-in-up">
+            <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-3xl p-1 shadow-xl shadow-amber-500/20 relative overflow-hidden group border border-amber-400/20">
+                <div class="bg-white dark:bg-slate-900/90 backdrop-blur-md rounded-[1.4rem] p-6 flex flex-col md:flex-row items-center justify-between gap-6 relative z-10 border border-white/10">
+                    <div class="flex items-center gap-5 text-center md:text-left">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl shrink-0 shadow-inner">
+                            <i class="fas fa-paper-plane animate-bounce-slow"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-black text-slate-900 dark:text-white mb-1 uppercase tracking-tight">Verifique seu e-mail</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Sua conta ainda não está ativa. Verifique sua caixa de entrada para liberar todos os recursos.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <form method="POST" action="{{ route('verification.send') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-amber-500/30 hover:-translate-y-1">
+                                Reenviar E-mail
+                            </button>
+                        </form>
+                        <a href="{{ route('panel.profile.edit') }}" class="px-6 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-2xl font-black text-xs uppercase tracking-widest transition-all">
+                            Meu Perfil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <!-- Welcome Section -->
     <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900 dark:from-blue-900/80 dark:via-indigo-950 dark:to-slate-950 p-10 shadow-[0_20px_60px_-15px_rgba(37,99,235,0.4)] dark:shadow-none mb-12 group border border-blue-400/20 dark:border-white/5">
@@ -132,7 +162,8 @@
                 @php
                     $checkItems = [
                         ['key' => 'plano_ativo', 'label' => 'Plano Premium Ativo', 'icon' => 'fa-gem'],
-                        ['key' => 'perfil_completo', 'label' => 'Perfil Verificado', 'icon' => 'fa-shield-check'],
+                        ['key' => 'email_verificado', 'label' => 'E-mail Verificado', 'icon' => 'fa-envelope-circle-check'],
+                        ['key' => 'perfil_completo', 'label' => 'Dados do Perfil', 'icon' => 'fa-id-card'],
                         ['key' => 'foto', 'label' => 'Headshot Profissional', 'icon' => 'fa-camera-retro'],
                         ['key' => 'bio', 'label' => 'Pitch de Apresentação', 'icon' => 'fa-quote-left'],
                         ['key' => 'telefone', 'label' => 'Canal de Contato', 'icon' => 'fa-mobile-screen'],
