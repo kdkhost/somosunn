@@ -66,6 +66,8 @@ class RegisterController extends Controller
             \Log::error('Points award error: ' . $e->getMessage());
         }
 
+        event(new \Illuminate\Auth\Events\Registered($user));
+
         Auth::login($user);
         return redirect()->route('planos')
             ->with('success', 'Conta criada com sucesso! Escolha um plano para aproveitar ao máximo a plataforma.');

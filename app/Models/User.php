@@ -72,7 +72,7 @@ use App\Services\ProfilePhotoService;
 use Illuminate\Support\Facades\Schema;
 use App\Models\EventRegistration;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, Traits\HasFeatureAccess;
 

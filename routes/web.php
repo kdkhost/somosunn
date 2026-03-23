@@ -693,3 +693,16 @@ Route::get('/checkout/falha/{order}', [\App\Http\Controllers\CheckoutController:
 
 // Impersonate Stop
 Route::get('/admin/stop-impersonating', [\App\Http\Controllers\Admin\ImpersonateController::class, 'stop'])->middleware(['auth'])->name('admin.impersonate.stop');
+
+// Email Verification
+Route::get('/email/verify', [App\Http\Controllers\Auth\EmailVerificationController::class, '__invoke'])
+    ->middleware('auth')
+    ->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', [App\Http\Controllers\Auth\EmailVerificationController::class, 'verify'])
+    ->middleware(['auth', 'signed'])
+    ->name('verification.verify');
+
+Route::post('/email/verification-notification', [App\Http\Controllers\Auth\EmailVerificationController::class, 'store'])
+    ->middleware(['auth', 'throttle:6,1'])
+    ->name('verification.send');

@@ -905,6 +905,22 @@
     @endphp
     @if($showNavigation)
         @include('partials.header')
+
+        @auth
+            @if(!auth()->user()->hasVerifiedEmail())
+                <div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white py-2.5 px-4 shadow-md relative z-[45]">
+                    <div class="unn-container flex flex-wrap items-center justify-between gap-2 text-sm font-semibold">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-exclamation-triangle animate-pulse text-amber-100"></i>
+                            <span>Seu perfil ainda não foi verificado. Verifique seu e-mail para garantir acesso total.</span>
+                        </div>
+                        <a href="{{ route('verification.notice') }}" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg backdrop-blur-sm transition flex items-center gap-2">
+                            Verificar Agora <i class="fas fa-chevron-right text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            @endif
+        @endauth
     @endif
 
     <main class="{{ $showNavigation ? 'pt-20 lg:pt-24' : 'pt-0' }} min-h-[calc(100vh-80px)]">
