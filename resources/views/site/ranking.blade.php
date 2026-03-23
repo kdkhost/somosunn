@@ -26,8 +26,8 @@
 
         <!-- Ranking Pódio (Top 3) -->
         @if($podium->isNotEmpty())
-            <section class="px-4 md:px-8 lg:px-12 mb-16 w-full overflow-x-hidden">
-                <div class="mx-auto">
+            <section class="py-8 w-full overflow-x-hidden">
+                <div class="unn-container">
                     @php
                         $medals = [
                             0 => ['bg' => 'from-yellow-400 to-amber-500', 'ring' => 'ring-yellow-400', 'label' => '🥇 1º lugar', 'icon' => 'fas fa-crown', 'iconColor' => 'text-yellow-400'],

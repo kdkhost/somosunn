@@ -60,8 +60,8 @@
 
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
         <!-- Hero Section -->
-        <section class="pt-10 md:pt-24 pb-12 md:pb-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
-            <div class="mx-auto">
+        <section class="pt-10 md:pt-24 pb-12 md:pb-16 w-full overflow-x-hidden">
+            <div class="unn-container">
                 <div class="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
                     <div>
                         <h1 class="unn-title-gradient unn-title-hero mb-6" style="word-break: keep-all; hyphens: none; max-width: 650px;">
@@ -164,8 +164,8 @@
         </section>
 
         <!-- Onde o network me levou -->
-        <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
-            <div class="mx-auto">
+        <section class="py-16 w-full overflow-x-hidden">
+            <div class="unn-container">
                 <div class="grid xl:grid-cols-[0.8fr_1.6fr] 2xl:grid-cols-[0.7fr_1.8fr] gap-6 md:gap-8 lg:gap-10 items-stretch">
                     <div class="home-journey-lead rounded-[2rem] p-8 md:p-10 lg:p-12 text-white overflow-hidden relative flex flex-col justify-center">
                             <div class="relative z-10">
@@ -221,8 +221,8 @@
         </section>
 
         <!-- Palestras Gratuitas -->
-        <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
-            <div class="mx-auto">
+        <section class="py-16 w-full overflow-x-hidden">
+            <div class="unn-container">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-black text-gray-900">{{ $homePage->get('events_title', 'Palestras gratuitas') }}</h2>
@@ -296,8 +296,8 @@
         </section>
 
         <!-- Mentorias Premium -->
-        <section class="py-16 px-4 md:px-8 lg:px-12 bg-white w-full overflow-x-hidden">
-            <div class="mx-auto">
+        <section class="py-16 bg-white w-full overflow-x-hidden">
+            <div class="unn-container">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-black text-gray-900">{{ $homePage->get('mentorships_title', 'Mentorias premium') }}</h2>
@@ -370,8 +370,8 @@
         </section>
 
         <!-- Comunidade por níveis -->
-        <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
-            <div class="mx-auto">
+        <section class="py-16 w-full overflow-x-hidden">
+            <div class="unn-container">
                 <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $homePage->get('community_title', 'Comunidade por níveis') }}</h2>
 
                 <div class="grid md:grid-cols-2 gap-8">
@@ -400,8 +400,8 @@
         </section>
 
         <!-- Ranking -->
-        <section class="py-16 px-4 md:px-8 lg:px-12 bg-white w-full overflow-x-hidden">
-            <div class="mx-auto">
+        <section class="py-16 bg-white w-full overflow-x-hidden">
+            <div class="unn-container">
                 <div class="flex items-center justify-between mb-10">
                     <div>
                         <h2 class="text-3xl font-black text-gray-900">{{ $homePage->get('ranking_title', 'Ranking do networking') }}</h2>
@@ -534,8 +534,8 @@
         </section>
 
         <!-- Depoimentos -->
-        <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
-            <div class="mx-auto">
+        <section class="py-16 w-full overflow-x-hidden">
+            <div class="unn-container">
                 <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $homePage->get('testimonials_title', 'O que dizem nossos membros') }}</h2>
 
                 @php
@@ -586,9 +586,9 @@
         </section>
 
         <!-- CTA Final -->
-        <section class="py-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden"
+        <section class="py-16 w-full overflow-x-hidden"
             style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-            <div class="mx-auto text-center text-white">
+            <div class="unn-container text-center text-white">
                 <h2 class="text-3xl lg:text-4xl font-black mb-4">{{ $homePage->get('cta_section_title', 'Pronto para transformar sua rede?') }}</h2>
                 <p class="text-lg opacity-90 mb-8">{{ $homePage->get('cta_section_subtitle', 'Junte-se a milhares de empreendedores que já estão crescendo juntos.') }}</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
