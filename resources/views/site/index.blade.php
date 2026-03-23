@@ -60,9 +60,9 @@
 
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
         <!-- Hero Section -->
-        <section class="pt-10 md:pt-24 pb-12 md:pb-16 px-4 md:px-12 lg:px-24">
-            <div class="max-w-7xl mx-auto">
-                <div class="grid lg:grid-cols-2 gap-8 md:gap-16 lg:gap-24 items-center">
+        <section class="pt-10 md:pt-24 pb-12 md:pb-16 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
+            <div class="mx-auto">
+                <div class="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
                     <div>
                         <h1 class="unn-title-gradient unn-title-hero mb-6" style="word-break: keep-all; hyphens: none; max-width: 650px;">
                             {{ $heroTitle }} {{ $heroSubtitle }}
@@ -95,8 +95,8 @@
 
         <!-- Stats Bar -->
         <!-- Stats Bar -->
-        <section class="py-6 md:py-8 px-4 md:px-12 lg:px-24">
-            <div class="max-w-7xl mx-auto">
+        <section class="py-6 md:py-8 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
+            <div class="mx-auto">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                     <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
                         <p class="text-2xl sm:text-3xl md:text-4xl font-black truncate" style="color: var(--unn-azul-1)">
