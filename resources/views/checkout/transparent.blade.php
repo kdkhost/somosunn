@@ -192,7 +192,11 @@
             $methodDebitCard = (bool) \App\Models\Setting::get('mercadopago_method_debit_card', 0);
             $methodPix = (bool) \App\Models\Setting::get('mercadopago_method_pix', 1);
             $methodTicket = (bool) \App\Models\Setting::get('mercadopago_method_ticket', 0);
-            $methodMercadoPago = (bool) \App\Models\Setting::get('mercadopago_method_mercadopago', 0);
+            
+            // Tentar chaves diferentes para a carteira do MP (wallet/account_money)
+            $methodMercadoPago = (bool) (\App\Models\Setting::get('mercadopago_method_mercadopago') 
+                                    ?? \App\Models\Setting::get('mercadopago_method_wallet') 
+                                    ?? \App\Models\Setting::get('mercadopago_method_account_money', 0));
         @endphp
 
         const showLoading = (show) => {

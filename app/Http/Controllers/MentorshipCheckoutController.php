@@ -44,8 +44,18 @@ class MentorshipCheckoutController extends Controller
             return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'preferredGateway'));
         }
 
-        $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
-        $mpEnabled = $gateways['mpEnabled'];
+        $sellerId = (int) ($mentorship->mentor_id);
+        $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
+        $isPlatformOwner = $sellerId === (int) $platformOwnerId;
+
+        $sellerMpAccount = null;
+        if (!$isPlatformOwner) {
+            $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+        } else {
+            $sellerMpAccount = \App\Models\GatewayAccount::resolveGlobalSettings();
+        }
+
+        $mpEnabled = $sellerMpAccount['mpEnabled'] ?? false;
         $preferredGateway = 'mercadopago';
 
         if (!$mpEnabled) {
@@ -89,10 +99,20 @@ class MentorshipCheckoutController extends Controller
         $gatewayProvider = 'free';
 
         if ($effectiveTotal > 0) {
-            $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
+            $sellerId = (int) ($mentorship->mentor_id);
+            $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
+            $isPlatformOwner = $sellerId === (int) $platformOwnerId;
+
+            $sellerMpAccount = null;
+            if (!$isPlatformOwner) {
+                $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+            } else {
+                $sellerMpAccount = \App\Models\GatewayAccount::resolveGlobalSettings();
+            }
+
             $gatewayProvider = 'mercadopago';
 
-            if (!$gateways['mpEnabled']) {
+            if (!($sellerMpAccount['mpEnabled'] ?? false)) {
                 return back()->with('error', 'Metodo de pagamento nao disponivel para esta mentoria. O mentor ainda nao configurou um gateway.');
             }
         } else {
@@ -224,10 +244,21 @@ class MentorshipCheckoutController extends Controller
                 ]),
             ]);
 
+            $sellerId = (int) ($mentorship->mentor_id);
+            $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
+            $isPlatformOwner = $sellerId === (int) $platformOwnerId;
+            
+            $sellerMpAccount = null;
+            if (!$isPlatformOwner) {
+                $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+            }
+
+            $mpPublicKey = (!$isPlatformOwner && is_array($sellerMpAccount)) ? ($sellerMpAccount['mpPublicKey'] ?? null) : null;
+
             return view('checkout.transparent', [
                 'order' => $order,
                 'preferenceId' => $preference['id'] ?? '',
-                'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key'),
+                'publicKey' => $mpPublicKey ?: config('payments.mercadopago.public_key') ?: \App\Models\Setting::get('mp_public_key'),
             ]);
     }
 

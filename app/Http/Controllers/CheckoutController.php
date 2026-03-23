@@ -254,8 +254,8 @@ class CheckoutController extends Controller
             }
 
             $gateways = [
-                'mp' => Setting::get('mp_active') && ($isPlatformOwner || ($sellerMpAccount instanceof GatewayAccount && $sellerMpAccount->active)),
-                'mpPublicKey' => (!$isPlatformOwner && $sellerMpAccount instanceof GatewayAccount) ? $sellerMpAccount->public_key : null,
+                'mp' => Setting::get('mp_active') && ($isPlatformOwner || (is_array($sellerMpAccount) && ($sellerMpAccount['mpEnabled'] ?? false))),
+                'mpPublicKey' => (!$isPlatformOwner && is_array($sellerMpAccount)) ? ($sellerMpAccount['mpPublicKey'] ?? null) : null,
             ];
 
             return view('checkout.transparent', [

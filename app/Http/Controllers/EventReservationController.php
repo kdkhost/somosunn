@@ -551,13 +551,21 @@ class EventReservationController extends Controller
                 ]),
             ]);
 
-            $sellerId = $event->seller_id ?: $event->user_id;
-            $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $sellerId);
+            $sellerId = (int) ($event->seller_id ?: $event->user_id);
+            $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
+            $isPlatformOwner = $sellerId === (int) $platformOwnerId;
+
+            $sellerMpAccount = null;
+            if (!$isPlatformOwner) {
+                $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+            }
+
+            $mpPublicKey = (!$isPlatformOwner && is_array($sellerMpAccount)) ? ($sellerMpAccount['mpPublicKey'] ?? null) : null;
 
             return view('checkout.transparent', [
                 'order' => $order,
                 'preferenceId' => $preference['id'] ?? '',
-                'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key'),
+                'publicKey' => $mpPublicKey ?: config('payments.mercadopago.public_key') ?: \App\Models\Setting::get('mp_public_key'),
             ]);
         } catch (\Exception $e) {
             \Log::error('Falha ao iniciar pagamento de evento', [
