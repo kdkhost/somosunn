@@ -223,12 +223,19 @@
                         <label class="text-uppercase text-muted small font-weight-bold">Parcelas sem juros</label>
                         <input type="number" name="gateway_max_installments_no_interest" class="form-control" value="{{ $settings['gateway_max_installments_no_interest'] ?? '1' }}">
                     </div>
-                    <div class="col-md-4 form-group">
+                    <div class="col-md-3 form-group">
                         <label class="text-uppercase text-muted small font-weight-bold">Repassar taxa</label>
                         <select name="gateway_pass_tax_to_client" class="form-control">
                             <option value="0" {{ (int) ($settings['gateway_pass_tax_to_client'] ?? 0) === 0 ? 'selected' : '' }}>Nao - empresa absorve</option>
                             <option value="1" {{ (int) ($settings['gateway_pass_tax_to_client'] ?? 1) === 1 ? 'selected' : '' }}>Sim - cliente paga</option>
                         </select>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label class="text-uppercase text-muted small font-weight-bold">Expiração do Pix (min)</label>
+                        <div class="input-group">
+                            <input type="number" name="pix_expiration_minutes" class="form-control" value="{{ $settings['pix_expiration_minutes'] ?? '15' }}" min="5" max="1440">
+                            <div class="input-group-append"><span class="input-group-text">min</span></div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -104,12 +104,21 @@
                             @foreach($userFeatures as $key => $label)
                                 <label class="flex items-start gap-4 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-200 dark:hover:border-blue-900 transition-all cursor-pointer group hover:shadow-sm">
                                     <div class="flex items-center h-5 mt-0.5">
+                                        @php
+                                            $hasViaPlan = $user->id && $user->activePlan() && $user->activePlan()->hasFeature($key);
+                                            $isChecked = in_array($key, old('extra_features', $user->extra_features ?? [])) || $hasViaPlan;
+                                        @endphp
                                         <input type="checkbox" name="extra_features[]" value="{{ $key }}"
-                                            {{ in_array($key, old('extra_features', $user->extra_features ?? [])) ? 'checked' : '' }}
+                                            {{ $isChecked ? 'checked' : '' }}
                                             class="w-5 h-5 text-blue-600 border-slate-300 dark:border-slate-700 rounded-lg focus:ring-blue-500 dark:bg-slate-950 dark:checked:bg-blue-600 transition-all">
                                     </div>
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{{ $label }}</span>
+                                        <span class="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                                            {{ $label }}
+                                            @if($hasViaPlan)
+                                                <span class="text-[9px] text-emerald-500 ml-1 font-black uppercase tracking-tighter">(No Plano)</span>
+                                            @endif
+                                        </span>
                                         <span class="text-[10px] text-slate-400 font-mono mt-1 uppercase tracking-tight">{{ $key }}</span>
                                     </div>
                                 </label>

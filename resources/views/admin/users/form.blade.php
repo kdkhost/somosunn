@@ -119,10 +119,19 @@
                                 @if(isset($userFeatures[$featureKey]))
                                     <div class="col-md-4 col-lg-3">
                                         <div class="custom-control custom-checkbox mb-2">
+                                            @php
+                                                $hasViaPlan = $user->exists && $user->activePlan() && $user->activePlan()->hasFeature($featureKey);
+                                                $isChecked = in_array($featureKey, $selectedFeatures, true) || $hasViaPlan;
+                                            @endphp
                                             <input type="checkbox" class="custom-control-input" id="extra-feature-{{ $featureKey }}"
                                                 name="extra_features[]" value="{{ $featureKey }}"
-                                                {{ in_array($featureKey, $selectedFeatures, true) ? 'checked' : '' }}>
-                                            <label class="custom-control-label" for="extra-feature-{{ $featureKey }}">{{ $userFeatures[$featureKey] }}</label>
+                                                {{ $isChecked ? 'checked' : '' }}>
+                                            <label class="custom-control-label font-weight-bold" for="extra-feature-{{ $featureKey }}">
+                                                {{ $userFeatures[$featureKey] }}
+                                                @if($hasViaPlan)
+                                                    <span class="badge badge-success ml-1" style="font-size: 8px;">PLANO</span>
+                                                @endif
+                                            </label>
                                         </div>
                                     </div>
                                 @endif
