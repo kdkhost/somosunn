@@ -166,57 +166,67 @@
         <!-- Onde o network me levou -->
         <section class="py-16 w-full overflow-x-hidden">
             <div class="unn-container">
-                <div class="grid xl:grid-cols-[0.8fr_1.6fr] 2xl:grid-cols-[0.7fr_1.8fr] gap-6 md:gap-8 lg:gap-10 items-stretch">
-                    <div class="home-journey-lead rounded-[2rem] p-8 md:p-10 lg:p-12 text-white overflow-hidden relative flex flex-col justify-center">
+                <div class="grid lg:grid-cols-[26rem_1fr] gap-6 md:gap-8 lg:gap-10 items-stretch">
+                   <div class="home-journey-lead rounded-[2rem] p-8 md:p-10 lg:p-12 text-white overflow-hidden relative flex flex-col justify-center">
                             <div class="relative z-10">
-                                <span class="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/20 px-4 py-2 text-xs font-black tracking-[0.18em] uppercase text-white/90">
-                                    <i class="fas fa-route"></i> Resultados reais
+                                <span class="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-2 text-[10px] font-black tracking-[0.2em] uppercase text-white/90 backdrop-blur-md">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                                    Resultados reais
                                 </span>
-                                <h2 class="mt-5 text-3xl md:text-4xl font-black leading-tight">
+                                <h2 class="mt-6 text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] tracking-tight">
                                     {{ $homePage->get('journey_title', 'Onde o network me levou') }}
                                 </h2>
-                                <p class="mt-4 text-base md:text-lg text-white/80 leading-relaxed max-w-xl">
+                                <p class="mt-5 text-base md:text-lg text-white/70 leading-relaxed font-medium">
                                     {{ $homePage->get('journey_subtitle', 'Conexões que começaram em uma conversa e terminaram em contratos, convites, expansão e crescimento com direção.') }}
                                 </p>
 
-                                <div class="mt-6 rounded-[1.5rem] bg-white/10 border border-white/15 p-5 backdrop-blur-sm">
-                                    <p class="text-sm uppercase tracking-[0.22em] text-white/65 font-bold">
-                                        {{ $homePage->get('journey_highlight_label', 'O que a rede certa acelera') }}
+                                <div class="mt-8 rounded-[2rem] bg-white/5 border border-white/10 p-6 backdrop-blur-xl relative overflow-hidden group">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                    <p class="text-[10px] uppercase tracking-[0.25em] text-white/40 font-black mb-3">
+                                        {{ $homePage->get('journey_highlight_label', 'Aceleração de Resultados') }}
                                     </p>
-                                    <p class="mt-3 text-2xl md:text-3xl font-black leading-tight">
-                                        {{ $homePage->get('journey_highlight_value', 'Mais visibilidade, mais negócios e mais acesso') }}
+                                    <p class="text-xl md:text-2xl font-black leading-tight text-white group-hover:text-emerald-300 transition-colors">
+                                        {{ $homePage->get('journey_highlight_value', 'Mais visibilidade, novos negócios e acesso exclusivo') }}
                                     </p>
                                 </div>
 
                                 <a href="#url-do-album-exclusivo"
-                                    class="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-sm md:text-base font-black transition hover:-translate-y-0.5 hover:shadow-xl"
+                                    class="mt-10 inline-flex items-center justify-center gap-3 rounded-full bg-white px-8 py-4 text-sm md:text-base font-black transition-all duration-300 hover:scale-105 hover:shadow-[0_20px_40px_-10px_rgba(255,255,255,0.3)] group"
                                     style="color: var(--unn-azul-1);">
                                     {{ $homePage->get('journey_cta_text', 'Ver fotos da comunidade') }}
-                                    <i class="fas fa-arrow-right"></i>
+                                    <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
                                 </a>
                             </div>
-                        </div>
-
+                   </div>
                         <div class="grid md:grid-cols-3 gap-5 lg:gap-6">
                             @foreach($journeyCards as $card)
-                                <article class="home-journey-card flex flex-col justify-center rounded-[2rem] border border-slate-200/80 bg-white p-8 md:p-10 h-full">
-                                    <div class="w-16 h-16 rounded-2xl btn-primary flex items-center justify-center text-white shadow-lg shadow-blue-500/20 mb-6">
-                                        <i class="{{ $card['icon'] }} text-2xl"></i>
+                                <article class="home-journey-card flex flex-col justify-between rounded-[2.5rem] border border-slate-100 bg-white p-8 lg:p-10 h-full group relative overflow-hidden transition-all duration-500">
+                                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-bl-[5rem] -mr-16 -mt-16 transition-all duration-500 group-hover:scale-150 group-hover:bg-blue-100/50"></div>
+                                    
+                                    <div class="relative z-10">
+                                        <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-8 transition-all duration-500 group-hover:bg-blue-600 group-hover:text-white group-hover:rotate-6 group-hover:shadow-lg group-hover:shadow-blue-200">
+                                            <i class="{{ $card['icon'] }} text-xl"></i>
+                                        </div>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-3">
+                                            {{ $card['title'] }}
+                                        </p>
+                                        <h3 class="text-xl lg:text-2xl font-black leading-tight text-slate-900 group-hover:text-blue-700 transition-colors duration-300">
+                                            {{ $card['result'] }}
+                                        </h3>
                                     </div>
-                                    <p class="mt-5 text-xs font-black uppercase tracking-[0.22em] text-slate-400">
-                                        {{ $card['title'] }}
-                                    </p>
-                                    <h3 class="mt-3 text-xl font-black leading-tight text-slate-900 min-h-[4.5rem]">
-                                        {{ $card['result'] }}
-                                    </h3>
-                                    <p class="mt-4 text-sm md:text-[0.95rem] text-slate-600 leading-7">
-                                        {{ $card['text'] }}
-                                    </p>
+
+                                    <div class="mt-6 relative z-10">
+                                        <p class="text-sm lg:text-base text-slate-500 leading-relaxed font-medium">
+                                            {{ $card['text'] }}
+                                        </p>
+                                        <div class="mt-6 flex items-center gap-2 text-blue-600 font-bold text-xs opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0">
+                                            Saiba mais <i class="fas fa-arrow-right text-[10px]"></i>
+                                        </div>
+                                    </div>
                                 </article>
                             @endforeach
                         </div>
                     </div>
-                </div>
             </div>
         </section>
 
@@ -686,32 +696,32 @@
         }
 
         .home-journey-lead {
-            background:
-                radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 36%),
-                linear-gradient(135deg, #123f9b 0%, #1f5edb 55%, #2d8cff 100%);
-            box-shadow: 0 28px 45px -28px rgba(31, 94, 219, 0.65);
+            background: 
+                radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 0% 100%, rgba(0, 0, 0, 0.1) 0%, transparent 40%),
+                linear-gradient(135deg, #1A237E 0%, #1F5EDB 50%, #00B0FF 100%);
+            box-shadow: 0 40px 80px -20px rgba(31, 94, 219, 0.4);
+            position: relative;
         }
 
-        .home-journey-lead::before {
+        .home-journey-lead::after {
             content: '';
             position: absolute;
-            inset: auto -6rem -6rem auto;
-            width: 16rem;
-            height: 16rem;
-            border-radius: 999px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 68%);
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4v-4H4v4H0v2h4v4h2v-4h4v-2H6zm30 0v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
             pointer-events: none;
         }
 
         .home-journey-card {
-            box-shadow: 0 16px 35px -26px rgba(15, 23, 42, 0.35);
-            transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, background-color 220ms ease;
+            box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
+            border-color: #f1f5f9;
         }
 
         .home-journey-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 24px 44px -28px rgba(31, 94, 219, 0.32);
-            border-color: rgba(59, 130, 246, 0.25);
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px -15px rgba(31, 94, 219, 0.15);
+            border-color: #e2e8f0;
             background: #ffffff;
         }
 
