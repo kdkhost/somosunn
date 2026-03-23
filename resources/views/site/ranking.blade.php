@@ -23,7 +23,7 @@
         </section>
         <!-- Ranking Pódio (Top 3) -->
         @if($podium->isNotEmpty())
-            <section class="pb-20 overflow-x-hidden">
+            <section class="pt-24 pb-20">
                 <div class="unn-container px-4">
                     <div class="grid lg:grid-cols-3 gap-8 items-end max-w-5xl mx-auto">
                         @foreach($podium as $rank)
@@ -41,8 +41,8 @@
                                     <div class="absolute -inset-1 bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 rounded-[2.5rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
                                     <a href="{{ $userLink }}" class="relative block bg-white rounded-[2.5rem] p-10 shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-amber-200 flex flex-col items-center text-center">
                                         {{-- Badge no topo --}}
-                                        <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-yellow-500 text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-amber-500/30 flex items-center gap-2">
-                                            <i class="fas fa-crown"></i> 1º Elite
+                                        <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-yellow-500 text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-amber-500/30 flex items-center gap-2 z-10 transition-transform group-hover:scale-110">
+                                            <i class="fas fa-crown text-sm"></i> 1º Elite
                                         </div>
 
                                         {{-- Avatar --}}
@@ -81,8 +81,12 @@
                                 <div class="{{ $pos === 1 ? 'lg:order-first' : 'lg:order-last' }}">
                                     <a href="{{ $userLink }}" class="block bg-white rounded-[2rem] p-8 shadow-xl transition-all duration-500 hover:-translate-y-1 border border-slate-100 flex flex-col items-center text-center group">
                                         {{-- Badge --}}
-                                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full {{ $pos === 1 ? 'bg-slate-100 text-slate-500' : 'bg-orange-50 text-orange-600' }} text-[10px] font-black uppercase tracking-widest mb-6">
-                                            {{ $pos === 1 ? '2º lugar' : '3º lugar' }}
+                                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full {{ $pos === 1 ? 'bg-slate-100 text-slate-500 border border-slate-200' : 'bg-orange-50 text-orange-600 border border-orange-100' }} text-[10px] font-black uppercase tracking-widest mb-6">
+                                            @if($pos === 1)
+                                                <i class="fas fa-medal text-slate-400"></i> 2º lugar
+                                            @else
+                                                <i class="fas fa-medal text-orange-400"></i> 3º lugar
+                                            @endif
                                         </div>
 
                                         {{-- Avatar --}}
