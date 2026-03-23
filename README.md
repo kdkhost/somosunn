@@ -1,5 +1,6 @@
 # UNN — Plataforma de Networking
 
+- **Logomarca Dinâmica Somos Únicas (23/03):** Implementada a funcionalidade de troca automática de logotipo no menu de navegação. Agora é possível configurar um logotipo exclusivo para a seção "Somos Únicas" através do painel administrativo (Configurações > Imagens). O sistema detecta o contexto da página (rotas ou conteúdo exclusivo) e alterna a identidade visual em tempo real para reforçar o branding da plataforma feminina.
 - **Sincronização de Credenciais Mercado Pago (23/03):** Expandida a correção de mismatch de `publicKey` para todos os fluxos de checkout: **Cursos, Eventos e Mentorias**. A lógica de detecção de conta do vendedor vs plataforma agora é unificada, garantindo que o gateway carregue corretamente independente do tipo de produto.
 - **Correção da Carteira Mercado Pago (23/03):** Resolvido problema onde a opção de pagamento via Conta Mercado Pago (Wallet) não aparecia no checkout. Foram adicionadas chaves de configuração redundantes (`wallet`, `account_money`) para garantir a ativação do método no SDK conforme a preferência do administrador.
 - **Correção de Sintaxe na Página de Indicação (22/03):** Resolvido o erro "unexpected end of file" na visualização do programa de indicações (`index.blade.php`), causado por uma diretiva `@if` não fechada.

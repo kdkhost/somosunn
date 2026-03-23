@@ -3,24 +3,6 @@
     <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-8 space-y-6">
         <div class="flex items-center gap-3 mb-2">
             <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                <i class="fas fa-id-card"></i>
-            </div>
-            <h3 class="font-bold text-slate-800 dark:text-white text-lg">Identidade Visual</h3>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            @foreach([
-                'logo_image' => ['Logo Principal', 'Logo Site', 'fas fa-image'],
-                'favicon_image' => ['Favicon', 'Favicon', 'fas fa-globe'],
-                'logo_admin' => ['Logo Admin', 'Logo Admin', 'fas fa-cogs'],
-                'logo_auth' => ['Logo Auth', 'Logo Auth', 'fas fa-lock']
-            ] as $name => $data)
-            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 space-y-4 flex flex-col items-center">
-                <label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-center h-8 flex items-center">{{ $data[0] }}</label>
-                
-                <div class="w-24 h-24 rounded-2xl bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative group">
-                    @if($url = $getUrl($name))
-                        <img id="preview_{{ $name }}" src="{{ $url }}" class="w-full h-full object-contain">
                     @else
                         <div class="text-center p-2">
                             <i class="{{ $data[2] }} text-xl text-slate-300 mb-1"></i>

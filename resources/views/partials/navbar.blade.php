@@ -1,6 +1,16 @@
 {{-- Navbar UNN com submenus e sidebar mobile --}}
 @php
+    $isSomosUnicas = request()->routeIs('somos-unicas*') ||
+                     request()->routeIs('site.somos-unicas*') ||
+                     (isset($event) && (($event->visibility ?? '') === 'somos_unicas' || ($event->is_somos_unicas ?? false))) ||
+                     (isset($course) && (($course->visibility ?? '') === 'somos_unicas' || ($course->is_somos_unicas ?? false))) ||
+                     (isset($mentorship) && (($mentorship->visibility ?? '') === 'somos_unicas' || ($mentorship->is_somos_unicas ?? false)));
+
     $logoSrc = \App\Models\Setting::getUrl('logo_front') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg');
+
+    if ($isSomosUnicas) {
+        $logoSrc = \App\Models\Setting::getUrl('logo_somos_unicas') ?: $logoSrc;
+    }
     $menuItems = [
         [
             'label' => 'Institucional',
