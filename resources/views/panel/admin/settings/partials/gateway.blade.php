@@ -363,21 +363,6 @@
                 <p class="text-[10px] text-slate-400 mt-1.5">Taxas de parcelamento</p>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center">
-                        <i class="fas fa-store text-emerald-500 text-xs"></i>
-                    </div>
-                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Taxa Marketplace</label>
-                </div>
-                <div class="relative">
-                    <input type="number" step="0.01" name="marketplace_fee"
-                        value="{{ $settings['marketplace_fee'] ?? '10.00' }}"
-                        class="w-full px-4 py-3 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
-                    <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">%</span>
-                </div>
-                <p class="text-[10px] text-slate-400 mt-1.5">Comissão sobre cada venda</p>
-            </div>
 
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
                 <div class="flex items-center gap-2 mb-3">
