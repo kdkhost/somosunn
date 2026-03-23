@@ -129,6 +129,10 @@ class RankingPublicController extends Controller
         $podium = $topRankings->take(3);
         $remaining = $topRankings->slice(3);
 
-        return view('site.ranking', compact('podium', 'remaining'));
+        return view('site.ranking', [
+            'podium' => $podium,
+            'remaining' => $remaining,
+            'isDemo' => $demoMode
+        ]);
     }
 }

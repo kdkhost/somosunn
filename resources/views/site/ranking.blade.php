@@ -31,7 +31,7 @@
                                 $pos = $loop->index;
                                 $userName = optional($rank->user)->name ?? 'Empreendedor';
                                 $userAvatar = optional($rank->user)->profile_photo_url ?? null;
-                                $userLink = optional($rank->user)->id ? route('social.profile', $rank->user->id) : '#';
+                                $userLink = optional($rank->user)->username ? route('social.profile', $rank->user->username) : '#';
                                 $isFirst = $pos === 0;
                             @endphp
 
@@ -136,7 +136,7 @@
                                 @php
                                     $userName = optional($rank->user)->name ?? 'Empreendedor';
                                     $userAvatar = optional($rank->user)->profile_photo_url ?? null;
-                                    $userLink = optional($rank->user)->id ? route('social.profile', $rank->user->id) : '#';
+                                    $userLink = optional($rank->user)->username ? route('social.profile', $rank->user->username) : '#';
                                     $position = $loop->index + 4;
                                 @endphp
                                 <a href="{{ $userLink }}" class="flex items-center p-6 md:p-8 border-b border-slate-50 hover:bg-slate-50/50 transition-all group last:border-0">
@@ -182,6 +182,7 @@
                     </div>
                 </div>
             </section>
+        @endif
     </div>
 
     <style>
