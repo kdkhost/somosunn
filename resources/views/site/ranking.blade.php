@@ -46,7 +46,11 @@
                                         </div>
 
                                         {{-- Avatar --}}
-                                        <div class="relative mb-8">
+                                        <div class="relative mb-8 pt-4">
+                                            {{-- Coroa flutuante --}}
+                                            <div class="absolute -top-10 left-1/2 -translate-x-1/2 text-amber-500 text-4xl drop-shadow-xl filter group-hover:scale-125 transition-transform duration-500 z-10">
+                                                <i class="fas fa-crown"></i>
+                                            </div>
                                             <div class="absolute -inset-2 bg-gradient-to-tr from-amber-400 to-yellow-200 rounded-full animate-spin-slow opacity-50"></div>
                                             @if($userAvatar)
                                                 <img src="{{ $userAvatar }}" alt="{{ $userName }}" class="relative w-32 h-32 rounded-full object-cover ring-4 ring-white shadow-2xl">
