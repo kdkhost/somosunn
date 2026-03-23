@@ -166,67 +166,69 @@
         <!-- Onde o network me levou -->
         <section class="py-16 w-full overflow-x-hidden">
             <div class="unn-container">
-                <div class="grid lg:grid-cols-[26rem_1fr] gap-6 md:gap-8 lg:gap-10 items-stretch">
-                   <div class="home-journey-lead rounded-[2rem] p-8 md:p-10 lg:p-12 text-white overflow-hidden relative flex flex-col justify-center">
-                            <div class="relative z-10">
-                                <span class="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-2 text-[10px] font-black tracking-[0.2em] uppercase text-white/90 backdrop-blur-md">
-                                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
-                                    Resultados reais
-                                </span>
-                                <h2 class="mt-6 text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] tracking-tight">
-                                    {{ $homePage->get('journey_title', 'Onde o network me levou') }}
-                                </h2>
-                                <p class="mt-5 text-base md:text-lg text-white/70 leading-relaxed font-medium">
-                                    {{ $homePage->get('journey_subtitle', 'Conexões que começaram em uma conversa e terminaram em contratos, convites, expansão e crescimento com direção.') }}
+                <!-- Lead Banner (Blue) -->
+                <div class="home-journey-lead rounded-[3rem] p-8 md:p-12 lg:p-16 text-white overflow-hidden relative mb-12">
+                    <div class="relative z-10 grid lg:grid-cols-[1fr_auto] gap-10 items-center">
+                        <div>
+                            <span class="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-2 text-[10px] font-black tracking-[0.2em] uppercase text-white/90 backdrop-blur-md mb-6">
+                                <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                                Resultados reais
+                            </span>
+                            <h2 class="text-3xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-6">
+                                {{ $homePage->get('journey_title', 'Onde o network me levou') }}
+                            </h2>
+                            <p class="text-lg md:text-xl text-white/70 leading-relaxed font-medium max-w-2xl">
+                                {{ $homePage->get('journey_subtitle', 'Conexões que começaram em uma conversa e terminaram em contratos, convites, expansão e crescimento com direção.') }}
+                            </p>
+                        </div>
+                        <div class="flex flex-col gap-6 min-w-[300px]">
+                            <div class="rounded-[2rem] bg-white/5 border border-white/10 p-6 backdrop-blur-xl">
+                                <p class="text-[10px] uppercase tracking-[0.25em] text-white/40 font-black mb-3">
+                                    {{ $homePage->get('journey_highlight_label', 'Aceleração de Resultados') }}
                                 </p>
-
-                                <div class="mt-8 rounded-[2rem] bg-white/5 border border-white/10 p-6 backdrop-blur-xl relative overflow-hidden group">
-                                    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                    <p class="text-[10px] uppercase tracking-[0.25em] text-white/40 font-black mb-3">
-                                        {{ $homePage->get('journey_highlight_label', 'Aceleração de Resultados') }}
-                                    </p>
-                                    <p class="text-xl md:text-2xl font-black leading-tight text-white group-hover:text-emerald-300 transition-colors">
-                                        {{ $homePage->get('journey_highlight_value', 'Mais visibilidade, novos negócios e acesso exclusivo') }}
-                                    </p>
-                                </div>
-
-                                <a href="#url-do-album-exclusivo"
-                                    class="mt-10 inline-flex items-center justify-center gap-3 rounded-full bg-white px-8 py-4 text-sm md:text-base font-black transition-all duration-300 hover:scale-105 hover:shadow-[0_20px_40px_-10px_rgba(255,255,255,0.3)] group"
-                                    style="color: var(--unn-azul-1);">
-                                    {{ $homePage->get('journey_cta_text', 'Ver fotos da comunidade') }}
-                                    <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
-                                </a>
+                                <p class="text-lg md:text-xl font-black text-white leading-tight">
+                                    {{ $homePage->get('journey_highlight_value', 'Mais visibilidade, novos negócios e acesso exclusivo') }}
+                                </p>
                             </div>
-                   </div>
-                        <div class="grid md:grid-cols-3 gap-5 lg:gap-6">
-                            @foreach($journeyCards as $card)
-                                <article class="home-journey-card flex flex-col justify-between rounded-[2.5rem] border border-slate-100 bg-white p-8 lg:p-10 h-full group relative overflow-hidden transition-all duration-500">
-                                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-bl-[5rem] -mr-16 -mt-16 transition-all duration-500 group-hover:scale-150 group-hover:bg-blue-100/50"></div>
-                                    
-                                    <div class="relative z-10">
-                                        <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-8 transition-all duration-500 group-hover:bg-blue-600 group-hover:text-white group-hover:rotate-6 group-hover:shadow-lg group-hover:shadow-blue-200">
-                                            <i class="{{ $card['icon'] }} text-xl"></i>
-                                        </div>
-                                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-3">
-                                            {{ $card['title'] }}
-                                        </p>
-                                        <h3 class="text-xl lg:text-2xl font-black leading-tight text-slate-900 group-hover:text-blue-700 transition-colors duration-300">
-                                            {{ $card['result'] }}
-                                        </h3>
-                                    </div>
-
-                                    <div class="mt-6 relative z-10">
-                                        <p class="text-sm lg:text-base text-slate-500 leading-relaxed font-medium">
-                                            {{ $card['text'] }}
-                                        </p>
-                                        <div class="mt-6 flex items-center gap-2 text-blue-600 font-bold text-xs opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0">
-                                            Saiba mais <i class="fas fa-arrow-right text-[10px]"></i>
-                                        </div>
-                                    </div>
-                                </article>
-                            @endforeach
+                            <a href="#url-do-album-exclusivo"
+                                class="inline-flex items-center justify-center gap-3 rounded-full bg-white px-8 py-4 md:py-5 text-sm md:text-base font-black transition-all duration-300 hover:scale-105 hover:shadow-[0_20px_40px_-10px_rgba(255,255,255,0.3)] group"
+                                style="color: var(--unn-azul-1);">
+                                {{ $homePage->get('journey_cta_text', 'Ver fotos da comunidade') }}
+                                <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                            </a>
                         </div>
                     </div>
+                </div>
+
+                <!-- Cards Row (White) -->
+                <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
+                    @foreach($journeyCards as $card)
+                        <article class="home-journey-card flex flex-col justify-between rounded-[2.5rem] border border-slate-100 bg-white p-8 lg:p-10 h-full group relative overflow-hidden transition-all duration-500">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-bl-[5rem] -mr-16 -mt-16 transition-all duration-500 group-hover:scale-150 group-hover:bg-blue-100/50"></div>
+                            
+                            <div class="relative z-10">
+                                <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-8 transition-all duration-500 group-hover:bg-blue-600 group-hover:text-white group-hover:rotate-6 group-hover:shadow-lg group-hover:shadow-blue-200">
+                                    <i class="{{ $card['icon'] }} text-xl"></i>
+                                </div>
+                                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-3">
+                                    {{ $card['title'] }}
+                                </p>
+                                <h3 class="text-xl lg:text-2xl font-black leading-tight text-slate-900 group-hover:text-blue-700 transition-colors duration-300">
+                                    {{ $card['result'] }}
+                                </h3>
+                            </div>
+
+                            <div class="mt-6 relative z-10">
+                                <p class="text-sm lg:text-base text-slate-500 leading-relaxed font-medium">
+                                    {{ $card['text'] }}
+                                </p>
+                                <div class="mt-6 flex items-center gap-2 text-blue-600 font-bold text-xs opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0">
+                                    Saiba mais <i class="fas fa-arrow-right text-[10px]"></i>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
             </div>
         </section>
 
