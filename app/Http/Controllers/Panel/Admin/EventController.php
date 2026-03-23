@@ -253,6 +253,29 @@ class EventController extends Controller
         return back()->with('success', $message);
     }
 
+    public function move(Request $request, Event $event)
+    {
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
+
+        $request->validate([
+            'start' => 'required|date',
+            'end' => 'nullable|date|after_or_equal:start',
+            'allDay' => 'nullable|boolean',
+        ]);
+
+        $event->update([
+            'start_at' => $request->input('start'),
+            'end_at' => $request->input('end'),
+            'all_day' => $request->boolean('allDay'),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Evento movido com sucesso',
+        ]);
+    }
+
     public function destroy(Event $event)
     {
         $this->ensurePermission('events.delete');

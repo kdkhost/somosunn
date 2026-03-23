@@ -171,12 +171,18 @@
         <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                @php
+                    $canEditCalendar = Auth::user()->isAdmin() || Auth::user()->hasPermission('events.edit');
+                @endphp
+
                 var calendarEl = document.getElementById('calendar');
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
                     locale: 'pt-br',
                     eventDisplay: 'block',
                     displayEventTime: false,
+                    editable: {{ $canEditCalendar ? 'true' : 'false' }},
+                    droppable: {{ $canEditCalendar ? 'true' : 'false' }},
                     headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',
@@ -193,6 +199,12 @@
                         var editUrl = info.event.extendedProps.editUrl || '/painel/admin/events/' + info.event.id + '/edit';
                         window.location.href = editUrl;
                     },
+                    eventDrop: function(info) {
+                        updateEventDates(info);
+                    },
+                    eventResize: function(info) {
+                        updateEventDates(info);
+                    },
                     buttonText: {
                         today: 'Hoje',
                         month: 'Mês',
@@ -201,6 +213,65 @@
                     }
                 });
                 calendar.render();
+
+                function updateEventDates(info) {
+                    const event = info.event;
+                    const start = event.startStr;
+                    const end = event.endStr || start;
+                    const allDay = event.allDay;
+
+                    fetch('{{ route("panel.admin.events.move", ":id") }}'.replace(':id', event.id), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            start: start,
+                            end: end,
+                            allDay: allDay
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sucesso',
+                                    text: data.message,
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                });
+                            }
+                        } else {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Erro',
+                                    text: data.message || 'Erro ao mover evento'
+                                });
+                            } else {
+                                alert(data.message || 'Erro ao mover evento');
+                            }
+                            info.revert();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro de Conexão',
+                                text: 'Não foi possível salvar a alteração no servidor.'
+                            });
+                        }
+                        info.revert();
+                    });
+                }
             });
         </script>
     @endpush
