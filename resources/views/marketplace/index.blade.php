@@ -597,7 +597,7 @@
 
     <div class="min-h-screen overflow-x-hidden bg-slate-50 pt-24 pb-16 px-4 md:px-6 lg:px-10">
         <div class="max-w-7xl mx-auto">
-            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 md:p-6">
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 md:p-6 mp-mobile-fullbleed mp-mobile-fullbleed-card">
                 <div class="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
                     <div class="flex items-center gap-3">
                         <div
