@@ -194,6 +194,7 @@
     </div>
 
     @prepend('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const toggles = document.querySelectorAll('.section-toggle');
@@ -240,7 +241,7 @@
                     });
                 });
 
-                 const navLinks = document.querySelectorAll('#section-nav a');
+                const navLinks = document.querySelectorAll('#section-nav a, a[href^="#sec-"]');
                 const sections = document.querySelectorAll('main > section, #dynamic-sections > section, #dynamic-sections > div[id^="sec-"]');
 
                 function showSection(targetId) {
@@ -273,22 +274,21 @@
                     }
                 }
 
-                navLinks.forEach(link => {
-                    link.addEventListener('click', function (e) {
+                document.addEventListener('click', function(e) {
+                    const link = e.target.closest('a[href^="#sec-"]');
+                    if (link) {
                         e.preventDefault();
-                        const targetId = this.getAttribute('href');
-                        showSection(targetId);
+                        showSection(link.getAttribute('href'));
                         window.scrollTo({ top: 0, behavior: 'smooth' });
-                    });
+                    }
                 });
 
                 // Initial State
                 const currentHash = window.location.hash || '#sec-seo';
                 showSection(currentHash);
                 
-                <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-                <script>
-                    window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData }) {
+                // Initialize Repeater Engine
+                window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData }) {
                         const container = document.getElementById(containerId);
                         const hiddenInput = document.querySelector(`[name="${inputId}"]`);
                         const addButton = document.getElementById(addButtonId);

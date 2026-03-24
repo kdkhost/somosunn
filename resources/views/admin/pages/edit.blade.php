@@ -53,38 +53,22 @@
         ],
         'valores' => [
             'sec-header' => ['icon' => 'fa-heart', 'label' => 'Cabeçalho'],
-            'sec-values' => ['icon' => 'fa-list-ul', 'label' => 'Os 6 Valores (JSON)'],
+            'sec-values' => ['icon' => 'fa-list-ul', 'label' => 'Os 6 Valores (Visual)'],
             'sec-quote' => ['icon' => 'fa-quote-left', 'label' => 'Citação Central'],
             'sec-cta' => ['icon' => 'fa-bullhorn', 'label' => 'CTA Final'],
         ],
         'como-funciona' => [
             'sec-header' => ['icon' => 'fa-cogs', 'label' => 'Cabeçalho'],
-            'sec-steps' => ['icon' => 'fa-list-ol', 'label' => 'Passos (JSON)'],
+            'sec-steps' => ['icon' => 'fa-list-ol', 'label' => 'Passos (Visual)'],
             'sec-plans' => ['icon' => 'fa-tags', 'label' => 'Seção Planos'],
             'sec-cta' => ['icon' => 'fa-bullhorn', 'label' => 'CTA Final'],
         ],
         'quem-somos' => [
             'sec-header' => ['icon' => 'fa-users', 'label' => 'Cabeçalho + Imagem'],
-            'sec-founders' => ['icon' => 'fa-crown', 'label' => 'Fundadores (JSON)'],
-            'sec-team' => ['icon' => 'fa-user-friends', 'label' => 'Equipe (JSON)'],
+            'sec-founders' => ['icon' => 'fa-crown', 'label' => 'Fundadores (Visual)'],
+            'sec-team' => ['icon' => 'fa-user-friends', 'label' => 'Equipe (Visual)'],
             'sec-stats' => ['icon' => 'fa-chart-bar', 'label' => 'SOMOS UNN em Números'],
             'sec-cta' => ['icon' => 'fa-bullhorn', 'label' => 'CTA Final'],
-        ],
-        // Páginas de app
-        'eventos' => [
-            'sec-hero' => ['icon' => 'fa-calendar-alt', 'label' => 'Hero & Badge'],
-            'sec-cta' => ['icon' => 'fa-bullhorn', 'label' => 'CTA Final'],
-        ],
-        'membros' => [
-            'sec-hero' => ['icon' => 'fa-users', 'label' => 'Hero'],
-            'sec-stats' => ['icon' => 'fa-chart-bar', 'label' => 'Estatísticas'],
-            'sec-cta' => ['icon' => 'fa-bullhorn', 'label' => 'CTA Final'],
-        ],
-        'vagas-abertas' => [
-            'sec-hero' => ['icon' => 'fa-briefcase', 'label' => 'Hero & Badge'],
-        ],
-        'cursos' => [
-            'sec-hero' => ['icon' => 'fa-graduation-cap', 'label' => 'Hero & Badge'],
         ],
         'portal' => [
             'sec-hero' => ['icon' => 'fa-network-wired', 'label' => 'Hero'],
@@ -92,13 +76,6 @@
             'sec-community' => ['icon' => 'fa-layer-group', 'label' => 'Niveis da Comunidade'],
             'sec-ranking' => ['icon' => 'fa-trophy', 'label' => 'Top Networkers'],
             'sec-cta' => ['icon' => 'fa-bullhorn', 'label' => 'CTA Final'],
-        ],
-        'premium' => [
-            'sec-hero' => ['icon' => 'fa-crown', 'label' => 'Hero & Imagem'],
-            'sec-plans' => ['icon' => 'fa-tags', 'label' => 'Seção de Planos'],
-        ],
-        'feed' => [
-            'sec-seo' => ['icon' => 'fa-search', 'label' => 'SEO'],
         ],
         'somos-unicas' => [
             'sec-identity' => ['icon' => 'fa-palette', 'label' => 'Identidade'],
@@ -121,12 +98,7 @@
         'como-funciona' => 'success',
         'quem-somos' => 'secondary',
         'eventos' => 'primary',
-        'membros' => 'info',
-        'vagas-abertas' => 'success',
-        'cursos' => 'warning',
         'portal' => 'secondary',
-        'premium' => 'danger',
-        'feed' => 'dark',
         'somos-unicas' => 'pink',
         'somos-unicas-sobre' => 'pink',
     ];
@@ -166,8 +138,7 @@
         <strong>Alterações não salvas.</strong> Clique em "Salvar alterações" para publicar.
     </div>
 
-    <form id="page-form" method="POST" action="{{ route('admin.pages.update', $page) }}" enctype="multipart/form-data"
-        data-upload-progress="false">
+    <form id="page-form" method="POST" action="{{ route('admin.pages.update', $page) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -182,19 +153,19 @@
                 @elseif ($page->slug === 'somos-unicas-sobre')
                     @include('admin.pages.partials.somos-unicas-sobre', ['data' => $data])
                 @elseif (View::exists($partialView))
-                    @include($partialView, ['data' => $data])
+                    <div id="dynamic-sections">
+                        @include($partialView, ['data' => $data])
+                    </div>
                 @else
-                    <div class="card card-outline card-secondary">
+                    <section id="sec-raw-json" class="card card-outline card-secondary">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-code mr-1"></i> Dados JSON brutos</h3>
                         </div>
                         <div class="card-body">
-                            <p class="text-muted small">Nenhum formulário específico para este slug. Edite os dados diretamente
-                                em JSON:</p>
-                            <textarea name="raw_json" rows="24" class="form-control"
-                                style="font-family:monospace;font-size:13px">{{ json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</textarea>
+                            <p class="text-muted small">Nenhum formulário específico para este slug. Edite os dados diretamente em JSON:</p>
+                            <textarea name="raw_json" rows="24" class="form-control" style="font-family:monospace;font-size:13px">{{ json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</textarea>
                         </div>
-                    </div>
+                    </section>
                 @endif
             </div>
 
@@ -223,49 +194,29 @@
                     </div>
 
                     {{-- Identificação & SEO --}}
-                    <div class="card card-outline card-info">
+                    <section id="sec-seo" class="card card-outline card-info">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-search mr-1"></i> SEO &amp; Identificação</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-                                        class="fas fa-minus"></i></button>
-                            </div>
                         </div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label class="mb-1">Slug <small class="text-muted">(somente leitura)</small></label>
                                 <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend"><span class="input-group-text text-muted">/</span>
-                                    </div>
-                                    <input type="text" class="form-control bg-light"
-                                        value="{{ $page->slug === 'home' ? '' : $page->slug }}" readonly>
+                                    <div class="input-group-prepend"><span class="input-group-text text-muted">/</span></div>
+                                    <input type="text" class="form-control bg-light" value="{{ $page->slug === 'home' ? '' : $page->slug }}" readonly>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="mb-1" for="title">Título <small class="text-muted">(no painel)</small></label>
-                                <input type="text" id="title" name="title"
-                                    class="form-control form-control-sm @error('title') is-invalid @enderror"
-                                    value="{{ old('title', $page->title) }}">
-                                @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <input type="text" id="title" name="title" class="form-control form-control-sm" value="{{ $page->title }}">
                             </div>
                             <div class="form-group">
-                                <label class="mb-1" for="seo_title">Meta Title <small class="text-muted">(~60
-                                        car.)</small></label>
-                                <input type="text" id="seo_title" name="seo_title"
-                                    class="form-control form-control-sm @error('seo_title') is-invalid @enderror"
-                                    value="{{ old('seo_title', $data['seo_title'] ?? '') }}" maxlength="255"
-                                    placeholder="Ex: Sobre a SOMOS UNN — Rede de Empreendedores">
-                                @error('seo_title')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <label class="mb-1" for="seo_title">Meta Title</label>
+                                <input type="text" id="seo_title" name="seo_title" class="form-control form-control-sm" value="{{ $data['seo_title'] ?? '' }}">
                             </div>
                             <div class="form-group mb-0">
-                                <label class="mb-1" for="seo_description">
-                                    Meta Description
-                                    <small class="text-muted">(~160 car.)</small>
-                                </label>
-                                <textarea id="seo_description" name="seo_description" rows="3" maxlength="320"
-                                    class="form-control form-control-sm @error('seo_description') is-invalid @enderror"
-                                    placeholder="Texto exibido nos resultados do Google">{{ old('seo_description', $data['seo_description'] ?? '') }}</textarea>
-                                @error('seo_description')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <label class="mb-1" for="seo_description">Meta Description</label>
+                                <textarea id="seo_description" name="seo_description" rows="3" class="form-control form-control-sm">{{ $data['seo_description'] ?? '' }}</textarea>
                                 <small class="form-text text-muted d-flex justify-content-between">
                                     <span>Recomendado: até 160 car.</span>
                                     <span><span id="seo-desc-count">0</span>/320</span>
@@ -279,126 +230,45 @@
                                     'preview_url' => !empty($data['seo_image']) ? asset('storage/' . $data['seo_image']) : null,
                                     'remove_name' => 'remove_seo_image',
                                     'accept' => 'image/*',
-                                    'max_size' => 6291456,
-                                    'label' => null,
-                                    'help' => 'PNG, JPG, WebP, GIF ou SVG - maximo de 6 MB. Recomendado: 1200x630px.',
                                 ])
-                                @error('seo_image')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted d-block mt-2" style="font-size: 11px;">Formatos: JPG, PNG, WEBP, GIF ou SVG.
-                                    Recomendado para Redes Sociais.</small>
                             </div>
                         </div>
-                    </div>
+                    </section>
 
                     {{-- Navegação rápida --}}
                     @if(!empty($sections))
                         <div class="card card-outline card-secondary">
                             <div class="card-header">
                                 <h3 class="card-title"><i class="fas fa-map-signs mr-1"></i> Ir para seção</h3>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-                                            class="fas fa-minus"></i></button>
-                                </div>
                             </div>
                             <div class="card-body p-0">
                                 <ul class="list-unstyled mb-0">
                                     @foreach($sections as $anchor => $info)
                                         <li>
-                                            <a href="#{{ $anchor }}"
-                                                class="section-jump d-flex align-items-center px-3 py-2 text-dark border-bottom"
-                                                style="font-size:.875rem;text-decoration:none"
-                                                onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background=''">
-                                                <i class="fas {{ $info['icon'] }} text-secondary mr-2"
-                                                    style="width:16px;font-size:.8rem"></i>
+                                            <a href="#{{ $anchor }}" class="section-jump d-flex align-items-center px-3 py-2 text-dark border-bottom" style="font-size:.875rem;text-decoration:none">
+                                                <i class="fas {{ $info['icon'] }} text-secondary mr-2" style="width:16px;font-size:.8rem"></i>
                                                 {{ $info['label'] }}
                                                 <i class="fas fa-chevron-right ml-auto text-muted" style="font-size:.65rem"></i>
                                             </a>
                                         </li>
                                     @endforeach
+                                    {{-- Sempre incluir SEO como âncora --}}
+                                    <li>
+                                        <a href="#sec-seo" class="section-jump d-flex align-items-center px-3 py-2 text-dark" style="font-size:.875rem;text-decoration:none">
+                                            <i class="fas fa-search text-secondary mr-2" style="width:16px;font-size:.8rem"></i>
+                                            SEO & Meta Tags
+                                            <i class="fas fa-chevron-right ml-auto text-muted" style="font-size:.65rem"></i>
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
                     @endif
 
-                    {{-- Dicas --}}
-                    <div class="card card-outline card-warning">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-lightbulb mr-1"></i> Dicas de uso</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-                                        class="fas fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body p-3" style="font-size:.82rem;line-height:1.7">
-                            <ul class="pl-3 mb-0">
-                                <li>Campos vazios exibem o valor padrão do sistema.</li>
-                                <li>Campos <span class="badge badge-secondary badge-sm">JSON</span> aceitam arrays — use
-                                    <strong>Formatar JSON</strong> para validar antes de salvar.
-                                </li>
-                                <li>Imagens ficam disponíveis no site imediatamente após salvar.</li>
-                                <li>O botão "Visualizar no site" abre a página sem sair do painel.</li>
-                            </ul>
-                        </div>
-                        </div>
-                    </div>
+                </div>
+            </div>
 
-                    {{-- Navegação rápida --}}
-                    @if(!empty($sections))
-                        <div class="card card-outline card-secondary">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-map-signs mr-1"></i> Ir para seção</h3>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-                                            class="fas fa-minus"></i></button>
-                                </div>
-                            </div>
-                            <div class="card-body p-0">
-                                <ul class="list-unstyled mb-0">
-                                    @foreach($sections as $anchor => $info)
-                                        <li>
-                                            <a href="#{{ $anchor }}"
-                                                class="section-jump d-flex align-items-center px-3 py-2 text-dark border-bottom"
-                                                style="font-size:.875rem;text-decoration:none"
-                                                onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background=''">
-                                                <i class="fas {{ $info['icon'] }} text-secondary mr-2"
-                                                    style="width:16px;font-size:.8rem"></i>
-                                                {{ $info['label'] }}
-                                                <i class="fas fa-chevron-right ml-auto text-muted" style="font-size:.65rem"></i>
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Dicas --}}
-                    <div class="card card-outline card-warning">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-lightbulb mr-1"></i> Dicas de uso</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-                                        class="fas fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body p-3" style="font-size:.82rem;line-height:1.7">
-                            <ul class="pl-3 mb-0">
-                                <li>Campos vazios exibem o valor padrão do sistema.</li>
-                                <li>Campos <span class="badge badge-secondary badge-sm">JSON</span> aceitam arrays — use
-                                    <strong>Formatar JSON</strong> para validar antes de salvar.
-                                </li>
-                                <li>Imagens ficam disponíveis no site imediatamente após salvar.</li>
-                                <li>O botão "Visualizar no site" abre a página sem sair do painel.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                </div>{{-- /sticky --}}
-            </div>{{-- /sidebar --}}
-
-        </div>{{-- /row --}}
+        </div>
     </form>
 @endsection
 
@@ -406,359 +276,90 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         (function () {
-            /* Motor de Repeater (Paridade com Painel Moderno) */
+            /* Motor de Repeater */
             window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData }) {
                 const container = document.getElementById(containerId);
                 const input = document.querySelector(`[name="${inputId}"]`);
                 const addButton = document.getElementById(addButtonId);
                 if (!container || !input || !addButton) return;
-
                 let items = initialData || [];
 
                 function sync() {
                     input.value = JSON.stringify(items);
-                    if (window.dirty !== undefined) {
-                        window.dirty = true;
-                        document.getElementById('unsaved-alert')?.classList.remove('d-none');
-                        document.getElementById('btn-save')?.classList.replace('btn-primary', 'btn-warning');
-                    }
+                    window.dirty = true;
+                    document.getElementById('unsaved-alert')?.classList.remove('d-none');
                 }
 
                 function render() {
                     container.innerHTML = '';
                     items.forEach((item, index) => {
                         const wrapper = document.createElement('div');
-                        wrapper.className = 'repeater-item card card-outline card-secondary mb-3 shadow-sm active-drag';
+                        wrapper.className = 'repeater-item card card-outline card-secondary mb-3 shadow-sm';
                         wrapper.dataset.index = index;
                         wrapper.innerHTML = `
                             <div class="card-header p-2 d-flex align-items-center justify-content-between bg-light">
-                                <div class="handle cursor-move px-2 text-muted">
-                                    <i class="fas fa-grip-vertical"></i>
-                                </div>
-                                <div class="text-[10px] font-bold text-muted uppercase tracking-wider ml-1">ITEM #${index + 1}</div>
-                                <button type="button" class="btn btn-xs btn-outline-danger btn-remove ml-auto" data-index="${index}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <div class="handle cursor-move px-2 text-muted"><i class="fas fa-grip-vertical"></i></div>
+                                <div class="text-[10px] font-bold text-muted uppercase">ITEM #${index + 1}</div>
+                                <button type="button" class="btn btn-xs btn-outline-danger btn-remove ml-auto" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
                             </div>
-                            <div class="card-body p-3">
-                                ${template(item, index)}
-                            </div>
+                            <div class="card-body p-3">${template(item, index)}</div>
                         `;
-
                         wrapper.querySelectorAll('input, textarea, select').forEach(field => {
                             field.addEventListener('input', function() {
-                                const fieldNameMatch = this.name.match(/\[(.*?)\]/);
-                                if (fieldNameMatch) {
-                                    const fieldName = fieldNameMatch[1];
-                                    if (fieldName.includes('.')) {
-                                        const parts = fieldName.split('.');
-                                        items[index][parts[0]][parts[1]] = this.value;
-                                    } else {
-                                        items[index][fieldName] = this.value;
-                                    }
-                                    sync();
-                                }
+                                const fieldMatch = this.name.match(/\[(.*?)\]/);
+                                if (fieldMatch) items[index][fieldMatch[1]] = this.value;
+                                sync();
                             });
                         });
-
-                        wrapper.querySelector('.btn-remove').onclick = function() {
-                            Swal.fire({
-                                title: 'Remover item?',
-                                text: "Esta ação não pode ser desfeita localmente até salvar a página.",
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonColor: '#d33',
-                                cancelButtonColor: '#3085d6',
-                                confirmButtonText: 'Sim, remover',
-                                cancelButtonText: 'Cancelar'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    items.splice(index, 1);
-                                    render();
-                                    sync();
-                                }
-                            });
+                        wrapper.querySelector('.btn-remove').onclick = () => {
+                            items.splice(index, 1); render(); sync();
                         };
-
-                        // Helper para upload de imagem no card do repeater
-                        wrapper.querySelectorAll('.repeater-upload-btn').forEach(btn => {
-                            btn.onclick = function() {
-                                const field = this.dataset.field;
-                                const fileInput = document.createElement('input');
-                                fileInput.type = 'file';
-                                fileInput.accept = 'image/*';
-                                fileInput.onchange = e => {
-                                    const file = e.target.files[0];
-                                    if (!file) return;
-
-                                    const formData = new FormData();
-                                    formData.append('file', file);
-                                    formData.append('path', 'pages/partials');
-
-                                    const btnIcon = this.querySelector('i');
-                                    const originalIcon = btnIcon.className;
-                                    btnIcon.className = 'fas fa-spinner fa-spin';
-                                    this.disabled = true;
-
-                                    fetch('/upload', {
-                                        method: 'POST',
-                                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                                        body: formData
-                                    })
-                                    .then(r => r.json())
-                                    .then(data => {
-                                        if (data.url) {
-                                            items[index][field] = data.path;
-                                            render();
-                                            sync();
-                                        } else {
-                                            throw new Error(data.message || 'Erro no upload');
-                                        }
-                                    })
-                                    .catch(err => {
-                                        Swal.fire('Erro!', err.message, 'error');
-                                        btnIcon.className = originalIcon;
-                                        this.disabled = false;
-                                    });
-                                };
-                                fileInput.click();
-                            };
-                        });
-
                         container.appendChild(wrapper);
                     });
                 }
-
-                addButton.onclick = () => {
-                    items.push({ ...itemSchema });
-                    render();
-                    sync();
-                };
-
-                // Drag and Drop
-                new Sortable(container, {
-                    handle: '.handle',
-                    animation: 150,
-                    ghostClass: 'bg-light',
-                    onEnd: function() {
-                        const newItems = [];
-                        container.querySelectorAll('.repeater-item').forEach(el => {
-                            newItems.push(items[parseInt(el.dataset.index)]);
-                        });
-                        items = newItems;
-                        render();
-                        sync();
-                    }
-                });
-
+                addButton.onclick = () => { items.push({ ...itemSchema }); render(); sync(); };
+                new Sortable(container, { handle: '.handle', animation: 150, onEnd: () => {
+                    const newItems = [];
+                    container.querySelectorAll('.repeater-item').forEach(el => newItems.push(items[parseInt(el.dataset.index)]));
+                    items = newItems; render(); sync();
+                }});
                 render();
             };
 
-            /* Contador meta description */
-            const desc = document.getElementById('seo_description');
-            const counter = document.getElementById('seo-desc-count');
-            if (desc && counter) {
-                const upd = () => {
-                    const n = desc.value.length;
-                    counter.textContent = n;
-                    counter.style.color = n > 160 ? '#dc3545' : (n > 120 ? '#fd7e14' : '');
-                };
-                desc.addEventListener('input', upd); upd();
-            }
-
-            /* Alerta de alterações não salvas */
-            window.dirty = false;
-            const form = document.getElementById('page-form');
-            const alert = document.getElementById('unsaved-alert');
-            const btnSave = document.getElementById('btn-save');
-            if (form) {
-                form.addEventListener('change', () => {
-                    if (!window.dirty) {
-                        window.dirty = true;
-                        alert?.classList.remove('d-none');
-                        btnSave?.classList.replace('btn-primary', 'btn-warning');
-                    }
-                });
-                form.addEventListener('submit', () => { window.dirty = false; });
-            }
-            window.addEventListener('beforeunload', e => { if (window.dirty) { e.preventDefault(); e.returnValue = ''; } });
-
             /* Navegação por Abas (Zero Refresh) */
-            const navLinks = document.querySelectorAll('.section-jump');
-            const sections = document.querySelectorAll('.col-xl-8 > section, .col-xl-8 > div[id^="sec-"]');
-
+            const sections = document.querySelectorAll('.col-xl-8 section, .col-xl-8 div[id^="sec-"], #sec-seo');
             function showSection(targetId) {
                 if (!targetId) return;
-                const id = targetId.startsWith('#') ? targetId.slice(1) : targetId;
+                const id = targetId.replace('#', '');
                 const targetElement = document.getElementById(id);
-
                 if (targetElement) {
                     sections.forEach(s => s.classList.add('d-none'));
                     targetElement.classList.remove('d-none');
-                    
-                    navLinks.forEach(link => {
-                        const isMain = link.getAttribute('href') === `#${id}`;
-                        if (isMain) {
-                            link.classList.add('bg-light', 'font-weight-bold');
-                            link.querySelector('i.fa-chevron-right')?.classList.replace('text-muted', 'text-primary');
-                        } else {
-                            link.classList.remove('bg-light', 'font-weight-bold');
-                            link.querySelector('i.fa-chevron-right')?.classList.replace('text-primary', 'text-muted');
-                        }
+                    document.querySelectorAll('a[href^="#sec-"]').forEach(link => {
+                        link.classList.toggle('bg-light', link.getAttribute('href') === `#${id}`);
+                        link.classList.toggle('font-weight-bold', link.getAttribute('href') === `#${id}`);
                     });
-
                     history.replaceState(null, null, `#${id}`);
                 }
             }
 
-            navLinks.forEach(link => {
-                link.addEventListener('click', function (e) {
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('a[href^="#sec-"]');
+                if (link) {
                     e.preventDefault();
-                    showSection(this.getAttribute('href'));
+                    showSection(link.getAttribute('href'));
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
+                }
             });
 
-            // Estado inicial da navegação
             const currentHash = window.location.hash || '#sec-seo';
-            // Se #sec-seo não existir de cara, tenta a primeira seção da sidebar
-            if (navLinks.length > 0) {
-                const firstId = window.location.hash || navLinks[0].getAttribute('href');
-                showSection(firstId);
+            showSection(currentHash);
+
+            /* Meta counters */
+            const desc = document.getElementById('seo_description');
+            if (desc) {
+                desc.addEventListener('input', () => { document.getElementById('seo-desc-count').textContent = desc.value.length; });
             }
-
-            /* Atualiza label dos file inputs */
-            document.querySelectorAll('.custom-file-input').forEach(inp => {
-                inp.addEventListener('change', function () {
-                    const lbl = this.nextElementSibling;
-                    if (lbl) lbl.textContent = this.files.length ? this.files[0].name : 'Escolher imagem...';
-                });
-            });
-
-            /* Preview inline ao selecionar imagem */
-            document.querySelectorAll('.custom-file-input[data-preview]').forEach(inp => {
-                inp.addEventListener('change', function () {
-                    const prev = document.getElementById(this.dataset.preview);
-                    if (!prev || !this.files?.[0]) return;
-                    const reader = new FileReader();
-                    reader.onload = e => { prev.src = e.target.result; prev.classList.remove('d-none'); };
-                    reader.readAsDataURL(this.files[0]);
-                });
-            });
-
-            /* Summernote compacto para subtítulos / campos HTML curtos */
-            if (typeof $ !== 'undefined' && $.fn && $.fn.summernote) {
-                $('.summernote-sm').summernote({
-                    height: 120,
-                    toolbar: [
-                        ['style', ['bold', 'italic', 'underline', 'clear']],
-                        ['color', ['color']],
-                        ['para', ['ul', 'ol']],
-                        ['insert', ['link']],
-                        ['view', ['codeview']]
-                    ],
-                    callbacks: {
-                        onChange: function () {
-                            /* dispara o dirty-check do formulário */
-                            const form = document.getElementById('page-form');
-                            if (form) form.dispatchEvent(new Event('change'));
-                        }
-                    }
-                });
-
-                $('.summernote').summernote({
-                    height: 300,
-                    callbacks: {
-                        onChange: function () {
-                            const form = document.getElementById('page-form');
-                            if (form) form.dispatchEvent(new Event('change'));
-                        }
-                    }
-                });
-            }
-
-            /* Formatar + Copiar JSON */
-            document.querySelectorAll('textarea[data-json]').forEach(ta => {
-                const wrap = document.createElement('div');
-                wrap.style.cssText = 'display:flex;gap:6px;margin-top:6px';
-
-                const btnFmt = document.createElement('button');
-                btnFmt.type = 'button';
-                btnFmt.className = 'btn btn-xs btn-outline-secondary';
-                btnFmt.innerHTML = '<i class="fas fa-magic mr-1"></i>Formatar JSON';
-                btnFmt.onclick = () => {
-                    try {
-                        ta.value = JSON.stringify(JSON.parse(ta.value), null, 2);
-                        ta.classList.remove('is-invalid');
-                        btnFmt.className = 'btn btn-xs btn-outline-success';
-                        btnFmt.innerHTML = '<i class="fas fa-check mr-1"></i>Válido!';
-                        setTimeout(() => { btnFmt.className = 'btn btn-xs btn-outline-secondary'; btnFmt.innerHTML = '<i class="fas fa-magic mr-1"></i>Formatar JSON'; }, 1600);
-                    } catch (err) {
-                        ta.classList.add('is-invalid');
-                        alert('JSON inválido: ' + err.message);
-                    }
-                };
-
-                const btnCopy = document.createElement('button');
-                btnCopy.type = 'button';
-                btnCopy.className = 'btn btn-xs btn-outline-secondary';
-                btnCopy.innerHTML = '<i class="fas fa-copy mr-1"></i>Copiar';
-                btnCopy.onclick = () => {
-                    navigator.clipboard?.writeText(ta.value).then(() => {
-                        btnCopy.innerHTML = '<i class="fas fa-check mr-1"></i>Copiado!';
-                        setTimeout(() => { btnCopy.innerHTML = '<i class="fas fa-copy mr-1"></i>Copiar'; }, 1500);
-                    });
-                };
-
-                wrap.appendChild(btnFmt);
-                wrap.appendChild(btnCopy);
-                ta.after(wrap);
-            });
-
-            /* AJAX Toggle de Seção */
-            document.querySelectorAll('.section-toggle').forEach(sw => {
-                sw.addEventListener('change', function () {
-                    const section = this.dataset.section;
-                    const status = this.checked;
-                    const url = "{{ route('admin.pages.toggle-section', $page) }}";
-
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ section, status })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Sucesso!',
-                                    text: data.message,
-                                    toast: true,
-                                    position: 'top-end',
-                                    showConfirmButton: false,
-                                    timer: 3000,
-                                    timerProgressBar: true
-                                });
-                            } else {
-                                throw new Error(data.message || 'Erro ao atualizar visibilidade');
-                            }
-                        })
-                        .catch(error => {
-                            this.checked = !status; // reverte o switch
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Erro!',
-                                text: error.message,
-                                confirmButtonText: 'Entendido'
-                            });
-                        });
-                });
-            });
         })();
     </script>
 @endpush
-```
