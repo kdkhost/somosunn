@@ -38,7 +38,7 @@
         ],
         ['label' => 'Premium', 'href' => route('planos'), 'setting_key' => 'feature_premium'],
         [
-            'label' => 'Somos Únicas',
+            'label' => 'Somos UNNicas',
             'href' => route('somos-unicas'),
             'children' => [
                 ['label' => 'Plataforma', 'href' => route('somos-unicas')],
