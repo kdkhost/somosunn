@@ -341,6 +341,58 @@
                                 <li>O botão "Visualizar no site" abre a página sem sair do painel.</li>
                             </ul>
                         </div>
+                        </div>
+                    </div>
+
+                    {{-- Navegação rápida --}}
+                    @if(!empty($sections))
+                        <div class="card card-outline card-secondary">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-map-signs mr-1"></i> Ir para seção</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                            class="fas fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-unstyled mb-0">
+                                    @foreach($sections as $anchor => $info)
+                                        <li>
+                                            <a href="#{{ $anchor }}"
+                                                class="section-jump d-flex align-items-center px-3 py-2 text-dark border-bottom"
+                                                style="font-size:.875rem;text-decoration:none"
+                                                onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background=''">
+                                                <i class="fas {{ $info['icon'] }} text-secondary mr-2"
+                                                    style="width:16px;font-size:.8rem"></i>
+                                                {{ $info['label'] }}
+                                                <i class="fas fa-chevron-right ml-auto text-muted" style="font-size:.65rem"></i>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Dicas --}}
+                    <div class="card card-outline card-warning">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-lightbulb mr-1"></i> Dicas de uso</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                        class="fas fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body p-3" style="font-size:.82rem;line-height:1.7">
+                            <ul class="pl-3 mb-0">
+                                <li>Campos vazios exibem o valor padrão do sistema.</li>
+                                <li>Campos <span class="badge badge-secondary badge-sm">JSON</span> aceitam arrays — use
+                                    <strong>Formatar JSON</strong> para validar antes de salvar.
+                                </li>
+                                <li>Imagens ficam disponíveis no site imediatamente após salvar.</li>
+                                <li>O botão "Visualizar no site" abre a página sem sair do painel.</li>
+                            </ul>
+                        </div>
                     </div>
 
                 </div>{{-- /sticky --}}
@@ -351,8 +403,157 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         (function () {
+            /* Motor de Repeater (Paridade com Painel Moderno) */
+            window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData }) {
+                const container = document.getElementById(containerId);
+                const input = document.querySelector(`[name="${inputId}"]`);
+                const addButton = document.getElementById(addButtonId);
+                if (!container || !input || !addButton) return;
+
+                let items = initialData || [];
+
+                function sync() {
+                    input.value = JSON.stringify(items);
+                    if (window.dirty !== undefined) {
+                        window.dirty = true;
+                        document.getElementById('unsaved-alert')?.classList.remove('d-none');
+                        document.getElementById('btn-save')?.classList.replace('btn-primary', 'btn-warning');
+                    }
+                }
+
+                function render() {
+                    container.innerHTML = '';
+                    items.forEach((item, index) => {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'repeater-item card card-outline card-secondary mb-3 shadow-sm active-drag';
+                        wrapper.dataset.index = index;
+                        wrapper.innerHTML = `
+                            <div class="card-header p-2 d-flex align-items-center justify-content-between bg-light">
+                                <div class="handle cursor-move px-2 text-muted">
+                                    <i class="fas fa-grip-vertical"></i>
+                                </div>
+                                <div class="text-[10px] font-bold text-muted uppercase tracking-wider ml-1">ITEM #${index + 1}</div>
+                                <button type="button" class="btn btn-xs btn-outline-danger btn-remove ml-auto" data-index="${index}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                            <div class="card-body p-3">
+                                ${template(item, index)}
+                            </div>
+                        `;
+
+                        wrapper.querySelectorAll('input, textarea, select').forEach(field => {
+                            field.addEventListener('input', function() {
+                                const fieldNameMatch = this.name.match(/\[(.*?)\]/);
+                                if (fieldNameMatch) {
+                                    const fieldName = fieldNameMatch[1];
+                                    if (fieldName.includes('.')) {
+                                        const parts = fieldName.split('.');
+                                        items[index][parts[0]][parts[1]] = this.value;
+                                    } else {
+                                        items[index][fieldName] = this.value;
+                                    }
+                                    sync();
+                                }
+                            });
+                        });
+
+                        wrapper.querySelector('.btn-remove').onclick = function() {
+                            Swal.fire({
+                                title: 'Remover item?',
+                                text: "Esta ação não pode ser desfeita localmente até salvar a página.",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d33',
+                                cancelButtonColor: '#3085d6',
+                                confirmButtonText: 'Sim, remover',
+                                cancelButtonText: 'Cancelar'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    items.splice(index, 1);
+                                    render();
+                                    sync();
+                                }
+                            });
+                        };
+
+                        // Helper para upload de imagem no card do repeater
+                        wrapper.querySelectorAll('.repeater-upload-btn').forEach(btn => {
+                            btn.onclick = function() {
+                                const field = this.dataset.field;
+                                const fileInput = document.createElement('input');
+                                fileInput.type = 'file';
+                                fileInput.accept = 'image/*';
+                                fileInput.onchange = e => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+
+                                    const formData = new FormData();
+                                    formData.append('file', file);
+                                    formData.append('path', 'pages/partials');
+
+                                    const btnIcon = this.querySelector('i');
+                                    const originalIcon = btnIcon.className;
+                                    btnIcon.className = 'fas fa-spinner fa-spin';
+                                    this.disabled = true;
+
+                                    fetch('/upload', {
+                                        method: 'POST',
+                                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                                        body: formData
+                                    })
+                                    .then(r => r.json())
+                                    .then(data => {
+                                        if (data.url) {
+                                            items[index][field] = data.path;
+                                            render();
+                                            sync();
+                                        } else {
+                                            throw new Error(data.message || 'Erro no upload');
+                                        }
+                                    })
+                                    .catch(err => {
+                                        Swal.fire('Erro!', err.message, 'error');
+                                        btnIcon.className = originalIcon;
+                                        this.disabled = false;
+                                    });
+                                };
+                                fileInput.click();
+                            };
+                        });
+
+                        container.appendChild(wrapper);
+                    });
+                }
+
+                addButton.onclick = () => {
+                    items.push({ ...itemSchema });
+                    render();
+                    sync();
+                };
+
+                // Drag and Drop
+                new Sortable(container, {
+                    handle: '.handle',
+                    animation: 150,
+                    ghostClass: 'bg-light',
+                    onEnd: function() {
+                        const newItems = [];
+                        container.querySelectorAll('.repeater-item').forEach(el => {
+                            newItems.push(items[parseInt(el.dataset.index)]);
+                        });
+                        items = newItems;
+                        render();
+                        sync();
+                    }
+                });
+
+                render();
+            };
+
             /* Contador meta description */
             const desc = document.getElementById('seo_description');
             const counter = document.getElementById('seo-desc-count');
@@ -366,21 +567,65 @@
             }
 
             /* Alerta de alterações não salvas */
-            let dirty = false;
+            window.dirty = false;
             const form = document.getElementById('page-form');
             const alert = document.getElementById('unsaved-alert');
             const btnSave = document.getElementById('btn-save');
             if (form) {
                 form.addEventListener('change', () => {
-                    if (!dirty) {
-                        dirty = true;
+                    if (!window.dirty) {
+                        window.dirty = true;
                         alert?.classList.remove('d-none');
                         btnSave?.classList.replace('btn-primary', 'btn-warning');
                     }
                 });
-                form.addEventListener('submit', () => { dirty = false; });
+                form.addEventListener('submit', () => { window.dirty = false; });
             }
-            window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+            window.addEventListener('beforeunload', e => { if (window.dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+            /* Navegação por Abas (Zero Refresh) */
+            const navLinks = document.querySelectorAll('.section-jump');
+            const sections = document.querySelectorAll('.col-xl-8 > section, .col-xl-8 > div[id^="sec-"]');
+
+            function showSection(targetId) {
+                if (!targetId) return;
+                const id = targetId.startsWith('#') ? targetId.slice(1) : targetId;
+                const targetElement = document.getElementById(id);
+
+                if (targetElement) {
+                    sections.forEach(s => s.classList.add('d-none'));
+                    targetElement.classList.remove('d-none');
+                    
+                    navLinks.forEach(link => {
+                        const isMain = link.getAttribute('href') === `#${id}`;
+                        if (isMain) {
+                            link.classList.add('bg-light', 'font-weight-bold');
+                            link.querySelector('i.fa-chevron-right')?.classList.replace('text-muted', 'text-primary');
+                        } else {
+                            link.classList.remove('bg-light', 'font-weight-bold');
+                            link.querySelector('i.fa-chevron-right')?.classList.replace('text-primary', 'text-muted');
+                        }
+                    });
+
+                    history.replaceState(null, null, `#${id}`);
+                }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    showSection(this.getAttribute('href'));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+
+            // Estado inicial da navegação
+            const currentHash = window.location.hash || '#sec-seo';
+            // Se #sec-seo não existir de cara, tenta a primeira seção da sidebar
+            if (navLinks.length > 0) {
+                const firstId = window.location.hash || navLinks[0].getAttribute('href');
+                showSection(firstId);
+            }
 
             /* Atualiza label dos file inputs */
             document.querySelectorAll('.custom-file-input').forEach(inp => {
@@ -390,7 +635,7 @@
                 });
             });
 
-            /* Preview inline ao selecionar imagem (file input com data-preview="id") */
+            /* Preview inline ao selecionar imagem */
             document.querySelectorAll('.custom-file-input[data-preview]').forEach(inp => {
                 inp.addEventListener('change', function () {
                     const prev = document.getElementById(this.dataset.preview);
@@ -398,21 +643,6 @@
                     const reader = new FileReader();
                     reader.onload = e => { prev.src = e.target.result; prev.classList.remove('d-none'); };
                     reader.readAsDataURL(this.files[0]);
-                });
-            });
-
-            /* Scroll suave para seção */
-            document.querySelectorAll('.section-jump').forEach(link => {
-                link.addEventListener('click', function (e) {
-                    const el = document.getElementById(this.getAttribute('href').slice(1));
-                    if (el) {
-                        e.preventDefault();
-                        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        const was = el.style.transition;
-                        el.style.transition = 'box-shadow .25s';
-                        el.style.boxShadow = '0 0 0 3px rgba(0,123,255,.4)';
-                        setTimeout(() => { el.style.boxShadow = was || ''; }, 1600);
-                    }
                 });
             });
 
@@ -531,3 +761,4 @@
         })();
     </script>
 @endpush
+```

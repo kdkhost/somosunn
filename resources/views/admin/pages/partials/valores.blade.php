@@ -35,21 +35,54 @@
             <span class="badge badge-secondary">JSON</span>
         </div>
     </div>
-    <div class="card-body">
-        <p class="text-muted small mb-2">
-            Array de 6 objetos. Cada objeto deve ter os campos:
-            <code>icon</code> (classe Font Awesome ex: <code>fa-heart</code>),
-            <code>title</code>, <code>text</code>, <code>quote</code>.
-        </p>
-        @error('values_json')<div class="alert alert-danger py-2 small">{{ $message }}</div>@enderror
-        <textarea name="values_json"
-                  rows="30"
-                  data-json="1"
-                  class="form-control @error('values_json') is-invalid @enderror"
-                  style="font-family: monospace; font-size: 12px">{{ old('values_json', json_encode($data['values'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
-        <small class="text-muted mt-1 d-block">Use o botão "Formatar JSON" que aparece abaixo do campo para validar a sintaxe antes de salvar.</small>
+        <div id="values-repeater-container"></div>
+        <button type="button" id="add-value-btn" class="btn btn-outline-primary btn-block mt-3">
+            <i class="fas fa-plus mr-1"></i> Adicionar Valor
+        </button>
+        <textarea name="values_json" class="d-none">{{ json_encode($data['values'] ?? []) }}</textarea>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    window.initJSONRepeater({
+        containerId: 'values-repeater-container',
+        inputId: 'values_json',
+        addButtonId: 'add-value-btn',
+        itemSchema: { icon: 'fa-heart', title: '', text: '', quote: '' },
+        initialData: {!! json_encode($data['values'] ?? []) !!},
+        template: (item, index) => `
+            <div class="row">
+                <div class="col-md-2 text-center">
+                    <div class="mb-2 mx-auto rounded overflow-hidden shadow-sm border bg-light d-flex align-items-center justify-content-center" style="width:60px; height:60px;">
+                        <i class="fas ${item.icon || 'fa-heart'} fa-2x text-primary"></i>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="small font-weight-bold">Ícone</label>
+                        <input type="text" name="values[${index}][icon]" value="${item.icon || 'fa-heart'}" class="form-control form-control-sm text-center" placeholder="fa-heart">
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="form-group mb-2">
+                        <label class="small font-weight-bold">Título do Valor</label>
+                        <input type="text" name="values[${index}][title]" value="${item.title || ''}" class="form-control form-control-sm">
+                    </div>
+                    <div class="form-group mb-2">
+                        <label class="small font-weight-bold">Texto Descritivo</label>
+                        <input type="text" name="values[${index}][text]" value="${item.text || ''}" class="form-control form-control-sm">
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="small font-weight-bold">Citação Interna</label>
+                        <textarea name="values[${index}][quote]" rows="2" class="form-control form-control-sm">${item.quote || ''}</textarea>
+                    </div>
+                </div>
+            </div>
+        `
+    });
+});
+</script>
+@endpush
 
 {{-- Blockquote --}}
 <div id="sec-quote" class="card card-outline card-warning">

@@ -32,7 +32,7 @@
     </div>
 </div>
 
-{{-- Fundadores (array JSON) --}}
+{{-- Fundadores (Repeater) --}}
 <div id="sec-founders" class="card card-outline card-secondary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-crown mr-1"></i> Fundadores</h3>
@@ -42,7 +42,6 @@
                     {{ ($data['founders_enabled'] ?? true) ? 'checked' : '' }}>
                 <label class="custom-control-label" for="toggle-founders">Exibir no site</label>
             </div>
-            <span class="badge badge-secondary">JSON</span>
         </div>
     </div>
     <div class="card-body">
@@ -50,20 +49,16 @@
             <label>Título da seção</label>
             <input type="text" name="founders_title" class="form-control" value="{{ old('founders_title', $data['founders_title'] ?? '') }}" placeholder="Fundadores">
         </div>
-        <p class="text-muted small mb-2">
-            Array de objetos com os campos:
-            <code>name</code>, <code>role</code>, <code>bio</code>, <code>initials</code> (2 letras para o avatar).
-        </p>
-        @error('founders_json')<div class="alert alert-danger py-2 small">{{ $message }}</div>@enderror
-        <textarea name="founders_json"
-                  rows="20"
-                  data-json="1"
-                  class="form-control @error('founders_json') is-invalid @enderror"
-                  style="font-family: monospace; font-size: 12px">{{ old('founders_json', json_encode($data['founders'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
+        
+        <div id="founders-repeater-container"></div>
+        <button type="button" id="add-founder-btn" class="btn btn-outline-primary btn-block mt-3">
+            <i class="fas fa-plus mr-1"></i> Adicionar Fundador
+        </button>
+        <textarea name="founders_json" class="d-none">{{ json_encode($data['founders'] ?? []) }}</textarea>
     </div>
 </div>
 
-{{-- Equipe (array JSON) --}}
+{{-- Equipe (Repeater) --}}
 <div id="sec-team" class="card card-outline card-secondary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-user-friends mr-1"></i> Equipe</h3>
@@ -73,7 +68,6 @@
                     {{ ($data['team_enabled'] ?? true) ? 'checked' : '' }}>
                 <label class="custom-control-label" for="toggle-team">Exibir no site</label>
             </div>
-            <span class="badge badge-secondary">JSON</span>
         </div>
     </div>
     <div class="card-body">
@@ -81,18 +75,98 @@
             <label>Título da seção</label>
             <input type="text" name="team_title" class="form-control" value="{{ old('team_title', $data['team_title'] ?? '') }}" placeholder="Nossa Equipe">
         </div>
-        <p class="text-muted small mb-2">
-            Array de objetos com os campos:
-            <code>name</code>, <code>role</code>, <code>initials</code>.
-        </p>
-        @error('team_json')<div class="alert alert-danger py-2 small">{{ $message }}</div>@enderror
-        <textarea name="team_json"
-                  rows="20"
-                  data-json="1"
-                  class="form-control @error('team_json') is-invalid @enderror"
-                  style="font-family: monospace; font-size: 12px">{{ old('team_json', json_encode($data['team'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
+
+        <div id="team-repeater-container"></div>
+        <button type="button" id="add-team-btn" class="btn btn-outline-primary btn-block mt-3">
+            <i class="fas fa-plus mr-1"></i> Adicionar Membro
+        </button>
+        <textarea name="team_json" class="d-none">{{ json_encode($data['team'] ?? []) }}</textarea>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Repeater Fundadores
+    window.initJSONRepeater({
+        containerId: 'founders-repeater-container',
+        inputId: 'founders_json',
+        addButtonId: 'add-founder-btn',
+        itemSchema: { name: '', role: '', bio: '', initials: '', image: '' },
+        initialData: {!! json_encode($data['founders'] ?? []) !!},
+        template: (item, index) => `
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    <div class="mb-2 mx-auto overflow-hidden rounded shadow-sm border bg-light d-flex align-items-center justify-content-center" style="width:100px; height:100px;">
+                        ${item.image ? `<img src="/storage/${item.image}" class="w-100 h-100 object-cover">` : `<span class="text-muted small">${item.initials || 'F'}</span>`}
+                    </div>
+                    <button type="button" class="btn btn-xs btn-block btn-outline-info repeater-upload-btn" data-field="image">
+                        <i class="fas fa-camera mr-1"></i> ${item.image ? 'Trocar Foto' : 'Subir Foto'}
+                    </button>
+                </div>
+                <div class="col-md-9">
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label class="small font-weight-bold">Nome</label>
+                            <input type="text" name="founders[${index}][name]" value="${item.name || ''}" class="form-control form-control-sm">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="small font-weight-bold">Iniciais (Avatar)</label>
+                            <input type="text" name="founders[${index}][initials]" value="${item.initials || ''}" class="form-control form-control-sm" maxlength="2">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="small font-weight-bold">Cargo / Role</label>
+                        <input type="text" name="founders[${index}][role]" value="${item.role || ''}" class="form-control form-control-sm">
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="small font-weight-bold">Bio curta</label>
+                        <textarea name="founders[${index}][bio]" rows="2" class="form-control form-control-sm">${item.bio || ''}</textarea>
+                    </div>
+                </div>
+            </div>
+        `
+    });
+
+    // Repeater Equipe
+    window.initJSONRepeater({
+        containerId: 'team-repeater-container',
+        inputId: 'team_json',
+        addButtonId: 'add-team-btn',
+        itemSchema: { name: '', role: '', initials: '', image: '' },
+        initialData: {!! json_encode($data['team'] ?? []) !!},
+        template: (item, index) => `
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    <div class="mb-2 mx-auto rounded-circle overflow-hidden shadow-sm border bg-light d-flex align-items-center justify-content-center" style="width:80px; height:80px;">
+                        ${item.image ? `<img src="/storage/${item.image}" class="w-100 h-100 object-cover">` : `<span class="text-muted small">${item.initials || 'M'}</span>`}
+                    </div>
+                    <button type="button" class="btn btn-xs btn-block btn-outline-info repeater-upload-btn" data-field="image">
+                        <i class="fas fa-camera mr-1"></i> Foto
+                    </button>
+                </div>
+                <div class="col-md-9">
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label class="small font-weight-bold">Nome</label>
+                            <input type="text" name="team[${index}][name]" value="${item.name || ''}" class="form-control form-control-sm">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="small font-weight-bold">Iniciais</label>
+                            <input type="text" name="team[${index}][initials]" value="${item.initials || ''}" class="form-control form-control-sm" maxlength="2">
+                        </div>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="small font-weight-bold">Cargo / Função</label>
+                        <input type="text" name="team[${index}][role]" value="${item.role || ''}" class="form-control form-control-sm">
+                    </div>
+                </div>
+            </div>
+        `
+    });
+});
+</script>
+@endpush
 
 {{-- Estatísticas --}}
 <div id="sec-stats" class="card card-outline card-info">

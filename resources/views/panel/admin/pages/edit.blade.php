@@ -240,28 +240,52 @@
                     });
                 });
 
-                const sections = document.querySelectorAll('section[id], div[id^="sec-"]');
-                const navLinks = document.querySelectorAll('#section-nav a');
+                 const navLinks = document.querySelectorAll('#section-nav a');
+                const sections = document.querySelectorAll('main > section, #dynamic-sections > section, #dynamic-sections > div[id^="sec-"]');
 
-                window.addEventListener('scroll', () => {
-                    let current = '';
-                    sections.forEach(section => {
-                        const sectionTop = section.offsetTop;
-                        if (pageYOffset >= sectionTop - 120) {
-                            current = section.getAttribute('id');
-                        }
-                    });
+                function showSection(targetId) {
+                    if (!targetId) return;
+                    
+                    // Normalize hash
+                    const id = targetId.startsWith('#') ? targetId.slice(1) : targetId;
+                    const targetElement = document.getElementById(id);
 
-                    navLinks.forEach(link => {
-                        link.classList.remove('text-blue-600', 'bg-blue-50', 'dark:bg-blue-900/20', 'dark:text-blue-400');
-                        link.classList.add('text-slate-600', 'dark:text-slate-400');
-                        if (link.getAttribute('href') === `#${current}`) {
-                            link.classList.remove('text-slate-600', 'dark:text-slate-400');
-                            link.classList.add('text-blue-600', 'bg-blue-50', 'dark:bg-blue-900/20', 'dark:text-blue-400');
-                        }
+                    if (targetElement) {
+                        // Hide all
+                        sections.forEach(s => s.classList.add('hidden'));
+                        // Show target
+                        targetElement.classList.remove('hidden');
+
+                        // Update Nav UI
+                        navLinks.forEach(link => {
+                            const isMain = link.getAttribute('href') === `#${id}`;
+                            if (isMain) {
+                                link.classList.add('bg-blue-50', 'dark:bg-blue-900/20', 'text-blue-600', 'dark:text-blue-400');
+                                link.classList.remove('text-slate-600', 'dark:text-slate-400', 'hover:bg-slate-50', 'dark:hover:bg-slate-800');
+                            } else {
+                                link.classList.remove('bg-blue-50', 'dark:bg-blue-900/20', 'text-blue-600', 'dark:text-blue-400');
+                                link.classList.add('text-slate-600', 'dark:text-slate-400', 'hover:bg-slate-50', 'dark:hover:bg-slate-800');
+                            }
+                        });
+
+                        // Update URL without jump
+                        history.replaceState(null, null, `#${id}`);
+                    }
+                }
+
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href');
+                        showSection(targetId);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     });
                 });
 
+                // Initial State
+                const currentHash = window.location.hash || '#sec-seo';
+                showSection(currentHash);
+                
                 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
                 <script>
                     window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData }) {

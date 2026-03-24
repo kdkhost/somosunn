@@ -321,20 +321,59 @@
                 value="{{ old('testimonials_title', $data['testimonials_title'] ?? '') }}"
                 placeholder="O que dizem nossos membros">
         </div>
-        <div class="form-group mb-0">
-            <label>
-                Depoimentos (JSON)
-                <small class="text-muted">— array de objetos:
-                    <code>[{"name":"…","role":"…","text":"…","rating":5}]</code></small>
-            </label>
-            @error('testimonials_json')
-                <div class="text-danger small mb-1">{{ $message }}</div>
-            @enderror
-            <textarea name="testimonials_json" rows="10" data-json="1"
-                class="form-control @error('testimonials_json') is-invalid @enderror" style="font-family: monospace; font-size: 12px">{{ old('testimonials_json', json_encode($data['testimonials'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
-        </div>
+        <div id="testimonials-repeater-container"></div>
+        <button type="button" id="add-testimonial-btn" class="btn btn-outline-primary btn-block mt-3">
+            <i class="fas fa-plus mr-1"></i> Adicionar Depoimento
+        </button>
+        <textarea name="testimonials_json" class="d-none">{{ json_encode($data['testimonials'] ?? []) }}</textarea>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    window.initJSONRepeater({
+        containerId: 'testimonials-repeater-container',
+        inputId: 'testimonials_json',
+        addButtonId: 'add-testimonial-btn',
+        itemSchema: { name: '', role: '', text: '', rating: 5, image: '' },
+        initialData: {!! json_encode($data['testimonials'] ?? []) !!},
+        template: (item, index) => `
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    <div class="mb-2 mx-auto rounded-circle overflow-hidden shadow-sm border bg-light d-flex align-items-center justify-content-center" style="width:80px; height:80px;">
+                        ${item.image ? `<img src="/storage/${item.image}" class="w-100 h-100 object-cover">` : `<i class="fas fa-user text-muted fa-2x"></i>`}
+                    </div>
+                    <button type="button" class="btn btn-xs btn-block btn-outline-info repeater-upload-btn" data-field="image">
+                        <i class="fas fa-camera mr-1"></i> Foto
+                    </button>
+                </div>
+                <div class="col-md-9">
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label class="small font-weight-bold">Nome do Autor</label>
+                            <input type="text" name="testimonials[${index}][name]" value="${item.name || ''}" class="form-control form-control-sm">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="small font-weight-bold">Estrelas (1-5)</label>
+                            <input type="number" name="testimonials[${index}][rating]" value="${item.rating || 5}" class="form-control form-control-sm" min="1" max="5">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="small font-weight-bold">Cargo / Empresa</label>
+                        <input type="text" name="testimonials[${index}][role]" value="${item.role || ''}" class="form-control form-control-sm">
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="small font-weight-bold">Texto do Depoimento</label>
+                        <textarea name="testimonials[${index}][text]" rows="3" class="form-control form-control-sm">${item.text || ''}</textarea>
+                    </div>
+                </div>
+            </div>
+        `
+    });
+});
+</script>
+@endpush
 
 {{-- CTA Final --}}
 <div id="sec-cta" class="card card-outline card-success">
