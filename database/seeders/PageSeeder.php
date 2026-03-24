@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Page;
 use App\Support\CmsPageCatalog;
+use Database\Seeders\Support\LegalPagesPublisher;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,6 +17,7 @@ class PageSeeder extends Seeder
         Page::resetTableAvailabilityCache();
 
         CmsPageCatalog::upsertDefaults();
+        LegalPagesPublisher::publishMissing();
     }
 
     private function ensurePagesTableExists(): void
