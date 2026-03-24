@@ -1,4 +1,4 @@
-﻿@extends('panel.layouts.app')
+@extends('panel.layouts.app')
 
 @section('title', 'Programa de IndicaÃ§Ãµes')
 

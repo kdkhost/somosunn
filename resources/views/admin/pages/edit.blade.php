@@ -285,16 +285,65 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
-        $(function () {
-            // Preparar o DOM: Todos os containers com id sec- são tab-panes
-            $('.tab-content div[id^="sec-"]').addClass('tab-pane fade');
+        /* Motor de Repeater Global - Definido fora do ready para disponibilidade imediata */
+        window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData }) {
+            const container = document.getElementById(containerId);
+            const input = document.querySelector(`[name="${inputId}"]`);
+            const addButton = document.getElementById(addButtonId);
+            if (!container || !input || !addButton) return;
+            let items = initialData || [];
 
+            function sync() {
+                if (input) {
+                    input.value = JSON.stringify(items);
+                    $('#unsaved-alert').removeClass('d-none');
+                }
+            }
+
+            function render() {
+                container.innerHTML = '';
+                items.forEach((item, index) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'repeater-item card card-outline card-secondary mb-3 shadow-sm';
+                    wrapper.dataset.index = index;
+                    wrapper.innerHTML = `
+                        <div class="card-header p-2 d-flex align-items-center justify-content-between bg-light">
+                            <div class="handle cursor-move px-2 text-muted"><i class="fas fa-grip-vertical"></i></div>
+                            <div class="text-[10px] font-bold text-muted uppercase">ITEM #${index + 1}</div>
+                            <button type="button" class="btn btn-xs btn-outline-danger btn-remove ml-auto" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                        <div class="card-body p-3">${template(item, index)}</div>
+                    `;
+                    wrapper.querySelectorAll('input, textarea, select').forEach(field => {
+                        field.addEventListener('input', function() {
+                            const fieldMatch = this.name.match(/\[(.*?)\]/);
+                            if (fieldMatch) items[index][fieldMatch[1]] = this.value;
+                            sync();
+                        });
+                    });
+                    wrapper.querySelector('.btn-remove').onclick = () => {
+                        items.splice(index, 1); render(); sync();
+                    };
+                    container.appendChild(wrapper);
+                });
+            }
+            addButton.onclick = () => { items.push({ ...itemSchema }); render(); sync(); };
+            new Sortable(container, { handle: '.handle', animation: 150, onEnd: () => {
+                const newItems = [];
+                container.querySelectorAll('.repeater-item').forEach(el => newItems.push(items[parseInt(el.dataset.index)]));
+                items = newItems; render(); sync();
+            }});
+            render();
+        };
+
+        $(function () {
             // Sincronização de abas com a URL (Zero Refresh)
             const hash = window.location.hash || '#sec-seo';
             const $targetTab = $(`#page-tabs a[href="${hash}"]`);
             
             if ($targetTab.length) {
                 $targetTab.tab('show');
+                // Adicionamos as classes de visibilidade nos containers (que agora são pais dos cards)
                 $(`.tab-content ${hash}`).addClass('show active');
             } else {
                 $('#tab-seo-link').tab('show');
@@ -325,55 +374,6 @@
             $('input, textarea, select').on('change input', function() {
                 $('#unsaved-alert').removeClass('d-none');
             });
-
-            /* Motor de Repeater Global */
-            window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData }) {
-                const container = document.getElementById(containerId);
-                const input = document.querySelector(`[name="${inputId}"]`);
-                const addButton = document.getElementById(addButtonId);
-                if (!container || !input || !addButton) return;
-                let items = initialData || [];
-
-                function sync() {
-                    input.value = JSON.stringify(items);
-                    $('#unsaved-alert').removeClass('d-none');
-                }
-
-                function render() {
-                    container.innerHTML = '';
-                    items.forEach((item, index) => {
-                        const wrapper = document.createElement('div');
-                        wrapper.className = 'repeater-item card card-outline card-secondary mb-3 shadow-sm';
-                        wrapper.dataset.index = index;
-                        wrapper.innerHTML = `
-                            <div class="card-header p-2 d-flex align-items-center justify-content-between bg-light">
-                                <div class="handle cursor-move px-2 text-muted"><i class="fas fa-grip-vertical"></i></div>
-                                <div class="text-[10px] font-bold text-muted uppercase">ITEM #${index + 1}</div>
-                                <button type="button" class="btn btn-xs btn-outline-danger btn-remove ml-auto" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
-                            </div>
-                            <div class="card-body p-3">${template(item, index)}</div>
-                        `;
-                        wrapper.querySelectorAll('input, textarea, select').forEach(field => {
-                            field.addEventListener('input', function() {
-                                const fieldMatch = this.name.match(/\[(.*?)\]/);
-                                if (fieldMatch) items[index][fieldMatch[1]] = this.value;
-                                sync();
-                            });
-                        });
-                        wrapper.querySelector('.btn-remove').onclick = () => {
-                            items.splice(index, 1); render(); sync();
-                        };
-                        container.appendChild(wrapper);
-                    });
-                }
-                addButton.onclick = () => { items.push({ ...itemSchema }); render(); sync(); };
-                new Sortable(container, { handle: '.handle', animation: 150, onEnd: () => {
-                    const newItems = [];
-                    container.querySelectorAll('.repeater-item').forEach(el => newItems.push(items[parseInt(el.dataset.index)]));
-                    items = newItems; render(); sync();
-                }});
-                render();
-            };
         });
     </script>
 @endpush
