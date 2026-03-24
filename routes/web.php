@@ -103,6 +103,7 @@ Route::get('/valores', [\App\Http\Controllers\InstitucionalController::class, 'v
 Route::get('/termos', [\App\Http\Controllers\InstitucionalController::class, 'termos'])->name('site.termos');
 Route::get('/privacidade', [\App\Http\Controllers\InstitucionalController::class, 'privacidade'])->name('site.privacidade');
 Route::get('/consentimento-lgpd', [\App\Http\Controllers\InstitucionalController::class, 'lgpd'])->name('site.lgpd');
+Route::post('/lgpd/aceite', [\App\Http\Controllers\LegalConsentController::class, 'store'])->middleware('auth')->name('lgpd.accept');
 Route::get('/embed/afiliado/{referralCode}', [\App\Http\Controllers\AffiliateEmbedController::class, 'widget'])->name('affiliate.embed.widget');
 Route::get('/embed/afiliado/{referralCode}/criativo/{preset}.svg', [\App\Http\Controllers\AffiliateEmbedController::class, 'graphic'])->name('affiliate.embed.graphic');
 Route::get('/contato', fn() => view('site.institucional.contato'))->name('contato');

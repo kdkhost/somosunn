@@ -206,6 +206,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'referral_code',
         'referred_by',
         'birth_date',
+        'lgpd_accepted_at',
+        'lgpd_version',
+        'lgpd_accept_ip',
+        'lgpd_accept_user_agent',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -217,6 +221,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'social_links' => 'array',
         'hide_profile' => 'boolean',
         'birth_date' => 'date',
+        'lgpd_accepted_at' => 'datetime',
     ];
 
     protected $appends = ['profile_photo_url'];

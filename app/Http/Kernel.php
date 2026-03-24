@@ -25,6 +25,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\TrackVisitor::class,
             \App\Http\Middleware\RunInternalCron::class,
             \App\Http\Middleware\LogUserActivity::class,
+            \App\Http\Middleware\EnsureLgpdConsent::class,
         ],
         'api' => [
             'throttle:api',

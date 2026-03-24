@@ -902,6 +902,9 @@
     @php
         $showNavigation = $showNavigation ?? true;
         $showFooter = $showFooter ?? true;
+        $lgpdConsent = auth()->check()
+            ? app(\App\Services\LegalConsentService::class)->modalData(auth()->user())
+            : null;
     @endphp
     @if($showNavigation)
         @include('partials.header')
@@ -946,6 +949,7 @@
     @endif
 
     @includeWhen($showFooter, 'partials.footer')
+    @include('partials.lgpd-consent-modal')
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/inputmask.min.js"></script>
