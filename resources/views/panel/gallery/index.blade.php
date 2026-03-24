@@ -13,7 +13,7 @@
         $selectedEventDate = $selectedEvent?->start_at
             ? \Carbon\Carbon::parse($selectedEvent->start_at)->format('d/m/Y')
             : null;
-        $visibleLabel = $selectedEvent ? 'Resultados do filtro' : 'Fotos visiveis';
+        $visibleLabel = $selectedEvent ? 'Resultados do filtro' : 'Midias visiveis';
     @endphp
 
     <div class="space-y-6">

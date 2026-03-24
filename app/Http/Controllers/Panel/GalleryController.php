@@ -9,10 +9,14 @@ use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 
 class GalleryController extends Controller
 {
+    private const DIRECT_UPLOAD_MAX_MB = 50;
+    private const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic', 'heif'];
+
     /**
      * Display gallery media.
      * Members see their own uploads and organizers can manage media from their own events.
@@ -60,13 +64,12 @@ class GalleryController extends Controller
      */
     public function upload(Request $request, WatermarkService $watermarkService)
     {
-        $perFileLimitBytes = UploadStorage::effectiveUploadLimitBytes(20 * 1024 * 1024)
-            ?? (20 * 1024 * 1024);
-        $perFileLimitKilobytes = max(1, (int) ceil($perFileLimitBytes / 1024));
+        $perFileLimitBytes = UploadStorage::effectiveUploadLimitBytes(self::DIRECT_UPLOAD_MAX_MB * 1024 * 1024)
+            ?? (self::DIRECT_UPLOAD_MAX_MB * 1024 * 1024);
         $perFileLimitMegabytes = number_format($perFileLimitBytes / 1024 / 1024, 2, '.', '');
 
         if (!$request->hasFile('files')) {
-            $message = "Nenhum arquivo chegou ao servidor. Verifique o limite de {$perFileLimitMegabytes} MB por arquivo e tente novamente com menos imagens por vez.";
+            $message = "Nenhum arquivo chegou ao servidor. Verifique o limite de {$perFileLimitMegabytes} MB por arquivo e tente novamente com menos midias por vez.";
 
             if ($request->expectsJson()) {
                 return response()->json([
@@ -81,35 +84,44 @@ class GalleryController extends Controller
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'files' => 'required|array|min:1',
-            'files.*' => "required|image|mimes:jpeg,png,jpg,webp|max:{$perFileLimitKilobytes}",
+            'files.*' => 'required|file',
         ]);
 
         $event = Event::findOrFail($request->event_id);
         $uploadedMedia = [];
         $failedFiles = [];
 
-        foreach ($request->file('files', []) as $file) {
-            $targetDirectory = 'events/' . $event->id . '/gallery';
-            $shouldWatermark = false; // Watermark feature removed
+        foreach ($this->validatedFiles($request->file('files')) as $fileData) {
+            $file = $fileData['file'];
+            $type = $fileData['type'];
+            $targetDirectory = $type === 'image'
+                ? 'events/' . $event->id . '/gallery'
+                : 'events/' . $event->id . '/gallery/videos';
+            $shouldWatermark = $type === 'image'
+                && $watermarkService->isWatermarkableImage($file)
+                && $watermarkService->shouldWatermarkUpload($targetDirectory);
 
             try {
-                $path = UploadStorage::storeUploadedFile(
-                    $file,
-                    $targetDirectory,
-                    null,
-                    ['prefix' => 'gallery-media']
-                );
+                if ($type === 'image') {
+                    $path = $watermarkService->processEventImage($file, $event);
+                    $watermarked = $shouldWatermark;
+                } else {
+                    $path = UploadStorage::storeUploadedFile($file, $targetDirectory);
+                    $watermarked = false;
+                }
+
                 $uploadedMedia[] = EventMedia::create([
                     'event_id' => $event->id,
                     'user_id' => auth()->id(),
                     'file_path' => $path,
-                    'type' => 'image',
-                    'watermarked' => $shouldWatermark,
+                    'type' => $type,
+                    'watermarked' => $watermarked,
                 ]);
             } catch (\Throwable $exception) {
                 \Log::error('Gallery upload error: ' . $exception->getMessage(), [
                     'event_id' => $event->id,
                     'file' => $file->getClientOriginalName(),
+                    'type' => $type,
                 ]);
 
                 try {
@@ -117,20 +129,21 @@ class GalleryController extends Controller
                         $file,
                         $targetDirectory,
                         null,
-                        ['prefix' => 'gallery-media']
+                        $type === 'image' ? ['prefix' => 'gallery-media'] : []
                     );
 
                     $uploadedMedia[] = EventMedia::create([
                         'event_id' => $event->id,
                         'user_id' => auth()->id(),
                         'file_path' => $path,
-                        'type' => 'image',
-                        'watermarked' => $shouldWatermark,
+                        'type' => $type,
+                        'watermarked' => false,
                     ]);
                 } catch (\Throwable $fallbackException) {
                     \Log::error('Gallery upload fallback error: ' . $fallbackException->getMessage(), [
                         'event_id' => $event->id,
                         'file' => $file->getClientOriginalName(),
+                        'type' => $type,
                     ]);
 
                     $failedFiles[] = $file->getClientOriginalName();
@@ -139,7 +152,7 @@ class GalleryController extends Controller
         }
 
         if ($uploadedMedia === []) {
-            $message = 'Nenhuma imagem conseguiu ser enviada para a galeria.';
+            $message = 'Nenhum arquivo conseguiu ser enviado para a galeria.';
 
             if ($request->expectsJson()) {
                 return response()->json([
@@ -152,7 +165,7 @@ class GalleryController extends Controller
             return back()->with('error', $message);
         }
 
-        $message = count($uploadedMedia) . ' imagem(ns) enviada(s) com sucesso.';
+        $message = count($uploadedMedia) . ' arquivo(s) enviado(s) com sucesso.';
         if ($failedFiles !== []) {
             $message .= ' ' . count($failedFiles) . ' arquivo(s) falharam.';
         }
@@ -315,7 +328,7 @@ class GalleryController extends Controller
                 'can_delete' => $user->isAdmin()
                     || (int) $media->user_id === (int) $user->id
                     || $isEventOwner,
-                'can_set_cover' => $user->isAdmin() || $isEventOwner,
+                'can_set_cover' => $media->type === 'image' && ($user->isAdmin() || $isEventOwner),
                 'is_cover' => $event
                     ? (blank($event->gallery_cover_image) && (int) $event->gallery_cover_media_id === (int) $media->id)
                     : false,
@@ -364,5 +377,62 @@ class GalleryController extends Controller
         }
 
         return back()->with('success', $message);
+    }
+
+    /**
+     * @param  array<int, UploadedFile>|null  $files
+     * @return array<int, array{file: UploadedFile, type: string}>
+     */
+    private function validatedFiles(?array $files): array
+    {
+        $files = array_values(array_filter($files ?? []));
+        $allowedVideoExtensions = $this->allowedVideoExtensions();
+        $maxBytes = self::DIRECT_UPLOAD_MAX_MB * 1024 * 1024;
+        $validated = [];
+        $errors = [];
+
+        foreach ($files as $file) {
+            if (!$file instanceof UploadedFile || !$file->isValid()) {
+                $errors[] = 'Um dos arquivos enviados esta corrompido ou incompleto.';
+                continue;
+            }
+
+            $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: '');
+            $isImage = in_array($extension, self::ALLOWED_IMAGE_EXTENSIONS, true);
+            $isVideo = in_array($extension, $allowedVideoExtensions, true);
+
+            if (!$isImage && !$isVideo) {
+                $errors[] = $file->getClientOriginalName() . ' possui um formato nao permitido.';
+                continue;
+            }
+
+            if (($file->getSize() ?: 0) > $maxBytes) {
+                $errors[] = $file->getClientOriginalName() . ' excede o limite de ' . self::DIRECT_UPLOAD_MAX_MB . ' MB por arquivo.';
+                continue;
+            }
+
+            $validated[] = [
+                'file' => $file,
+                'type' => $isImage ? 'image' : 'video',
+            ];
+        }
+
+        if ($errors !== []) {
+            throw ValidationException::withMessages([
+                'files' => $errors,
+            ]);
+        }
+
+        return $validated;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function allowedVideoExtensions(): array
+    {
+        $configured = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_video_formats', [])));
+
+        return array_values(array_unique(array_merge($configured, ['mp4', 'mov', 'm4v', 'webm'])));
     }
 }

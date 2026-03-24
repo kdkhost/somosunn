@@ -8,7 +8,7 @@
             <div>
                 <p class="text-xs font-black uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">Colecao</p>
                 <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                    {{ $selectedEvent ? 'Cobertura filtrada do evento' : 'Painel de fotos publicadas' }}
+                    {{ $selectedEvent ? 'Cobertura filtrada do evento' : 'Painel de midias publicadas' }}
                 </h2>
                 <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
                     {{ $selectedEvent ? 'Cada card traz contexto do evento, autor e data do envio.' : 'Uma visao consolidada da galeria, pronta para moderacao e consulta rapida.' }}
@@ -24,7 +24,7 @@
         <div id="panel-gallery-grid" class="columns-1 md:columns-2 lg:columns-3 2xl:columns-4 gap-6 space-y-6">
             @foreach($items as $item)
                 @php
-                    $imageUrl = \App\Support\UploadStorage::url($item->file_path, asset('img/default-user.svg'));
+                    $assetUrl = \App\Support\UploadStorage::url($item->file_path, asset('img/default-user.svg'));
                     $eventTitle = optional($item->event)->title ?: 'Evento sem titulo';
                     $ownerName = optional($item->user)->name ?: 'Sistema';
                     $ownerInitial = strtoupper(\Illuminate\Support\Str::substr($ownerName, 0, 1));
@@ -32,7 +32,8 @@
                     $showAvatar = $avatarUrl && !str_contains((string) $avatarUrl, 'default-user.svg');
                     $isEventOwner = (int) optional($item->event)->user_id === (int) auth()->id();
                     $canDelete = $isAdmin || (int) $item->user_id === (int) auth()->id() || $isEventOwner;
-                    $canSetCover = $isAdmin || $isEventOwner;
+                    $isVideo = $item->type === 'video';
+                    $canSetCover = !$isVideo && ($isAdmin || $isEventOwner);
                     $isCover = blank(optional($item->event)->gallery_cover_image)
                         && (int) optional($item->event)->gallery_cover_media_id === (int) $item->id;
                     $eventDate = optional(optional($item->event)->start_at)?->format('d/m/Y');
@@ -41,17 +42,26 @@
                 <article class="group break-inside-avoid overflow-hidden rounded-[2rem] border border-slate-200/70 bg-white shadow-sm shadow-slate-200/60 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
                     <div class="relative overflow-hidden bg-slate-950">
                         <button type="button"
-                            data-lightbox-src="{{ $imageUrl }}"
+                            data-lightbox-src="{{ $assetUrl }}"
                             data-lightbox-title="{{ $eventTitle }}"
+                            data-lightbox-type="{{ $isVideo ? 'video' : 'image' }}"
                             class="block w-full text-left">
-                            <img src="{{ $imageUrl }}" alt="{{ $eventTitle }}"
-                                class="block w-full h-auto object-cover transition duration-500 group-hover:scale-[1.04]">
+                            @if($isVideo)
+                                <video src="{{ $assetUrl }}" muted playsinline preload="metadata"
+                                    class="block w-full h-auto object-cover transition duration-500 group-hover:scale-[1.04]"></video>
+                            @else
+                                <img src="{{ $assetUrl }}" alt="{{ $eventTitle }}"
+                                    class="block w-full h-auto object-cover transition duration-500 group-hover:scale-[1.04]">
+                            @endif
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-transparent opacity-90"></div>
                             <div class="absolute left-5 right-5 top-5 flex items-start justify-between gap-4">
                                 <span class="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
                                     {{ \Illuminate\Support\Str::limit($eventTitle, 28) }}
                                 </span>
                                 <div class="flex flex-col items-end gap-2">
+                                    <span class="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
+                                        {{ $isVideo ? 'Video' : 'Imagem' }}
+                                    </span>
 
                                     @if($isCover)
                                         <span class="rounded-full border border-amber-300/25 bg-amber-400/20 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-amber-100 backdrop-blur">
@@ -63,11 +73,11 @@
 
                             <div class="absolute inset-x-5 bottom-5 flex items-end justify-between gap-3">
                                 <div>
-                                    <p class="text-xs font-black uppercase tracking-[0.18em] text-blue-200">Abrir foto</p>
+                                    <p class="text-xs font-black uppercase tracking-[0.18em] text-blue-200">{{ $isVideo ? 'Abrir video' : 'Abrir imagem' }}</p>
                                     <p class="mt-1 text-lg font-black text-white">{{ $ownerName }}</p>
                                 </div>
                                 <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-white backdrop-blur transition group-hover:bg-white/20">
-                                    <i class="fas fa-up-right-and-down-left-from-center"></i>
+                                    <i class="fas {{ $isVideo ? 'fa-play' : 'fa-up-right-and-down-left-from-center' }}"></i>
                                 </span>
                             </div>
                         </button>
@@ -144,10 +154,10 @@
             </div>
 
             <h2 class="mt-8 text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-                {{ $selectedEvent ? 'Nenhuma foto encontrada para este evento' : 'Sua galeria ainda nao tem registros para exibir' }}
+                {{ $selectedEvent ? 'Nenhuma midia encontrada para este evento' : 'Sua galeria ainda nao tem registros para exibir' }}
             </h2>
             <p class="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-500 dark:text-slate-400">
-                {{ $selectedEvent ? 'Troque o filtro ou publique novas fotos para construir a narrativa visual desse evento.' : 'Assim que voce subir imagens, esta area passa a mostrar os cards com preview, autor, contexto do evento e acoes rapidas.' }}
+                {{ $selectedEvent ? 'Troque o filtro ou publique novas midias para construir a narrativa visual desse evento.' : 'Assim que voce subir imagens e videos, esta area passa a mostrar os cards com preview, autor, contexto do evento e acoes rapidas.' }}
             </p>
 
             <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -155,7 +165,7 @@
                     data-gallery-open-upload
                     class="inline-flex items-center justify-center gap-3 rounded-[1.6rem] bg-blue-600 px-7 py-4 text-sm font-black uppercase tracking-[0.16em] text-white shadow-[0_18px_40px_rgba(37,99,235,0.28)] transition hover:-translate-y-0.5 hover:bg-blue-500">
                     <i class="fas fa-cloud-upload-alt"></i>
-                    Subir minhas fotos
+                    Subir minhas midias
                 </button>
 
                 @if($selectedEventId > 0)

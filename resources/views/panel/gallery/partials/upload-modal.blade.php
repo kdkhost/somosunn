@@ -18,9 +18,9 @@
                         </div>
                         <div>
                             <p class="text-xs font-black uppercase tracking-[0.24em] text-blue-600 dark:text-blue-400">Nova contribuicao</p>
-                            <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white">Enviar fotos para a galeria</h2>
+                            <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white">Enviar fotos e videos para a galeria</h2>
                             <p class="mt-2 text-sm leading-7 text-slate-500 dark:text-slate-400">
-                                Use o mesmo padrao visual do painel para enviar varias fotos de um evento com feedback de progresso e retorno imediato.
+                                Use o mesmo padrao visual do painel para enviar varias midias de um evento com feedback de progresso e retorno imediato.
                             </p>
                         </div>
                     </div>
@@ -67,16 +67,16 @@
 
                             <div id="gallery-dropzone"
                                 class="gallery-dropzone rounded-[2rem] border-2 border-dashed border-slate-200 bg-slate-50 p-6 transition dark:border-slate-700 dark:bg-slate-950">
-                                <input id="gallery-files-input" type="file" name="files[]" accept="image/jpeg,image/png,image/jpg,image/webp,image/heic,image/heif,.heic,.heif" multiple
+                                <input id="gallery-files-input" type="file" name="files[]" accept="image/jpeg,image/png,image/jpg,image/webp,image/heic,image/heif,video/mp4,video/quicktime,video/x-m4v,video/webm,.heic,.heif,.mp4,.mov,.m4v,.webm" multiple
                                     class="hidden" data-filepond-ignore="true">
 
                                 <div class="flex flex-col items-center justify-center text-center">
                                     <div class="flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-blue-600 text-2xl text-white shadow-lg shadow-blue-500/20">
                                         <i class="fas fa-images"></i>
                                     </div>
-                                    <h3 class="mt-5 text-xl font-black text-slate-900 dark:text-white">Arraste suas fotos aqui</h3>
+                                    <h3 class="mt-5 text-xl font-black text-slate-900 dark:text-white">Arraste suas midias aqui</h3>
                                     <p class="mt-2 max-w-xl text-sm leading-7 text-slate-500 dark:text-slate-400">
-                                        Clique na area abaixo ou solte varias imagens. O envio acontece uma foto por vez e respeita o limite efetivo de {{ $galleryUploadPerFileLimitMb }} MB por arquivo.
+                                        Clique na area abaixo ou solte imagens e videos. O envio acontece um arquivo por vez e respeita o limite efetivo de {{ $galleryUploadPerFileLimitMb }} MB por arquivo.
                                     </p>
 
                                     <button type="button"
@@ -120,7 +120,7 @@
                                         <span class="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[10px] text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-300">
                                             <i class="fas fa-check"></i>
                                         </span>
-                                        O painel publica uma imagem por vez para evitar recusas por lote excessivo.
+                                        O painel publica um arquivo por vez para evitar recusas por lote excessivo.
                                     </li>
 
                                 </ul>

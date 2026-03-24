@@ -18,7 +18,7 @@
                     <div>
                         <h1 class="text-3xl font-black tracking-tight text-white md:text-5xl">Galeria coletiva para reviver cada encontro</h1>
                         <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-300 md:text-base">
-                            Centralize os registros dos eventos, acompanhe a cobertura por album e publique novas fotos em uma experiencia coerente com a vitrine publica da galeria.
+                            Centralize os registros dos eventos, acompanhe a cobertura por album e publique novas midias em uma experiencia coerente com a vitrine publica da galeria.
                         </p>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                     data-gallery-open-upload
                     class="inline-flex items-center justify-center gap-3 rounded-[1.5rem] bg-blue-600 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white shadow-[0_20px_45px_rgba(37,99,235,0.35)] transition hover:-translate-y-0.5 hover:bg-blue-500">
                     <i class="fas fa-cloud-upload-alt text-base"></i>
-                    Adicionar fotos
+                    Adicionar midias
                 </button>
 
                 @if($selectedEventId > 0)
@@ -78,7 +78,7 @@
                 <div class="mt-4 flex items-end justify-between gap-3">
                     <div>
                         <p class="text-4xl font-black text-white">{{ number_format($stats['visible_total'] ?? 0, 0, ',', '.') }}</p>
-                        <p class="mt-2 text-sm text-slate-300">Fotos renderizadas na busca atual do painel.</p>
+                        <p class="mt-2 text-sm text-slate-300">Midias renderizadas na busca atual do painel.</p>
                     </div>
                     <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-200">
                         <i class="fas fa-image"></i>

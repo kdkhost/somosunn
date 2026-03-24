@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const progressValue = document.getElementById('gallery-upload-progress-value');
     const submitButton = document.getElementById('gallery-upload-submit');
     const lightboxImage = document.getElementById('gallery-lightbox-image');
+    const lightboxVideo = document.getElementById('gallery-lightbox-video');
     const lightboxTitle = document.getElementById('gallery-lightbox-title');
     const uiTop = document.getElementById('gallery-ui-top');
     const uiBottom = document.getElementById('gallery-ui-bottom');
@@ -68,6 +69,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function stripHtml(value) {
         return String(value || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function fileKind(file) {
+        const mime = String(file?.type || '').toLowerCase();
+        const name = String(file?.name || '').toLowerCase();
+
+        if (mime.startsWith('image/') || /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(name)) {
+            return 'image';
+        }
+
+        if (mime.startsWith('video/') || /\.(mp4|mov|m4v|webm)$/i.test(name)) {
+            return 'video';
+        }
+
+        return 'file';
     }
 
     function notify(icon, title, text) {
@@ -126,10 +142,26 @@ document.addEventListener('DOMContentLoaded', function () {
         if (uiBottom) { uiBottom.style.opacity = opacity; uiBottom.style.pointerEvents = pointer; }
     }
 
-    function openLightbox(src, title) {
-        if (!lightbox || !lightboxImage) return;
-        lightboxImage.src = src;
-        lightboxImage.alt = title || 'Foto da galeria';
+    function openLightbox(src, title, type) {
+        if (!lightbox || !lightboxImage || !lightboxVideo) return;
+        const mediaType = type === 'video' ? 'video' : 'image';
+
+        lightboxImage.classList.toggle('hidden', mediaType !== 'image');
+        lightboxVideo.classList.toggle('hidden', mediaType !== 'video');
+
+        if (mediaType === 'video') {
+            lightboxImage.src = '';
+            lightboxImage.alt = '';
+            lightboxVideo.src = src;
+            lightboxVideo.load();
+        } else {
+            lightboxVideo.pause();
+            lightboxVideo.removeAttribute('src');
+            lightboxVideo.load();
+            lightboxImage.src = src;
+            lightboxImage.alt = title || 'Midia da galeria';
+        }
+
         if (lightboxTitle) lightboxTitle.textContent = title || '';
         lightbox.classList.remove('hidden');
         requestAnimationFrame(() => lightbox.classList.remove('opacity-0'));
@@ -137,12 +169,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function closeLightbox() {
-        if (!lightbox || !lightboxImage) return;
+        if (!lightbox || !lightboxImage || !lightboxVideo) return;
         lightbox.classList.add('opacity-0');
         setTimeout(() => {
             lightbox.classList.add('hidden');
             lightboxImage.src = '';
             lightboxImage.alt = '';
+            lightboxVideo.pause();
+            lightboxVideo.removeAttribute('src');
+            lightboxVideo.load();
             if (lightboxTitle) lightboxTitle.textContent = '';
             if (!uploadModal || uploadModal.classList.contains('hidden')) lockBody(false);
         }, 300);
@@ -152,7 +187,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (item.state === 'done') return ['concluido', 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300'];
         if (item.state === 'error') return ['falhou', 'bg-rose-100 text-rose-700 dark:bg-rose-900/20 dark:text-rose-300'];
         if (item.state === 'uploading') return ['enviando', 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'];
-        return ['imagem', 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'];
+        return [
+            item.kind === 'video' ? 'video' : 'imagem',
+            item.kind === 'video'
+                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300'
+                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+        ];
     }
 
     function renderQueue() {
@@ -205,12 +245,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const incoming = Array.from(fileList || []);
         const rejected = [];
         incoming.forEach((file) => {
-            const mime = String(file.type || '').toLowerCase();
-            const name = String(file.name || '').toLowerCase();
-            const isImage = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/heic', 'image/heif'].includes(mime)
-                || /\.(jpe?g|png|webp|heic|heif)$/i.test(name);
-            if (!isImage) {
-                rejected.push(`${file.name} possui formato nao suportado. Use JPG, PNG ou WEBP.`);
+            const kind = fileKind(file);
+            if (kind === 'file') {
+                rejected.push(`${file.name} possui formato nao suportado. Use JPG, PNG, WEBP, MP4, MOV ou WEBM.`);
                 return;
             }
             if ((file.size || 0) > perFileLimitBytes) {
@@ -219,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             const signature = [file.name, file.size, file.lastModified].join('::');
             if (!queue.some((item) => item.signature === signature)) {
-                queue.push({ id: `gallery-upload-${++seed}`, signature, file, progress: 0, state: 'ready', remaining: 'pronto para iniciar', error: '' });
+                queue.push({ id: `gallery-upload-${++seed}`, signature, file, kind, progress: 0, state: 'ready', remaining: 'pronto para iniciar', error: '' });
             }
         });
         if (filesInput) filesInput.value = '';
@@ -233,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let message = payload?.message || '';
         if (payload?.errors) message = Object.values(payload.errors).flat().join(' ');
         if (!message && xhr.responseText) message = stripHtml(xhr.responseText);
-        if (!message) message = 'Falha ao enviar as fotos para a galeria.';
+        if (!message) message = 'Falha ao enviar as midias para a galeria.';
         if (xhr.status === 413) message = `O servidor recusou o arquivo por exceder o limite permitido de ${fmtBytes(perFileLimitBytes)}.`;
         if (xhr.status === 419) message = 'Sua sessao expirou. Recarregue a pagina e tente novamente.';
         if (xhr.status >= 500 && !payload?.message) message = 'O servidor encontrou um erro interno ao processar o upload.';
@@ -285,7 +322,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-gallery-open-upload]').forEach((button) => button.addEventListener('click', openUploadModal));
     document.querySelectorAll('[data-gallery-close-upload]').forEach((button) => button.addEventListener('click', closeUploadModal));
     document.querySelectorAll('[data-gallery-close-lightbox]').forEach((button) => button.addEventListener('click', closeLightbox));
-    document.querySelectorAll('[data-lightbox-src]').forEach((button) => button.addEventListener('click', function () { openLightbox(this.dataset.lightboxSrc || '', this.dataset.lightboxTitle || ''); }));
+    document.querySelectorAll('[data-lightbox-src]').forEach((button) => button.addEventListener('click', function () {
+        openLightbox(this.dataset.lightboxSrc || '', this.dataset.lightboxTitle || '', this.dataset.lightboxType || 'image');
+    }));
     
     if (lightbox && lightboxImage) {
         lightbox.addEventListener('click', (e) => {
@@ -314,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     document.querySelectorAll('.gallery-delete-form').forEach((form) => {
         form.addEventListener('submit', function (event) {
-            const prompt = 'Esta foto sera removida da galeria. Deseja continuar?';
+            const prompt = 'Esta midia sera removida da galeria. Deseja continuar?';
             if (typeof Swal === 'undefined') {
                 if (!window.confirm(prompt)) event.preventDefault();
                 return;
@@ -322,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function () {
             event.preventDefault();
             Swal.fire({
                 icon: 'warning',
-                title: 'Excluir foto?',
+                title: 'Excluir midia?',
                 text: prompt,
                 showCancelButton: true,
                 confirmButtonText: 'Sim, excluir',
@@ -377,11 +416,11 @@ document.addEventListener('DOMContentLoaded', function () {
         uploadForm.addEventListener('submit', async function (event) {
             event.preventDefault();
             if (!String(eventField?.value || '').trim()) {
-                notify('warning', 'Evento obrigatorio', 'Selecione o evento antes de enviar as fotos.');
+                notify('warning', 'Evento obrigatorio', 'Selecione o evento antes de enviar as midias.');
                 return;
             }
             if (queue.length === 0) {
-                notify('warning', 'Fotos obrigatorias', 'Selecione pelo menos uma imagem para publicar.');
+                notify('warning', 'Arquivos obrigatorios', 'Selecione pelo menos uma imagem ou video para publicar.');
                 return;
             }
 
@@ -415,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (failures.length === 0) {
                 setProgress(100, 'Upload concluido');
-                await notify('success', 'Galeria atualizada', `${total} foto(s) publicada(s) com sucesso.`);
+                await notify('success', 'Galeria atualizada', `${total} arquivo(s) publicado(s) com sucesso.`);
                 resetQueue();
                 closeUploadModal();
                 window.location.reload();
@@ -435,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function () {
             await notify(
                 failures.length < total ? 'warning' : 'error',
                 failures.length < total ? 'Upload concluido com ressalvas' : 'Upload recusado',
-                failures.length < total ? `${total - failures.length} foto(s) foram publicadas. ${summary}` : summary
+                failures.length < total ? `${total - failures.length} arquivo(s) foram publicados. ${summary}` : summary
             );
         });
     }

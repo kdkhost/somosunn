@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Http\Controllers\Admin\EventMediaController;
+use App\Http\Controllers\Panel\GalleryController as PanelGalleryController;
 use App\Models\Event;
 use App\Models\EventMedia;
 use App\Models\User;
+use App\Services\ImageOptimizer;
 use App\Services\WatermarkService;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
@@ -111,12 +113,12 @@ class EventMediaUploadTest extends TestCase
         {
             public function isWatermarkableImage($file): bool
             {
-                return true;
+                return false;
             }
 
             public function shouldWatermarkUpload(?string $directory = null): bool
             {
-                return true;
+                return false;
             }
 
             public function processEventImage($file, Event $event): string
@@ -125,7 +127,15 @@ class EventMediaUploadTest extends TestCase
             }
         });
 
-        $image = UploadedFile::fake()->image('foto.jpg', 1200, 800);
+        $this->app->instance(ImageOptimizer::class, new class extends ImageOptimizer
+        {
+            public function process(UploadedFile $file): UploadedFile
+            {
+                return $file;
+            }
+        });
+
+        $image = UploadedFile::fake()->create('foto.jpg', 256, 'image/jpeg');
         $video = UploadedFile::fake()->create('clip.mp4', 1024, 'video/mp4');
 
         $this->actingAs($admin);
@@ -155,6 +165,72 @@ class EventMediaUploadTest extends TestCase
         $this->assertSame(1, EventMedia::query()->where('type', 'video')->count());
         $this->assertFalse((bool) EventMedia::query()->where('type', 'image')->value('watermarked'));
         $this->assertFalse((bool) EventMedia::query()->where('type', 'video')->value('watermarked'));
+    }
+
+    public function test_panel_gallery_upload_accepts_image_and_video_in_batch(): void
+    {
+        $member = User::create([
+            'name' => 'Member Upload',
+            'email' => 'member-upload@example.com',
+            'role' => 'member',
+        ]);
+
+        $eventId = DB::table('events')->insertGetId([
+            'user_id' => $member->id,
+            'title' => 'Evento do Painel',
+            'start_at' => now()->addDay(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $event = Event::query()->findOrFail($eventId);
+
+        $this->app->instance(WatermarkService::class, new class extends WatermarkService
+        {
+            public function isWatermarkableImage($file): bool
+            {
+                return true;
+            }
+
+            public function shouldWatermarkUpload(?string $directory = null): bool
+            {
+                return true;
+            }
+
+            public function processEventImage($file, Event $event): string
+            {
+                return 'events/' . $event->id . '/gallery/painel-processada.jpg';
+            }
+        });
+
+        $image = UploadedFile::fake()->create('painel.jpg', 256, 'image/jpeg');
+        $video = UploadedFile::fake()->create('painel.mp4', 1024, 'video/mp4');
+
+        $this->actingAs($member);
+
+        $request = Request::create('/painel/galeria/upload', 'POST', [
+            'event_id' => $eventId,
+        ], [], [
+            'files' => [$image, $video],
+        ], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
+        ]);
+
+        $response = app(PanelGalleryController::class)->upload(
+            $request,
+            app(WatermarkService::class)
+        );
+
+        $this->assertSame(200, $response->getStatusCode());
+        $payload = $response->getData(true);
+
+        $this->assertTrue((bool) ($payload['success'] ?? false));
+        $this->assertSame(2, (int) ($payload['uploaded_count'] ?? 0));
+        $this->assertSame(0, (int) ($payload['failed_count'] ?? 0));
+        $this->assertSame(2, EventMedia::query()->count());
+        $this->assertSame(1, EventMedia::query()->where('type', 'image')->count());
+        $this->assertSame(1, EventMedia::query()->where('type', 'video')->count());
     }
 
     private function deleteDirectory(string $directory): void

@@ -5,7 +5,7 @@
                 <p class="text-xs font-black uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">Capa do album</p>
                 <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white">{{ $selectedEvent->title }}</h2>
                 <p class="mt-2 text-sm leading-7 text-slate-500 dark:text-slate-400">
-                    A capa aparece na listagem publica da galeria e no hero do evento. Voce pode enviar uma capa exclusiva ou usar qualquer foto ja publicada logo abaixo.
+                    A capa aparece na listagem publica da galeria e no hero do evento. Voce pode enviar uma capa exclusiva ou usar qualquer imagem ja publicada logo abaixo.
                 </p>
             </div>
 
@@ -56,7 +56,7 @@
                         @method('DELETE')
                         <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Acoes rapidas</p>
                         <p class="mt-3 text-sm leading-7 text-slate-500 dark:text-slate-400">
-                            Para usar uma foto ja enviada, clique em <strong>Definir capa</strong> no card correspondente logo abaixo.
+                            Para usar uma imagem ja enviada, clique em <strong>Definir capa</strong> no card correspondente logo abaixo.
                         </p>
                         <button type="submit"
                             class="mt-4 inline-flex items-center gap-3 rounded-[1.3rem] border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:text-white">
