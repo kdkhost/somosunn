@@ -68,8 +68,11 @@
                             'quem-somos' => ['Hero', 'Fundadores', 'Time', 'Estatísticas', 'CTA'],
                             'eventos' => ['Hero', 'Listagem', 'CTA'],
                             'portal' => ['Hero', 'Estatísticas', 'Niveis da Comunidade', 'Top Networkers', 'CTA'],
-                            'somos-unicas' => ['Identidade', 'Banner', 'Conteúdo'],
-                            'somos-unicas-sobre' => ['Identidade', 'Conteúdo'],
+                            'somos-unicas' => ['Identidade', 'Banner', 'Conteudo'],
+                            'somos-unicas-sobre' => ['Identidade', 'Conteudo'],
+                            'termos-de-uso' => ['Hero', 'Conteudo'],
+                            'politica-de-privacidade' => ['Hero', 'Conteudo'],
+                            'consentimento-lgpd' => ['Hero', 'Conteudo'],
                         ];
                         $pageSections = $slugSections[$page->slug] ?? [];
                     @endphp

@@ -312,6 +312,12 @@ class PageController extends Controller
         'somos-unicas-sobre' => [],
     ];
 
+    private const LEGAL_PAGE_SLUGS = [
+        'consentimento-lgpd',
+        'politica-de-privacidade',
+        'termos-de-uso',
+    ];
+
     public function index(): View
     {
         Page::resetTableAvailabilityCache();
@@ -377,6 +383,10 @@ class PageController extends Controller
         ]);
 
         $newData = $page->data ?? [];
+
+        if (in_array($slug, self::LEGAL_PAGE_SLUGS, true) && !$request->exists('body_content') && $request->exists('content')) {
+            $newData['body_content'] = $request->input('content', '');
+        }
 
         foreach ($scalarFields as $field) {
             if ($request->exists($field)) {

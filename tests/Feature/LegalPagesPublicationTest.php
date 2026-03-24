@@ -22,4 +22,28 @@ class LegalPagesPublicationTest extends TestCase
             $this->assertStringContainsString('<p>', (string) ($page->get('body_content') ?? ''));
         }
     }
+
+    public function test_admin_legal_page_partial_uses_body_content_field(): void
+    {
+        $page = new Page([
+            'slug' => 'consentimento-lgpd',
+            'title' => 'Consentimento LGPD',
+            'data' => [],
+        ]);
+
+        $html = view('admin.pages.partials.institucional', [
+            'page' => $page,
+            'data' => [
+                'hero_title' => 'Consentimento LGPD',
+                'hero_subtitle' => 'Subtitulo de teste',
+                'body_content' => '<p>Conteudo legal</p>',
+            ],
+        ])->render();
+
+        $this->assertStringContainsString('name="hero_subtitle"', $html);
+        $this->assertStringContainsString('name="body_content"', $html);
+        $this->assertStringNotContainsString('name="content"', $html);
+        $this->assertStringContainsString('Subtitulo de teste', $html);
+        $this->assertStringContainsString('&lt;p&gt;Conteudo legal&lt;/p&gt;', $html);
+    }
 }
