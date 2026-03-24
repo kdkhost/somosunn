@@ -138,7 +138,7 @@
                 <div class="card-body">
                     <div class="tab-content" id="page-tabs-content">
                         {{-- Tab: Geral & SEO --}}
-                        <div class="tab-pane fade show active" id="sec-seo" role="tabpanel">
+                        <div class="tab-pane fade" id="sec-seo" role="tabpanel">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="card card-outline card-info">
@@ -286,22 +286,31 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         $(function () {
+            // Preparar o DOM: Todos os containers com id sec- são tab-panes
+            $('.tab-content div[id^="sec-"]').addClass('tab-pane fade');
+
             // Sincronização de abas com a URL (Zero Refresh)
             const hash = window.location.hash || '#sec-seo';
-            $(`#page-tabs a[href="${hash}"]`).tab('show');
+            const $targetTab = $(`#page-tabs a[href="${hash}"]`);
+            
+            if ($targetTab.length) {
+                $targetTab.tab('show');
+                $(`.tab-content ${hash}`).addClass('show active');
+            } else {
+                $('#tab-seo-link').tab('show');
+                $('#sec-seo').addClass('show active');
+            }
 
             $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-                history.replaceState(null, null, e.target.hash);
+                const targetId = e.target.hash;
+                history.replaceState(null, null, targetId);
+                
+                // Garantir que APENAS o alvo tenha active/show
+                $('.tab-content .tab-pane').removeClass('show active');
+                $(targetId).addClass('show active');
+                
                 $(window).scrollTop(0);
             });
-
-            // Ajustar o partial para se comportar como abas
-            // Nota: Os partials atuais usam IDs como sec-hero, sec-stats.
-            // Precisamos garantir que eles tenham a classe 'tab-pane fade' e estejam dentro do 'tab-content'.
-            // Como eles já estão dentro de 'tab-content' via include, basta adicionar as classes via JS
-            // ou garantir que o partial já as tenha (ideal).
-            $('.tab-content div[id^="sec-"]').addClass('tab-pane fade');
-            $(`.tab-content ${hash}`).addClass('show active');
 
             /* Meta counter */
             const desc = document.getElementById('seo_description');
