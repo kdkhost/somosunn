@@ -550,6 +550,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::post('quick-scanner/validate', [\App\Http\Controllers\Admin\QuickScannerController::class, 'validateTicket'])->name('quick-scanner.validate');
 
         // Mail Templates (Tailwind)
+        Route::get('mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
         Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
         Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class);
     });
@@ -672,6 +673,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::delete('gallery/events/{event}/cover', [\App\Http\Controllers\Admin\GalleryController::class, 'clearCover'])->name('gallery.cover.clear');
     Route::delete('gallery/{media}', [\App\Http\Controllers\Admin\GalleryController::class, 'destroy'])->name('gallery.destroy');
     Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class)->except(['destroy']);
+    Route::get('mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
     Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
     Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class)->except(['show']);
     Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class)->except(['show']);

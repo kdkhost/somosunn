@@ -420,22 +420,43 @@
             const loader = document.getElementById('previewLoader');
             const iframe = document.getElementById('previewFrame');
             loader.style.display = 'flex';
+            
+            // Clear previous content
+            try {
+                const doc = iframe.contentWindow.document;
+                doc.open();
+                doc.write('<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:sans-serif;color:#94a3b8;">Carregando...</div>');
+                doc.close();
+            } catch(e) {}
 
             fetch('{{ url("painel/admin/mailtemplates") }}/' + id + '/preview')
-                .then(r => r.json())
+                .then(r => {
+                    if (!r.ok) throw new Error('Falha ao carregar preview (Status: ' + r.status + ')');
+                    return r.json();
+                })
                 .then(data => {
                     const doc = iframe.contentWindow.document;
                     doc.open();
+                    // Force white background for the preview content
+                    doc.write('<style>body{background:#fff!important;margin:0;padding:20px;display:flex;justify-content:center;}</style>');
                     doc.write(data.html);
                     doc.close();
 
-                    loader.style.display = 'none';
-
-                    // Adjust height after content written to show "completo"
+                    // Adjust height after content written
                     setTimeout(() => {
                         const height = iframe.contentWindow.document.body.scrollHeight;
                         iframe.style.height = (height + 50) + 'px';
-                    }, 200);
+                    }, 300);
+                })
+                .catch(err => {
+                    console.error(err);
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write('<div style="padding:40px;text-align:center;color:#ef4444;font-family:sans-serif;"><b>Erro ao carregar pré-visualização</b><br>' + err.message + '</div>');
+                    doc.close();
+                })
+                .finally(() => {
+                    loader.style.display = 'none';
                 });
         }
 
