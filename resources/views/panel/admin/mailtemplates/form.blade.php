@@ -6,7 +6,6 @@
     <!-- Summernote Lite CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
 @endpush
-@endpush
 
 @section('panel_breadcrumb')
     <a href="{{ route('panel.admin.mailtemplates.index') }}" class="hover:underline transition-all">Templates</a>
@@ -46,38 +45,44 @@
 @endsection
 
 @push('scripts')
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Summernote -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-pt-BR.min.js"></script>
-
     <script>
-        $(document).ready(function () {
-            // Init Summernote
-            $('#bodyEditor').summernote({
-                placeholder: 'Escreva o conteúdo do e-mail aqui...',
-                tabsize: 2,
-                height: 400,
-                lang: 'pt-BR',
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'underline', 'clear']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture', 'hr']],
-                    ['view', ['fullscreen', 'codeview', 'help']]
-                ],
-                callbacks: {
-                    onChange: function() {
-                        renderPreview();
+        (function() {
+            function initMailTemplateEditor() {
+                const $editor = $('#bodyEditor');
+                if (!$editor.length || $editor.data('summernote-ready')) return;
+
+                // Init Summernote
+                $editor.summernote({
+                    placeholder: 'Escreva o conteúdo do e-mail aqui...',
+                    tabsize: 2,
+                    height: 400,
+                    lang: 'pt-BR',
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'hr']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ],
+                    callbacks: {
+                        onChange: renderPreview,
+                        onKeyup: renderPreview,
+                        onPaste: renderPreview,
+                        onInit: function() {
+                            $editor.data('summernote-ready', true);
+                            renderPreview();
+                        }
                     }
-                }
-            });
+                });
+
+                // Real-time events on the editable area (more aggressive than onChange)
+                $(document).on('keyup input paste', '.note-editable', renderPreview);
+            }
 
             // Insert Variables
-            $('.insert-var').on('click', function () {
+            $(document).on('click', '.insert-var', function () {
                 var v = $(this).data('var');
                 $('#bodyEditor').summernote('pasteHTML', v);
                 renderPreview();
@@ -85,7 +90,7 @@
 
             // Auto Slug (only for new)
             @if(!$template->id)
-                $('#tpl_name').on('keyup change', function () {
+                $(document).on('keyup change', '#tpl_name', function () {
                     if ($('#tpl_slug').val().trim() !== '') return;
                     const slug = $(this).val().toString()
                         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -95,7 +100,7 @@
             @endif
 
             // Test Email
-            $('#btnSendTest').click(function () {
+            $(document).on('click', '#btnSendTest', function () {
                 const url = $(this).data('url');
                 if (!url) return toastr.warning('Salve o template primeiro antes de testar.');
 
@@ -162,29 +167,38 @@
                     @endphp
 
                     const config = {!! json_encode($previewData) !!};
-                    const bodyContent = $('#bodyEditor').summernote('code') || '<p class="text-slate-400">Comece a escrever para ver a prévia...</p>';
+                    const bodyContent = $('#bodyEditor').summernote('code') || '<p style="color: #94a3b8; text-align: center; padding: 20px;">Comece a escrever para ver a prévia em tempo real...</p>';
                     
-                    $('#tpl_preview').html(`
-                        <div style="background-color: #ffffff; width: 100%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin: 0 auto; max-width: 600px;">
-                            <div style="${config.headerStyle} padding: 45px 20px; text-align: center; flex-shrink: 0;">
-                                <img src="${config.logo}" alt="${config.siteName}" style="max-height: 50px; width: auto; height: auto; display: inline-block;">
+                    const html = `
+                        <div style="background-color: #ffffff; width: 100%; font-family: 'Inter', Helvetica, Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin: 0 auto; max-width: 600px;">
+                            <div style="${config.headerStyle} padding: 50px 20px; text-align: center; flex-shrink: 0; display: block;">
+                                <img src="${config.logo}" alt="${config.siteName}" style="max-height: 55px; width: auto; height: auto; display: inline-block; vertical-align: middle;">
                             </div>
-                            <div style="padding: 40px 30px; color: #1e293b; line-height: 1.6; word-wrap: break-word; font-size: 15px; min-height: 200px; background-color: #ffffff;">
+                            <div style="padding: 45px 35px; color: #1e293b; line-height: 1.7; word-wrap: break-word; font-size: 16px; min-height: 250px; background-color: #ffffff; display: block;">
                                 ${bodyContent}
                             </div>
-                            <div style="background-color: #f8fafc; padding: 30px 20px; text-align: center; color: #64748b; font-size: 12px; border-top: 1px solid #f1f5f9; flex-shrink: 0;">
-                                <p style="margin: 4px 0; font-weight: 600; color: #475569;">&copy; ${config.year} ${config.siteName}.</p>
-                                <p style="margin: 8px 0;"><a href="${config.siteUrl}" style="color: ${config.primaryColor}; text-decoration: none; font-weight: 700; border-bottom: 2px solid ${config.primaryColor};">Visite nosso site oficial</a></p>
+                            <div style="background-color: #f8fafc; padding: 35px 20px; text-align: center; color: #64748b; font-size: 13px; border-top: 1px solid #f1f5f9; flex-shrink: 0; display: block;">
+                                <p style="margin: 5px 0; font-weight: 700; color: #334155;">&copy; ${config.year} ${config.siteName}.</p>
+                                <p style="margin: 10px 0;"><a href="${config.siteUrl}" style="color: ${config.primaryColor}; text-decoration: none; font-weight: 800; border-bottom: 2px solid ${config.primaryColor}; padding-bottom: 1px;">Visite nosso site oficial</a></p>
                             </div>
                         </div>
-                    `);
+                    `;
+
+                    $('#tpl_preview').html(html);
                 } catch (e) {
                     console.error('Erro no preview:', e);
-                    $('#tpl_preview').html('<div class="p-4 text-red-500 font-bold border border-red-200 rounded-xl bg-red-50">Erro ao gerar prévia. Verifique os logs do console.</div>');
                 }
             }
 
-            renderPreview();
-        });
+            // Expose for external calls if needed
+            window.renderMailPreview = renderPreview;
+
+            // Initialize
+            if (typeof jQuery !== 'undefined') {
+                $(document).ready(initMailTemplateEditor);
+                // Fallback for SPA/AJAX loads
+                setTimeout(initMailTemplateEditor, 500);
+            }
+        })();
     </script>
-@endpush
+@endpush
