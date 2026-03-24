@@ -376,7 +376,7 @@
     </div>
 </nav>
 
-<div id="mobile-menu" class="fixed inset-0 z-[100] hidden" aria-hidden="true">
+<div id="mobile-menu" class="fixed inset-0 z-[1100] hidden" aria-hidden="true">
     <div id="mobile-menu-overlay"
         class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 pointer-events-none"></div>
     <div id="mobile-menu-panel"

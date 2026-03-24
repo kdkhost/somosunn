@@ -38,7 +38,7 @@
     ];
 @endphp
 
-<div class="mobile-app-nav lg:hidden fixed inset-x-0 bottom-0 z-[100] animate-fade-in-up">
+<div class="mobile-app-nav lg:hidden fixed inset-x-0 bottom-0 z-[90] animate-fade-in-up">
     <nav class="mobile-app-nav__bar" aria-label="Navegacao rapida">
         @foreach ($navItems as $item)
             <a href="{{ $item['route'] }}"
