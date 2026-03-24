@@ -1518,8 +1518,8 @@
                             $sellerPaymentsEnabled = $sellerId > 0 ? $sellerPaymentsEnabled : $platformPaymentsEnabled;
                             $buyEnabled = $price <= 0 ? true : ($canBuy && $sellerPaymentsEnabled && $organizerAvailable);
                             $disabledBuyLabel = !$organizerAvailable
-                                ? 'Organizador indisponÃ­vel'
-                                : (!$sellerPaymentsEnabled ? 'Pagamento indisponÃ­vel' : 'IndisponÃ­vel');
+                                ? 'Organizador indisponível'
+                                : (!$sellerPaymentsEnabled ? 'Pagamento indisponível' : 'Indisponível');
                             $disabledBuyLabel = !$organizerAvailable
                                 ? 'Organizador indisponivel'
                                 : (!$sellerPaymentsEnabled ? 'Pagamento indisponivel' : 'Indisponivel');

@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        // Corrige erro do tipo "enum" nas migrations usando Doctrine DBAL (executa logo no inÃ­cio)
+        // Corrige erro do tipo "enum" nas migrations usando Doctrine DBAL (executa logo no início)
         try {
             if (
                 class_exists('Doctrine\\DBAL\\Types\\Type') &&
@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
                     ->registerDoctrineTypeMapping('enum', 'string');
             }
         } catch (\Throwable $e) {
-            // Ignora se nÃ£o estiver usando DBAL
+            // Ignora se não estiver usando DBAL
         }
 
         RateLimiter::for('invoices_email', function ($job) {
@@ -62,7 +62,7 @@ class AppServiceProvider extends ServiceProvider
         try {
             DB::connection()->getPdo();
 
-            // Carregar configuraÃ§Ãµes sociais se existirem (sobrescreve .env)
+            // Carregar configurações sociais se existirem (sobrescreve .env)
             try {
                 $socialSettings = DB::table('settings')->whereIn('key', [
                     'social_login_enabled',
@@ -139,7 +139,7 @@ class AppServiceProvider extends ServiceProvider
                 // Silently fail if table doesnt exist yet
             }
 
-            // Carregar integraÃ§Ãµes/infra (reCAPTCHA e limites de upload) se existirem (sobrescreve .env)
+            // Carregar integrações/infra (reCAPTCHA e limites de upload) se existirem (sobrescreve .env)
             try {
                 $extraSettings = DB::table('settings')->whereIn('key', [
                     // reCAPTCHA v3
@@ -212,7 +212,7 @@ class AppServiceProvider extends ServiceProvider
                 // Silently fail if table doesnt exist yet
             }
 
-            // Carregar configuraÃ§Ãµes de SMTP do banco de dados (sobrescreve .env)
+            // Carregar configurações de SMTP do banco de dados (sobrescreve .env)
             try {
                 $smtpSettings = DB::table('settings')->whereIn('key', [
                     'smtp_host',
@@ -257,7 +257,7 @@ class AppServiceProvider extends ServiceProvider
                 // Silently fail if table doesnt exist yet
             }
 
-            // Carregar configuraÃ§Ãµes de Pagamento (Mercado Pago)
+            // Carregar configurações de Pagamento (Mercado Pago)
             try {
                 $paymentSettings = DB::table('settings')->whereIn('key', [
                     // Config Env
@@ -319,7 +319,7 @@ class AppServiceProvider extends ServiceProvider
             }
 
         } catch (\Throwable $e) {
-            Log::warning('Banco de dados indisponÃ­vel: ' . $e->getMessage());
+            Log::warning('Banco de dados indisponível: ' . $e->getMessage());
             View::share('unnDbAvailable', false);
             UploadStorage::applyRuntimeConfig();
         }
