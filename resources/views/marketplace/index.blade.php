@@ -173,6 +173,17 @@
                 scrollbar-width: none;
             }
 
+            [data-hscroll] {
+                min-width: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            [data-hscroll-container] {
+                width: 100%;
+                max-width: 100%;
+            }
+
             /* Liquid Background Animation */
             @keyframes liquid-bg {
                 0% {
@@ -550,6 +561,20 @@
             }
 
             @media (max-width: 767.98px) {
+                .mp-mobile-fullbleed {
+                    margin-left: -1rem;
+                    margin-right: -1rem;
+                }
+
+                .mp-mobile-fullbleed-card {
+                    border-radius: 0 !important;
+                    padding: 1.25rem 1rem;
+                }
+
+                .mp-mobile-category-card {
+                    width: min(21rem, calc(100vw - 2.5rem));
+                }
+
                 .mp-selling-title,
                 .mp-selling-eyebrow,
                 .mp-selling-copy,
@@ -570,7 +595,7 @@
         </style>
     @endpush
 
-    <div class="min-h-screen bg-slate-50 pt-24 pb-16 px-4 md:px-6 lg:px-10">
+    <div class="min-h-screen overflow-x-hidden bg-slate-50 pt-24 pb-16 px-4 md:px-6 lg:px-10">
         <div class="max-w-7xl mx-auto">
             <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 md:p-6">
                 <div class="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
@@ -928,10 +953,10 @@
             </div>
 
             {{-- Top categorias (estilo loja) --}}
-            <section id="marketplace-categories" class="relative mt-6 md:-mt-10 z-10">
-                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-7">
+            <section id="marketplace-categories" class="relative mt-6 md:-mt-10 z-10 mp-mobile-fullbleed">
+                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-7 mp-mobile-fullbleed-card">
                     <div class="grid lg:grid-cols-12 gap-6 items-center">
-                        <div class="lg:col-span-3">
+                        <div class="lg:col-span-3 min-w-0">
                             <div class="text-sm font-black text-slate-500 uppercase tracking-wide">Top categorias</div>
                             <div class="mt-2 text-2xl font-black text-slate-900">Encontre o que você precisa</div>
                             <p class="mt-2 text-sm text-slate-600 mb-0">Navegue por cursos, mentorias e eventos da
@@ -944,7 +969,7 @@
                             </div>
                         </div>
 
-                        <div class="lg:col-span-9">
+                        <div class="lg:col-span-9 min-w-0">
                             <div class="relative" data-hscroll data-scroll-amount="420">
                                 <button type="button" data-hscroll-left
                                     class="hidden md:inline-flex absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full bg-white border border-slate-200 text-slate-700 shadow hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
@@ -956,7 +981,7 @@
                                     data-hscroll-container>
                                     @foreach($storeCategories as $cat)
                                         <a href="{{ $cat['href'] }}"
-                                            class="snap-start shrink-0 w-72 sm:w-80 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-sm transition p-4 flex items-center gap-4">
+                                            class="mp-mobile-category-card snap-start shrink-0 w-72 sm:w-80 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-sm transition p-4 flex items-center gap-4">
                                             <div
                                                 class="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-blue-700 flex items-center justify-center">
                                                 <i class="{{ $cat['icon'] }} text-lg"></i>
