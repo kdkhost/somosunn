@@ -294,7 +294,7 @@
                                     @include('admin.components.upload-global', [
                                         'name' => 'seo_og_image',
                                         'path' => $data['seo_og_image'] ?? ($data['seo_image'] ?? null),
-                                        'preview_url' => !empty($data['seo_og_image'] ?? $data['seo_image']) ? asset('storage/' . ($data['seo_og_image'] ?? $data['seo_image'])) : null,
+                                        'preview_url' => !empty($data['seo_og_image'] ?? ($data['seo_image'] ?? null)) ? asset('storage/' . ($data['seo_og_image'] ?? ($data['seo_image'] ?? null))) : null,
                                         'remove_name' => 'remove_seo_og_image',
                                         'accept' => 'image/*',
                                     ])

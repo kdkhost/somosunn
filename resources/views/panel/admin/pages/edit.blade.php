@@ -233,8 +233,8 @@
                                     <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs italic">OpenGraph Image (FB/WA 1200x630)</label>
                                     <div class="relative group">
                                         <div class="aspect-video rounded-[2rem] overflow-hidden bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center transition-all group-hover:border-blue-500/50">
-                                            @if (!empty($data['seo_og_image'] ?? $data['seo_image']))
-                                                <img src="{{ Storage::url($data['seo_og_image'] ?? $data['seo_image']) }}" alt="Preview OG" class="w-full h-full object-cover">
+                                            @if (!empty($data['seo_og_image'] ?? ($data['seo_image'] ?? null)))
+                                                <img src="{{ Storage::url($data['seo_og_image'] ?? ($data['seo_image'] ?? null)) }}" alt="Preview OG" class="w-full h-full object-cover">
                                                 <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                                                     <label class="cursor-pointer bg-white text-slate-900 px-4 py-2 rounded-xl font-bold text-xs shadow-xl">
                                                         <i class="fas fa-edit mr-1"></i> Alterar
@@ -259,8 +259,8 @@
                                     <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs italic">Twitter Card Image (1200x600)</label>
                                     <div class="relative group">
                                         <div class="aspect-video rounded-[2rem] overflow-hidden bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center transition-all group-hover:border-blue-500/50">
-                                            @if (!empty($data['seo_twitter_image']))
-                                                <img src="{{ Storage::url($data['seo_twitter_image']) }}" alt="Preview Twitter" class="w-full h-full object-cover">
+                                            @if (!empty($data['seo_twitter_image'] ?? null))
+                                                <img src="{{ Storage::url($data['seo_twitter_image'] ?? null) }}" alt="Preview Twitter" class="w-full h-full object-cover">
                                                 <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                                                     <label class="cursor-pointer bg-white text-slate-900 px-4 py-2 rounded-xl font-bold text-xs shadow-xl">
                                                         <i class="fas fa-edit mr-1"></i> Alterar
