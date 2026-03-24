@@ -286,8 +286,89 @@
             }, 300);
         }
 
+        // High Fidelity Preview Logic (Synced with form.blade.php)
+        function renderPreview() {
+            const $editor = $('#bodyEditor');
+            const $preview = $('#tpl_preview');
+
+            if (!$editor.length || !$preview.length) return;
+
+            try {
+                @php
+                    $logo = \App\Models\Setting::get('logo_admin') ?: \App\Models\Setting::get('logo_front') ?: \App\Models\Setting::get('logo_image');
+                    $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
+                    
+                    $bgType = \App\Models\Setting::get('email_header_bg_type') ?? 'gradient';
+                    $color1 = \App\Models\Setting::get('email_header_color_1') ?? \App\Models\Setting::get('site_color_primary') ?? '#000000';
+                    $color2 = \App\Models\Setting::get('email_header_color_2') ?? \App\Models\Setting::get('site_color_secondary') ?? '#333333';
+                    $color3 = \App\Models\Setting::get('email_header_color_3');
+
+                    $headerStyle = "";
+                    if ($bgType === 'solid') {
+                        $headerStyle = "background-color: {$color1};";
+                    } else {
+                        if ($color3) {
+                            $headerStyle = "background: linear-gradient(135deg, {$color1} 0%, {$color2} 50%, {$color3} 100%);";
+                        } else {
+                            $headerStyle = "background: linear-gradient(135deg, {$color1} 0%, {$color2} 100%);";
+                        }
+                    }
+
+                    $previewData = [
+                        'logo' => $logoUrl,
+                        'siteName' => config('app.name'),
+                        'siteUrl' => url('/'),
+                        'year' => date('Y'),
+                        'headerStyle' => $headerStyle,
+                        'primaryColor' => $color1
+                    ];
+                @endphp
+
+                const config = {!! json_encode($previewData) !!};
+                
+                let bodyContent = '';
+                try {
+                    if ($editor.data('summernote-ready')) {
+                        bodyContent = $editor.summernote('code');
+                    } else {
+                        bodyContent = $editor.val();
+                    }
+                } catch(e) { 
+                    bodyContent = $editor.val(); 
+                }
+
+                if (!bodyContent || bodyContent.trim() === '' || bodyContent === '<p><br></p>') {
+                    bodyContent = '<p style="color: #64728b; text-align: center; padding: 40px; font-weight: 500;">Digite no editor para ver a mágica acontecer... ✨</p>';
+                }
+                
+                const html = `
+                    <div style="background-color: #ffffff; width: 100%; font-family: 'Inter', Helvetica, Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 45px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; margin: 0 auto; max-width: 600px; transition: all 0.3s ease;">
+                        <div style="${config.headerStyle} padding: 45px 30px; text-align: center; flex-shrink: 0; display: block; border-bottom: 5px solid rgba(0,0,0,0.1);">
+                            <img src="${config.logo}" alt="${config.siteName}" style="max-height: 55px; max-width: 85%; width: auto; height: auto; display: inline-block; vertical-align: middle; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+                        </div>
+                        <div style="padding: 40px 35px; color: #1e293b; line-height: 1.8; word-wrap: break-word; font-size: 16px; min-height: 250px; background-color: #ffffff; display: block; text-align: left;">
+                            ${bodyContent}
+                        </div>
+                        <div style="background-color: #f8fafc; padding: 35px 20px; text-align: center; color: #64748b; font-size: 13px; border-top: 1px solid #f1f5f9; flex-shrink: 0; display: block;">
+                            <p style="margin: 5px 0; font-weight: 700; color: #334155;">&copy; ${config.year} ${config.siteName}.</p>
+                            <p style="margin: 10px 0;">
+                                <a href="${config.siteUrl}" style="color: ${config.primaryColor}; text-decoration: none; font-weight: 800; display: inline-block; border-bottom: 2px solid ${config.primaryColor}; padding-bottom: 1px;">Visite nosso site</a>
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                $preview.html(html).css('opacity', 1);
+            } catch (e) {
+                console.error('Erro no renderPreview:', e);
+            }
+        }
+
         function initSummernote() {
-            $('#bodyEditor').summernote({
+            const $editor = $('#bodyEditor');
+            if ($editor.length === 0) return;
+
+            $editor.summernote({
                 placeholder: 'Conteúdo do e-mail...',
                 tabsize: 2,
                 height: 350,
@@ -302,13 +383,25 @@
                     ['view', ['fullscreen', 'codeview', 'help']]
                 ],
                 callbacks: {
+                    onInit: function() {
+                        $editor.data('summernote-ready', true);
+                        renderPreview();
+                    },
+                    onChange: renderPreview,
+                    onKeyup: renderPreview,
+                    onFocus: renderPreview,
                     onPaste: function (e) {
                         var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
                         e.preventDefault();
                         document.execCommand('insertText', false, bufferText);
+                        renderPreview();
                     }
                 }
             });
+            
+            // Extra real-time listeners
+            $(document).off('input keyup paste', '.note-editable');
+            $(document).on('input keyup paste', '.note-editable', renderPreview);
         }
 
         function initScripts() {
@@ -316,6 +409,7 @@
             $('.insert-var').off('click').on('click', function () {
                 var v = $(this).data('var');
                 $('#bodyEditor').summernote('pasteHTML', v);
+                renderPreview();
             });
 
             // Auto slug for new items
@@ -348,6 +442,9 @@
                     complete: () => btn.prop('disabled', false).html(original)
                 });
             });
+
+            // Initial render
+            setTimeout(renderPreview, 500);
         }
 
         // Save Template
