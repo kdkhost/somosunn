@@ -36,4 +36,22 @@ class InstitucionalController extends Controller
         $page = Page::findBySlug('quem-somos') ?? new Page();
         return view('site.institucional.quem-somos', compact('page'));
     }
+    
+    public function termos(): View
+    {
+        $page = Page::findBySlug('termos-de-uso') ?? new Page();
+        return view('site.institucional.termos', compact('page'));
+    }
+
+    public function privacidade(): View
+    {
+        $page = Page::findBySlug('politica-de-privacidade') ?? new Page();
+        return view('site.institucional.privacidade', compact('page'));
+    }
+
+    public function lgpd(): View
+    {
+        $page = Page::findBySlug('consentimento-lgpd') ?? new Page();
+        return view('site.institucional.lgpd', compact('page'));
+    }
 }

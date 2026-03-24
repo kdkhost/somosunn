@@ -436,6 +436,39 @@ class CmsPageCatalog
                     'seo_description' => 'Descubra a missão e os valores por trás do movimento Somos Únicas.',
                 ],
             ],
+            [
+                'slug' => 'termos-de-uso',
+                'title' => 'Termos de Uso',
+                'data' => [
+                    'seo_title' => 'Termos de Uso - SOMOS UNN',
+                    'seo_description' => 'Leia nossos termos e condições de uso da plataforma UNN.',
+                    'hero_title' => 'Termos de Uso',
+                    'hero_subtitle' => 'Regras e diretrizes para o uso da nossa plataforma e serviços.',
+                    'body_content' => '<h2>1. Aceitação dos Termos</h2><p>Ao acessar e usar a plataforma UNN, você concorda em cumprir estes termos...</p>',
+                ],
+            ],
+            [
+                'slug' => 'politica-de-privacidade',
+                'title' => 'Política de Privacidade',
+                'data' => [
+                    'seo_title' => 'Política de Privacidade - SOMOS UNN',
+                    'seo_description' => 'Saiba como protegemos e tratamos seus dados pessoais na UNN.',
+                    'hero_title' => 'Política de Privacidade',
+                    'hero_subtitle' => 'Compromisso com a transparência e segurança dos seus dados.',
+                    'body_content' => '<h2>1. Coleta de Dados</h2><p>Coletamos informações necessárias para fornecer nossos serviços...</p>',
+                ],
+            ],
+            [
+                'slug' => 'consentimento-lgpd',
+                'title' => 'Consentimento LGPD',
+                'data' => [
+                    'seo_title' => 'Consentimento e LGPD - SOMOS UNN',
+                    'seo_description' => 'Informações detalhadas sobre a Lei Geral de Proteção de Dados (LGPD) na UNN.',
+                    'hero_title' => 'Consentimento LGPD',
+                    'hero_subtitle' => 'Seus direitos e nossa conformidade com a legislação brasileira.',
+                    'body_content' => '<h2>Direitos do Titular</h2><p>Você tem direito ao acesso, correção e eliminação de seus dados conforme a LGPD...</p>',
+                ],
+            ],
         ];
     }
 

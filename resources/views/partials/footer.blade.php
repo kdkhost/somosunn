@@ -31,6 +31,12 @@
             <span>{{ $footerText }}</span>
             <a href="{{ route('jobs.public.index') }}" class="hover:text-[#1F5EDB] transition-colors font-medium">Vagas
                 Abertas</a>
+            <span class="text-slate-200">|</span>
+            <a href="{{ route('site.termos') }}" class="hover:text-[#1F5EDB] transition-colors font-medium">Termos</a>
+            <span class="text-slate-200">|</span>
+            <a href="{{ route('site.privacidade') }}" class="hover:text-[#1F5EDB] transition-colors font-medium">Privacidade</a>
+            <span class="text-slate-200">|</span>
+            <a href="{{ route('site.lgpd') }}" class="hover:text-[#1F5EDB] transition-colors font-medium">LGPD</a>
         </div>
         <div class="text-xs text-center sm:text-right hidden md:block">
             Desenvolvido por:

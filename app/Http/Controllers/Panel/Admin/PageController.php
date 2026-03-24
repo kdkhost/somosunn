@@ -238,6 +238,9 @@ class PageController extends Controller
             'cta_subtitle',
             'cta_btn',
         ],
+        'termos-de-uso' => ['hero_title', 'hero_subtitle', 'body_content', 'seo_title', 'seo_description'],
+        'politica-de-privacidade' => ['hero_title', 'hero_subtitle', 'body_content', 'seo_title', 'seo_description'],
+        'consentimento-lgpd' => ['hero_title', 'hero_subtitle', 'body_content', 'seo_title', 'seo_description'],
         'premium' => [
             'seo_title',
             'seo_description',
@@ -294,6 +297,9 @@ class PageController extends Controller
         'feed' => ['seo_image'],
         'somos-unicas' => ['hero_image'],
         'somos-unicas-sobre' => ['hero_image', 'networking_image'],
+        'termos-de-uso' => ['seo_image'],
+        'politica-de-privacidade' => ['seo_image'],
+        'consentimento-lgpd' => ['seo_image'],
     ];
 
     private const SLUG_JSON_FIELDS = [

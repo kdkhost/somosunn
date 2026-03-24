@@ -76,6 +76,9 @@
                                 'premium' => ['Hero', 'Planos'],
                                 'somos-unicas' => ['Identidade', 'Banner', 'Conteúdo'],
                                 'somos-unicas-sobre' => ['Identidade', 'Conteúdo'],
+                                'termos-de-uso' => ['Hero', 'Conteúdo'],
+                                'politica-de-privacidade' => ['Hero', 'Conteúdo'],
+                                'consentimento-lgpd' => ['Hero', 'Conteúdo'],
                             ];
                             $pageSections = $slugSections[$page->slug] ?? [];
                         @endphp

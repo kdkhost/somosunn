@@ -100,6 +100,9 @@ Route::get('/manifesto', [\App\Http\Controllers\InstitucionalController::class, 
 Route::get('/quem-somos', [\App\Http\Controllers\InstitucionalController::class, 'quemSomos'])->name('quem-somos');
 Route::get('/como-funciona', [\App\Http\Controllers\InstitucionalController::class, 'comoFunciona'])->name('como-funciona');
 Route::get('/valores', [\App\Http\Controllers\InstitucionalController::class, 'valores'])->name('valores');
+Route::get('/termos', [\App\Http\Controllers\InstitucionalController::class, 'termos'])->name('site.termos');
+Route::get('/privacidade', [\App\Http\Controllers\InstitucionalController::class, 'privacidade'])->name('site.privacidade');
+Route::get('/consentimento-lgpd', [\App\Http\Controllers\InstitucionalController::class, 'lgpd'])->name('site.lgpd');
 Route::get('/embed/afiliado/{referralCode}', [\App\Http\Controllers\AffiliateEmbedController::class, 'widget'])->name('affiliate.embed.widget');
 Route::get('/embed/afiliado/{referralCode}/criativo/{preset}.svg', [\App\Http\Controllers\AffiliateEmbedController::class, 'graphic'])->name('affiliate.embed.graphic');
 Route::get('/contato', fn() => view('site.institucional.contato'))->name('contato');
