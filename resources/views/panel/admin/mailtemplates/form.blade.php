@@ -68,13 +68,19 @@
                     ['table', ['table']],
                     ['insert', ['link', 'picture', 'hr']],
                     ['view', ['fullscreen', 'codeview', 'help']]
-                ]
+                ],
+                callbacks: {
+                    onChange: function() {
+                        renderPreview();
+                    }
+                }
             });
 
             // Insert Variables
             $('.insert-var').on('click', function () {
                 var v = $(this).data('var');
                 $('#bodyEditor').summernote('pasteHTML', v);
+                renderPreview();
             });
 
             // Auto Slug (only for new)
@@ -122,56 +128,63 @@
 
             // Preview Logic
             function renderPreview() {
-                @php
-                    $logo = \App\Models\Setting::get('logo_admin');
-                    if(!$logo) $logo = \App\Models\Setting::get('logo_front');
-                    if(!$logo) $logo = \App\Models\Setting::get('logo_image');
-                    $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
-                    
-                    $bgType = \App\Models\Setting::get('email_header_bg_type') ?? 'gradient';
-                    $color1 = \App\Models\Setting::get('email_header_color_1') ?? \App\Models\Setting::get('site_color_primary') ?? '#000000';
-                    $color2 = \App\Models\Setting::get('email_header_color_2') ?? \App\Models\Setting::get('site_color_secondary') ?? '#333333';
-                    $color3 = \App\Models\Setting::get('email_header_color_3');
+                try {
+                    @php
+                        $logo = \App\Models\Setting::get('logo_admin');
+                        if(!$logo) $logo = \App\Models\Setting::get('logo_front');
+                        if(!$logo) $logo = \App\Models\Setting::get('logo_image');
+                        $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
+                        
+                        $bgType = \App\Models\Setting::get('email_header_bg_type') ?? 'gradient';
+                        $color1 = \App\Models\Setting::get('email_header_color_1') ?? \App\Models\Setting::get('site_color_primary') ?? '#000000';
+                        $color2 = \App\Models\Setting::get('email_header_color_2') ?? \App\Models\Setting::get('site_color_secondary') ?? '#333333';
+                        $color3 = \App\Models\Setting::get('email_header_color_3');
 
-                    $headerStyle = "";
-                    if ($bgType === 'solid') {
-                        $headerStyle = "background-color: {$color1};";
-                    } else {
-                        if ($color3) {
-                            $headerStyle = "background: linear-gradient(135deg, {$color1} 0%, {$color2} 50%, {$color3} 100%);";
+                        $headerStyle = "";
+                        if ($bgType === 'solid') {
+                            $headerStyle = "background-color: {$color1};";
                         } else {
-                            $headerStyle = "background: linear-gradient(135deg, {$color1} 0%, {$color2} 100%);";
+                            if ($color3) {
+                                $headerStyle = "background: linear-gradient(135deg, {$color1} 0%, {$color2} 50%, {$color3} 100%);";
+                            } else {
+                                $headerStyle = "background: linear-gradient(135deg, {$color1} 0%, {$color2} 100%);";
+                            }
                         }
-                    }
-                @endphp
 
-                const logo = '{{ $logoUrl }}';
-                const siteName = '{{ config('app.name') }}';
-                const siteUrl = '{{ url('/') }}';
-                const year = '{{ date('Y') }}';
-                const headerStyle = '{!! $headerStyle !!}';
-                const primaryColor = '{{ $color1 }}';
-                
-                const bodyContent = $('#bodyEditor').summernote('code');
-                
-                $('#tpl_preview').html(`
-                    <div style="background-color: #ffffff; width: 100%; font-family: sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;">
-                        <div style="${headerStyle} padding: 40px 20px; text-align: center; flex-shrink: 0;">
-                            <img src="${logo}" alt="${siteName}" style="max-height: 45px; max-width: 100%; height: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+                        $previewData = [
+                            'logo' => $logoUrl,
+                            'siteName' => config('app.name'),
+                            'siteUrl' => url('/'),
+                            'year' => date('Y'),
+                            'headerStyle' => $headerStyle,
+                            'primaryColor' => $color1
+                        ];
+                    @endphp
+
+                    const config = {!! json_encode($previewData) !!};
+                    const bodyContent = $('#bodyEditor').summernote('code') || '<p class="text-slate-400">Comece a escrever para ver a prévia...</p>';
+                    
+                    $('#tpl_preview').html(`
+                        <div style="background-color: #ffffff; width: 100%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin: 0 auto; max-width: 600px;">
+                            <div style="${config.headerStyle} padding: 45px 20px; text-align: center; flex-shrink: 0;">
+                                <img src="${config.logo}" alt="${config.siteName}" style="max-height: 50px; width: auto; height: auto; display: inline-block;">
+                            </div>
+                            <div style="padding: 40px 30px; color: #1e293b; line-height: 1.6; word-wrap: break-word; font-size: 15px; min-height: 200px; background-color: #ffffff;">
+                                ${bodyContent}
+                            </div>
+                            <div style="background-color: #f8fafc; padding: 30px 20px; text-align: center; color: #64748b; font-size: 12px; border-top: 1px solid #f1f5f9; flex-shrink: 0;">
+                                <p style="margin: 4px 0; font-weight: 600; color: #475569;">&copy; ${config.year} ${config.siteName}.</p>
+                                <p style="margin: 8px 0;"><a href="${config.siteUrl}" style="color: ${config.primaryColor}; text-decoration: none; font-weight: 700; border-bottom: 2px solid ${config.primaryColor};">Visite nosso site oficial</a></p>
+                            </div>
                         </div>
-                        <div style="padding: 30px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px; min-height: 250px;">
-                            ${bodyContent}
-                        </div>
-                        <div style="background-color: #fcfcfc; padding: 25px 20px; text-align: center; color: #888888; font-size: 11px; border-top: 1px dashed #eeeeee; flex-shrink: 0;">
-                            <p style="margin: 4px 0; font-weight: 500;">&copy; ${year} ${siteName}.</p>
-                            <p style="margin: 4px 0;"><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none; font-weight: 700;">Visite nosso site</a></p>
-                        </div>
-                    </div>
-                `);
+                    `);
+                } catch (e) {
+                    console.error('Erro no preview:', e);
+                    $('#tpl_preview').html('<div class="p-4 text-red-500 font-bold border border-red-200 rounded-xl bg-red-50">Erro ao gerar prévia. Verifique os logs do console.</div>');
+                }
             }
 
             renderPreview();
-            $('#bodyEditor').on('summernote.change', renderPreview);
         });
     </script>
 @endpush

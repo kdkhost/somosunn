@@ -115,7 +115,7 @@
                     </h3>
                 </div>
                 
-                <div id="tpl_preview" class="p-4 bg-slate-50 dark:bg-slate-950 min-h-[400px]">
+                <div id="tpl_preview" class="p-4 min-h-[400px]">
                     <!-- Rendered content via JS -->
                 </div>
             </div>
