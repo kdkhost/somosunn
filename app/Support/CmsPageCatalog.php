@@ -436,7 +436,6 @@ class CmsPageCatalog
                     'seo_description' => 'Descubra a missão e os valores por trás do movimento Somos Únicas.',
                 ],
             ],
-            ...LegalPageContent::definitions(),
         ];
     }
 
