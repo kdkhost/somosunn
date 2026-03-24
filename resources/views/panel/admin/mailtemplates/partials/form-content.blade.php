@@ -115,8 +115,13 @@
                     </h3>
                 </div>
                 
-                <div id="tpl_preview" class="p-4 min-h-[400px]">
-                    <!-- Rendered content via JS -->
+                <div id="tpl_preview" class="p-4 min-h-[500px] bg-slate-50 dark:bg-slate-950/20 flex flex-col items-center justify-start transition-all duration-500">
+                    <div class="text-center p-8 mt-12 opacity-50">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mb-4 animate-pulse">
+                            <i class="fas fa-magic text-2xl"></i>
+                        </div>
+                        <p class="text-slate-500 dark:text-slate-400 font-medium tracking-tight">Renderizando sua prévia magnética...</p>
+                    </div>
                 </div>
             </div>
 

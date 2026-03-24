@@ -47,92 +47,11 @@
 @push('scripts')
     <script>
         (function() {
-            function initMailTemplateEditor() {
-                const $editor = $('#bodyEditor');
-                if (!$editor.length || $editor.data('summernote-ready')) return;
-
-                // Init Summernote
-                $editor.summernote({
-                    placeholder: 'Escreva o conteúdo do e-mail aqui...',
-                    tabsize: 2,
-                    height: 400,
-                    lang: 'pt-BR',
-                    toolbar: [
-                        ['style', ['style']],
-                        ['font', ['bold', 'underline', 'clear']],
-                        ['color', ['color']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                        ['table', ['table']],
-                        ['insert', ['link', 'picture', 'hr']],
-                        ['view', ['fullscreen', 'codeview', 'help']]
-                    ],
-                    callbacks: {
-                        onChange: renderPreview,
-                        onKeyup: renderPreview,
-                        onPaste: renderPreview,
-                        onInit: function() {
-                            $editor.data('summernote-ready', true);
-                            renderPreview();
-                        }
-                    }
-                });
-
-                // Real-time events on the editable area (more aggressive than onChange)
-                $(document).on('keyup input paste', '.note-editable', renderPreview);
-            }
-
-            // Insert Variables
-            $(document).on('click', '.insert-var', function () {
-                var v = $(this).data('var');
-                $('#bodyEditor').summernote('pasteHTML', v);
-                renderPreview();
-            });
-
-            // Auto Slug (only for new)
-            @if(!$template->id)
-                $(document).on('keyup change', '#tpl_name', function () {
-                    if ($('#tpl_slug').val().trim() !== '') return;
-                    const slug = $(this).val().toString()
-                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-                    $('#tpl_slug').val(slug);
-                });
-            @endif
-
-            // Test Email
-            $(document).on('click', '#btnSendTest', function () {
-                const url = $(this).data('url');
-                if (!url) return toastr.warning('Salve o template primeiro antes de testar.');
-
-                const email = $('#test_email_input').val();
-                if (!email) return toastr.warning('Digite um e-mail para teste.');
-
-                const btn = $(this);
-                const originalContent = btn.html();
-                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
-
-                $.ajax({
-                    url: url,
-                    method: 'POST',
-                    data: {
-                        email: email,
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function (res) {
-                        toastr.success(res.message || 'E-mail enviado com sucesso!');
-                    },
-                    error: function (xhr) {
-                        console.error(xhr);
-                        toastr.error('Erro ao enviar e-mail.');
-                    },
-                    complete: function () {
-                        btn.prop('disabled', false).html(originalContent);
-                    }
-                });
-            });
-
-            // Preview Logic
+            // High Fidelity Preview Logic
             function renderPreview() {
+                const $editor = $('#bodyEditor');
+                if (!$editor.length) return;
+
                 try {
                     @php
                         $logo = \App\Models\Setting::get('logo_admin');
@@ -167,38 +86,122 @@
                     @endphp
 
                     const config = {!! json_encode($previewData) !!};
-                    const bodyContent = $('#bodyEditor').summernote('code') || '<p style="color: #94a3b8; text-align: center; padding: 20px;">Comece a escrever para ver a prévia em tempo real...</p>';
+                    const bodyContent = $editor.summernote('code') || '<p style="color: #64728b; text-align: center; padding: 40px; font-weight: 500;">Comece a escrever para ver a magía acontecer em tempo real... ✨</p>';
                     
                     const html = `
-                        <div style="background-color: #ffffff; width: 100%; font-family: 'Inter', Helvetica, Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin: 0 auto; max-width: 600px;">
-                            <div style="${config.headerStyle} padding: 50px 20px; text-align: center; flex-shrink: 0; display: block;">
-                                <img src="${config.logo}" alt="${config.siteName}" style="max-height: 55px; width: auto; height: auto; display: inline-block; vertical-align: middle;">
+                        <div style="background-color: #ffffff; width: 100%; font-family: 'Inter', Helvetica, Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 45px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; margin: 0 auto; max-width: 600px; transition: all 0.3s ease;">
+                            <div style="${config.headerStyle} padding: 45px 30px; text-align: center; flex-shrink: 0; display: block; border-bottom: 5px solid rgba(0,0,0,0.1);">
+                                <img src="${config.logo}" alt="${config.siteName}" style="max-height: 55px; max-width: 85%; width: auto; height: auto; display: inline-block; vertical-align: middle; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
                             </div>
-                            <div style="padding: 45px 35px; color: #1e293b; line-height: 1.7; word-wrap: break-word; font-size: 16px; min-height: 250px; background-color: #ffffff; display: block;">
+                            <div style="padding: 40px 35px; color: #1e293b; line-height: 1.8; word-wrap: break-word; font-size: 16px; min-height: 250px; background-color: #ffffff; display: block; text-align: left;">
                                 ${bodyContent}
                             </div>
                             <div style="background-color: #f8fafc; padding: 35px 20px; text-align: center; color: #64748b; font-size: 13px; border-top: 1px solid #f1f5f9; flex-shrink: 0; display: block;">
                                 <p style="margin: 5px 0; font-weight: 700; color: #334155;">&copy; ${config.year} ${config.siteName}.</p>
-                                <p style="margin: 10px 0;"><a href="${config.siteUrl}" style="color: ${config.primaryColor}; text-decoration: none; font-weight: 800; border-bottom: 2px solid ${config.primaryColor}; padding-bottom: 1px;">Visite nosso site oficial</a></p>
+                                <p style="margin: 10px 0;">
+                                    <a href="${config.siteUrl}" style="color: ${config.primaryColor}; text-decoration: none; font-weight: 800; display: inline-block; border-bottom: 2px solid ${config.primaryColor}; padding-bottom: 1px;">Visite nosso site</a>
+                                </p>
                             </div>
                         </div>
                     `;
 
-                    $('#tpl_preview').html(html);
+                    $('#tpl_preview').html(html).css('opacity', 1);
                 } catch (e) {
-                    console.error('Erro no preview:', e);
+                    console.error('Erro no renderPreview:', e);
                 }
             }
 
-            // Expose for external calls if needed
+            // Initialization logic (Supports SPA and Modals)
+            function initMailTemplateEditor() {
+                const $editor = $('#bodyEditor');
+                if (!$editor.length || $editor.data('summernote-ready')) return;
+
+                $editor.summernote({
+                    placeholder: 'Escreva o conteúdo do e-mail aqui...',
+                    tabsize: 2,
+                    height: 400,
+                    lang: 'pt-BR',
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'hr']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ],
+                    callbacks: {
+                        onInit: function() {
+                            $editor.data('summernote-ready', true);
+                            renderPreview();
+                        },
+                        onChange: renderPreview,
+                        onKeyup: renderPreview,
+                        onFocus: renderPreview,
+                        onPaste: renderPreview
+                    }
+                });
+
+                // Extra listeners for ultra-fast real-time response
+                $(document).off('input keyup paste', '.note-editable');
+                $(document).on('input keyup paste', '.note-editable', renderPreview);
+            }
+
+            // Expose for external calls
             window.renderMailPreview = renderPreview;
 
-            // Initialize
+            // Variables Insertion
+            $(document).on('click', '.insert-var', function () {
+                var v = $(this).data('var');
+                $('#bodyEditor').summernote('pasteHTML', v);
+                renderPreview();
+            });
+
+            // Handle Slugs
+            @if(!$template->id)
+                $(document).on('keyup change', '#tpl_name', function () {
+                    if ($('#tpl_slug').val().trim() !== '') return;
+                    const slug = $(this).val().toString()
+                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                    $('#tpl_slug').val(slug);
+                });
+            @endif
+
+            // Test E-mail Logic
+            $(document).on('click', '#btnSendTest', function () {
+                const url = $(this).data('url');
+                const email = $('#test_email_input').val();
+                if (!url) return toastr.warning('Salve o template primeiro.');
+                if (!email) return toastr.warning('Digite um e-mail.');
+
+                const btn = $(this);
+                const originalHtml = btn.html();
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: { email: email, _token: '{{ csrf_token() }}' },
+                    success: function (res) { toastr.success(res.message); },
+                    error: function () { toastr.error('Falha ao enviar teste.'); },
+                    complete: function () { btn.prop('disabled', false).html(originalHtml); }
+                });
+            });
+
+            // Start polling for initialization (crucial for slow-loading modals or SPA)
+            let initCount = 0;
+            const initInterval = setInterval(function() {
+                initMailTemplateEditor();
+                initCount++;
+                if (initCount > 10) clearInterval(initInterval);
+            }, 500);
+
+            // Immediate call
             if (typeof jQuery !== 'undefined') {
                 $(document).ready(initMailTemplateEditor);
-                // Fallback for SPA/AJAX loads
-                setTimeout(initMailTemplateEditor, 500);
             }
         })();
     </script>
-@endpush
+@endpush
+
