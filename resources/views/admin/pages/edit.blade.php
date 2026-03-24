@@ -286,7 +286,7 @@
             // Ajustar o partial para se comportar como abas
             // Nota: Os partials atuais usam IDs como sec-hero, sec-stats.
             // Precisamos garantir que eles tenham a classe 'tab-pane fade' e estejam dentro do 'tab-content'.
-            // Como eles já estão dentro de 'tab-content' via @include, basta adicionar as classes via JS
+            // Como eles já estão dentro de 'tab-content' via include, basta adicionar as classes via JS
             // ou garantir que o partial já as tenha (ideal).
             $('.tab-content div[id^="sec-"]').addClass('tab-pane fade');
             $(`.tab-content ${hash}`).addClass('show active');
