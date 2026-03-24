@@ -261,6 +261,128 @@
                         }
                     });
                 });
+
+                <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+                <script>
+                    window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData }) {
+                        const container = document.getElementById(containerId);
+                        const hiddenInput = document.querySelector(`[name="${inputId}"]`);
+                        const addButton = document.getElementById(addButtonId);
+                        let items = Array.isArray(initialData) ? initialData : [];
+
+                        function sync() {
+                            hiddenInput.value = JSON.stringify(items);
+                        }
+
+                        function render() {
+                            container.innerHTML = '';
+                            items.forEach((item, index) => {
+                                const wrapper = document.createElement('div');
+                                wrapper.className = 'repeater-item group relative bg-slate-50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-800/50 rounded-3xl p-6 mb-4 transition-all hover:border-blue-500/30';
+                                wrapper.dataset.index = index;
+                                wrapper.innerHTML = `
+                                    <div class="reorder-handle absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-lg flex items-center justify-center cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-all shadow-sm z-10">
+                                        <i class="fas fa-grip-lines text-slate-400 text-xs text-[10px]"></i>
+                                    </div>
+                                    <button type="button" class="btn-remove absolute -right-2 -top-2 w-8 h-8 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 z-10" data-index="${index}">
+                                        <i class="fas fa-times text-xs"></i>
+                                    </button>
+                                    ${template(item, index)}
+                                `;
+                                
+                                // Bind remove
+                                wrapper.querySelector('.btn-remove').addEventListener('click', function() {
+                                    items.splice(index, 1);
+                                    render();
+                                });
+
+                                // Bind inputs
+                                wrapper.querySelectorAll('input, textarea, select').forEach(input => {
+                                    input.addEventListener('input', function() {
+                                        const fieldMatch = this.name.match(/\[(.*?)\]/);
+                                        if (fieldMatch) {
+                                            const field = fieldMatch[1];
+                                            items[index][field] = this.value;
+                                            sync();
+                                        }
+                                    });
+                                });
+
+                                // Bind Image Uploads
+                                wrapper.querySelectorAll('.repeater-upload-btn').forEach(btn => {
+                                    const field = btn.dataset.field;
+                                    btn.onclick = () => {
+                                        const fileInput = document.createElement('input');
+                                        fileInput.type = 'file';
+                                        fileInput.accept = 'image/*';
+                                        fileInput.onchange = (e) => {
+                                            const file = e.target.files[0];
+                                            if(!file) return;
+                                            
+                                            const fd = new FormData();
+                                            fd.append('file', file);
+                                            
+                                            const originalContent = btn.innerHTML;
+                                            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                                            btn.style.pointerEvents = 'none';
+
+                                            fetch('/upload', {
+                                                method: 'POST',
+                                                body: fd,
+                                                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                                            }).then(r => r.json()).then(data => {
+                                                if(data.path) {
+                                                    items[index][field] = data.path;
+                                                    sync();
+                                                    render();
+                                                } else {
+                                                    Swal.fire('Erro', data.error || 'Falha no upload', 'error');
+                                                    btn.innerHTML = originalContent;
+                                                    btn.style.pointerEvents = 'auto';
+                                                }
+                                            }).catch(err => {
+                                                Swal.fire('Erro', 'Falha na conexão', 'error');
+                                                btn.innerHTML = originalContent;
+                                                btn.style.pointerEvents = 'auto';
+                                            });
+                                        };
+                                        fileInput.click();
+                                    };
+                                });
+
+                                container.appendChild(wrapper);
+                            });
+
+                            if (window.Sortable && container) {
+                                if (container._sortable) container._sortable.destroy();
+                                container._sortable = Sortable.create(container, {
+                                    handle: '.reorder-handle',
+                                    animation: 150,
+                                    onEnd: function() {
+                                        const newItems = [];
+                                        container.querySelectorAll('.repeater-item').forEach(el => {
+                                            newItems.push(items[parseInt(el.dataset.index)]);
+                                        });
+                                        items = newItems;
+                                        render();
+                                    }
+                                });
+                            }
+
+                            sync();
+                        }
+
+                        if(addButton) {
+                            addButton.onclick = () => {
+                                const newItem = itemSchema ? { ...itemSchema } : {};
+                                items.push(newItem);
+                                render();
+                            };
+                        }
+
+                        render();
+                    };
+                </script>
             });
         </script>
     @endprepend

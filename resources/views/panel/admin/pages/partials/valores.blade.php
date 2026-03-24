@@ -60,39 +60,66 @@
         </div>
     </div>
     <div class="p-8 space-y-4">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 px-1">
-            <label class="text-sm font-bold text-slate-600 dark:text-slate-400">Configuração dos Valores (Editor
-                JSON)</label>
-            <span
-                class="text-[10px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded italic">Array
-                de 6 objetos</span>
-        </div>
-
-        <div
-            class="p-4 bg-slate-50 dark:bg-slate-800/20 rounded-2xl border border-slate-100 dark:border-slate-800/50 space-y-2 mb-4">
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                Cada objeto deve conter: <code class="text-blue-600 dark:text-blue-400">icon</code> (ex: fa-heart),
-                <code class="text-blue-600 dark:text-blue-400">title</code>,
-                <code class="text-blue-600 dark:text-blue-400">text</code> e
-                <code class="text-blue-600 dark:text-blue-400">quote</code>.
-            </p>
-        </div>
-
-        <div class="group relative">
-            <textarea name="values_json" rows="15"
-                class="w-full bg-slate-950 text-blue-400 font-mono text-xs border-slate-800 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-500/50 transition-all leading-relaxed shadow-inner"
-                style="font-family: 'Fira Code', 'Courier New', monospace;">{{ old('values_json', json_encode($data['values'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
-            <div class="absolute top-2 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                <i class="fas fa-terminal text-slate-700"></i>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div>
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">Princípios Fundamentais</h3>
+                <p class="text-xs text-slate-500">Liste os valores que regem a cultura da organização.</p>
             </div>
+            <button type="button" id="add-value"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-blue-500/20">
+                <i class="fas fa-plus"></i>
+                Adicionar Valor
+            </button>
         </div>
 
-        @error('values_json')
-            <div class="text-red-500 text-xs font-bold px-2 flex items-center gap-2">
-                <i class="fas fa-exclamation-circle"></i>
-                {{ $message }}
-            </div>
-        @enderror
+        <div id="values-container"></div>
+        
+        <textarea name="values_json" class="hidden">{{ old('values_json', json_encode($data['values'] ?? [])) }}</textarea>
+
+        @prepend('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.initJSONRepeater({
+                    containerId: 'values-container',
+                    inputId: 'values_json',
+                    addButtonId: 'add-value',
+                    itemSchema: { icon: 'fa-heart', title: '', text: '', quote: '' },
+                    initialData: {!! json_encode($data['values'] ?? []) !!},
+                    template: function(item, index) {
+                        return `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Ícone (FontAwesome)</label>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-blue-600 shadow-sm">
+                                            <i class="fas ${item.icon || 'fa-star'}"></i>
+                                        </div>
+                                        <input type="text" name="value[icon]" value="${item.icon || ''}" class="flex-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-blue-500 transition-all" placeholder="fa-heart">
+                                    </div>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Título do Valor</label>
+                                    <input type="text" name="value[title]" value="${item.title || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Ex: Ética e Transparência">
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Descrição Curta</label>
+                                    <textarea name="value[text]" rows="2" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Descreva como este valor é aplicado...">${item.text || ''}</textarea>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Citação / Frase de Impacto</label>
+                                    <input type="text" name="value[quote]" value="${item.quote || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-medium italic focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Uma frase que resume este valor...">
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }
+                });
+            });
+        </script>
+        @endprepend
     </div>
 </section>
 

@@ -76,23 +76,75 @@
             </label>
         </div>
     </div>
-    <div class="p-8 space-y-6">
-        <div class="space-y-2">
-            <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Título da Seção</label>
-            <input type="text" name="founders_title" value="{{ old('founders_title', $data['founders_title'] ?? '') }}"
-                class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
-                placeholder="Fundadores">
+    <div class="p-8 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div>
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">Gestão de Fundadores</h3>
+                <p class="text-xs text-slate-500">Adicione ou remova os fundadores da UNN.</p>
+            </div>
+            <button type="button" id="add-founder"
+                class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-slate-900/20">
+                <i class="fas fa-plus"></i>
+                Novo Fundador
+            </button>
         </div>
 
-        <div class="space-y-4">
-            <div class="flex items-center justify-between px-1">
-                <label class="text-xs font-black uppercase tracking-widest text-slate-400">Dados dos Fundadores
-                    (JSON)</label>
-            </div>
-            <textarea name="founders_json" rows="12"
-                class="w-full bg-slate-950 text-emerald-400 font-mono text-xs border-slate-800 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-emerald-500/50 transition-all leading-relaxed shadow-inner">{{ old('founders_json', json_encode($data['founders'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
-            <p class="text-[10px] text-slate-500 px-2 italic">Campos requeridos: name, role, bio, initials.</p>
-        </div>
+        <div id="founders-container"></div>
+        
+        <textarea name="founders_json" class="hidden">{{ old('founders_json', json_encode($data['founders'] ?? [])) }}</textarea>
+
+        @prepend('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.initJSONRepeater({
+                    containerId: 'founders-container',
+                    inputId: 'founders_json',
+                    addButtonId: 'add-founder',
+                    itemSchema: { name: '', role: '', bio: '', initials: '', image: '' },
+                    initialData: {!! json_encode($data['founders'] ?? []) !!},
+                    template: function(item, index) {
+                        const baseUrl = '{{ Storage::url("") }}'.replace(/\/$/, "");
+                        const imageExists = item.image && item.image.trim() !== '';
+                        const displayImage = imageExists ? (item.image.startsWith('http') ? item.image : (baseUrl + '/' + item.image)) : '';
+
+                        return `
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div class="md:col-span-1 space-y-4">
+                                <div class="relative group/img aspect-square rounded-2xl bg-slate-100 dark:bg-slate-900 overflow-hidden border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                                    ${imageExists ? `<img src="${displayImage}" class="w-full h-full object-cover">` : `<span class="text-2xl font-black text-slate-300 dark:text-slate-700">${item.initials || '?'}</span>`}
+                                    <button type="button" class="repeater-upload-btn absolute inset-0 bg-black/40 text-white opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center gap-2 text-[10px] font-bold" data-field="image">
+                                        <i class="fas fa-camera"></i> ALTERAR FOTO
+                                    </button>
+                                </div>
+                                <input type="hidden" name="founder[image]" value="${item.image || ''}">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Iniciais (Fallback)</label>
+                                    <input type="text" name="founder[initials]" value="${item.initials || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-black text-blue-600 focus:ring-2 focus:ring-blue-500 transition-all uppercase" placeholder="MB" maxlength="2">
+                                </div>
+                            </div>
+                            <div class="md:col-span-3 grid grid-cols-1 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-black uppercase text-slate-400">Nome Completo</label>
+                                        <input type="text" name="founder[name]" value="${item.name || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Nome do Fundador">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-black uppercase text-slate-400">Cargo / Título</label>
+                                        <input type="text" name="founder[role]" value="${item.role || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Ex: CEO & Fundador">
+                                    </div>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Mini Biografia</label>
+                                    <textarea name="founder[bio]" rows="5" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Descreva a trajetória do fundador...">${item.bio || ''}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }
+                });
+            });
+        </script>
+        @endprepend
     </div>
 </section>
 
@@ -120,23 +172,67 @@
             </label>
         </div>
     </div>
-    <div class="p-8 space-y-6">
-        <div class="space-y-2">
-            <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Título da Seção</label>
-            <input type="text" name="team_title" value="{{ old('team_title', $data['team_title'] ?? '') }}"
-                class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
-                placeholder="Nossa Equipe">
+    <div class="p-8 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div>
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">Membros da Equipe</h3>
+                <p class="text-xs text-slate-500">Gerencie os colaboradores que aparecem no site.</p>
+            </div>
+            <button type="button" id="add-team"
+                class="bg-slate-700 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-slate-600/20">
+                <i class="fas fa-plus"></i>
+                Novo Membro
+            </button>
         </div>
 
-        <div class="space-y-4">
-            <div class="flex items-center justify-between px-1">
-                <label class="text-xs font-black uppercase tracking-widest text-slate-400">Membros da Equipe
-                    (JSON)</label>
-            </div>
-            <textarea name="team_json" rows="12"
-                class="w-full bg-slate-950 text-blue-400 font-mono text-xs border-slate-800 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-500/50 transition-all leading-relaxed shadow-inner">{{ old('team_json', json_encode($data['team'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
-            <p class="text-[10px] text-slate-500 px-2 italic">Campos requeridos: name, role, initials.</p>
-        </div>
+        <div id="team-container"></div>
+        
+        <textarea name="team_json" class="hidden">{{ old('team_json', json_encode($data['team'] ?? [])) }}</textarea>
+
+        @prepend('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.initJSONRepeater({
+                    containerId: 'team-container',
+                    inputId: 'team_json',
+                    addButtonId: 'add-team',
+                    itemSchema: { name: '', role: '', initials: '', image: '' },
+                    initialData: {!! json_encode($data['team'] ?? []) !!},
+                    template: function(item, index) {
+                        const baseUrl = '{{ Storage::url("") }}'.replace(/\/$/, "");
+                        const imageExists = item.image && item.image.trim() !== '';
+                        const displayImage = imageExists ? (item.image.startsWith('http') ? item.image : (baseUrl + '/' + item.image)) : '';
+
+                        return `
+                        <div class="flex flex-col md:flex-row gap-6 items-center">
+                            <div class="relative group/img w-20 h-20 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-900 overflow-hidden border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                                ${imageExists ? `<img src="${displayImage}" class="w-full h-full object-cover">` : `<span class="text-xl font-black text-slate-300 dark:text-slate-700">${item.initials || '?'}</span>`}
+                                <button type="button" class="repeater-upload-btn absolute inset-0 bg-black/40 text-white opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center text-[8px] font-bold" data-field="image">
+                                    ALTERAR
+                                </button>
+                            </div>
+                            <input type="hidden" name="member[image]" value="${item.image || ''}">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Iniciais</label>
+                                    <input type="text" name="member[initials]" value="${item.initials || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-black text-slate-600 focus:ring-2 focus:ring-blue-500 transition-all uppercase" placeholder="SM" maxlength="2">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Nome</label>
+                                    <input type="text" name="member[name]" value="${item.name || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Nome do Membro">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Cargo</label>
+                                    <input type="text" name="member[role]" value="${item.role || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Ex: Social Media">
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }
+                });
+            });
+        </script>
+        @endprepend
     </div>
 </section>
 

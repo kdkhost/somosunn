@@ -481,25 +481,78 @@
                     class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm font-medium">
             </div>
         </div>
-        <div class="space-y-4">
-            <div class="flex items-center justify-between px-1">
-                <label class="text-sm font-bold text-slate-600 dark:text-slate-400">Depoimentos Personalizados (Editor
-                    JSON)</label>
-                <span
-                    class="text-[10px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded italic">Modo
-                    Avançado</span>
+    <div class="p-8 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div>
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">Depoimentos Personalizados</h3>
+                <p class="text-xs text-slate-500">Adicione prova social ao seu site de forma visual.</p>
             </div>
-            <div class="group relative">
-                <textarea name="testimonials_json" rows="8"
-                    class="w-full bg-slate-950 text-emerald-400 font-mono text-xs border-slate-800 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-emerald-500/50 transition-all leading-relaxed shadow-inner"
-                    placeholder='[{"name":"João","role":"CEO","text":"Ótima rede!","rating":5}]'>{{ old('testimonials_json', json_encode($data['testimonials'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
-                <div class="absolute top-2 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <i class="fas fa-code text-slate-700"></i>
-                </div>
-            </div>
-            <p class="text-[11px] text-slate-400 px-2">Certifique-se de manter a sintaxe correta do JSON para que os
-                depoimentos sejam exibidos.</p>
+            <button type="button" id="add-testimonial"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-blue-500/20">
+                <i class="fas fa-plus"></i>
+                Novo Depoimento
+            </button>
         </div>
+
+        <div id="testimonials-container"></div>
+        
+        <textarea name="testimonials_json" class="hidden">{{ old('testimonials_json', json_encode($data['testimonials'] ?? [])) }}</textarea>
+
+        @prepend('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.initJSONRepeater({
+                    containerId: 'testimonials-container',
+                    inputId: 'testimonials_json',
+                    addButtonId: 'add-testimonial',
+                    itemSchema: { name: '', role: '', text: '', rating: 5, image: '' },
+                    initialData: {!! json_encode($data['testimonials'] ?? []) !!},
+                    template: function(item, index) {
+                        const baseUrl = '{{ Storage::url("") }}'.replace(/\/$/, "");
+                        const imageExists = item.image && item.image.trim() !== '';
+                        const displayImage = imageExists ? (item.image.startsWith('http') ? item.image : (baseUrl + '/' + item.image)) : '';
+
+                        return `
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div class="md:col-span-1 space-y-4">
+                                <div class="relative group/img aspect-square rounded-2xl bg-white dark:bg-slate-900 overflow-hidden border border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-sm">
+                                    ${imageExists ? `<img src="${displayImage}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-300"><i class="fas fa-user text-3xl"></i></div>`}
+                                    <button type="button" class="repeater-upload-btn absolute inset-0 bg-black/40 text-white opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center gap-2 text-[10px] font-bold" data-field="image">
+                                        <i class="fas fa-camera"></i> FOTO
+                                    </button>
+                                </div>
+                                <input type="hidden" name="testimonial[image]" value="${item.image || ''}">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Avaliação (1-5)</label>
+                                    <select name="testimonial[rating]" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-blue-500 transition-all">
+                                        ${[1,2,3,4,5].map(r => `<option value="${r}" ${item.rating == r ? 'selected' : ''}>${r} Estrelas</option>`).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="md:col-span-3 grid grid-cols-1 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-black uppercase text-slate-400">Nome do Autor</label>
+                                        <input type="text" name="testimonial[name]" value="${item.name || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Ex: Maria Silva">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-black uppercase text-slate-400">Cargo / Empresa</label>
+                                        <input type="text" name="testimonial[role]" value="${item.role || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Ex: CEO da TechLog">
+                                    </div>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Depoimento</label>
+                                    <textarea name="testimonial[text]" rows="5" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Escreva o que o cliente disse...">${item.text || ''}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }
+                });
+            });
+        </script>
+        @endprepend
+    </div>
     </div>
 </section>
 

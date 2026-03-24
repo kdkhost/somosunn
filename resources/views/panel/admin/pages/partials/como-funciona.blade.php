@@ -59,39 +59,84 @@
         </div>
     </div>
     <div class="p-8 space-y-4">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 px-1">
-            <label class="text-sm font-bold text-slate-600 dark:text-slate-400">Jornada do Usuário (Editor JSON)</label>
-            <span
-                class="text-[10px] font-black uppercase text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded italic">Array
-                de 4 objetos</span>
-        </div>
-
-        <div
-            class="p-4 bg-slate-50 dark:bg-slate-800/20 rounded-2xl border border-slate-100 dark:border-slate-800/50 space-y-2 mb-4">
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                Cada objeto deve conter: <code class="text-blue-600 dark:text-blue-400">direction</code> ("row" ou
-                "row-reverse"),
-                <code class="text-blue-600 dark:text-blue-400">title</code>,
-                <code class="text-blue-600 dark:text-blue-400">text</code> e
-                <code class="text-blue-600 dark:text-blue-400">li</code> (array de 3 frases).
-            </p>
-        </div>
-
-        <div class="group relative">
-            <textarea name="steps_json" rows="15"
-                class="w-full bg-slate-950 text-orange-400 font-mono text-xs border-slate-800 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-orange-500/50 transition-all leading-relaxed shadow-inner"
-                style="font-family: 'Fira Code', 'Courier New', monospace;">{{ old('steps_json', json_encode($data['steps'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
-            <div class="absolute top-2 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                <i class="fas fa-code text-slate-700"></i>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div>
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">Jornada do Usuário</h3>
+                <p class="text-xs text-slate-500">Gerencie as etapas que o usuário percorre no sistema.</p>
             </div>
+            <button type="button" id="add-step"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-blue-500/20">
+                <i class="fas fa-plus"></i>
+                Novo Passo
+            </button>
         </div>
 
-        @error('steps_json')
-            <div class="text-red-500 text-xs font-bold px-2 flex items-center gap-2">
-                <i class="fas fa-exclamation-circle"></i>
-                {{ $message }}
-            </div>
-        @enderror
+        <div id="steps-container"></div>
+        
+        <textarea name="steps_json" class="hidden">{{ old('steps_json', json_encode($data['steps'] ?? [])) }}</textarea>
+
+        @prepend('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.initJSONRepeater({
+                    containerId: 'steps-container',
+                    inputId: 'steps_json',
+                    addButtonId: 'add-step',
+                    itemSchema: { direction: 'row', title: '', text: '', li: ['', '', ''] },
+                    initialData: {!! json_encode($data['steps'] ?? []) !!},
+                    template: function(item, index) {
+                        return `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Direção</label>
+                                    <select name="step[direction]" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-blue-500 transition-all">
+                                        <option value="row" ${item.direction === 'row' ? 'selected' : ''}>Normal (Imagem Direita)</option>
+                                        <option value="row-reverse" ${item.direction === 'row-reverse' ? 'selected' : ''}>Invertido (Imagem Esquerda)</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Título do Passo</label>
+                                    <input type="text" name="step[title]" value="${item.title || ''}" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Ex: Primeiro Acesso">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase text-slate-400">Texto Descritivo</label>
+                                    <textarea name="step[text]" rows="3" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Descreva brevemente este passo...">${item.text || ''}</textarea>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-black uppercase text-slate-400">Benefícios / Tópicos (3 frases)</label>
+                                ${[0,1,2].map(i => `
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-5 h-5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-[10px]">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <input type="text" name="step[li.${i}]" value="${(item.li && item.li[i]) || ''}" 
+                                            class="flex-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 transition-all"
+                                            placeholder="Frase ${i+1}"
+                                            oninput="this.closest('.repeater-item').querySelector('[name=\\'step[li.${i}]\\']').dispatchEvent(new Event('change'))">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        `;
+                    }
+                });
+
+                // Custom handle for nested 'li' array
+                document.getElementById('steps-container').addEventListener('input', function(e) {
+                    if (e.target.name.startsWith('step[li.')) {
+                        const index = e.target.closest('.repeater-item').querySelector('.btn-remove').dataset.index;
+                        const liIndex = e.target.name.split('.')[1].replace(']', '');
+                        const stepsJson = JSON.parse(document.querySelector('[name="steps_json"]').value);
+                        if (!stepsJson[index].li) stepsJson[index].li = ['', '', ''];
+                        stepsJson[index].li[liIndex] = e.target.value;
+                        document.querySelector('[name="steps_json"]').value = JSON.stringify(stepsJson);
+                    }
+                });
+            });
+        </script>
+        @endprepend
     </div>
 </section>
 

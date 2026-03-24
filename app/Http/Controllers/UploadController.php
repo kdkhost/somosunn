@@ -18,15 +18,25 @@ class UploadController extends Controller
 
         $allowedV = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_video_formats', [])));
         $allowedD = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_document_formats', [])));
+        $allowedI = array_map('strtolower', array_map('trim', (array) config('uploads.allowed_image_formats', ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'])));
 
         $isVideo = in_array($ext, $allowedV, true);
         $isDoc = in_array($ext, $allowedD, true);
+        $isImage = in_array($ext, $allowedI, true);
 
-        if(!$isVideo && !$isDoc){
+        if(!$isVideo && !$isDoc && !$isImage){
             return response()->json(['error' => 'Formato de arquivo não permitido'], 422);
         }
 
-        $maxMb = (int) ($isVideo ? config('uploads.video_max_mb', 1024) : config('uploads.document_max_mb', 50));
+        $maxMb = 50;
+        if ($isVideo) {
+            $maxMb = (int) config('uploads.video_max_mb', 1024);
+        } elseif ($isImage) {
+            $maxMb = (int) config('uploads.image_max_mb', 10);
+        } else {
+            $maxMb = (int) config('uploads.document_max_mb', 50);
+        }
+        
         $maxKb = max(1, $maxMb) * 1024;
 
         $request->validate([
