@@ -47,10 +47,24 @@
 @push('scripts')
     <script>
         (function() {
-            // High Fidelity Preview Logic
+            let lastContent = '';
+            let renderAttempts = 0;
+
+            // Updated High Fidelity Preview Logic
             function renderPreview() {
+                // Try to find editor and preview relative to each other or globally
                 const $editor = $('#bodyEditor');
-                if (!$editor.length) return;
+                const $preview = $('#tpl_preview');
+
+                if (!$editor.length) {
+                    if (renderAttempts < 5) console.warn('Aguardando editor #bodyEditor...');
+                    return;
+                }
+                
+                if (!$preview.length) {
+                    if (renderAttempts < 5) console.warn('Aguardando container de preview #tpl_preview...');
+                    return;
+                }
 
                 try {
                     @php
@@ -86,8 +100,27 @@
                     @endphp
 
                     const config = {!! json_encode($previewData) !!};
-                    const bodyContent = $editor.summernote('code') || '<p style="color: #64728b; text-align: center; padding: 40px; font-weight: 500;">Comece a escrever para ver a magía acontecer em tempo real... ✨</p>';
                     
+                    // Safe content capture
+                    let bodyContent = '';
+                    try {
+                        if ($editor.data('summernote-ready')) {
+                            bodyContent = $editor.summernote('code');
+                        } else {
+                            bodyContent = $editor.val();
+                        }
+                    } catch(e) { 
+                        bodyContent = $editor.val(); 
+                    }
+
+                    if (!bodyContent || bodyContent.trim() === '') {
+                        bodyContent = '<p style="color: #64728b; text-align: center; padding: 40px; font-weight: 500;">Digite no editor para ver a mágica acontecer... ✨</p>';
+                    }
+                    
+                    if (bodyContent === lastContent && renderAttempts > 0) return;
+                    lastContent = bodyContent;
+                    renderAttempts++;
+
                     const html = `
                         <div style="background-color: #ffffff; width: 100%; font-family: 'Inter', Helvetica, Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 45px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; margin: 0 auto; max-width: 600px; transition: all 0.3s ease;">
                             <div style="${config.headerStyle} padding: 45px 30px; text-align: center; flex-shrink: 0; display: block; border-bottom: 5px solid rgba(0,0,0,0.1);">
@@ -105,16 +138,23 @@
                         </div>
                     `;
 
-                    $('#tpl_preview').html(html).css('opacity', 1);
+                    $preview.html(html).css('opacity', 1);
                 } catch (e) {
                     console.error('Erro no renderPreview:', e);
+                    $preview.html('<div class="p-4 text-red-500 text-xs">Erro ao renderizar preview: ' + e.message + '</div>');
                 }
             }
 
-            // Initialization logic (Supports SPA and Modals)
+            // Robust Initialization
             function initMailTemplateEditor() {
                 const $editor = $('#bodyEditor');
-                if (!$editor.length || $editor.data('summernote-ready')) return;
+                if (!$editor.length) return;
+                
+                // If it's the same element and already ready, just force a render
+                if ($editor.data('summernote-ready')) {
+                    renderPreview();
+                    return;
+                }
 
                 $editor.summernote({
                     placeholder: 'Escreva o conteúdo do e-mail aqui...',
@@ -142,9 +182,11 @@
                     }
                 });
 
-                // Extra listeners for ultra-fast real-time response
+                // Global delegated listeners as fallback
                 $(document).off('input keyup paste', '.note-editable');
-                $(document).on('input keyup paste', '.note-editable', renderPreview);
+                $(document).on('input keyup paste', '.note-editable', function() {
+                    renderPreview();
+                });
             }
 
             // Expose for external calls
@@ -189,18 +231,20 @@
                 });
             });
 
-            // Start polling for initialization (crucial for slow-loading modals or SPA)
-            let initCount = 0;
+            // Start polling for initialization (extended for modals)
+            let pollCounts = 0;
             const initInterval = setInterval(function() {
                 initMailTemplateEditor();
-                initCount++;
-                if (initCount > 10) clearInterval(initInterval);
+                pollCounts++;
+                // Stop after 10 seconds (20 * 500ms)
+                if (pollCounts > 20) clearInterval(initInterval);
+                
+                // Force a render at 2 seconds just in case
+                if (pollCounts === 4) renderPreview();
             }, 500);
 
             // Immediate call
-            if (typeof jQuery !== 'undefined') {
-                $(document).ready(initMailTemplateEditor);
-            }
+            initMailTemplateEditor();
         })();
     </script>
 @endpush
