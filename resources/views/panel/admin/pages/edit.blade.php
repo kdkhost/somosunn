@@ -120,50 +120,166 @@
                                 <i class="fas fa-search text-sm"></i>
                             </div>
                             <h2 class="text-lg font-bold text-slate-800 dark:text-white uppercase tracking-wider">
-                                Configurações de SEO</h2>
+                                Configurações da Página</h2>
                         </div>
                     </div>
-                    <div class="p-8 space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Título interno da
-                                    página</label>
-                                <input type="text" name="title" value="{{ old('title', $page->title) }}"
-                                    class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium"
-                                    placeholder="Ex: Home - Somos UNN">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Meta Title</label>
-                                <input type="text" name="seo_title" value="{{ old('seo_title', $data['seo_title'] ?? '') }}"
-                                    class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium"
-                                    placeholder="Ex: Sobre a Somos UNN">
-                            </div>
-                            <div class="space-y-2 md:col-span-2">
-                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Meta
-                                    Descrição</label>
-                                <textarea name="seo_description" rows="2"
-                                    class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium"
-                                    placeholder="Breve resumo para resultados de busca (Google)">{{ old('seo_description', $data['seo_description'] ?? '') }}</textarea>
+                    <div class="p-8 space-y-10">
+                        {{-- Identificação Interna --}}
+                        <div class="space-y-4">
+                            <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 flex items-center gap-2">
+                                <span class="w-8 h-[1px] bg-slate-100 dark:bg-slate-800"></span>
+                                Identificação Interna
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs">Slug da URL</label>
+                                    <div class="relative group">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">/</div>
+                                        <input type="text" value="{{ $page->slug === 'home' ? '' : $page->slug }}" readonly
+                                            class="w-full bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 rounded-2xl pl-8 pr-5 py-3 text-sm text-slate-400 cursor-not-allowed font-mono">
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs">Nome no Painel</label>
+                                    <input type="text" name="title" value="{{ old('title', $page->title) }}"
+                                        class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium border">
+                                </div>
                             </div>
                         </div>
 
-                        <div class="space-y-3">
-                            <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1">Imagem de
-                                compartilhamento (SEO)</label>
-                            <input type="file" name="seo_image" accept="image/*"
-                                class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium">
-                            @if (!empty($data['seo_image']))
-                                <div class="rounded-[1.5rem] overflow-hidden border border-slate-200 dark:border-slate-800">
-                                    <img src="{{ Storage::url($data['seo_image']) }}" alt="Preview SEO"
-                                        class="w-full h-48 object-cover">
-                                </div>
-                                <label
-                                    class="inline-flex items-center gap-2 text-sm font-semibold text-rose-600 dark:text-rose-400">
-                                    <input type="checkbox" name="remove_seo_image" value="1"
-                                        class="rounded border-slate-300 text-rose-600 focus:ring-rose-500">
-                                    Remover imagem atual
+                        {{-- SEO Principal --}}
+                        <div class="space-y-6">
+                            <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 flex items-center gap-2">
+                                <span class="w-8 h-[1px] bg-slate-100 dark:bg-slate-800"></span>
+                                SEO Principal
+                            </h3>
+                            
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs">Título H1 (Destaque Visual)</label>
+                                <input type="text" name="h1_title" value="{{ old('h1_title', $data['h1_title'] ?? '') }}"
+                                    class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium border"
+                                    placeholder="Ex: O Manifesto SOMOS UNN">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs">Meta Title (Google)</label>
+                                <input type="text" name="seo_title" value="{{ old('seo_title', $data['seo_title'] ?? '') }}"
+                                    class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium border"
+                                    placeholder="Título para os motores de busca...">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs flex justify-between items-center">
+                                    Meta Descrição
+                                    <span class="text-[10px] text-slate-400 font-normal"><span id="seo-desc-count">0</span>/320 caracteres</span>
                                 </label>
-                            @endif
+                                <textarea name="seo_description" id="seo_description" rows="3"
+                                    class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium border"
+                                    placeholder="Breve resumo para resultados de busca...">{{ old('seo_description', $data['seo_description'] ?? '') }}</textarea>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs">Meta Keywords</label>
+                                <input type="text" name="seo_keywords" value="{{ old('seo_keywords', $data['seo_keywords'] ?? '') }}"
+                                    class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium border"
+                                    placeholder="ex: curso, mentoria, comunidade (separadas por vírgula)">
+                            </div>
+                        </div>
+
+                        {{-- Indexação & Avançado --}}
+                        <div class="space-y-6">
+                            <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 flex items-center gap-2">
+                                <span class="w-8 h-[1px] bg-slate-100 dark:bg-slate-800"></span>
+                                Indexação &amp; Avançado
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs">Robots Management</label>
+                                    <select name="meta_robots" class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium border">
+                                        @php $robots = $data['meta_robots'] ?? 'index,follow'; @endphp
+                                        <option value="index,follow" {{ $robots === 'index,follow' ? 'selected' : '' }}>Index, Follow (Padrão)</option>
+                                        <option value="noindex,follow" {{ $robots === 'noindex,follow' ? 'selected' : '' }}>NoIndex, Follow</option>
+                                        <option value="index,nofollow" {{ $robots === 'index,nofollow' ? 'selected' : '' }}>Index, NoFollow</option>
+                                        <option value="noindex,nofollow" {{ $robots === 'noindex,nofollow' ? 'selected' : '' }}>NoIndex, NoFollow</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs">OpenGraph Type</label>
+                                    <select name="og_type" class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium border">
+                                        @php $ogType = $data['og_type'] ?? 'website'; @endphp
+                                        <option value="website" {{ $ogType === 'website' ? 'selected' : '' }}>Website</option>
+                                        <option value="article" {{ $ogType === 'article' ? 'selected' : '' }}>Article</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs">URL Canônica (Opcional)</label>
+                                <input type="url" name="canonical_url" value="{{ old('canonical_url', $data['canonical_url'] ?? '') }}"
+                                    class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium border"
+                                    placeholder="https://somosunn.com.br/{{ $page->slug }}">
+                            </div>
+                        </div>
+
+                        {{-- Social Sharing --}}
+                        <div class="space-y-6">
+                            <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 flex items-center gap-2">
+                                <span class="w-8 h-[1px] bg-slate-100 dark:bg-slate-800"></span>
+                                Social Sharing (OG / Twitter)
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {{-- OG Image --}}
+                                <div class="space-y-4">
+                                    <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs italic">OpenGraph Image (FB/WA 1200x630)</label>
+                                    <div class="relative group">
+                                        <div class="aspect-video rounded-[2rem] overflow-hidden bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center transition-all group-hover:border-blue-500/50">
+                                            @if (!empty($data['seo_og_image'] ?? $data['seo_image']))
+                                                <img src="{{ Storage::url($data['seo_og_image'] ?? $data['seo_image']) }}" alt="Preview OG" class="w-full h-full object-cover">
+                                                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                                    <label class="cursor-pointer bg-white text-slate-900 px-4 py-2 rounded-xl font-bold text-xs shadow-xl">
+                                                        <i class="fas fa-edit mr-1"></i> Alterar
+                                                        <input type="file" name="seo_og_image" accept="image/*" class="hidden">
+                                                    </label>
+                                                    <label class="cursor-pointer bg-rose-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-xl">
+                                                        <input type="checkbox" name="remove_seo_og_image" value="1" class="hidden">
+                                                        <i class="fas fa-trash"></i>
+                                                    </label>
+                                                </div>
+                                            @else
+                                                <i class="fas fa-cloud-upload-alt text-3xl text-slate-300 dark:text-slate-700 mb-2"></i>
+                                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Upload OG Image</span>
+                                                <input type="file" name="seo_og_image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Twitter Image --}}
+                                <div class="space-y-4">
+                                    <label class="text-sm font-bold text-slate-600 dark:text-slate-400 px-1 text-xs italic">Twitter Card Image (1200x600)</label>
+                                    <div class="relative group">
+                                        <div class="aspect-video rounded-[2rem] overflow-hidden bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center transition-all group-hover:border-blue-500/50">
+                                            @if (!empty($data['seo_twitter_image']))
+                                                <img src="{{ Storage::url($data['seo_twitter_image']) }}" alt="Preview Twitter" class="w-full h-full object-cover">
+                                                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                                    <label class="cursor-pointer bg-white text-slate-900 px-4 py-2 rounded-xl font-bold text-xs shadow-xl">
+                                                        <i class="fas fa-edit mr-1"></i> Alterar
+                                                        <input type="file" name="seo_twitter_image" accept="image/*" class="hidden">
+                                                    </label>
+                                                    <label class="cursor-pointer bg-rose-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-xl">
+                                                        <input type="checkbox" name="remove_seo_twitter_image" value="1" class="hidden">
+                                                        <i class="fas fa-trash"></i>
+                                                    </label>
+                                                </div>
+                                            @else
+                                                <i class="fas fa-cloud-upload-alt text-3xl text-slate-300 dark:text-slate-700 mb-2"></i>
+                                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Upload Twitter Image</span>
+                                                <input type="file" name="seo_twitter_image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -282,6 +398,14 @@
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 });
+
+                const seoDesc = document.getElementById('seo_description');
+                const seoCount = document.getElementById('seo-desc-count');
+                if (seoDesc && seoCount) {
+                    const updateCount = () => { seoCount.textContent = seoDesc.value.length; };
+                    seoDesc.addEventListener('input', updateCount);
+                    updateCount();
+                }
 
                 // Initial State
                 const currentHash = window.location.hash || '#sec-seo';

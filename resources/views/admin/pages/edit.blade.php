@@ -193,44 +193,123 @@
                         </div>
                     </div>
 
-                    {{-- Identificação & SEO --}}
+                    {{-- Configurações da Página (SEO Robusto) --}}
                     <section id="sec-seo" class="card card-outline card-info">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-search mr-1"></i> SEO &amp; Identificação</h3>
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <h3 class="card-title text-bold"><i class="fas fa-search mr-1"></i> Configurações da Página</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <div class="form-group">
-                                <label class="mb-1">Slug <small class="text-muted">(somente leitura)</small></label>
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend"><span class="input-group-text text-muted">/</span></div>
-                                    <input type="text" class="form-control bg-light" value="{{ $page->slug === 'home' ? '' : $page->slug }}" readonly>
+                            {{-- Identificação Interna --}}
+                            <div class="form-group mb-4">
+                                <label class="text-xs text-uppercase text-muted mb-2">Identificação Interna</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="small font-weight-bold mb-1">Slug</label>
+                                        <div class="input-group input-group-sm">
+                                            <div class="input-group-prepend"><span class="input-group-text">/</span></div>
+                                            <input type="text" class="form-control bg-light" value="{{ $page->slug === 'home' ? '' : $page->slug }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="small font-weight-bold mb-1" for="title">Nome no Painel</label>
+                                        <input type="text" id="title" name="title" class="form-control form-control-sm" value="{{ $page->title }}">
+                                    </div>
                                 </div>
                             </div>
+
+                            {{-- SEO Principal --}}
+                            <hr class="my-4">
                             <div class="form-group">
-                                <label class="mb-1" for="title">Título <small class="text-muted">(no painel)</small></label>
-                                <input type="text" id="title" name="title" class="form-control form-control-sm" value="{{ $page->title }}">
+                                <label class="text-xs text-uppercase text-muted mb-2">SEO Principal</label>
+                                
+                                <div class="mb-3">
+                                    <label class="small font-weight-bold mb-1" for="h1_title">Título H1 <small class="text-muted">(Destaque no site)</small></label>
+                                    <input type="text" id="h1_title" name="h1_title" class="form-control form-control-sm" value="{{ $data['h1_title'] ?? '' }}" placeholder="Ex: O Manifesto UNN">
+                                    <p class="text-xs text-muted mb-0">Título principal exibido visualmente na página.</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="small font-weight-bold mb-1" for="seo_title">Meta Title <small class="text-muted">(Título Google)</small></label>
+                                    <input type="text" id="seo_title" name="seo_title" class="form-control form-control-sm" value="{{ $data['seo_title'] ?? '' }}" placeholder="Título para os buscadores...">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="small font-weight-bold mb-1" for="seo_description">Meta Description</label>
+                                    <textarea id="seo_description" name="seo_description" rows="3" class="form-control form-control-sm" placeholder="Breve resumo para os buscadores...">{{ $data['seo_description'] ?? '' }}</textarea>
+                                    <div class="d-flex justify-content-between mt-1">
+                                        <span class="text-xs text-muted">Ideal: até 160 caracteres.</span>
+                                        <span class="text-xs text-muted"><span id="seo-desc-count">0</span>/320</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="small font-weight-bold mb-1" for="seo_keywords">Meta Keywords</label>
+                                    <input type="text" id="seo_keywords" name="seo_keywords" class="form-control form-control-sm" value="{{ $data['seo_keywords'] ?? '' }}" placeholder="ex: curso, mentoria, comunidade">
+                                    <p class="text-xs text-muted mb-0">Separe as palavras por vírgula.</p>
+                                </div>
                             </div>
+
+                            {{-- Indexação & Avançado --}}
+                            <hr class="my-4">
                             <div class="form-group">
-                                <label class="mb-1" for="seo_title">Meta Title</label>
-                                <input type="text" id="seo_title" name="seo_title" class="form-control form-control-sm" value="{{ $data['seo_title'] ?? '' }}">
+                                <label class="text-xs text-uppercase text-muted mb-2">Indexação &amp; Avançado</label>
+                                
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="small font-weight-bold mb-1">Robots</label>
+                                        <select name="meta_robots" class="form-control form-control-sm">
+                                            @php $robots = $data['meta_robots'] ?? 'index,follow'; @endphp
+                                            <option value="index,follow" {{ $robots === 'index,follow' ? 'selected' : '' }}>Index, Follow</option>
+                                            <option value="noindex,follow" {{ $robots === 'noindex,follow' ? 'selected' : '' }}>NoIndex, Follow</option>
+                                            <option value="index,nofollow" {{ $robots === 'index,nofollow' ? 'selected' : '' }}>Index, NoFollow</option>
+                                            <option value="noindex,nofollow" {{ $robots === 'noindex,nofollow' ? 'selected' : '' }}>NoIndex, NoFollow</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="small font-weight-bold mb-1">OG Type</label>
+                                        <select name="og_type" class="form-control form-control-sm">
+                                            @php $ogType = $data['og_type'] ?? 'website'; @endphp
+                                            <option value="website" {{ $ogType === 'website' ? 'selected' : '' }}>Website</option>
+                                            <option value="article" {{ $ogType === 'article' ? 'selected' : '' }}>Article</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <label class="small font-weight-bold mb-1" for="canonical_url">URL Canônica <small class="text-muted">(Opcional)</small></label>
+                                    <input type="url" id="canonical_url" name="canonical_url" class="form-control form-control-sm" value="{{ $data['canonical_url'] ?? '' }}" placeholder="https://exemplo.com/pagina">
+                                </div>
                             </div>
+
+                            {{-- Imagens Sociais --}}
+                            <hr class="my-4">
                             <div class="form-group mb-0">
-                                <label class="mb-1" for="seo_description">Meta Description</label>
-                                <textarea id="seo_description" name="seo_description" rows="3" class="form-control form-control-sm">{{ $data['seo_description'] ?? '' }}</textarea>
-                                <small class="form-text text-muted d-flex justify-content-between">
-                                    <span>Recomendado: até 160 car.</span>
-                                    <span><span id="seo-desc-count">0</span>/320</span>
-                                </small>
-                            </div>
-                            <div class="form-group mb-0 mt-3">
-                                <label class="mb-3 d-block font-weight-bold">Imagem de Compartilhamento (SEO)</label>
-                                @include('admin.components.upload-global', [
-                                    'name' => 'seo_image',
-                                    'path' => $data['seo_image'] ?? null,
-                                    'preview_url' => !empty($data['seo_image']) ? asset('storage/' . $data['seo_image']) : null,
-                                    'remove_name' => 'remove_seo_image',
-                                    'accept' => 'image/*',
-                                ])
+                                <label class="text-xs text-uppercase text-muted mb-3 d-block">Social Sharing (OG / Twitter)</label>
+                                
+                                <div class="mb-4">
+                                    <label class="small font-weight-bold mb-2">OpenGraph Image <small class="text-muted">(FB/WA - 1200x630)</small></label>
+                                    @include('admin.components.upload-global', [
+                                        'name' => 'seo_og_image',
+                                        'path' => $data['seo_og_image'] ?? ($data['seo_image'] ?? null),
+                                        'preview_url' => !empty($data['seo_og_image'] ?? $data['seo_image']) ? asset('storage/' . ($data['seo_og_image'] ?? $data['seo_image'])) : null,
+                                        'remove_name' => 'remove_seo_og_image',
+                                        'accept' => 'image/*',
+                                    ])
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="small font-weight-bold mb-2">Twitter Card Image <small class="text-muted">(Twitter - 1200x600)</small></label>
+                                    @include('admin.components.upload-global', [
+                                        'name' => 'seo_twitter_image',
+                                        'path' => $data['seo_twitter_image'] ?? null,
+                                        'preview_url' => !empty($data['seo_twitter_image']) ? asset('storage/' . $data['seo_twitter_image']) : null,
+                                        'remove_name' => 'remove_seo_twitter_image',
+                                        'accept' => 'image/*',
+                                    ])
+                                </div>
                             </div>
                         </div>
                     </section>

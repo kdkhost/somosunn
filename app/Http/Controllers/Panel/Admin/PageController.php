@@ -12,6 +12,17 @@ use Illuminate\View\View;
 
 class PageController extends Controller
 {
+    private const SHARED_SCALAR_FIELDS = [
+        'seo_title',
+        'seo_description',
+        'seo_keywords',
+        'meta_robots',
+        'canonical_url',
+        'og_type',
+        'twitter_card',
+        'h1_title',
+    ];
+
     /**
      * Campos escalares editáveis por slug (Baseado no AdminLTE PageController).
      */
@@ -56,12 +67,8 @@ class PageController extends Controller
             'cta_section_subtitle',
             'cta_section_btn_primary',
             'cta_section_btn_secondary',
-            'seo_title',
-            'seo_description',
         ],
         'sobre' => [
-            'seo_title',
-            'seo_description',
             'hero_title',
             'vision',
             'cta_btn_primary',
@@ -90,8 +97,6 @@ class PageController extends Controller
             'cta_btn',
         ],
         'manifesto' => [
-            'seo_title',
-            'seo_description',
             'hero_title',
             'hero_title_highlight',
             'hero_subtitle',
@@ -119,8 +124,6 @@ class PageController extends Controller
             'cta_btn',
         ],
         'valores' => [
-            'seo_title',
-            'seo_description',
             'hero_subtitle',
             'blockquote_text',
             'blockquote_author',
@@ -129,8 +132,6 @@ class PageController extends Controller
             'cta_btn',
         ],
         'como-funciona' => [
-            'seo_title',
-            'seo_description',
             'hero_subtitle',
             'plans_title',
             'plans_subtitle',
@@ -139,8 +140,6 @@ class PageController extends Controller
             'cta_btn',
         ],
         'quem-somos' => [
-            'seo_title',
-            'seo_description',
             'hero_subtitle',
             'founders_title',
             'team_title',
@@ -158,8 +157,6 @@ class PageController extends Controller
             'cta_btn',
         ],
         'eventos' => [
-            'seo_title',
-            'seo_description',
             'hero_badge',
             'hero_title',
             'hero_subtitle',
@@ -168,8 +165,6 @@ class PageController extends Controller
             'cta_btn',
         ],
         'membros' => [
-            'seo_title',
-            'seo_description',
             'hero_title',
             'hero_subtitle',
             'stat_1_value',
@@ -185,22 +180,16 @@ class PageController extends Controller
             'cta_btn',
         ],
         'vagas-abertas' => [
-            'seo_title',
-            'seo_description',
             'hero_badge',
             'hero_title',
             'hero_subtitle',
         ],
         'cursos' => [
-            'seo_title',
-            'seo_description',
             'hero_badge',
             'hero_title',
             'hero_subtitle',
         ],
         'portal' => [
-            'seo_title',
-            'seo_description',
             'hero_title',
             'hero_subtitle',
             'stat_1_value',
@@ -238,12 +227,10 @@ class PageController extends Controller
             'cta_subtitle',
             'cta_btn',
         ],
-        'termos-de-uso' => ['hero_title', 'hero_subtitle', 'body_content', 'seo_title', 'seo_description'],
-        'politica-de-privacidade' => ['hero_title', 'hero_subtitle', 'body_content', 'seo_title', 'seo_description'],
-        'consentimento-lgpd' => ['hero_title', 'hero_subtitle', 'body_content', 'seo_title', 'seo_description'],
+        'termos-de-uso' => ['hero_title', 'hero_subtitle', 'body_content'],
+        'politica-de-privacidade' => ['hero_title', 'hero_subtitle', 'body_content'],
+        'consentimento-lgpd' => ['hero_title', 'hero_subtitle', 'body_content'],
         'premium' => [
-            'seo_title',
-            'seo_description',
             'hero_badge',
             'hero_title',
             'hero_subtitle',
@@ -252,10 +239,8 @@ class PageController extends Controller
             'plans_title',
             'plans_subtitle',
         ],
-        'feed' => ['seo_title', 'seo_description'],
+        'feed' => [],
         'somos-unicas' => [
-            'seo_title',
-            'seo_description',
             'theme_color',
             'hero_title',
             'hero_subtitle',
@@ -269,8 +254,6 @@ class PageController extends Controller
             'empty_description'
         ],
         'somos-unicas-sobre' => [
-            'seo_title',
-            'seo_description',
             'theme_color',
             'hero_title',
             'hero_subtitle',
@@ -279,27 +262,27 @@ class PageController extends Controller
         ],
     ];
 
-    private const SHARED_IMAGE_FIELDS = ['seo_image'];
+    private const SHARED_IMAGE_FIELDS = ['seo_image', 'seo_og_image', 'seo_twitter_image'];
 
     private const SLUG_IMAGE_FIELDS = [
-        'home' => ['hero_image', 'seo_image'],
-        'sobre' => ['hero_image', 'seo_image'],
-        'manifesto' => ['seo_image'],
-        'valores' => ['seo_image'],
-        'como-funciona' => ['seo_image'],
-        'quem-somos' => ['cover_image', 'seo_image'],
-        'eventos' => ['hero_image', 'seo_image'],
-        'membros' => ['seo_image'],
-        'vagas-abertas' => ['hero_image', 'seo_image'],
-        'cursos' => ['hero_image', 'seo_image'],
-        'portal' => ['hero_image', 'seo_image'],
-        'premium' => ['hero_image', 'seo_image'],
-        'feed' => ['seo_image'],
+        'home' => ['hero_image'],
+        'sobre' => ['hero_image'],
+        'manifesto' => [],
+        'valores' => [],
+        'como-funciona' => [],
+        'quem-somos' => ['cover_image'],
+        'eventos' => ['hero_image'],
+        'membros' => [],
+        'vagas-abertas' => ['hero_image'],
+        'cursos' => ['hero_image'],
+        'portal' => ['hero_image'],
+        'premium' => ['hero_image'],
+        'feed' => [],
         'somos-unicas' => ['hero_image'],
         'somos-unicas-sobre' => ['hero_image', 'networking_image'],
-        'termos-de-uso' => ['seo_image'],
-        'politica-de-privacidade' => ['seo_image'],
-        'consentimento-lgpd' => ['seo_image'],
+        'termos-de-uso' => [],
+        'politica-de-privacidade' => [],
+        'consentimento-lgpd' => [],
     ];
 
     private const SLUG_JSON_FIELDS = [
@@ -338,7 +321,10 @@ class PageController extends Controller
     public function update(Request $request, Page $page): RedirectResponse
     {
         $slug = $page->slug;
-        $scalarFields = self::SLUG_SCALAR_FIELDS[$slug] ?? [];
+        $scalarFields = array_merge(
+            self::SHARED_SCALAR_FIELDS,
+            self::SLUG_SCALAR_FIELDS[$slug] ?? []
+        );
         $jsonFields = self::SLUG_JSON_FIELDS[$slug] ?? [];
         $imageFields = array_values(array_unique(array_merge(
             self::SHARED_IMAGE_FIELDS,
