@@ -191,7 +191,7 @@
     <div id="previewModal"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
         <div
-            class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-800">
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-800">
             <div class="flex justify-between items-center p-4 border-b border-slate-100 dark:border-slate-800">
                 <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
                     <i class="fas fa-eye text-blue-500"></i> Pré-visualização
@@ -437,16 +437,16 @@
                 .then(data => {
                     const doc = iframe.contentWindow.document;
                     doc.open();
-                    // Force white background for the preview content
-                    doc.write('<style>body{background:#fff!important;margin:0;padding:20px;display:flex;justify-content:center;}</style>');
+                    // Clean styles: removed the outer padding since the email layout already has it.
+                    doc.write('<style>body{background:#fff!important;margin:0;padding:0;overflow-x:hidden;display:block;width:100%;}</style>');
                     doc.write(data.html);
                     doc.close();
 
                     // Adjust height after content written
                     setTimeout(() => {
                         const height = iframe.contentWindow.document.body.scrollHeight;
-                        iframe.style.height = (height + 50) + 'px';
-                    }, 300);
+                        iframe.style.height = (height + 20) + 'px';
+                    }, 400);
                 })
                 .catch(err => {
                     console.error(err);
