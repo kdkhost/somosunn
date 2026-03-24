@@ -80,6 +80,17 @@ class LegalConsentTest extends TestCase
             ]);
     }
 
+    public function test_legal_pages_render_without_blocking_modal_for_user_pending_consent(): void
+    {
+        $user = $this->createUser();
+
+        $response = $this->actingAs($user)
+            ->get(route('site.lgpd'));
+
+        $response->assertOk();
+        $response->assertDontSee('id="lgpd-consent-modal"', false);
+    }
+
     private function createUser(): User
     {
         static $sequence = 1;

@@ -902,9 +902,16 @@
     @php
         $showNavigation = $showNavigation ?? true;
         $showFooter = $showFooter ?? true;
+        $lgpdReadingRoute = request()->routeIs('site.termos')
+            || request()->routeIs('site.privacidade')
+            || request()->routeIs('site.lgpd');
         $lgpdConsent = auth()->check()
             ? app(\App\Services\LegalConsentService::class)->modalData(auth()->user())
             : null;
+
+        if (is_array($lgpdConsent)) {
+            $lgpdConsent['requires_consent'] = ($lgpdConsent['requires_consent'] ?? false) && !$lgpdReadingRoute;
+        }
     @endphp
     @if($showNavigation)
         @include('partials.header')
