@@ -264,6 +264,9 @@ class PageController extends Controller
             'content_title',
             'content_body'
         ],
+        'consentimento-lgpd' => ['hero_title', 'hero_subtitle', 'body_content'],
+        'politica-de-privacidade' => ['hero_title', 'hero_subtitle', 'body_content'],
+        'termos-de-uso' => ['hero_title', 'hero_subtitle', 'body_content'],
     ];
 
     /**

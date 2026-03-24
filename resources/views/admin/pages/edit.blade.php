@@ -86,6 +86,18 @@
             'sec-identity' => ['icon' => 'fa-palette', 'label' => 'Identidade'],
             'sec-content' => ['icon' => 'fa-file-alt', 'label' => 'Conteúdo'],
         ],
+        'consentimento-lgpd' => [
+            'sec-identity' => ['icon' => 'fa-shield-alt', 'label' => 'Hero'],
+            'sec-content' => ['icon' => 'fa-file-signature', 'label' => 'Conteúdo'],
+        ],
+        'politica-de-privacidade' => [
+            'sec-identity' => ['icon' => 'fa-user-shield', 'label' => 'Hero'],
+            'sec-content' => ['icon' => 'fa-lock', 'label' => 'Conteúdo'],
+        ],
+        'termos-de-uso' => [
+            'sec-identity' => ['icon' => 'fa-file-contract', 'label' => 'Hero'],
+            'sec-content' => ['icon' => 'fa-gavel', 'label' => 'Conteúdo'],
+        ],
     ];
     $sections = $slugSections[$page->slug] ?? [];
     $badgeColor = 'primary';
