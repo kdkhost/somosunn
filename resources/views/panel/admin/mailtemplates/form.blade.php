@@ -91,8 +91,6 @@
             // Test Email
             $('#btnSendTest').click(function () {
                 const url = $(this).data('url');
-                // ... (rest of test logic copied from original/partial logic if needed)
-                // For standalone form, we can just use the same logic or alert
                 if (!url) return toastr.warning('Salve o template primeiro antes de testar.');
 
                 const email = $('#test_email_input').val();
@@ -121,6 +119,59 @@
                     }
                 });
             });
+
+            // Preview Logic
+            function renderPreview() {
+                @php
+                    $logo = \App\Models\Setting::get('logo_admin');
+                    if(!$logo) $logo = \App\Models\Setting::get('logo_front');
+                    if(!$logo) $logo = \App\Models\Setting::get('logo_image');
+                    $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
+                    
+                    $bgType = \App\Models\Setting::get('email_header_bg_type') ?? 'gradient';
+                    $color1 = \App\Models\Setting::get('email_header_color_1') ?? \App\Models\Setting::get('site_color_primary') ?? '#000000';
+                    $color2 = \App\Models\Setting::get('email_header_color_2') ?? \App\Models\Setting::get('site_color_secondary') ?? '#333333';
+                    $color3 = \App\Models\Setting::get('email_header_color_3');
+
+                    $headerStyle = "";
+                    if ($bgType === 'solid') {
+                        $headerStyle = "background-color: {$color1};";
+                    } else {
+                        if ($color3) {
+                            $headerStyle = "background: linear-gradient(135deg, {$color1} 0%, {$color2} 50%, {$color3} 100%);";
+                        } else {
+                            $headerStyle = "background: linear-gradient(135deg, {$color1} 0%, {$color2} 100%);";
+                        }
+                    }
+                @endphp
+
+                const logo = '{{ $logoUrl }}';
+                const siteName = '{{ config('app.name') }}';
+                const siteUrl = '{{ url('/') }}';
+                const year = '{{ date('Y') }}';
+                const headerStyle = '{!! $headerStyle !!}';
+                const primaryColor = '{{ $color1 }}';
+                
+                const bodyContent = $('#bodyEditor').summernote('code');
+                
+                $('#tpl_preview').html(`
+                    <div style="background-color: #ffffff; width: 100%; font-family: sans-serif; box-sizing: border-box; display: flex; flex-direction: column;">
+                        <div style="${headerStyle} padding: 30px 20px; text-align: center; flex-shrink: 0;">
+                            <img src="${logo}" alt="${siteName}" style="max-height: 50px; max-width: 100%; height: auto;">
+                        </div>
+                        <div style="padding: 30px 25px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px; min-height: 200px;">
+                            ${bodyContent}
+                        </div>
+                        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; color: #777777; font-size: 11px; border-top: 1px solid #eeeeee; flex-shrink: 0;">
+                            <p style="margin: 4px 0;">&copy; ${year} ${siteName}. Todos os direitos reservados.</p>
+                            <p style="margin: 4px 0;"><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none; font-weight: bold;">Visite nosso site</a></p>
+                        </div>
+                    </div>
+                `);
+            }
+
+            renderPreview();
+            $('#bodyEditor').on('summernote.change', renderPreview);
         });
     </script>
 @endpush

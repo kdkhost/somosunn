@@ -25,7 +25,10 @@
             <div>
                 <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 transition-colors">Conteúdo (HTML)</label>
                 <textarea name="body" id="bodyEditor">{{ old('body', $template->body ?? '') }}</textarea>
-                <p class="text-xs text-slate-500 dark:text-slate-500 mt-2 transition-colors">A logo da plataforma será inserida automaticamente no topo do e-mail.</p>
+                <div class="flex items-center gap-2 mt-2 text-xs text-slate-500 dark:text-slate-500 transition-colors">
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                    <span>O cabeçalho e rodapé padrão serão aplicados automaticamente ao enviar.</span>
+                </div>
             </div>
         </div>
 
@@ -105,8 +108,10 @@
 
         <!-- Test Email -->
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 space-y-4 transition-colors duration-300">
-            <h3 class="font-bold text-slate-800 dark:text-white mb-2 transition-colors">Testar Template</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-500 transition-colors">Salve as alterações antes de testar para visualizar o conteúdo atualizado.</p>
+            <h3 class="font-bold text-slate-800 dark:text-white mb-2 transition-colors flex items-center gap-2">
+                <i class="fas fa-paper-plane text-blue-500 text-sm"></i> Testar Template
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-500 transition-colors">Salve antes de testar para aplicar as mudanças mais recentes.</p>
             
             <div class="flex gap-2">
                  <input type="email" id="test_email_input" placeholder="seu@email.com" 
@@ -116,6 +121,17 @@
                          class="bg-blue-600 text-white rounded-2xl px-6 hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 transform hover:scale-[1.02]">
                      <i class="fas fa-paper-plane"></i>
                  </button>
+            </div>
+        </div>
+
+        <!-- Real-time Preview -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 space-y-4 transition-colors duration-300 overflow-hidden">
+            <h3 class="font-bold text-slate-800 dark:text-white mb-2 transition-colors flex items-center gap-2">
+                <i class="fas fa-eye text-blue-500 text-sm"></i> Preview em Tempo Real
+            </h3>
+            
+            <div id="tpl_preview" class="w-full rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 min-h-[300px]">
+                <!-- Rendered content via JS -->
             </div>
         </div>
     </div>

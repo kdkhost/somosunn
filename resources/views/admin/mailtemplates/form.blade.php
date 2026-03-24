@@ -192,29 +192,43 @@ $(function(){
 
     function renderPreview(){
         @php
-            $logo = \App\Models\Setting::where('key', 'logo_admin')->value('value');
-            if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_front')->value('value');
-            if(!$logo) $logo = \App\Models\Setting::where('key', 'logo_image')->value('value');
+            $logo = \App\Models\Setting::get('logo_admin');
+            if(!$logo) $logo = \App\Models\Setting::get('logo_front');
+            if(!$logo) $logo = \App\Models\Setting::get('logo_image');
             $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
-            $primaryColor = \App\Models\Setting::where('key', 'site_color_primary')->value('value') ?? '#007bff';
-            $secondaryColor = \App\Models\Setting::where('key', 'site_color_secondary')->value('value') ?? '#6c757d';
+            
+            $bgType = \App\Models\Setting::get('email_header_bg_type') ?? 'gradient';
+            $color1 = \App\Models\Setting::get('email_header_color_1') ?? \App\Models\Setting::get('site_color_primary') ?? '#000000';
+            $color2 = \App\Models\Setting::get('email_header_color_2') ?? \App\Models\Setting::get('site_color_secondary') ?? '#333333';
+            $color3 = \App\Models\Setting::get('email_header_color_3');
+
+            $headerStyle = "";
+            if ($bgType === 'solid') {
+                $headerStyle = "background-color: {$color1};";
+            } else {
+                if ($color3) {
+                    $headerStyle = "background: linear-gradient(135deg, {$color1} 0%, {$color2} 50%, {$color3} 100%);";
+                } else {
+                    $headerStyle = "background: linear-gradient(135deg, {$color1} 0%, {$color2} 100%);";
+                }
+            }
         @endphp
 
         const logo = '{{ $logoUrl }}';
-        const primaryColor = '{{ $primaryColor }}';
-        const secondaryColor = '{{ $secondaryColor }}';
         const siteName = '{{ config('app.name') }}';
         const siteUrl = '{{ url('/') }}';
         const year = '{{ date('Y') }}';
+        const headerStyle = '{!! $headerStyle !!}';
+        const primaryColor = '{{ $color1 }}';
         
         const bodyContent = $('#bodyEditor').summernote('code');
         
         $('#tpl_preview').html(`
         <div style="background-color: #ffffff; width: 100%; font-family: sans-serif; box-sizing: border-box; display: flex; flex-direction: column;">
-            <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); padding: 25px 20px; text-align: center; flex-shrink: 0;">
+            <div style="${headerStyle} padding: 25px 20px; text-align: center; flex-shrink: 0;">
                 <img src="${logo}" alt="${siteName}" style="max-height: 50px; max-width: 100%; height: auto;">
             </div>
-            <div style="padding: 25px 20px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px;">
+            <div style="padding: 25px 20px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px; min-height: 150px;">
                 ${bodyContent}
             </div>
             <div style="background-color: #f8f9fa; padding: 15px; text-align: center; color: #777777; font-size: 11px; border-top: 1px solid #eeeeee; flex-shrink: 0;">
