@@ -33,7 +33,7 @@
             </div>
             <span class="badge badge-secondary">JSON</span>
         </div>
-    </div>
+    <div class="card-body">
         <div id="steps-repeater-container"></div>
         <button type="button" id="add-step-btn" class="btn btn-outline-primary btn-block mt-3">
             <i class="fas fa-plus mr-1"></i> Adicionar Passo
