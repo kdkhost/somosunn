@@ -106,32 +106,45 @@
             </div>
         </div>
 
-        <!-- Test Email -->
-        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 space-y-4 transition-colors duration-300">
-            <h3 class="font-bold text-slate-800 dark:text-white mb-2 transition-colors flex items-center gap-2">
-                <i class="fas fa-paper-plane text-blue-500 text-sm"></i> Testar Template
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-500 transition-colors">Salve antes de testar para aplicar as mudanças mais recentes.</p>
-            
-            <div class="flex gap-2">
-                 <input type="email" id="test_email_input" placeholder="seu@email.com" 
-                        class="flex-1 px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none text-sm dark:text-white placeholder-slate-400 dark:placeholder-slate-600 transition-all">
-                 <button type="button" id="btnSendTest" 
-                         data-url="{{ isset($template->id) ? route('panel.admin.mailtemplates.sendpreview', $template) : '' }}"
-                         class="bg-blue-600 text-white rounded-2xl px-6 hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 transform hover:scale-[1.02]">
-                     <i class="fas fa-paper-plane"></i>
-                 </button>
-            </div>
-        </div>
-
         <!-- Real-time Preview -->
-        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 space-y-4 transition-colors duration-300 overflow-hidden">
-            <h3 class="font-bold text-slate-800 dark:text-white mb-2 transition-colors flex items-center gap-2">
-                <i class="fas fa-eye text-blue-500 text-sm"></i> Preview em Tempo Real
-            </h3>
-            
-            <div id="tpl_preview" class="w-full rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 min-h-[300px]">
-                <!-- Rendered content via JS -->
+        <div class="sticky top-6 space-y-4">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-800">
+                    <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-eye text-blue-500 text-sm"></i> Preview em tempo real
+                    </h3>
+                </div>
+                
+                <div id="tpl_preview" class="p-4 bg-slate-50 dark:bg-slate-950 min-h-[400px]">
+                    <!-- Rendered content via JS -->
+                </div>
+            </div>
+
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 border border-blue-100 dark:border-blue-900/30">
+                <div class="flex gap-3">
+                    <i class="fas fa-lightbulb text-blue-500 mt-1"></i>
+                    <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed font-medium">
+                        Dica: Use as variáveis dinâmicas ao lado para personalizar o conteúdo automaticamente para cada destinatário.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Test Email -->
+            <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 space-y-4 transition-colors duration-300">
+                <h3 class="font-bold text-slate-800 dark:text-white mb-2 transition-colors flex items-center gap-2">
+                    <i class="fas fa-paper-plane text-blue-500 text-sm"></i> Testar Template
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-500 transition-colors">Envie uma prévia real para seu e-mail.</p>
+                
+                <div class="flex gap-2">
+                     <input type="email" id="test_email_input" placeholder="seu@email.com" 
+                            class="flex-1 px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none text-sm dark:text-white placeholder-slate-400 dark:placeholder-slate-600 transition-all">
+                     <button type="button" id="btnSendTest" 
+                             data-url="{{ isset($template->id) ? route('panel.admin.mailtemplates.sendpreview', $template) : '' }}"
+                             class="bg-blue-600 text-white rounded-2xl px-6 hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 transform hover:scale-[1.02]">
+                         <i class="fas fa-paper-plane"></i>
+                     </button>
+                </div>
             </div>
         </div>
     </div>

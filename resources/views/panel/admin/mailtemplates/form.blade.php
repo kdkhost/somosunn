@@ -155,16 +155,16 @@
                 const bodyContent = $('#bodyEditor').summernote('code');
                 
                 $('#tpl_preview').html(`
-                    <div style="background-color: #ffffff; width: 100%; font-family: sans-serif; box-sizing: border-box; display: flex; flex-direction: column;">
-                        <div style="${headerStyle} padding: 30px 20px; text-align: center; flex-shrink: 0;">
-                            <img src="${logo}" alt="${siteName}" style="max-height: 50px; max-width: 100%; height: auto;">
+                    <div style="background-color: #ffffff; width: 100%; font-family: sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;">
+                        <div style="${headerStyle} padding: 40px 20px; text-align: center; flex-shrink: 0;">
+                            <img src="${logo}" alt="${siteName}" style="max-height: 45px; max-width: 100%; height: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
                         </div>
-                        <div style="padding: 30px 25px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px; min-height: 200px;">
+                        <div style="padding: 30px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px; min-height: 250px;">
                             ${bodyContent}
                         </div>
-                        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; color: #777777; font-size: 11px; border-top: 1px solid #eeeeee; flex-shrink: 0;">
-                            <p style="margin: 4px 0;">&copy; ${year} ${siteName}. Todos os direitos reservados.</p>
-                            <p style="margin: 4px 0;"><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none; font-weight: bold;">Visite nosso site</a></p>
+                        <div style="background-color: #fcfcfc; padding: 25px 20px; text-align: center; color: #888888; font-size: 11px; border-top: 1px dashed #eeeeee; flex-shrink: 0;">
+                            <p style="margin: 4px 0; font-weight: 500;">&copy; ${year} ${siteName}.</p>
+                            <p style="margin: 4px 0;"><a href="${siteUrl}" style="color: ${primaryColor}; text-decoration: none; font-weight: 700;">Visite nosso site</a></p>
                         </div>
                     </div>
                 `);
