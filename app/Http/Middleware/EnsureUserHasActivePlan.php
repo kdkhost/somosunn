@@ -40,6 +40,8 @@ class EnsureUserHasActivePlan
             'premium',
             'panel.profile.edit',
             'panel.profile.update',
+            'panel.purchases.index',
+            'panel.purchases.download',
             'admin.courses.available',
             'checkout.show',
             'checkout.process',

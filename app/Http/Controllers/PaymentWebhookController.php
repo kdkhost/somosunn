@@ -16,6 +16,7 @@ use App\Models\OrderSplit;
 use App\Services\CouponService;
 use App\Services\AffiliateTrackingService;
 use App\Services\InvoiceService;
+use App\Services\Marketplace\SellerProductFulfillmentService;
 use App\Services\PointsService;
 use App\Support\EmailQueueSettings;
 use Illuminate\Http\Request;
@@ -149,6 +150,7 @@ class PaymentWebhookController extends Controller
         $this->activatePlanForOrder($order);
         app(AffiliateTrackingService::class)->recordPaidOrder($order);
         $this->fulfillDigitalItemsForOrder($order);
+        app(SellerProductFulfillmentService::class)->fulfillPaidOrder($order);
         app(InvoiceService::class)->issueAndQueueForOrder($order);
 
         if (!$wasPaid || !data_get($order->metadata, 'emails.marketplace_paid_sent_at')) {

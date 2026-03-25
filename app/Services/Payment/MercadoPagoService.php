@@ -21,6 +21,11 @@ class MercadoPagoService
     private function calculateTotalAndFee(Order $order, array $config): array
     {
         $originalAmount = (float) $order->total_amount;
+        $feeBaseAmount = (float) data_get($order->metadata, 'platform_fee_base_amount', $originalAmount);
+        if ($feeBaseAmount <= 0 || $feeBaseAmount > $originalAmount) {
+            $feeBaseAmount = $originalAmount;
+        }
+
         $feePercent = (float) Setting::get('marketplace_platform_fee_percent', 0);
         $globalBehavior = Setting::get('marketplace_fee_behavior', 'absorb');
 
@@ -39,13 +44,13 @@ class MercadoPagoService
             if ($passFee) {
                 // Pass Fee: Add fee to total.
                 // Formula: Total = Original + (Original * Fee%)
-                $feeValue = round($originalAmount * ($feePercent / 100), 2);
+                $feeValue = round($feeBaseAmount * ($feePercent / 100), 2);
                 $finalAmount = $originalAmount + $feeValue;
                 $applicationFee = $feeValue;
             } else {
                 // Absorb Fee: Deduct from seller.
                 // Formula: Application Fee = Total * Fee%
-                $applicationFee = round($originalAmount * ($feePercent / 100), 2);
+                $applicationFee = round($feeBaseAmount * ($feePercent / 100), 2);
             }
         }
 

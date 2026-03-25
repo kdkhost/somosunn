@@ -109,6 +109,61 @@
         </div>
     </div>
 
+    <div
+        class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-8 space-y-6">
+        <div class="flex items-center gap-3 mb-2">
+            <div
+                class="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                <i class="fas fa-truck-fast"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-800 dark:text-white text-lg">Frete Correios</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Credenciais e servicos usados nas lojas dos vendedores.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Token Bearer</label>
+                    <input type="password" name="correios_api_token"
+                        value="{{ $settings['correios_api_token'] ?? '' }}"
+                        placeholder="Token da API Correios"
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Base URL</label>
+                    <input type="text" name="correios_api_base_url"
+                        value="{{ $settings['correios_api_base_url'] ?? 'https://api.correios.com.br' }}"
+                        placeholder="https://api.correios.com.br"
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Codigo PAC</label>
+                    <input type="text" name="correios_service_code_pac"
+                        value="{{ $settings['correios_service_code_pac'] ?? '03298' }}"
+                        placeholder="03298"
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Codigo SEDEX</label>
+                    <input type="text" name="correios_service_code_sedex"
+                        value="{{ $settings['correios_service_code_sedex'] ?? '03220' }}"
+                        placeholder="03220"
+                        class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                </div>
+
+                <div class="sm:col-span-2 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Configure aqui o token da plataforma e os codigos dos servicos usados no checkout de produtos fisicos. O vendedor precisa manter CEP e endereco preenchidos no perfil para que a cotacao funcione.
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Carousel -->
     <div
         class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-8 space-y-6">

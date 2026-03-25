@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\MailTemplate;
 use App\Models\Mentorship;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Services\Mail\SystemMailLayoutData;
 use App\Support\EmailQueueSettings;
 use Illuminate\Bus\Queueable;
@@ -195,7 +196,7 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
                 'items_html' => $itemsHtml,
             ],
             'links' => [
-                'account_url' => route('login'),
+                'account_url' => route('panel.purchases.index'),
                 'seller_panel_url' => route('login'),
             ],
         ];
@@ -219,7 +220,7 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
             $unit = (float) ($item->price ?? 0);
             $price = 'R$ ' . number_format($unit, 2, ',', '.');
 
-            $accessUrl = $this->resolveAccessUrl((string) ($item->item_type ?? ''), (int) ($item->item_id ?? 0));
+            $accessUrl = $this->resolveAccessUrl($item);
             $accessLink = $accessUrl ? '<div style="margin-top: 6px;"><a href="' . e($accessUrl) . '" style="color: ' . e($primary) . '; text-decoration: none;">Acessar</a></div>' : '';
 
             $qtyText = $qty > 1 ? ' (x' . $qty . ')' : '';
@@ -230,9 +231,12 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
         return $html;
     }
 
-    private function resolveAccessUrl(string $type, int $id): ?string
+    private function resolveAccessUrl(OrderItem $item): ?string
     {
         try {
+            $type = (string) ($item->item_type ?? '');
+            $id = (int) ($item->item_id ?? 0);
+
             if ($type === 'course' && $id > 0) {
                 $course = Course::query()->select(['id', 'slug'])->find($id);
                 if ($course) {
@@ -252,6 +256,14 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
                 $event = Event::query()->select(['id'])->find($id);
                 if ($event) {
                     return route('events.show', $event->id);
+                }
+            }
+
+            if ($type === 'seller_product') {
+                $storeSlug = trim((string) data_get($item, 'data.store_slug', ''));
+                $productSlug = trim((string) data_get($item, 'data.product_slug', ''));
+                if ($storeSlug !== '' && $productSlug !== '') {
+                    return route('seller-stores.products.show', [$storeSlug, $productSlug]);
                 }
             }
         } catch (\Throwable $e) {

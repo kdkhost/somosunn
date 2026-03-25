@@ -1,0 +1,279 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\GatewayAccount;
+use App\Models\Order;
+use App\Models\OrderShipment;
+use App\Models\SellerStore;
+use App\Services\Marketplace\CorreiosShippingService;
+use App\Services\Marketplace\SellerProductCartService;
+use App\Services\OrderSettlementService;
+use App\Services\Payment\MercadoPagoService;
+use App\Support\MarketplaceFee;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class SellerProductCheckoutController extends Controller
+{
+    public function show(Request $request, SellerProductCartService $cartService, CorreiosShippingService $shippingService)
+    {
+        if (!Auth::check()) {
+            return redirect()->guest(route('login'))->with('error', 'Faca login para finalizar a compra.');
+        }
+
+        $totals = $cartService->totals();
+        if ($totals['items']->isEmpty()) {
+            return redirect()->route('seller-products.cart.show')->with('error', 'Seu carrinho esta vazio.');
+        }
+
+        $sellerStore = SellerStore::query()->with('user')->findOrFail((int) $totals['items']->first()['product']->seller_store_id);
+        abort_unless(app(\App\Services\Marketplace\SellerStoreService::class)->isPubliclyAvailable($sellerStore), 404);
+
+        $shippingAddress = [
+            'recipient_name' => old('recipient_name', Auth::user()->name),
+            'recipient_email' => old('recipient_email', Auth::user()->email),
+            'recipient_phone' => old('recipient_phone', Auth::user()->phone),
+            'postal_code' => old('postal_code', Auth::user()->cep),
+            'address_line' => old('address_line', Auth::user()->address),
+            'number' => old('number', Auth::user()->number),
+            'complement' => old('complement', Auth::user()->complement),
+            'neighborhood' => old('neighborhood', Auth::user()->neighborhood),
+            'city' => old('city', Auth::user()->city),
+            'state' => old('state', Auth::user()->state),
+        ];
+
+        $quotes = [];
+        $shippingError = null;
+        if ($totals['has_physical'] && filled($shippingAddress['postal_code'])) {
+            try {
+                $quotes = $shippingService->quote($sellerStore, $totals['items'], $shippingAddress);
+            } catch (\Throwable $e) {
+                $shippingError = $e->getMessage();
+            }
+        }
+
+        $gateways = GatewayAccount::resolveForSeller((int) $sellerStore->user_id);
+
+        return view('storefront.checkout', [
+            'sellerStore' => $sellerStore,
+            'totals' => $totals,
+            'quotes' => $quotes,
+            'shippingError' => $shippingError,
+            'shippingAddress' => $shippingAddress,
+            'mpEnabled' => (bool) ($gateways['mpEnabled'] ?? false),
+        ]);
+    }
+
+    public function process(
+        Request $request,
+        SellerProductCartService $cartService,
+        CorreiosShippingService $shippingService,
+        MercadoPagoService $mpService,
+        OrderSettlementService $orderSettlementService
+    ) {
+        if (!Auth::check()) {
+            return redirect()->guest(route('login'))->with('error', 'Faca login para finalizar a compra.');
+        }
+
+        $totals = $cartService->totals();
+        if ($totals['items']->isEmpty()) {
+            return redirect()->route('seller-products.cart.show')->with('error', 'Seu carrinho esta vazio.');
+        }
+
+        $sellerStore = SellerStore::query()->with('user')->findOrFail((int) $totals['items']->first()['product']->seller_store_id);
+        abort_unless(app(\App\Services\Marketplace\SellerStoreService::class)->isPubliclyAvailable($sellerStore), 404);
+
+        $data = $request->validate([
+            'gateway_provider' => ['nullable', 'in:mercadopago'],
+            'recipient_name' => ['nullable', 'string', 'max:120'],
+            'recipient_email' => ['nullable', 'email', 'max:120'],
+            'recipient_phone' => ['nullable', 'string', 'max:40'],
+            'postal_code' => ['nullable', 'string', 'max:20'],
+            'address_line' => ['nullable', 'string', 'max:200'],
+            'number' => ['nullable', 'string', 'max:40'],
+            'complement' => ['nullable', 'string', 'max:120'],
+            'neighborhood' => ['nullable', 'string', 'max:120'],
+            'city' => ['nullable', 'string', 'max:120'],
+            'state' => ['nullable', 'string', 'max:10'],
+            'shipping_service_code' => ['nullable', 'string', 'max:40'],
+        ]);
+
+        $shippingQuote = null;
+        if ($totals['has_physical']) {
+            foreach (['recipient_name', 'recipient_email', 'postal_code', 'address_line', 'city', 'state'] as $field) {
+                if (blank($data[$field] ?? null)) {
+                    return back()->withErrors([$field => 'Preencha o endereco de entrega para itens fisicos.'])->withInput();
+                }
+            }
+
+            $quotes = $shippingService->quote($sellerStore, $totals['items'], $data);
+            $shippingQuote = collect($quotes)->firstWhere('service_code', (string) ($data['shipping_service_code'] ?? ''));
+            if (!$shippingQuote) {
+                return back()->withErrors(['shipping_service_code' => 'Selecione uma opcao valida de frete dos Correios.'])->withInput();
+            }
+        }
+
+        $subtotal = round((float) $totals['subtotal'], 2);
+        $shippingAmount = round((float) data_get($shippingQuote, 'amount', 0), 2);
+        $total = round($subtotal + $shippingAmount, 2);
+
+        $gateways = GatewayAccount::resolveForSeller((int) $sellerStore->user_id);
+        if ($total > 0 && !($gateways['mpEnabled'] ?? false)) {
+            return back()->with('error', 'Mercado Pago nao configurado pelo vendedor.')->withInput();
+        }
+
+        $order = null;
+        DB::transaction(function () use (&$order, $totals, $subtotal, $shippingAmount, $total, $shippingQuote, $data, $sellerStore) {
+            $platformFeeAmount = MarketplaceFee::amount($subtotal);
+            $platformFeePercent = MarketplaceFee::percent();
+
+            foreach ($totals['items'] as $row) {
+                $product = $row['product']->fresh(['store.user']);
+                if (!$product || !$product->isPublished() || !$product->store || !app(\App\Services\Marketplace\SellerStoreService::class)->isPubliclyAvailable($product->store)) {
+                    abort(422, 'Um dos produtos nao esta mais disponivel para compra.');
+                }
+
+                if ($product->isPhysical()) {
+                    $availableStock = max(0, (int) ($product->stock ?? 0));
+                    if ($availableStock < (int) $row['quantity']) {
+                        abort(422, 'Estoque insuficiente para concluir o pedido.');
+                    }
+                }
+            }
+
+            $order = Order::query()->create([
+                'user_id' => auth()->id(),
+                'seller_id' => $sellerStore->user_id,
+                'status' => 'pending',
+                'total_amount' => $total,
+                'fee_amount' => 0,
+                'platform_fee_amount' => $platformFeeAmount,
+                'currency' => 'BRL',
+                'gateway' => $total <= 0 ? 'free' : 'mercadopago',
+                'metadata' => [
+                    'context' => 'marketplace',
+                    'sale_type' => 'seller_product',
+                    'public_token' => Str::random(40),
+                    'platform_fee_base_amount' => $subtotal,
+                    'platform_fee_percent' => $platformFeePercent,
+                    'shipping_amount' => $shippingAmount,
+                    'store' => [
+                        'id' => $sellerStore->id,
+                        'slug' => $sellerStore->slug,
+                        'brand_name' => $sellerStore->brand_name,
+                    ],
+                ],
+            ]);
+
+            foreach ($totals['items'] as $row) {
+                $product = $row['product'];
+                $deliverySnapshot = null;
+                if ($product->isDigital()) {
+                    $deliverySnapshot = [
+                        'type' => $product->digital_delivery_type,
+                        'url' => $product->digital_url,
+                        'file_path' => $product->digital_file_path,
+                        'file_name' => $product->digital_file_name,
+                        'instructions' => $product->digital_instructions,
+                    ];
+                }
+
+                $order->items()->create([
+                    'item_type' => 'seller_product',
+                    'item_id' => $product->id,
+                    'title' => $product->title,
+                    'price' => $row['unit_price'],
+                    'quantity' => $row['quantity'],
+                    'data' => [
+                        'type' => $product->type,
+                        'sku' => $product->sku,
+                        'store_id' => $product->seller_store_id,
+                        'store_slug' => $sellerStore->slug,
+                        'product_slug' => $product->slug,
+                        'cover_url' => $product->cover_url,
+                        'digital_delivery' => $deliverySnapshot,
+                        'dimensions' => [
+                            'weight_grams' => $product->weight_grams,
+                            'height_cm' => $product->height_cm,
+                            'width_cm' => $product->width_cm,
+                            'length_cm' => $product->length_cm,
+                        ],
+                    ],
+                ]);
+            }
+
+            if ($shippingQuote) {
+                $order->items()->create([
+                    'item_type' => 'shipping',
+                    'item_id' => 0,
+                    'title' => 'Frete Correios - ' . (string) $shippingQuote['service_name'],
+                    'price' => $shippingAmount,
+                    'quantity' => 1,
+                    'data' => [
+                        'service_code' => $shippingQuote['service_code'],
+                        'service_name' => $shippingQuote['service_name'],
+                        'delivery_days' => $shippingQuote['delivery_days'],
+                    ],
+                ]);
+
+                OrderShipment::query()->create([
+                    'order_id' => $order->id,
+                    'status' => 'pending',
+                    'service_code' => $shippingQuote['service_code'],
+                    'service_name' => $shippingQuote['service_name'],
+                    'shipping_amount' => $shippingAmount,
+                    'delivery_days' => $shippingQuote['delivery_days'],
+                    'recipient_name' => $data['recipient_name'] ?? null,
+                    'recipient_email' => $data['recipient_email'] ?? null,
+                    'recipient_phone' => $data['recipient_phone'] ?? null,
+                    'postal_code' => $data['postal_code'] ?? '',
+                    'address_line' => $data['address_line'] ?? null,
+                    'number' => $data['number'] ?? null,
+                    'complement' => $data['complement'] ?? null,
+                    'neighborhood' => $data['neighborhood'] ?? null,
+                    'city' => $data['city'] ?? null,
+                    'state' => $data['state'] ?? null,
+                    'quote_payload' => $shippingQuote['payload'] ?? [],
+                ]);
+            }
+        });
+
+        $cartService->clear();
+
+        if ($total <= 0) {
+            $orderSettlementService->settleAsPaid($order, [
+                'transaction_id' => 'FREE-SELLER-PRODUCT-' . $order->id . '-' . now()->format('YmdHis'),
+                'payment_method' => 'free_checkout',
+                'queue_invoice_email' => false,
+                'send_notifications' => false,
+                'gateway_data' => [
+                    'source' => 'free_seller_product_checkout',
+                    'automatic' => true,
+                ],
+            ]);
+
+            return redirect()->route('checkout.success', $order);
+        }
+
+        $preference = $mpService->createPreference($order, [
+            'statement_descriptor' => 'UNN LOJA',
+        ]);
+
+        $order->update([
+            'metadata' => array_merge($order->metadata ?? [], [
+                'mercadopago_preference_id' => $preference['id'] ?? null,
+                'mercadopago_init_point' => $preference['init_point'] ?? null,
+                'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
+            ]),
+        ]);
+
+        return view('checkout.transparent', [
+            'order' => $order->fresh('items', 'user'),
+            'preferenceId' => $preference['id'] ?? '',
+            'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key') ?: \App\Models\Setting::get('mp_public_key'),
+        ]);
+    }
+}

@@ -7,14 +7,16 @@ use App\Models\Event;
 use App\Models\GatewayAccount;
 use App\Models\Mentorship;
 use App\Models\Order;
+use App\Models\SellerProduct;
 use App\Models\Testimonial;
+use App\Services\Marketplace\SellerStoreService;
 use App\Support\ContentVisibility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MarketplaceController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, SellerStoreService $storeService)
     {
         $publicStatuses = ['published', 'paused'];
         $q = trim((string) $request->query('q', ''));
@@ -79,6 +81,23 @@ class MarketplaceController extends Controller
             ->limit(12)
             ->get();
 
+        $sellerProductsQuery = SellerProduct::query()
+            ->with(['store.user', 'media'])
+            ->published()
+            ->latest('id');
+
+        if ($q !== '') {
+            $sellerProductsQuery->where(function ($query) use ($q) {
+                $query->where('title', 'like', '%' . $q . '%')
+                    ->orWhere('excerpt', 'like', '%' . $q . '%')
+                    ->orWhere('description', 'like', '%' . $q . '%');
+            });
+        }
+
+        $sellerProducts = $sellerProductsQuery
+            ->limit(24)
+            ->get();
+
         $testimonials = Testimonial::query()
             ->where('status', 'approved')
             ->orderByDesc('is_featured')
@@ -112,15 +131,35 @@ class MarketplaceController extends Controller
             $paymentsConfigured = $paymentsConfigured || $paymentsEnabledByUserId[(int) $seller->id];
         }
 
+        foreach ($sellerProducts->pluck('store.user')->filter()->unique('id') as $seller) {
+            $canSellByUserId[(int) $seller->id] = (bool) $seller->canSellOnMarketplace();
+            $gateways = GatewayAccount::resolveForSeller((int) $seller->id);
+            $paymentsEnabledByUserId[(int) $seller->id] = (bool) ($gateways['mpEnabled']);
+            $paymentsConfigured = $paymentsConfigured || $paymentsEnabledByUserId[(int) $seller->id];
+        }
+
+        $storeUserIds = collect(array_keys($canSellByUserId));
+        $publishedStores = $storeService->publishedStoresByUserIds($storeUserIds);
+        $sellerStoreUrlsByUserId = $publishedStores
+            ->map(fn($store) => route('seller-stores.show', $store->slug))
+            ->all();
+
+        $sellerProducts = $sellerProducts
+            ->filter(fn(SellerProduct $product) => isset($sellerStoreUrlsByUserId[(int) $product->user_id]))
+            ->take(12)
+            ->values();
+
         return view('marketplace.index', compact(
             'courses',
             'mentorships',
             'events',
+            'sellerProducts',
             'testimonials',
             'paymentsConfigured',
             'platformPaymentsEnabled',
             'canSellByUserId',
             'paymentsEnabledByUserId',
+            'sellerStoreUrlsByUserId',
         ));
     }
 

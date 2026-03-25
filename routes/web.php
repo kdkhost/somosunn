@@ -395,6 +395,8 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
     Route::get('/notificacoes', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notificacoes/read/{id?}', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.markRead');
     Route::delete('/notificacoes/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::get('/painel/compras', [\App\Http\Controllers\Panel\MarketplacePurchaseController::class, 'index'])->name('panel.purchases.index');
+    Route::get('/painel/compras/{order}/itens/{item}/download', [\App\Http\Controllers\Panel\MarketplacePurchaseController::class, 'downloadDigital'])->name('panel.purchases.download');
 });
 
 // Painel do Membro (Tailwind)
@@ -415,6 +417,17 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::get('/pagamentos', [\App\Http\Controllers\Panel\MarketplaceController::class, 'payments'])->name('payments');
         Route::get('/pagamentos/configurar', [\App\Http\Controllers\Panel\MarketplaceController::class, 'editPayment'])->name('payments.edit');
         Route::post('/pagamentos/testar', [\App\Http\Controllers\Panel\MarketplaceController::class, 'testCredentials'])->name('payments.test');
+        Route::get('/loja', [\App\Http\Controllers\Panel\MarketplaceStoreController::class, 'edit'])->name('store.edit');
+        Route::post('/loja', [\App\Http\Controllers\Panel\MarketplaceStoreController::class, 'update'])->name('store.update');
+        Route::get('/produtos', [\App\Http\Controllers\Panel\SellerProductController::class, 'index'])->name('products.index');
+        Route::get('/produtos/novo', [\App\Http\Controllers\Panel\SellerProductController::class, 'create'])->name('products.create');
+        Route::post('/produtos', [\App\Http\Controllers\Panel\SellerProductController::class, 'store'])->name('products.store');
+        Route::get('/produtos/{product}/editar', [\App\Http\Controllers\Panel\SellerProductController::class, 'edit'])->name('products.edit');
+        Route::put('/produtos/{product}', [\App\Http\Controllers\Panel\SellerProductController::class, 'update'])->name('products.update');
+        Route::delete('/produtos/{product}', [\App\Http\Controllers\Panel\SellerProductController::class, 'destroy'])->name('products.destroy');
+        Route::delete('/produtos/{product}/midia/{media}', [\App\Http\Controllers\Panel\SellerProductController::class, 'destroyMedia'])->name('products.media.destroy');
+        Route::get('/pedidos', [\App\Http\Controllers\Panel\SellerOrderController::class, 'index'])->name('orders.index');
+        Route::post('/pedidos/{order}/envio', [\App\Http\Controllers\Panel\SellerOrderController::class, 'updateShipment'])->name('orders.shipment.update');
         Route::get('/vendas', [\App\Http\Controllers\Panel\MarketplaceController::class, 'sales'])->name('sales');
         Route::get('/contabilidade', [\App\Http\Controllers\Panel\MarketplaceAccountingController::class, 'index'])->name('accounting');
         Route::get('/contabilidade/exportar', [\App\Http\Controllers\Panel\MarketplaceAccountingController::class, 'export'])->name('accounting.export');
@@ -543,6 +556,10 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::resource('jobs', \App\Http\Controllers\Panel\Admin\JobController::class);
         Route::post('points-rules/exchange-settings', [\App\Http\Controllers\Panel\Admin\PointsRuleController::class, 'updateExchangeSettings'])->name('points-rules.exchange-settings');
         Route::resource('points-rules', \App\Http\Controllers\Panel\Admin\PointsRuleController::class);
+        Route::get('marketplace/lojas', [\App\Http\Controllers\Panel\Admin\SellerStoreController::class, 'index'])->name('marketplace.stores.index');
+        Route::post('marketplace/lojas/{store}/toggle', [\App\Http\Controllers\Panel\Admin\SellerStoreController::class, 'toggle'])->name('marketplace.stores.toggle');
+        Route::get('marketplace/produtos', [\App\Http\Controllers\Panel\Admin\SellerProductController::class, 'index'])->name('marketplace.products.index');
+        Route::post('marketplace/produtos/{product}/toggle', [\App\Http\Controllers\Panel\Admin\SellerProductController::class, 'toggle'])->name('marketplace.products.toggle');
         Route::post('redemptions/{redemption}/approve', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'approve'])->name('redemptions.approve');
         Route::post('redemptions/{redemption}/ship', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'ship'])->name('redemptions.ship');
         Route::post('redemptions/{redemption}/complete', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'complete'])->name('redemptions.complete');
@@ -562,6 +579,14 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
 
 // Marketplace (Público)
 Route::get('/marketplace', [\App\Http\Controllers\MarketplaceController::class, 'index'])->name('marketplace.index');
+Route::get('/loja/carrinho', [\App\Http\Controllers\SellerProductCartController::class, 'show'])->name('seller-products.cart.show');
+Route::post('/loja/produtos/{product}/carrinho', [\App\Http\Controllers\SellerProductCartController::class, 'store'])->name('seller-products.cart.add');
+Route::post('/loja/carrinho', [\App\Http\Controllers\SellerProductCartController::class, 'update'])->name('seller-products.cart.update');
+Route::post('/loja/carrinho/limpar', [\App\Http\Controllers\SellerProductCartController::class, 'clear'])->name('seller-products.cart.clear');
+Route::get('/loja/checkout', [\App\Http\Controllers\SellerProductCheckoutController::class, 'show'])->name('seller-products.checkout.show');
+Route::post('/loja/checkout', [\App\Http\Controllers\SellerProductCheckoutController::class, 'process'])->name('seller-products.checkout.process');
+Route::get('/loja/{storeSlug}', [\App\Http\Controllers\SellerStorefrontController::class, 'show'])->name('seller-stores.show');
+Route::get('/loja/{storeSlug}/p/{productSlug}', [\App\Http\Controllers\SellerStorefrontController::class, 'product'])->name('seller-stores.products.show');
 
 // Share Product (Compartilhamento de produtos)
 Route::get('/share/{code}', [\App\Http\Controllers\ShareController::class, 'product'])->name('share.product');

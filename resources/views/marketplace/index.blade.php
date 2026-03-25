@@ -7,11 +7,13 @@
         $courses = $courses ?? collect();
         $mentorships = $mentorships ?? collect();
         $events = $events ?? collect();
+        $sellerProducts = $sellerProducts ?? collect();
         $testimonials = $testimonials ?? collect();
         $paymentsConfigured = (bool) ($paymentsConfigured ?? false);
         $platformPaymentsEnabled = (bool) ($platformPaymentsEnabled ?? false);
         $canSellByUserId = $canSellByUserId ?? [];
         $paymentsEnabledByUserId = $paymentsEnabledByUserId ?? [];
+        $sellerStoreUrlsByUserId = $sellerStoreUrlsByUserId ?? [];
 
         $user = auth()->user();
         $isAdmin = $user ? $user->isAdmin() : false;
@@ -68,15 +70,30 @@
             return (bool) ($paymentsEnabledByUserId[$userId] ?? false);
         };
 
-        $totalResults = $courses->count() + $mentorships->count() + $events->count();
+        $sellerStoreUrl = function (?int $userId) use ($sellerStoreUrlsByUserId): ?string {
+            if (!$userId) {
+                return null;
+            }
+
+            return $sellerStoreUrlsByUserId[$userId] ?? null;
+        };
+
+        $totalResults = $courses->count() + $mentorships->count() + $events->count() + $sellerProducts->count();
 
         $chips = [
+            ['label' => 'Produtos', 'icon' => 'fas fa-box-open', 'href' => '#marketplace-products'],
             ['label' => 'Cursos', 'icon' => 'fas fa-book-open', 'href' => '#marketplace-courses'],
             ['label' => 'Mentorias', 'icon' => 'fas fa-user-tie', 'href' => '#marketplace-mentorships'],
             ['label' => 'Eventos', 'icon' => 'fas fa-calendar-alt', 'href' => '#marketplace-events'],
         ];
 
         $storeCategories = [
+            [
+                'label' => 'Produtos',
+                'icon' => 'fas fa-box-open',
+                'href' => '#marketplace-products',
+                'count' => (int) $sellerProducts->count(),
+            ],
             [
                 'label' => 'Cursos',
                 'icon' => 'fas fa-book-open',
@@ -1206,6 +1223,91 @@
                 </section>
             @endif
 
+            {{-- Produtos proprios --}}
+            <section id="marketplace-products" class="mt-10">
+                <div class="flex items-end justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900">
+                            <i class="fas fa-box-open mr-2 text-slate-400"></i> Produtos
+                        </h2>
+                        <p class="text-slate-600 mb-0">Catalogos proprios de vendedores com compra direta dentro do marketplace.</p>
+                    </div>
+                    <a href="{{ route('marketplace.index', ['q' => request('q')]) }}" class="text-sm font-black text-blue-700 hover:text-blue-800">Explorar</a>
+                </div>
+
+                <div class="grid auto-rows-fr sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    @forelse($sellerProducts as $product)
+                        @php
+                            $sellerId = (int) ($product->user_id ?? 0);
+                            $price = (float) ($product->effective_price ?? $product->price ?? 0);
+                            $storeUrl = $sellerStoreUrl($sellerId);
+                            $sellerName = optional(optional($product->store)->user)->name ?? ($product->store->brand_name ?? 'Vendedor');
+                            $productUrl = $product->store ? route('seller-stores.products.show', [$product->store->slug, $product->slug]) : '#';
+                            $excerpt = \Illuminate\Support\Str::limit(strip_tags((string) ($product->excerpt ?: $product->description)), 90);
+                        @endphp
+
+                        <article class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition" data-product-card>
+                            <a href="{{ $productUrl }}" class="block flex flex-1 flex-col">
+                                <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
+                                    @if($product->cover_url)
+                                        <img src="{{ $product->cover_url }}" alt="{{ $product->title }}" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-slate-300">
+                                            <i class="fas fa-box text-4xl"></i>
+                                        </div>
+                                    @endif
+
+                                    <div class="mp-selling-badge absolute top-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black text-white shadow"
+                                        style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3));">
+                                        {{ strtoupper($product->type === 'physical' ? 'Fisico' : 'Digital') }}
+                                    </div>
+                                </div>
+
+                                <div class="mp-selling-content">
+                                    <div class="mp-selling-title font-black text-slate-900 leading-snug line-clamp-2">
+                                        {{ $product->title }}
+                                    </div>
+                                    <div class="mp-selling-eyebrow text-xs text-slate-500 mt-1 line-clamp-2">
+                                        Anunciado e vendido por: {{ $sellerName }}
+                                    </div>
+                                    <div class="mp-selling-copy text-sm text-slate-600 mt-3 line-clamp-3">
+                                        {{ $excerpt }}
+                                    </div>
+                                    <div class="mp-selling-footer mt-auto pt-4 border-t border-slate-100">
+                                        <div class="text-xs text-slate-500">Preco</div>
+                                        <div class="text-lg font-black text-slate-900">
+                                            {{ $price > 0 ? 'R$ ' . number_format($price, 2, ',', '.') : 'Gratuito' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+
+                            <div class="mp-selling-actions">
+                                @if($storeUrl)
+                                    <a href="{{ $storeUrl }}"
+                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                        Ver mais desse vendedor
+                                    </a>
+                                @endif
+
+                                <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="w-full">
+                                    @csrf
+                                    <input type="hidden" name="buy_now" value="1">
+                                    <button type="submit"
+                                        class="w-full mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                        Comprar agora
+                                    </button>
+                                </form>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="col-span-full bg-white rounded-3xl border border-slate-100 p-6 text-slate-600">
+                            Nenhum produto proprio encontrado no momento.
+                        </div>
+                    @endforelse
+                </div>
+            </section>
+
             {{-- Cursos --}}
             <section id="marketplace-courses" class="mt-10">
                 <div class="flex items-end justify-between gap-4 mb-4">
@@ -1319,6 +1421,13 @@
                                     class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
                                     Ver
                                 </a>
+
+                                @if($storeUrl = $sellerStoreUrl($sellerId))
+                                    <a href="{{ $storeUrl }}"
+                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                        Ver mais desse vendedor
+                                    </a>
+                                @endif
 
                                 @if($hasAccess)
                                     <a href="{{ route('courses.show', $showParam) }}"
@@ -1488,6 +1597,13 @@
                                     </span>
                                 @endif
 
+                                @if($storeUrl = $sellerStoreUrl($sellerId))
+                                    <a href="{{ $storeUrl }}"
+                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                        Ver mais desse vendedor
+                                    </a>
+                                @endif
+
                                 @if($buyEnabled && !$isMentorshipClosed)
                                     <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
                                         class="mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
@@ -1652,6 +1768,13 @@
                                         class="mp-selling-action mp-selling-action-disabled rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
                                         Encerrado
                                     </span>
+                                @endif
+
+                                @if($storeUrl = $sellerStoreUrl($sellerId))
+                                    <a href="{{ $storeUrl }}"
+                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                        Ver mais desse vendedor
+                                    </a>
                                 @endif
 
                                 @if($buyEnabled && !$isEventClosed)

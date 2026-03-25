@@ -10,6 +10,7 @@ use App\Models\EventRegistration;
 use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\Plan;
+use App\Services\Marketplace\SellerProductFulfillmentService;
 use App\Support\EmailQueueSettings;
 use App\Notifications\AppNotification;
 use Illuminate\Support\Facades\DB;
@@ -72,6 +73,7 @@ class OrderSettlementService
         $this->confirmEventRegistrationsForOrder($order);
         $this->activatePlanForOrder($order);
         $this->fulfillDigitalItemsForOrder($order);
+        app(SellerProductFulfillmentService::class)->fulfillPaidOrder($order);
 
         $invoice = app(InvoiceService::class)->issueAndQueueForOrder($order, $queueInvoiceEmail);
         if ($invoice && $isManualApproval) {
