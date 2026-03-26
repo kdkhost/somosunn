@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\SellerProduct;
+use App\Models\SellerStore;
 use App\Services\Payment\MercadoPagoService;
 use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
@@ -14,6 +16,7 @@ class MarketplaceController extends Controller
     public function index(MercadoPagoService $mpService)
     {
         $userId = (int) Auth::id();
+        $storefrontModuleInstalled = SellerStore::tableAvailable() && SellerProduct::tableAvailable();
 
         $paidTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('total_amount');
         $platformFeeTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('platform_fee_amount');
@@ -50,7 +53,8 @@ class MarketplaceController extends Controller
             'pendingCount',
             'paymentsConfigured',
             'platformFeePercent',
-            'balance'
+            'balance',
+            'storefrontModuleInstalled'
         ));
     }
 

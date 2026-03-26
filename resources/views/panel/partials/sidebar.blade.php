@@ -2,6 +2,7 @@
     $user = auth()->user();
     $plan = $user ? $user->activePlan() : null;
     $currentTheme = $user->theme_pref ?? 'light';
+    $storefrontModuleInstalled = \App\Models\SellerStore::tableAvailable() && \App\Models\SellerProduct::tableAvailable();
     $canAccessInstructorArea = (method_exists($user, 'canAccessInstructorArea') && $user->canAccessInstructorArea());
     $hasPartnerProfile = false;
 
@@ -166,21 +167,21 @@
             'route' => route('panel.marketplace.store.edit'),
             'icon' => 'fas fa-store',
             'active' => request()->routeIs('panel.marketplace.store.*'),
-            'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace(),
+            'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace() && $storefrontModuleInstalled,
         ],
         [
             'label' => 'Produtos proprios',
             'route' => route('panel.marketplace.products.index'),
             'icon' => 'fas fa-box-open',
             'active' => request()->routeIs('panel.marketplace.products.*'),
-            'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace(),
+            'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace() && $storefrontModuleInstalled,
         ],
         [
             'label' => 'Pedidos da loja',
             'route' => route('panel.marketplace.orders.index'),
             'icon' => 'fas fa-truck',
             'active' => request()->routeIs('panel.marketplace.orders.*'),
-            'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace(),
+            'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace() && $storefrontModuleInstalled,
         ],
         [
             'label' => 'Minhas vendas',
@@ -408,6 +409,17 @@
                             <span>{{ $item['label'] }}</span>
                         </a>
                     @endforeach
+                    @if(method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace() && !$storefrontModuleInstalled)
+                        <div class="rounded-xl border border-amber-200/70 bg-amber-50/90 px-3 py-3 text-[13px] text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-100">
+                            <div class="flex items-start gap-2">
+                                <i class="fas fa-triangle-exclamation mt-0.5 w-4 text-amber-500"></i>
+                                <div>
+                                    <div class="font-bold">Loja virtual pendente</div>
+                                    <div class="mt-1 text-[12px] text-amber-800/80 dark:text-amber-100/70">Execute <span class="font-black">php artisan migrate --force</span> no servidor.</div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </details>
         @endif

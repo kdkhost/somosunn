@@ -11,6 +11,7 @@
         $pendingCount = (int) ($pendingCount ?? 0);
         $paymentsConfigured = (bool) ($paymentsConfigured ?? false);
         $platformFeePercent = (float) ($platformFeePercent ?? 0);
+        $storefrontModuleInstalled = (bool) ($storefrontModuleInstalled ?? false);
     @endphp
 
     <div
@@ -25,18 +26,20 @@
                     plataforma.</p>
             </div>
             <div class="flex flex-wrap gap-3">
-                <a href="{{ route('panel.marketplace.store.edit') }}"
-                    class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                    <i class="fas fa-store mr-2"></i> Minha loja
-                </a>
-                <a href="{{ route('panel.marketplace.products.index') }}"
-                    class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                    <i class="fas fa-box-open mr-2"></i> Produtos
-                </a>
-                <a href="{{ route('panel.marketplace.orders.index') }}"
-                    class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                    <i class="fas fa-truck mr-2"></i> Pedidos
-                </a>
+                @if($storefrontModuleInstalled)
+                    <a href="{{ route('panel.marketplace.store.edit') }}"
+                        class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                        <i class="fas fa-store mr-2"></i> Minha loja
+                    </a>
+                    <a href="{{ route('panel.marketplace.products.index') }}"
+                        class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                        <i class="fas fa-box-open mr-2"></i> Produtos
+                    </a>
+                    <a href="{{ route('panel.marketplace.orders.index') }}"
+                        class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                        <i class="fas fa-truck mr-2"></i> Pedidos
+                    </a>
+                @endif
                 <a href="{{ route('panel.marketplace.payments') }}"
                     class="inline-flex items-center justify-center rounded-full border border-blue-600 dark:border-blue-500 px-5 py-2.5 text-sm font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-600/10 transition-all">
                     <i class="fas fa-credit-card mr-2"></i> Pagamentos
@@ -53,6 +56,25 @@
         </div>
         </div>
     </div>
+
+    @unless($storefrontModuleInstalled)
+        <div class="mt-6 rounded-[2rem] border border-amber-200 bg-amber-50/90 p-6 text-amber-950 shadow-[0_12px_35px_-20px_rgba(245,158,11,0.45)] dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-100">
+            <div class="flex items-start gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-300">
+                    <i class="fas fa-triangle-exclamation text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-black">Loja virtual pendente de instalacao</h2>
+                    <p class="mt-1 text-sm font-medium text-amber-900/80 dark:text-amber-100/80">
+                        Os atalhos de Minha loja, Produtos proprios e Pedidos da loja ficam disponiveis somente depois que a migration do modulo for executada neste servidor.
+                    </p>
+                    <div class="mt-4 rounded-2xl border border-amber-200/80 bg-white/80 px-4 py-3 text-sm font-bold text-slate-700 dark:border-amber-500/15 dark:bg-slate-950/40 dark:text-slate-100">
+                        Execute no servidor: <code class="font-black text-amber-700 dark:text-amber-300">php artisan migrate --force</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endunless
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6">
         {{-- Saldo Mercado Pago --}}
