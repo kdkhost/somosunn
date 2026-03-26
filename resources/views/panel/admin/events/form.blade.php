@@ -603,8 +603,21 @@
             .note-editor.note-frame {
                 border: 1px solid #e2e8f0;
                 border-radius: 1rem;
-                overflow: hidden;
+                overflow: visible;
                 font-family: inherit;
+            }
+            .note-editor .note-editing-area {
+                overflow: hidden;
+                border-bottom-left-radius: 1rem;
+                border-bottom-right-radius: 1rem;
+            }
+            .note-editor .note-toolbar,
+            .note-editor .note-statusbar {
+                position: relative;
+                z-index: 2;
+            }
+            .note-editor .note-toolbar .note-dropdown-menu {
+                z-index: 1200;
             }
             .dark .note-editor.note-frame {
                 border-color: #1e293b;
@@ -615,14 +628,31 @@
                 border-bottom: 1px solid #334155;
             }
             .dark .note-editor .note-editing-area .note-editable {
-                color: #f8fafc;
+                background: #ffffff;
+                color: #0f172a;
             }
             .dark .note-editor .note-editing-area .note-editable p {
-                color: #f8fafc;
+                color: inherit;
             }
             .dark .note-editor .note-statusbar {
                 background: #1e293b;
                 border-top: 1px solid #334155;
+            }
+            .dark .note-editor .note-toolbar .note-dropdown-menu {
+                background: #0f172a;
+                border-color: #334155;
+            }
+            .dark .note-editor .note-toolbar .note-palette-title {
+                color: #cbd5e1;
+                border-bottom-color: #334155;
+            }
+            .dark .note-editor .note-toolbar .note-color-reset,
+            .dark .note-editor .note-toolbar .note-color-select {
+                color: #e2e8f0;
+            }
+            .dark .note-editor .note-toolbar .note-color-reset:hover,
+            .dark .note-editor .note-toolbar .note-color-select:hover {
+                background: #1e293b;
             }
             .upload-preview img {
                 width: 100%;

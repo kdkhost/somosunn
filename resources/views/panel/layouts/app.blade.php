@@ -13,13 +13,40 @@
         .note-editor.note-frame {
             border-radius: 1.25rem !important;
             border-color: #e2e8f0 !important;
-            overflow: hidden;
+            overflow: visible !important;
         }
 
         .note-toolbar {
             background-color: #f8fafc !important;
             border-bottom-color: #e2e8f0 !important;
             padding: 0.75rem !important;
+        }
+
+        .note-editor .note-editing-area {
+            overflow: hidden;
+            border-bottom-left-radius: 1.25rem;
+            border-bottom-right-radius: 1.25rem;
+        }
+
+        .note-editor .note-toolbar,
+        .note-editor .note-statusbar {
+            position: relative;
+            z-index: 2;
+        }
+
+        .note-editor .note-toolbar .note-dropdown-menu {
+            z-index: 1200;
+        }
+
+        .note-editor .note-toolbar .note-color .note-dropdown-menu,
+        .note-editor .note-toolbar .note-color-all .note-dropdown-menu {
+            min-width: 337px;
+            padding: 0.5rem;
+        }
+
+        .note-editor .note-toolbar .note-color .note-dropdown-menu .note-palette,
+        .note-editor .note-toolbar .note-color-all .note-dropdown-menu .note-palette {
+            width: 160px;
         }
 
         .dark .note-editor.note-frame {
@@ -39,8 +66,12 @@
         }
 
         .dark .note-editable {
-            background-color: #020617 !important;
-            color: #f8fafc !important;
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+        }
+
+        .dark .note-placeholder {
+            color: #94a3b8 !important;
         }
 
         .dark .note-statusbar {
@@ -51,6 +82,25 @@
         .dark .note-dropdown-menu {
             background-color: #0f172a !important;
             border-color: #1e293b !important;
+        }
+
+        .dark .note-palette-title {
+            color: #cbd5e1 !important;
+            border-bottom-color: #334155 !important;
+        }
+
+        .dark .note-color-reset,
+        .dark .note-color-select {
+            color: #e2e8f0 !important;
+        }
+
+        .dark .note-color-reset:hover,
+        .dark .note-color-select:hover {
+            background-color: #1e293b !important;
+        }
+
+        .dark .note-holder-custom .note-color-btn {
+            border-color: #475569 !important;
         }
 
         .dark .note-dropdown-item {

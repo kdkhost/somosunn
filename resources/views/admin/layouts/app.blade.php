@@ -103,6 +103,30 @@
             --unn-azul-3: #1D3FC4;
         }
 
+        .note-editor.note-frame {
+            overflow: visible !important;
+        }
+
+        .note-editor .note-editing-area {
+            overflow: hidden;
+        }
+
+        .note-editor .note-toolbar,
+        .note-editor .note-statusbar {
+            position: relative;
+            z-index: 2;
+        }
+
+        .note-editor .note-toolbar .note-dropdown-menu {
+            z-index: 1200;
+        }
+
+        .note-editor .note-toolbar .note-color .note-dropdown-menu,
+        .note-editor .note-toolbar .note-color-all .note-dropdown-menu {
+            min-width: 337px;
+            padding: 0.5rem;
+        }
+
         /* Tooltip customizada (Premium) */
         .ui-tooltip {
             position: relative;
