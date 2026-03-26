@@ -5,10 +5,13 @@ namespace App\Models;
 use App\Support\UploadStorage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class SellerStore extends Model
 {
     use HasFactory;
+
+    protected static ?bool $tableAvailable = null;
 
     protected $fillable = [
         'user_id',
@@ -76,5 +79,20 @@ class SellerStore extends Model
     public function isSlugLocked(): bool
     {
         return $this->slug_locked_at !== null;
+    }
+
+    public static function tableAvailable(): bool
+    {
+        if (static::$tableAvailable !== null) {
+            return static::$tableAvailable;
+        }
+
+        try {
+            static::$tableAvailable = Schema::hasTable((new static())->getTable());
+        } catch (\Throwable) {
+            static::$tableAvailable = false;
+        }
+
+        return static::$tableAvailable;
     }
 }

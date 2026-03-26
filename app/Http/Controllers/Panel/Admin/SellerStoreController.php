@@ -10,6 +10,12 @@ class SellerStoreController extends Controller
 {
     public function index(Request $request)
     {
+        if (!SellerStore::tableAvailable()) {
+            return redirect()
+                ->route('panel.admin.dashboard')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         $search = trim((string) $request->query('q', ''));
 
         $stores = SellerStore::query()
@@ -33,6 +39,12 @@ class SellerStoreController extends Controller
 
     public function toggle(Request $request, SellerStore $store)
     {
+        if (!SellerStore::tableAvailable()) {
+            return redirect()
+                ->route('panel.admin.dashboard')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         $request->validate([
             'is_blocked' => ['required', 'boolean'],
         ]);

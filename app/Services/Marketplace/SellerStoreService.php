@@ -26,6 +26,8 @@ class SellerStoreService
 
     public function ensureForUser(User $user): SellerStore
     {
+        abort_unless(SellerStore::tableAvailable(), 503, 'O modulo da loja virtual ainda nao foi instalado. Rode as migrations do sistema.');
+
         return SellerStore::query()->firstOrCreate(
             ['user_id' => $user->id],
             [
@@ -54,6 +56,10 @@ class SellerStoreService
 
     public function isPubliclyAvailable(?SellerStore $store): bool
     {
+        if (!SellerStore::tableAvailable()) {
+            return false;
+        }
+
         return $store instanceof SellerStore
             && $store->is_published
             && !$store->is_blocked
@@ -63,6 +69,10 @@ class SellerStoreService
 
     public function publishedStoresByUserIds(iterable $userIds): Collection
     {
+        if (!SellerStore::tableAvailable()) {
+            return collect();
+        }
+
         $ids = collect($userIds)
             ->map(fn($id) => (int) $id)
             ->filter(fn(int $id) => $id > 0)
@@ -86,6 +96,15 @@ class SellerStoreService
 
     public function storefrontPayload(SellerStore $store): array
     {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return [
+                'products' => collect(),
+                'courses' => collect(),
+                'mentorships' => collect(),
+                'events' => collect(),
+            ];
+        }
+
         $store->loadMissing('user', 'products.media');
 
         $products = $store->products()

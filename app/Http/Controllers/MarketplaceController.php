@@ -81,22 +81,25 @@ class MarketplaceController extends Controller
             ->limit(12)
             ->get();
 
-        $sellerProductsQuery = SellerProduct::query()
-            ->with(['store.user', 'media'])
-            ->published()
-            ->latest('id');
+        $sellerProducts = collect();
+        if (SellerProduct::tableAvailable()) {
+            $sellerProductsQuery = SellerProduct::query()
+                ->with(['store.user', 'media'])
+                ->published()
+                ->latest('id');
 
-        if ($q !== '') {
-            $sellerProductsQuery->where(function ($query) use ($q) {
-                $query->where('title', 'like', '%' . $q . '%')
-                    ->orWhere('excerpt', 'like', '%' . $q . '%')
-                    ->orWhere('description', 'like', '%' . $q . '%');
-            });
+            if ($q !== '') {
+                $sellerProductsQuery->where(function ($query) use ($q) {
+                    $query->where('title', 'like', '%' . $q . '%')
+                        ->orWhere('excerpt', 'like', '%' . $q . '%')
+                        ->orWhere('description', 'like', '%' . $q . '%');
+                });
+            }
+
+            $sellerProducts = $sellerProductsQuery
+                ->limit(24)
+                ->get();
         }
-
-        $sellerProducts = $sellerProductsQuery
-            ->limit(24)
-            ->get();
 
         $testimonials = Testimonial::query()
             ->where('status', 'approved')

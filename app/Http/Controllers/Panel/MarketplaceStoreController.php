@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Models\SellerStore;
 use App\Services\Marketplace\SellerStoreService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
@@ -13,6 +14,12 @@ class MarketplaceStoreController extends Controller
 {
     public function edit(SellerStoreService $storeService)
     {
+        if (!SellerStore::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         $store = $storeService->ensureForUser(auth()->user());
 
         return view('panel.marketplace.store', [
@@ -23,6 +30,12 @@ class MarketplaceStoreController extends Controller
 
     public function update(Request $request, SellerStoreService $storeService)
     {
+        if (!SellerStore::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         $user = auth()->user();
         $store = $storeService->ensureForUser($user);
 

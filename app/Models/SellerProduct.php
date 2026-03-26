@@ -6,10 +6,13 @@ use App\Support\UploadStorage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class SellerProduct extends Model
 {
     use HasFactory;
+
+    protected static ?bool $tableAvailable = null;
 
     protected $fillable = [
         'seller_store_id',
@@ -114,5 +117,20 @@ class SellerProduct extends Model
     public function isPublished(): bool
     {
         return $this->status === 'published';
+    }
+
+    public static function tableAvailable(): bool
+    {
+        if (static::$tableAvailable !== null) {
+            return static::$tableAvailable;
+        }
+
+        try {
+            static::$tableAvailable = Schema::hasTable((new static())->getTable());
+        } catch (\Throwable) {
+            static::$tableAvailable = false;
+        }
+
+        return static::$tableAvailable;
     }
 }

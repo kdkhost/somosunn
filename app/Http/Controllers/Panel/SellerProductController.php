@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Models\SellerProduct;
 use App\Models\SellerProductMedia;
+use App\Models\SellerStore;
 use App\Services\Marketplace\SellerStoreService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
@@ -15,6 +16,12 @@ class SellerProductController extends Controller
 {
     public function index(SellerStoreService $storeService)
     {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         $store = $storeService->ensureForUser(auth()->user());
 
         $products = SellerProduct::query()
@@ -28,6 +35,12 @@ class SellerProductController extends Controller
 
     public function create(SellerStoreService $storeService)
     {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         $store = $storeService->ensureForUser(auth()->user());
         $product = new SellerProduct([
             'type' => 'digital',
@@ -39,6 +52,12 @@ class SellerProductController extends Controller
 
     public function store(Request $request, SellerStoreService $storeService)
     {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         $store = $storeService->ensureForUser(auth()->user());
         $product = new SellerProduct([
             'user_id' => auth()->id(),
@@ -50,6 +69,12 @@ class SellerProductController extends Controller
 
     public function edit(SellerProduct $product, SellerStoreService $storeService)
     {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         abort_unless((int) $product->user_id === (int) auth()->id(), 403);
         $store = $storeService->ensureForUser(auth()->user());
         $product->load('media');
@@ -59,6 +84,12 @@ class SellerProductController extends Controller
 
     public function update(Request $request, SellerProduct $product, SellerStoreService $storeService)
     {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         abort_unless((int) $product->user_id === (int) auth()->id(), 403);
         $store = $storeService->ensureForUser(auth()->user());
 
@@ -67,6 +98,12 @@ class SellerProductController extends Controller
 
     public function destroy(SellerProduct $product)
     {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         abort_unless((int) $product->user_id === (int) auth()->id(), 403);
 
         foreach ($product->media as $media) {
@@ -88,6 +125,12 @@ class SellerProductController extends Controller
 
     public function destroyMedia(SellerProduct $product, SellerProductMedia $media)
     {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         abort_unless((int) $product->user_id === (int) auth()->id(), 403);
         abort_unless((int) $media->seller_product_id === (int) $product->id, 404);
 

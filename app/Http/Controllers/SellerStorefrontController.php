@@ -10,6 +10,8 @@ class SellerStorefrontController extends Controller
 {
     public function show(string $storeSlug, SellerStoreService $storeService)
     {
+        abort_unless(SellerStore::tableAvailable(), 404);
+
         $store = SellerStore::query()
             ->with('user')
             ->where('slug', $storeSlug)
@@ -26,6 +28,8 @@ class SellerStorefrontController extends Controller
 
     public function product(string $storeSlug, string $productSlug, SellerStoreService $storeService)
     {
+        abort_unless(SellerStore::tableAvailable() && SellerProduct::tableAvailable(), 404);
+
         $store = SellerStore::query()
             ->with('user')
             ->where('slug', $storeSlug)

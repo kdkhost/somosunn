@@ -4,12 +4,19 @@ namespace App\Http\Controllers\Panel\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SellerProduct;
+use App\Models\SellerStore;
 use Illuminate\Http\Request;
 
 class SellerProductController extends Controller
 {
     public function index(Request $request)
     {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('panel.admin.dashboard')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         $search = trim((string) $request->query('q', ''));
 
         $products = SellerProduct::query()
@@ -33,6 +40,12 @@ class SellerProductController extends Controller
 
     public function toggle(Request $request, SellerProduct $product)
     {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('panel.admin.dashboard')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         $request->validate([
             'status' => ['required', 'in:draft,published,blocked'],
         ]);

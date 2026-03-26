@@ -4,12 +4,19 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\SellerStore;
 use Illuminate\Http\Request;
 
 class SellerOrderController extends Controller
 {
     public function index()
     {
+        if (!SellerStore::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         $orders = Order::query()
             ->with(['user:id,name,email,phone', 'items', 'shipment'])
             ->where('seller_id', auth()->id())
@@ -24,6 +31,12 @@ class SellerOrderController extends Controller
 
     public function updateShipment(Request $request, Order $order)
     {
+        if (!SellerStore::tableAvailable()) {
+            return redirect()
+                ->route('panel.marketplace.index')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
         abort_unless((int) $order->seller_id === (int) auth()->id(), 403);
         abort_unless($order->items()->where('item_type', 'seller_product')->exists(), 404);
 

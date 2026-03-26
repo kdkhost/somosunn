@@ -118,6 +118,12 @@ class SellerProductCartService
 
     public function items(): Collection
     {
+        if (!SellerProduct::tableAvailable()) {
+            $this->clear();
+
+            return collect();
+        }
+
         $cart = $this->getCart();
         $items = is_array($cart['items'] ?? null) ? $cart['items'] : [];
 
