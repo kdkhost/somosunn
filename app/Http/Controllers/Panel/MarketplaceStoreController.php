@@ -57,8 +57,8 @@ class MarketplaceStoreController extends Controller
             'instagram_url' => ['nullable', 'url', 'max:255'],
             'facebook_url' => ['nullable', 'url', 'max:255'],
             'youtube_url' => ['nullable', 'url', 'max:255'],
-            'primary_color' => ['nullable', 'string', 'max:20'],
-            'accent_color' => ['nullable', 'string', 'max:20'],
+            'primary_color' => ['nullable', 'string', 'max:7', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
+            'accent_color' => ['nullable', 'string', 'max:7', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
             'is_published' => ['nullable', 'boolean'],
             'logo' => ['nullable', 'image', 'max:4096'],
             'banner' => ['nullable', 'image', 'max:6144'],
@@ -66,6 +66,8 @@ class MarketplaceStoreController extends Controller
             'remove_banner' => ['nullable', 'boolean'],
         ], [
             'slug.regex' => 'Use apenas letras minusculas, numeros e hifens no slug da loja.',
+            'primary_color.regex' => 'Informe uma cor hexadecimal valida no formato #RRGGBB.',
+            'accent_color.regex' => 'Informe uma cor hexadecimal valida no formato #RRGGBB.',
         ]);
 
         $slug = Str::slug((string) ($data['slug'] ?? ''));
@@ -111,8 +113,8 @@ class MarketplaceStoreController extends Controller
             'instagram_url' => $data['instagram_url'] ?? null,
             'facebook_url' => $data['facebook_url'] ?? null,
             'youtube_url' => $data['youtube_url'] ?? null,
-            'primary_color' => ($data['primary_color'] ?? null) ?: '#1F5EDB',
-            'accent_color' => ($data['accent_color'] ?? null) ?: '#0F172A',
+            'primary_color' => $this->normalizeHexColor($data['primary_color'] ?? null, '#1F5EDB'),
+            'accent_color' => $this->normalizeHexColor($data['accent_color'] ?? null, '#0F172A'),
             'is_published' => $publishRequested,
         ]);
 
@@ -145,5 +147,16 @@ class MarketplaceStoreController extends Controller
         return redirect()
             ->route('panel.marketplace.store.edit')
             ->with('success', 'Configuracoes da loja atualizadas com sucesso.');
+    }
+
+    private function normalizeHexColor(?string $value, string $fallback): string
+    {
+        $cleaned = strtoupper(ltrim(trim((string) $value), '#'));
+
+        if (!preg_match('/^[0-9A-F]{6}$/', $cleaned)) {
+            return $fallback;
+        }
+
+        return '#' . $cleaned;
     }
 }
