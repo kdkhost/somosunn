@@ -356,6 +356,27 @@ class SellerProductController extends Controller
         return $slug;
     }
 
+    private function normalizeMoneyInput($value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        $value = str_replace(['R$', ' ', "\u{00A0}"], '', $value);
+
+        if (str_contains($value, ',')) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        }
+
+        return $value;
+    }
+
     private function decodeEditorHtmlInput(?string $value): ?string
     {
         if ($value === null || trim($value) === '') {
