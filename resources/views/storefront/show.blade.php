@@ -8,8 +8,9 @@
     $catalogType = trim((string) request('tipo', ''));
     $catalogPrice = trim((string) request('preco', ''));
     $catalogSort = trim((string) request('ordem', 'featured'));
-    $themePrimary = '#e10f35';
-    $themeDark = '#111111';
+    $themePrimary = '#1F5EDB';
+    $themeDark = '#0F172A';
+    $themeSoft = '#f8fbff';
 
     $discountPercent = static function ($product): ?int {
         $basePrice = (float) ($product->price ?? 0);
@@ -77,7 +78,6 @@
         ?? $filteredProducts->first()
         ?? ($products->firstWhere('is_featured', true) ?? $products->first());
     $heroDiscount = $heroProduct ? $discountPercent($heroProduct) : null;
-    $secondaryHeroProducts = $filteredProducts->reject(fn ($product) => $heroProduct && $product->id === $heroProduct->id)->take(2)->values();
     $offerProducts = $filteredProducts->filter(fn ($product) => $product->is_featured || ($discountPercent($product) ?? 0) > 0)->take(10)->values();
     if ($offerProducts->isEmpty()) {
         $offerProducts = $filteredProducts->take(10)->values();
@@ -135,6 +135,11 @@
     $contentCards = $contentCards->take(6)->values();
 
     $catalogCount = $filteredProducts->count();
+    $activeChannelCount = collect([
+        $products->contains(fn ($product) => $product->supportsInternalCheckout()),
+        $products->contains(fn ($product) => $product->supportsPointsRedemption()),
+        $products->contains(fn ($product) => $product->supportsExternalCheckout()),
+    ])->filter()->count();
     $heroHeadline = $heroProduct
         ? 'Os produtos em destaque da ' . $store->brand_name . ' com condicoes especiais por tempo limitado.'
         : 'Explore a loja oficial da ' . $store->brand_name . ' dentro do ecossistema UNN.';
@@ -145,41 +150,172 @@
 
 @push('styles')
     <style>
-        .store-home-shell { background: #f4f4f4; }
-        .store-home-wrap { max-width: 1380px; margin: 0 auto; padding: 0 1rem; }
-        .store-home-card { border: 1px solid rgba(15, 23, 42, 0.08); box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06); }
-        .store-topbar, .store-main-nav, .store-sale-badge, .store-button-primary { background: {{ $themePrimary }}; color: #fff; }
-        .store-header-search, .store-filter-field { border: 1px solid rgba(148, 163, 184, 0.28); background: #fff; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
-        .store-header-search:focus-within, .store-filter-field:focus { border-color: {{ $themePrimary }}; box-shadow: 0 0 0 4px rgba(225, 15, 53, 0.1); }
-        .store-main-nav a:hover, .store-button-primary:hover { filter: brightness(1.05); }
-        .store-hero { position: relative; overflow: hidden; background: {{ $themeDark }}; }
-        .store-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(17, 17, 17, 0.86) 0%, rgba(17, 17, 17, 0.74) 42%, rgba(17, 17, 17, 0.54) 100%); pointer-events: none; }
-        .store-product-grid { display: grid; gap: 1rem; grid-template-columns: repeat(5, minmax(0, 1fr)); }
-        .store-grid-card { display: flex; min-height: 100%; flex-direction: column; overflow: hidden; border: 1px solid rgba(15, 23, 42, 0.08); box-shadow: 0 14px 35px rgba(15, 23, 42, 0.05); transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
-        .store-grid-card:hover { transform: translateY(-4px); border-color: rgba(225, 15, 53, 0.18); box-shadow: 0 24px 45px rgba(15, 23, 42, 0.1); }
-        .store-card-image { aspect-ratio: 5 / 6; background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%); }
-        .store-line-clamp-2, .store-line-clamp-3, .store-line-clamp-4 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+        .store-home-shell {
+            background:
+                radial-gradient(circle at top left, rgba(31, 94, 219, 0.14), transparent 24%),
+                radial-gradient(circle at top right, rgba(15, 23, 42, 0.12), transparent 26%),
+                linear-gradient(180deg, {{ $themeSoft }} 0%, #eef4ff 26%, #ffffff 62%);
+        }
+
+        .store-home-wrap {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .store-home-card {
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            box-shadow: 0 18px 44px rgba(15, 23, 42, 0.06);
+        }
+
+        .store-topbar {
+            background: linear-gradient(135deg, {{ $themeDark }} 0%, #16243f 100%);
+            color: #fff;
+        }
+
+        .store-main-nav {
+            background: linear-gradient(135deg, {{ $themePrimary }} 0%, #2b7cff 100%);
+            color: #fff;
+        }
+
+        .store-sale-badge,
+        .store-button-primary {
+            background: linear-gradient(135deg, {{ $themePrimary }} 0%, #2b7cff 100%);
+            color: #fff;
+        }
+
+        .store-header-search,
+        .store-filter-field {
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            background: #fff;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .store-header-search:focus-within,
+        .store-filter-field:focus {
+            border-color: {{ $themePrimary }};
+            box-shadow: 0 0 0 4px rgba(31, 94, 219, 0.1);
+        }
+
+        .store-main-nav a:hover,
+        .store-button-primary:hover {
+            filter: brightness(1.04);
+        }
+
+        .store-hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, {{ $themeDark }} 0%, #16243f 48%, {{ $themePrimary }} 100%);
+        }
+
+        .store-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(255, 255, 255, 0.12), transparent 28%),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.16) 0%, rgba(15, 23, 42, 0.08) 100%);
+            pointer-events: none;
+        }
+
+        .store-product-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .store-grid-card {
+            display: flex;
+            min-height: 100%;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.05);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        }
+
+        .store-grid-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(31, 94, 219, 0.18);
+            box-shadow: 0 24px 45px rgba(15, 23, 42, 0.1);
+        }
+
+        .store-card-image {
+            aspect-ratio: 4 / 4.3;
+            background: linear-gradient(180deg, #fafafa 0%, #f0f4fb 100%);
+        }
+
+        .store-line-clamp-2,
+        .store-line-clamp-3,
+        .store-line-clamp-4 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
         .store-line-clamp-2 { -webkit-line-clamp: 2; }
         .store-line-clamp-3 { -webkit-line-clamp: 3; }
         .store-line-clamp-4 { -webkit-line-clamp: 4; }
-        .store-button-secondary { background: #fff; color: #111; }
-        .store-newsletter { position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(14, 14, 16, 0.96) 0%, rgba(26, 26, 28, 0.92) 100%); }
-        .store-newsletter::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at top right, rgba(225, 15, 53, 0.28), transparent 28%), radial-gradient(circle at left center, rgba(255, 255, 255, 0.06), transparent 22%); pointer-events: none; }
-        .store-richtext, .store-richtext p, .store-richtext ul, .store-richtext ol, .store-richtext blockquote { color: #475569; line-height: 1.85; }
-        .store-richtext p, .store-richtext ul, .store-richtext ol, .store-richtext blockquote { margin-top: 0.85rem; margin-bottom: 0; }
-        .store-richtext ul, .store-richtext ol { padding-left: 1.25rem; }
-        .store-richtext a { color: {{ $themePrimary }}; font-weight: 700; }
-        @media (max-width: 1279px) { .store-product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-        @media (max-width: 1023px) { .store-product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-        @media (max-width: 767px) { .store-home-wrap { padding: 0 0.75rem; } .store-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-        @media (max-width: 420px) { .store-product-grid { grid-template-columns: minmax(0, 1fr); } }
+
+        .store-button-secondary {
+            background: #fff;
+            color: {{ $themeDark }};
+        }
+
+        .store-newsletter {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, {{ $themeDark }} 0%, #16243f 58%, {{ $themePrimary }} 100%);
+        }
+
+        .store-newsletter::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(255, 255, 255, 0.12), transparent 28%),
+                radial-gradient(circle at left center, rgba(255, 255, 255, 0.05), transparent 22%);
+            pointer-events: none;
+        }
+
+        .store-richtext,
+        .store-richtext p,
+        .store-richtext ul,
+        .store-richtext ol,
+        .store-richtext blockquote {
+            color: #475569;
+            line-height: 1.85;
+        }
+
+        .store-richtext p,
+        .store-richtext ul,
+        .store-richtext ol,
+        .store-richtext blockquote {
+            margin-top: 0.85rem;
+            margin-bottom: 0;
+        }
+
+        .store-richtext ul,
+        .store-richtext ol {
+            padding-left: 1.25rem;
+        }
+
+        .store-richtext a {
+            color: {{ $themePrimary }};
+            font-weight: 700;
+        }
+
+        @media (max-width: 1279px) { .store-product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (max-width: 1023px) { .store-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 767px) { .store-home-wrap { padding: 0 0.75rem; } }
+        @media (max-width: 520px) { .store-product-grid { grid-template-columns: minmax(0, 1fr); } }
     </style>
 @endpush
 
 @section('title', ($store->brand_name ?: 'Loja') . ' - UNN')
 
 @section('content')
-    <div class="store-home-shell min-h-screen pt-24 pb-20">
+    <div class="store-home-shell min-h-screen pt-20 pb-16 md:pt-24 md:pb-20">
         <div class="store-home-wrap">
             <section class="store-topbar overflow-hidden rounded-t-[1.65rem] text-white">
                 <div class="flex flex-col gap-3 px-4 py-3 text-[11px] font-semibold sm:px-5 lg:flex-row lg:items-center lg:justify-between">
@@ -230,7 +366,7 @@
                         <input type="hidden" name="canal" value="{{ $catalogChannel }}">
                         <input type="hidden" name="preco" value="{{ $catalogPrice }}">
                         <input type="hidden" name="ordem" value="{{ $catalogSort }}">
-                        <button type="submit" class="store-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-rose-600/20">Buscar</button>
+                        <button type="submit" class="store-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-blue-700/20">Buscar</button>
                     </form>
 
                     <div class="flex items-center justify-end gap-2">
@@ -258,15 +394,74 @@
                     </div>
                 </nav>
             </section>
-            <section class="store-hero mt-6 rounded-[1.85rem]">
+            <section class="store-hero mt-4 rounded-[2rem]">
                 @if($store->banner_url)
                     <img src="{{ $store->banner_url }}" alt="{{ $store->brand_name }}" class="absolute inset-0 h-full w-full object-cover opacity-30">
                 @endif
 
-                <div class="relative z-10 grid gap-8 px-5 py-8 lg:grid-cols-[290px,minmax(0,1fr)] lg:items-center lg:px-8 lg:py-10">
-                    <div class="store-home-card rounded-[1.65rem] bg-white p-4">
+                <div class="relative z-10 grid gap-8 px-5 py-6 lg:grid-cols-[minmax(0,1.2fr),390px] lg:items-center lg:px-8 lg:py-8">
+                    <div class="max-w-4xl text-white">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-white/80">
+                                <i class="fas fa-store text-[10px]"></i> Loja oficial
+                            </span>
+                            <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-white/70">
+                                <i class="fas fa-link text-[10px]"></i> /loja/{{ $store->slug }}
+                            </span>
+                        </div>
+
+                        <div class="mt-5 flex items-center gap-4">
+                            <div class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[1.35rem] border border-white/15 bg-white/95">
+                                @if($store->logo_url)
+                                    <img src="{{ $store->logo_url }}" alt="{{ $store->brand_name }}" class="h-full w-full object-cover">
+                                @else
+                                    <div class="flex h-full w-full items-center justify-center text-2xl text-slate-300">
+                                        <i class="fas fa-store"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs font-black uppercase tracking-[0.24em] text-white/60">Anunciado e vendido por</p>
+                                <h2 class="mt-2 text-3xl font-black tracking-tight text-white md:text-4xl">{{ $store->brand_name }}</h2>
+                            </div>
+                        </div>
+
+                        <h3 class="mt-6 max-w-4xl text-3xl font-black leading-tight md:text-5xl">{{ $heroHeadline }}</h3>
+                        <p class="mt-4 max-w-3xl text-sm leading-8 text-white/78 md:text-base">{{ $heroText }}</p>
+
+                        <div class="mt-6 flex flex-wrap gap-3">
+                            <a href="#produtos" class="store-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-blue-900/25">Explorar produtos</a>
+                            <a href="#atendimento" class="store-button-secondary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-slate-950/10">Falar com a loja</a>
+                        </div>
+
+                        <div class="mt-6 grid gap-3 sm:grid-cols-3">
+                            <div class="rounded-[1.35rem] border border-white/12 bg-white/10 px-4 py-4 backdrop-blur-sm">
+                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/55">Produtos</p>
+                                <p class="mt-2 text-3xl font-black">{{ $products->count() }}</p>
+                                <p class="mt-1 text-sm text-white/72">itens publicados</p>
+                            </div>
+                            <div class="rounded-[1.35rem] border border-white/12 bg-white/10 px-4 py-4 backdrop-blur-sm">
+                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/55">Canais</p>
+                                <p class="mt-2 text-3xl font-black">{{ $activeChannelCount }}</p>
+                                <p class="mt-1 text-sm text-white/72">modos de compra ativos</p>
+                            </div>
+                            <div class="rounded-[1.35rem] border border-white/12 bg-white/10 px-4 py-4 backdrop-blur-sm">
+                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/55">Conteudos</p>
+                                <p class="mt-2 text-3xl font-black">{{ $courses->count() + $mentorships->count() + $events->count() }}</p>
+                                <p class="mt-1 text-sm text-white/72">ativos no ecossistema</p>
+                            </div>
+                        </div>
+
+                        @if($storeBioHtml)
+                            <div class="mt-6 rounded-[1.5rem] border border-white/12 bg-white/10 px-5 py-4 text-sm leading-7 text-white/76 backdrop-blur-sm">
+                                {{ \Illuminate\Support\Str::limit(trim(strip_tags((string) $storeBioHtml)), 220) }}
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="store-home-card rounded-[1.75rem] bg-white p-4 lg:ml-auto">
                         @if($heroProduct)
-                            <a href="{{ route('seller-stores.products.show', [$store->slug, $heroProduct->slug]) }}" class="block rounded-[1.35rem] border border-slate-200 bg-slate-50 p-4 text-center text-slate-900">
+                            <div class="rounded-[1.35rem] border border-slate-200 bg-slate-50 p-4 text-slate-900">
                                 <div class="store-card-image flex items-center justify-center overflow-hidden rounded-[1.15rem] bg-white">
                                     @if($heroProduct->cover_url)
                                         <img src="{{ $heroProduct->cover_url }}" alt="{{ $heroProduct->title }}" class="h-full w-full object-cover">
@@ -284,16 +479,42 @@
                                     <span class="inline-flex rounded-full border border-slate-200 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">{{ $heroProduct->isPhysical() ? 'Fisico' : 'Digital' }}</span>
                                 </div>
 
-                                <p class="mt-4 text-xs font-black uppercase tracking-[0.22em] text-slate-400">{{ $store->brand_name }}</p>
-                                <h2 class="store-line-clamp-2 mt-2 text-lg font-black leading-tight text-slate-900">{{ $heroProduct->title }}</h2>
-                                <div class="mt-3 text-sm text-slate-500">{{ $heroProduct->salesChannelLabel() }}</div>
-                                <div class="mt-3 flex items-end justify-center gap-2">
-                                    <span class="text-2xl font-black text-slate-900">R$ {{ number_format((float) $heroProduct->effective_price, 2, ',', '.') }}</span>
-                                    @if($heroProduct->sale_price !== null && (float) $heroProduct->sale_price < (float) $heroProduct->price)
-                                        <span class="text-sm font-bold text-slate-400 line-through">R$ {{ number_format((float) $heroProduct->price, 2, ',', '.') }}</span>
+                                <div class="mt-4 flex items-center justify-between gap-3">
+                                    <p class="text-xs font-black uppercase tracking-[0.22em] text-slate-400">{{ $store->brand_name }}</p>
+                                    @if($heroProduct->sku)
+                                        <span class="rounded-full bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">SKU {{ $heroProduct->sku }}</span>
                                     @endif
                                 </div>
-                            </a>
+                                <h2 class="store-line-clamp-2 mt-2 text-2xl font-black leading-tight text-slate-900">{{ $heroProduct->title }}</h2>
+                                <p class="store-line-clamp-2 mt-3 text-sm leading-7 text-slate-600">{{ $heroProduct->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $heroProduct->description), 120) }}</p>
+                                <div class="mt-4 text-sm font-semibold text-slate-500">{{ $heroProduct->salesChannelLabel() }}</div>
+                                <div class="mt-4 flex flex-wrap items-end justify-between gap-3">
+                                    <div>
+                                        <span class="text-3xl font-black text-slate-900">R$ {{ number_format((float) $heroProduct->effective_price, 2, ',', '.') }}</span>
+                                        @if($heroProduct->sale_price !== null && (float) $heroProduct->sale_price < (float) $heroProduct->price)
+                                            <span class="ml-2 text-sm font-bold text-slate-400 line-through">R$ {{ number_format((float) $heroProduct->price, 2, ',', '.') }}</span>
+                                        @endif
+                                    </div>
+                                    @if($heroProduct->supportsPointsRedemption() && $heroProduct->redeemableItem)
+                                        <span class="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-amber-700">{{ number_format((int) $heroProduct->redeemableItem->points_cost, 0, ',', '.') }} {{ $coinName }}</span>
+                                    @endif
+                                </div>
+
+                                <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                                    <a href="{{ route('seller-stores.products.show', [$store->slug, $heroProduct->slug]) }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700">Ver detalhes</a>
+                                    @if($heroProduct->supportsExternalCheckout())
+                                        <a href="{{ $heroProduct->external_checkout_url }}" target="_blank" rel="noopener noreferrer" class="store-button-primary inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-black shadow-lg shadow-blue-700/20">Site externo</a>
+                                    @elseif($heroProduct->supportsPointsRedemption() && !$heroProduct->supportsInternalCheckout() && $heroProduct->redeemableItem)
+                                        <a href="{{ route('panel.redemptions.shop') }}" class="inline-flex items-center justify-center rounded-xl bg-amber-500 px-4 py-3 text-sm font-black text-white shadow-lg shadow-amber-500/20">Trocar por pontos</a>
+                                    @else
+                                        <form action="{{ route('seller-products.cart.add', $heroProduct) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="buy_now" value="1">
+                                            <button type="submit" class="store-button-primary inline-flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-black shadow-lg shadow-blue-700/20">Comprar agora</button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
                         @else
                             <div class="rounded-[1.35rem] border border-slate-200 bg-slate-50 p-6 text-center">
                                 <div class="flex h-56 items-center justify-center rounded-[1.15rem] bg-white text-6xl text-slate-300">
@@ -303,73 +524,11 @@
                                 <p class="mt-2 text-sm text-slate-500">A vitrine desta loja sera publicada com os proximos produtos.</p>
                             </div>
                         @endif
-
-                        <div class="mt-4 flex items-center justify-center gap-2 text-slate-300">
-                            <span class="h-2.5 w-2.5 rounded-full bg-slate-900"></span>
-                            <span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span>
-                            <span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span>
-                        </div>
-                    </div>
-
-                    <div class="text-white">
-                        <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.28em] text-white/85">
-                            <i class="fas fa-bolt text-[10px]"></i> Separamos para voce
-                        </span>
-                        <h2 class="mt-5 max-w-4xl text-4xl font-black leading-tight md:text-5xl">{{ $heroHeadline }}</h2>
-                        <p class="mt-4 max-w-3xl text-sm leading-8 text-white/80 md:text-base">{{ $heroText }}</p>
-
-                        <div class="mt-6 flex flex-wrap gap-3">
-                            <a href="#ofertas" class="store-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-rose-700/25">ir para ofertas +</a>
-                            <a href="#produtos" class="store-button-secondary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-black/10">ir para loja +</a>
-                        </div>
-
-                        <div class="mt-7 grid gap-3 sm:grid-cols-3">
-                            <div class="rounded-[1.35rem] border border-white/10 bg-white/8 px-4 py-4 backdrop-blur-sm">
-                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/55">Catalogo ativo</p>
-                                <p class="mt-2 text-3xl font-black">{{ $products->count() }}</p>
-                                <p class="mt-1 text-sm text-white/70">produto(s) cadastrados na loja</p>
-                            </div>
-                            <div class="rounded-[1.35rem] border border-white/10 bg-white/8 px-4 py-4 backdrop-blur-sm">
-                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/55">Canais</p>
-                                <p class="mt-2 text-3xl font-black">{{ collect([$products->contains(fn ($product) => $product->supportsInternalCheckout()), $products->contains(fn ($product) => $product->supportsPointsRedemption()), $products->contains(fn ($product) => $product->supportsExternalCheckout())])->filter()->count() }}</p>
-                                <p class="mt-1 text-sm text-white/70">modos de compra configurados</p>
-                            </div>
-                            <div class="rounded-[1.35rem] border border-white/10 bg-white/8 px-4 py-4 backdrop-blur-sm">
-                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/55">Ecossistema</p>
-                                <p class="mt-2 text-3xl font-black">{{ $courses->count() + $mentorships->count() + $events->count() }}</p>
-                                <p class="mt-1 text-sm text-white/70">curso(s), mentoria(s) e evento(s)</p>
-                            </div>
-                        </div>
-
-                        @if($secondaryHeroProducts->isNotEmpty())
-                            <div class="mt-7 grid gap-3 lg:grid-cols-2">
-                                @foreach($secondaryHeroProducts as $secondaryProduct)
-                                    <a href="{{ route('seller-stores.products.show', [$store->slug, $secondaryProduct->slug]) }}" class="rounded-[1.35rem] border border-white/10 bg-white/8 px-4 py-4 backdrop-blur-sm transition hover:bg-white/12">
-                                        <div class="flex items-center gap-4">
-                                            <div class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1rem] bg-white/95">
-                                                @if($secondaryProduct->cover_url)
-                                                    <img src="{{ $secondaryProduct->cover_url }}" alt="{{ $secondaryProduct->title }}" class="h-full w-full object-cover">
-                                                @else
-                                                    <div class="flex h-full w-full items-center justify-center text-3xl text-slate-300">
-                                                        <i class="fas fa-box-open"></i>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                            <div class="min-w-0 flex-1">
-                                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/55">Oferta adicional</p>
-                                                <h3 class="store-line-clamp-2 mt-2 text-lg font-black text-white">{{ $secondaryProduct->title }}</h3>
-                                                <p class="mt-2 text-sm font-semibold text-white/72">R$ {{ number_format((float) $secondaryProduct->effective_price, 2, ',', '.') }}</p>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-                        @endif
                     </div>
                 </div>
             </section>
 
-            <section class="store-home-card mt-6 rounded-[1.65rem] bg-white p-5 md:p-6">
+            <section class="store-home-card mt-5 rounded-[1.65rem] bg-white p-5 md:p-6">
                 <div class="text-center">
                     <h2 class="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">Novidades da loja</h2>
                     <p class="mt-2 text-sm font-medium text-slate-500">Melhores precos, filtros rapidos e canais configurados por {{ $store->brand_name }}.</p>
@@ -401,15 +560,15 @@
                         <option value="lowest" @selected($catalogSort === 'lowest')>Menor preco</option>
                         <option value="highest" @selected($catalogSort === 'highest')>Maior preco</option>
                     </select>
-                    <button type="submit" class="store-button-primary inline-flex items-center justify-center rounded-2xl px-5 py-3 text-sm font-black shadow-lg shadow-rose-600/20">Filtrar</button>
+                    <button type="submit" class="store-button-primary inline-flex items-center justify-center rounded-2xl px-5 py-3 text-sm font-black shadow-lg shadow-blue-700/20">Filtrar</button>
                 </form>
             </section>
 
-            <section class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <section class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 @foreach($serviceHighlights as $highlight)
                     <article class="store-home-card rounded-[1.65rem] bg-white p-5">
                         <div class="flex items-start gap-4">
-                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-lg" style="color: {{ $themePrimary }};">
+                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
                                 <i class="{{ $highlight['icon'] }}"></i>
                             </div>
                             <div>
@@ -465,9 +624,9 @@
                                     <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">{{ $store->brand_name }}</p>
                                     <h3 class="store-line-clamp-2 mt-2 text-base font-black leading-tight text-slate-900">{{ $product->title }}</h3>
                                     <p class="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{{ $product->salesChannelLabel() }}</p>
-                                    <p class="store-line-clamp-3 mt-3 text-sm leading-6 text-slate-600">{{ $product->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $product->description), 90) }}</p>
+                                    <p class="store-line-clamp-2 mt-3 text-sm leading-6 text-slate-600">{{ $product->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $product->description), 90) }}</p>
 
-                                    <div class="mt-4 space-y-2">
+                                    <div class="mt-auto pt-4 space-y-2">
                                         <div class="flex flex-wrap items-end gap-2">
                                             <span class="text-xl font-black text-slate-900">R$ {{ number_format((float) $product->effective_price, 2, ',', '.') }}</span>
                                             @if($product->sale_price !== null && (float) $product->sale_price < (float) $product->price)
@@ -480,7 +639,7 @@
                                     </div>
 
                                     <div class="mt-5 space-y-2">
-                                        <a href="{{ route('seller-stores.products.show', [$store->slug, $product->slug]) }}" class="store-button-primary inline-flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-black shadow-lg shadow-rose-600/20">{{ $ctaLabel }}</a>
+                                        <a href="{{ route('seller-stores.products.show', [$store->slug, $product->slug]) }}" class="store-button-primary inline-flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-black shadow-lg shadow-blue-700/20">{{ $ctaLabel }}</a>
                                         <div class="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
                                             <span>{{ $product->isPhysical() ? 'Produto fisico' : 'Produto digital' }}</span>
                                             @if($product->sku)
@@ -496,7 +655,7 @@
                     <div class="store-home-card rounded-[1.65rem] bg-white p-8 text-center">
                         <h3 class="text-2xl font-black text-slate-900">Nenhum produto encontrado com esse filtro.</h3>
                         <p class="mt-3 text-sm leading-7 text-slate-600">Ajuste a busca ou remova filtros para visualizar outras opcoes publicadas nesta loja.</p>
-                        <a href="{{ route('seller-stores.show', $store->slug) }}" class="store-button-primary mt-5 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-rose-600/20">Limpar filtros</a>
+                        <a href="{{ route('seller-stores.show', $store->slug) }}" class="store-button-primary mt-5 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-blue-700/20">Limpar filtros</a>
                     </div>
                 @else
                     <div class="store-home-card rounded-[1.65rem] bg-white p-8 text-center">
@@ -514,7 +673,7 @@
                         <p class="mt-4 max-w-3xl text-sm leading-8 text-white/74 md:text-base">A loja publica combina estrutura de ecommerce, vitrine do vendedor, conteudo agregado e canais oficiais para conversao direta.</p>
                     </div>
                     <div class="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
-                        <a href="#produtos" class="store-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-rose-900/30">Explorar produtos</a>
+                        <a href="#produtos" class="store-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-blue-900/30">Explorar produtos</a>
                         @if($whatsappUrl)
                             <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="store-button-secondary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-black/15">Falar com a loja</a>
                         @elseif($store->support_email)
@@ -537,7 +696,7 @@
                     <div class="grid gap-4 lg:grid-cols-3">
                         @foreach($contentCards as $contentCard)
                             <a href="{{ $contentCard['href'] }}" class="store-home-card flex h-full flex-col rounded-[1.65rem] bg-white p-6 transition hover:-translate-y-1">
-                                <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-lg" style="color: {{ $themePrimary }};">
+                                <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
                                     <i class="{{ $contentCard['icon'] }}"></i>
                                 </div>
                                 <p class="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">{{ $contentCard['type'] }}</p>
@@ -567,7 +726,7 @@
                         <div class="mt-5 space-y-4 text-sm text-slate-600">
                             @if($store->support_email)
                                 <div class="flex items-start gap-3">
-                                    <div class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-50 text-lg" style="color: {{ $themePrimary }};">
+                                    <div class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
                                         <i class="fas fa-envelope"></i>
                                     </div>
                                     <div>
@@ -578,7 +737,7 @@
                             @endif
                             @if($store->support_phone)
                                 <div class="flex items-start gap-3">
-                                    <div class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-50 text-lg" style="color: {{ $themePrimary }};">
+                                    <div class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
                                         <i class="fas fa-phone"></i>
                                     </div>
                                     <div>
@@ -589,7 +748,7 @@
                             @endif
                             @if($store->whatsapp)
                                 <div class="flex items-start gap-3">
-                                    <div class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-50 text-lg" style="color: {{ $themePrimary }};">
+                                    <div class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
                                         <i class="fab fa-whatsapp"></i>
                                     </div>
                                     <div>
@@ -602,10 +761,10 @@
 
                         <div class="mt-6 flex flex-wrap gap-3">
                             @if($whatsappUrl)
-                                <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="store-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-rose-600/20">Falar no WhatsApp</a>
+                                <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="store-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-blue-700/20">Falar no WhatsApp</a>
                             @endif
                             @if($store->website_url)
-                                <a href="{{ $store->website_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-sm transition hover:border-rose-200 hover:text-rose-700">Visitar site</a>
+                                <a href="{{ $store->website_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">Visitar site</a>
                             @endif
                         </div>
                     </article>
