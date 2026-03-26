@@ -673,8 +673,8 @@
                 </section>
             @endif
 
-            <section class="mt-10 grid gap-6 xl:grid-cols-3">
-                <article id="sobre-loja" class="store-home-card rounded-[1.65rem] bg-white p-6 md:p-8 xl:col-span-1">
+            <section class="mt-10 grid items-start gap-6 lg:grid-cols-3">
+                <article id="sobre-loja" class="store-home-card self-start rounded-[1.65rem] bg-white p-6 md:p-8">
                     <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Sobre a loja</p>
                     <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">Conheca {{ $store->brand_name }}</h2>
                     @if($storeBioHtml)
@@ -684,7 +684,7 @@
                     @endif
                 </article>
 
-                <article id="atendimento" class="store-home-card rounded-[1.65rem] bg-white p-6 xl:col-span-1">
+                <article id="atendimento" class="store-home-card self-start rounded-[1.65rem] bg-white p-6">
                         <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Atendimento</p>
                         <div class="mt-5 space-y-4 text-sm text-slate-600">
                             @if($store->support_email)
@@ -732,7 +732,7 @@
                         </div>
                 </article>
 
-                <article class="store-home-card rounded-[1.65rem] bg-white p-6 xl:col-span-1">
+                <article class="store-home-card self-start rounded-[1.65rem] bg-white p-6">
                         <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Resumo da operacao</p>
                         <div class="mt-5 grid gap-4 text-sm text-slate-600">
                             <div class="rounded-[1.25rem] bg-slate-50 px-4 py-4">
