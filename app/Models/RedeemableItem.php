@@ -25,6 +25,7 @@ class RedeemableItem extends Model
         'is_active',
         'provider_type',
         'provider_user_id',
+        'seller_product_id',
         'provider_name',
         'item_type',
         'fulfillment_instructions',
@@ -48,6 +49,11 @@ class RedeemableItem extends Model
     public function providerUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'provider_user_id');
+    }
+
+    public function sellerProduct(): BelongsTo
+    {
+        return $this->belongsTo(SellerProduct::class, 'seller_product_id');
     }
 
     public function getProviderLabelAttribute(): string

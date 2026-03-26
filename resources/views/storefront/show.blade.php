@@ -4,7 +4,41 @@
     $primaryColor = $store->primary_color ?: '#1F5EDB';
     $accentColor = $store->accent_color ?: '#0F172A';
     $storeBioHtml = \App\Support\RichText::toHtml($store->bio);
-    $heroProduct = $products->firstWhere('is_featured', true) ?? $products->first();
+    $coinName = (string) (app(\App\Services\PointsExchangeService::class)->settings()['coin_name'] ?? 'UNNBIT');
+    $catalogSearch = trim((string) request('q', ''));
+    $catalogChannel = trim((string) request('canal', ''));
+    $catalogType = trim((string) request('tipo', ''));
+
+    $filteredProducts = $products
+        ->filter(function ($product) use ($catalogSearch, $catalogChannel, $catalogType) {
+            if ($catalogSearch !== '') {
+                $haystack = strtolower(trim((string) ($product->title . ' ' . $product->excerpt . ' ' . strip_tags((string) $product->description))));
+                if (!str_contains($haystack, strtolower($catalogSearch))) {
+                    return false;
+                }
+            }
+
+            if ($catalogType !== '' && (string) $product->type !== $catalogType) {
+                return false;
+            }
+
+            if ($catalogChannel !== '') {
+                if ($catalogChannel === 'store' && !$product->supportsInternalCheckout()) {
+                    return false;
+                }
+                if ($catalogChannel === 'points' && !$product->supportsPointsRedemption()) {
+                    return false;
+                }
+                if ($catalogChannel === 'external' && !$product->supportsExternalCheckout()) {
+                    return false;
+                }
+            }
+
+            return true;
+        })
+        ->values();
+
+    $heroProduct = $filteredProducts->firstWhere('is_featured', true) ?? $filteredProducts->first() ?? ($products->firstWhere('is_featured', true) ?? $products->first());
     $whatsappUrl = null;
     if (filled($store->whatsapp)) {
         $whatsappDigits = preg_replace('/\D+/', '', (string) $store->whatsapp);
@@ -29,7 +63,7 @@
         ['label' => 'Eventos', 'value' => $events->count(), 'icon' => 'fas fa-calendar-days'],
     ];
 
-    $hasAnyCatalog = $products->isNotEmpty() || $courses->isNotEmpty() || $mentorships->isNotEmpty() || $events->isNotEmpty();
+    $hasAnyCatalog = $filteredProducts->isNotEmpty() || $courses->isNotEmpty() || $mentorships->isNotEmpty() || $events->isNotEmpty();
 @endphp
 
 @push('styles')
@@ -154,6 +188,17 @@
             color: #1d4ed8;
             background: rgba(255, 255, 255, 0.98);
         }
+
+        .store-reference-strip {
+            background: linear-gradient(90deg, {{ $primaryColor }} 0%, {{ $accentColor }} 100%);
+        }
+
+        .store-filter-select,
+        .store-filter-input {
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+        }
     </style>
 @endpush
 
@@ -162,6 +207,69 @@
 @section('content')
     <div class="storefront-shell min-h-screen pt-24 pb-24">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <section class="store-reference-strip overflow-hidden rounded-[2rem] text-white shadow-[0_25px_80px_-35px_rgba(15,23,42,0.45)]">
+                <div class="flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between">
+                    <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-white/85">
+                        @if($store->support_phone)
+                            <span class="inline-flex items-center gap-2"><i class="fas fa-phone-volume text-[11px]"></i> {{ $store->support_phone }}</span>
+                        @endif
+                        @if($store->support_email)
+                            <span class="inline-flex items-center gap-2"><i class="fas fa-envelope text-[11px]"></i> {{ $store->support_email }}</span>
+                        @endif
+                        <span class="inline-flex items-center gap-2"><i class="fas fa-store text-[11px]"></i> Loja oficial {{ $store->brand_name }}</span>
+                    </div>
+
+                    @if($socialLinks->isNotEmpty())
+                        <div class="flex flex-wrap items-center gap-2">
+                            @foreach($socialLinks->take(5) as $link)
+                                <a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
+                                    <i class="{{ $link['icon'] }} text-sm"></i>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </section>
+
+            <section class="store-surface-card mt-4 overflow-hidden rounded-[2rem] p-5 md:p-6">
+                <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="h-16 w-16 overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm">
+                            @if($store->logo_url)
+                                <img src="{{ $store->logo_url }}" alt="{{ $store->brand_name }}" class="h-full w-full object-cover">
+                            @else
+                                <div class="flex h-full w-full items-center justify-center text-2xl text-slate-300">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                            @endif
+                        </div>
+                        <div>
+                            <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Storefront premium</p>
+                            <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900">{{ $store->brand_name }}</h2>
+                            <p class="mt-1 text-sm text-slate-500">{{ $store->tagline ?: 'Catalogo oficial da marca dentro do ecossistema UNN.' }}</p>
+                        </div>
+                    </div>
+
+                    <form method="GET" class="grid gap-3 md:grid-cols-[minmax(0,1.4fr),180px,180px,auto]">
+                        <input type="text" name="q" value="{{ $catalogSearch }}" placeholder="Buscar produtos da loja" class="store-filter-input min-w-0 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
+                        <select name="tipo" class="store-filter-select rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
+                            <option value="">Todos os tipos</option>
+                            <option value="physical" @selected($catalogType === 'physical')>Fisico</option>
+                            <option value="digital" @selected($catalogType === 'digital')>Digital</option>
+                        </select>
+                        <select name="canal" class="store-filter-select rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
+                            <option value="">Todos os canais</option>
+                            <option value="store" @selected($catalogChannel === 'store')>Loja virtual</option>
+                            <option value="points" @selected($catalogChannel === 'points')>Troca de pontos</option>
+                            <option value="external" @selected($catalogChannel === 'external')>Site externo</option>
+                        </select>
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition hover:brightness-110" style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 100%);">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </form>
+                </div>
+            </section>
+
             <section class="storefront-hero relative overflow-hidden rounded-[2.75rem] border border-slate-200/70 bg-slate-950 shadow-[0_35px_100px_-35px_rgba(15,23,42,0.55)]" style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 88%);">
                 @if($store->banner_url)
                     <img src="{{ $store->banner_url }}" alt="{{ $store->brand_name }}" class="absolute inset-0 h-full w-full object-cover opacity-35">
@@ -275,9 +383,16 @@
                                                 <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/55">Preco atual</p>
                                                 <p class="mt-2 text-3xl font-black">R$ {{ number_format((float) $heroProduct->effective_price, 2, ',', '.') }}</p>
                                             </div>
-                                            <a href="{{ route('seller-stores.products.show', [$store->slug, $heroProduct->slug]) }}" class="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-black text-slate-950 transition hover:brightness-110">
-                                                Ver produto <i class="fas fa-arrow-right text-[11px]" style="color: {{ $primaryColor }};"></i>
-                                            </a>
+                                            <div class="flex flex-wrap gap-2">
+                                                @if($heroProduct->supportsPointsRedemption() && $heroProduct->redeemableItem)
+                                                    <span class="inline-flex items-center gap-2 rounded-2xl border border-white/12 bg-white/10 px-4 py-3 text-sm font-black text-white">
+                                                        <i class="fas fa-coins text-[11px]"></i> {{ number_format((int) $heroProduct->redeemableItem->points_cost, 0, ',', '.') }} {{ $coinName }}
+                                                    </span>
+                                                @endif
+                                                <a href="{{ route('seller-stores.products.show', [$store->slug, $heroProduct->slug]) }}" class="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-black text-slate-950 transition hover:brightness-110">
+                                                    Ver produto <i class="fas fa-arrow-right text-[11px]" style="color: {{ $primaryColor }};"></i>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -316,7 +431,7 @@
 
             @if($hasAnyCatalog)
                 <section class="mt-8 flex flex-wrap gap-3">
-                    @if($products->isNotEmpty())
+                    @if($filteredProducts->isNotEmpty())
                         <a href="#produtos" class="store-anchor-chip inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold text-slate-700 transition">
                             <i class="fas fa-box-open text-slate-400"></i> Produtos
                         </a>
@@ -339,7 +454,7 @@
                 </section>
             @endif
 
-            @if($products->isNotEmpty())
+            @if($filteredProducts->isNotEmpty())
                 <section id="produtos" class="mt-10">
                     <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                         <div>
@@ -361,7 +476,7 @@
                     </div>
 
                     <div class="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                        @foreach($products as $product)
+                        @foreach($filteredProducts as $product)
                             <article class="store-product-card store-surface-card group flex h-full flex-col overflow-hidden rounded-[2rem]">
                                 <div class="relative">
                                     <a href="{{ route('seller-stores.products.show', [$store->slug, $product->slug]) }}" class="block aspect-[16/11] overflow-hidden bg-slate-100">
@@ -401,9 +516,15 @@
 
                                     <div class="mt-5 grid gap-3 rounded-[1.5rem] bg-slate-50/90 p-4 text-sm text-slate-600">
                                         <div class="flex items-center justify-between gap-3">
-                                            <span class="font-semibold text-slate-500">Entrega</span>
-                                            <span class="font-bold text-slate-900">{{ $product->isPhysical() ? 'Frete calculado no checkout' : 'Liberacao digital apos pagamento' }}</span>
+                                            <span class="font-semibold text-slate-500">Canal</span>
+                                            <span class="font-bold text-slate-900">{{ $product->salesChannelLabel() }}</span>
                                         </div>
+                                        @if($product->supportsPointsRedemption() && $product->redeemableItem)
+                                            <div class="flex items-center justify-between gap-3">
+                                                <span class="font-semibold text-slate-500">{{ $coinName }}</span>
+                                                <span class="font-bold text-slate-900">{{ number_format((int) $product->redeemableItem->points_cost, 0, ',', '.') }}</span>
+                                            </div>
+                                        @endif
                                         @if($product->isPhysical())
                                             <div class="flex items-center justify-between gap-3">
                                                 <span class="font-semibold text-slate-500">Estoque</span>
@@ -428,17 +549,35 @@
                                         <a href="{{ route('seller-stores.products.show', [$store->slug, $product->slug]) }}" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700">
                                             Ver detalhes
                                         </a>
-                                        <form action="{{ route('seller-products.cart.add', $product) }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="buy_now" value="1">
-                                            <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition hover:brightness-110" style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 100%);">
-                                                Comprar agora
-                                            </button>
-                                        </form>
+                                        @if($product->supportsExternalCheckout())
+                                            <a href="{{ $product->external_checkout_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition hover:brightness-110" style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 100%);">
+                                                Site externo
+                                            </a>
+                                        @elseif($product->supportsPointsRedemption() && !$product->supportsInternalCheckout() && $product->redeemableItem)
+                                            <a href="{{ route('panel.redemptions.shop') }}" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-500 px-4 py-3 text-sm font-black text-white shadow-lg shadow-amber-500/20 transition hover:brightness-110">
+                                                Trocar por pontos
+                                            </a>
+                                        @else
+                                            <form action="{{ route('seller-products.cart.add', $product) }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="buy_now" value="1">
+                                                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition hover:brightness-110" style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 100%);">
+                                                    Comprar agora
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </div>
                             </article>
                         @endforeach
+                    </div>
+                </section>
+            @elseif($products->isNotEmpty())
+                <section class="mt-10">
+                    <div class="store-surface-card rounded-[2.25rem] p-8 md:p-10">
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Nenhum resultado</p>
+                        <h2 class="mt-3 text-3xl font-black tracking-tight text-slate-900">Nenhum produto encontrou esse filtro.</h2>
+                        <p class="mt-4 text-sm leading-7 text-slate-600 md:text-base">Ajuste a busca, o tipo ou o canal para visualizar outros itens da loja.</p>
                     </div>
                 </section>
             @elseif(!$hasAnyCatalog)
@@ -464,6 +603,28 @@
                     </div>
                 </section>
             @endif
+
+            <section class="mt-10 overflow-hidden rounded-[2.5rem] border border-slate-200/70 shadow-[0_28px_90px_-40px_rgba(15,23,42,0.35)]" style="background: linear-gradient(135deg, {{ $accentColor }} 0%, {{ $primaryColor }} 100%);">
+                <div class="grid gap-6 px-6 py-8 md:px-8 md:py-10 lg:grid-cols-[1.2fr,0.8fr] lg:items-center">
+                    <div class="text-white">
+                        <p class="text-xs font-black uppercase tracking-[0.28em] text-white/60">Comunicacao premium</p>
+                        <h2 class="mt-4 text-3xl font-black tracking-tight md:text-4xl">Receba novidades, lancamentos e ofertas desta loja.</h2>
+                        <p class="mt-4 max-w-2xl text-sm leading-7 text-white/75 md:text-base">A vitrine foi estruturada para parecer uma loja real: busca, destaque de produtos, compra direta, pontos e canais oficiais da marca em um unico fluxo.</p>
+                    </div>
+                    <div class="rounded-[2rem] bg-white/10 p-5 backdrop-blur-md">
+                        <div class="grid gap-3">
+                            <a href="{{ $store->website_url ?: route('seller-stores.show', $store->slug) }}" @if($store->website_url) target="_blank" rel="noopener noreferrer" @endif class="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-black text-slate-950 transition hover:brightness-110">
+                                <i class="fas fa-bag-shopping text-[12px]" style="color: {{ $primaryColor }};"></i> Explorar catalogo
+                            </a>
+                            @if($whatsappUrl)
+                                <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15">
+                                    <i class="fab fa-whatsapp"></i> Falar com a loja
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <div class="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.15fr),360px]">
                 <section class="space-y-8">

@@ -84,7 +84,7 @@ class MarketplaceController extends Controller
         $sellerProducts = collect();
         if (SellerProduct::tableAvailable()) {
             $sellerProductsQuery = SellerProduct::query()
-                ->with(['store.user', 'media'])
+                ->with(['store.user', 'media', 'redeemableItem'])
                 ->published()
                 ->latest('id');
 

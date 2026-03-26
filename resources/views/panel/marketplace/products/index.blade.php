@@ -8,7 +8,7 @@
             <div>
                 <p class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Catalogo proprio</p>
                 <h1 class="mt-2 text-3xl font-black text-slate-900 dark:text-white">Produtos da minha loja</h1>
-                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Cadastre produtos fisicos e digitais para vender na sua storefront e no marketplace.</p>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Cadastre produtos fisicos e digitais para vender na loja, trocar por pontos ou encaminhar para um site externo.</p>
             </div>
             <div class="flex flex-wrap gap-3">
                 <a href="{{ route('panel.marketplace.store.edit') }}" class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 transition">
@@ -33,11 +33,22 @@
                     <div class="mt-4 flex items-start justify-between gap-3">
                         <div>
                             <h2 class="text-lg font-black text-slate-900 dark:text-white">{{ $product->title }}</h2>
-                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ ucfirst($product->type) }} ? {{ strtoupper($product->status) }}</p>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ ucfirst($product->type) }} • {{ $product->salesChannelLabel() }}</p>
                         </div>
                         <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black {{ $product->status === 'published' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' }}">{{ $product->status === 'published' ? 'Publicado' : 'Rascunho' }}</span>
                     </div>
                     <p class="mt-3 text-sm text-slate-600 dark:text-slate-300 line-clamp-3">{{ $product->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $product->description), 110) }}</p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        @if($product->supportsInternalCheckout())
+                            <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-[11px] font-black text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">Loja virtual</span>
+                        @endif
+                        @if($product->supportsPointsRedemption())
+                            <span class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-[11px] font-black text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">{{ number_format((int) optional($product->redeemableItem)->points_cost, 0, ',', '.') ?: '0' }} UNNBIT</span>
+                        @endif
+                        @if($product->supportsExternalCheckout())
+                            <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[11px] font-black text-slate-700 dark:bg-slate-800 dark:text-slate-300">Site externo</span>
+                        @endif
+                    </div>
                     <div class="mt-4 flex items-end justify-between gap-3 border-t border-slate-100 dark:border-slate-800 pt-4">
                         <div>
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Preco</p>

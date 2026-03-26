@@ -1244,6 +1244,7 @@
                             $sellerName = optional(optional($product->store)->user)->name ?? ($product->store->brand_name ?? 'Vendedor');
                             $productUrl = $product->store ? route('seller-stores.products.show', [$product->store->slug, $product->slug]) : '#';
                             $excerpt = \Illuminate\Support\Str::limit(strip_tags((string) ($product->excerpt ?: $product->description)), 90);
+                            $pointsCost = (int) optional($product->redeemableItem)->points_cost;
                         @endphp
 
                         <article class="group mp-selling-card rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition" data-product-card>
@@ -1273,6 +1274,16 @@
                                     <div class="mp-selling-copy text-sm text-slate-600 mt-3 line-clamp-3">
                                         {{ $excerpt }}
                                     </div>
+                                    <div class="mt-3 flex flex-wrap gap-2">
+                                        <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[11px] font-black text-slate-700">
+                                            {{ $product->salesChannelLabel() }}
+                                        </span>
+                                        @if($product->supportsPointsRedemption() && $pointsCost > 0)
+                                            <span class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-[11px] font-black text-amber-700">
+                                                {{ number_format($pointsCost, 0, ',', '.') }} UNNBIT
+                                            </span>
+                                        @endif
+                                    </div>
                                     <div class="mp-selling-footer mt-auto pt-4 border-t border-slate-100">
                                         <div class="text-xs text-slate-500">Preco</div>
                                         <div class="text-lg font-black text-slate-900">
@@ -1290,14 +1301,26 @@
                                     </a>
                                 @endif
 
-                                <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="w-full">
-                                    @csrf
-                                    <input type="hidden" name="buy_now" value="1">
-                                    <button type="submit"
-                                        class="w-full mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
-                                        Comprar agora
-                                    </button>
-                                </form>
+                                @if($product->supportsExternalCheckout())
+                                    <a href="{{ $product->external_checkout_url }}" target="_blank" rel="noopener noreferrer"
+                                        class="w-full mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md text-center">
+                                        Comprar no site externo
+                                    </a>
+                                @elseif($product->supportsPointsRedemption() && !$product->supportsInternalCheckout() && $pointsCost > 0)
+                                    <a href="{{ route('panel.redemptions.shop') }}"
+                                        class="w-full mp-selling-action mp-selling-action-primary rounded-2xl bg-amber-500 px-4 py-2 text-sm font-black text-white shadow-md text-center">
+                                        Trocar por {{ number_format($pointsCost, 0, ',', '.') }} UNNBIT
+                                    </a>
+                                @else
+                                    <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="w-full">
+                                        @csrf
+                                        <input type="hidden" name="buy_now" value="1">
+                                        <button type="submit"
+                                            class="w-full mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
+                                            Comprar agora
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </article>
                     @empty

@@ -37,6 +37,10 @@ class SellerProductCartController extends Controller
                 ->with('warning', 'Seu carrinho atual contem itens de outro vendedor. Confirme a substituicao para continuar.');
         }
 
+        if ($result['status'] === 'unavailable') {
+            return back()->with('error', 'Esse produto nao esta disponivel para compra direta na loja virtual.');
+        }
+
         if ($request->boolean('buy_now')) {
             return redirect()->route('seller-products.checkout.show');
         }

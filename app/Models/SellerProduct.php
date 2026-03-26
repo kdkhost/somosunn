@@ -5,12 +5,20 @@ namespace App\Models;
 use App\Support\UploadStorage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 
 class SellerProduct extends Model
 {
     use HasFactory;
+
+    public const SALES_CHANNELS = [
+        'store_only' => 'Venda somente na loja virtual',
+        'points_only' => 'Troca de pontos',
+        'store_and_points' => 'Ambos os locais',
+        'external_only' => 'Somente venda no site externo',
+    ];
 
     protected static ?bool $tableAvailable = null;
 
@@ -33,11 +41,14 @@ class SellerProduct extends Model
         'width_cm',
         'length_cm',
         'status',
+        'sales_channel',
         'is_featured',
         'digital_delivery_type',
         'digital_file_path',
         'digital_file_name',
         'digital_url',
+        'external_checkout_url',
+        'points_reference_value',
         'digital_instructions',
         'metadata',
         'published_at',
@@ -46,6 +57,7 @@ class SellerProduct extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
+        'points_reference_value' => 'decimal:2',
         'sale_price_ends_at' => 'datetime',
         'published_at' => 'datetime',
         'is_featured' => 'boolean',
@@ -70,6 +82,11 @@ class SellerProduct extends Model
     public function media()
     {
         return $this->hasMany(SellerProductMedia::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function redeemableItem(): HasOne
+    {
+        return $this->hasOne(RedeemableItem::class, 'seller_product_id');
     }
 
     public function scopePublished(Builder $query): Builder
@@ -117,6 +134,40 @@ class SellerProduct extends Model
     public function isPublished(): bool
     {
         return $this->status === 'published';
+    }
+
+    public function supportsInternalCheckout(): bool
+    {
+        $channel = (string) ($this->sales_channel ?: 'store_only');
+
+        return in_array($channel, ['store_only', 'store_and_points'], true);
+    }
+
+    public function supportsPointsRedemption(): bool
+    {
+        $channel = (string) ($this->sales_channel ?: 'store_only');
+
+        return in_array($channel, ['points_only', 'store_and_points'], true);
+    }
+
+    public function supportsExternalCheckout(): bool
+    {
+        return (string) ($this->sales_channel ?: 'store_only') === 'external_only' && filled($this->external_checkout_url);
+    }
+
+    public function salesChannelLabel(): string
+    {
+        return self::SALES_CHANNELS[(string) ($this->sales_channel ?: 'store_only')] ?? self::SALES_CHANNELS['store_only'];
+    }
+
+    public function pointsReferenceValue(): float
+    {
+        $referenceValue = $this->points_reference_value;
+        if ($referenceValue !== null && (float) $referenceValue > 0) {
+            return round((float) $referenceValue, 2);
+        }
+
+        return round((float) ($this->effective_price > 0 ? $this->effective_price : ($this->price ?? 0.01)), 2);
     }
 
     public static function tableAvailable(): bool

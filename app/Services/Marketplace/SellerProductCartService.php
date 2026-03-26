@@ -25,6 +25,14 @@ class SellerProductCartService
     public function add(SellerProduct $product, int $quantity = 1, bool $replace = false): array
     {
         $quantity = max(1, $quantity);
+
+        if (!$product->supportsInternalCheckout()) {
+            return [
+                'status' => 'unavailable',
+                'cart' => $this->getCart(),
+            ];
+        }
+
         $cart = $this->getCart();
         $currentSellerId = (int) ($cart['seller_id'] ?? 0);
         $sellerId = (int) $product->user_id;
@@ -140,7 +148,7 @@ class SellerProductCartService
         $resolvedItems = collect($items)
             ->map(function (array $item, $productId) use ($products) {
                 $product = $products->get((int) $productId);
-                if (!$product || !$product->isPublished()) {
+                if (!$product || !$product->isPublished() || !$product->supportsInternalCheckout()) {
                     return null;
                 }
 

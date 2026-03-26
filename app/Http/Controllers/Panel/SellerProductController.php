@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\SellerProduct;
 use App\Models\SellerProductMedia;
 use App\Models\SellerStore;
+use App\Services\Marketplace\SellerProductChannelSyncService;
 use App\Services\Marketplace\SellerStoreService;
+use App\Services\PointsExchangeService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -26,14 +28,14 @@ class SellerProductController extends Controller
 
         $products = SellerProduct::query()
             ->where('user_id', auth()->id())
-            ->with('media')
+            ->with(['media', 'redeemableItem'])
             ->latest('id')
             ->paginate(12);
 
         return view('panel.marketplace.products.index', compact('store', 'products'));
     }
 
-    public function create(SellerStoreService $storeService)
+    public function create(SellerStoreService $storeService, PointsExchangeService $exchangeService)
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
             return redirect()
@@ -45,9 +47,12 @@ class SellerProductController extends Controller
         $product = new SellerProduct([
             'type' => 'digital',
             'status' => 'draft',
+            'sales_channel' => 'store_only',
         ]);
 
-        return view('panel.marketplace.products.form', compact('store', 'product'));
+        $exchangeSettings = $exchangeService->settings();
+
+        return view('panel.marketplace.products.form', compact('store', 'product', 'exchangeSettings'));
     }
 
     public function store(Request $request, SellerStoreService $storeService)
@@ -67,7 +72,7 @@ class SellerProductController extends Controller
         return $this->persist($request, $product, $store);
     }
 
-    public function edit(SellerProduct $product, SellerStoreService $storeService)
+    public function edit(SellerProduct $product, SellerStoreService $storeService, PointsExchangeService $exchangeService)
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
             return redirect()
@@ -77,9 +82,11 @@ class SellerProductController extends Controller
 
         abort_unless((int) $product->user_id === (int) auth()->id(), 403);
         $store = $storeService->ensureForUser(auth()->user());
-        $product->load('media');
+        $product->load('media', 'redeemableItem');
 
-        return view('panel.marketplace.products.form', compact('store', 'product'));
+        $exchangeSettings = $exchangeService->settings();
+
+        return view('panel.marketplace.products.form', compact('store', 'product', 'exchangeSettings'));
     }
 
     public function update(Request $request, SellerProduct $product, SellerStoreService $storeService)
@@ -96,7 +103,7 @@ class SellerProductController extends Controller
         return $this->persist($request, $product, $store);
     }
 
-    public function destroy(SellerProduct $product)
+    public function destroy(SellerProduct $product, SellerProductChannelSyncService $channelSyncService)
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
             return redirect()
@@ -105,6 +112,8 @@ class SellerProductController extends Controller
         }
 
         abort_unless((int) $product->user_id === (int) auth()->id(), 403);
+
+        $channelSyncService->detachBeforeProductDeletion($product);
 
         foreach ($product->media as $media) {
             UploadStorage::disk()->delete(UploadStorage::normalizePath($media->file_path));
@@ -152,6 +161,7 @@ class SellerProductController extends Controller
             'price' => ['required', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0'],
             'status' => ['required', 'in:draft,published'],
+            'sales_channel' => ['required', 'in:' . implode(',', array_keys(SellerProduct::SALES_CHANNELS))],
             'is_featured' => ['nullable', 'boolean'],
             'stock' => ['nullable', 'integer', 'min:0'],
             'weight_grams' => ['nullable', 'integer', 'min:1'],
@@ -162,6 +172,8 @@ class SellerProductController extends Controller
             'gallery.*' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,mp4,mov,m4v,webm', 'max:20480'],
             'digital_file' => ['nullable', 'file', 'max:51200'],
             'digital_url' => ['nullable', 'url', 'max:2048'],
+            'external_checkout_url' => ['nullable', 'url', 'max:2048'],
+            'points_reference_value' => ['nullable', 'numeric', 'min:0.01'],
             'digital_instructions' => ['nullable', 'string', 'max:5000'],
             'remove_cover' => ['nullable', 'boolean'],
             'remove_digital_file' => ['nullable', 'boolean'],
@@ -169,8 +181,20 @@ class SellerProductController extends Controller
 
         $status = (string) ($data['status'] ?? 'draft');
         $type = (string) ($data['type'] ?? 'digital');
+        $salesChannel = (string) ($data['sales_channel'] ?? 'store_only');
+        $supportsInternalCheckout = in_array($salesChannel, ['store_only', 'store_and_points'], true);
+        $supportsPointsRedemption = in_array($salesChannel, ['points_only', 'store_and_points'], true);
+        $supportsExternalCheckout = $salesChannel === 'external_only';
         if ($status === 'published') {
-            if ($type === 'physical') {
+            if ($supportsExternalCheckout && blank($data['external_checkout_url'] ?? null)) {
+                return back()->withErrors(['external_checkout_url' => 'Informe a URL do site externo antes de publicar esse produto.'])->withInput();
+            }
+
+            if (($supportsInternalCheckout || $supportsPointsRedemption) && $type === 'physical' && !filled($data['stock'] ?? null)) {
+                return back()->withErrors(['stock' => 'Informe o estoque antes de publicar esse produto fisico.'])->withInput();
+            }
+
+            if ($supportsInternalCheckout && $type === 'physical') {
                 foreach (['stock', 'weight_grams', 'height_cm', 'width_cm', 'length_cm'] as $field) {
                     if (!filled($data[$field] ?? null)) {
                         return back()->withErrors([$field => 'Preencha todos os dados logisticos antes de publicar um produto fisico.'])->withInput();
@@ -185,7 +209,7 @@ class SellerProductController extends Controller
                 }
             }
 
-            if ($type === 'digital' && blank($data['digital_url'] ?? null) && !$request->hasFile('digital_file') && blank($product->digital_file_path)) {
+            if ($supportsInternalCheckout && $type === 'digital' && blank($data['digital_url'] ?? null) && !$request->hasFile('digital_file') && blank($product->digital_file_path)) {
                 return back()->withErrors(['digital_file' => 'Envie um arquivo digital ou informe uma URL valida antes de publicar.'])->withInput();
             }
         }
@@ -201,15 +225,21 @@ class SellerProductController extends Controller
             $product->digital_file_name = null;
         }
 
+        if (($type !== 'digital' || !$supportsInternalCheckout) && $product->digital_file_path) {
+            Storage::disk('local')->delete($product->digital_file_path);
+            $product->digital_file_path = null;
+            $product->digital_file_name = null;
+        }
+
         if ($request->hasFile('cover')) {
             $data['cover_path'] = UploadStorage::storeUploadedFile($request->file('cover'), 'uploads/imagens/marketplace/products/covers');
         }
 
-        if ($request->hasFile('digital_file')) {
+        if ($supportsInternalCheckout && $request->hasFile('digital_file')) {
             $data['digital_file_path'] = $request->file('digital_file')->store('seller-products/digital', 'local');
             $data['digital_file_name'] = $request->file('digital_file')->getClientOriginalName();
             $data['digital_delivery_type'] = 'file';
-        } elseif (filled($data['digital_url'] ?? null)) {
+        } elseif ($supportsInternalCheckout && filled($data['digital_url'] ?? null)) {
             $data['digital_delivery_type'] = 'url';
         }
 
@@ -228,13 +258,16 @@ class SellerProductController extends Controller
             'price' => $data['price'],
             'sale_price' => $data['sale_price'] ?? null,
             'status' => $status,
+            'sales_channel' => $salesChannel,
             'is_featured' => $request->boolean('is_featured'),
-            'stock' => $type === 'physical' ? (int) ($data['stock'] ?? 0) : 1,
+            'stock' => $type === 'physical' ? (int) ($data['stock'] ?? 0) : max(1, (int) ($data['stock'] ?? 1)),
             'weight_grams' => $type === 'physical' ? (int) ($data['weight_grams'] ?? 0) : null,
             'height_cm' => $type === 'physical' ? (int) ($data['height_cm'] ?? 0) : null,
             'width_cm' => $type === 'physical' ? (int) ($data['width_cm'] ?? 0) : null,
             'length_cm' => $type === 'physical' ? (int) ($data['length_cm'] ?? 0) : null,
-            'digital_url' => $type === 'digital' ? ($data['digital_url'] ?? null) : null,
+            'digital_url' => $type === 'digital' && $supportsInternalCheckout ? ($data['digital_url'] ?? null) : null,
+            'external_checkout_url' => $supportsExternalCheckout ? ($data['external_checkout_url'] ?? null) : null,
+            'points_reference_value' => $supportsPointsRedemption ? ($data['points_reference_value'] ?? null) : null,
             'digital_instructions' => $type === 'digital' ? ($data['digital_instructions'] ?? null) : null,
             'published_at' => $status === 'published' ? ($product->published_at ?: now()) : null,
         ]);
@@ -243,21 +276,25 @@ class SellerProductController extends Controller
             $product->cover_path = $data['cover_path'];
         }
 
-        if (isset($data['digital_file_path'])) {
+        if (isset($data['digital_file_path']) && $supportsInternalCheckout) {
             $product->digital_file_path = $data['digital_file_path'];
             $product->digital_file_name = $data['digital_file_name'];
             $product->digital_delivery_type = $data['digital_delivery_type'];
-        } elseif ($type !== 'digital') {
+        } elseif ($type !== 'digital' || !$supportsInternalCheckout) {
             $product->digital_delivery_type = null;
             $product->digital_file_path = null;
             $product->digital_file_name = null;
             $product->digital_url = null;
-            $product->digital_instructions = null;
+            if ($type !== 'digital') {
+                $product->digital_instructions = null;
+            }
         } elseif (filled($data['digital_url'] ?? null) && blank($product->digital_file_path)) {
             $product->digital_delivery_type = 'url';
         }
 
         $product->save();
+
+        app(SellerProductChannelSyncService::class)->sync($product->fresh(['store.user', 'redeemableItem']));
 
         if ($request->hasFile('gallery')) {
             $sortOrder = (int) $product->media()->max('sort_order');

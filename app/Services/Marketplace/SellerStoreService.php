@@ -105,10 +105,10 @@ class SellerStoreService
             ];
         }
 
-        $store->loadMissing('user', 'products.media');
+        $store->loadMissing('user', 'products.media', 'products.redeemableItem');
 
         $products = $store->products()
-            ->with('media')
+            ->with(['media', 'redeemableItem'])
             ->published()
             ->get()
             ->filter(fn(SellerProduct $product) => !$product->store->is_blocked)

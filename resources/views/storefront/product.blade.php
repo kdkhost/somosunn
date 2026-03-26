@@ -5,6 +5,11 @@
     $accentColor = $store->accent_color ?: '#0F172A';
     $descriptionHtml = \App\Support\RichText::toHtml($product->description);
     $excerpt = $product->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $product->description), 180);
+    $coinName = (string) (app(\App\Services\PointsExchangeService::class)->settings()['coin_name'] ?? 'UNNBIT');
+    $canBuyInStore = $product->supportsInternalCheckout();
+    $canRedeemWithPoints = $product->supportsPointsRedemption() && $product->redeemableItem;
+    $canBuyExternally = $product->supportsExternalCheckout();
+    $pointsCost = $canRedeemWithPoints ? (int) $product->redeemableItem->points_cost : 0;
 
     $galleryItems = collect();
 
@@ -142,6 +147,9 @@
                                         SKU {{ $product->sku }}
                                     </span>
                                 @endif
+                                <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/25 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-white/70">
+                                    {{ $product->salesChannelLabel() }}
+                                </span>
                             </div>
 
                             <h1 class="mt-5 max-w-4xl text-4xl font-black tracking-tight text-white md:text-5xl">{{ $product->title }}</h1>
@@ -325,9 +333,25 @@
 
                 <aside class="space-y-6 xl:sticky xl:top-28 xl:self-start">
                     <section class="product-surface-card rounded-[2.25rem] p-6 md:p-7">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Comprar agora</p>
-                        <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">Checkout rapido</h2>
-                        <p class="mt-3 text-sm leading-7 text-slate-600">Adicione ao carrinho ou siga direto para o checkout do marketplace.</p>
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Acao principal</p>
+                        <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">
+                            @if($canBuyExternally)
+                                Comprar no site externo
+                            @elseif($canRedeemWithPoints && !$canBuyInStore)
+                                Trocar por {{ $coinName ?? 'UNNBIT' }}
+                            @else
+                                Checkout rapido
+                            @endif
+                        </h2>
+                        <p class="mt-3 text-sm leading-7 text-slate-600">
+                            @if($canBuyExternally)
+                                Este item e exibido na vitrine da marca, mas a compra e concluida no site externo informado pelo vendedor.
+                            @elseif($canRedeemWithPoints && !$canBuyInStore)
+                                Este item e gerenciado pela loja, mas a obtencao acontece pelo modulo de troca por pontos.
+                            @else
+                                Adicione ao carrinho ou siga direto para o checkout do marketplace.
+                            @endif
+                        </p>
 
                         <div class="mt-6 rounded-[1.75rem] bg-slate-50 p-5">
                             <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Valor do item</p>
@@ -339,25 +363,43 @@
                             </div>
                         </div>
 
-                        <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="mt-6 space-y-4">
-                            @csrf
-                            <div>
-                                <label for="product-quantity" class="text-sm font-bold text-slate-700">Quantidade</label>
-                                <input id="product-quantity" type="number" min="1" value="1" name="quantity" class="mt-2 w-full rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:border-blue-500 focus:ring-blue-500">
-                            </div>
+                        @if($canBuyInStore)
+                            <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="mt-6 space-y-4">
+                                @csrf
+                                <div>
+                                    <label for="product-quantity" class="text-sm font-bold text-slate-700">Quantidade</label>
+                                    <input id="product-quantity" type="number" min="1" value="1" name="quantity" class="mt-2 w-full rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:border-blue-500 focus:ring-blue-500">
+                                </div>
 
-                            <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700">
-                                <i class="fas fa-cart-shopping"></i> Adicionar ao carrinho
-                            </button>
-                            <button type="submit" name="buy_now" value="1" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition hover:brightness-110" style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 100%);">
-                                <i class="fas fa-bolt"></i> Comprar agora
-                            </button>
-                        </form>
+                                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700">
+                                    <i class="fas fa-cart-shopping"></i> Adicionar ao carrinho
+                                </button>
+                                <button type="submit" name="buy_now" value="1" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition hover:brightness-110" style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 100%);">
+                                    <i class="fas fa-bolt"></i> Comprar agora
+                                </button>
+                            </form>
+                        @endif
+
+                        @if($canRedeemWithPoints)
+                            <a href="{{ route('panel.redemptions.shop') }}" class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-500 px-4 py-3 text-sm font-black text-white shadow-lg shadow-amber-500/20 transition hover:brightness-110">
+                                <i class="fas fa-coins"></i> Trocar por {{ number_format($pointsCost, 0, ',', '.') }} {{ $coinName ?? 'UNNBIT' }}
+                            </a>
+                        @endif
+
+                        @if($canBuyExternally)
+                            <a href="{{ $product->external_checkout_url }}" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition hover:brightness-110" style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 100%);">
+                                <i class="fas fa-up-right-from-square"></i> Ir para o site externo
+                            </a>
+                        @endif
 
                         <div class="mt-6 space-y-3 border-t border-slate-100 pt-6 text-sm text-slate-600">
                             <div class="flex items-center justify-between gap-3">
                                 <span class="font-semibold text-slate-500">Tipo</span>
                                 <span class="font-bold text-slate-900">{{ $product->isPhysical() ? 'Produto fisico' : 'Produto digital' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="font-semibold text-slate-500">Canal</span>
+                                <span class="font-bold text-slate-900">{{ $product->salesChannelLabel() }}</span>
                             </div>
                             @if($product->isPhysical())
                                 <div class="flex items-center justify-between gap-3">
@@ -365,9 +407,25 @@
                                     <span class="font-bold text-slate-900">{{ max(0, (int) ($product->stock ?? 0)) }} unidade(s)</span>
                                 </div>
                             @endif
+                            @if($canRedeemWithPoints)
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="font-semibold text-slate-500">Troca por pontos</span>
+                                    <span class="font-bold text-slate-900">{{ number_format($pointsCost, 0, ',', '.') }} {{ $coinName ?? 'UNNBIT' }}</span>
+                                </div>
+                            @endif
                             <div class="flex items-center justify-between gap-3">
                                 <span class="font-semibold text-slate-500">Entrega</span>
-                                <span class="font-bold text-slate-900">{{ $product->isPhysical() ? 'Correios no checkout' : 'Area do comprador' }}</span>
+                                <span class="font-bold text-slate-900">
+                                    @if($canBuyExternally)
+                                        Site externo
+                                    @elseif($product->isPhysical() && $canBuyInStore)
+                                        Correios no checkout
+                                    @elseif($canRedeemWithPoints)
+                                        Resgate com o vendedor
+                                    @else
+                                        Area do comprador
+                                    @endif
+                                </span>
                             </div>
                         </div>
                     </section>

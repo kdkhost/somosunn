@@ -189,6 +189,7 @@ class SellerProductCheckoutController extends Controller
                     'quantity' => $row['quantity'],
                     'data' => [
                         'type' => $product->type,
+                        'sales_channel' => $product->sales_channel,
                         'sku' => $product->sku,
                         'store_id' => $product->seller_store_id,
                         'store_slug' => $sellerStore->slug,

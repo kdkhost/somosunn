@@ -38,7 +38,7 @@ class SellerStorefrontController extends Controller
         abort_unless($storeService->isPubliclyAvailable($store), 404);
 
         $product = SellerProduct::query()
-            ->with(['store.user', 'media'])
+            ->with(['store.user', 'media', 'redeemableItem'])
             ->where('seller_store_id', $store->id)
             ->where('slug', $productSlug)
             ->firstOrFail();
@@ -46,7 +46,7 @@ class SellerStorefrontController extends Controller
         abort_unless($product->isPublished(), 404);
 
         $relatedProducts = SellerProduct::query()
-            ->with(['store.user', 'media'])
+            ->with(['store.user', 'media', 'redeemableItem'])
             ->where('seller_store_id', $store->id)
             ->where('status', 'published')
             ->where('id', '!=', $product->id)
