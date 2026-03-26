@@ -127,7 +127,39 @@
 
         .note-editor .note-toolbar .note-color .note-dropdown-menu .note-palette,
         .note-editor .note-toolbar .note-color-all .note-dropdown-menu .note-palette {
+            display: inline-block;
+            vertical-align: top;
             width: 160px;
+        }
+
+        .note-editor .note-toolbar .note-color-palette {
+            line-height: 1;
+        }
+
+        .note-editor .note-toolbar .note-color-palette .note-color-row {
+            display: flex;
+            height: 20px;
+        }
+
+        .note-editor .note-toolbar .note-color-palette .note-color-btn {
+            width: 20px !important;
+            min-width: 20px !important;
+            height: 20px !important;
+            padding: 0 !important;
+            border: 1px solid var(--summernote-dropdown-separator) !important;
+            border-radius: 0.375rem !important;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        .note-editor .note-toolbar .note-color-palette .note-color-btn:hover,
+        .note-editor .note-toolbar .note-color-palette .note-color-btn:focus {
+            transform: scale(1.08);
+            transition: transform 0.15s ease;
+            box-shadow: 0 0 0 1px var(--summernote-link);
+        }
+
+        .note-editor .note-current-color-button .note-recent-color {
+            color: var(--summernote-toolbar-button-text);
         }
 
         .note-editor .note-dropdown-item {
@@ -422,6 +454,32 @@
 
         <script>
             (function () {
+                const themeSafeColors = new Set([
+                    '',
+                    '#000',
+                    '#000000',
+                    'black',
+                    'rgb(0,0,0)',
+                    'rgb(0, 0, 0)',
+                    '#0f172a',
+                    '#020617',
+                    'rgb(15,23,42)',
+                    'rgb(15, 23, 42)',
+                    'rgb(2,6,23)',
+                    'rgb(2, 6, 23)',
+                    '#fff',
+                    '#ffffff',
+                    'white',
+                    'rgb(255,255,255)',
+                    'rgb(255, 255, 255)',
+                    '#e2e8f0',
+                    '#f8fafc',
+                    'rgb(226,232,240)',
+                    'rgb(226, 232, 240)',
+                    'rgb(248,250,252)',
+                    'rgb(248, 250, 252)',
+                ]);
+
                 function isDarkTheme() {
                     return document.documentElement.classList.contains('dark');
                 }
@@ -430,6 +488,37 @@
                     return isDarkTheme()
                         ? { foreColor: '#E2E8F0', backColor: '#0F172A' }
                         : { foreColor: '#0F172A', backColor: '#FFFFFF' };
+                }
+
+                function normalizeColorValue(value) {
+                    return String(value || '')
+                        .trim()
+                        .toLowerCase()
+                        .replace(/\s+/g, '');
+                }
+
+                function shouldReplaceThemeColor(value) {
+                    return themeSafeColors.has(normalizeColorValue(value));
+                }
+
+                function refreshSummernoteColorButtons() {
+                    const themeColors = currentColorButtonConfig();
+
+                    document.querySelectorAll('.note-editor .note-current-color-button').forEach((button) => {
+                        const currentFore = button.getAttribute('data-foreColor') || '';
+                        const currentBack = button.getAttribute('data-backColor') || '';
+                        const nextFore = shouldReplaceThemeColor(currentFore) ? themeColors.foreColor : currentFore;
+                        const nextBack = shouldReplaceThemeColor(currentBack) ? themeColors.backColor : currentBack;
+                        const preview = button.querySelector('.note-recent-color');
+
+                        button.setAttribute('data-foreColor', nextFore);
+                        button.setAttribute('data-backColor', nextBack);
+
+                        if (preview) {
+                            preview.style.color = nextFore;
+                            preview.style.backgroundColor = nextBack;
+                        }
+                    });
                 }
 
                 function syncSummernoteThemeDefaults() {
@@ -441,14 +530,47 @@
                         ...($.summernote.options.colorButton || {}),
                         ...currentColorButtonConfig(),
                     };
+
+                    refreshSummernoteColorButtons();
                 }
 
                 window.syncSummernoteThemeDefaults = syncSummernoteThemeDefaults;
                 syncSummernoteThemeDefaults();
 
                 if (!window.__unnSummernoteThemeObserver) {
-                    const observer = new MutationObserver(syncSummernoteThemeDefaults);
+                    let rafId = null;
+                    const scheduleSync = function () {
+                        if (rafId !== null) {
+                            cancelAnimationFrame(rafId);
+                        }
+
+                        rafId = requestAnimationFrame(function () {
+                            rafId = null;
+                            syncSummernoteThemeDefaults();
+                        });
+                    };
+
+                    const observer = new MutationObserver(function (mutations) {
+                        const shouldRefresh = mutations.some(function (mutation) {
+                            if (mutation.type === 'attributes') {
+                                return true;
+                            }
+
+                            return Array.from(mutation.addedNodes || []).some(function (node) {
+                                return node.nodeType === 1 && (
+                                    node.matches('.note-editor, .note-current-color-button') ||
+                                    node.querySelector('.note-editor, .note-current-color-button')
+                                );
+                            });
+                        });
+
+                        if (shouldRefresh) {
+                            scheduleSync();
+                        }
+                    });
+
                     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                    observer.observe(document.body, { childList: true, subtree: true });
                     window.__unnSummernoteThemeObserver = observer;
                 }
             })();
