@@ -158,6 +158,58 @@
             border-color: var(--summernote-dropdown-separator) !important;
         }
 
+        html.dark .note-editor .note-editing-area .note-editable :is(
+            [style*="color:#000"],
+            [style*="color: #000"],
+            [style*="color:#000000"],
+            [style*="color: #000000"],
+            [style*="color:black"],
+            [style*="color: black"],
+            [style*="color:rgb(0,0,0)"],
+            [style*="color: rgb(0, 0, 0)"],
+            [style*="color:#0f172a"],
+            [style*="color: #0f172a"],
+            [style*="color:#020617"],
+            [style*="color: #020617"],
+            [style*="color:rgb(15,23,42)"],
+            [style*="color: rgb(15, 23, 42)"],
+            [style*="color:rgb(2,6,23)"],
+            [style*="color: rgb(2, 6, 23)"],
+            font[color="#000"],
+            font[color="#000000"],
+            font[color="black"],
+            font[color="#0f172a"],
+            font[color="#020617"]
+        ) {
+            color: var(--summernote-text) !important;
+        }
+
+        html:not(.dark) .note-editor .note-editing-area .note-editable :is(
+            [style*="color:#fff"],
+            [style*="color: #fff"],
+            [style*="color:#ffffff"],
+            [style*="color: #ffffff"],
+            [style*="color:white"],
+            [style*="color: white"],
+            [style*="color:rgb(255,255,255)"],
+            [style*="color: rgb(255, 255, 255)"],
+            [style*="color:#f8fafc"],
+            [style*="color: #f8fafc"],
+            [style*="color:#e2e8f0"],
+            [style*="color: #e2e8f0"],
+            [style*="color:rgb(248,250,252)"],
+            [style*="color: rgb(248, 250, 252)"],
+            [style*="color:rgb(226,232,240)"],
+            [style*="color: rgb(226, 232, 240)"],
+            font[color="#fff"],
+            font[color="#ffffff"],
+            font[color="white"],
+            font[color="#f8fafc"],
+            font[color="#e2e8f0"]
+        ) {
+            color: var(--summernote-text) !important;
+        }
+
         .note-editor .note-editing-area .note-editable table td,
         .note-editor .note-editing-area .note-editable table th,
         .note-editor .note-editing-area .note-editable blockquote {
@@ -367,6 +419,40 @@
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-pt-BR.min.js"></script>
+
+        <script>
+            (function () {
+                function isDarkTheme() {
+                    return document.documentElement.classList.contains('dark');
+                }
+
+                function currentColorButtonConfig() {
+                    return isDarkTheme()
+                        ? { foreColor: '#E2E8F0', backColor: '#0F172A' }
+                        : { foreColor: '#0F172A', backColor: '#FFFFFF' };
+                }
+
+                function syncSummernoteThemeDefaults() {
+                    if (!(window.jQuery && $.summernote && $.summernote.options)) {
+                        return;
+                    }
+
+                    $.summernote.options.colorButton = {
+                        ...($.summernote.options.colorButton || {}),
+                        ...currentColorButtonConfig(),
+                    };
+                }
+
+                window.syncSummernoteThemeDefaults = syncSummernoteThemeDefaults;
+                syncSummernoteThemeDefaults();
+
+                if (!window.__unnSummernoteThemeObserver) {
+                    const observer = new MutationObserver(syncSummernoteThemeDefaults);
+                    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                    window.__unnSummernoteThemeObserver = observer;
+                }
+            })();
+        </script>
 
         <script>
             (function () {

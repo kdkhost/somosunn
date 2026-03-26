@@ -239,6 +239,53 @@
             border-color: var(--summernote-dropdown-separator) !important;
         }
 
+        body.dark-mode .note-editor .note-editing-area .note-editable :is(
+            [style*="color:#000"],
+            [style*="color: #000"],
+            [style*="color:#000000"],
+            [style*="color: #000000"],
+            [style*="color:black"],
+            [style*="color: black"],
+            [style*="color:rgb(0,0,0)"],
+            [style*="color: rgb(0, 0, 0)"],
+            [style*="color:#212529"],
+            [style*="color: #212529"],
+            [style*="color:rgb(33,37,41)"],
+            [style*="color: rgb(33, 37, 41)"],
+            font[color="#000"],
+            font[color="#000000"],
+            font[color="black"],
+            font[color="#212529"]
+        ) {
+            color: var(--summernote-text) !important;
+        }
+
+        body:not(.dark-mode) .note-editor .note-editing-area .note-editable :is(
+            [style*="color:#fff"],
+            [style*="color: #fff"],
+            [style*="color:#ffffff"],
+            [style*="color: #ffffff"],
+            [style*="color:white"],
+            [style*="color: white"],
+            [style*="color:rgb(255,255,255)"],
+            [style*="color: rgb(255, 255, 255)"],
+            [style*="color:#f8fafc"],
+            [style*="color: #f8fafc"],
+            [style*="color:#e5e7eb"],
+            [style*="color: #e5e7eb"],
+            [style*="color:rgb(248,250,252)"],
+            [style*="color: rgb(248, 250, 252)"],
+            [style*="color:rgb(229,231,235)"],
+            [style*="color: rgb(229, 231, 235)"],
+            font[color="#fff"],
+            font[color="#ffffff"],
+            font[color="white"],
+            font[color="#f8fafc"],
+            font[color="#e5e7eb"]
+        ) {
+            color: var(--summernote-text) !important;
+        }
+
         .note-editor .note-editing-area .note-editable table td,
         .note-editor .note-editing-area .note-editable table th,
         .note-editor .note-editing-area .note-editable blockquote {
@@ -721,6 +768,42 @@
         src="https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/js/bootstrap-colorpicker.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    <script>
+        (function () {
+            function isDarkTheme() {
+                return document.body.classList.contains('dark-mode');
+            }
+
+            function currentColorButtonConfig() {
+                return isDarkTheme()
+                    ? { foreColor: '#E5E7EB', backColor: '#111827' }
+                    : { foreColor: '#212529', backColor: '#FFFFFF' };
+            }
+
+            function syncSummernoteThemeDefaults() {
+                if (!(window.jQuery && $.summernote && $.summernote.options)) {
+                    return;
+                }
+
+                $.summernote.options.colorButton = {
+                    ...($.summernote.options.colorButton || {}),
+                    ...currentColorButtonConfig(),
+                };
+            }
+
+            window.syncSummernoteThemeDefaults = syncSummernoteThemeDefaults;
+
+            $(function () {
+                syncSummernoteThemeDefaults();
+            });
+
+            if (!window.__unnAdminSummernoteThemeObserver) {
+                const observer = new MutationObserver(syncSummernoteThemeDefaults);
+                observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+                window.__unnAdminSummernoteThemeObserver = observer;
+            }
+        })();
+    </script>
     @include('partials.global-sweetalert-confirm')
     @php($unnAjaxAutoBind = false)
     @php($unnAjaxPreferPjax = true)
