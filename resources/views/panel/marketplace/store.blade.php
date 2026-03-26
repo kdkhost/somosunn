@@ -64,7 +64,8 @@
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Bio da loja</label>
-                                <textarea name="bio" rows="6" class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-slate-900 dark:text-white">{{ old('bio', $store->bio) }}</textarea>
+                                <textarea name="bio" rows="6" class="store-bio-editor w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-slate-900 dark:text-white">{{ old('bio', $store->bio) }}</textarea>
+                                <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Use o editor para destacar a historia, diferenciais e servicos da sua marca.</p>
                             </div>
                         </div>
                     </div>
@@ -125,3 +126,53 @@
         </form>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (function () {
+            function initMarketplaceStoreBioEditor() {
+                if (!(window.jQuery && $.fn && $.fn.summernote)) {
+                    return;
+                }
+
+                $('.store-bio-editor').each(function () {
+                    const $field = $(this);
+
+                    if ($field.next('.note-editor').length) {
+                        return;
+                    }
+
+                    $field.summernote({
+                        height: 260,
+                        lang: 'pt-BR',
+                        placeholder: 'Apresente sua empresa, seus diferenciais e o que o cliente encontra na sua loja.',
+                        toolbar: [
+                            ['style', ['style']],
+                            ['font', ['bold', 'italic', 'underline', 'clear']],
+                            ['color', ['color']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['table', ['table']],
+                            ['insert', ['link', 'picture', 'video']],
+                            ['view', ['fullscreen', 'codeview', 'help']]
+                        ],
+                        callbacks: {
+                            onChange: function (contents) {
+                                $field.val(contents);
+                            }
+                        }
+                    });
+
+                    $field.closest('form').off('submit.storeBioEditor').on('submit.storeBioEditor', function () {
+                        $field.val($field.summernote('code'));
+                    });
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initMarketplaceStoreBioEditor);
+            } else {
+                initMarketplaceStoreBioEditor();
+            }
+        })();
+    </script>
+@endpush
