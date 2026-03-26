@@ -315,7 +315,7 @@
 @section('title', ($store->brand_name ?: 'Loja') . ' - UNN')
 
 @section('content')
-    <div class="store-home-shell min-h-screen pt-20 pb-16 md:pt-24 md:pb-20">
+    <div class="store-home-shell min-h-screen pb-16 md:pb-20">
         <div class="store-home-wrap">
             <section class="store-topbar overflow-hidden rounded-t-[1.65rem] text-white">
                 <div class="flex flex-col gap-3 px-4 py-3 text-[11px] font-semibold sm:px-5 lg:flex-row lg:items-center lg:justify-between">
