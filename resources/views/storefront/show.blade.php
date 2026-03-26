@@ -673,8 +673,8 @@
                 </section>
             @endif
 
-            <section class="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1.25fr),420px]">
-                <article id="sobre-loja" class="store-home-card rounded-[1.65rem] bg-white p-6 md:p-8">
+            <section class="mt-10 grid gap-6 xl:grid-cols-3">
+                <article id="sobre-loja" class="store-home-card rounded-[1.65rem] bg-white p-6 md:p-8 xl:col-span-1">
                     <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Sobre a loja</p>
                     <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">Conheca {{ $store->brand_name }}</h2>
                     @if($storeBioHtml)
@@ -684,8 +684,7 @@
                     @endif
                 </article>
 
-                <aside id="atendimento" class="space-y-6">
-                    <article class="store-home-card rounded-[1.65rem] bg-white p-6">
+                <article id="atendimento" class="store-home-card rounded-[1.65rem] bg-white p-6 xl:col-span-1">
                         <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Atendimento</p>
                         <div class="mt-5 space-y-4 text-sm text-slate-600">
                             @if($store->support_email)
@@ -731,11 +730,11 @@
                                 <a href="{{ $store->website_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">Visitar site</a>
                             @endif
                         </div>
-                    </article>
+                </article>
 
-                    <article class="store-home-card rounded-[1.65rem] bg-white p-6">
+                <article class="store-home-card rounded-[1.65rem] bg-white p-6 xl:col-span-1">
                         <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Resumo da operacao</p>
-                        <div class="mt-5 grid gap-4 text-sm text-slate-600 sm:grid-cols-2 lg:grid-cols-1">
+                        <div class="mt-5 grid gap-4 text-sm text-slate-600">
                             <div class="rounded-[1.25rem] bg-slate-50 px-4 py-4">
                                 <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Produtos</p>
                                 <p class="mt-2 text-3xl font-black text-slate-900">{{ $products->count() }}</p>
@@ -749,8 +748,7 @@
                                 <p class="mt-2 text-lg font-black text-slate-900">/loja/{{ $store->slug }}</p>
                             </div>
                         </div>
-                    </article>
-                </aside>
+                </article>
             </section>
         </div>
     </div>
