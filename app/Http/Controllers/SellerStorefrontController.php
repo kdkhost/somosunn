@@ -45,6 +45,16 @@ class SellerStorefrontController extends Controller
 
         abort_unless($product->isPublished(), 404);
 
-        return view('storefront.product', compact('store', 'product'));
+        $relatedProducts = SellerProduct::query()
+            ->with(['store.user', 'media'])
+            ->where('seller_store_id', $store->id)
+            ->where('status', 'published')
+            ->where('id', '!=', $product->id)
+            ->latest('is_featured')
+            ->latest('id')
+            ->limit(4)
+            ->get();
+
+        return view('storefront.product', compact('store', 'product', 'relatedProducts'));
     }
 }
