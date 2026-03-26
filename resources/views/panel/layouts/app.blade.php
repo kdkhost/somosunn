@@ -10,15 +10,52 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
 
     <style>
+        :root {
+            --summernote-surface: #ffffff;
+            --summernote-surface-soft: #f8fafc;
+            --summernote-surface-muted: #eff6ff;
+            --summernote-border: #e2e8f0;
+            --summernote-text: #0f172a;
+            --summernote-muted: #94a3b8;
+            --summernote-toolbar: #f8fafc;
+            --summernote-toolbar-button: #ffffff;
+            --summernote-toolbar-button-border: #cbd5e1;
+            --summernote-toolbar-button-text: #0f172a;
+            --summernote-dropdown-bg: #ffffff;
+            --summernote-dropdown-hover: #eff6ff;
+            --summernote-dropdown-text: #0f172a;
+            --summernote-dropdown-separator: #e2e8f0;
+            --summernote-link: #2563eb;
+        }
+
+        .dark {
+            --summernote-surface: #020617;
+            --summernote-surface-soft: #0f172a;
+            --summernote-surface-muted: #1e293b;
+            --summernote-border: #1e293b;
+            --summernote-text: #e2e8f0;
+            --summernote-muted: #64748b;
+            --summernote-toolbar: #0f172a;
+            --summernote-toolbar-button: #1e293b;
+            --summernote-toolbar-button-border: #334155;
+            --summernote-toolbar-button-text: #f8fafc;
+            --summernote-dropdown-bg: #0f172a;
+            --summernote-dropdown-hover: #1e293b;
+            --summernote-dropdown-text: #e2e8f0;
+            --summernote-dropdown-separator: #334155;
+            --summernote-link: #60a5fa;
+        }
+
         .note-editor.note-frame {
             border-radius: 1.25rem !important;
-            border-color: #e2e8f0 !important;
+            border-color: var(--summernote-border) !important;
+            background-color: var(--summernote-surface) !important;
             overflow: visible !important;
         }
 
         .note-toolbar {
-            background-color: #f8fafc !important;
-            border-bottom-color: #e2e8f0 !important;
+            background-color: var(--summernote-toolbar) !important;
+            border-bottom-color: var(--summernote-border) !important;
             padding: 0.75rem !important;
         }
 
@@ -28,13 +65,57 @@
             border-bottom-right-radius: 1.25rem;
         }
 
+        .note-editor .note-editing-area .note-editable,
+        .note-editor .note-editing-area .note-codable {
+            background-color: var(--summernote-surface) !important;
+            color: var(--summernote-text) !important;
+        }
+
+        .note-editor .note-editing-area .note-editable {
+            caret-color: var(--summernote-text);
+        }
+
+        .note-editor .note-editing-area .note-editable :where(p, div, li, ul, ol, blockquote, h1, h2, h3, h4, h5, h6, small, strong, em, u, s, code, pre) {
+            color: inherit;
+        }
+
+        .note-editor .note-editing-area .note-editable a {
+            color: var(--summernote-link);
+        }
+
+        .note-editor .note-placeholder {
+            color: var(--summernote-muted) !important;
+        }
+
         .note-editor .note-toolbar,
         .note-editor .note-statusbar {
             position: relative;
             z-index: 2;
         }
 
+        .note-editor .note-statusbar {
+            background-color: var(--summernote-toolbar) !important;
+            border-top-color: var(--summernote-border) !important;
+        }
+
+        .note-editor .note-btn {
+            background-color: var(--summernote-toolbar-button) !important;
+            border-color: var(--summernote-toolbar-button-border) !important;
+            color: var(--summernote-toolbar-button-text) !important;
+        }
+
+        .note-editor .note-btn:hover,
+        .note-editor .note-btn:focus,
+        .note-editor .note-btn.active {
+            background-color: var(--summernote-surface-muted) !important;
+            border-color: var(--summernote-toolbar-button-border) !important;
+            color: var(--summernote-toolbar-button-text) !important;
+        }
+
         .note-editor .note-toolbar .note-dropdown-menu {
+            background-color: var(--summernote-dropdown-bg) !important;
+            border-color: var(--summernote-border) !important;
+            color: var(--summernote-dropdown-text) !important;
             z-index: 1200;
         }
 
@@ -49,66 +130,38 @@
             width: 160px;
         }
 
-        .dark .note-editor.note-frame {
-            border-color: #1e293b !important;
-            background-color: #020617 !important;
+        .note-editor .note-dropdown-item {
+            color: var(--summernote-dropdown-text) !important;
         }
 
-        .dark .note-toolbar {
-            background-color: #0f172a !important;
-            border-bottom-color: #1e293b !important;
+        .note-editor .note-dropdown-item:hover,
+        .note-editor .note-dropdown-item:focus {
+            background-color: var(--summernote-dropdown-hover) !important;
         }
 
-        .dark .note-btn {
-            background-color: #1e293b !important;
-            border-color: #334155 !important;
-            color: #f8fafc !important;
+        .note-editor .note-palette-title {
+            color: var(--summernote-dropdown-text) !important;
+            border-bottom-color: var(--summernote-dropdown-separator) !important;
         }
 
-        .dark .note-editable {
-            background-color: #ffffff !important;
-            color: #0f172a !important;
+        .note-editor .note-color-reset,
+        .note-editor .note-color-select {
+            color: var(--summernote-dropdown-text) !important;
         }
 
-        .dark .note-placeholder {
-            color: #94a3b8 !important;
+        .note-editor .note-color-reset:hover,
+        .note-editor .note-color-select:hover {
+            background-color: var(--summernote-dropdown-hover) !important;
         }
 
-        .dark .note-statusbar {
-            background-color: #0f172a !important;
-            border-top-color: #1e293b !important;
+        .note-editor .note-holder-custom .note-color-btn {
+            border-color: var(--summernote-dropdown-separator) !important;
         }
 
-        .dark .note-dropdown-menu {
-            background-color: #0f172a !important;
-            border-color: #1e293b !important;
-        }
-
-        .dark .note-palette-title {
-            color: #cbd5e1 !important;
-            border-bottom-color: #334155 !important;
-        }
-
-        .dark .note-color-reset,
-        .dark .note-color-select {
-            color: #e2e8f0 !important;
-        }
-
-        .dark .note-color-reset:hover,
-        .dark .note-color-select:hover {
-            background-color: #1e293b !important;
-        }
-
-        .dark .note-holder-custom .note-color-btn {
-            border-color: #475569 !important;
-        }
-
-        .dark .note-dropdown-item {
-            color: #f8fafc !important;
-        }
-
-        .dark .note-dropdown-item:hover {
-            background-color: #1e293b !important;
+        .note-editor .note-editing-area .note-editable table td,
+        .note-editor .note-editing-area .note-editable table th,
+        .note-editor .note-editing-area .note-editable blockquote {
+            border-color: var(--summernote-border);
         }
 
         .dark .panel-theme-shell input[class*='dark:bg-slate-']:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not([type='file']):not([class*='dark:text-']),

@@ -101,14 +101,71 @@
             --unn-azul-1: #1F5EDB;
             --unn-azul-2: #177FD6;
             --unn-azul-3: #1D3FC4;
+            --summernote-surface: #ffffff;
+            --summernote-surface-soft: #f8fafc;
+            --summernote-surface-muted: #eff6ff;
+            --summernote-border: #dee2e6;
+            --summernote-text: #212529;
+            --summernote-muted: #6c757d;
+            --summernote-toolbar: #f8f9fa;
+            --summernote-toolbar-button: #ffffff;
+            --summernote-toolbar-button-border: #ced4da;
+            --summernote-toolbar-button-text: #212529;
+            --summernote-dropdown-bg: #ffffff;
+            --summernote-dropdown-hover: #e9ecef;
+            --summernote-dropdown-text: #212529;
+            --summernote-dropdown-separator: #dee2e6;
+            --summernote-link: #0d6efd;
+        }
+
+        .dark-mode {
+            --summernote-surface: #0f172a;
+            --summernote-surface-soft: #111827;
+            --summernote-surface-muted: #1f2937;
+            --summernote-border: #334155;
+            --summernote-text: #e5e7eb;
+            --summernote-muted: #94a3b8;
+            --summernote-toolbar: #111827;
+            --summernote-toolbar-button: #1f2937;
+            --summernote-toolbar-button-border: #475569;
+            --summernote-toolbar-button-text: #f8fafc;
+            --summernote-dropdown-bg: #111827;
+            --summernote-dropdown-hover: #1f2937;
+            --summernote-dropdown-text: #e5e7eb;
+            --summernote-dropdown-separator: #334155;
+            --summernote-link: #60a5fa;
         }
 
         .note-editor.note-frame {
+            border-color: var(--summernote-border) !important;
+            background-color: var(--summernote-surface) !important;
             overflow: visible !important;
         }
 
         .note-editor .note-editing-area {
             overflow: hidden;
+        }
+
+        .note-editor .note-editing-area .note-editable,
+        .note-editor .note-editing-area .note-codable {
+            background-color: var(--summernote-surface) !important;
+            color: var(--summernote-text) !important;
+        }
+
+        .note-editor .note-editing-area .note-editable {
+            caret-color: var(--summernote-text);
+        }
+
+        .note-editor .note-editing-area .note-editable :where(p, div, li, ul, ol, blockquote, h1, h2, h3, h4, h5, h6, small, strong, em, u, s, code, pre) {
+            color: inherit;
+        }
+
+        .note-editor .note-editing-area .note-editable a {
+            color: var(--summernote-link);
+        }
+
+        .note-editor .note-placeholder {
+            color: var(--summernote-muted) !important;
         }
 
         .note-editor .note-toolbar,
@@ -117,7 +174,34 @@
             z-index: 2;
         }
 
+        .note-editor .note-toolbar {
+            background-color: var(--summernote-toolbar) !important;
+            border-bottom-color: var(--summernote-border) !important;
+        }
+
+        .note-editor .note-statusbar {
+            background-color: var(--summernote-toolbar) !important;
+            border-top-color: var(--summernote-border) !important;
+        }
+
+        .note-editor .note-btn {
+            background-color: var(--summernote-toolbar-button) !important;
+            border-color: var(--summernote-toolbar-button-border) !important;
+            color: var(--summernote-toolbar-button-text) !important;
+        }
+
+        .note-editor .note-btn:hover,
+        .note-editor .note-btn:focus,
+        .note-editor .note-btn.active {
+            background-color: var(--summernote-surface-muted) !important;
+            border-color: var(--summernote-toolbar-button-border) !important;
+            color: var(--summernote-toolbar-button-text) !important;
+        }
+
         .note-editor .note-toolbar .note-dropdown-menu {
+            background-color: var(--summernote-dropdown-bg) !important;
+            border-color: var(--summernote-border) !important;
+            color: var(--summernote-dropdown-text) !important;
             z-index: 1200;
         }
 
@@ -125,6 +209,40 @@
         .note-editor .note-toolbar .note-color-all .note-dropdown-menu {
             min-width: 337px;
             padding: 0.5rem;
+        }
+
+        .note-editor .note-dropdown-item {
+            color: var(--summernote-dropdown-text) !important;
+        }
+
+        .note-editor .note-dropdown-item:hover,
+        .note-editor .note-dropdown-item:focus {
+            background-color: var(--summernote-dropdown-hover) !important;
+        }
+
+        .note-editor .note-palette-title {
+            color: var(--summernote-dropdown-text) !important;
+            border-bottom-color: var(--summernote-dropdown-separator) !important;
+        }
+
+        .note-editor .note-color-reset,
+        .note-editor .note-color-select {
+            color: var(--summernote-dropdown-text) !important;
+        }
+
+        .note-editor .note-color-reset:hover,
+        .note-editor .note-color-select:hover {
+            background-color: var(--summernote-dropdown-hover) !important;
+        }
+
+        .note-editor .note-holder-custom .note-color-btn {
+            border-color: var(--summernote-dropdown-separator) !important;
+        }
+
+        .note-editor .note-editing-area .note-editable table td,
+        .note-editor .note-editing-area .note-editable table th,
+        .note-editor .note-editing-area .note-editable blockquote {
+            border-color: var(--summernote-border);
         }
 
         /* Tooltip customizada (Premium) */
