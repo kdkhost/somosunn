@@ -78,6 +78,30 @@ class SellerStorefrontFeatureTest extends TestCase
         $this->get(route('seller-stores.show', $store->slug))->assertNotFound();
     }
 
+    public function test_superadmin_platform_store_remains_public_without_active_plan(): void
+    {
+        $superAdmin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'superadmin-store@example.com',
+            'password' => Hash::make('password123'),
+            'role' => 'superadmin',
+        ]);
+
+        $store = app(SellerStoreService::class)->ensureForUser($superAdmin);
+
+        $store->forceFill([
+            'is_published' => true,
+            'published_at' => now(),
+        ])->save();
+
+        $this->assertTrue($store->fresh()->is_platform_store);
+        $this->assertNotEmpty($store->fresh()->slug);
+
+        $this->get(route('seller-stores.show', $store->slug))
+            ->assertOk()
+            ->assertSee($store->brand_name);
+    }
+
     public function test_store_slug_cannot_use_reserved_keyword_or_change_after_publish(): void
     {
         $seller = $this->createSeller('seller-slug@example.com');

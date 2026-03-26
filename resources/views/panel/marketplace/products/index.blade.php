@@ -3,6 +3,9 @@
 @section('title', 'Produtos da loja - UNN')
 
 @section('panel_content')
+    @php
+        $isSuperAdmin = auth()->user()?->isSuperAdmin();
+    @endphp
     <div class="space-y-6">
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 shadow-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -12,7 +15,7 @@
             </div>
             <div class="flex flex-wrap gap-3">
                 <a href="{{ route('panel.marketplace.store.edit') }}" class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 transition">
-                    <i class="fas fa-store text-slate-400"></i> Minha loja
+                    <i class="fas fa-store text-slate-400"></i> {{ $isSuperAdmin ? 'Loja da plataforma' : 'Minha loja' }}
                 </a>
                 <a href="{{ route('panel.marketplace.products.create') }}" class="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 hover:brightness-110 transition">
                     <i class="fas fa-plus"></i> Novo produto

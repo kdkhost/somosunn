@@ -163,7 +163,7 @@
             'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace(),
         ],
         [
-            'label' => 'Minha loja',
+            'label' => $user->isSuperAdmin() ? 'Loja da plataforma' : 'Minha loja',
             'route' => route('panel.marketplace.store.edit'),
             'icon' => 'fas fa-store',
             'active' => request()->routeIs('panel.marketplace.store.*'),

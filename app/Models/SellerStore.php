@@ -15,6 +15,7 @@ class SellerStore extends Model
 
     protected $fillable = [
         'user_id',
+        'is_platform_store',
         'slug',
         'brand_name',
         'tagline',
@@ -39,6 +40,7 @@ class SellerStore extends Model
     ];
 
     protected $casts = [
+        'is_platform_store' => 'boolean',
         'is_published' => 'boolean',
         'is_blocked' => 'boolean',
         'published_at' => 'datetime',
@@ -79,6 +81,11 @@ class SellerStore extends Model
     public function isSlugLocked(): bool
     {
         return $this->slug_locked_at !== null;
+    }
+
+    public function isPlatformStore(): bool
+    {
+        return (bool) $this->is_platform_store;
     }
 
     public static function tableAvailable(): bool

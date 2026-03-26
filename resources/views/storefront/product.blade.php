@@ -10,6 +10,7 @@
     $canRedeemWithPoints = $product->supportsPointsRedemption() && $product->redeemableItem;
     $canBuyExternally = $product->supportsExternalCheckout();
     $pointsCost = $canRedeemWithPoints ? (int) $product->redeemableItem->points_cost : 0;
+    $isPlatformStore = $store->isPlatformStore();
 
     $galleryItems = collect();
 
@@ -178,7 +179,7 @@
                                         </div>
                                         <div>
                                             <p class="font-black">{{ $store->brand_name }}</p>
-                                            <p class="text-sm text-white/65">/loja/{{ $store->slug }}</p>
+                                            <p class="text-sm text-white/65">{{ $isPlatformStore ? 'Loja oficial da plataforma' : '/loja/' . $store->slug }}</p>
                                         </div>
                                     </div>
                                 </div>

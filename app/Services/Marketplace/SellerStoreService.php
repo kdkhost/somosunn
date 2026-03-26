@@ -7,9 +7,11 @@ use App\Models\Event;
 use App\Models\Mentorship;
 use App\Models\SellerProduct;
 use App\Models\SellerStore;
+use App\Models\Setting;
 use App\Models\User;
 use App\Support\ContentVisibility;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class SellerStoreService
 {
@@ -28,16 +30,39 @@ class SellerStoreService
     {
         abort_unless(SellerStore::tableAvailable(), 503, 'O modulo da loja virtual ainda nao foi instalado. Rode as migrations do sistema.');
 
-        return SellerStore::query()->firstOrCreate(
+        $defaults = $this->defaultStoreAttributesFor($user);
+
+        $store = SellerStore::query()->firstOrCreate(
             ['user_id' => $user->id],
-            [
-                'brand_name' => trim((string) ($user->company ?: $user->name ?: 'Loja UNN')),
-                'support_email' => $user->email,
-                'support_phone' => $user->phone,
-                'primary_color' => '#1F5EDB',
-                'accent_color' => '#0F172A',
-            ]
+            $defaults
         );
+
+        if ($user->isSuperAdmin()) {
+            $dirty = false;
+
+            if (!$store->isPlatformStore()) {
+                $store->is_platform_store = true;
+                $dirty = true;
+            }
+
+            if (blank($store->slug) && !$store->isSlugLocked()) {
+                $store->slug = $this->generateDefaultSlugFor($user, $store);
+                $dirty = true;
+            }
+
+            foreach (['brand_name', 'support_email', 'support_phone', 'primary_color', 'accent_color'] as $field) {
+                if (blank($store->{$field}) && filled($defaults[$field] ?? null)) {
+                    $store->{$field} = $defaults[$field];
+                    $dirty = true;
+                }
+            }
+
+            if ($dirty) {
+                $store->save();
+            }
+        }
+
+        return $store;
     }
 
     public function isReservedSlug(?string $slug): bool
@@ -47,8 +72,12 @@ class SellerStoreService
         return $slug !== '' && in_array($slug, self::RESERVED_SLUGS, true);
     }
 
-    public function isEligible(?User $user): bool
+    public function isEligible(?User $user, ?SellerStore $store = null): bool
     {
+        if ($this->isPlatformStoreForSuperAdmin($store, $user)) {
+            return true;
+        }
+
         return $user instanceof User
             && $user->canSellOnMarketplace()
             && (bool) $user->activePlan();
@@ -64,7 +93,7 @@ class SellerStoreService
             && $store->is_published
             && !$store->is_blocked
             && $store->slug !== null
-            && $this->isEligible($store->user);
+            && $this->isEligible($store->user, $store);
     }
 
     public function publishedStoresByUserIds(iterable $userIds): Collection
@@ -137,5 +166,110 @@ class SellerStoreService
         )->publicUpcoming()->orderBy('start_at')->get();
 
         return compact('products', 'courses', 'mentorships', 'events');
+    }
+
+    private function defaultStoreAttributesFor(User $user): array
+    {
+        $isPlatformStore = $user->isSuperAdmin();
+
+        return [
+            'is_platform_store' => $isPlatformStore,
+            'slug' => $isPlatformStore ? $this->generateDefaultSlugFor($user) : null,
+            'brand_name' => $this->defaultBrandNameFor($user, $isPlatformStore),
+            'tagline' => $isPlatformStore ? $this->defaultPlatformTagline() : null,
+            'support_email' => $this->defaultSupportEmailFor($user, $isPlatformStore),
+            'support_phone' => $this->defaultSupportPhoneFor($user, $isPlatformStore),
+            'primary_color' => $this->defaultPrimaryColorFor($isPlatformStore),
+            'accent_color' => '#0F172A',
+        ];
+    }
+
+    private function defaultBrandNameFor(User $user, bool $isPlatformStore): string
+    {
+        if ($isPlatformStore) {
+            return trim((string) (Setting::get('app_name') ?: config('app.name', 'Loja Oficial UNN')));
+        }
+
+        return trim((string) ($user->company ?: $user->name ?: 'Loja UNN'));
+    }
+
+    private function defaultSupportEmailFor(User $user, bool $isPlatformStore): ?string
+    {
+        if ($isPlatformStore) {
+            return trim((string) (Setting::get('site_contact_email') ?: config('mail.from.address') ?: $user->email)) ?: null;
+        }
+
+        return $user->email;
+    }
+
+    private function defaultSupportPhoneFor(User $user, bool $isPlatformStore): ?string
+    {
+        if ($isPlatformStore) {
+            return trim((string) (Setting::get('site_contact_phone') ?: $user->phone)) ?: null;
+        }
+
+        return $user->phone;
+    }
+
+    private function defaultPrimaryColorFor(bool $isPlatformStore): string
+    {
+        if ($isPlatformStore) {
+            return trim((string) (Setting::get('site_color_primary') ?: '#1F5EDB')) ?: '#1F5EDB';
+        }
+
+        return '#1F5EDB';
+    }
+
+    private function defaultPlatformTagline(): string
+    {
+        return trim((string) (Setting::get('site_tagline') ?: 'Loja oficial da plataforma.')) ?: 'Loja oficial da plataforma.';
+    }
+
+    private function generateDefaultSlugFor(User $user, ?SellerStore $ignoreStore = null): string
+    {
+        $appName = trim((string) (Setting::get('app_name') ?: config('app.name', 'unn')));
+        $base = $user->isSuperAdmin()
+            ? (Str::slug($appName ?: 'loja-oficial') ?: 'loja-oficial')
+            : (Str::slug((string) ($user->company ?: $user->name ?: 'loja-unn')) ?: 'loja-unn');
+
+        $candidates = array_values(array_unique([
+            $base,
+            'loja-' . $base,
+            $base . '-oficial',
+            'loja-oficial',
+        ]));
+
+        foreach ($candidates as $candidate) {
+            if (!$this->slugExists($candidate, $ignoreStore)) {
+                return $candidate;
+            }
+        }
+
+        $suffix = 2;
+        do {
+            $candidate = $base . '-' . $suffix;
+            $suffix++;
+        } while ($this->slugExists($candidate, $ignoreStore));
+
+        return $candidate;
+    }
+
+    private function slugExists(string $slug, ?SellerStore $ignoreStore = null): bool
+    {
+        return SellerStore::query()
+            ->where('slug', $slug)
+            ->when($ignoreStore?->exists, fn ($query) => $query->where('id', '!=', $ignoreStore->id))
+            ->exists();
+    }
+
+    private function isPlatformStoreForSuperAdmin(?SellerStore $store, ?User $user = null): bool
+    {
+        if (!$store instanceof SellerStore || !$store->isPlatformStore()) {
+            return false;
+        }
+
+        $owner = $user instanceof User ? $user : $store->user;
+
+        return $owner instanceof User && $owner->isSuperAdmin();
     }
 }

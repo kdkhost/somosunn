@@ -8,6 +8,7 @@
     $catalogType = trim((string) request('tipo', ''));
     $catalogPrice = trim((string) request('preco', ''));
     $catalogSort = trim((string) request('ordem', 'featured'));
+    $isPlatformStore = $store->isPlatformStore();
     $themePrimary = '#1F5EDB';
     $themeDark = '#0F172A';
     $themeSoft = '#f8fbff';
@@ -326,7 +327,7 @@
                         @if($store->support_email)
                             <span class="inline-flex items-center gap-2"><i class="fas fa-envelope text-[10px]"></i> {{ $store->support_email }}</span>
                         @endif
-                        <span class="inline-flex items-center gap-2"><i class="fas fa-location-dot text-[10px]"></i> Loja oficial {{ $store->brand_name }}</span>
+                        <span class="inline-flex items-center gap-2"><i class="fas fa-location-dot text-[10px]"></i> {{ $isPlatformStore ? 'Loja oficial da plataforma' : 'Loja oficial ' . $store->brand_name }}</span>
                     </div>
 
                     @if($socialLinks->isNotEmpty())
@@ -355,7 +356,7 @@
                         </div>
                         <div class="min-w-0">
                             <h1 class="text-2xl font-black tracking-tight text-slate-900">{{ $store->brand_name }}</h1>
-                            <p class="mt-1 text-sm font-medium text-slate-500">{{ $store->tagline ?: 'Loja virtual oficial dentro do marketplace UNN.' }}</p>
+                            <p class="mt-1 text-sm font-medium text-slate-500">{{ $store->tagline ?: ($isPlatformStore ? 'Loja institucional oficial dentro do ecossistema UNN.' : 'Loja virtual oficial dentro do marketplace UNN.') }}</p>
                         </div>
                     </div>
 

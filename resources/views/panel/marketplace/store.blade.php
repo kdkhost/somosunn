@@ -1,9 +1,10 @@
 @extends('panel.layouts.app')
 
-@section('title', 'Minha loja - UNN')
+@section('title', ($store->isPlatformStore() ? 'Loja da plataforma' : 'Minha loja') . ' - UNN')
 
 @section('panel_content')
     @php
+        $isPlatformStore = $store->isPlatformStore();
         $primaryColorRaw = (string) old('primary_color', $store->primary_color ?: '#1F5EDB');
         $accentColorRaw = (string) old('accent_color', $store->accent_color ?: '#0F172A');
         $primaryColor = preg_match('/^#?[0-9A-Fa-f]{6}$/', $primaryColorRaw) ? '#' . ltrim(strtoupper($primaryColorRaw), '#') : '#1F5EDB';
@@ -13,15 +14,20 @@
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 shadow-sm">
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <p class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Loja virtual</p>
-                    <h1 class="mt-2 text-3xl font-black text-slate-900 dark:text-white">Minha loja premium</h1>
-                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Configure a identidade da sua marca, confirme o slug publico e publique sua vitrine.</p>
+                    <p class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">{{ $isPlatformStore ? 'Loja oficial da plataforma' : 'Loja virtual' }}</p>
+                    <h1 class="mt-2 text-3xl font-black text-slate-900 dark:text-white">{{ $isPlatformStore ? 'Loja institucional da plataforma' : 'Minha loja premium' }}</h1>
+                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">{{ $isPlatformStore ? 'Esta loja institucional fica separada da elegibilidade comum do vendedor e permanece vinculada ao superadmin da plataforma.' : 'Configure a identidade da sua marca, confirme o slug publico e publique sua vitrine.' }}</p>
                 </div>
                 <div class="flex flex-wrap gap-3">
                     @if($storeUrl)
                         <a href="{{ $storeUrl }}" target="_blank" class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 transition">
                             <i class="fas fa-up-right-from-square text-slate-400"></i> Ver loja
                         </a>
+                    @endif
+                    @if($isPlatformStore)
+                        <span class="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-bold text-white dark:bg-slate-800">
+                            <i class="fas fa-shield-halved text-blue-300"></i> Loja da plataforma
+                        </span>
                     @endif
                     <span class="inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold {{ $store->is_published ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' }}">
                         <i class="fas {{ $store->is_published ? 'fa-circle-check' : 'fa-pen-ruler' }}"></i>
@@ -49,7 +55,7 @@
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Slug publico</label>
                                 <input type="text" name="slug" value="{{ old('slug', $store->slug) }}" {{ $store->isSlugLocked() ? 'readonly' : '' }} class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-slate-900 dark:text-white">
-                                <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Sua loja abrira em <strong>/loja/{{ old('slug', $store->slug ?: 'sua-marca') }}</strong>. Depois da primeira publicacao o slug fica travado.</p>
+                                <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Sua loja abrira em <strong>/loja/{{ old('slug', $store->slug ?: ($isPlatformStore ? 'loja-oficial' : 'sua-marca')) }}</strong>. Depois da primeira publicacao o slug fica travado.</p>
                                 @error('slug')<p class="mt-2 text-sm text-red-500">{{ $message }}</p>@enderror
                             </div>
                             <div>
@@ -162,7 +168,7 @@
                             <span id="store_preview_accent_badge" class="inline-flex items-center rounded-full border border-white/20 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em]" style="background-color: {{ $accentColor }};">Destaque</span>
                         </div>
                         <h3 id="store_preview_brand_name" class="mt-4 text-2xl font-black">{{ old('brand_name', $store->brand_name) ?: 'Sua marca' }}</h3>
-                        <p id="store_preview_tagline" class="mt-2 text-sm text-white/80">{{ old('tagline', $store->tagline) ?: 'Loja premium dentro do ecossistema UNN.' }}</p>
+                        <p id="store_preview_tagline" class="mt-2 text-sm text-white/80">{{ old('tagline', $store->tagline) ?: ($isPlatformStore ? 'Loja oficial da plataforma dentro do ecossistema UNN.' : 'Loja premium dentro do ecossistema UNN.') }}</p>
                         <p class="mt-4 text-sm text-white/70">Esse bloco mostra como a sua loja vai aparecer no topo da vitrine publica.</p>
                         <div class="mt-5 flex flex-wrap gap-3">
                             <span id="store_preview_button_primary" class="inline-flex items-center rounded-2xl px-4 py-2 text-sm font-black shadow-lg shadow-black/10" style="background-color: {{ $primaryColor }};">Comprar com a marca</span>
@@ -233,6 +239,7 @@
                 const previewAccentBadge = document.getElementById('store_preview_accent_badge');
                 const previewPrimaryButton = document.getElementById('store_preview_button_primary');
                 const previewAccentButton = document.getElementById('store_preview_button_accent');
+                const defaultTagline = @json($isPlatformStore ? 'Loja oficial da plataforma dentro do ecossistema UNN.' : 'Loja premium dentro do ecossistema UNN.');
 
                 const defaultColors = {
                     primary: '#1F5EDB',
@@ -292,7 +299,7 @@
                     }
 
                     if (taglineTarget && taglineInput) {
-                        taglineTarget.textContent = taglineInput.value.trim() || 'Loja premium dentro do ecossistema UNN.';
+                        taglineTarget.textContent = taglineInput.value.trim() || defaultTagline;
                     }
                 };
 
