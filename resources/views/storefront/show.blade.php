@@ -528,15 +528,15 @@
                 </div>
             </section>
 
-            <section class="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <section class="mt-5 grid auto-rows-fr gap-4 md:grid-cols-2 lg:grid-cols-4">
                 @foreach($serviceHighlights as $highlight)
-                    <article class="store-home-card h-full rounded-[1.65rem] bg-white p-5">
-                        <div class="flex items-start gap-4">
-                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
+                    <article class="store-home-card flex h-full rounded-[1.65rem] bg-white p-5">
+                        <div class="flex w-full items-start gap-4">
+                            <div class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
                                 <i class="{{ $highlight['icon'] }}"></i>
                             </div>
-                            <div>
-                                <h3 class="text-lg font-black text-slate-900">{{ $highlight['title'] }}</h3>
+                            <div class="min-w-0">
+                                <h3 class="text-lg font-black leading-tight text-slate-900">{{ $highlight['title'] }}</h3>
                                 <p class="mt-2 text-sm leading-7 text-slate-600">{{ $highlight['text'] }}</p>
                             </div>
                         </div>
