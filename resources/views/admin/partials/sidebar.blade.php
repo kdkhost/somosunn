@@ -76,10 +76,12 @@
                 </li>
 
                 @php
-                    $canMarketplaceSeller = auth()->user()->canSellOnMarketplace();
+                    $canAccessMarketplace = auth()->user()->isAdmin() || auth()->user()->canSellOnMarketplace();
+                    $canManageOwnMarketplace = auth()->user()->isSuperAdmin() || auth()->user()->canSellOnMarketplace();
+                    $storefrontModuleInstalled = \App\Models\SellerStore::tableAvailable() && \App\Models\SellerProduct::tableAvailable();
                 @endphp
 
-                @if($canMarketplaceSeller)
+                @if($canAccessMarketplace)
                     <li class="nav-header">MARKETPLACE</li>
                     <li class="nav-item has-treeview {{ $open(['admin.marketplace.*', 'admin.splits.*']) }}">
                         <a href="#" class="nav-link {{ $is(['admin.marketplace.*', 'admin.splits.*']) }}">
@@ -101,14 +103,53 @@
                                     <p>Pagamentos</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.marketplace.sales') }}"
-                                    class="nav-link {{ $is('admin.marketplace.sales') }}">
-                                    <i class="fas fa-receipt nav-icon"></i>
-                                    <p>Minhas vendas</p>
-                                </a>
-                            </li>
-                            @if(auth()->user()->isAdmin())
+                            @if($canManageOwnMarketplace && $storefrontModuleInstalled)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.marketplace.store.edit') }}"
+                                        class="nav-link {{ $is('admin.marketplace.store.*') }}">
+                                        <i class="fas fa-store-alt nav-icon"></i>
+                                        <p>{{ auth()->user()->isSuperAdmin() ? 'Loja da plataforma' : 'Minha loja' }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.marketplace.products.index') }}"
+                                        class="nav-link {{ $is('admin.marketplace.products.*') }}">
+                                        <i class="fas fa-box-open nav-icon"></i>
+                                        <p>Produtos proprios</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.marketplace.orders.index') }}"
+                                        class="nav-link {{ $is('admin.marketplace.orders.*') }}">
+                                        <i class="fas fa-truck nav-icon"></i>
+                                        <p>Pedidos da loja</p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if($canManageOwnMarketplace)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.marketplace.sales') }}"
+                                        class="nav-link {{ $is('admin.marketplace.sales') }}">
+                                        <i class="fas fa-receipt nav-icon"></i>
+                                        <p>Minhas vendas</p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if(auth()->user()->isAdmin() && $storefrontModuleInstalled)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.marketplace.stores.index') }}"
+                                        class="nav-link {{ $is('admin.marketplace.stores.*') }}">
+                                        <i class="fas fa-store-alt-slash nav-icon"></i>
+                                        <p>Lojas marketplace</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.marketplace.catalog.index') }}"
+                                        class="nav-link {{ $is('admin.marketplace.catalog.*') }}">
+                                        <i class="fas fa-boxes-stacked nav-icon"></i>
+                                        <p>Produtos marketplace</p>
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a href="{{ route('admin.splits.index') }}"
                                         class="nav-link {{ $is('admin.splits.*') }}">

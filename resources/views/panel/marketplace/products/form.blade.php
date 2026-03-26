@@ -285,6 +285,14 @@
                 return Math.max(0, parseFloat(normalized || '0') || 0);
             }
 
+            function encodeEditorContent(value) {
+                try {
+                    return btoa(unescape(encodeURIComponent(String(value || ''))));
+                } catch (error) {
+                    return String(value || '');
+                }
+            }
+
             function bindSellerProductForm() {
                 if (window.jQuery && $.fn && $.fn.summernote) {
                     $('.seller-product-editor').each(function () {
@@ -339,7 +347,7 @@
                         $('.seller-product-editor').each(function () {
                             const $field = $(this);
                             if ($field.next('.note-editor').length) {
-                                $field.val($field.summernote('code'));
+                                $field.val(encodeEditorContent($field.summernote('code')));
                             }
                         });
                     });

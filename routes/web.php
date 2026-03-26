@@ -636,7 +636,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::prefix('marketplace')->name('marketplace.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\MarketplaceController::class, 'index'])->name('index');
         Route::get('/payments', [\App\Http\Controllers\Admin\MarketplaceController::class, 'payments'])->name('payments');
+        Route::get('/loja', [\App\Http\Controllers\Admin\MarketplaceStoreController::class, 'edit'])->name('store.edit');
+        Route::post('/loja', [\App\Http\Controllers\Admin\MarketplaceStoreController::class, 'update'])->name('store.update');
+        Route::get('/produtos', [\App\Http\Controllers\Admin\SellerProductController::class, 'index'])->name('products.index');
+        Route::get('/produtos/novo', [\App\Http\Controllers\Admin\SellerProductController::class, 'create'])->name('products.create');
+        Route::post('/produtos', [\App\Http\Controllers\Admin\SellerProductController::class, 'store'])->name('products.store');
+        Route::get('/produtos/{product}/editar', [\App\Http\Controllers\Admin\SellerProductController::class, 'edit'])->name('products.edit');
+        Route::put('/produtos/{product}', [\App\Http\Controllers\Admin\SellerProductController::class, 'update'])->name('products.update');
+        Route::delete('/produtos/{product}', [\App\Http\Controllers\Admin\SellerProductController::class, 'destroy'])->name('products.destroy');
+        Route::delete('/produtos/{product}/midia/{media}', [\App\Http\Controllers\Admin\SellerProductController::class, 'destroyMedia'])->name('products.media.destroy');
+        Route::get('/pedidos', [\App\Http\Controllers\Admin\SellerOrderController::class, 'index'])->name('orders.index');
+        Route::post('/pedidos/{order}/envio', [\App\Http\Controllers\Admin\SellerOrderController::class, 'updateShipment'])->name('orders.shipment.update');
         Route::get('/sales', [\App\Http\Controllers\Admin\MarketplaceController::class, 'sales'])->name('sales');
+        Route::get('/lojas', [\App\Http\Controllers\Admin\MarketplaceController::class, 'stores'])->name('stores.index');
+        Route::post('/lojas/{store}/toggle', [\App\Http\Controllers\Admin\MarketplaceController::class, 'toggleStore'])->name('stores.toggle');
+        Route::get('/catalogo', [\App\Http\Controllers\Admin\MarketplaceController::class, 'catalog'])->name('catalog.index');
+        Route::post('/catalogo/{product}/toggle', [\App\Http\Controllers\Admin\MarketplaceController::class, 'toggleCatalogProduct'])->name('catalog.toggle');
     });
 
     Route::get('splits', [\App\Http\Controllers\Admin\SplitController::class, 'index'])->name('splits.index');

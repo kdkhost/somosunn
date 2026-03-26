@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\SellerProduct;
+use App\Models\SellerStore;
 use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +15,7 @@ class MarketplaceController extends Controller
     public function index()
     {
         $userId = (int) Auth::id();
+        $storefrontModuleInstalled = SellerStore::tableAvailable() && SellerProduct::tableAvailable();
 
         $paidTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('total_amount');
         $platformFeeTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('platform_fee_amount');
@@ -26,7 +29,7 @@ class MarketplaceController extends Controller
 
         $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
 
-        return view('admin.marketplace.index', compact('paidTotal', 'platformFeeTotal', 'netTotal', 'paidCount', 'pendingCount', 'paymentsConfigured', 'platformFeePercent'));
+        return view('admin.marketplace.index', compact('paidTotal', 'platformFeeTotal', 'netTotal', 'paidCount', 'pendingCount', 'paymentsConfigured', 'platformFeePercent', 'storefrontModuleInstalled'));
     }
 
     public function payments()
@@ -55,5 +58,108 @@ class MarketplaceController extends Controller
         $paidCount = (int) Order::where('seller_id', $userId)->financialPaid()->count();
 
         return view('admin.marketplace.sales', compact('orders', 'paidTotal', 'platformFeeTotal', 'netTotal', 'paidCount'));
+    }
+
+    public function stores(Request $request)
+    {
+        if (!SellerStore::tableAvailable()) {
+            return redirect()
+                ->route('admin.dashboard')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
+        $search = trim((string) $request->query('q', ''));
+
+        $stores = SellerStore::query()
+            ->with('user:id,name,email,plan_id,plan_expires_at')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($nested) use ($search) {
+                    $nested->where('brand_name', 'like', '%' . $search . '%')
+                        ->orWhere('slug', 'like', '%' . $search . '%')
+                        ->orWhereHas('user', function ($users) use ($search) {
+                            $users->where('name', 'like', '%' . $search . '%')
+                                ->orWhere('email', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->latest('id')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.marketplace.stores.index', compact('stores', 'search'));
+    }
+
+    public function toggleStore(Request $request, SellerStore $store)
+    {
+        if (!SellerStore::tableAvailable()) {
+            return redirect()
+                ->route('admin.dashboard')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
+        $request->validate([
+            'is_blocked' => ['required', 'boolean'],
+        ]);
+
+        $store->is_blocked = $request->boolean('is_blocked');
+        if ($store->is_blocked) {
+            $store->is_published = false;
+        }
+        $store->save();
+
+        return back()->with('success', 'Status da loja atualizado com sucesso.');
+    }
+
+    public function catalog(Request $request)
+    {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('admin.dashboard')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
+        $search = trim((string) $request->query('q', ''));
+
+        $products = SellerProduct::query()
+            ->with(['user:id,name,email', 'store:id,brand_name,slug'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($nested) use ($search) {
+                    $nested->where('title', 'like', '%' . $search . '%')
+                        ->orWhere('sku', 'like', '%' . $search . '%')
+                        ->orWhereHas('store', function ($stores) use ($search) {
+                            $stores->where('brand_name', 'like', '%' . $search . '%')
+                                ->orWhere('slug', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->latest('id')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.marketplace.catalog.index', compact('products', 'search'));
+    }
+
+    public function toggleCatalogProduct(Request $request, SellerProduct $product)
+    {
+        if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            return redirect()
+                ->route('admin.dashboard')
+                ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
+        }
+
+        $request->validate([
+            'status' => ['required', 'in:draft,published,blocked'],
+        ]);
+
+        $product->status = $request->input('status');
+        if ($product->status === 'published' && !$product->published_at) {
+            $product->published_at = now();
+        }
+        if ($product->status !== 'published') {
+            $product->published_at = null;
+        }
+        $product->save();
+
+        return back()->with('success', 'Status do produto atualizado com sucesso.');
     }
 }

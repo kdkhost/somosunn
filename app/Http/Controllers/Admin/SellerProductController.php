@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Panel;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SellerProduct;
@@ -21,7 +21,7 @@ class SellerProductController extends Controller
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
             return redirect()
-                ->route('panel.marketplace.index')
+                ->route('admin.marketplace.index')
                 ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
         }
 
@@ -33,14 +33,14 @@ class SellerProductController extends Controller
             ->latest('id')
             ->paginate(12);
 
-        return view('panel.marketplace.products.index', compact('store', 'products'));
+        return view('admin.marketplace.products.index', compact('store', 'products'));
     }
 
     public function create(SellerStoreService $storeService, PointsExchangeService $exchangeService)
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
             return redirect()
-                ->route('panel.marketplace.index')
+                ->route('admin.marketplace.index')
                 ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
         }
 
@@ -53,14 +53,14 @@ class SellerProductController extends Controller
 
         $exchangeSettings = $exchangeService->settings();
 
-        return view('panel.marketplace.products.form', compact('store', 'product', 'exchangeSettings'));
+        return view('admin.marketplace.products.form', compact('store', 'product', 'exchangeSettings'));
     }
 
     public function store(Request $request, SellerStoreService $storeService)
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
             return redirect()
-                ->route('panel.marketplace.index')
+                ->route('admin.marketplace.index')
                 ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
         }
 
@@ -77,7 +77,7 @@ class SellerProductController extends Controller
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
             return redirect()
-                ->route('panel.marketplace.index')
+                ->route('admin.marketplace.index')
                 ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
         }
 
@@ -87,14 +87,14 @@ class SellerProductController extends Controller
 
         $exchangeSettings = $exchangeService->settings();
 
-        return view('panel.marketplace.products.form', compact('store', 'product', 'exchangeSettings'));
+        return view('admin.marketplace.products.form', compact('store', 'product', 'exchangeSettings'));
     }
 
     public function update(Request $request, SellerProduct $product, SellerStoreService $storeService)
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
             return redirect()
-                ->route('panel.marketplace.index')
+                ->route('admin.marketplace.index')
                 ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
         }
 
@@ -108,7 +108,7 @@ class SellerProductController extends Controller
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
             return redirect()
-                ->route('panel.marketplace.index')
+                ->route('admin.marketplace.index')
                 ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
         }
 
@@ -130,14 +130,14 @@ class SellerProductController extends Controller
 
         $product->delete();
 
-        return redirect()->route('panel.marketplace.products.index')->with('success', 'Produto removido com sucesso.');
+        return redirect()->route('admin.marketplace.products.index')->with('success', 'Produto removido com sucesso.');
     }
 
     public function destroyMedia(SellerProduct $product, SellerProductMedia $media)
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
             return redirect()
-                ->route('panel.marketplace.index')
+                ->route('admin.marketplace.index')
                 ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
         }
 
@@ -150,49 +150,16 @@ class SellerProductController extends Controller
         return back()->with('success', 'Midia removida com sucesso.');
     }
 
-    private function normalizeMoneyInput($value): ?string
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        $value = trim((string) $value);
-        if ($value === '') {
-            return null;
-        }
-
-        $value = str_replace(['R$', ' ', "\u{00A0}"], '', $value);
-
-        if (str_contains($value, ',')) {
-            $value = str_replace('.', '', $value);
-            $value = str_replace(',', '.', $value);
-        }
-
-        return $value;
-    }
-
-    private function decodeEditorHtmlInput(?string $value): ?string
-    {
-        if ($value === null || trim($value) === '') {
-            return $value;
-        }
-
-        $decoded = base64_decode($value, true);
-        if ($decoded !== false && base64_encode($decoded) === $value) {
-            return RichText::sanitizeHtml($decoded);
-        }
-
-        return $value;
-    }
-
     private function persist(Request $request, SellerProduct $product, $store)
     {
         $isNew = !$product->exists;
 
         foreach (['price', 'sale_price', 'points_reference_value'] as $field) {
-            if ($request->has($field)) {
-                $request->merge([$field => $this->normalizeMoneyInput($request->input($field))]);
+            if (!$request->has($field)) {
+                continue;
             }
+
+            $request->merge([$field => $this->normalizeMoneyInput($request->input($field))]);
         }
 
         foreach (['description', 'digital_instructions'] as $field) {
@@ -200,6 +167,7 @@ class SellerProductController extends Controller
                 $request->merge([$field => $this->decodeEditorHtmlInput($request->input($field))]);
             }
         }
+
         $data = $request->validate([
             'title' => ['required', 'string', 'max:180'],
             'sku' => ['nullable', 'string', 'max:80'],
@@ -361,7 +329,7 @@ class SellerProductController extends Controller
         }
 
         return redirect()
-            ->route('panel.marketplace.products.edit', $product)
+            ->route('admin.marketplace.products.edit', $product)
             ->with('success', $isNew ? 'Produto criado com sucesso.' : 'Produto atualizado com sucesso.');
     }
 
@@ -386,5 +354,19 @@ class SellerProductController extends Controller
         }
 
         return $slug;
+    }
+
+    private function decodeEditorHtmlInput(?string $value): ?string
+    {
+        if ($value === null || trim($value) === '') {
+            return $value;
+        }
+
+        $decoded = base64_decode($value, true);
+        if ($decoded !== false && base64_encode($decoded) === $value) {
+            return RichText::sanitizeHtml($decoded);
+        }
+
+        return $value;
     }
 }

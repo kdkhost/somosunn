@@ -15,12 +15,25 @@
             ];
         }
 
-        $canMarketplaceSeller = $user->canSellOnMarketplace();
+        $canAccessMarketplace = $user->isAdmin() || $user->canSellOnMarketplace();
+        $canManageOwnMarketplace = $user->isSuperAdmin() || $user->canSellOnMarketplace();
+        $storefrontModuleInstalled = \App\Models\SellerStore::tableAvailable() && \App\Models\SellerProduct::tableAvailable();
 
-        if ($canMarketplaceSeller) {
+        if ($canAccessMarketplace) {
             $quickLinks[] = ['label' => 'Marketplace', 'icon' => 'fas fa-store', 'route' => route('admin.marketplace.index')];
             $quickLinks[] = ['label' => 'Pagamentos', 'icon' => 'fas fa-credit-card', 'route' => route('admin.marketplace.payments')];
-            $quickLinks[] = ['label' => 'Minhas vendas', 'icon' => 'fas fa-receipt', 'route' => route('admin.marketplace.sales')];
+            if ($canManageOwnMarketplace && $storefrontModuleInstalled) {
+                $quickLinks[] = ['label' => $user->isSuperAdmin() ? 'Loja da plataforma' : 'Minha loja', 'icon' => 'fas fa-store-alt', 'route' => route('admin.marketplace.store.edit')];
+                $quickLinks[] = ['label' => 'Produtos proprios', 'icon' => 'fas fa-box-open', 'route' => route('admin.marketplace.products.index')];
+                $quickLinks[] = ['label' => 'Pedidos da loja', 'icon' => 'fas fa-truck', 'route' => route('admin.marketplace.orders.index')];
+            }
+            if ($canManageOwnMarketplace) {
+                $quickLinks[] = ['label' => 'Minhas vendas', 'icon' => 'fas fa-receipt', 'route' => route('admin.marketplace.sales')];
+            }
+            if ($user->isAdmin() && $storefrontModuleInstalled) {
+                $quickLinks[] = ['label' => 'Lojas marketplace', 'icon' => 'fas fa-store-alt-slash', 'route' => route('admin.marketplace.stores.index')];
+                $quickLinks[] = ['label' => 'Produtos marketplace', 'icon' => 'fas fa-boxes-stacked', 'route' => route('admin.marketplace.catalog.index')];
+            }
         }
     }
 @endphp
