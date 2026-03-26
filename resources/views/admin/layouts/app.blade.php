@@ -871,6 +871,19 @@
                 });
             }
 
+            function refreshSummernotePaletteButtons() {
+                document.querySelectorAll('.note-editor .note-color-btn[data-value]').forEach((button) => {
+                    const swatchColor = button.getAttribute('data-value');
+
+                    if (!swatchColor) {
+                        return;
+                    }
+
+                    button.style.setProperty('background-color', swatchColor, 'important');
+                    button.style.setProperty('background-image', 'none', 'important');
+                });
+            }
+
             function syncSummernoteThemeDefaults() {
                 if (!(window.jQuery && $.summernote && $.summernote.options)) {
                     return;
@@ -882,6 +895,7 @@
                 };
 
                 refreshSummernoteColorButtons();
+                refreshSummernotePaletteButtons();
             }
 
             window.syncSummernoteThemeDefaults = syncSummernoteThemeDefaults;
