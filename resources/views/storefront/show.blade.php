@@ -529,38 +529,47 @@
             </section>
 
             <section class="store-home-card mt-5 rounded-[1.65rem] bg-white p-5 md:p-6">
-                <div class="text-center">
-                    <h2 class="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">Novidades da loja</h2>
-                    <p class="mt-2 text-sm font-medium text-slate-500">Melhores precos, filtros rapidos e canais configurados por {{ $store->brand_name }}.</p>
+                <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Catalogo da loja</p>
+                        <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900 md:text-3xl">Novidades da loja</h2>
+                        <p class="mt-2 text-sm font-medium text-slate-500">Melhores precos, filtros rapidos e canais configurados por {{ $store->brand_name }}.</p>
+                    </div>
+                    <div class="inline-flex items-center gap-2 self-start rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700">
+                        <i class="fas fa-sliders"></i> {{ $catalogCount > 0 ? $catalogCount : $products->count() }} item(ns)
+                    </div>
                 </div>
 
-                <form method="GET" class="mt-6 grid gap-3 xl:grid-cols-[1.5fr,1fr,1fr,1fr,1fr,auto]">
-                    <input type="text" name="q" value="{{ $catalogSearch }}" placeholder="Buscar produto" class="store-filter-field rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none">
-                    <select name="preco" class="store-filter-field rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none">
+                <form method="GET" class="mt-5 flex flex-col gap-3 xl:flex-row xl:items-center xl:flex-nowrap">
+                    <div class="store-filter-field flex min-w-0 items-center rounded-2xl px-4 py-3 xl:flex-[1.45]">
+                        <i class="fas fa-magnifying-glass mr-3 text-slate-400"></i>
+                        <input type="text" name="q" value="{{ $catalogSearch }}" placeholder="Buscar produto" class="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-sm font-semibold text-slate-900 outline-none focus:ring-0">
+                    </div>
+                    <select name="preco" class="store-filter-field w-full rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none xl:w-[170px]">
                         <option value="">Preco</option>
                         <option value="under_100" @selected($catalogPrice === 'under_100')>Ate R$ 100</option>
                         <option value="100_300" @selected($catalogPrice === '100_300')>R$ 100 a R$ 300</option>
                         <option value="300_700" @selected($catalogPrice === '300_700')>R$ 300 a R$ 700</option>
                         <option value="above_700" @selected($catalogPrice === 'above_700')>Acima de R$ 700</option>
                     </select>
-                    <select name="canal" class="store-filter-field rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none">
+                    <select name="canal" class="store-filter-field w-full rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none xl:w-[170px]">
                         <option value="">Canal</option>
                         <option value="store" @selected($catalogChannel === 'store')>Loja virtual</option>
                         <option value="points" @selected($catalogChannel === 'points')>Troca de pontos</option>
                         <option value="external" @selected($catalogChannel === 'external')>Site externo</option>
                     </select>
-                    <select name="tipo" class="store-filter-field rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none">
+                    <select name="tipo" class="store-filter-field w-full rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none xl:w-[160px]">
                         <option value="">Tipo</option>
                         <option value="physical" @selected($catalogType === 'physical')>Fisico</option>
                         <option value="digital" @selected($catalogType === 'digital')>Digital</option>
                     </select>
-                    <select name="ordem" class="store-filter-field rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none">
+                    <select name="ordem" class="store-filter-field w-full rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 outline-none xl:w-[170px]">
                         <option value="featured" @selected($catalogSort === 'featured')>Em destaque</option>
                         <option value="latest" @selected($catalogSort === 'latest')>Mais recentes</option>
                         <option value="lowest" @selected($catalogSort === 'lowest')>Menor preco</option>
                         <option value="highest" @selected($catalogSort === 'highest')>Maior preco</option>
                     </select>
-                    <button type="submit" class="store-button-primary inline-flex items-center justify-center rounded-2xl px-5 py-3 text-sm font-black shadow-lg shadow-blue-700/20">Filtrar</button>
+                    <button type="submit" class="store-button-primary inline-flex w-full items-center justify-center rounded-2xl px-6 py-3 text-sm font-black shadow-lg shadow-blue-700/20 xl:w-auto xl:min-w-[140px]">Filtrar</button>
                 </form>
             </section>
 
