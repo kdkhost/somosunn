@@ -606,8 +606,11 @@
                 overflow: visible;
                 font-family: inherit;
                 background: var(--summernote-surface);
+                isolation: isolate;
             }
             .note-editor .note-editing-area {
+                position: relative;
+                z-index: 1;
                 overflow: hidden;
                 border-bottom-left-radius: 1rem;
                 border-bottom-right-radius: 1rem;
@@ -615,7 +618,12 @@
             .note-editor .note-toolbar,
             .note-editor .note-statusbar {
                 position: relative;
-                z-index: 2;
+            }
+            .note-editor .note-toolbar {
+                z-index: 4;
+            }
+            .note-editor .note-statusbar {
+                z-index: 0;
             }
             .note-editor .note-toolbar .note-dropdown-menu {
                 z-index: 1200;

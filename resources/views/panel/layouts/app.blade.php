@@ -51,6 +51,7 @@
             border-color: var(--summernote-border) !important;
             background-color: var(--summernote-surface) !important;
             overflow: visible !important;
+            isolation: isolate;
         }
 
         .note-toolbar {
@@ -60,6 +61,8 @@
         }
 
         .note-editor .note-editing-area {
+            position: relative;
+            z-index: 1;
             overflow: hidden;
             border-bottom-left-radius: 1.25rem;
             border-bottom-right-radius: 1.25rem;
@@ -90,10 +93,14 @@
         .note-editor .note-toolbar,
         .note-editor .note-statusbar {
             position: relative;
-            z-index: 2;
+        }
+
+        .note-editor .note-toolbar {
+            z-index: 4;
         }
 
         .note-editor .note-statusbar {
+            z-index: 0;
             background-color: var(--summernote-toolbar) !important;
             border-top-color: var(--summernote-border) !important;
         }
