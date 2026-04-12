@@ -594,8 +594,9 @@ class Event extends Model
         if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
             return true;
         }
-
         return method_exists($user, 'canAccessFeature') && $user->canAccessFeature('events.first_lot');
+    }
+
     public function resolveRouteBinding($value, $field = null)
     {
         if ($field) {
