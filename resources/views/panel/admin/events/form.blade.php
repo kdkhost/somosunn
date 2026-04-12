@@ -160,13 +160,13 @@
                                 class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-show="type === 'event'">
                             <div>
                                 <label
                                     class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Início</label>
                                 <input type="datetime-local" name="start_at"
                                     value="{{ old('start_at', $event->start_at ? $event->start_at->format('Y-m-d\TH:i') : '') }}"
-                                    required
+                                    :required="type === 'event'"
                                     class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
                             </div>
                             <div>
@@ -180,7 +180,7 @@
                         </div>
 
                         <div class="flex items-center gap-6">
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2" x-show="type === 'event'">
                                 <input type="checkbox" name="all_day" id="allDay" value="1" @checked(old('all_day', $event->all_day))
                                     class="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-500 bg-white dark:bg-slate-950">
                                 <label for="allDay"

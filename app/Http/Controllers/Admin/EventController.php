@@ -143,7 +143,7 @@ class EventController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'start_at' => 'required|date',
+            'start_at' => 'required_if:type,event|nullable|date',
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string',
@@ -214,6 +214,9 @@ class EventController extends Controller
         // Define o criador do evento
         $data = $validated;
         $data['type'] = $request->input('type', 'event');
+        if ($data['type'] === 'album' && !isset($data['start_at'])) {
+            $data['start_at'] = now();
+        }
         $data['slug'] = $request->input('slug') ?: ($data['type'] === 'album' ? Str::slug($data['title']) : null);
         $data['user_id'] = Auth::id();
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
@@ -270,7 +273,7 @@ class EventController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'start_at' => 'required|date',
+            'start_at' => 'required_if:type,event|nullable|date',
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string',
@@ -348,6 +351,9 @@ class EventController extends Controller
         $data = $validated;
         if ($request->has('type')) {
             $data['type'] = $request->input('type');
+        }
+        if (($data['type'] ?? 'event') === 'album' && (!isset($data['start_at']) || empty($data['start_at']))) {
+            $data['start_at'] = now();
         }
         if ($request->has('slug')) {
             $data['slug'] = $request->input('slug') ?: ($data['type'] === 'album' ? Str::slug($data['title']) : null);
