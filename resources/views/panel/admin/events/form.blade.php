@@ -568,7 +568,11 @@
 
                 {{-- Tab: Gallery --}}
                 <div x-show="tab === 'gallery'" class="space-y-6">
-                    @include('panel.admin.partials.gallery', ['event' => $event])
+                    @include('panel.admin.partials.gallery', [
+                        'model' => $event,
+                        'uploadUrl' => route('panel.admin.events.media.store', $event),
+                        'deleteUrlPattern' => urldecode(route('panel.admin.events.media.destroy', [$event, ':media']))
+                    ])
                 </div>
             @endif
         </form>
