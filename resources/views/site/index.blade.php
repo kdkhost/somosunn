@@ -197,7 +197,7 @@
                                     {{ $homePage->get('journey_highlight_value', 'Mais visibilidade, novos negócios e acesso exclusivo') }}
                                 </p>
                             </div>
-                            <a href="{{ route('gallery.show', 'onde-o-network-me-levou') }}"
+                            <a href="{{ route('gallery.index') }}"
                                 class="inline-flex items-center justify-center gap-3 rounded-full bg-white px-8 py-4 md:py-5 text-sm md:text-base font-black transition-all duration-300 hover:scale-105 hover:shadow-[0_20px_40px_-10px_rgba(255,255,255,0.3)] group"
                                 style="color: var(--unn-azul-1);">
                                 {{ $homePage->get('journey_cta_text', 'Ver fotos da comunidade') }}
