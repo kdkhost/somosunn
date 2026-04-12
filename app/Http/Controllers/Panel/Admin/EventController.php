@@ -35,6 +35,12 @@ class EventController extends Controller
 
         $query = Event::query()->latest();
 
+        // Filtro por tipo (Evento ou Álbum) vindo da rota ou query string
+        $type = $request->route('type') ?? $request->query('type');
+        if ($type) {
+            $query->where('type', $type);
+        }
+
         if (!$this->canManageAllEvents()) {
             $query->where('user_id', Auth::id());
         }
@@ -46,7 +52,7 @@ class EventController extends Controller
 
         $events = $query->get();
 
-        return view('panel.admin.events.list', compact('events', 'search'));
+        return view('panel.admin.events.list', compact('events', 'search', 'type'));
     }
 
     public function feed(Request $request)
@@ -489,5 +495,30 @@ class EventController extends Controller
         $data['scanner_radius_meters'] = $meters;
 
         return $data;
+    }
+
+    /**
+     * Alterna o valor de um campo booleano via AJAX.
+     */
+    public function toggleField(Request $request, Event $event)
+    {
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
+
+        $field = $request->input('field');
+        $allowedFields = ['published', 'show_on_gallery'];
+
+        if (!in_array($field, $allowedFields)) {
+            return response()->json(['success' => false, 'message' => 'Campo não permitido para alternância rápida.'], 400);
+        }
+
+        $event->$field = !$event->$field;
+        $event->save();
+
+        return response()->json([
+            'status' => 'success',
+            'value' => (bool) $event->$field,
+            'message' => 'Alteração salva com sucesso!'
+        ]);
     }
 }

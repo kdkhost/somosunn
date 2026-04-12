@@ -94,6 +94,14 @@
                 <span>Preço & Ingressos</span>
             </button>
             @if($event->exists)
+                <button type="button" @click="tab = 'gallery'"
+                    :class="tab === 'gallery' 
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
+                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                    class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                    <i class="fas fa-images"></i>
+                    <span>Galeria</span>
+                </button>
                 <button type="button" @click="if (certificateEnabled) { tab = 'certificate'; }" :disabled="!certificateEnabled"
                     x-show="type === 'event'"
                     :class="tab === 'certificate' 
@@ -495,8 +503,8 @@
                 </div>
             </div>
 
-            {{-- Tab: Certificate --}}
             @if($event->exists)
+                {{-- Tab: Certificate --}}
                 <div x-show="tab === 'certificate'" class="space-y-6">
                     @php
                         $eventCertificateSettings = $event->certificate_settings ?? [];
@@ -556,61 +564,11 @@
                         'autoInfoValue' => $event->start_at ? $event->start_at->format('d/m/Y H:i') : 'Data definida apos o cadastro',
                         'saveLabel' => 'Salvar Certificado',
                     ])
-                    @if(false)
-                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                        {{-- Preview Canvas --}}
-                        <div
-                            class="xl:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 min-h-[600px] flex flex-col transition-colors duration-300">
-                            <div class="flex items-center justify-between mb-6">
-                                <h3
-                                    class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider transition-colors">
-                                    Editor do Certificado</h3>
-                            </div>
+                </div>
 
-                            <div
-                                class="flex-1 bg-slate-100 dark:bg-slate-950 rounded-2xl p-8 flex items-center justify-center overflow-auto border-2 border-dashed border-slate-200 dark:border-slate-800 transition-colors">
-                                <div id="cert-canvas" class="relative bg-white shadow-2xl overflow-hidden shrink-0"
-                                    style="width: 842px; height: 595px;">
-                                    @if($event->certificate_bg)
-                                        <img src="{{ asset($event->certificate_bg) }}" id="cert-bg-img"
-                                            class="absolute inset-0 w-full h-full object-cover z-0">
-                                    @endif
-                                    <div id="cert-elements-layer" class="absolute inset-0 z-10"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Settings --}}
-                        <div class="space-y-6">
-                            <div
-                                class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                                <div class="flex items-center gap-3 mb-6">
-                                    <div
-                                        class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors">
-                                        <i class="fas fa-cog"></i>
-                                    </div>
-                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase transition-colors">
-                                        Configurações</h3>
-                                </div>
-
-                                <div class="space-y-6">
-                                    <div
-                                        class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 transition-colors">
-                                        <p
-                                            class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase transition-colors">
-                                            Certificado habilitado
-                                        </p>
-                                        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                                            Esta aba só fica ativa quando a opção <strong>Certificado ativo</strong> estiver marcada na aba Geral.
-                                        </p>
-                                    </div>
-
-                                    <input type="hidden" name="certificate_settings" id="certificate_settings_input">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
+                {{-- Tab: Gallery --}}
+                <div x-show="tab === 'gallery'" class="space-y-6">
+                    @include('panel.admin.partials.gallery', ['event' => $event])
                 </div>
             @endif
         </form>

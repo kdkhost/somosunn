@@ -1,146 +1,168 @@
 @extends('panel.layouts.app')
 
-@section('title', 'Gerenciar Eventos')
+@section('title', (isset($type) && $type === 'album') ? 'Acervo de Mídia' : 'Gerenciar Eventos')
 
 @section('panel_breadcrumb')
     <a href="{{ route('panel.admin.events.index') }}" class="hover:underline">Eventos</a>
+    <span class="mx-2 text-slate-300">/</span>
+    <span class="text-slate-600 dark:text-slate-400 font-bold">{{ (isset($type) && $type === 'album') ? 'Acervo' : 'Gerenciar' }}</span>
 @endsection
 
 @section('panel_content')
     <div class="space-y-6">
         {{-- Header --}}
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 transition-all duration-500">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">Eventos</h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Gerencie todos os eventos e workshops da plataforma.</p>
+                <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white transition-colors">
+                    {{ (isset($type) && $type === 'album') ? 'Acervo de Mídia' : 'Eventos' }}
+                </h1>
+                <p class="text-base text-slate-500 dark:text-slate-400 mt-2 transition-colors">
+                    {{ (isset($type) && $type === 'album') ? 'Gerencie seus álbuns de fotos e vídeos de forma rápida e organizada.' : 'Gerencie todos os eventos e workshops da plataforma.' }}
+                </p>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3">
-                <a href="{{ route('panel.admin.events.create') }}"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 border border-transparent rounded-xl text-sm font-semibold text-white hover:bg-blue-700 transition-all shadow-sm shadow-blue-200">
-                    <i class="fas fa-plus"></i>
-                    <span>Novo Evento</span>
-                </a>
+            <div class="flex flex-wrap items-center gap-4">
+                @if(!(isset($type) && $type === 'album'))
                 <a href="{{ route('panel.admin.quick-scanner') }}"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 border border-transparent rounded-xl text-sm font-semibold text-white hover:bg-emerald-700 transition-all shadow-sm shadow-emerald-200">
-                    <i class="fas fa-qrcode"></i>
+                    class="group inline-flex items-center gap-2.5 px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-sm font-black transition-all duration-300 shadow-lg shadow-emerald-200/50 dark:shadow-none hover:scale-105 active:scale-95">
+                    <i class="fas fa-qrcode text-lg transition-transform group-hover:rotate-12"></i>
                     <span>Scanner Universal</span>
+                </a>
+                @endif
+                <a href="{{ route('panel.admin.events.create', ['type' => $type ?? 'event']) }}"
+                    class="group inline-flex items-center gap-2.5 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-sm font-black transition-all duration-300 shadow-lg shadow-blue-200/50 dark:shadow-none hover:scale-105 active:scale-95">
+                    <i class="fas fa-plus text-lg transition-transform group-hover:rotate-12"></i>
+                    <span>Novo {{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}</span>
                 </a>
             </div>
         </div>
 
         {{-- Table Card --}}
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
-            <div class="p-4 sm:p-6">
+        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden transition-all duration-500">
+            <div class="p-4 sm:p-8">
                 <table id="panel-events-table" class="w-full text-left border-collapse display">
                     <thead>
-                        <tr
-                            class="bg-slate-50/50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold transition-colors">
-                            <th class="px-6 py-4">Evento</th>
-                            <th class="px-6 py-4">Data/Hora</th>
-                            <th class="px-6 py-4">Local</th>
-                            <th class="px-6 py-4">Preço</th>
-                            <th class="px-6 py-4">Status</th>
-                            <th class="px-6 py-4 text-right">Ações</th>
+                        <tr class="bg-slate-50/50 dark:bg-slate-950/50 border-b border-slate-100 dark:border-slate-800 text-[11px] uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500 font-black transition-colors">
+                            <th class="px-6 py-5">{{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}</th>
+                            @if(!(isset($type) && $type === 'album'))
+                            <th class="px-6 py-5">Data/Hora</th>
+                            <th class="px-6 py-5">Local</th>
+                            @endif
+                            <th class="px-6 py-5 text-center">Visível</th>
+                            <th class="px-6 py-5 text-center">Galeria</th>
+                            <th class="px-6 py-5 text-right">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($events as $event)
-                            <tr class="hover:bg-slate-50/50 transition-colors group">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-4">
-                                        <div
-                                            class="w-16 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
-                                            @if($event->image_url)
-                                                <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
-                                                    class="w-full h-full object-cover">
-                                            @else
-                                                <div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 transition-colors">
-                                                    <i class="fas fa-calendar-star text-slate-300 dark:text-slate-600"></i>
-                                                </div>
+                            <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-5">
+                                        <div class="relative group/thumb">
+                                            <div class="w-20 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 overflow-hidden border-2 border-slate-200/60 dark:border-slate-700 shrink-0 transition-all duration-500 group-hover/thumb:scale-110 shadow-sm">
+                                                @if($event->image_url)
+                                                    <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
+                                                        class="w-full h-full object-cover">
+                                                @else
+                                                    <div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 transition-colors">
+                                                        <i class="fas fa-{{ $event->type === 'album' ? 'images' : 'calendar-star' }} text-slate-300 dark:text-slate-600 text-xl"></i>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            @if($event->type === 'album')
+                                                <div class="absolute -top-2 -right-2 bg-blue-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg border border-white dark:border-slate-900 uppercase tracking-tighter">Álbum</div>
                                             @endif
                                         </div>
-                                        <div class="max-w-xs font-bold text-slate-900 dark:text-white transition-colors panel-events-table__title" title="{{ $event->title }}">
+                                        <div class="max-w-md font-black text-slate-900 dark:text-white transition-colors text-lg" title="{{ $event->title }}">
                                             {{ $event->title }}
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap" data-order="{{ \Carbon\Carbon::parse($event->start_at)->timestamp }}">
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors">
-                                            {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y') }}
-                                        </span>
-                                        <span class="text-[10px] text-slate-500 uppercase font-medium">
-                                            {{ \Carbon\Carbon::parse($event->start_at)->format('H:i') }}
-                                        </span>
-                                    </div>
+                                @if(!(isset($type) && $type === 'album'))
+                                <td class="px-6 py-5 whitespace-nowrap" data-order="{{ $event->start_at ? \Carbon\Carbon::parse($event->start_at)->timestamp : 0 }}">
+                                    @if($event->start_at)
+                                        <div class="flex flex-col">
+                                            <span class="text-base font-black text-slate-700 dark:text-slate-300 transition-colors">
+                                                {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y') }}
+                                            </span>
+                                            <span class="text-[11px] text-slate-400 dark:text-slate-500 uppercase font-black tracking-widest mt-0.5">
+                                                <i class="far fa-clock mr-1"></i>{{ \Carbon\Carbon::parse($event->start_at)->format('H:i') }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="text-sm font-bold text-slate-400">Pendente</span>
+                                    @endif
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-slate-600 dark:text-slate-400 transition-colors panel-events-table__location">
-                                        <i class="fas fa-map-marker-alt mr-1 text-slate-400"></i>
+                                <td class="px-6 py-5">
+                                    <div class="text-sm font-bold text-slate-600 dark:text-slate-400 transition-colors rounded-xl bg-slate-100/50 dark:bg-slate-800/50 px-3 py-1.5 inline-flex items-center gap-2">
+                                        <i class="fas fa-map-marker-alt text-blue-500"></i>
                                         {{ $event->location ?: 'Online' }}
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-bold text-slate-900 dark:text-white transition-colors">
-                                        {{ $event->price > 0 ? 'R$ ' . number_format($event->price, 2, ',', '.') : 'Gratuito' }}
-                                    </div>
+                                @endif
+                                
+                                <td class="px-6 py-5 text-center">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer ajax-toggle" data-id="{{ $event->id }}" data-field="published" {{ $event->published ? 'checked' : '' }}>
+                                        <div class="w-12 h-6 bg-slate-200 peer-focus:outline-none dark:peer-focus:ring-white/10 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-[24px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-blue-600 shadow-inner"></div>
+                                    </label>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @php
-                                        $statusClass = $event->published 
-                                            ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/50' 
-                                            : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700';
-                                        $statusLabel = $event->published ? 'Publicado' : 'Rascunho';
-                                    @endphp
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $statusClass }} transition-colors">
-                                        {{ $statusLabel }}
-                                    </span>
+                                
+                                <td class="px-6 py-5 text-center">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer ajax-toggle" data-id="{{ $event->id }}" data-field="show_on_gallery" {{ $event->show_on_gallery ? 'checked' : '' }}>
+                                        <div class="w-12 h-6 bg-slate-200 peer-focus:outline-none dark:peer-focus:ring-white/10 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-[24px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-500 shadow-inner"></div>
+                                    </label>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex items-center justify-end gap-2 text-slate-400 dark:text-slate-500 transition-opacity">
-                                        @if($event->is_ticket_enabled)
+
+                                <td class="px-6 py-5 whitespace-nowrap text-right">
+                                    <div class="flex items-center justify-end gap-2.5">
+                                        <a href="{{ route('panel.admin.events.edit', ['event' => $event, 'tab' => 'gallery']) }}"
+                                            class="w-10 h-10 flex items-center justify-center bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-[0.9rem] transition-all duration-300 border border-amber-100 dark:border-amber-800/50 hover:scale-110 active:scale-95 shadow-sm"
+                                            title="Gerenciar Mídia">
+                                            <i class="fas fa-photo-video"></i>
+                                        </a>
+
+                                        @if($event->is_ticket_enabled && $event->type !== 'album')
                                             <a href="{{ route('panel.admin.events.scanner', $event) }}"
-                                                class="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg transition-colors border border-transparent hover:border-emerald-100 dark:hover:border-emerald-800/50"
+                                                class="w-10 h-10 flex items-center justify-center bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-[0.9rem] transition-all duration-300 border border-emerald-100 dark:border-emerald-800/50 hover:scale-110 active:scale-95 shadow-sm"
                                                 title="Escanear Ingressos">
                                                 <i class="fas fa-qrcode"></i>
                                             </a>
-                                        @else
-                                            <span
-                                                class="p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed"
-                                                title="QR Code desativado">
-                                                <i class="fas fa-ban"></i>
-                                            </span>
                                         @endif
 
                                         <a href="{{ route('panel.admin.events.edit', $event) }}"
-                                            class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors border border-transparent hover:border-blue-100 dark:hover:border-blue-800/50"
+                                            class="w-10 h-10 flex items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-[0.9rem] transition-all duration-300 border border-blue-100 dark:border-blue-800/50 hover:scale-110 active:scale-95 shadow-sm"
                                             title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
 
-                                        <form action="{{ route('panel.admin.events.destroy', $event) }}" method="POST"
-                                              onsubmit="return confirmAction(event, 'Excluir evento?', 'Tem certeza que deseja excluir este evento?');"
-                                              class="inline">
+                                        <button type="button"
+                                            onclick="confirmDelete({{ $event->id }})"
+                                            class="w-10 h-10 flex items-center justify-center bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-[0.9rem] transition-all duration-300 border border-red-100 dark:border-red-800/50 hover:scale-110 active:scale-95 shadow-sm"
+                                            title="Excluir">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                        
+                                        <form id="delete-form-{{ $event->id }}" action="{{ route('panel.admin.events.destroy', $event) }}" method="POST" class="hidden">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                class="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-800/50 text-slate-400 dark:text-slate-500 hover:text-red-700 dark:hover:text-red-400"
-                                                title="Excluir">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
                                         </form>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center text-slate-500">
-                                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <i class="fas fa-calendar-alt text-slate-300 text-xl"></i>
+                                <td colspan="7" class="px-6 py-20 text-center">
+                                    <div class="w-24 h-24 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors duration-500">
+                                        <i class="fas fa-folder-open text-slate-300 dark:text-slate-600 text-3xl"></i>
                                     </div>
-                                    <p class="text-sm">Nenhum evento encontrado.</p>
-                                    <a href="{{ route('panel.admin.events.create') }}" class="text-blue-600 hover:underline mt-2 inline-block">Criar seu primeiro evento</a>
+                                    <h3 class="text-xl font-black text-slate-900 dark:text-white">Nenhum registro encontrado</h3>
+                                    <p class="text-slate-500 dark:text-slate-400 mt-2 max-w-xs mx-auto">Comece criando um novo registro para visualizar aqui.</p>
+                                    <a href="{{ route('panel.admin.events.create', ['type' => $type ?? 'event']) }}" class="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-200">
+                                        <i class="fas fa-plus"></i>
+                                        Novo Registro
+                                    </a>
                                 </td>
                             </tr>
                         @endforelse
@@ -216,21 +238,79 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script>
         $(function () {
-            $('#panel-events-table').DataTable({
+            const table = $('#panel-events-table').DataTable({
                 responsive: true,
                 autoWidth: false,
                 pageLength: 10,
-                order: [[1, 'desc']],
+                order: [[0, 'desc']],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json'
                 },
                 columnDefs: [
-                    { targets: 5, orderable: false, searchable: false, responsivePriority: 1 },
-                    { targets: 0, responsivePriority: 2 },
-                    { targets: 1, responsivePriority: 3 },
-                    { targets: 2, responsivePriority: 4 }
+                    { targets: -1, orderable: false, searchable: false, responsivePriority: 1 },
+                    { targets: 0, responsivePriority: 2 }
                 ]
             });
+
+            // AJAX Toggle Handler
+            $('.ajax-toggle').on('change', function() {
+                const $checkbox = $(this);
+                const id = $checkbox.data('id');
+                const field = $checkbox.data('field');
+                const value = $checkbox.is(':checked');
+
+                // Visual feedback
+                $checkbox.prop('disabled', true);
+                
+                axios.post('{{ route("panel.admin.events.toggle-field", "") }}/' + id, {
+                    field: field
+                })
+                .then(response => {
+                    if (response.data.status === 'success') {
+                        Toast.fire({
+                            icon: 'success',
+                            title: response.data.message || 'Atualizado com sucesso!'
+                        });
+                    } else {
+                        Toast.fire({
+                            icon: 'error',
+                            title: response.data.message || 'Erro ao atualizar.'
+                        });
+                        $checkbox.prop('checked', !value);
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Falha na comunicação com o servidor.'
+                    });
+                    $checkbox.prop('checked', !value);
+                })
+                .finally(() => {
+                    $checkbox.prop('disabled', false);
+                });
+            });
         });
+
+        function confirmDelete(id) {
+            const isAlbum = {{ (isset($type) && $type === 'album') ? 'true' : 'false' }};
+            Swal.fire({
+                title: isAlbum ? 'Excluir álbum?' : 'Excluir evento?',
+                text: "Esta ação excluirá permanentemente este registro e todas as mídias associadas!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sim, excluir!',
+                cancelButtonText: 'Cancelar',
+                background: document.documentElement.classList.contains('dark') ? '#0f172a' : '#fff',
+                color: document.documentElement.classList.contains('dark') ? '#fff' : '#000'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+        }
     </script>
 @endpush

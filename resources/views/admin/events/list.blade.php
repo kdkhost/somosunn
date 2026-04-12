@@ -1,46 +1,50 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Gerenciar Eventos')
+@section('title', (isset($type) && $type === 'album') ? 'Acervo de Mídia' : 'Gerenciar Eventos')
 
-@section('page_title', 'Gerenciar Eventos')
+@section('page_title', (isset($type) && $type === 'album') ? 'Acervo de Mídia' : 'Gerenciar Eventos')
 
 @section('breadcrumb_items')
     <li class="breadcrumb-item"><a href="{{ route('admin.events.index') }}">Eventos</a></li>
-    <li class="breadcrumb-item active">Gerenciar</li>
+    <li class="breadcrumb-item active">{{ (isset($type) && $type === 'album') ? 'Acervo' : 'Gerenciar' }}</li>
 @endsection
 
 @section('content')
     <div class="container-fluid">
         <div class="row mb-3">
-            <div class="col-12">
-                <div class="d-flex flex-wrap" style="gap: 10px;">
+            <div class="col-12 text-right">
+                <div class="d-inline-flex" style="gap: 10px;">
+                    @if(!(isset($type) && $type === 'album'))
                     <a href="{{ route('admin.quick-scanner') }}"
                         class="btn btn-success shadow-sm hover:translate-y-[-2px] transition-all">
                         <i class="fas fa-qrcode mr-2"></i> Scanner Universal
                     </a>
-                    <a href="{{ route('admin.events.create') }}"
+                    @endif
+                    <a href="{{ route('admin.events.create', ['type' => $type ?? 'event']) }}"
                         class="btn btn-primary shadow-sm hover:translate-y-[-2px] transition-all">
-                        <i class="fas fa-plus mr-2"></i> Novo Evento
+                        <i class="fas fa-plus mr-2"></i> Novo {{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}
                     </a>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-12">
-                <div class="card card-outline card-primary">
+                <div class="card card-outline card-primary shadow-lg border-0">
                     <div class="card-header">
-                        <h3 class="card-title">Listagem de Eventos</h3>
+                        <h3 class="card-title">Listagem de {{ (isset($type) && $type === 'album') ? 'Álbuns de Mídia' : 'Eventos' }}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body p-0">
                         <table id="admin-events-table" class="table table-hover align-middle mb-0 w-100">
                             <thead>
                                 <tr>
-                                    <th>Evento</th>
+                                    <th>{{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}</th>
+                                    @if(!(isset($type) && $type === 'album'))
                                     <th>Data/Hora</th>
                                     <th>Local</th>
-                                    <th>Preço</th>
-                                    <th>Status</th>
+                                    @endif
+                                    <th class="text-center">Visível</th>
+                                    <th class="text-center">Galeria</th>
                                     <th class="text-right">Ações</th>
                                 </tr>
                             </thead>
@@ -54,62 +58,79 @@
                                                         class="img-size-50 mr-3 img-rounded shadow-sm"
                                                         style="object-fit: cover; width: 50px; height: 35px;">
                                                 @else
-                                                    <div class="img-size-50 mr-3 d-flex align-items-center justify-center bg-light img-rounded"
+                                                    <div class="img-size-50 mr-3 d-flex align-items-center justify-content-center bg-light img-rounded"
                                                         style="width: 50px; height: 35px;">
-                                                        <i class="fas fa-calendar-star text-muted"></i>
+                                                        <i class="fas fa-{{ $event->type === 'album' ? 'images' : 'calendar-star' }} text-muted"></i>
                                                     </div>
                                                 @endif
-                                                <span class="font-weight-bold admin-events-table__title"
-                                                    title="{{ $event->title }}">{{ Str::limit($event->title, 60) }}</span>
+                                                <div>
+                                                    <span class="font-weight-bold d-block text-truncate" style="max-width: 300px;"
+                                                        title="{{ $event->title }}">{{ $event->title }}</span>
+                                                    @if($event->type === 'album')
+                                                        <small class="badge badge-info uppercase">Acervo</small>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </td>
-                                        <td data-order="{{ \Carbon\Carbon::parse($event->start_at)->timestamp }}">
-                                            <div class="d-flex flex-column">
-                                                <span>{{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y') }}</span>
-                                                <small
-                                                    class="text-muted">{{ \Carbon\Carbon::parse($event->start_at)->format('H:i') }}</small>
-                                            </div>
+                                        @if(!(isset($type) && $type === 'album'))
+                                        <td data-order="{{ $event->start_at ? \Carbon\Carbon::parse($event->start_at)->timestamp : 0 }}">
+                                            @if($event->start_at)
+                                                <div class="d-flex flex-column">
+                                                    <span>{{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y') }}</span>
+                                                    <small class="text-muted">{{ \Carbon\Carbon::parse($event->start_at)->format('H:i') }}</small>
+                                                </div>
+                                            @else
+                                                <span class="text-muted">Sem data</span>
+                                            @endif
                                         </td>
-                                        <td class="admin-events-table__location">
+                                        <td>
                                             <i class="fas fa-map-marker-alt mr-1 text-muted"></i>
                                             {{ $event->location ?: 'Online' }}
                                         </td>
-                                        <td>
-                                            <span class="font-weight-bold">
-                                                {{ $event->price > 0 ? 'R$ ' . number_format($event->price, 2, ',', '.') : 'Gratuito' }}
-                                            </span>
+                                        @endif
+                                        <td class="text-center">
+                                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                                <input type="checkbox" class="custom-control-input ajax-toggle" 
+                                                       id="toggle-pub-{{ $event->id }}" 
+                                                       data-id="{{ $event->id }}" 
+                                                       data-field="published"
+                                                       {{ $event->published ? 'checked' : '' }}>
+                                                <label class="custom-control-label" for="toggle-pub-{{ $event->id }}"></label>
+                                            </div>
                                         </td>
-                                        <td>
-                                            @if($event->published)
-                                                <span class="badge badge-success">Publicado</span>
-                                            @else
-                                                <span class="badge badge-secondary">Rascunho</span>
-                                            @endif
+                                        <td class="text-center">
+                                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                                <input type="checkbox" class="custom-control-input ajax-toggle" 
+                                                       id="toggle-gal-{{ $event->id }}" 
+                                                       data-id="{{ $event->id }}" 
+                                                       data-field="show_on_gallery"
+                                                       {{ $event->show_on_gallery ? 'checked' : '' }}>
+                                                <label class="custom-control-label" for="toggle-gal-{{ $event->id }}"></label>
+                                            </div>
                                         </td>
                                         <td class="text-right">
                                             <div class="btn-group btn-group-sm">
+                                                <a href="{{ route('admin.events.edit', ['event' => $event, 'tab' => 'gallery']) }}" class="btn btn-warning"
+                                                    title="Gerenciar Mídia">
+                                                    <i class="fas fa-photo-video"></i>
+                                                </a>
                                                 @if($event->is_ticket_enabled)
                                                     <a href="{{ route('admin.events.scanner', $event) }}" class="btn btn-success"
                                                         title="Escanear Ingressos">
                                                         <i class="fas fa-qrcode"></i>
                                                     </a>
-                                                @else
-                                                    <button type="button" class="btn btn-light text-muted" title="QR Code desativado" disabled>
-                                                        <i class="fas fa-ban"></i>
-                                                    </button>
                                                 @endif
                                                 <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-info"
                                                     title="Editar">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
-                                                    data-confirm-title="Excluir evento?"
-                                                    data-confirm-text="Deseja realmente excluir este evento?"
-                                                    data-confirm-icon="warning"
+                                                    class="form-delete"
+                                                    data-id="{{ $event->id }}"
                                                     style="display:inline-block;">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger" title="Excluir">
+                                                    <button type="button" class="btn btn-danger btn-delete" title="Excluir">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -118,19 +139,18 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5 text-muted">
-                                            <i class="fas fa-calendar-alt fa-3x mb-3"></i>
-                                            <p>Nenhum evento encontrado.</p>
-                                            <a href="{{ route('admin.events.create') }}" class="btn btn-primary btn-sm">Criar
-                                                meu primeiro evento</a>
+                                        <td colspan="7" class="text-center py-5 text-muted">
+                                            <i class="fas fa-folder-open fa-3x mb-3"></i>
+                                            <p>Nenhum registro encontrado.</p>
+                                            <a href="{{ route('admin.events.create', ['type' => $type ?? 'event']) }}" class="btn btn-primary btn-sm">Criar
+                                                meu primeiro registro</a>
                                         </td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
-                </div>
-                <!-- /.card -->
+                </div>  <!-- /.card -->
             </div>
         </div>
     </div>
@@ -188,7 +208,7 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
     <script>
         $(function () {
-            $('#admin-events-table').DataTable({
+            const table = $('#admin-events-table').DataTable({
                 responsive: true,
                 autoWidth: false,
                 pageLength: 15,
@@ -197,11 +217,62 @@
                     url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json'
                 },
                 columnDefs: [
-                    { targets: 5, orderable: false, searchable: false, responsivePriority: 1 },
-                    { targets: 0, responsivePriority: 2 },
-                    { targets: 1, responsivePriority: 3 },
-                    { targets: 2, responsivePriority: 4 }
+                    { targets: -1, orderable: false, searchable: false, responsivePriority: 1 },
+                    { targets: 0, responsivePriority: 2 }
                 ]
+            });
+
+            // Handle AJAX Toggle
+            $('.ajax-toggle').on('change', function() {
+                const $checkbox = $(this);
+                const id = $checkbox.data('id');
+                const field = $checkbox.data('field');
+                const value = $checkbox.is(':checked');
+
+                $checkbox.prop('disabled', true);
+
+                axios.post('{{ route("admin.events.toggle-field", "") }}/' + id, {
+                    field: field
+                })
+                .then(response => {
+                    if (response.data.status === 'success') {
+                        toastr.success(response.data.message || 'Atualizado com sucesso!');
+                    } else {
+                        toastr.error(response.data.message || 'Erro ao atualizar.');
+                        $checkbox.prop('checked', !value);
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    toastr.error('Erro de conexão ao servidor.');
+                    $checkbox.prop('checked', !value);
+                })
+                .finally(() => {
+                    $checkbox.prop('disabled', false);
+                });
+            });
+
+            // Handle Delete with SweetAlert2
+            $('.btn-delete').on('click', function(e) {
+                e.preventDefault();
+                const $form = $(this).closest('form');
+                const isAlbum = {{ (isset($type) && $type === 'album') ? 'true' : 'false' }};
+                const title = isAlbum ? 'Excluir álbum?' : 'Excluir evento?';
+                
+                Swal.fire({
+                    title: title,
+                    text: "Esta ação não poderá ser revertida!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sim, excluir!',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $form.submit();
+                    }
+                });
             });
         });
     </script>

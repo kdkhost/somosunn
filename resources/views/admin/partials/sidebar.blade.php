@@ -217,6 +217,14 @@
                                 </a></li>
                         </ul>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('admin.events.acervo') }}"
+                            class="nav-link {{ $is('admin.events.acervo') }} rounded-lg font-semibold">
+                            <i class="nav-icon fas fa-photo-video"></i>
+                            <p>Acervo de Mídia</p>
+                        </a>
+                    </li>
                 @endif
 
                 @if(auth()->user()->isAdmin() || auth()->user()->canAccessFeature('courses'))

@@ -97,6 +97,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressBar = document.getElementById('progress-bar-fill');
     const percentageText = document.getElementById('upload-percentage');
     
+    // Ensure axios is available (fixes "axios is not defined")
+    if (typeof axios === 'undefined' && typeof window.axios === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js';
+        script.onload = () => { window.axios = axios; };
+        document.head.appendChild(script);
+    } else if (typeof window.axios === 'undefined') {
+        window.axios = axios;
+    }
+
     const uploadUrl = dropzone.dataset.url;
 
     dropzone.addEventListener('dragover', (e) => {
