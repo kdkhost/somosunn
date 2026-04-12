@@ -32,18 +32,18 @@
 
             <div class="mt-8 max-w-4xl">
                 <span class="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-cyan-100">
-                    <i class="fas fa-photo-film"></i> Cobertura oficial
+                    <i class="fas fa-{{ $event->isAlbum() ? 'users' : 'photo-film' }}"></i> {{ $event->isAlbum() ? 'Comunidade UNN' : 'Cobertura oficial' }}
                 </span>
 
                 <h1 class="mt-5 text-4xl font-black tracking-tight text-white md:text-5xl">{{ $event->title }}</h1>
 
                 <div class="mt-5 flex flex-wrap gap-3 text-sm text-slate-300">
-                    @if($eventDate)
+                    @if(!$event->isAlbum() && $eventDate)
                         <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur">
                             <i class="far fa-calendar"></i> {{ $eventDate }}
                         </span>
                     @endif
-                    @if($event->location)
+                    @if(!$event->isAlbum() && $event->location)
                         <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur">
                             <i class="fas fa-location-dot"></i> {{ $event->location }}
                         </span>

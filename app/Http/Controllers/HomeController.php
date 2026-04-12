@@ -23,7 +23,7 @@ class HomeController extends Controller
         if (view()->shared('unnDbAvailable')) {
             try {
                 $freeEvents = ContentVisibility::applyPublicFilter(
-                    Event::query()->where('published', true),
+                    Event::query()->where('published', true)->where('type', 'event'),
                     'events'
                 )
                     ->publicUpcoming()

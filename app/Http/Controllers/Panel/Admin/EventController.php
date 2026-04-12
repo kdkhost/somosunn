@@ -61,7 +61,7 @@ class EventController extends Controller
             return response()->json(['message' => 'Intervalo inválido.'], 422);
         }
 
-        $query = Event::where(function ($query) use ($start, $end) {
+        $query = Event::where('type', 'event')->where(function ($query) use ($start, $end) {
             $query->where('start_at', '<', $end)
                 ->where(function ($subQuery) use ($start) {
                     $subQuery->where(function ($rangeQuery) use ($start) {
@@ -345,6 +345,8 @@ class EventController extends Controller
             'batch_2_deadline' => 'nullable|date',
             'batch_3_price' => 'nullable|numeric|min:0',
             'batch_3_deadline' => 'nullable|date',
+            'type' => 'nullable|string|in:event,album',
+            'slug' => 'nullable|string|unique:events,slug,' . ($event ? $event->id : 'NULL'),
         ]);
 
         return $this->applyScannerRestrictionPayload($request, $validated);

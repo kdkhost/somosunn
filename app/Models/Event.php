@@ -20,6 +20,8 @@ class Event extends Model
     public const SCANNER_RESTRICTION_RADIUS = 'radius';
 
     protected $fillable = [
+        'type',
+        'slug',
         'user_id',
         'title',
         'speaker',
@@ -594,5 +596,24 @@ class Event extends Model
         }
 
         return method_exists($user, 'canAccessFeature') && $user->canAccessFeature('events.first_lot');
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if ($field) {
+            return $this->where($field, $value)->firstOrFail();
+        }
+
+        return $this->where('slug', $value)
+            ->orWhere('id', $value)
+            ->firstOrFail();
+    }
+
+    public function isAlbum(): bool
+    {
+        return $this->type === 'album';
+    }
+
+    public function isEvent(): bool
+    {
+        return $this->type === 'event' || is_null($this->type);
     }
 }
