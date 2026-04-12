@@ -3,8 +3,14 @@
 
 <div class="tab-pane fade" id="sec-hero">
     <div class="card card-outline card-primary">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title"><i class="fas fa-home mr-1"></i> Hero</h3>
+            <div class="card-tools ml-auto">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-hero" data-section="hero" {{ ($data['hero_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="toggle-hero">Visibilidade</label>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -43,8 +49,14 @@
 
 <div class="tab-pane fade" id="sec-stats">
     <div class="card card-outline card-info">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> Estatísticas</h3>
+            <div class="card-tools ml-auto">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-stats" data-section="stats" {{ ($data['stats_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="toggle-stats">Visibilidade</label>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             @foreach ([1, 2, 3, 4] as $i)
@@ -67,8 +79,14 @@
 
 <div class="tab-pane fade" id="sec-about">
     <div class="card card-outline card-secondary">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title"><i class="fas fa-info-circle mr-1"></i> Seção "O que é a UNN"</h3>
+            <div class="card-tools ml-auto">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-about" data-section="about" {{ ($data['about_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="toggle-about">Visibilidade</label>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             <div class="form-row">
@@ -104,8 +122,14 @@
 
 <div class="tab-pane fade" id="sec-journey">
     <div class="card card-outline card-primary">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title"><i class="fas fa-route mr-1"></i> Seção "Onde o network me levou"</h3>
+            <div class="card-tools ml-auto">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-journey" data-section="journey" {{ ($data['journey_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="toggle-journey">Visibilidade</label>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             <div class="form-row">
@@ -146,8 +170,14 @@
 
 <div class="tab-pane fade" id="sec-events">
     <div class="card card-outline card-secondary">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title"><i class="fas fa-calendar mr-1"></i> Eventos & Mentorias</h3>
+            <div class="card-tools ml-auto">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-events" data-section="events" {{ ($data['events_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="toggle-events">Visibilidade</label>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             <div class="form-row">
@@ -180,8 +210,14 @@
 
 <div class="tab-pane fade" id="sec-ranking">
     <div class="card card-outline card-secondary">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title"><i class="fas fa-trophy mr-1"></i> Ranking & Depoimentos</h3>
+            <div class="card-tools ml-auto">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-ranking" data-section="ranking" {{ ($data['ranking_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="toggle-ranking">Visibilidade</label>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             <div class="form-row">
@@ -253,8 +289,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="tab-pane fade" id="sec-cta">
     <div class="card card-outline card-success">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+            <div class="card-tools ml-auto">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-cta" data-section="cta" {{ ($data['cta_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="toggle-cta">Visibilidade</label>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             <div class="form-group">

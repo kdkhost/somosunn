@@ -264,6 +264,66 @@
                     update();
                 }
 
+                // --- NOVO: Listener para Toggles de Visibilidade das Seções ---
+                document.querySelectorAll('.section-toggle').forEach(toggle => {
+                    toggle.addEventListener('change', function() {
+                        const section = this.getAttribute('data-section');
+                        const status = this.checked;
+                        const pageId = "{{ $page->id }}";
+                        
+                        // Feedback visual de carregamento opcional ou desativar temporariamente
+                        this.disabled = true;
+
+                        fetch(`/painel/admin/pages/${pageId}/toggle-section`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                section: section,
+                                status: status
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            this.disabled = false;
+                            if (data.success) {
+                                // Notificação Toasty/Swal Toast conforme diretriz global
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    didOpen: (toast) => {
+                                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                    }
+                                });
+
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: data.message || 'Visibilidade atualizada!'
+                                });
+                            } else {
+                                throw new Error(data.message || 'Erro ao atualizar visibilidade.');
+                            }
+                        })
+                        .catch(error => {
+                            this.disabled = false;
+                            this.checked = !status; // Reverter estado em caso de erro
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro!',
+                                text: error.message || 'Não foi possível salvar a alteração.',
+                                confirmButtonColor: '#3b82f6'
+                            });
+                        });
+                    });
+                });
+
                 // Global Repeater Engine
                 window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData }) {
                     const container = document.getElementById(containerId);

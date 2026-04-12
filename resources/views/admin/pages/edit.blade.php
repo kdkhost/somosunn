@@ -374,6 +374,50 @@
             $('input, textarea, select').on('change input', function() {
                 $('#unsaved-alert').removeClass('d-none');
             });
+
+            /* --- NOVO: Listener para Toggles de Visibilidade das Seções (Legacy) --- */
+            $('.section-toggle').on('change', function() {
+                const $toggle = $(this);
+                const section = $toggle.data('section');
+                const status = $toggle.prop('checked');
+                const pageId = "{{ $page->id }}";
+
+                $toggle.prop('disabled', true);
+
+                $.ajax({
+                    url: `/admin/pages/${pageId}/toggle-section`,
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        section: section,
+                        status: status ? 1 : 0
+                    },
+                    success: function(response) {
+                        $toggle.prop('disabled', false);
+                        if(response.success) {
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true
+                            });
+                            Toast.fire({
+                                icon: 'success',
+                                title: response.message || 'Visibilidade atualizada!'
+                            });
+                        } else {
+                            $toggle.prop('checked', !status);
+                            Swal.fire('Erro!', response.message || 'Não foi possível salvar.', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        $toggle.prop('disabled', false);
+                        $toggle.prop('checked', !status);
+                        Swal.fire('Erro!', 'Falha na comunicação com o servidor.', 'error');
+                    }
+                });
+            });
         });
     </script>
 @endpush

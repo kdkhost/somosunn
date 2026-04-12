@@ -538,6 +538,14 @@ class PageController extends Controller
         $page->data = $data;
         $page->save();
 
+        try {
+            \Artisan::call('cache:clear');
+            \Artisan::call('config:clear');
+            \Artisan::call('view:clear');
+        } catch (\Throwable $e) {
+            \Log::error('Erro ao limpar cache na Admin/PageController@toggleSection: ' . $e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Visibilidade da seção atualizada com sucesso!'

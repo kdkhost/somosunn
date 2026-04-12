@@ -621,7 +621,6 @@ class SettingController extends Controller
                 $data[$key] = '';
             }
         }
-
         $data['uploads_storage_disk'] = 'public';
         foreach (['s3_key', 's3_secret', 's3_region', 's3_bucket', 's3_url', 's3_endpoint'] as $key) {
             $data[$key] = '';
@@ -639,9 +638,10 @@ class SettingController extends Controller
         ];
 
         if ($currentGroup === 'gateway') {
+            foreach ($paymentMethodCheckboxes as $checkbox) {
+                $data[$checkbox] = $request->has($checkbox) ? 1 : 0;
+            }
 
-        }
-        if ($currentGroup === 'gateway') {
             // Remover chaves ANTIGAS e lixo que não pertencem ao gateway
             $trashKeys = ['video_plyr_options_json', 'gateway_checkout_theme_selected', 'gateway_checkout_primary_color_hex'];
             foreach ($trashKeys as $trash) {
@@ -691,11 +691,6 @@ class SettingController extends Controller
             $mpAccount->save();
         }
 
-        // Auto-save: Retornar JSON se for requisição AJAX
-        if ($request->wantsJson() || $request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Configurações salvas automaticamente.']);
-        }
-
         try {
             Artisan::call('cache:clear');
             Artisan::call('config:clear');
@@ -704,19 +699,12 @@ class SettingController extends Controller
             \Log::error('Erro ao limpar cache nas configurações: ' . $e->getMessage());
         }
 
-        return response()->json(['reload' => true, 'message' => 'Configuracoes salvas']);
-
-    }
-
-    private function storePublic($file, $relativeDir)
-    {
-        if (!$file || !$file->isValid()) {
-            throw new \RuntimeException('Arquivo de imagem inválido ou corrompido.');
+        // Auto-save: Retornar JSON se for requisição AJAX
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Configurações salvas automaticamente.']);
         }
 
-        $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
-        $name = uniqid('', true) . '.' . $ext;
-        $this->ensurePublicDir($relativeDir);
+        return response()->json(['reload' => true, 'message' => 'Configuracoes salvas']);
 
         try {
             Storage::disk('public')->putFileAs($relativeDir, $file, $name, ['visibility' => 'public']);
