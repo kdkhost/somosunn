@@ -140,7 +140,10 @@ document.addEventListener('DOMContentLoaded', function() {
         progressBar.style.width = '0%';
         percentageText.innerText = '0%';
 
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
         axios.post(uploadUrl, formData, {
+            headers: token ? { 'X-CSRF-TOKEN': token } : {},
             onUploadProgress: (progressEvent) => {
                 const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                 progressBar.style.width = percentCompleted + '%';
@@ -194,7 +197,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.delete(url)
+                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    axios.delete(url, { headers: token ? { 'X-CSRF-TOKEN': token } : {} })
                         .then(() => {
                             item.remove();
                             Swal.fire({
