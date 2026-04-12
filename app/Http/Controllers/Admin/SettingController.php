@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Artisan;
+
 
 class SettingController extends Controller
 {
@@ -694,7 +696,16 @@ class SettingController extends Controller
             return response()->json(['success' => true, 'message' => 'Configurações salvas automaticamente.']);
         }
 
+        try {
+            Artisan::call('cache:clear');
+            Artisan::call('config:clear');
+            Artisan::call('view:clear');
+        } catch (\Throwable $e) {
+            \Log::error('Erro ao limpar cache nas configurações: ' . $e->getMessage());
+        }
+
         return response()->json(['reload' => true, 'message' => 'Configuracoes salvas']);
+
     }
 
     private function storePublic($file, $relativeDir)

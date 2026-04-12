@@ -9,6 +9,8 @@ use App\Support\UploadStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Artisan;
+
 
 class PageController extends Controller
 {
@@ -396,6 +398,14 @@ class PageController extends Controller
             'data' => $newData,
         ]);
 
+        try {
+            Artisan::call('cache:clear');
+            Artisan::call('config:clear');
+            Artisan::call('view:clear');
+        } catch (\Throwable $e) {
+            \Log::error('Erro ao limpar cache na PageController@update: ' . $e->getMessage());
+        }
+
         return redirect()
             ->route('panel.admin.pages.index')
             ->with('success', 'Página atualizada com sucesso.');
@@ -411,6 +421,14 @@ class PageController extends Controller
 
         $page->data = $data;
         $page->save();
+
+        try {
+            Artisan::call('cache:clear');
+            Artisan::call('config:clear');
+            Artisan::call('view:clear');
+        } catch (\Throwable $e) {
+            \Log::error('Erro ao limpar cache na PageController@toggleSection: ' . $e->getMessage());
+        }
 
         return response()->json([
             'success' => true,

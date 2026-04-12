@@ -60,12 +60,13 @@
 
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
         <!-- Hero Section -->
+        @if($homePage->get('hero_enabled', true))
         <section class="pt-10 md:pt-24 pb-12 md:pb-16 w-full overflow-x-hidden">
             <div class="unn-container">
                 <div class="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
                     <div>
                         <h1 class="unn-title-gradient unn-title-hero mb-6" style="word-break: keep-all; hyphens: none; max-width: 650px;">
-                            {{ $heroTitle }} {{ $heroSubtitle }}
+                            {!! nl2br(e(str_replace(',', ",\n", $heroTitle))) !!} {{ $heroSubtitle }}
                         </h1>
                         <p class="text-base sm:text-lg text-gray-600 mb-6 md:mb-8 leading-relaxed max-w-xl">
                             {{ $heroText }}
@@ -92,9 +93,11 @@
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- Stats Bar -->
         <!-- Stats Bar -->
+        @if($homePage->get('stats_enabled', true))
         <section class="py-6 md:py-8 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
             <div class="unn-container">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -121,8 +124,10 @@
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- O que é a UNN -->
+        @if($homePage->get('about_enabled', true))
         <section class="py-16 px-4 md:px-8 lg:px-12 bg-white w-full overflow-x-hidden">
             <div class="unn-container">
                 <div class="text-center mb-12">
@@ -162,8 +167,10 @@
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- Onde o network me levou -->
+        @if($homePage->get('journey_enabled', true))
         <section class="py-16 w-full overflow-x-hidden">
             <div class="unn-container">
                 <!-- Lead Banner (Blue) -->
@@ -231,8 +238,10 @@
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- Palestras Gratuitas -->
+        @if($homePage->get('events_enabled', true))
         <section class="py-16 w-full overflow-x-hidden">
             <div class="unn-container">
                 <div class="flex justify-between items-center mb-8">
@@ -306,8 +315,10 @@
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- Mentorias Premium -->
+        @if($homePage->get('mentorships_enabled', true))
         <section class="py-16 bg-white w-full overflow-x-hidden">
             <div class="unn-container">
                 <div class="flex justify-between items-center mb-8">
@@ -380,8 +391,10 @@
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- Comunidade por níveis -->
+        @if($homePage->get('community_enabled', true))
         <section class="py-16 w-full overflow-x-hidden">
             <div class="unn-container">
                 <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $homePage->get('community_title', 'Comunidade por níveis') }}</h2>
@@ -410,8 +423,10 @@
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- Ranking -->
+        @if($homePage->get('ranking_enabled', true))
         <section class="py-16 bg-white w-full overflow-x-hidden">
             <div class="unn-container">
                 <div class="flex items-center justify-between mb-10">
@@ -544,8 +559,10 @@
                 @endif
             </div>
         </section>
+        @endif
 
         <!-- Depoimentos -->
+        @if($homePage->get('testimonials_enabled', true))
         <section class="py-16 w-full overflow-x-hidden">
             <div class="unn-container">
                 <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">{{ $homePage->get('testimonials_title', 'O que dizem nossos membros') }}</h2>
@@ -596,8 +613,10 @@
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- CTA Final -->
+        @if($homePage->get('cta_enabled', true))
         <section class="py-16 w-full overflow-x-hidden"
             style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
             <div class="unn-container text-center text-white">
@@ -617,6 +636,7 @@
                 </div>
             </div>
         </section>
+        @endif
     </div>
 
     <style>
