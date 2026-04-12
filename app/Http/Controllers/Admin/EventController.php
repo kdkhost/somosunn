@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class EventController extends Controller
@@ -175,6 +176,8 @@ class EventController extends Controller
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
             'scanner_radius_value' => 'nullable|numeric|min:0.001',
             'scanner_radius_unit' => 'nullable|string|in:m,km',
+            'type' => 'nullable|string|in:event,album',
+            'slug' => 'nullable|string|max:255',
         ]);
 
         $validated['published'] = $request->has('published')
@@ -200,7 +203,7 @@ class EventController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $validated['image'] = app(WatermarkService::class)->processStorageImage(
+            $validated['image'] = UploadStorage::storeUploadedFile(
                 $request->file('image'),
                 'event-images',
                 null,
@@ -210,6 +213,8 @@ class EventController extends Controller
 
         // Define o criador do evento
         $data = $validated;
+        $data['type'] = $request->input('type', 'event');
+        $data['slug'] = $request->input('slug') ?: ($data['type'] === 'album' ? Str::slug($data['title']) : null);
         $data['user_id'] = Auth::id();
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
@@ -298,6 +303,8 @@ class EventController extends Controller
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
             'scanner_radius_value' => 'nullable|numeric|min:0.001',
             'scanner_radius_unit' => 'nullable|string|in:m,km',
+            'type' => 'nullable|string|in:event,album',
+            'slug' => 'nullable|string|max:255',
         ]);
 
         if ($request->has('published')) {
@@ -330,7 +337,7 @@ class EventController extends Controller
 
         if ($request->hasFile('image')) {
             $this->deleteEventImageIfExists($event);
-            $validated['image'] = app(WatermarkService::class)->processStorageImage(
+            $validated['image'] = UploadStorage::storeUploadedFile(
                 $request->file('image'),
                 'event-images',
                 null,
@@ -339,6 +346,12 @@ class EventController extends Controller
         }
 
         $data = $validated;
+        if ($request->has('type')) {
+            $data['type'] = $request->input('type');
+        }
+        if ($request->has('slug')) {
+            $data['slug'] = $request->input('slug') ?: ($data['type'] === 'album' ? Str::slug($data['title']) : null);
+        }
         if ($request->has('is_certificate_enabled')) {
             $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         }

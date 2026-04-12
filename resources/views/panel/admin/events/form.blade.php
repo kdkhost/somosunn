@@ -10,6 +10,7 @@
     <div
         x-data="{
             tab: 'general',
+            type: '{{ old('type', $event->type ?? 'event') }}',
             certificateEnabled: {{ old('is_certificate_enabled', $event->is_certificate_enabled) ? 'true' : 'false' }},
             ticketEnabled: {{ old('is_ticket_enabled', $event->is_ticket_enabled) ? 'true' : 'false' }},
             scannerMode: '{{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) }}'
@@ -76,7 +77,7 @@
                 <i class="fas fa-info-circle"></i>
                 <span>Geral</span>
             </button>
-            <button type="button" @click="tab = 'location'"
+            <button type="button" @click="tab = 'location'" x-show="type === 'event'"
                 :class="tab === 'location' 
                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
                             : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
@@ -84,7 +85,7 @@
                 <i class="fas fa-map-marker-alt"></i>
                 <span>Local & Capacidade</span>
             </button>
-            <button type="button" @click="tab = 'pricing'"
+            <button type="button" @click="tab = 'pricing'" x-show="type === 'event'"
                 :class="tab === 'pricing' 
                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
                             : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
@@ -94,6 +95,7 @@
             </button>
             @if($event->exists)
                 <button type="button" @click="if (certificateEnabled) { tab = 'certificate'; }" :disabled="!certificateEnabled"
+                    x-show="type === 'event'"
                     :class="tab === 'certificate' 
                                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20' 
                                         : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
@@ -135,6 +137,21 @@
                 <div class="lg:col-span-2 space-y-6">
                     <div
                         class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2">Tipo de Registro</label>
+                                <select name="type" x-model="type" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-slate-900 dark:text-white font-semibold">
+                                    <option value="event">Evento Tradicional</option>
+                                    <option value="album">Álbum Privado / Galeria</option>
+                                </select>
+                                <p class="text-[10px] text-slate-500 mt-1">Álbuns não aparecem no calendário público.</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2">URL Amigável (Slug)</label>
+                                <input type="text" name="slug" value="{{ old('slug', $event->slug) }}" placeholder="ex: onde-o-network-me-levou" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-slate-900 dark:text-white font-medium">
+                                <p class="text-[10px] text-slate-500 mt-1">Deixe em branco para gerar pelo título.</p>
+                            </div>
+                        </div>
                         <div>
                             <label
                                 class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Título

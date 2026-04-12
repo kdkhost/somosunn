@@ -30,6 +30,32 @@
                         action="{{ $event->exists ? route('admin.events.update', $event) : route('admin.events.store') }}">
                         @csrf
                         @if($event->exists) @method('PUT') @endif
+
+                        <div class="card card-outline card-info mb-3">
+                            <div class="card-header"><h3 class="card-title font-weight-bold">Configurações do Registro</h3></div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-0">
+                                            <label>Tipo de Registro</label>
+                                            <select name="type" id="registryType" class="form-control">
+                                                <option value="event" {{ old('type', $event->type ?? 'event') == 'event' ? 'selected' : '' }}>Evento Tradicional</option>
+                                                <option value="album" {{ old('type', $event->type ?? 'event') == 'album' ? 'selected' : '' }}>Álbum Privado / Galeria</option>
+                                            </select>
+                                            <small class="text-muted">Álbuns não aparecem no calendário e não possuem venda de ingressos.</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-0">
+                                            <label>URL Amigável (Slug)</label>
+                                            <input name="slug" class="form-control" value="{{ old('slug', $event->slug) }}" placeholder="ex: onde-o-network-me-levou">
+                                            <small class="text-muted">Deixe em branco para gerar automaticamente.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-group mb-2"><label>Título</label><input name="title" class="form-control"
                                 value="{{ old('title', $event->title) }}" required></div>
 
@@ -38,24 +64,26 @@
                             <textarea name="description" id="eventDescriptionLegacy" class="form-control" rows="6">{{ old('description', $event->description) }}</textarea>
                         </div>
 
-                        <div class="form-group mb-2"><label>Início</label><input name="start_at" type="datetime-local"
+                        <div class="form-group mb-2 event-only-field"><label>Início</label><input name="start_at" type="datetime-local"
                                 class="form-control" value="{{ old('start_at', $event->start_at) }}"></div>
 
-                        <div class="form-group mb-2"><label>Preço</label><input name="price" class="form-control mask-money"
-                                value="{{ old('price', $event->price) }}"></div>
-                        <div class="form-group mb-2">
-                            <label>Promoção relâmpago (preço)</label>
-                            <input name="flash_sale_price" class="form-control mask-money"
-                                value="{{ old('flash_sale_price', $event->flash_sale_price) }}" placeholder="0,00">
-                        </div>
-                        <div class="form-group mb-2">
-                            <label>Promoção relâmpago (termina em)</label>
-                            <input name="flash_sale_ends_at" type="datetime-local" class="form-control"
-                                value="{{ old('flash_sale_ends_at', $event->flash_sale_ends_at ? $event->flash_sale_ends_at->format('Y-m-d\\TH:i') : '') }}">
-                            <small class="text-muted d-block mt-1">Quando expirar, o valor volta ao normal automaticamente.</small>
+                        <div class="event-only-field">
+                            <div class="form-group mb-2"><label>Preço</label><input name="price" class="form-control mask-money"
+                                    value="{{ old('price', $event->price) }}"></div>
+                            <div class="form-group mb-2">
+                                <label>Promoção relâmpago (preço)</label>
+                                <input name="flash_sale_price" class="form-control mask-money"
+                                    value="{{ old('flash_sale_price', $event->flash_sale_price) }}" placeholder="0,00">
+                            </div>
+                            <div class="form-group mb-2">
+                                <label>Promoção relâmpago (termina em)</label>
+                                <input name="flash_sale_ends_at" type="datetime-local" class="form-control"
+                                    value="{{ old('flash_sale_ends_at', $event->flash_sale_ends_at ? $event->flash_sale_ends_at->format('Y-m-d\\TH:i') : '') }}">
+                                <small class="text-muted d-block mt-1">Quando expirar, o valor volta ao normal automaticamente.</small>
+                            </div>
                         </div>
                         
-                        <div class="card card-outline card-secondary my-3">
+                        <div class="card card-outline card-secondary my-3 event-only-field">
                             <div class="card-header"><h3 class="card-title font-weight-bold">Preços por Lote</h3></div>
                             <div class="card-body">
                                 <div class="row">
@@ -138,16 +166,12 @@
                                         class="form-control" value="{{ old('longitude', $event->longitude) }}" readonly>
                                 </div>
                                 <input type="hidden" name="published" value="0">
-                                <div class="form-check mb-2">
-                                    <input type="checkbox" name="published" value="1" class="form-check-input" {{ old('published', $event->published) ? 'checked' : '' }}>
-                                    <label class="form-check-label">Publicado</label>
-                                </div>
-                                <div class="form-check mb-2">
+                                <div class="form-check mb-2 event-only-field">
                                     <input type="checkbox" name="is_ticket_enabled" value="1" class="form-check-input" {{ old('is_ticket_enabled', $event->is_ticket_enabled) ? 'checked' : '' }}>
                                     <label class="form-check-label font-weight-bold" style="color:#007bff;"><i class="fas fa-qrcode mr-1"></i> Habilitar Validação de Entrada por QR Code</label>
                                     <small class="d-block text-muted">Quando ativo, o sistema criará um ingresso com QR Code e pontuará organizador e participante após validação.</small>
                                 </div>
-                                <div class="card card-outline card-info mb-3">
+                                <div class="card card-outline card-info mb-3 event-only-field">
                                     <div class="card-body">
                                         <div class="form-group mb-3">
                                             <label class="font-weight-bold"><i class="fas fa-map-marked-alt mr-1"></i> Restricao de leitura do QR Code</label>
@@ -697,6 +721,19 @@
 
             $('#scannerRestrictionMode').on('change', syncScannerRestrictionFields);
             syncScannerRestrictionFields();
+
+            function syncRegistryType() {
+                const type = $('#registryType').val();
+                if (type === 'album') {
+                    $('.event-only-field').hide();
+                    $('#cert-tab').parent().hide();
+                } else {
+                    $('.event-only-field').show();
+                    $('#cert-tab').parent().show();
+                }
+            }
+            $('#registryType').on('change', syncRegistryType);
+            syncRegistryType();
         });
     </script>
 @endpush

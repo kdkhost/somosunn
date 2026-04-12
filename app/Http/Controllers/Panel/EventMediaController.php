@@ -43,8 +43,13 @@ class EventMediaController extends Controller
             try {
                 try {
                     if ($type === 'image') {
-                        $path = $watermarkService->processEventImage($file, $event);
-                        $watermarked = $shouldWatermark;
+                        $path = UploadStorage::storeUploadedFile(
+                            $file,
+                            $targetDirectory,
+                            null,
+                            ['prefix' => 'gallery-media']
+                        );
+                        $watermarked = false;
                     } else {
                         $path = UploadStorage::storeUploadedFile(
                             $file,

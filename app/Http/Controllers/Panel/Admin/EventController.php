@@ -132,7 +132,7 @@ class EventController extends Controller
         $data = $this->serializeRequest($request);
 
         if ($request->hasFile('image')) {
-            $data['image'] = app(WatermarkService::class)->processStorageImage(
+            $data['image'] = UploadStorage::storeUploadedFile(
                 $request->file('image'),
                 'event-images',
                 null,
@@ -188,7 +188,7 @@ class EventController extends Controller
                 Storage::disk('public')->delete($event->image);
             }
 
-            $data['image'] = app(WatermarkService::class)->processStorageImage(
+            $data['image'] = UploadStorage::storeUploadedFile(
                 $request->file('image'),
                 'event-images',
                 null,
