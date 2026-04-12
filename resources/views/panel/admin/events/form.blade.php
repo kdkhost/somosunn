@@ -167,6 +167,7 @@
                                 <input type="datetime-local" name="start_at"
                                     value="{{ old('start_at', $event->start_at ? $event->start_at->format('Y-m-d\TH:i') : '') }}"
                                     :required="type === 'event'"
+                                    :disabled="type !== 'event'"
                                     class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
                             </div>
                             <div>
@@ -175,6 +176,7 @@
                                     (Opcional)</label>
                                 <input type="datetime-local" name="end_at"
                                     value="{{ old('end_at', $event->end_at ? $event->end_at->format('Y-m-d\TH:i') : '') }}"
+                                    :disabled="type !== 'event'"
                                     class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
                             </div>
                         </div>

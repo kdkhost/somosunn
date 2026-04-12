@@ -722,13 +722,15 @@
             $('#scannerRestrictionMode').on('change', syncScannerRestrictionFields);
             syncScannerRestrictionFields();
 
-            function syncRegistryType() {
+        function syncRegistryType() {
                 const type = $('#registryType').val();
                 if (type === 'album') {
-                    $('.event-only-field').hide();
+                    $('.event-only-field').hide().find('input, select, textarea').prop('disabled', true).prop('required', false);
                     $('#cert-tab').parent().hide();
                 } else {
-                    $('.event-only-field').show();
+                    $('.event-only-field').show().find('input, select, textarea').prop('disabled', false).prop('required', function() {
+                        return $(this).attr('name') === 'start_at';
+                    });
                     $('#cert-tab').parent().show();
                 }
             }
