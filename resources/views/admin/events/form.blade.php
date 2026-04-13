@@ -10,7 +10,7 @@
                     <a class="nav-link {{ request('tab') !== 'gallery' ? 'active' : '' }}" id="general-tab" data-toggle="pill" href="#general" role="tab"
                         aria-controls="general" aria-selected="{{ request('tab') !== 'gallery' ? 'true' : 'false' }}">Dados Gerais</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item event-only-field">
                     <a class="nav-link" id="cert-tab" data-toggle="pill" href="#certificate" role="tab"
                         aria-controls="certificate" aria-selected="false">Certificado</a>
                 </li>
@@ -35,7 +35,7 @@
                             <div class="card-header"><h3 class="card-title font-weight-bold">Configurações do Registro</h3></div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-6 event-only-field">
+                                    <div class="col-md-6">
                                         <div class="form-group mb-0">
                                             <label>Tipo de Registro</label>
                                             <select name="type" id="registryType" class="form-control">
@@ -133,7 +133,7 @@
                             </div>
                         </div>
                         <div class="form-group mb-2 event-only-field">
-                            <label>{{ (!isset($event) || $event->type !== 'album' ? (request('type') !== 'album' ? 'Imagem Principal (Capa do Evento)' : 'Imagem Principal (Capa do Álbum)') : 'Imagem Principal (Capa do Álbum)') }}</label>
+                            <label id="coverImageLabel">{{ (!isset($event) || $event->type !== 'album' ? (request('type') !== 'album' ? 'Imagem Principal (Capa do Evento)' : 'Imagem Principal (Capa do Álbum)') : 'Imagem Principal (Capa do Álbum)') }}</label>
                             <input type="hidden" name="remove_image" value="0">
                             <div class="upload-box" data-max-size="5242880"
                                 data-existing-url="{{ $event->image ? asset('storage/' . $event->image) : '' }}"
@@ -228,7 +228,7 @@
                 </div>
 
                 <!-- TAB CERTIFICADO -->
-                <div class="tab-pane fade" id="certificate" role="tabpanel" aria-labelledby="cert-tab">
+                <div class="tab-pane fade event-only-field" id="certificate" role="tabpanel" aria-labelledby="cert-tab">
                     @if(!$event->exists)
                         <div class="alert alert-info border-0 shadow-sm">
                             <i class="fas fa-info-circle mr-2"></i> Você poderá configurar o certificado após salvar o evento
@@ -733,14 +733,21 @@
 
             function syncRegistryType() {
                 const type = $('#registryType').val();
+                const coverLabel = $('#coverImageLabel');
                 if (type === 'album') {
                     $('.event-only-field').hide().find('input, select, textarea').not('#registryType').prop('disabled', true).prop('required', false);
-                    $('#cert-tab').parent().hide();
+                    if (coverLabel.length) coverLabel.text('Imagem Principal (Capa do Álbum)');
+                    
+                    // Se estiver na aba de certificado, volta para a geral
+                    if ($('#certificate').hasClass('active')) {
+                        $('#general-tab').tab('show');
+                    }
                 } else {
                     $('.event-only-field').show().find('input, select, textarea').prop('disabled', false).prop('required', function() {
-                        return $(this).attr('name') === 'start_at';
+                        const name = $(this).attr('name');
+                        return name === 'start_at' || name === 'title';
                     });
-                    $('#cert-tab').parent().show();
+                    if (coverLabel.length) coverLabel.text('Imagem Principal (Capa do Evento)');
                 }
             }
             $('#registryType').on('change', syncRegistryType);
