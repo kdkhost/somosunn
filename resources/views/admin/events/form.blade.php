@@ -133,7 +133,7 @@
                             </div>
                         </div>
                         <div class="form-group mb-2">
-                            <label>Imagem do evento</label>
+                            <label>{{ (!isset($event) || $event->type !== 'album' ? (request('type') !== 'album' ? 'Imagem Principal (Capa do Evento)' : 'Imagem Principal (Capa do Álbum)') : 'Imagem Principal (Capa do Álbum)') }}</label>
                             <input type="hidden" name="remove_image" value="0">
                             <div class="upload-box" data-max-size="5242880"
                                 data-existing-url="{{ $event->image ? asset('storage/' . $event->image) : '' }}"
@@ -149,7 +149,7 @@
                                     class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row event-only-field">
                             <div class="col-md-6">
                                 <div class="form-group mb-2"><label>Local (Nome do Local)</label><input name="location"
                                         class="form-control" value="{{ old('location', $event->location) }}"></div>
@@ -166,7 +166,14 @@
                                         class="form-control" value="{{ old('longitude', $event->longitude) }}" readonly>
                                 </div>
                                 <input type="hidden" name="published" value="0">
-                                <div class="form-check mb-2 event-only-field">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Mapa (Clique para marcar)</label>
+                                <div id="map" style="height: 300px; border-radius: 8px; border: 1px solid #ddd;"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-2 mt-4 event-only-field">
                                     <input type="checkbox" name="is_ticket_enabled" value="1" class="form-check-input" {{ old('is_ticket_enabled', $event->is_ticket_enabled) ? 'checked' : '' }}>
                                     <label class="form-check-label font-weight-bold" style="color:#007bff;"><i class="fas fa-qrcode mr-1"></i> Habilitar Validação de Entrada por QR Code</label>
                                     <small class="d-block text-muted">Quando ativo, o sistema criará um ingresso com QR Code e pontuará organizador e participante após validação.</small>
@@ -213,9 +220,6 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <label>Mapa (Clique para marcar)</label>
-                                <div id="map" style="height: 300px; border-radius: 8px; border: 1px solid #ddd;"></div>
                             </div>
                         </div>
 

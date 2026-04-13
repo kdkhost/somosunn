@@ -162,7 +162,7 @@
                         </div>
                         <div>
                             <label
-                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Título
+                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors" x-text="type === 'album' ? 'Título do Álbum' : 'Título do Evento'">Título
                                 do Evento</label>
                             <input type="text" name="title" value="{{ old('title', $event->title) }}" required
                                 class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
@@ -228,7 +228,7 @@
                     <div
                         class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
                         <label
-                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-4 transition-colors">Capa
+                            class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-4 transition-colors" x-text="type === 'album' ? 'Capa do Álbum' : 'Capa do Evento'">Capa
                             do Evento</label>
                         <div class="space-y-4" id="event-cover-upload-container">
                             <input type="hidden" name="remove_image" id="remove_image_input" value="0">
