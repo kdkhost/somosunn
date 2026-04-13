@@ -170,6 +170,9 @@
                                         <p class="text-sm text-gray-500">Data</p>
                                         <p class="text-lg font-bold text-gray-900">
                                             {{ $startDate->translatedFormat('d \d\e F \d\e Y') }}</p>
+                                        @if($endDate && !$startDate->isSameDay($endDate))
+                                            <p class="text-sm text-gray-500">até {{ $endDate->translatedFormat('d \d\e F \d\e Y') }}</p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -185,6 +188,24 @@
                                             {{ $startDate->format('H:i') }}
                                             @if($endDate) às {{ $endDate->format('H:i') }} @endif
                                         </p>
+                                        @if($endDate)
+                                            @php
+                                                $diffMinutes = $startDate->diffInMinutes($endDate);
+                                                $durationHours = intdiv($diffMinutes, 60);
+                                                $durationMins = $diffMinutes % 60;
+                                                $durationLabel = '';
+                                                if ($durationHours > 0) {
+                                                    $durationLabel .= $durationHours . 'h';
+                                                }
+                                                if ($durationMins > 0) {
+                                                    $durationLabel .= ($durationHours > 0 ? ' ' : '') . $durationMins . 'min';
+                                                }
+                                                if ($durationLabel === '') {
+                                                    $durationLabel = '0min';
+                                                }
+                                            @endphp
+                                            <p class="text-sm text-gray-500">Duração: {{ $durationLabel }}</p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -406,7 +427,7 @@
                         <i class="fas fa-hourglass-half text-3xl text-green-500 mb-3"></i>
                         <p class="text-2xl font-bold text-gray-900">
                             @if($endDate)
-                                {{ $startDate->diffInHours($endDate) }}h
+                                {{ $durationLabel ?? ($startDate->diffInHours($endDate) . 'h') }}
                             @else
                                 —
                             @endif

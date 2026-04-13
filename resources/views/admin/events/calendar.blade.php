@@ -394,12 +394,18 @@
                     <input type="hidden" id="event_latitude" name="latitude">
                     <input type="hidden" id="event_longitude" name="longitude">
                     <div class="modal-footer justify-content-between">
-                        <a href="#" id="modalEventEdit" class="btn btn-warning"><i class="fas fa-edit mr-1"></i> Editar</a>
-                        <a href="#" id="modalEventScanner" class="btn btn-primary d-none"><i class="fas fa-qrcode mr-1"></i>
-                            Ler Ingressos</a>
-                        <button type="button" class="btn btn-danger" id="modalEventDelete"><i class="fas fa-trash mr-1"></i>
-                            Excluir</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                        <div>
+                            <a href="#" id="modalEventEdit" class="btn btn-warning"><i class="fas fa-edit mr-1"></i> Editar</a>
+                            <a href="#" id="modalEventScanner" class="btn btn-primary d-none"><i class="fas fa-qrcode mr-1"></i>
+                                Ler Ingressos</a>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-success" id="modalEventSave"><i class="fas fa-save mr-1"></i>
+                                Salvar</button>
+                            <button type="button" class="btn btn-danger" id="modalEventDelete"><i class="fas fa-trash mr-1"></i>
+                                Excluir</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                        </div>
                     </div>
                 </form>
             </div>
