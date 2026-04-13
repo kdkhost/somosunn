@@ -539,6 +539,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::post('events/{event}/move', [\App\Http\Controllers\Panel\Admin\EventController::class, 'move'])->name('events.move');
         Route::get('events/list', [\App\Http\Controllers\Panel\Admin\EventController::class, 'list'])->name('events.list');
         Route::get('acervo', [\App\Http\Controllers\Panel\Admin\EventController::class, 'list'])->defaults('type', 'album')->name('events.acervo');
+        Route::get('acervo/create', [\App\Http\Controllers\Panel\Admin\EventController::class, 'create'])->defaults('type', 'album')->name('acervo.create');
         Route::get('events/{event}/scanner', [\App\Http\Controllers\Panel\EventScannerController::class, 'index'])->name('events.scanner');
         Route::post('events/{event}/toggle-published', [\App\Http\Controllers\Panel\Admin\EventController::class, 'togglePublished'])->name('events.toggle-published');
         Route::post('events/{event}/toggle-field', [\App\Http\Controllers\Panel\Admin\EventController::class, 'toggleField'])->name('events.toggle-field');
@@ -627,6 +628,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::get('events/feed', [\App\Http\Controllers\Admin\EventController::class, 'feed'])->name('events.feed');
     Route::get('events/list', [\App\Http\Controllers\Admin\EventController::class, 'list'])->name('events.list');
     Route::get('acervo', [\App\Http\Controllers\Admin\EventController::class, 'list'])->defaults('type', 'album')->name('events.acervo');
+    Route::get('acervo/create', [\App\Http\Controllers\Admin\EventController::class, 'create'])->defaults('type', 'album')->name('acervo.create');
     Route::post('events/calendar/settings', [\App\Http\Controllers\Admin\EventController::class, 'updateCalendarSettings'])->name('events.calendar.settings');
     Route::get('events/{event}/scanner', [\App\Http\Controllers\Admin\EventScannerController::class, 'index'])->name('events.scanner');
     Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Admin\EventScannerController::class, 'validateTicket'])->name('events.scanner.validate');

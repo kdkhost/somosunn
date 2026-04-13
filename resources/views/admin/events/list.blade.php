@@ -20,7 +20,7 @@
                         <i class="fas fa-qrcode mr-2"></i> Scanner Universal
                     </a>
                     @endif
-                    <a href="{{ route('admin.events.create', ['type' => $type ?? 'event']) }}"
+                    <a href="{{ (isset($type) && $type === 'album') ? route('admin.acervo.create') : route('admin.events.create') }}"
                         class="btn btn-primary shadow-sm hover:translate-y-[-2px] transition-all">
                         <i class="fas fa-plus mr-2"></i> Novo {{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}
                     </a>
@@ -215,7 +215,7 @@
                         <div class="text-center py-5 text-muted">
                             <i class="fas fa-folder-open fa-3x mb-3"></i>
                             <p>Nenhum registro encontrado.</p>
-                            <a href="{{ route('admin.events.create', ['type' => $type ?? 'event']) }}" class="btn btn-primary btn-sm">Criar meu primeiro registro</a>
+                            <a href="{{ isset($type) && $type === 'album' ? route('admin.acervo.create') : route('admin.events.create') }}" class="btn btn-primary btn-sm">Criar meu primeiro registro</a>
                         </div>
                     `
                 },

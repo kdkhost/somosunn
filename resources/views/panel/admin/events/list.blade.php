@@ -29,7 +29,7 @@
                     <span>Scanner Universal</span>
                 </a>
                 @endif
-                <a href="{{ route('panel.admin.events.create', ['type' => $type ?? 'event']) }}"
+                <a href="{{ (isset($type) && $type === 'album') ? route('panel.admin.acervo.create') : route('panel.admin.events.create') }}"
                     class="group inline-flex items-center gap-2.5 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-sm font-black transition-all duration-300 shadow-lg shadow-blue-200/50 dark:shadow-none hover:scale-105 active:scale-95">
                     <i class="fas fa-plus text-lg transition-transform group-hover:rotate-12"></i>
                     <span>Novo {{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}</span>
@@ -159,7 +159,7 @@
                                     </div>
                                     <h3 class="text-xl font-black text-slate-900 dark:text-white">Nenhum registro encontrado</h3>
                                     <p class="text-slate-500 dark:text-slate-400 mt-2 max-w-xs mx-auto">Comece criando um novo registro para visualizar aqui.</p>
-                                    <a href="{{ route('panel.admin.events.create', ['type' => $type ?? 'event']) }}" class="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-200">
+                                    <a href="{{ (isset($type) && $type === 'album') ? route('panel.admin.acervo.create') : route('panel.admin.events.create') }}" class="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-200">
                                         <i class="fas fa-plus"></i>
                                         Novo Registro
                                     </a>
