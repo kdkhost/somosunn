@@ -612,6 +612,11 @@
                                                 <i class="fas fa-video text-white fa-3x"></i>
                                             </div>
                                         @endif
+                                        @if($media->type === 'image')
+                                            <button type="button" onclick="setAsCover({{ $media->id }})" class="btn btn-primary btn-sm position-absolute" style="top: 5px; left: 5px;" title="Definir como Capa">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        @endif
                                         <button type="button" onclick="deleteAdminMedia({{ $media->id }})" class="btn btn-danger btn-sm position-absolute" style="top: 5px; right: 5px;">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -842,6 +847,11 @@ async function uploadAdminGallery(files) {
                                 <button type="button" onclick="deleteAdminMedia(${media.id})" class="btn btn-danger btn-sm position-absolute" style="top: 5px; right: 5px;">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                ${media.type === 'image' ? `
+                                <button type="button" onclick="setAsCover(${media.id})" class="btn btn-primary btn-sm position-absolute" style="top: 5px; left: 5px;" title="Definir como Capa">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                                ` : ''}
                             </div>
                         </div>
                     `);
@@ -908,6 +918,36 @@ async function deleteAdminMedia(id) {
             }
         } else {
             Swal.fire('Erro', data.message || 'Erro ao excluir mídia.', 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        Swal.fire('Erro', 'Ocorreu um erro na requisição.', 'error');
+    }
+}
+
+async function setAsCover(mediaId) {
+    try {
+        const response = await fetch('{{ route("admin.events.set-cover", $event) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ media_id: mediaId })
+        });
+
+        const data = await response.json();
+        if (response.ok && data.status === 'success') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Sucesso!',
+                text: data.message,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } else {
+            Swal.fire('Erro', data.message || 'Erro ao definir capa.', 'error');
         }
     } catch (e) {
         console.error(e);

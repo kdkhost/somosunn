@@ -225,7 +225,7 @@
 
                 <div class="space-y-6">
                     {{-- Cover Image --}}
-                    <div
+                    <div x-show="type === 'event'"
                         class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-300">
                         <label
                             class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-4 transition-colors" x-text="type === 'album' ? 'Capa do Álbum' : 'Capa do Evento'">Capa

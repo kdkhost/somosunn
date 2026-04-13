@@ -529,4 +529,31 @@ class EventController extends Controller
             'message' => 'Alteração salva com sucesso!'
         ]);
     }
+
+    /**
+     * Define uma imagem da galeria como capa do evento/álbum.
+     */
+    public function setCover(Request $request, Event $event)
+    {
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
+
+        $request->validate([
+            'media_id' => 'required|exists:event_media,id'
+        ]);
+
+        $media = \App\Models\EventMedia::where('event_id', $event->id)
+            ->where('id', $request->media_id)
+            ->where('type', 'image')
+            ->firstOrFail();
+
+        $event->update([
+            'image' => $media->file_path
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Capa do álbum atualizada com sucesso!'
+        ]);
+    }
 }

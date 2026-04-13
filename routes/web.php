@@ -543,6 +543,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::get('events/{event}/scanner', [\App\Http\Controllers\Panel\EventScannerController::class, 'index'])->name('events.scanner');
         Route::post('events/{event}/toggle-published', [\App\Http\Controllers\Panel\Admin\EventController::class, 'togglePublished'])->name('events.toggle-published');
         Route::post('events/{event}/toggle-field', [\App\Http\Controllers\Panel\Admin\EventController::class, 'toggleField'])->name('events.toggle-field');
+        Route::post('events/{event}/set-cover', [\App\Http\Controllers\Panel\Admin\EventController::class, 'setCover'])->name('events.set-cover');
         Route::resource('events', \App\Http\Controllers\Panel\Admin\EventController::class);
         Route::post('events/{event}/media', [\App\Http\Controllers\Panel\EventMediaController::class, 'store'])->name('events.media.store');
         Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Panel\EventMediaController::class, 'destroy'])->name('events.media.destroy');
@@ -633,6 +634,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::get('events/{event}/scanner', [\App\Http\Controllers\Admin\EventScannerController::class, 'index'])->name('events.scanner');
     Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Admin\EventScannerController::class, 'validateTicket'])->name('events.scanner.validate');
     Route::post('events/{event}/toggle-field', [\App\Http\Controllers\Admin\EventController::class, 'toggleField'])->name('events.toggle-field');
+    Route::post('events/{event}/set-cover', [\App\Http\Controllers\Admin\EventController::class, 'setCover'])->name('events.set-cover');
     Route::get('users/{user}/impersonate', [\App\Http\Controllers\Admin\ImpersonateController::class, 'impersonate'])->name('users.impersonate');
     Route::get('courses/available', [\App\Http\Controllers\Admin\CourseController::class, 'available'])->name('courses.available');
     Route::get('mentorships/available', [\App\Http\Controllers\Admin\MentorshipController::class, 'available'])->name('mentorships.available');
