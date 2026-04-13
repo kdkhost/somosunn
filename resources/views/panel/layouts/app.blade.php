@@ -973,37 +973,23 @@
                 window.initPanelScripts = function () {
                     window.initializePanelFileUploads(document);
 
-                    // Notificações Globais SweetAlert2 (Laravel Flash Messages)
+                    // Notificações Globais via Toastr (Laravel Flash Messages)
                     @if(session('success'))
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Sucesso!',
-                            text: "{{ session('success') }}",
-                            confirmButtonColor: '#3b82f6',
-                            timer: 4000,
-                            timerProgressBar: true,
-                            popup: 'rounded-[32px]'
-                        });
+                        if (typeof toastr !== 'undefined') {
+                            toastr.success("{{ session('success') }}");
+                        }
                     @endif
 
                     @if(session('error'))
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Ops!',
-                            text: "{{ session('error') }}",
-                            confirmButtonColor: '#ef4444',
-                            popup: 'rounded-[32px]'
-                        });
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error("{{ session('error') }}");
+                        }
                     @endif
 
                     @if(session('info'))
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'Informação',
-                            text: "{{ session('info') }}",
-                            confirmButtonColor: '#3b82f6',
-                            popup: 'rounded-[32px]'
-                        });
+                        if (typeof toastr !== 'undefined') {
+                            toastr.info("{{ session('info') }}");
+                        }
                     @endif
                 };
 
