@@ -49,7 +49,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($events as $event)
+                                @foreach($events as $event)
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
@@ -137,16 +137,7 @@
                                             </div>
                                         </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="{{ (isset($type) && $type === 'album') ? 4 : 6 }}" class="text-center py-5 text-muted">
-                                            <i class="fas fa-folder-open fa-3x mb-3"></i>
-                                            <p>Nenhum registro encontrado.</p>
-                                            <a href="{{ route('admin.events.create', ['type' => $type ?? 'event']) }}" class="btn btn-primary btn-sm">Criar
-                                                meu primeiro registro</a>
-                                        </td>
-                                    </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -219,7 +210,14 @@
                 pageLength: 15,
                 order: isAlbum ? [[0, 'asc']] : [[1, 'desc']],
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json'
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json',
+                    emptyTable: `
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-folder-open fa-3x mb-3"></i>
+                            <p>Nenhum registro encontrado.</p>
+                            <a href="{{ route('admin.events.create', ['type' => $type ?? 'event']) }}" class="btn btn-primary btn-sm">Criar meu primeiro registro</a>
+                        </div>
+                    `
                 },
                 columnDefs: [
                     { targets: -1, orderable: false, searchable: false, responsivePriority: 1 },
