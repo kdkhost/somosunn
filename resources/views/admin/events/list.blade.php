@@ -209,6 +209,10 @@
     <script>
         $(function () {
             const isAlbum = {{ (isset($type) && $type === 'album') ? 'true' : 'false' }};
+            const colCount = $('#admin-events-table thead th').length;
+            const bodyColCount = $('#admin-events-table tbody tr:first td').length;
+            console.log('DataTable Init: isAlbum=', isAlbum, 'thead cols:', colCount, 'tbody first tr cols:', bodyColCount);
+
             const table = $('#admin-events-table').DataTable({
                 responsive: true,
                 autoWidth: false,
