@@ -164,9 +164,6 @@ class Event extends Model
 
     public function currentPriceFor(?User $user = null): float
     {
-        if ($this->hasFirstLotPriority($user) && $this->batch_1_price !== null) {
-            return round((float) $this->batch_1_price, 2);
-        }
 
         $now = now();
 
@@ -198,9 +195,6 @@ class Event extends Model
 
     public function currentBatchLabelFor(?User $user = null): string
     {
-        if ($this->hasFirstLotPriority($user) && $this->batch_1_price !== null) {
-            return '1° Lote VIP';
-        }
 
         $now = now();
         if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline))) {
@@ -585,14 +579,7 @@ class Event extends Model
         return $this->hasMany(Certificate::class);
     }
 
-    private function hasFirstLotPriority(?User $user): bool
-    {
-        if (!$user) {
-            return false;
-        }
 
-        return method_exists($user, 'canAccessFeature') && $user->canAccessFeature('events.first_lot');
-    }
 
     public function resolveRouteBinding($value, $field = null)
     {
