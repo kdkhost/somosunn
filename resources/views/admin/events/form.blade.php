@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('page_title', $event->exists ? 'Editar Evento' : 'Novo Evento')
+@section('page_title', $event->exists ? ($event->type === 'album' ? 'Editar Álbum' : 'Editar Evento') : (request('type') === 'album' ? 'Novo Álbum' : 'Novo Evento'))
 
 @section('content')
     <div class="card card-primary card-outline card-tabs">
@@ -39,8 +39,8 @@
                                         <div class="form-group mb-0">
                                             <label>Tipo de Registro</label>
                                             <select name="type" id="registryType" class="form-control">
-                                                <option value="event" {{ old('type', $event->type ?? 'event') == 'event' ? 'selected' : '' }}>Evento Tradicional</option>
-                                                <option value="album" {{ old('type', $event->type ?? 'event') == 'album' ? 'selected' : '' }}>Álbum Privado / Galeria</option>
+                                                <option value="event" {{ old('type', $event->type ?? request('type', 'event')) == 'event' ? 'selected' : '' }}>Evento Tradicional</option>
+                                                <option value="album" {{ old('type', $event->type ?? request('type', 'event')) == 'album' ? 'selected' : '' }}>Álbum Privado / Galeria</option>
                                             </select>
                                             <small class="text-muted">Álbuns não aparecem no calendário e não possuem venda de ingressos.</small>
                                         </div>
