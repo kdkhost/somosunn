@@ -7,8 +7,8 @@
         <div class="card-header p-0 pt-1 border-bottom-0">
             <ul class="nav nav-tabs" id="event-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="general-tab" data-toggle="pill" href="#general" role="tab"
-                        aria-controls="general" aria-selected="true">Dados Gerais</a>
+                    <a class="nav-link {{ request('tab') !== 'gallery' ? 'active' : '' }}" id="general-tab" data-toggle="pill" href="#general" role="tab"
+                        aria-controls="general" aria-selected="{{ request('tab') !== 'gallery' ? 'true' : 'false' }}">Dados Gerais</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="cert-tab" data-toggle="pill" href="#certificate" role="tab"
@@ -16,8 +16,8 @@
                 </li>
                 @if($event->exists)
                 <li class="nav-item">
-                    <a class="nav-link" id="gallery-tab" data-toggle="pill" href="#gallery" role="tab"
-                        aria-controls="gallery" aria-selected="false">Galeria de Fotos</a>
+                    <a class="nav-link {{ request('tab') === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-toggle="pill" href="#gallery" role="tab"
+                        aria-controls="gallery" aria-selected="{{ request('tab') === 'gallery' ? 'true' : 'false' }}">Galeria de Fotos</a>
                 </li>
                 @endif
             </ul>
@@ -25,7 +25,7 @@
         <div class="card-body">
             <div class="tab-content" id="event-tabs-content">
                 <!-- TAB GERAL -->
-                <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+                <div class="tab-pane fade {{ request('tab') !== 'gallery' ? 'show active' : '' }}" id="general" role="tabpanel" aria-labelledby="general-tab">
                     <form method="POST" enctype="multipart/form-data"
                         action="{{ $event->exists ? route('admin.events.update', $event) : route('admin.events.store') }}">
                         @csrf
@@ -132,7 +132,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group mb-2">
+                        <div class="form-group mb-2 event-only-field">
                             <label>{{ (!isset($event) || $event->type !== 'album' ? (request('type') !== 'album' ? 'Imagem Principal (Capa do Evento)' : 'Imagem Principal (Capa do Álbum)') : 'Imagem Principal (Capa do Álbum)') }}</label>
                             <input type="hidden" name="remove_image" value="0">
                             <div class="upload-box" data-max-size="5242880"
@@ -543,7 +543,7 @@
 
                 <!-- TAB GALERIA -->
                 @if($event->exists)
-                <div class="tab-pane fade" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
+                <div class="tab-pane fade {{ request('tab') === 'gallery' ? 'show active' : '' }}" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
                     <div class="card shadow-sm border-0 mt-3 event-gallery-panel" style="overflow:hidden">
                         <div class="card-body">
                             <h4 class="mb-3">Galeria de Fotos e Vídeos do Evento</h4>
@@ -726,10 +726,10 @@
             $('#scannerRestrictionMode').on('change', syncScannerRestrictionFields);
             syncScannerRestrictionFields();
 
-        function syncRegistryType() {
+            function syncRegistryType() {
                 const type = $('#registryType').val();
                 if (type === 'album') {
-                    $('.event-only-field').hide().find('input, select, textarea').prop('disabled', true).prop('required', false);
+                    $('.event-only-field').hide().find('input, select, textarea').not('#registryType').prop('disabled', true).prop('required', false);
                     $('#cert-tab').parent().hide();
                 } else {
                     $('.event-only-field').show().find('input, select, textarea').prop('disabled', false).prop('required', function() {
