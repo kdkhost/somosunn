@@ -146,7 +146,7 @@
                     <div
                         class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6 transition-colors duration-300">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-slate-100 dark:border-slate-800">
-                            <div>
+                            <div x-show="type === 'event'">
                                 <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2">Tipo de Registro</label>
                                 <select name="type" x-model="type" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-slate-900 dark:text-white font-semibold">
                                     <option value="event">Evento Tradicional</option>
@@ -154,7 +154,7 @@
                                 </select>
                                 <p class="text-[10px] text-slate-500 mt-1">Álbuns não aparecem no calendário público.</p>
                             </div>
-                            <div>
+                            <div :class="type === 'album' ? 'md:col-span-2' : ''">
                                 <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2">URL Amigável (Slug)</label>
                                 <input type="text" name="slug" value="{{ old('slug', $event->slug) }}" placeholder="ex: onde-o-network-me-levou" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-slate-900 dark:text-white font-medium">
                                 <p class="text-[10px] text-slate-500 mt-1">Deixe em branco para gerar pelo título.</p>
@@ -232,7 +232,7 @@
                             do Evento</label>
                         <div class="space-y-4" id="event-cover-upload-container">
                             <input type="hidden" name="remove_image" id="remove_image_input" value="0">
-                            <input type="file" name="image" id="image_upload_input" accept="image/*" class="hidden" {{ $event->image ? '' : 'required' }}>
+                            <input type="file" name="image" id="image_upload_input" accept="image/*" class="hidden" :required="type !== 'album' && !'{{ $event->image }}'">
                             
                             <div id="drag-drop-area" class="group relative w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl p-8 transition-all duration-300 ease-out cursor-pointer overflow-hidden bg-slate-50 dark:bg-slate-900/50 hover:border-blue-500 hover:bg-blue-50/50 dark:hover:border-blue-500 dark:hover:bg-blue-900/20" style="min-height: 240px;">
                                 

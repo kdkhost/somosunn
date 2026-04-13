@@ -35,7 +35,7 @@
                             <div class="card-header"><h3 class="card-title font-weight-bold">Configurações do Registro</h3></div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 event-only-field">
                                         <div class="form-group mb-0">
                                             <label>Tipo de Registro</label>
                                             <select name="type" id="registryType" class="form-control">
@@ -45,7 +45,7 @@
                                             <small class="text-muted">Álbuns não aparecem no calendário e não possuem venda de ingressos.</small>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 event-col-expand">
                                         <div class="form-group mb-0">
                                             <label>URL Amigável (Slug)</label>
                                             <input name="slug" class="form-control" value="{{ old('slug', $event->slug) }}" placeholder="ex: onde-o-network-me-levou">
