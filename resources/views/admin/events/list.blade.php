@@ -139,7 +139,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-5 text-muted">
+                                        <td colspan="{{ (isset($type) && $type === 'album') ? 4 : 6 }}" class="text-center py-5 text-muted">
                                             <i class="fas fa-folder-open fa-3x mb-3"></i>
                                             <p>Nenhum registro encontrado.</p>
                                             <a href="{{ route('admin.events.create', ['type' => $type ?? 'event']) }}" class="btn btn-primary btn-sm">Criar
@@ -208,11 +208,12 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
     <script>
         $(function () {
+            const isAlbum = {{ (isset($type) && $type === 'album') ? 'true' : 'false' }};
             const table = $('#admin-events-table').DataTable({
                 responsive: true,
                 autoWidth: false,
                 pageLength: 15,
-                order: [[1, 'desc']],
+                order: isAlbum ? [[0, 'asc']] : [[1, 'desc']],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json'
                 },
