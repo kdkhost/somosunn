@@ -7,6 +7,7 @@ use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Event;
 use App\Models\Setting;
 use App\Services\WatermarkService;
+use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
