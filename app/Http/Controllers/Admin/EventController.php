@@ -244,11 +244,15 @@ class EventController extends Controller
 
         $event = Event::create($data);
 
+        $isAlbum = ($data['type'] ?? 'event') === 'album';
+        $redirectRoute = $isAlbum ? 'events.acervo' : 'admin.events.index';
+        $successMsg = $isAlbum ? 'Álbum criado com sucesso' : 'Evento criado com sucesso';
+
         if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
-            return redirect()->route('admin.events.index')->with('success', 'Evento criado com sucesso');
+            return redirect()->route($redirectRoute)->with('success', $successMsg);
         }
 
-        return response()->json(['status' => 'success', 'message' => 'Evento criado com sucesso', 'event' => $event]);
+        return response()->json(['status' => 'success', 'message' => $successMsg, 'event' => $event]);
     }
 
     public function update(Request $request, Event $event)
@@ -391,11 +395,15 @@ class EventController extends Controller
 
         $event->update($data);
 
+        $isAlbum = ($data['type'] ?? $event->type) === 'album';
+        $redirectRoute = $isAlbum ? 'events.acervo' : 'admin.events.index';
+        $successMsg = $isAlbum ? 'Álbum atualizado com sucesso' : 'Evento atualizado com sucesso';
+
         if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
-            return redirect()->route('admin.events.index')->with('success', 'Evento atualizado');
+            return redirect()->route($redirectRoute)->with('success', $successMsg);
         }
 
-        return response()->json(['status' => 'success', 'message' => 'Evento atualizado', 'event' => $event]);
+        return response()->json(['status' => 'success', 'message' => $successMsg, 'event' => $event]);
     }
 
     public function destroy(Event $event)
@@ -403,14 +411,18 @@ class EventController extends Controller
         $this->ensurePermission('events.delete');
         $this->ensureCanManage($event);
 
+        $isAlbum = $event->type === 'album';
+        $redirectRoute = $isAlbum ? 'events.acervo' : 'admin.events.index';
+        $successMsg = $isAlbum ? 'Álbum removido com sucesso' : 'Evento removido com sucesso';
+
         $this->deleteEventImageIfExists($event);
         $event->delete();
 
         if (!request()->ajax() && !request()->wantsJson() && !request()->expectsJson()) {
-            return redirect()->route('admin.events.index')->with('success', 'Evento removido');
+            return redirect()->route($redirectRoute)->with('success', $successMsg);
         }
 
-        return response()->json(['status' => 'success', 'message' => 'Evento removido']);
+        return response()->json(['status' => 'success', 'message' => $successMsg]);
     }
 
     public function updateCalendarSettings(Request $request)

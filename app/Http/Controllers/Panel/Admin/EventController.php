@@ -174,7 +174,11 @@ class EventController extends Controller
 
         Event::create($data);
 
-        return redirect()->route('panel.admin.events.index')->with('success', 'Evento criado com sucesso');
+        $isAlbum = ($data['type'] ?? 'event') === 'album';
+        $redirectRoute = $isAlbum ? 'events.acervo' : 'panel.admin.events.index';
+        $successMsg = $isAlbum ? 'Álbum criado com sucesso' : 'Evento criado com sucesso';
+
+        return redirect()->route($redirectRoute)->with('success', $successMsg);
     }
 
     public function update(Request $request, Event $event)
@@ -240,7 +244,11 @@ class EventController extends Controller
 
         $event->update($data);
 
-        return redirect()->route('panel.admin.events.index')->with('success', 'Evento atualizado');
+        $isAlbum = ($data['type'] ?? $event->type) === 'album';
+        $redirectRoute = $isAlbum ? 'events.acervo' : 'panel.admin.events.index';
+        $successMsg = $isAlbum ? 'Álbum atualizado com sucesso' : 'Evento atualizado com sucesso';
+
+        return redirect()->route($redirectRoute)->with('success', $successMsg);
     }
 
     public function togglePublished(Event $event)
