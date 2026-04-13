@@ -246,7 +246,7 @@ class EventController extends Controller
         $event = Event::create($data);
 
         $isAlbum = ($data['type'] ?? 'event') === 'album';
-        $redirectRoute = $isAlbum ? 'events.acervo' : 'admin.events.index';
+        $redirectRoute = $isAlbum ? 'admin.events.acervo' : 'admin.events.index';
         $successMsg = $isAlbum ? 'Álbum criado com sucesso' : 'Evento criado com sucesso';
 
         if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
@@ -397,7 +397,7 @@ class EventController extends Controller
         $event->update($data);
 
         $isAlbum = ($data['type'] ?? $event->type) === 'album';
-        $redirectRoute = $isAlbum ? 'events.acervo' : 'admin.events.index';
+        $redirectRoute = $isAlbum ? 'admin.events.acervo' : 'admin.events.index';
         $successMsg = $isAlbum ? 'Álbum atualizado com sucesso' : 'Evento atualizado com sucesso';
 
         if (!$request->ajax() && !$request->wantsJson() && !$request->expectsJson()) {
@@ -413,8 +413,8 @@ class EventController extends Controller
         $this->ensureCanManage($event);
 
         $isAlbum = $event->type === 'album';
-        $redirectRoute = $isAlbum ? 'events.acervo' : 'admin.events.index';
-        $successMsg = $isAlbum ? 'Álbum removido com sucesso' : 'Evento removido com sucesso';
+        $redirectRoute = $isAlbum ? 'admin.events.acervo' : 'admin.events.index';
+        $successMsg = $isAlbum ? 'Álbum apagado com sucesso' : 'Evento removido com sucesso';
 
         $this->deleteEventImageIfExists($event);
         $event->delete();

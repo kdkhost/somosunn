@@ -175,7 +175,7 @@ class EventController extends Controller
         Event::create($data);
 
         $isAlbum = ($data['type'] ?? 'event') === 'album';
-        $redirectRoute = $isAlbum ? 'events.acervo' : 'panel.admin.events.index';
+        $redirectRoute = $isAlbum ? 'panel.admin.events.acervo' : 'panel.admin.events.index';
         $successMsg = $isAlbum ? 'Álbum criado com sucesso' : 'Evento criado com sucesso';
 
         return redirect()->route($redirectRoute)->with('success', $successMsg);
@@ -245,7 +245,7 @@ class EventController extends Controller
         $event->update($data);
 
         $isAlbum = ($data['type'] ?? $event->type) === 'album';
-        $redirectRoute = $isAlbum ? 'events.acervo' : 'panel.admin.events.index';
+        $redirectRoute = $isAlbum ? 'panel.admin.events.acervo' : 'panel.admin.events.index';
         $successMsg = $isAlbum ? 'Álbum atualizado com sucesso' : 'Evento atualizado com sucesso';
 
         return redirect()->route($redirectRoute)->with('success', $successMsg);
