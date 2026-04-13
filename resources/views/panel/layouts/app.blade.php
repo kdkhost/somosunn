@@ -973,24 +973,7 @@
                 window.initPanelScripts = function () {
                     window.initializePanelFileUploads(document);
 
-                    // Notificações Globais via Toastr (Laravel Flash Messages)
-                    @if(session('success'))
-                        if (typeof toastr !== 'undefined') {
-                            toastr.success("{{ session('success') }}");
-                        }
-                    @endif
-
-                    @if(session('error'))
-                        if (typeof toastr !== 'undefined') {
-                            toastr.error("{{ session('error') }}");
-                        }
-                    @endif
-
-                    @if(session('info'))
-                        if (typeof toastr !== 'undefined') {
-                            toastr.info("{{ session('info') }}");
-                        }
-                    @endif
+                    // Flash messages já são exibidas pelo layout pai (layouts/app.blade.php)
                 };
 
                 // Executar inicialização normal
