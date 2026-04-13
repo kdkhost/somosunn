@@ -199,7 +199,7 @@ class Event extends Model
     public function currentBatchLabelFor(?User $user = null): string
     {
         if ($this->hasFirstLotPriority($user) && $this->batch_1_price !== null) {
-            return '1° Lote';
+            return '1° Lote VIP';
         }
 
         $now = now();
@@ -591,9 +591,6 @@ class Event extends Model
             return false;
         }
 
-        if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
-            return true;
-        }
         return method_exists($user, 'canAccessFeature') && $user->canAccessFeature('events.first_lot');
     }
 
