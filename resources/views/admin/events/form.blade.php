@@ -897,7 +897,7 @@ async function deleteAdminMedia(id) {
     if (!confirmed) return;
 
     try {
-        const response = await fetch(`/admin/events/{{ $event->id }}/media/${id}`, {
+        const response = await fetch(`{{ route('admin.events.media.destroy', [$event, 'MEDIA_ID']) }}`.replace('MEDIA_ID', id), {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',

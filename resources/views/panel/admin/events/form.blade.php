@@ -9,7 +9,7 @@
 @section('panel_content')
     <div
         x-data="{
-            tab: 'general',
+            tab: '{{ request('tab', 'general') }}',
             type: '{{ old('type', $event->type ?? 'event') }}',
             certificateEnabled: {{ old('is_certificate_enabled', $event->is_certificate_enabled) ? 'true' : 'false' }},
             ticketEnabled: {{ old('is_ticket_enabled', $event->is_ticket_enabled) ? 'true' : 'false' }},

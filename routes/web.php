@@ -635,6 +635,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Admin\EventScannerController::class, 'validateTicket'])->name('events.scanner.validate');
     Route::post('events/{event}/toggle-field', [\App\Http\Controllers\Admin\EventController::class, 'toggleField'])->name('events.toggle-field');
     Route::post('events/{event}/set-cover', [\App\Http\Controllers\Admin\EventController::class, 'setCover'])->name('events.set-cover');
+    Route::post('events/{event}/media', [\App\Http\Controllers\Admin\EventMediaController::class, 'store'])->name('events.media.store');
+    Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Admin\EventMediaController::class, 'destroy'])->name('events.media.destroy');
     Route::get('users/{user}/impersonate', [\App\Http\Controllers\Admin\ImpersonateController::class, 'impersonate'])->name('users.impersonate');
     Route::get('courses/available', [\App\Http\Controllers\Admin\CourseController::class, 'available'])->name('courses.available');
     Route::get('mentorships/available', [\App\Http\Controllers\Admin\MentorshipController::class, 'available'])->name('mentorships.available');
