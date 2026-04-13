@@ -712,6 +712,11 @@
                             ]
                         });
                     }
+                    // Sincroniza o conteúdo do textarea no editor Summernote
+                    var existingContent = $desc.val() || '';
+                    if (existingContent) {
+                        $desc.summernote('code', existingContent);
+                    }
                 });
 
                 $(document).on('hidden.bs.modal', '#eventModal', function () {
