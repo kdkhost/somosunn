@@ -3,21 +3,45 @@
 @section('page_title', $event->exists ? ($event->type === 'album' ? 'Editar Álbum' : 'Editar Evento') : (request('type') === 'album' ? 'Novo Álbum' : 'Novo Evento'))
 
 @section('content')
+    <style>
+        #legacy-general:not(.active), #legacy-certificate:not(.active), #legacy-gallery:not(.active) { 
+            display: none !important; 
+        }
+    </style>
+    @push('scripts')
+    <script>
+        $(function () {
+            // Se há ?tab= na URL, forçar a tab correta e ignorar o localStorage
+            var urlTab = new URLSearchParams(location.search).get('tab');
+            if (urlTab) {
+                var $target = $('a[data-toggle="tab"][href="#legacy-' + urlTab + '"]');
+                if ($target.length) {
+                    // Remove active de todas as tabs/panes primeiro
+                    $('#event-tabs .nav-link').removeClass('active');
+                    $('#event-tabs-content .tab-pane').removeClass('show active');
+                    // Ativa a correta
+                    $target.addClass('active');
+                    $('#legacy-' + urlTab).addClass('show active');
+                }
+            }
+        });
+    </script>
+    @endpush
     <div class="card card-primary card-outline card-tabs">
         <div class="card-header p-0 pt-1 border-bottom-0">
             <ul class="nav nav-tabs" id="event-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link {{ request('tab') !== 'gallery' ? 'active' : '' }}" id="general-tab" data-toggle="pill" href="#general" role="tab"
-                        aria-controls="general" aria-selected="{{ request('tab') !== 'gallery' ? 'true' : 'false' }}">Dados Gerais</a>
+                    <a class="nav-link {{ request('tab') !== 'gallery' ? 'active' : '' }}" id="general-tab" data-toggle="tab" href="#legacy-general" role="tab"
+                        aria-controls="legacy-general" aria-selected="{{ request('tab') !== 'gallery' ? 'true' : 'false' }}">Dados Gerais</a>
                 </li>
                 <li class="nav-item event-only-field">
-                    <a class="nav-link" id="cert-tab" data-toggle="pill" href="#certificate" role="tab"
-                        aria-controls="certificate" aria-selected="false">Certificado</a>
+                    <a class="nav-link" id="cert-tab" data-toggle="tab" href="#legacy-certificate" role="tab"
+                        aria-controls="legacy-certificate" aria-selected="false">Certificado</a>
                 </li>
                 @if($event->exists)
                 <li class="nav-item">
-                    <a class="nav-link {{ request('tab') === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-toggle="pill" href="#gallery" role="tab"
-                        aria-controls="gallery" aria-selected="{{ request('tab') === 'gallery' ? 'true' : 'false' }}">Galeria de Fotos</a>
+                    <a class="nav-link {{ request('tab') === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-toggle="tab" href="#legacy-gallery" role="tab"
+                        aria-controls="legacy-gallery" aria-selected="{{ request('tab') === 'gallery' ? 'true' : 'false' }}">Galeria de Fotos</a>
                 </li>
                 @endif
             </ul>
@@ -25,8 +49,8 @@
         <div class="card-body">
             <div class="tab-content" id="event-tabs-content">
                 <!-- TAB GERAL -->
-                <div class="tab-pane fade {{ request('tab') !== 'gallery' ? 'show active' : '' }}" id="general" role="tabpanel" aria-labelledby="general-tab">
-                    <form method="POST" enctype="multipart/form-data"
+                <div class="tab-pane {{ request('tab') !== 'gallery' ? 'show active' : '' }}" id="legacy-general" role="tabpanel" aria-labelledby="general-tab">
+                    <form method="POST" enctype="multipart/form-data" autocomplete="off"
                         action="{{ $event->exists ? route('admin.events.update', $event) : route('admin.events.store') }}">
                         @csrf
                         @if($event->exists) @method('PUT') @endif
@@ -219,16 +243,13 @@
                                         <option value="somos_unicas" {{ old('visibility', $event->visibility ?? 'ambos') == 'somos_unicas' ? 'selected' : '' }} style="color: #ec4899; font-weight: bold;">Somente Somos Únicas</option>
                                     </select>
                                 </div>
-                            </div>
-                            </div>
-                        </div>
 
                         <button class="btn btn-primary mt-3">Salvar</button>
                     </form>
                 </div>
 
                 <!-- TAB CERTIFICADO -->
-                <div class="tab-pane fade event-only-field" id="certificate" role="tabpanel" aria-labelledby="cert-tab">
+                <div class="tab-pane event-only-field" id="legacy-certificate" role="tabpanel" aria-labelledby="cert-tab">
                     @if(!$event->exists)
                         <div class="alert alert-info border-0 shadow-sm">
                             <i class="fas fa-info-circle mr-2"></i> Você poderá configurar o certificado após salvar o evento
@@ -543,7 +564,7 @@
 
                 <!-- TAB GALERIA -->
                 @if($event->exists)
-                <div class="tab-pane fade {{ request('tab') === 'gallery' ? 'show active' : '' }}" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
+                <div class="tab-pane {{ request('tab') === 'gallery' ? 'show active' : '' }}" id="legacy-gallery" role="tabpanel" aria-labelledby="gallery-tab">
                     <div class="card shadow-sm border-0 mt-3 event-gallery-panel" style="overflow:hidden">
                         <div class="card-body">
                             <h4 class="mb-3">Galeria de Fotos e Vídeos do Evento</h4>
@@ -557,7 +578,7 @@
                                         As imagens ficam em <code>storage/app/public/events/{{ $event->id }}/gallery</code> e os videos em <code>storage/app/public/events/{{ $event->id }}/gallery/videos</code>.
                                     </small>
                                 </div>
-                                <a href="{{ route('admin.gallery.index', ['event_id' => $event->id]) }}"
+                                <a href="{{ route('admin.gallery.index', ['event_id' => $event->id]) }}?tab=gallery"
                                     class="btn event-gallery-toolbar__action rounded-pill px-4 py-2 font-weight-bold">
                                     <i class="fas fa-images mr-2"></i> Abrir galeria completa do evento
                                 </a>
@@ -752,6 +773,29 @@
             }
             $('#registryType').on('change', syncRegistryType);
             syncRegistryType();
+
+            // Reforço drástico para o comportamento das abas do Bootstrap 4
+            $('a[data-toggle="tab"]').on('shown.bs.tab click', function (e) {
+                const target = $(this).attr('href');
+                if(!target || !target.startsWith('#legacy-')) return;
+                
+                // Forçar remoção de classes de todas as abas
+                $('.tab-pane').removeClass('show active').css('display', 'none');
+                
+                // Ativar apenas a selecionada
+                $(target).addClass('show active').css('display', 'block');
+                
+                // Sincronizar URL para manter estado em recarregamentos
+                const url = new URL(window.location);
+                url.searchParams.set('tab', target.replace('#legacy-', ''));
+                window.history.replaceState({}, '', url);
+            });
+            
+            // Ativação inicial baseada na URL
+            const initialTab = new URLSearchParams(window.location.search).get('tab');
+            if (initialTab && $('#legacy-' + initialTab).length) {
+                $('[href="#legacy-' + initialTab + '"]').tab('show');
+            }
         });
     </script>
 @endpush

@@ -1721,6 +1721,8 @@
         });
 
         function restoreActiveTab() {
+            // Não restaurar do localStorage se a URL já define a tab via ?tab=
+            if (new URLSearchParams(location.search).get('tab')) return;
             const savedTab = localStorage.getItem(tabKey);
             if (savedTab) {
                 const $tab = $('a[href="' + savedTab + '"]');
