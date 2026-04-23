@@ -6,11 +6,15 @@
 @endsection
 
 @section('content')
+    @php
+        $isPanelAdmin = request()->is('painel/admin/*');
+        $routePrefix = $isPanelAdmin ? 'panel.admin' : 'admin';
+    @endphp
     <div class="card">
         <div class="card-body">
             <div class="d-flex justify-content-between mb-3">
                 <h3 class="m-0">Modelos de E-mail</h3>
-                <a href="{{ route('admin.mailtemplates.create') }}" class="btn btn-primary">Novo Modelo</a>
+                <a href="{{ route($routePrefix . '.mailtemplates.create') }}" class="btn btn-primary">Novo Modelo</a>
             </div>
 
             {{-- Toastr global --}}
@@ -35,10 +39,10 @@
                             <td>{{ $t->subject }}</td>
                             <td>{{ $t->is_active ? 'Sim' : 'Não' }}</td>
                             <td>
-                                <a href="{{ route('admin.mailtemplates.edit', $t) }}"
+                                <a href="{{ route($routePrefix . '.mailtemplates.edit', $t) }}"
                                     class="btn btn-sm btn-secondary">Editar</a>
                                 <a href="#" onclick="preview({{ $t->id }})" class="btn btn-sm btn-info">Pré-visualizar</a>
-                                <form action="{{ route('admin.mailtemplates.destroy', $t) }}" method="POST"
+                                <form action="{{ route($routePrefix . '.mailtemplates.destroy', $t) }}" method="POST"
                                     style="display:inline">
                                     @csrf
                                     @method('DELETE')
@@ -73,11 +77,19 @@
     </div>
 
     <script>
+        // Detectar qual painel está sendo usado pela URL atual
+        const isPanelAdmin = window.location.pathname.startsWith('/painel/admin');
+        const routePrefix = isPanelAdmin ? 'panel.admin' : 'admin';
+        
         // Debug: verificar qual URL está sendo gerada
-        console.log('Preview route template:', '{{ route("admin.mailtemplates.preview", ":id") }}');
+        const previewRouteTemplate = isPanelAdmin 
+            ? '{{ route("panel.admin.mailtemplates.preview", ":id") }}'
+            : '{{ route("admin.mailtemplates.preview", ":id") }}';
+        console.log('Using route prefix:', routePrefix);
+        console.log('Preview route template:', previewRouteTemplate);
         
         function preview(id) {
-            const previewUrl = '{{ route("admin.mailtemplates.preview", ":id") }}'.replace(':id', id);
+            const previewUrl = previewRouteTemplate.replace(':id', id);
             console.log('Calling preview URL:', previewUrl);
             
             fetch(previewUrl)
@@ -108,7 +120,10 @@
                 return;
             }
             
-            const sendUrl = '{{ route("admin.mailtemplates.sendpreview", ":id") }}'.replace(':id', window.previewId);
+            const sendRouteTemplate = isPanelAdmin
+                ? '{{ route("panel.admin.mailtemplates.sendpreview", ":id") }}'
+                : '{{ route("admin.mailtemplates.sendpreview", ":id") }}';
+            const sendUrl = sendRouteTemplate.replace(':id', window.previewId);
             
             Swal.fire({ title: 'Enviando...', text: 'Aguarde', icon: 'info', showConfirmButton: false });
             

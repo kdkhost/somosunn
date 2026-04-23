@@ -574,10 +574,17 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::get('ranking', [\App\Http\Controllers\Panel\Admin\RankingController::class, 'index'])->name('ranking.index');
         Route::post('quick-scanner/validate', [\App\Http\Controllers\Admin\QuickScannerController::class, 'validateTicket'])->name('quick-scanner.validate');
 
-        // Mail Templates (Tailwind)
-        Route::get('mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
-        Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
-        Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class);
+        // Mail Templates (Tailwind) - Panel Admin
+        Route::get('mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('panel.admin.mailtemplates.preview');
+        Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('panel.admin.mailtemplates.sendpreview');
+        Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class)->names([
+            'index' => 'panel.admin.mailtemplates.index',
+            'create' => 'panel.admin.mailtemplates.create',
+            'store' => 'panel.admin.mailtemplates.store',
+            'edit' => 'panel.admin.mailtemplates.edit',
+            'update' => 'panel.admin.mailtemplates.update',
+            'destroy' => 'panel.admin.mailtemplates.destroy',
+        ]);
     });
 });
 
