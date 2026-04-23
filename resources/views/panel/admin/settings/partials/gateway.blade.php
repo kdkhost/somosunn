@@ -458,6 +458,204 @@
 
 </div>{{-- /space-y-6 wrapper --}}
 
+{{-- ============================================================
+     SEÇÃO SUMUP
+     ============================================================ --}}
+<div class="mt-8">
+    <div class="relative overflow-hidden rounded-2xl mb-6"
+         style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+        <div class="absolute inset-0 opacity-[0.07]"
+             style="background-image: radial-gradient(circle at 20% 50%, #fff 1px, transparent 1px); background-size: 40px 40px;"></div>
+        <div class="relative flex items-start justify-between p-6 gap-4 flex-wrap">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0 border border-white/20">
+                    <i class="fas fa-credit-card text-white text-2xl"></i>
+                </div>
+                <div>
+                    <p class="text-blue-200 text-xs font-bold uppercase tracking-widest mb-0.5">Gateway de Pagamento</p>
+                    <h2 class="text-white text-2xl font-black leading-tight">SumUp</h2>
+                    <p class="text-blue-200 text-xs mt-1">Checkout integrado &bull; Cartão de crédito &bull; PIX</p>
+                </div>
+            </div>
+            <div class="flex flex-col items-end gap-2 pt-1">
+                <label class="relative inline-flex items-center cursor-pointer gap-2 mt-1">
+                    <span class="text-blue-200 text-xs font-semibold">Ativo</span>
+                    <input type="hidden" name="sumup_enabled" value="0">
+                    <input type="checkbox" class="sr-only peer" name="sumup_enabled" value="1"
+                        onchange="toggleSetting('sumup_enabled', this.checked)"
+                        {{ ($settings['sumup_enabled'] ?? 0) ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer border border-white/30
+                                 peer-checked:after:translate-x-full peer-checked:after:border-white
+                                 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white
+                                 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
+                                 after:transition-all peer-checked:bg-emerald-500 relative"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    {{-- Credenciais SumUp --}}
+    <div class="rounded-2xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden mb-4">
+        <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+            <i class="fas fa-key text-slate-500 text-xs"></i>
+            <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Credenciais da API SumUp</span>
+            <a href="https://developer.sumup.com/docs/authorization" target="_blank"
+               class="ml-auto text-[10px] text-blue-500 hover:underline flex items-center gap-1">
+                <i class="fas fa-external-link-alt text-[8px]"></i> Obter credenciais
+            </a>
+        </div>
+        <div class="p-4 bg-white dark:bg-slate-900 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">API Key</label>
+                <div class="relative">
+                    <input type="password" name="sumup_api_key" id="sumup_api_key"
+                        value="{{ $settings['sumup_api_key'] ?? '' }}"
+                        placeholder="sup_sk_••••••••••••••••••••••••••••••••"
+                        class="w-full px-4 py-3 pr-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+                    <button type="button" onclick="toggleReveal('sumup_api_key', this)"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                        <i class="fas fa-eye text-sm"></i>
+                    </button>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">Personal Access Token ou OAuth Bearer Token</p>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Merchant Code</label>
+                <input type="text" name="sumup_merchant_code"
+                    value="{{ $settings['sumup_merchant_code'] ?? '' }}"
+                    placeholder="MXXXXXXXX"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+                <p class="text-[10px] text-slate-400 mt-1.5">Encontrado em: SumUp Dashboard → Perfil</p>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Client ID (OAuth)</label>
+                <input type="text" name="sumup_client_id"
+                    value="{{ $settings['sumup_client_id'] ?? '' }}"
+                    placeholder="com.sumup.app.xxxxxxxx"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Client Secret (OAuth)</label>
+                <div class="relative">
+                    <input type="password" name="sumup_client_secret" id="sumup_client_secret"
+                        value="{{ $settings['sumup_client_secret'] ?? '' }}"
+                        placeholder="••••••••••••••••••••••••••••••••"
+                        class="w-full px-4 py-3 pr-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+                    <button type="button" onclick="toggleReveal('sumup_client_secret', this)"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                        <i class="fas fa-eye text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Webhook Secret (HMAC)</label>
+                <div class="relative">
+                    <input type="password" name="sumup_webhook_secret" id="sumup_webhook_secret"
+                        value="{{ $settings['sumup_webhook_secret'] ?? '' }}"
+                        placeholder="••••••••••••••••••••••••••••••••"
+                        class="w-full px-4 py-3 pr-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+                    <button type="button" onclick="toggleReveal('sumup_webhook_secret', this)"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                        <i class="fas fa-eye text-sm"></i>
+                    </button>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">Usado para validar assinatura dos webhooks recebidos</p>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Ambiente</label>
+                <select name="sumup_env"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                    <option value="sandbox"    {{ ($settings['sumup_env'] ?? 'sandbox') === 'sandbox'    ? 'selected' : '' }}>Sandbox (testes)</option>
+                    <option value="production" {{ ($settings['sumup_env'] ?? '') === 'production' ? 'selected' : '' }}>Produção (real)</option>
+                </select>
+            </div>
+        </div>
+        {{-- Botão de teste --}}
+        <div class="px-4 pb-4 bg-white dark:bg-slate-900">
+            <button type="button" onclick="testSumUpConnection()" id="btn-test-sumup"
+                class="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-bold text-sm transition-all
+                       bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white shadow-lg active:scale-[0.98]">
+                <i class="fas fa-plug"></i>
+                Testar Conexão com SumUp
+            </button>
+        </div>
+    </div>
+
+    {{-- Taxas SumUp --}}
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-4">
+        <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+            <i class="fas fa-percent text-slate-500 text-xs"></i>
+            <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Taxas SumUp</span>
+        </div>
+        <div class="p-4 bg-white dark:bg-slate-900 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Taxa Percentual (%)</label>
+                <div class="relative">
+                    <input type="number" step="0.01" name="sumup_fee_percentage"
+                        value="{{ $settings['sumup_fee_percentage'] ?? '2.75' }}"
+                        class="w-full px-4 py-3 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                    <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">%</span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Taxa Fixa (R$)</label>
+                <div class="relative">
+                    <input type="number" step="0.01" name="sumup_fee_fixed"
+                        value="{{ $settings['sumup_fee_fixed'] ?? '0.00' }}"
+                        class="w-full px-4 py-3 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                    <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">R$</span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Repassar Taxa ao Comprador</label>
+                <select name="sumup_pass_fee"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                    <option value="0" {{ ($settings['sumup_pass_fee'] ?? 0) == 0 ? 'selected' : '' }}>Não — plataforma absorve</option>
+                    <option value="1" {{ ($settings['sumup_pass_fee'] ?? 0) == 1 ? 'selected' : '' }}>Sim — comprador paga</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    {{-- Métodos SumUp --}}
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+            <i class="fas fa-credit-card text-slate-500 text-xs"></i>
+            <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Métodos de Pagamento SumUp</span>
+        </div>
+        <div class="p-4 bg-white dark:bg-slate-900 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            @php
+                $sumupMethods = [
+                    ['name' => 'sumup_method_card', 'label' => 'Cartão de Crédito', 'desc' => 'Via SumUp.js (tokenizado)', 'icon' => 'fa-credit-card', 'color' => 'blue', 'default' => 1],
+                    ['name' => 'sumup_method_pix',  'label' => 'PIX',               'desc' => 'QR Code inline',           'icon' => 'fa-pix',         'color' => 'teal', 'default' => 1, 'brand' => true],
+                ];
+            @endphp
+            @foreach($sumupMethods as $m)
+                @php $checked = ($settings[$m['name']] ?? $m['default']); @endphp
+                <label for="sumup_method_{{ $m['name'] }}"
+                    class="flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all select-none
+                           {{ $checked ? 'border-' . $m['color'] . '-400 bg-' . $m['color'] . '-50 dark:bg-' . $m['color'] . '-900/15 dark:border-' . $m['color'] . '-600/50' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900' }}">
+                    <input type="hidden" name="{{ $m['name'] }}" value="0">
+                    <input type="checkbox" id="sumup_method_{{ $m['name'] }}" class="sr-only method-cb" name="{{ $m['name'] }}" value="1"
+                        data-color="{{ $m['color'] }}" onchange="onMethodToggle(this)" {{ $checked ? 'checked' : '' }}>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center {{ $checked ? 'bg-' . $m['color'] . '-100 dark:bg-' . $m['color'] . '-800/30' : 'bg-slate-100 dark:bg-slate-800' }}">
+                        <i class="{{ !empty($m['brand']) ? 'fa-brands' : 'fas' }} {{ $m['icon'] }} text-lg {{ $checked ? 'text-' . $m['color'] . '-600 dark:text-' . $m['color'] . '-400' : 'text-slate-400' }}"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-black text-sm {{ $checked ? 'text-' . $m['color'] . '-800 dark:text-' . $m['color'] . '-300' : 'text-slate-700 dark:text-slate-300' }}">{{ $m['label'] }}</p>
+                        <p class="text-xs {{ $checked ? 'text-' . $m['color'] . '-500' : 'text-slate-400' }}">{{ $m['desc'] }}</p>
+                    </div>
+                    <span class="method-status-badge px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
+                                 {{ $checked ? 'bg-' . $m['color'] . '-100 dark:bg-' . $m['color'] . '-900/30 text-' . $m['color'] . '-700 dark:text-' . $m['color'] . '-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400' }}">
+                        {{ $checked ? 'Ativo' : 'Off' }}
+                    </span>
+                </label>
+            @endforeach
+        </div>
+    </div>
+</div>
+{{-- /SEÇÃO SUMUP --}}
+
 @push('scripts')
     <script>
         /* ───────── TABS ───────── */
@@ -617,6 +815,44 @@
                     btn.innerHTML = orig;
                 })
                 .finally(() => { btn.disabled = false; });
+            };
+
+            /* ───────── TEST SUMUP CONNECTION ───────── */
+            window.testSumUpConnection = function () {
+                const btn   = document.getElementById('btn-test-sumup');
+                const orig  = btn.innerHTML;
+                const token = document.querySelector('input[name="sumup_api_key"]').value;
+
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Testando conexão...';
+
+                fetch('{{ route("panel.admin.settings.test_gateway") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ gateway: 'sumup', access_token: token, env: 'production' })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true });
+                    if (data.success) {
+                        Toast.fire({ icon: 'success', title: data.message });
+                        btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Conexão OK';
+                        setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 3000);
+                    } else {
+                        Toast.fire({ icon: 'error', title: data.message });
+                        btn.innerHTML = '<i class="fas fa-times-circle mr-2"></i> Falhou';
+                        setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 4000);
+                    }
+                })
+                .catch(() => {
+                    Swal.fire({ icon: 'error', title: 'Erro', text: 'Falha na requisição.' });
+                    btn.innerHTML = orig;
+                    btn.disabled = false;
+                });
             };
         });
     </script>

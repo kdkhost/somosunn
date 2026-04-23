@@ -282,7 +282,6 @@ class SumUpService
     {
         return (string) (Setting::get('sumup_merchant_code') ?: config('payments.sumup.merchant_code', ''));
     }
-
     private function buildWebhookUrl(int $orderId, string $token): string
     {
         return url("/webhook/sumup/{$orderId}/{$token}");

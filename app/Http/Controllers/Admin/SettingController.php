@@ -315,6 +315,10 @@ class SettingController extends Controller
                 'mercadopago_method_credit_card',
                 'mercadopago_method_pix',
                 'mercadopago_method_ticket',
+                'sumup_enabled',
+                'sumup_method_card',
+                'sumup_method_pix',
+                'sumup_pass_fee',
             ],
             'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled', 'marketplace_events_popup_enabled'],
             'social' => [
@@ -689,6 +693,30 @@ class SettingController extends Controller
             }
 
             $mpAccount->save();
+        }
+
+        // Sincronizar credenciais SumUp com gateway_account (mesmo padrão do MercadoPago)
+        if ($currentGroup === 'gateway') {
+            $userId = Auth::id();
+
+            $sumupApiKey      = $data['sumup_api_key'] ?? null;
+            $sumupMerchantCode = $data['sumup_merchant_code'] ?? null;
+
+            $sumupAccount = \App\Models\GatewayAccount::firstOrNew(['user_id' => $userId, 'provider' => 'sumup']);
+
+            if (!empty($sumupApiKey))
+                $sumupAccount->access_token = $sumupApiKey;
+
+            $extra = $sumupAccount->extra ?? [];
+            if (!empty($sumupMerchantCode))
+                $extra['merchant_code'] = $sumupMerchantCode;
+            $sumupAccount->extra = $extra;
+
+            if ($sumupAccount->access_token) {
+                $sumupAccount->enabled = true;
+            }
+
+            $sumupAccount->save();
         }
 
         try {
@@ -1115,11 +1143,11 @@ class SettingController extends Controller
     {
         try {
             $data = $request->validate([
-                'gateway' => 'required|in:mercadopago',
-                'env' => 'required|in:sandbox,production',
+                'gateway'      => 'required|in:mercadopago,sumup',
+                'env'          => 'nullable|in:sandbox,production',
                 'access_token' => 'nullable|string',
-                'token' => 'nullable|string',
-                'email' => 'nullable|email'
+                'token'        => 'nullable|string',
+                'email'        => 'nullable|email',
             ]);
 
             $success = false;
@@ -1131,19 +1159,39 @@ class SettingController extends Controller
                     throw new \Exception('Access Token não informado.');
                 }
 
-                // Teste MP: Get Stores ou User Info
                 $response = Http::withToken($token)->get('https://api.mercadopago.com/users/me');
 
                 if ($response->successful()) {
-                    $json = $response->json();
+                    $json     = $response->json();
                     $userName = $json['first_name'] . ' ' . $json['last_name'];
-                    $success = true;
-                    $message = "Conexão com Mercado Pago [{$data['env']}] realizada com sucesso! Usuário: {$userName}";
+                    $success  = true;
+                    $message  = "Conexão com Mercado Pago [{$data['env']}] realizada com sucesso! Usuário: {$userName}";
                 } else {
                     $error = $response->json()['message'] ?? 'Erro desconhecido';
                     throw new \Exception("Falha na conexão MP: {$error}");
                 }
+            }
 
+            if ($data['gateway'] === 'sumup') {
+                $apiKey = $data['access_token'];
+                if (!$apiKey) {
+                    throw new \Exception('API Key SumUp não informada.');
+                }
+
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Accept'        => 'application/json',
+                ])->get('https://api.sumup.com/v0.1/me');
+
+                if ($response->successful()) {
+                    $json        = $response->json();
+                    $merchantCode = $json['merchant_profile']['merchant_code'] ?? $json['username'] ?? 'N/A';
+                    $success     = true;
+                    $message     = "Conexão com SumUp realizada com sucesso! Merchant Code: {$merchantCode}";
+                } else {
+                    $error = $response->json()['message'] ?? $response->json()['error_message'] ?? 'Erro desconhecido';
+                    throw new \Exception("Falha na conexão SumUp: {$error}");
+                }
             }
 
             return response()->json(['success' => $success, 'message' => $message]);

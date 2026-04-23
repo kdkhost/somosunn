@@ -294,6 +294,117 @@
             </div>
         </div>
     </div>
+
+    {{-- ============================================================
+         SEÇÃO SUMUP (Admin Legado)
+         ============================================================ --}}
+    <hr class="my-4">
+    <div class="card card-outline card-dark gateway-section mb-0">
+        <div class="card-header d-flex justify-content-between align-items-center"
+             style="background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;">
+            <h3 class="card-title font-weight-bold mb-0">
+                <i class="fas fa-credit-card mr-2"></i> SumUp
+            </h3>
+            <div class="custom-control custom-switch">
+                <input type="hidden" name="sumup_enabled" value="0">
+                <input type="checkbox" class="custom-control-input" id="sumup_enabled" name="sumup_enabled" value="1"
+                    {{ ($settings['sumup_enabled'] ?? 0) ? 'checked' : '' }}>
+                <label class="custom-control-label text-white" for="sumup_enabled">Ativo</label>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">API Key</label>
+                    <div class="input-group">
+                        <input type="password" name="sumup_api_key" id="sumup_api_key_legacy"
+                            value="{{ $settings['sumup_api_key'] ?? '' }}"
+                            class="form-control font-monospace" placeholder="sup_sk_••••••••••••••••••••••••••••••••">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="toggleGatewaySecret('sumup_api_key_legacy', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <small class="text-muted">Personal Access Token ou OAuth Bearer Token</small>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Merchant Code</label>
+                    <input type="text" name="sumup_merchant_code"
+                        value="{{ $settings['sumup_merchant_code'] ?? '' }}"
+                        class="form-control font-monospace" placeholder="MXXXXXXXX">
+                    <small class="text-muted">SumUp Dashboard → Perfil</small>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Client ID (OAuth)</label>
+                    <input type="text" name="sumup_client_id"
+                        value="{{ $settings['sumup_client_id'] ?? '' }}"
+                        class="form-control font-monospace" placeholder="com.sumup.app.xxxxxxxx">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Client Secret (OAuth)</label>
+                    <div class="input-group">
+                        <input type="password" name="sumup_client_secret" id="sumup_client_secret_legacy"
+                            value="{{ $settings['sumup_client_secret'] ?? '' }}"
+                            class="form-control font-monospace" placeholder="••••••••••••••••••••••••••••••••">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="toggleGatewaySecret('sumup_client_secret_legacy', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Webhook Secret (HMAC)</label>
+                    <div class="input-group">
+                        <input type="password" name="sumup_webhook_secret" id="sumup_webhook_secret_legacy"
+                            value="{{ $settings['sumup_webhook_secret'] ?? '' }}"
+                            class="form-control font-monospace" placeholder="••••••••••••••••••••••••••••••••">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="toggleGatewaySecret('sumup_webhook_secret_legacy', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Ambiente</label>
+                    <select name="sumup_env" class="form-control">
+                        <option value="sandbox"    {{ ($settings['sumup_env'] ?? 'sandbox') === 'sandbox'    ? 'selected' : '' }}>Sandbox (testes)</option>
+                        <option value="production" {{ ($settings['sumup_env'] ?? '') === 'production' ? 'selected' : '' }}>Produção (real)</option>
+                    </select>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Taxa Percentual (%)</label>
+                    <input type="number" step="0.01" name="sumup_fee_percentage"
+                        value="{{ $settings['sumup_fee_percentage'] ?? '2.75' }}"
+                        class="form-control">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Taxa Fixa (R$)</label>
+                    <input type="number" step="0.01" name="sumup_fee_fixed"
+                        value="{{ $settings['sumup_fee_fixed'] ?? '0.00' }}"
+                        class="form-control">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Repassar Taxa ao Comprador</label>
+                    <select name="sumup_pass_fee" class="form-control">
+                        <option value="0" {{ ($settings['sumup_pass_fee'] ?? 0) == 0 ? 'selected' : '' }}>Não — plataforma absorve</option>
+                        <option value="1" {{ ($settings['sumup_pass_fee'] ?? 0) == 1 ? 'selected' : '' }}>Sim — comprador paga</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="button" class="btn btn-dark btn-block font-weight-bold" id="btn-test-sumup-legacy"
+                        onclick="testSumUpConnectionLegacy()">
+                        <i class="fas fa-plug mr-1"></i> Testar Conexão SumUp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -440,5 +551,40 @@
         syncGatewayColor(document.getElementById('gateway_checkout_primary_color')?.value || '#1F5EDB');
         document.querySelectorAll('[data-method-card] input[type="checkbox"]').forEach((checkbox) => updateGatewayMethodCard(checkbox));
     });
+
+    function testSumUpConnectionLegacy() {
+        const btn   = document.getElementById('btn-test-sumup-legacy');
+        const orig  = btn.innerHTML;
+        const token = document.getElementById('sumup_api_key_legacy')?.value || '';
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando...';
+
+        fetch('{{ route("admin.settings.test_gateway") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify({ gateway: 'sumup', access_token: token, env: 'production' })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                gatewayToast('success', data.message);
+                btn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Conexão OK';
+            } else {
+                gatewayToast('error', data.message);
+                btn.innerHTML = '<i class="fas fa-times-circle mr-1"></i> Falhou';
+            }
+            setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 3500);
+        })
+        .catch(() => {
+            gatewayToast('error', 'Erro ao testar conexão SumUp.');
+            btn.innerHTML = orig;
+            btn.disabled = false;
+        });
+    }
 </script>
 @endpush
