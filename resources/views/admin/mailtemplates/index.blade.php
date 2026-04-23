@@ -74,24 +74,56 @@
 
     <script>
         function preview(id) {
-            fetch('/admin/mailtemplates/' + id + '/preview')
-                .then(r => r.json())
+            const previewUrl = '{{ route("admin.mailtemplates.preview", ":id") }}'.replace(':id', id);
+            fetch(previewUrl)
+                .then(r => {
+                    if (!r.ok) throw new Error('Erro ao carregar preview');
+                    return r.json();
+                })
                 .then(data => {
                     document.getElementById('previewBody').innerHTML = data.html;
                     window.previewId = id;
                     $('#previewModal').modal('show');
+                })
+                .catch(e => {
+                    Swal.fire({ 
+                        title: 'Erro de conexão', 
+                        text: 'Não foi possível comunicar com o servidor.', 
+                        icon: 'error' 
+                    });
                 });
         }
 
         document.getElementById('sendPreviewBtn').addEventListener('click', function () {
             var to = document.getElementById('previewEmail').value;
-            fetch('/admin/mailtemplates/' + window.previewId + '/send-preview', {
+            if (!to) {
+                Swal.fire({ title: 'Atenção', text: 'Digite um e-mail válido.', icon: 'warning' });
+                return;
+            }
+            
+            const sendUrl = '{{ route("admin.mailtemplates.sendpreview", ":id") }}'.replace(':id', window.previewId);
+            
+            Swal.fire({ title: 'Enviando...', text: 'Aguarde', icon: 'info', showConfirmButton: false });
+            
+            fetch(sendUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify({ email: to })
-            }).then(r => r.json()).then(data => {
-                Swal.fire({ title: 'Sucesso', text: data.message || 'Enviado', icon: 'success' });
-            }).catch(e => { Swal.fire({ title: 'Erro', text: 'Não foi possível enviar o e-mail de teste.', icon: 'error' }); });
+            })
+            .then(r => {
+                if (!r.ok) throw new Error('Erro ao enviar');
+                return r.json();
+            })
+            .then(data => {
+                Swal.fire({ title: 'Sucesso', text: data.message || 'E-mail enviado com sucesso!', icon: 'success' });
+            })
+            .catch(e => { 
+                Swal.fire({ title: 'Erro', text: 'Não foi possível enviar o e-mail de teste.', icon: 'error' }); 
+            });
         });
     </script>
 @endsection
