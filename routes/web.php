@@ -577,14 +577,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         // Mail Templates (Tailwind) - Panel Admin
         Route::get('mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('panel.admin.mailtemplates.preview');
         Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('panel.admin.mailtemplates.sendpreview');
-        Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class)->names([
-            'index' => 'panel.admin.mailtemplates.index',
-            'create' => 'panel.admin.mailtemplates.create',
-            'store' => 'panel.admin.mailtemplates.store',
-            'edit' => 'panel.admin.mailtemplates.edit',
-            'update' => 'panel.admin.mailtemplates.update',
-            'destroy' => 'panel.admin.mailtemplates.destroy',
-        ]);
+        Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class)->names('panel.admin.mailtemplates');
     });
 });
 
