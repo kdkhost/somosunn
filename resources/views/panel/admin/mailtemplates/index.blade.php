@@ -526,7 +526,7 @@
                 doc.close();
             } catch(e) {}
 
-            fetch('{{ url("painel/admin/mailtemplates") }}/' + id + '/preview')
+            fetch('{{ route("panel.admin.mailtemplates.preview", ":id") }}'.replace(':id', id))
                 .then(r => {
                     if (!r.ok) throw new Error('Falha ao carregar preview (Status: ' + r.status + ')');
                     return r.json();
@@ -575,7 +575,7 @@
             btn.disabled = true;
             btn.innerText = 'Enviando...';
 
-            fetch('{{ url("painel/admin/mailtemplates") }}/' + currentPreviewId + '/send-preview', {
+            fetch('{{ route("panel.admin.mailtemplates.sendpreview", ":id") }}'.replace(':id', currentPreviewId), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 body: JSON.stringify({ email: email })
