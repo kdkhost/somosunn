@@ -73,10 +73,16 @@
     </div>
 
     <script>
+        // Debug: verificar qual URL está sendo gerada
+        console.log('Preview route template:', '{{ route("admin.mailtemplates.preview", ":id") }}');
+        
         function preview(id) {
             const previewUrl = '{{ route("admin.mailtemplates.preview", ":id") }}'.replace(':id', id);
+            console.log('Calling preview URL:', previewUrl);
+            
             fetch(previewUrl)
                 .then(r => {
+                    console.log('Response status:', r.status);
                     if (!r.ok) throw new Error('Erro ao carregar preview');
                     return r.json();
                 })
@@ -86,6 +92,7 @@
                     $('#previewModal').modal('show');
                 })
                 .catch(e => {
+                    console.error('Preview error:', e);
                     Swal.fire({ 
                         title: 'Erro de conexão', 
                         text: 'Não foi possível comunicar com o servidor.', 
