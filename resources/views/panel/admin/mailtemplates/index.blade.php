@@ -13,7 +13,7 @@
 @endpush
 
 @section('panel_breadcrumb')
-    <a href="{{ route('panel.admin.mailtemplates.index') }}" class="hover:underline">Templates</a>
+    <a href="{{ route('admin.mailtemplates.index') }}" class="hover:underline">Templates</a>
 @endsection
 
 @section('panel_content')
@@ -26,7 +26,7 @@
                 <p class="text-slate-500 dark:text-slate-400 text-sm">Gerencie os templates de notificação do sistema.</p>
             </div>
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                <form action="{{ route('panel.admin.mailtemplates.index') }}" method="GET"
+                <form action="{{ route('admin.mailtemplates.index') }}" method="GET"
                     class="relative group w-full sm:w-64">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition"></i>
@@ -43,12 +43,12 @@
 
         <!-- Filters (Optional - Categories) -->
         <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-            <a href="{{ route('panel.admin.mailtemplates.index') }}"
+            <a href="{{ route('admin.mailtemplates.index') }}"
                 class="px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition {{ !request('category') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800' }}">
                 Todos
             </a>
             @foreach(['sistema', 'conta', 'financeiro', 'marketing'] as $cat)
-                <a href="{{ route('panel.admin.mailtemplates.index', ['category' => $cat]) }}"
+                <a href="{{ route('admin.mailtemplates.index', ['category' => $cat]) }}"
                     class="px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request('category') == $cat ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800' }}">
                     {{ ucfirst($cat) }}
                 </a>
@@ -98,7 +98,7 @@
                                                 <div
                                                     class="flex items-center justify-end gap-2 transition-opacity">
                                                     <button
-                                                        onclick="openEditor('{{ route('panel.admin.mailtemplates.edit', $t) }}', '{{ route('panel.admin.mailtemplates.update', $t) }}')"
+                                                        onclick="openEditor('{{ route('admin.mailtemplates.edit', $t) }}', '{{ route('admin.mailtemplates.update', $t) }}')"
                                                         class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition"
                                                         title="Editar">
                                                         <i class="fas fa-pen text-xs"></i>
@@ -108,7 +108,7 @@
                                                         title="Pré-visualizar">
                                                         <i class="fas fa-eye text-xs"></i>
                                                     </button>
-                                                    <form action="{{ route('panel.admin.mailtemplates.destroy', $t) }}" method="POST"
+                                                    <form action="{{ route('admin.mailtemplates.destroy', $t) }}" method="POST"
                                                         onsubmit="return confirmAction(event, 'Excluir template?', 'Excluir este template?')">
                                                         @csrf
                                                         @method('DELETE')
@@ -251,8 +251,8 @@
                                 </div>
                             `;
 
-            const url = editUrl || '{{ route("panel.admin.mailtemplates.create") }}';
-            currentAction = updateUrl || '{{ route("panel.admin.mailtemplates.store") }}';
+            const url = editUrl || '{{ route("admin.mailtemplates.create") }}';
+            currentAction = updateUrl || '{{ route("admin.mailtemplates.store") }}';
             currentMethod = updateUrl ? 'PUT' : 'POST';
             modalTitle.innerText = editUrl ? 'Editar Modelo' : 'Novo Modelo';
 
@@ -526,7 +526,7 @@
                 doc.close();
             } catch(e) {}
 
-            fetch('{{ route("panel.admin.mailtemplates.preview", ":id") }}'.replace(':id', id))
+            fetch('{{ route("admin.mailtemplates.preview", ":id") }}'.replace(':id', id))
                 .then(r => {
                     if (!r.ok) throw new Error('Falha ao carregar preview (Status: ' + r.status + ')');
                     return r.json();
@@ -575,7 +575,7 @@
             btn.disabled = true;
             btn.innerText = 'Enviando...';
 
-            fetch('{{ route("panel.admin.mailtemplates.sendpreview", ":id") }}'.replace(':id', currentPreviewId), {
+            fetch('{{ route("admin.mailtemplates.sendpreview", ":id") }}'.replace(':id', currentPreviewId), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 body: JSON.stringify({ email: email })

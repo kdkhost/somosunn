@@ -575,9 +575,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::post('quick-scanner/validate', [\App\Http\Controllers\Admin\QuickScannerController::class, 'validateTicket'])->name('quick-scanner.validate');
 
         // Mail Templates (Tailwind) - Panel Admin
-        Route::get('mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('panel.admin.mailtemplates.preview');
-        Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('panel.admin.mailtemplates.sendpreview');
-        Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class)->names('panel.admin.mailtemplates');
+        Route::get('mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
+        Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
+        Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class);
     });
 });
 
