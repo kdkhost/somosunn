@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Services\Payment\MercadoPagoService;
+use App\Services\Payment\SumUpService;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -78,6 +80,8 @@ class OrderRefundService
     {
         return match ((string) $order->gateway) {
             'mercadopago' => app(\App\Services\Payment\MercadoPagoService::class)
+                ->refundPayment($order, $isPartial ? $requestedAmount : null),
+            'sumup' => app(SumUpService::class)
                 ->refundPayment($order, $isPartial ? $requestedAmount : null),
             default => throw new RuntimeException('Gateway nao suportado para reembolso automatico.'),
         };

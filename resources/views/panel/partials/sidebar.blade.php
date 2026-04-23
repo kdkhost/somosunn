@@ -309,6 +309,7 @@
         ['label' => 'Login social', 'route' => route('panel.admin.settings', ['group' => 'social']), 'icon' => 'fas fa-share-alt', 'active' => request()->routeIs('panel.admin.settings') && request('group') == 'social', 'visible' => $user->isAdmin()],
         ['label' => 'SEO', 'route' => route('panel.admin.settings', ['group' => 'seo']), 'icon' => 'fas fa-search', 'active' => request()->routeIs('panel.admin.settings') && request('group') == 'seo', 'visible' => $user->isAdmin()],
         ['label' => 'E-mails', 'route' => route('panel.admin.mailtemplates.index'), 'icon' => 'fas fa-at', 'active' => request()->routeIs('panel.admin.mailtemplates.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'SumUp', 'route' => route('panel.admin.sumup.index'), 'icon' => 'fas fa-credit-card', 'active' => request()->routeIs('panel.admin.sumup.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Cron interno', 'route' => route('panel.admin.cron.index'), 'icon' => 'fas fa-clock', 'active' => request()->routeIs('panel.admin.cron.*'), 'visible' => $user->isAdmin()],
     ], fn(array $item) => $item['visible']));
 

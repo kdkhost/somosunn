@@ -40,4 +40,51 @@ return [
          */
         'platform_id' => env('MERCADOPAGO_PLATFORM_ID', ''),
     ],
+
+    'sumup' => [
+        /**
+         * Chave de API SumUp para autenticação nas chamadas de API.
+         */
+        'api_key' => env('SUMUP_API_KEY', ''),
+
+        /**
+         * Client ID do aplicativo SumUp (OAuth).
+         */
+        'client_id' => env('SUMUP_CLIENT_ID', ''),
+
+        /**
+         * Client Secret do aplicativo SumUp (OAuth).
+         */
+        'client_secret' => env('SUMUP_CLIENT_SECRET', ''),
+
+        /**
+         * Merchant Code da conta SumUp.
+         */
+        'merchant_code' => env('SUMUP_MERCHANT_CODE', ''),
+
+        /**
+         * Ambiente: sandbox ou production.
+         */
+        'env' => env('SUMUP_ENV', 'sandbox'),
+
+        /**
+         * Percentual de taxa cobrado pelo SumUp (ex: 2.75 para 2,75%).
+         */
+        'fee_percentage' => env('SUMUP_FEE_PERCENTAGE', 2.75),
+
+        /**
+         * Taxa fixa cobrada pelo SumUp por transação (em reais).
+         */
+        'fee_fixed' => env('SUMUP_FEE_FIXED', 0),
+
+        /**
+         * Se true, a taxa é repassada ao comprador; se false, absorvida pela plataforma.
+         */
+        'pass_fee' => env('SUMUP_PASS_FEE', false),
+
+        /**
+         * Segredo para validação de assinatura HMAC dos webhooks.
+         */
+        'webhook_secret' => env('SUMUP_WEBHOOK_SECRET', ''),
+    ],
 ];

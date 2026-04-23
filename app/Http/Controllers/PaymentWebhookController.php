@@ -13,10 +13,13 @@ use App\Models\Plan;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\OrderSplit;
+use App\Models\SumUpWebhookLog;
 use App\Services\CouponService;
 use App\Services\AffiliateTrackingService;
 use App\Services\InvoiceService;
 use App\Services\Marketplace\SellerProductFulfillmentService;
+use App\Services\Payment\SumUpService;
+use App\Services\Payment\SumUpWebhookProcessor;
 use App\Services\PointsService;
 use App\Support\EmailQueueSettings;
 use Illuminate\Http\Request;
@@ -27,6 +30,49 @@ use Illuminate\Support\Str;
 
 class PaymentWebhookController extends Controller
 {
+    /**
+     * Webhook dinâmico SumUp — URL única por transação.
+     * Rota: POST /webhook/sumup/{orderId}/{token}
+     */
+    public function sumup(Request $request, int $orderId, string $token)
+    {
+        $rawPayload = $request->getContent();
+        $signature  = $request->header('X-SumUp-Signature', '');
+        $payload    = $request->all();
+        $eventType  = $payload['event_type'] ?? $payload['type'] ?? 'unknown';
+
+        // Loga o webhook recebido
+        $log = SumUpWebhookLog::create([
+            'order_id'   => $orderId,
+            'event_type' => $eventType,
+            'payload'    => $payload,
+            'signature'  => $signature,
+            'is_valid'   => false,
+        ]);
+
+        // Valida assinatura HMAC
+        $secret  = (string) (Setting::get('sumup_webhook_secret') ?: config('payments.sumup.webhook_secret', ''));
+        $sumUpSvc = app(SumUpService::class);
+
+        if ($secret && !$sumUpSvc->validateWebhookSignature($rawPayload, $signature, $secret)) {
+            Log::warning('SumUp webhook: assinatura invalida', ['order_id' => $orderId, 'token' => $token]);
+            return response('Unauthorized', 401);
+        }
+
+        $log->update(['is_valid' => true]);
+
+        try {
+            app(SumUpWebhookProcessor::class)->process($payload, $token);
+        } catch (\Throwable $e) {
+            Log::error('SumUp webhook processing error', [
+                'order_id' => $orderId,
+                'error'    => $e->getMessage(),
+            ]);
+        }
+
+        return response('OK', 200);
+    }
+
     public function mercadopago(Request $request, $seller_id = 'platform')
     {
         $type = $request->input('type') ?? $request->input('topic');

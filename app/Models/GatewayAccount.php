@@ -93,4 +93,40 @@ class GatewayAccount extends Model
             'source' => 'global',
         ];
     }
+
+    /**
+     * Resolve credenciais SumUp para um vendedor.
+     * Prioridade: credenciais do vendedor > credenciais globais da plataforma.
+     */
+    public static function resolveForSellerSumUp(int $sellerId): array
+    {
+        if ($sellerId > 0) {
+            $account = self::query()
+                ->where('user_id', $sellerId)
+                ->where('provider', 'sumup')
+                ->where('enabled', true)
+                ->first();
+
+            if ($account && !empty($account->access_token)) {
+                $extra = $account->extra ?? [];
+                return [
+                    'sumupEnabled'  => true,
+                    'apiKey'        => trim($account->access_token),
+                    'merchantCode'  => $extra['merchant_code'] ?? '',
+                    'source'        => 'seller',
+                ];
+            }
+        }
+
+        $apiKey       = trim((string) (Setting::get('sumup_api_key') ?: config('payments.sumup.api_key', '')));
+        $merchantCode = trim((string) (Setting::get('sumup_merchant_code') ?: config('payments.sumup.merchant_code', '')));
+        $enabled      = $apiKey !== '' && $merchantCode !== '';
+
+        return [
+            'sumupEnabled' => $enabled,
+            'apiKey'       => $apiKey,
+            'merchantCode' => $merchantCode,
+            'source'       => 'global',
+        ];
+    }
 }

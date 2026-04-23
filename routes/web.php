@@ -289,6 +289,7 @@ Route::post('/upload', [\App\Http\Controllers\UploadController::class, 'upload']
 
 // Webhook
 Route::post('/webhook/mercadopago', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])->defaults('seller_id', 'platform');
+Route::post('/webhook/sumup/{orderId}/{token}', [\App\Http\Controllers\PaymentWebhookController::class, 'sumup'])->name('webhook.sumup');
 
 // Installer
 Route::prefix('install')->group(function () {
@@ -578,6 +579,16 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan'])->gro
         Route::get('mailtemplates/{mailtemplate}/preview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'preview'])->name('mailtemplates.preview');
         Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
         Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class);
+
+        // SumUp - Panel Admin
+        Route::prefix('sumup')->name('sumup.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Panel\Admin\SumUpController::class, 'index'])->name('index');
+            Route::get('/report', [\App\Http\Controllers\Panel\Admin\SumUpController::class, 'report'])->name('report');
+            Route::get('/report/export', [\App\Http\Controllers\Panel\Admin\SumUpController::class, 'exportReport'])->name('report.export');
+            Route::post('/test-connection', [\App\Http\Controllers\Panel\Admin\SumUpController::class, 'testConnection'])->name('test-connection');
+            Route::get('/{sumupTransaction}', [\App\Http\Controllers\Panel\Admin\SumUpController::class, 'show'])->name('show');
+            Route::post('/orders/{order}/refund', [\App\Http\Controllers\Panel\Admin\SumUpController::class, 'refund'])->name('refund');
+        });
     });
 });
 
