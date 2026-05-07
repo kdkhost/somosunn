@@ -15,6 +15,7 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Corrigido
 - Salvamento das credenciais SumUp do vendedor, incluindo API Key e Merchant Code em `gateway_accounts.extra`.
 - Validação de webhooks SumUp compatível com o cabeçalho oficial `x-payload-signature`.
+- Validação de credenciais SumUp compatível com o retorno atual `merchant_profile.merchant_code` da API.
 
 ---
 

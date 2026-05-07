@@ -225,7 +225,11 @@ class SumUpService
             }
 
             $response = $this->get('/v0.1/me', $apiKey);
-            return !empty($response['merchant_code'] ?? $response['username'] ?? null);
+            return !empty(
+                data_get($response, 'merchant_profile.merchant_code')
+                ?? data_get($response, 'merchant_code')
+                ?? data_get($response, 'username')
+            );
         } catch (\Throwable $e) {
             Log::warning('SumUp validateCredentials failed', ['error' => $e->getMessage()]);
             return false;
