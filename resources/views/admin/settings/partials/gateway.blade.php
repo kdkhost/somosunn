@@ -17,8 +17,14 @@
 <style>
     .gateway-shell .gateway-top{border-radius:1rem;background:linear-gradient(135deg,#1548c0 0%,#1f67ef 55%,#37a4ff 100%);color:#fff;padding:1.5rem;box-shadow:0 18px 42px rgba(31,103,239,.2)}
     .gateway-shell .gateway-badge{display:inline-flex;align-items:center;gap:.45rem;padding:.45rem .8rem;border-radius:999px;font-size:.75rem;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.15)}
+    .gateway-shell .gateway-badge.badge-success{background:rgba(40,199,111,.25);border-color:rgba(40,199,111,.4);color:#fff}
+    .gateway-shell .gateway-badge.badge-secondary{background:rgba(108,117,125,.25);border-color:rgba(108,117,125,.4);color:#fff}
     .gateway-shell .gateway-dot{width:8px;height:8px;border-radius:999px;background:currentColor}
     .gateway-shell .gateway-tab-btn{border-radius:999px}
+    .gateway-shell .main-gateway-tab{border-radius:12px;font-size:1.1rem;padding:.75rem 1.5rem;transition:all .3s ease}
+    .gateway-shell .main-gateway-tab .badge{font-size:.7rem;padding:.25rem .5rem}
+    .gateway-shell .main-gateway-pane{display:none}
+    .gateway-shell .main-gateway-pane.is-active{display:block}
     .gateway-shell .gateway-pane{display:none}
     .gateway-shell .gateway-pane.is-active{display:block}
     .gateway-shell .gateway-method-card{border:1px solid #dfe7f2;border-radius:1rem;padding:1rem;height:100%;transition:.2s ease;background:#fff}
@@ -33,8 +39,31 @@
 <div class="card-body gateway-shell">
     <div class="alert alert-info">
         <i class="fas fa-info-circle mr-2"></i>
-        Esta tela foi reorganizada para corrigir o card quebrado do gateway e deixar a configuracao mais clara.
+        Configure os gateways de pagamento da plataforma. <strong>Apenas um gateway pode ficar ativo por vez.</strong>
     </div>
+
+    {{-- ============================================================
+         TABS PRINCIPAIS: MERCADO PAGO | SUMUP
+         ============================================================ --}}
+    <div class="mb-4">
+        <button type="button" class="btn btn-lg btn-primary main-gateway-tab mr-2 mb-2" data-target="main-tab-mercadopago" onclick="switchMainGatewayTab(this)">
+            <i class="fas fa-handshake mr-2"></i>Mercado Pago
+            @if($gatewayEnabled)
+                <span class="badge badge-success ml-2">Ativo</span>
+            @endif
+        </button>
+        <button type="button" class="btn btn-lg btn-outline-secondary main-gateway-tab mb-2" data-target="main-tab-sumup" onclick="switchMainGatewayTab(this)">
+            <i class="fas fa-credit-card mr-2"></i>SumUp
+            @if(($settings['sumup_enabled'] ?? 0))
+                <span class="badge badge-success ml-2">Ativo</span>
+            @endif
+        </button>
+    </div>
+
+    {{-- ============================================================
+         TAB MERCADO PAGO
+         ============================================================ --}}
+    <div class="main-gateway-pane is-active" id="main-tab-mercadopago">
 
     <div class="gateway-top mb-4" id="gatewayHero" data-sandbox-configured="{{ $hasSandbox ? 1 : 0 }}" data-production-configured="{{ $hasProduction ? 1 : 0 }}">
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center">
@@ -45,7 +74,7 @@
                 <div class="d-flex flex-wrap" style="gap:.5rem;">
                     <span class="gateway-badge" id="gatewayEnvBadge"><span class="gateway-dot"></span>{{ $mpEnv === 'production' ? 'Producao' : 'Sandbox' }}</span>
                     <span class="gateway-badge" id="gatewayConfigBadge"><span class="gateway-dot"></span>{{ $isConfigured ? 'Configurado' : 'Pendente' }}</span>
-                    <span class="gateway-badge" id="gatewayEnabledBadge"><span class="gateway-dot"></span>{{ $gatewayEnabled ? 'Gateway ativo' : 'Gateway inativo' }}</span>
+                    <span class="gateway-badge {{ $gatewayEnabled ? 'badge-success' : 'badge-secondary' }}" id="gatewayEnabledBadge"><span class="gateway-dot"></span>{{ $gatewayEnabled ? 'Gateway ativo' : 'Gateway inativo' }}</span>
                 </div>
             </div>
             <div class="bg-white rounded-lg p-3 text-dark" style="min-width:280px;max-width:320px;width:100%;">
@@ -53,7 +82,7 @@
                     <strong>Status rapido</strong>
                     <div class="custom-control custom-switch mb-0">
                         <input type="hidden" name="mercadopago_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="mercadopago_enabled" name="mercadopago_enabled" value="1" onchange="handleGatewayEnabledToggle(this)" {{ $gatewayEnabled ? 'checked' : '' }}>
+                        <input type="checkbox" class="custom-control-input gateway-enable-toggle" id="mercadopago_enabled" name="mercadopago_enabled" value="1" data-gateway="mercadopago" onchange="handleGatewayEnabledToggle(this)" {{ $gatewayEnabled ? 'checked' : '' }}>
                         <label class="custom-control-label" for="mercadopago_enabled"></label>
                     </div>
                 </div>
@@ -295,22 +324,56 @@
         </div>
     </div>
 
+    </div>
+
+    {{-- FIM TAB MERCADO PAGO --}}
+    </div>
+
     {{-- ============================================================
-         SEÇÃO SUMUP (Admin Legado)
+         TAB SUMUP
          ============================================================ --}}
-    <hr class="my-4">
+    <div class="main-gateway-pane" id="main-tab-sumup">
+
+    <div class="gateway-top mb-4" style="border-radius:1rem;background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;padding:1.5rem;box-shadow:0 18px 42px rgba(15,52,96,.2)">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center">
+            <div class="pr-lg-4 mb-3 mb-lg-0">
+                <div class="text-uppercase font-weight-bold mb-1" style="font-size:.72rem;letter-spacing:.14em;opacity:.8;">Pagamentos</div>
+                <h3 class="mb-2 font-weight-bold">SumUp</h3>
+                <p class="mb-3" style="opacity:.86;max-width:720px;">Configure as credenciais e opções do gateway SumUp para processar pagamentos.</p>
+                <div class="d-flex flex-wrap" style="gap:.5rem;">
+                    @php
+                        $sumupEnv = $settings['sumup_env'] ?? 'sandbox';
+                        $sumupEnabled = (int) ($settings['sumup_enabled'] ?? 0) === 1;
+                        $sumupConfigured = !empty($settings['sumup_api_key']) && !empty($settings['sumup_merchant_code']);
+                    @endphp
+                    <span class="gateway-badge"><span class="gateway-dot"></span>{{ $sumupEnv === 'production' ? 'Producao' : 'Sandbox' }}</span>
+                    <span class="gateway-badge"><span class="gateway-dot"></span>{{ $sumupConfigured ? 'Configurado' : 'Pendente' }}</span>
+                    <span class="gateway-badge {{ $sumupEnabled ? 'badge-success' : 'badge-secondary' }}" id="sumupEnabledBadge"><span class="gateway-dot"></span>{{ $sumupEnabled ? 'Gateway ativo' : 'Gateway inativo' }}</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-3 text-dark" style="min-width:280px;max-width:320px;width:100%;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>Status rapido</strong>
+                    <div class="custom-control custom-switch mb-0">
+                        <input type="hidden" name="sumup_enabled" value="0">
+                        <input type="checkbox" class="custom-control-input gateway-enable-toggle" id="sumup_enabled" name="sumup_enabled" value="1" data-gateway="sumup" onchange="handleGatewayEnabledToggle(this)" {{ $sumupEnabled ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="sumup_enabled"></label>
+                    </div>
+                </div>
+                <small class="text-muted d-block mb-3">Desligue para desativar o SumUp como gateway da plataforma.</small>
+                <button type="button" class="btn btn-dark btn-block font-weight-bold" id="btn-test-sumup" onclick="testSumUpConnection()">
+                    <i class="fas fa-plug mr-1"></i> Testar conexao
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="card card-outline card-dark gateway-section mb-0">
         <div class="card-header d-flex justify-content-between align-items-center"
              style="background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;">
             <h3 class="card-title font-weight-bold mb-0">
-                <i class="fas fa-credit-card mr-2"></i> SumUp
+                <i class="fas fa-cog mr-2"></i> Configurações SumUp
             </h3>
-            <div class="custom-control custom-switch">
-                <input type="hidden" name="sumup_enabled" value="0">
-                <input type="checkbox" class="custom-control-input" id="sumup_enabled" name="sumup_enabled" value="1"
-                    {{ ($settings['sumup_enabled'] ?? 0) ? 'checked' : '' }}>
-                <label class="custom-control-label text-white" for="sumup_enabled">Ativo</label>
-            </div>
         </div>
         <div class="card-body">
             <div class="alert alert-info small">
@@ -415,14 +478,18 @@
                     </select>
                 </div>
                 <div class="col-12">
-                    <button type="button" class="btn btn-dark btn-block font-weight-bold" id="btn-test-sumup-legacy"
+                    <button type="button" class="btn btn-dark btn-block font-weight-bold d-none" id="btn-test-sumup-legacy"
                         onclick="testSumUpConnectionLegacy()">
-                        <i class="fas fa-plug mr-1"></i> Testar Conexão SumUp
+                        <i class="fas fa-plug mr-1"></i> Testar Conexão SumUp (Legacy)
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- FIM TAB SUMUP --}}
+    </div>
+
 </div>
 
 @push('scripts')
@@ -435,6 +502,18 @@
         if (typeof toastr !== 'undefined') {
             toastr[type === 'error' ? 'error' : 'success'](message);
         }
+    }
+
+    function switchMainGatewayTab(button) {
+        const targetId = button.getAttribute('data-target');
+        document.querySelectorAll('.main-gateway-tab').forEach((item) => {
+            item.classList.remove('btn-primary');
+            item.classList.add('btn-outline-secondary');
+        });
+        document.querySelectorAll('.main-gateway-pane').forEach((pane) => pane.classList.remove('is-active'));
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-primary');
+        document.getElementById(targetId)?.classList.add('is-active');
     }
 
     function switchGatewayTab(button) {
@@ -515,15 +594,126 @@
     }
 
     function handleGatewayEnabledToggle(checkbox) {
-        updateGatewayHeroState();
-        toggleSetting('mercadopago_enabled', checkbox.checked)
+        const gatewayName = checkbox.getAttribute('data-gateway') || 'mercadopago';
+        const isEnabling = checkbox.checked;
+        
+        // Se está ativando um gateway, verificar se outro está ativo
+        if (isEnabling) {
+            const otherGateway = gatewayName === 'mercadopago' ? 'sumup' : 'mercadopago';
+            const otherCheckbox = document.querySelector(`input[data-gateway="${otherGateway}"]`) || document.getElementById(otherGateway + '_enabled');
+            
+            if (otherCheckbox && otherCheckbox.checked) {
+                // Mostrar confirmação
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Atenção!',
+                        html: `Apenas um gateway pode ficar ativo por vez.<br><br>Ativar <strong>${gatewayName === 'mercadopago' ? 'Mercado Pago' : 'SumUp'}</strong> irá desativar automaticamente <strong>${otherGateway === 'mercadopago' ? 'Mercado Pago' : 'SumUp'}</strong>.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sim, ativar',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Desativar o outro gateway
+                            otherCheckbox.checked = false;
+                            updateGatewayBadge(otherGateway, false);
+                            
+                            // Ativar o gateway atual
+                            updateGatewayBadge(gatewayName, true);
+                            saveGatewayToggle(checkbox, gatewayName);
+                        } else {
+                            // Cancelou, reverter o checkbox
+                            checkbox.checked = false;
+                        }
+                    });
+                } else {
+                    // Sem Swal, usar confirm nativo
+                    const confirmed = confirm(`Apenas um gateway pode ficar ativo por vez.\n\nAtivar ${gatewayName === 'mercadopago' ? 'Mercado Pago' : 'SumUp'} irá desativar automaticamente ${otherGateway === 'mercadopago' ? 'Mercado Pago' : 'SumUp'}.\n\nDeseja continuar?`);
+                    if (confirmed) {
+                        otherCheckbox.checked = false;
+                        updateGatewayBadge(otherGateway, false);
+                        updateGatewayBadge(gatewayName, true);
+                        saveGatewayToggle(checkbox, gatewayName);
+                    } else {
+                        checkbox.checked = false;
+                    }
+                }
+                return;
+            }
+        }
+        
+        // Se está desativando ou não há conflito, apenas atualizar
+        updateGatewayBadge(gatewayName, isEnabling);
+        saveGatewayToggle(checkbox, gatewayName);
+    }
+
+    function updateGatewayBadge(gatewayName, isEnabled) {
+        if (gatewayName === 'mercadopago') {
+            updateGatewayHeroState();
+        } else if (gatewayName === 'sumup') {
+            const badge = document.getElementById('sumupEnabledBadge');
+            if (badge) {
+                badge.innerHTML = '<span class="gateway-dot"></span>' + (isEnabled ? 'Gateway ativo' : 'Gateway inativo');
+                badge.classList.toggle('badge-success', isEnabled);
+                badge.classList.toggle('badge-secondary', !isEnabled);
+            }
+        }
+        
+        // Atualizar badges nas abas principais
+        updateMainTabBadges();
+    }
+
+    function updateMainTabBadges() {
+        const mpEnabled = document.getElementById('mercadopago_enabled')?.checked || false;
+        const sumupEnabled = document.getElementById('sumup_enabled')?.checked || false;
+        
+        // Atualizar badge do Mercado Pago
+        const mpTab = document.querySelector('[data-target="main-tab-mercadopago"]');
+        if (mpTab) {
+            let mpBadge = mpTab.querySelector('.badge');
+            if (mpEnabled) {
+                if (!mpBadge) {
+                    mpBadge = document.createElement('span');
+                    mpBadge.className = 'badge badge-success ml-2';
+                    mpTab.appendChild(mpBadge);
+                }
+                mpBadge.textContent = 'Ativo';
+                mpBadge.className = 'badge badge-success ml-2';
+            } else if (mpBadge) {
+                mpBadge.remove();
+            }
+        }
+        
+        // Atualizar badge do SumUp
+        const sumupTab = document.querySelector('[data-target="main-tab-sumup"]');
+        if (sumupTab) {
+            let sumupBadge = sumupTab.querySelector('.badge');
+            if (sumupEnabled) {
+                if (!sumupBadge) {
+                    sumupBadge = document.createElement('span');
+                    sumupBadge.className = 'badge badge-success ml-2';
+                    sumupTab.appendChild(sumupBadge);
+                }
+                sumupBadge.textContent = 'Ativo';
+                sumupBadge.className = 'badge badge-success ml-2';
+            } else if (sumupBadge) {
+                sumupBadge.remove();
+            }
+        }
+    }
+
+    function saveGatewayToggle(checkbox, gatewayName) {
+        const settingKey = gatewayName === 'mercadopago' ? 'mercadopago_enabled' : 'sumup_enabled';
+        toggleSetting(settingKey, checkbox.checked)
             .then((data) => {
                 if (!data || !data.success) throw new Error((data && data.message) || 'Falha ao atualizar o gateway.');
                 gatewayToast('success', 'Status do gateway atualizado.');
             })
             .catch((error) => {
                 checkbox.checked = !checkbox.checked;
-                updateGatewayHeroState();
+                updateGatewayBadge(gatewayName, checkbox.checked);
                 gatewayToast('error', error.message || 'Nao foi possivel atualizar o gateway.');
             });
     }
@@ -568,7 +758,48 @@
         setGatewayEnvironment(document.getElementById('mercadopago_env')?.value || 'sandbox');
         syncGatewayColor(document.getElementById('gateway_checkout_primary_color')?.value || '#1F5EDB');
         document.querySelectorAll('[data-method-card] input[type="checkbox"]').forEach((checkbox) => updateGatewayMethodCard(checkbox));
+        updateMainTabBadges();
     });
+
+    function testSumUpConnection() {
+        const btn = document.getElementById('btn-test-sumup');
+        const orig = btn.innerHTML;
+        const token = document.getElementById('sumup_api_key_legacy')?.value || '';
+
+        if (!token) {
+            gatewayToast('error', 'Preencha a API Key do SumUp antes do teste.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando conexao...';
+
+        fetch('{{ route("admin.settings.test_gateway") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ gateway: 'sumup', access_token: token, env: 'production' })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                gatewayToast('success', data.message);
+                btn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Conexao OK';
+            } else {
+                gatewayToast('error', data.message);
+                btn.innerHTML = '<i class="fas fa-times-circle mr-1"></i> Falhou';
+            }
+            setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 3500);
+        })
+        .catch(() => {
+            gatewayToast('error', 'Erro ao testar conexao SumUp.');
+            btn.innerHTML = orig;
+            btn.disabled = false;
+        });
+    }
 
     function testSumUpConnectionLegacy() {
         const btn   = document.getElementById('btn-test-sumup-legacy');

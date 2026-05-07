@@ -11,7 +11,11 @@
                     Finalizar seu Pedido
                 </h1>
                 <p class="mt-3 max-w-2xl mx-auto text-xl text-slate-500 sm:mt-4">
-                    Pagamento seguro e processamento instantâneo via Mercado Pago.
+                    @if(($gateway ?? 'mercadopago') === 'sumup')
+                        Pagamento seguro e processamento instantâneo via SumUp.
+                    @else
+                        Pagamento seguro e processamento instantâneo via Mercado Pago.
+                    @endif
                 </p>
             </div>
 
@@ -25,11 +29,17 @@
                             <div class="flex space-x-2 mr-4">
                                 <i class="fab fa-cc-visa text-slate-400 text-xl"></i>
                                 <i class="fab fa-cc-mastercard text-slate-400 text-xl"></i>
-                                <i class="fa-brands fa-pix text-slate-400 text-xl"></i>
+                                @if(($gateway ?? 'mercadopago') === 'mercadopago')
+                                    <i class="fa-brands fa-pix text-slate-400 text-xl"></i>
+                                @endif
                             </div>
                         </div>
                         <div class="p-6 sm:p-8">
-                            <div id="paymentBrick_container"></div>
+                            @if(($gateway ?? 'mercadopago') === 'sumup')
+                                @include('partials.checkout.sumup-card-form')
+                            @else
+                                <div id="paymentBrick_container"></div>
+                            @endif
                         </div>
                     </div>
 
@@ -176,6 +186,7 @@
         </div>
     </div>
 
+    @if(($gateway ?? 'mercadopago') === 'mercadopago')
     <script src="https://sdk.mercadopago.com/js/v2"></script>
     <script>
         const mp = new MercadoPago('{{ $publicKey }}', {
@@ -373,4 +384,5 @@
 
         renderPaymentBrick(bricksBuilder);
     </script>
+    @endif
 @endsection

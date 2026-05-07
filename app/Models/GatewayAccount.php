@@ -129,4 +129,109 @@ class GatewayAccount extends Model
             'source'       => 'global',
         ];
     }
+
+    /**
+     * Resolve o gateway ativo para um vendedor (Mercado Pago OU SumUp).
+     * Retorna informações sobre qual gateway está ativo e suas configurações.
+     *
+     * Prioridade:
+     * 1. Credenciais conectadas do vendedor em gateway_accounts (enabled = true)
+     * 2. Credenciais globais da plataforma salvas na tabela settings
+     *
+     * @return array{
+     *   provider: string|null,
+     *   enabled: bool,
+     *   config: array,
+     *   source: string
+     * }
+     */
+    public static function resolveActiveGatewayForSeller(int $sellerId): array
+    {
+        $account = null;
+
+        if ($sellerId > 0) {
+            $account = self::query()
+                ->where('user_id', $sellerId)
+                ->where('enabled', true)
+                ->whereIn('provider', ['mercadopago', 'sumup'])
+                ->first();
+        }
+
+        if ($account) {
+            if ($account->provider === 'mercadopago') {
+                $mpPublicKey = trim((string) ($account->public_key ?? ''));
+                $mpToken = trim((string) ($account->access_token ?? ''));
+                $mpEnabled = $mpPublicKey !== '' && $mpToken !== '';
+
+                if ($mpEnabled) {
+                    return [
+                        'provider' => 'mercadopago',
+                        'enabled' => true,
+                        'config' => [
+                            'mpEnabled' => true,
+                            'mpPublicKey' => $mpPublicKey,
+                            'mpAccessToken' => $mpToken,
+                        ],
+                        'source' => 'seller',
+                    ];
+                }
+            } elseif ($account->provider === 'sumup') {
+                $apiKey = trim((string) ($account->access_token ?? ''));
+                $extra = $account->extra ?? [];
+                $merchantCode = $extra['merchant_code'] ?? '';
+                $sumupEnabled = $apiKey !== '';
+
+                if ($sumupEnabled) {
+                    return [
+                        'provider' => 'sumup',
+                        'enabled' => true,
+                        'config' => [
+                            'sumupEnabled' => true,
+                            'apiKey' => $apiKey,
+                            'merchantCode' => $merchantCode,
+                        ],
+                        'source' => 'seller',
+                    ];
+                }
+            }
+        }
+
+        // Fallback para credenciais globais
+        // Verificar Mercado Pago global primeiro
+        $mpGlobal = static::resolveGlobalSettings();
+        if ($mpGlobal['mpEnabled']) {
+            return [
+                'provider' => 'mercadopago',
+                'enabled' => true,
+                'config' => $mpGlobal,
+                'source' => 'global',
+            ];
+        }
+
+        // Verificar SumUp global
+        $apiKey = trim((string) (Setting::get('sumup_api_key') ?: config('payments.sumup.api_key', '')));
+        $merchantCode = trim((string) (Setting::get('sumup_merchant_code') ?: config('payments.sumup.merchant_code', '')));
+        $sumupEnabled = $apiKey !== '' && $merchantCode !== '';
+
+        if ($sumupEnabled) {
+            return [
+                'provider' => 'sumup',
+                'enabled' => true,
+                'config' => [
+                    'sumupEnabled' => true,
+                    'apiKey' => $apiKey,
+                    'merchantCode' => $merchantCode,
+                ],
+                'source' => 'global',
+            ];
+        }
+
+        // Nenhum gateway ativo
+        return [
+            'provider' => null,
+            'enabled' => false,
+            'config' => [],
+            'source' => 'none',
+        ];
+    }
 }

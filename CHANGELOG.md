@@ -11,11 +11,24 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Adicionado
 - Instruções detalhadas para configuração da SumUp nos painéis de gateway, com origem da API Key, Merchant Code, credenciais OAuth e Webhook Secret.
 - Atalho "Configurar Credenciais" e resumo operacional na tela administrativa de transações SumUp.
+- **Detecção dinâmica de gateway ativo** no checkout de eventos: sistema agora detecta automaticamente qual gateway (Mercado Pago ou SumUp) o vendedor configurou como ativo
+- **Interface com abas separadas** no painel administrativo para configurações de gateway (Mercado Pago / SumUp) com validação de exclusividade
+- **Validação de gateway único**: apenas um gateway pode ficar ativo por vendedor, com desativação automática do gateway concorrente
+- **Feedback visual** com badges de status (Ativo/Inativo) nas abas de configuração de gateway
+- **Método unificado** `GatewayAccount::resolveActiveGatewayForSeller()` para detecção de gateway ativo independente do provedor
+- **Roteamento condicional** no `EventReservationController` para processar pagamentos via SumUp ou Mercado Pago baseado no gateway ativo
+- **Formulário de cartão SumUp** (`sumup-card-form.blade.php`) para checkout transparente de eventos
+- **Métodos dedicados** `processSumUpPayment()` e `processMercadoPagoPayment()` para processamento isolado de cada gateway
 
 ### Corrigido
 - Salvamento das credenciais SumUp do vendedor, incluindo API Key e Merchant Code em `gateway_accounts.extra`.
 - Validação de webhooks SumUp compatível com o cabeçalho oficial `x-payload-signature`.
 - Validação de credenciais SumUp compatível com o retorno atual `merchant_profile.merchant_code` da API.
+- **Gateway SumUp não carregava no checkout de eventos**: `EventReservationController` estava hardcoded para usar apenas Mercado Pago, impedindo vendedores com SumUp ativo de receberem pagamentos
+- **Detecção de gateway ativo** no método `checkout()` agora verifica ambos gateways (Mercado Pago e SumUp) em vez de apenas Mercado Pago
+- **Criação de pedidos** agora usa o gateway ativo detectado dinamicamente em vez de hardcoded `'mercadopago'`
+- **View de checkout transparente** (`checkout.transparent`) agora suporta renderização condicional para ambos gateways
+- **Sincronização automática** entre `settings` e `gateway_accounts` ao ativar/desativar gateways no painel admin
 
 ---
 

@@ -41,18 +41,23 @@ class EventReservationController extends Controller
                     ->with('error', 'Este organizador não está habilitado para vender no marketplace.');
             }
 
-            $gateways = \App\Models\GatewayAccount::resolveForSeller($seller ? (int) $seller->id : 0);
-            $mpEnabled = $gateways['mpEnabled'];
-            $preferredGateway = 'mercadopago';
+            $gatewayConfig = \App\Models\GatewayAccount::resolveActiveGatewayForSeller($seller ? (int) $seller->id : 0);
+            $activeGateway = $gatewayConfig['provider'];
+            $gatewayEnabled = $gatewayConfig['enabled'];
 
-            if (!$mpEnabled) {
+            // Manter compatibilidade com código existente
+            $mpEnabled = $activeGateway === 'mercadopago' && $gatewayEnabled;
+            $preferredGateway = $activeGateway;
+
+            if (!$gatewayEnabled || !$activeGateway) {
                 \Illuminate\Support\Facades\Log::warning('EventCheckout: organizador sem gateway configurado', [
                     'event_id' => $event->id,
                     'event_user_id' => $event->user_id,
                     'seller_id' => $seller ? $seller->id : null,
                     'seller_found' => $seller !== null,
-                    'mp_enabled' => $mpEnabled,
-                    'gateway_source' => $gateways['source'] ?? null,
+                    'active_gateway' => $activeGateway,
+                    'gateway_enabled' => $gatewayEnabled,
+                    'gateway_source' => $gatewayConfig['source'] ?? null,
                 ]);
                 return redirect()
                     ->route('events.show', $event)
@@ -70,7 +75,7 @@ class EventReservationController extends Controller
         return view('events.checkout', compact('event', 'registration', 'mpEnabled', 'preferredGateway'));
     }
 
-    public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService, OrderSettlementService $orderSettlementService)
+    public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService, \App\Services\Payment\SumUpService $sumUpService, OrderSettlementService $orderSettlementService)
     {
         $this->abortIfDisabledOrUnpublished($event);
 
@@ -92,21 +97,18 @@ class EventReservationController extends Controller
         $isPaid = (float) $event->effective_price > 0;
         $seller = $event->user ?: User::find($event->user_id);
         $sellerId = $seller ? (int) $seller->id : (int) ($event->user_id ?? 0);
+        
+        // Detectar gateway ativo dinamicamente
+        $gatewayConfig = \App\Models\GatewayAccount::resolveActiveGatewayForSeller($sellerId);
+        $gatewayProvider = $gatewayConfig['provider'] ?? null;
+        $paymentsConfigured = $gatewayConfig['enabled'] && $gatewayProvider !== null;
+
+        // Manter compatibilidade com código existente
         $gateways = [
-            'mpEnabled' => false,
-            'preferredGateway' => null,
-            'mpPublicKey' => '',
+            'mpEnabled' => $gatewayProvider === 'mercadopago' && $paymentsConfigured,
+            'preferredGateway' => $gatewayProvider,
+            'mpPublicKey' => $gatewayProvider === 'mercadopago' ? ($gatewayConfig['config']['mpPublicKey'] ?? '') : '',
         ];
-
-        // Determinar gateways disponíveis e gateway selecionado pelo comprador
-        $paymentsConfigured = false;
-        $gatewayProvider = 'mercadopago';
-        if ($isPaid) {
-            $gateways = \App\Models\GatewayAccount::resolveForSeller($sellerId);
-            $paymentsConfigured = $gateways['mpEnabled'];
-
-            $gatewayProvider = 'mercadopago';
-        }
 
         if ($isPaid) {
             if (false && $seller && !$seller->canSellOnMarketplace()) {
@@ -530,60 +532,19 @@ class EventReservationController extends Controller
             return redirect()->route('events.show', $event)->with('success', 'Vaga confirmada com sucesso!');
         }
 
-        try {
-            $order->load('items', 'user');
-
-            // MercadoPago — usa o token correto do vendedor via MercadoPagoService
-            $preference = $mpService->createPreference($order, [
-                'statement_descriptor' => 'UNN EVENTOS',
-                'back_urls' => [
-                    'success' => route('events.payment.success', $order->id),
-                    'failure' => route('events.payment.failure', $order->id),
-                    'pending' => route('events.payment.pending', $order->id),
-                ],
-            ]);
-
-            $order->update([
-                'metadata' => array_merge($order->metadata ?? [], [
-                    'mercadopago_preference_id' => $preference['id'] ?? null,
-                    'mercadopago_init_point' => $preference['init_point'] ?? null,
-                    'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
-                ]),
-            ]);
-
-            $sellerId = (int) ($event->seller_id ?: $event->user_id);
-            $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
-            $isPlatformOwner = $sellerId === (int) $platformOwnerId;
-
-            $sellerMpAccount = null;
-            if (!$isPlatformOwner) {
-                $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
-            }
-
-            $mpPublicKey = (!$isPlatformOwner && is_array($sellerMpAccount)) ? ($sellerMpAccount['mpPublicKey'] ?? null) : null;
-
-            return view('checkout.transparent', [
-                'order' => $order,
-                'preferenceId' => $preference['id'] ?? '',
-                'publicKey' => $mpPublicKey ?: config('payments.mercadopago.public_key') ?: \App\Models\Setting::get('mp_public_key'),
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Falha ao iniciar pagamento de evento', [
+        // Roteamento para o gateway correto
+        if ($gatewayProvider === 'sumup') {
+            return $this->processSumUpPayment($order, $event, $gatewayConfig, $sumUpService);
+        } elseif ($gatewayProvider === 'mercadopago') {
+            return $this->processMercadoPagoPayment($order, $event, $gatewayConfig, $mpService);
+        } else {
+            \Log::error('Gateway desconhecido ou não configurado', [
                 'event_id' => $event->id,
                 'order_id' => $order?->id,
-                'message' => $e->getMessage(),
+                'gateway_provider' => $gatewayProvider,
             ]);
 
-            $friendlyMessage = 'Nao foi possivel iniciar o pagamento agora.';
-            $rawMessage = (string) $e->getMessage();
-
-            if (str_contains($rawMessage, 'PA_UNAUTHORIZED_RESULT_FROM_POLICIES') || str_contains($rawMessage, 'PolicyAgent')) {
-                $friendlyMessage = 'Mercado Pago indisponivel no momento. Tente novamente em instantes.';
-            } elseif (str_contains($rawMessage, 'MercadoPago Preference Error')) {
-                $friendlyMessage = 'Nao foi possivel gerar a sessao de pagamento no Mercado Pago.';
-            }
-
-            return back()->with('error', $friendlyMessage);
+            return back()->with('error', 'Método de pagamento não configurado. Entre em contato com o organizador.');
         }
     }
 
@@ -766,5 +727,112 @@ class EventReservationController extends Controller
         ]);
 
         return $order;
+    }
+
+    /**
+     * Processa pagamento via SumUp
+     */
+    private function processSumUpPayment(Order $order, Event $event, array $gatewayConfig, \App\Services\Payment\SumUpService $sumUpService)
+    {
+        try {
+            $order->load('items', 'user');
+
+            // Criar checkout SumUp
+            $checkout = $sumUpService->createCheckout($order, [
+                'description' => 'Ingresso: ' . $event->title,
+                'return_url' => route('events.payment.success', $order->id),
+            ]);
+
+            // Salvar dados do checkout no pedido
+            $order->update([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'sumup_checkout_id' => $checkout['id'] ?? null,
+                    'sumup_checkout_url' => $checkout['checkout_url'] ?? null,
+                ]),
+            ]);
+
+            // Resolver chave pública do SumUp
+            $sellerId = (int) ($event->seller_id ?: $event->user_id);
+            $sumupConfig = $gatewayConfig['config'] ?? [];
+            $sumupPublicKey = $sumupConfig['merchantCode'] ?? config('payments.sumup.merchant_code') ?? \App\Models\Setting::get('sumup_merchant_code');
+
+            return view('checkout.transparent', [
+                'order' => $order,
+                'checkoutId' => $checkout['id'] ?? '',
+                'publicKey' => $sumupPublicKey,
+                'gateway' => 'sumup',
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Falha ao iniciar pagamento SumUp de evento', [
+                'event_id' => $event->id,
+                'order_id' => $order?->id,
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Não foi possível iniciar o pagamento via SumUp. Tente novamente em instantes.');
+        }
+    }
+
+    /**
+     * Processa pagamento via Mercado Pago
+     */
+    private function processMercadoPagoPayment(Order $order, Event $event, array $gatewayConfig, \App\Services\Payment\MercadoPagoService $mpService)
+    {
+        try {
+            $order->load('items', 'user');
+
+            // MercadoPago — usa o token correto do vendedor via MercadoPagoService
+            $preference = $mpService->createPreference($order, [
+                'statement_descriptor' => 'UNN EVENTOS',
+                'back_urls' => [
+                    'success' => route('events.payment.success', $order->id),
+                    'failure' => route('events.payment.failure', $order->id),
+                    'pending' => route('events.payment.pending', $order->id),
+                ],
+            ]);
+
+            $order->update([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'mercadopago_preference_id' => $preference['id'] ?? null,
+                    'mercadopago_init_point' => $preference['init_point'] ?? null,
+                    'mercadopago_sandbox_init_point' => $preference['sandbox_init_point'] ?? null,
+                ]),
+            ]);
+
+            $sellerId = (int) ($event->seller_id ?: $event->user_id);
+            $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
+            $isPlatformOwner = $sellerId === (int) $platformOwnerId;
+
+            $sellerMpAccount = null;
+            if (!$isPlatformOwner) {
+                $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+            }
+
+            $mpPublicKey = (!$isPlatformOwner && is_array($sellerMpAccount)) ? ($sellerMpAccount['mpPublicKey'] ?? null) : null;
+
+            return view('checkout.transparent', [
+                'order' => $order,
+                'preferenceId' => $preference['id'] ?? '',
+                'publicKey' => $mpPublicKey ?: config('payments.mercadopago.public_key') ?: \App\Models\Setting::get('mp_public_key'),
+                'gateway' => 'mercadopago',
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Falha ao iniciar pagamento de evento', [
+                'event_id' => $event->id,
+                'order_id' => $order?->id,
+                'message' => $e->getMessage(),
+            ]);
+
+            $friendlyMessage = 'Não foi possível iniciar o pagamento agora.';
+            $rawMessage = (string) $e->getMessage();
+
+            if (str_contains($rawMessage, 'PA_UNAUTHORIZED_RESULT_FROM_POLICIES') || str_contains($rawMessage, 'PolicyAgent')) {
+                $friendlyMessage = 'Mercado Pago indisponível no momento. Tente novamente em instantes.';
+            } elseif (str_contains($rawMessage, 'MercadoPago Preference Error')) {
+                $friendlyMessage = 'Não foi possível gerar a sessão de pagamento no Mercado Pago.';
+            }
+
+            return back()->with('error', $friendlyMessage);
+        }
     }
 }

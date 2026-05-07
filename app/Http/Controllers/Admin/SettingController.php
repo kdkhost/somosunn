@@ -62,9 +62,13 @@ class SettingController extends Controller
         $key = $request->input('key');
         $value = $request->boolean('value') ? 1 : 0;
 
-        // Segurança: permitir apenas chaves específicas se necessário, 
-        // mas como é admin, podemos confiar ou usar uma lista de permissões.
-        // Para os métodos de pagamento, as chaves são prefixadas.
+        // VALIDAÇÃO: Apenas um gateway pode ficar ativo por vez
+        if (in_array($key, ['mercadopago_enabled', 'sumup_enabled']) && $value === 1) {
+            // Se está ativando um gateway, desativar o outro
+            $otherGateway = $key === 'mercadopago_enabled' ? 'sumup_enabled' : 'mercadopago_enabled';
+            Setting::set($otherGateway, 0);
+            \Log::info("[GATEWAY TOGGLE] Ativando {$key}, desativando {$otherGateway} automaticamente.");
+        }
 
         Setting::set($key, $value);
 
@@ -646,6 +650,28 @@ class SettingController extends Controller
                 $data[$checkbox] = $request->has($checkbox) ? 1 : 0;
             }
 
+            // VALIDAÇÃO: Apenas um gateway pode ficar ativo por vez
+            $mpEnabled = isset($data['mercadopago_enabled']) ? (int) $data['mercadopago_enabled'] : 0;
+            $sumupEnabled = isset($data['sumup_enabled']) ? (int) $data['sumup_enabled'] : 0;
+
+            // Se ambos estão tentando ficar ativos, desativar o outro
+            if ($mpEnabled === 1 && $sumupEnabled === 1) {
+                // Priorizar o que foi explicitamente marcado no request
+                if ($request->has('mercadopago_enabled') && !$request->has('sumup_enabled')) {
+                    // Mercado Pago foi ativado, desativar SumUp
+                    $data['sumup_enabled'] = 0;
+                    \Log::info('[GATEWAY VALIDATION] MercadoPago ativado, SumUp desativado automaticamente.');
+                } elseif ($request->has('sumup_enabled') && !$request->has('mercadopago_enabled')) {
+                    // SumUp foi ativado, desativar Mercado Pago
+                    $data['mercadopago_enabled'] = 0;
+                    \Log::info('[GATEWAY VALIDATION] SumUp ativado, MercadoPago desativado automaticamente.');
+                } else {
+                    // Ambos foram enviados, manter apenas o último alterado (SumUp por padrão)
+                    $data['mercadopago_enabled'] = 0;
+                    \Log::info('[GATEWAY VALIDATION] Conflito detectado, mantendo apenas SumUp ativo.');
+                }
+            }
+
             // Remover chaves ANTIGAS e lixo que não pertencem ao gateway
             $trashKeys = ['video_plyr_options_json', 'gateway_checkout_theme_selected', 'gateway_checkout_primary_color_hex'];
             foreach ($trashKeys as $trash) {
@@ -687,9 +713,14 @@ class SettingController extends Controller
             if (!empty($accessToken))
                 $mpAccount->access_token = $accessToken;
 
-            // Ativar se tiver as chaves
+            // Ativar/desativar baseado na configuração global
+            $mpEnabled = isset($data['mercadopago_enabled']) ? (int) $data['mercadopago_enabled'] : 
+                         (int) (Setting::where('key', 'mercadopago_enabled')->value('value') ?? 1);
+            
             if ($mpAccount->public_key && $mpAccount->access_token) {
-                $mpAccount->enabled = true;
+                $mpAccount->enabled = $mpEnabled === 1;
+            } else {
+                $mpAccount->enabled = false;
             }
 
             $mpAccount->save();
@@ -712,8 +743,14 @@ class SettingController extends Controller
                 $extra['merchant_code'] = $sumupMerchantCode;
             $sumupAccount->extra = $extra;
 
+            // Ativar/desativar baseado na configuração global
+            $sumupEnabled = isset($data['sumup_enabled']) ? (int) $data['sumup_enabled'] : 
+                            (int) (Setting::where('key', 'sumup_enabled')->value('value') ?? 0);
+
             if ($sumupAccount->access_token) {
-                $sumupAccount->enabled = true;
+                $sumupAccount->enabled = $sumupEnabled === 1;
+            } else {
+                $sumupAccount->enabled = false;
             }
 
             $sumupAccount->save();
