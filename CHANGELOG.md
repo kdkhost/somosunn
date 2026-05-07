@@ -30,6 +30,7 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **View de checkout transparente** (`checkout.transparent`) agora suporta renderização condicional para ambos gateways
 - **Sincronização automática** entre `settings` e `gateway_accounts` ao ativar/desativar gateways no painel admin
 - **Migração `add_sumup_subscription_id_to_subscriptions_table`**: corrigida referência à coluna inexistente `gateway` para usar `next_billing_at` (coluna que existe na tabela `subscriptions`)
+- **Models SumUp**: adicionada propriedade `$table` explícita nos Models `SumUpTransaction`, `SumUpWebhookLog` e `SumUpSavedCard` para usar nomes corretos das tabelas (`sumup_*` em vez da convenção padrão `sum_up_*` do Laravel)
 
 ---
 
