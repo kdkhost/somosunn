@@ -29,6 +29,7 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **Criação de pedidos** agora usa o gateway ativo detectado dinamicamente em vez de hardcoded `'mercadopago'`
 - **View de checkout transparente** (`checkout.transparent`) agora suporta renderização condicional para ambos gateways
 - **Sincronização automática** entre `settings` e `gateway_accounts` ao ativar/desativar gateways no painel admin
+- **Migração `add_sumup_subscription_id_to_subscriptions_table`**: corrigida referência à coluna inexistente `gateway` para usar `next_billing_at` (coluna que existe na tabela `subscriptions`)
 
 ---
 
