@@ -737,6 +737,24 @@ class EventReservationController extends Controller
         try {
             $order->load('items', 'user');
 
+            // Validar configuração do gateway
+            $sumupConfig = $gatewayConfig['config'] ?? [];
+            $apiKey = $sumupConfig['apiKey'] ?? null;
+            $merchantCode = $sumupConfig['merchantCode'] ?? null;
+
+            if (empty($apiKey) || empty($merchantCode)) {
+                \Log::error('Credenciais SumUp não configuradas', [
+                    'event_id' => $event->id,
+                    'order_id' => $order->id,
+                    'seller_id' => $event->user_id,
+                    'gateway_config' => $gatewayConfig,
+                    'api_key_empty' => empty($apiKey),
+                    'merchant_code_empty' => empty($merchantCode),
+                ]);
+
+                return back()->with('error', 'Não foi possível iniciar o pagamento via SumUp. O organizador ainda não configurou as credenciais do gateway.');
+            }
+
             // Criar checkout SumUp
             $checkout = $sumUpService->createCheckout($order, [
                 'description' => 'Ingresso: ' . $event->title,
@@ -752,13 +770,11 @@ class EventReservationController extends Controller
             ]);
 
             // Resolver chave pública do SumUp
-            $sellerId = (int) ($event->seller_id ?: $event->user_id);
-            $sumupConfig = $gatewayConfig['config'] ?? [];
-            $sumupPublicKey = $sumupConfig['merchantCode'] ?? config('payments.sumup.merchant_code') ?? \App\Models\Setting::get('sumup_merchant_code');
+            $sumupPublicKey = $merchantCode;
 
             return view('checkout.transparent', [
                 'order' => $order,
-                'checkoutId' => $checkout['id'] ?? '',
+                'checkoutId' => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
                 'publicKey' => $sumupPublicKey,
                 'gateway' => 'sumup',
             ]);
@@ -766,7 +782,9 @@ class EventReservationController extends Controller
             \Log::error('Falha ao iniciar pagamento SumUp de evento', [
                 'event_id' => $event->id,
                 'order_id' => $order?->id,
+                'seller_id' => $event->user_id,
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return back()->with('error', 'Não foi possível iniciar o pagamento via SumUp. Tente novamente em instantes.');
