@@ -72,6 +72,7 @@
 
 <script src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
 (function() {
     const CHECKOUT_ID  = '{{ $checkoutId ?? '' }}';
     const API_KEY      = '{{ $apiKey }}';
@@ -282,6 +283,7 @@
         loadSumupPix();
     }
 })();
+});
 </script>
 
 <style>
