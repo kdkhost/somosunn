@@ -6,7 +6,21 @@
     $amount     = number_format($order->total_amount ?? 0, 2, '.', '');
     $successUrl = route('events.payment.success', $orderId);
     $pendingUrl = route('events.payment.pending', $orderId);
+    $checkoutIdValue = $checkoutId ?? '';
 @endphp
+
+{{-- Debug: Verificar se variáveis estão sendo passadas --}}
+@if(config('app.debug'))
+<div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
+    <strong>Debug Info:</strong><br>
+    Checkout ID: {{ $checkoutIdValue }}<br>
+    API Key: {{ !empty($apiKey) ? 'Configurada' : 'NÃO configurada' }}<br>
+    Method Card: {{ $methodCard ? 'Sim' : 'Não' }}<br>
+    Method PIX: {{ $methodPix ? 'Sim' : 'Não' }}<br>
+    Order ID: {{ $orderId }}<br>
+    Amount: R$ {{ $amount }}
+</div>
+@endif
 
 {{-- Seletor de método de pagamento --}}
 @if($methodCard && $methodPix)
@@ -74,13 +88,20 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 (function() {
-    const CHECKOUT_ID  = '{{ $checkoutId ?? '' }}';
+    const CHECKOUT_ID  = '{{ $checkoutIdValue }}';
     const API_KEY      = '{{ $apiKey }}';
     const ORDER_ID     = {{ $orderId }};
     const SUCCESS_URL  = '{{ $successUrl }}';
     const PENDING_URL  = '{{ $pendingUrl }}';
     const METHOD_CARD  = {{ $methodCard ? 'true' : 'false' }};
     const METHOD_PIX   = {{ $methodPix  ? 'true' : 'false' }};
+
+    console.log('=== SumUp Form Initialization ===');
+    console.log('Checkout ID:', CHECKOUT_ID);
+    console.log('API Key configured:', API_KEY ? 'Yes' : 'No');
+    console.log('Method Card:', METHOD_CARD);
+    console.log('Method PIX:', METHOD_PIX);
+    console.log('Order ID:', ORDER_ID);
 
     let pixTimerInterval = null;
     let pixLoaded = false;
@@ -115,13 +136,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ── Cartão ───────────────────────────────────────────────────────────────
     if (METHOD_CARD) {
-        if (!CHECKOUT_ID) {
-            document.getElementById('sumup-card').innerHTML =
+        console.log('Initializing SumUp Card Widget...');
+        const cardContainer = document.getElementById('sumup-card');
+        
+        if (!cardContainer) {
+            console.error('Container #sumup-card not found in DOM');
+        } else if (!CHECKOUT_ID) {
+            console.error('Checkout ID is empty');
+            cardContainer.innerHTML =
                 '<div class="text-center py-8 text-red-600"><i class="fas fa-exclamation-triangle text-3xl mb-4"></i><p>Erro: ID do checkout não encontrado.</p></div>';
         } else if (typeof SumUpCard === 'undefined') {
-            document.getElementById('sumup-card').innerHTML =
+            console.error('SumUpCard SDK not loaded');
+            cardContainer.innerHTML =
                 '<div class="text-center py-8 text-red-600"><i class="fas fa-exclamation-triangle text-3xl mb-4"></i><p>Erro: SDK do SumUp não carregou.</p></div>';
         } else {
+            console.log('SumUpCard SDK loaded, mounting widget...');
             try {
                 SumUpCard.mount({
                     checkoutId: CHECKOUT_ID,
@@ -137,16 +166,19 @@ document.addEventListener('DOMContentLoaded', function() {
                             setTimeout(() => window.location.href = PENDING_URL, 1500);
                         }
                     },
-                    onLoad: function() { console.log('SumUp Card Widget loaded'); },
+                    onLoad: function() { 
+                        console.log('SumUp Card Widget loaded successfully'); 
+                    },
                     onError: function(error) {
                         console.error('SumUp Widget Error:', error);
-                        document.getElementById('sumup-card').innerHTML =
+                        cardContainer.innerHTML =
                             '<div class="text-center py-8 text-red-600"><i class="fas fa-exclamation-triangle text-3xl mb-4"></i><p>Erro ao carregar formulário. Tente novamente.</p></div>';
                     }
                 });
+                console.log('SumUpCard.mount() called successfully');
             } catch (e) {
                 console.error('SumUp init error:', e);
-                document.getElementById('sumup-card').innerHTML =
+                cardContainer.innerHTML =
                     '<div class="text-center py-8 text-red-600"><i class="fas fa-exclamation-triangle text-3xl mb-4"></i><p>Erro ao inicializar SumUp: ' + e.message + '</p></div>';
             }
         }
