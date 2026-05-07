@@ -40,8 +40,7 @@
                             @else
                                 <div id="paymentBrick_container"></div>
                             @endif
-                        </div>
-                    </div>
+                        </div>                    </div>
 
                     <div class="mt-6 flex items-center justify-center space-x-4 text-slate-400 text-sm">
                         <div class="flex items-center">

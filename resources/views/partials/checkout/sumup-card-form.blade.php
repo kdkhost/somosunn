@@ -176,7 +176,12 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('SumUpCard SDK loaded, mounting widget...');
             try {
                 SumUpCard.mount({
+                    id: 'sumup-card',
                     checkoutId: CHECKOUT_ID,
+                    locale: 'pt-BR',
+                    country: 'BR',
+                    currency: 'BRL',
+                    showInstallments: true,
                     onResponse: function(type, body) {
                         console.log('SumUp Card Response:', type, body);
                         if (type === 'success') {
@@ -365,59 +370,34 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-    #sumup-card { min-height: 400px; }
+    /*
+     * O widget SumUp Card renderiza dentro de um iframe.
+     * Elementos com data-sumup-id ficam no DOM do host e podem ser estilizados.
+     * O iframe interno não pode ser estilizado por CSS externo.
+     */
+
+    /* Container externo: altura automática */
+    #sumup-card {
+        min-height: 0 !important;
+        height: auto !important;
+    }
+
+    /* O iframe gerado pelo SDK deve ocupar 100% da largura */
+    #sumup-card > iframe,
     #sumup-card iframe {
         width: 100% !important;
+        min-width: 100% !important;
         border: none !important;
-        min-height: 400px !important;
-    }
-    #sumup-pix-section { min-height: 200px; }
-
-    /* Corrigir altura dos campos do formulário SumUp */
-    #sumup-card .sumup-card-input-wrapper,
-    #sumup-card .sumup-card-input,
-    #sumup-card input[type="text"],
-    #sumup-card input[type="tel"],
-    #sumup-card input[type="email"] {
-        height: 48px !important;
-        max-height: 48px !important;
-        min-height: 48px !important;
-        line-height: 48px !important;
-        padding: 0 12px !important;
-        font-size: 14px !important;
-    }
-
-    /* Corrigir altura dos iframes internos do SumUp */
-    #sumup-card iframe[name*="sumup"] {
-        height: 48px !important;
-        max-height: 48px !important;
-        min-height: 48px !important;
-    }
-
-    /* Corrigir containers dos campos */
-    #sumup-card [class*="input-container"],
-    #sumup-card [class*="field-container"],
-    #sumup-card .sumup-card-field {
-        height: 48px !important;
-        max-height: 48px !important;
-        min-height: 48px !important;
-        margin-bottom: 16px !important;
-    }
-
-    /* Corrigir labels */
-    #sumup-card label {
-        font-size: 13px !important;
-        margin-bottom: 6px !important;
         display: block !important;
     }
 
-    /* Corrigir botão de submit */
-    #sumup-card button[type="submit"],
-    #sumup-card .sumup-card-button {
-        height: 50px !important;
-        max-height: 50px !important;
-        min-height: 50px !important;
-        font-size: 16px !important;
-        font-weight: 600 !important;
+    /* Estilizar o container principal do widget via data-sumup-id */
+    [data-sumup-id="widget__container"] {
+        font-family: inherit !important;
+        font-size: 14px !important;
+        line-height: 1.5 !important;
     }
+
+    /* Seção PIX */
+    #sumup-pix-section { min-height: 200px; }
 </style>
