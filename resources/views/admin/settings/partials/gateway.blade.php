@@ -477,6 +477,32 @@
                         <option value="1" {{ ($settings['sumup_pass_fee'] ?? 0) == 1 ? 'selected' : '' }}>Sim — comprador paga</option>
                     </select>
                 </div>
+                {{-- Parcelamento SumUp --}}
+                <div class="col-12"><hr><h6 class="text-uppercase text-muted small font-weight-bold mb-3"><i class="fas fa-layer-group mr-1"></i> Parcelamento SumUp</h6></div>
+                <div class="col-md-4 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Máx. Parcelas</label>
+                    <input type="number" min="1" max="12" step="1" name="sumup_max_installments"
+                        value="{{ $settings['sumup_max_installments'] ?? '12' }}"
+                        class="form-control">
+                    <small class="text-muted">1 = somente à vista</small>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Parcelas sem Juros</label>
+                    <input type="number" min="1" max="12" step="1" name="sumup_installments_no_interest"
+                        value="{{ $settings['sumup_installments_no_interest'] ?? '1' }}"
+                        class="form-control">
+                    <small class="text-muted">Parcelas até este número não têm juros</small>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Juros por Parcela (%)</label>
+                    <div class="input-group">
+                        <input type="number" min="0" max="99.99" step="0.01" name="sumup_installment_tax"
+                            value="{{ $settings['sumup_installment_tax'] ?? '0.00' }}"
+                            class="form-control">
+                        <div class="input-group-append"><span class="input-group-text">%</span></div>
+                    </div>
+                    <small class="text-muted">Aplicado a partir da {{ ($settings['sumup_installments_no_interest'] ?? 1) + 1 }}ª parcela</small>
+                </div>
                 <div class="col-12">
                     <button type="button" class="btn btn-dark btn-block font-weight-bold d-none" id="btn-test-sumup-legacy"
                         onclick="testSumUpConnectionLegacy()">

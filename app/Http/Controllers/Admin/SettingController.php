@@ -323,8 +323,7 @@ class SettingController extends Controller
                 'sumup_method_card',
                 'sumup_method_pix',
                 'sumup_pass_fee',
-            ],
-            'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled', 'marketplace_events_popup_enabled'],
+            ],            'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled', 'marketplace_events_popup_enabled'],
             'social' => [
                 'social_login_enabled',
                 'social_google_enabled',
@@ -433,6 +432,9 @@ class SettingController extends Controller
             'video_watermark_size_percent' => ['min' => 1, 'max' => 100],
             'video_watermark_margin' => ['min' => 0, 'max' => 200],
             'video_watermark_rotate' => ['min' => -180, 'max' => 180],
+            // SumUp parcelamento
+            'sumup_max_installments'        => ['min' => 1, 'max' => 12],
+            'sumup_installments_no_interest' => ['min' => 1, 'max' => 12],
         ] as $key => $limits) {
             if (!array_key_exists($key, $data)) {
                 continue;
@@ -449,8 +451,7 @@ class SettingController extends Controller
             $data[$key] = (string) $value;
         }
 
-        foreach (['video_plyr_volume', 'video_watermark_opacity'] as $key) {
-            if (!array_key_exists($key, $data)) {
+        foreach (['video_plyr_volume', 'video_watermark_opacity'] as $key) {            if (!array_key_exists($key, $data)) {
                 continue;
             }
 
@@ -464,6 +465,18 @@ class SettingController extends Controller
             $value = (float) $raw;
             $value = max(0.0, min(1.0, $value));
             $data[$key] = rtrim(rtrim(number_format($value, 2, '.', ''), '0'), '.');
+        }
+
+        // Validação de taxa de parcelamento SumUp (0.00 a 99.99%)
+        if (array_key_exists('sumup_installment_tax', $data)) {
+            $raw = trim(str_replace(',', '.', (string) $data['sumup_installment_tax']));
+            if ($raw === '') {
+                $data['sumup_installment_tax'] = '0.00';
+            } else {
+                $value = (float) $raw;
+                $value = max(0.0, min(99.99, $value));
+                $data['sumup_installment_tax'] = number_format($value, 2, '.', '');
+            }
         }
 
         if (array_key_exists('video_watermark_position', $data)) {

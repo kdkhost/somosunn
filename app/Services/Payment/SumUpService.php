@@ -25,18 +25,30 @@ class SumUpService
      */
     public function createCheckout(Order $order, array $options = []): array
     {
-        $config      = $this->getSellerConfig($order);
+        $config       = $this->getSellerConfig($order);
         $webhookToken = Str::random(64);
         $webhookUrl   = $this->buildWebhookUrl($order->id, $webhookToken);
+
+        // Descrição: nome do serviço + nome do comprador (visível no painel SumUp)
+        $description = $this->orderDescription($order);
+        if (!empty($options['description'])) {
+            $description = $options['description'];
+        }
 
         $payload = [
             'checkout_reference' => 'ORDER-' . $order->id . '-' . time(),
             'amount'             => (float) $order->total_amount,
             'currency'           => $order->currency ?? 'BRL',
             'merchant_code'      => $config['merchant_code'],
-            'description'        => $this->orderDescription($order),
+            'description'        => mb_substr($description, 0, 255),
             'return_url'         => $options['return_url'] ?? route('checkout.success', $order),
         ];
+
+        // customer_id: identificador único do comprador no sistema do lojista
+        // Permite rastrear o cliente no painel SumUp
+        if ($order->user_id) {
+            $payload['customer_id'] = 'user-' . $order->user_id;
+        }
 
         $response = $this->post('/v0.1/checkouts', $payload, $config['api_key']);
 
@@ -350,8 +362,25 @@ class SumUpService
 
     private function orderDescription(Order $order): string
     {
-        $items = $order->items->pluck('name')->implode(', ');
-        return $items ?: 'Pedido #' . $order->id;
+        // Nome do serviço: título do primeiro item do pedido
+        $order->loadMissing('items', 'user');
+
+        $itemTitle = $order->items->first()?->title ?? '';
+        $buyerName = $order->user?->name ?? '';
+
+        if ($itemTitle !== '' && $buyerName !== '') {
+            return $itemTitle . ' - ' . $buyerName;
+        }
+
+        if ($itemTitle !== '') {
+            return $itemTitle;
+        }
+
+        if ($buyerName !== '') {
+            return 'Pedido #' . $order->id . ' - ' . $buyerName;
+        }
+
+        return 'Pedido #' . $order->id;
     }
 
     private function headers(string $apiKey): array

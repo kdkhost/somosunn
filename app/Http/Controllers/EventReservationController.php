@@ -757,7 +757,7 @@ class EventReservationController extends Controller
 
             // Criar checkout SumUp
             $checkout = $sumUpService->createCheckout($order, [
-                'description' => 'Ingresso: ' . $event->title,
+                'description' => 'Ingresso: ' . $event->title . ($order->user ? ' - ' . $order->user->name : ''),
                 'return_url' => route('events.payment.success', $order->id),
             ]);
 
@@ -778,16 +778,25 @@ class EventReservationController extends Controller
             $methodCard = $methodCardRaw !== null ? (bool)(int)$methodCardRaw : true;
             $methodPix  = $methodPixRaw  !== null ? (bool)(int)$methodPixRaw  : true;
 
+            // Parcelamento e taxas
+            $maxInstallments      = max(1, min(12, (int) (\App\Models\Setting::get('sumup_max_installments', 12))));
+            $noInterestUpTo       = max(1, min(12, (int) (\App\Models\Setting::get('sumup_installments_no_interest', 1))));
+            $installmentTax       = max(0.0, (float) (\App\Models\Setting::get('sumup_installment_tax', 0)));
+            $passFeeToClient      = (bool)(int)(\App\Models\Setting::get('sumup_pass_fee', 0));
+
             return view('checkout.transparent', [
-                'order'           => $order,
-                'checkoutId'      => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
-                'publicKey'       => $sumupPublicKey,
-                'gateway'         => 'sumup',
-                'sumupMethodCard' => $methodCard,
-                'sumupMethodPix'  => $methodPix,
-                'sumupApiKey'     => $apiKey,
-            ]);
-        } catch (\Exception $e) {
+                'order'                    => $order,
+                'checkoutId'               => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
+                'publicKey'                => $sumupPublicKey,
+                'gateway'                  => 'sumup',
+                'sumupMethodCard'          => $methodCard,
+                'sumupMethodPix'           => $methodPix,
+                'sumupApiKey'              => $apiKey,
+                'sumupMaxInstallments'     => $maxInstallments,
+                'sumupNoInterestUpTo'      => $noInterestUpTo,
+                'sumupInstallmentTax'      => $installmentTax,
+                'sumupPassFeeToClient'     => $passFeeToClient,
+            ]);        } catch (\Exception $e) {
             \Log::error('Falha ao iniciar pagamento SumUp de evento', [
                 'event_id' => $event->id,
                 'order_id' => $order?->id,

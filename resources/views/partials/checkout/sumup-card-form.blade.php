@@ -1,12 +1,36 @@
 @php
-    $methodCard      = $sumupMethodCard ?? true;
-    $methodPix       = $sumupMethodPix  ?? true;
-    $apiKey          = $sumupApiKey     ?? '';
-    $orderId         = $order->id       ?? 0;
-    $amount          = number_format($order->total_amount ?? 0, 2, '.', '');
-    $successUrl      = route('events.payment.success', $orderId);
-    $pendingUrl      = route('events.payment.pending', $orderId);
-    $checkoutIdValue = $checkoutId ?? '';
+    $methodCard          = $sumupMethodCard      ?? true;
+    $methodPix           = $sumupMethodPix       ?? true;
+    $apiKey              = $sumupApiKey          ?? '';
+    $orderId             = $order->id            ?? 0;
+    $amount              = (float) ($order->total_amount ?? 0);
+    $amountFormatted     = number_format($amount, 2, '.', '');
+    $successUrl          = route('events.payment.success', $orderId);
+    $pendingUrl          = route('events.payment.pending', $orderId);
+    $checkoutIdValue     = $checkoutId           ?? '';
+    $maxInstallments     = (int) ($sumupMaxInstallments  ?? 12);
+    $noInterestUpTo      = (int) ($sumupNoInterestUpTo   ?? 1);
+    $installmentTax      = (float) ($sumupInstallmentTax ?? 0);
+    $passFeeToClient     = (bool) ($sumupPassFeeToClient ?? false);
+
+    // Pré-calcular as opções de parcelas para exibição no debug e no JS
+    $installmentOptions = [];
+    for ($i = 1; $i <= $maxInstallments; $i++) {
+        if ($i <= $noInterestUpTo || $installmentTax <= 0) {
+            $total = $amount;
+            $perInstallment = $amount / $i;
+        } else {
+            // Juros simples: valor_parcela = (total * (1 + taxa/100)) / n
+            $total = $passFeeToClient ? $amount * (1 + $installmentTax / 100) : $amount;
+            $perInstallment = $total / $i;
+        }
+        $installmentOptions[] = [
+            'n'               => $i,
+            'per_installment' => round($perInstallment, 2),
+            'total'           => round($total, 2),
+            'has_interest'    => $i > $noInterestUpTo && $installmentTax > 0,
+        ];
+    }
 @endphp
 
 {{-- Debug: Verificar se variáveis estão sendo passadas --}}
@@ -17,8 +41,8 @@
     API Key: {{ !empty($apiKey) ? 'Configurada' : 'NÃO configurada' }}<br>
     Method Card: {{ $methodCard ? 'Sim' : 'Não' }}<br>
     Method PIX: {{ $methodPix ? 'Sim' : 'Não' }}<br>
-    Order ID: {{ $orderId }}<br>
-    Amount: R$ {{ $amount }}
+    Order ID: {{ $orderId }} | Amount: R$ {{ $amountFormatted }}<br>
+    Parcelas: até {{ $maxInstallments }}x | Sem juros: até {{ $noInterestUpTo }}x | Juros: {{ $installmentTax }}% | Repasse: {{ $passFeeToClient ? 'Sim' : 'Não' }}
 </div>
 @endif
 
@@ -67,6 +91,10 @@
 {{-- Formulário de Cartão (SumUp Card Widget) --}}
 @if($methodCard)
 <div id="sumup-card-section" class="{{ (!$methodCard || ($methodCard && $methodPix)) ? '' : '' }}">
+    {{-- Resumo de parcelas (atualizado via JS ao selecionar parcelas) --}}
+    @if($maxInstallments > 1)
+    <div id="sumup-installment-summary" class="hidden mb-3 text-center text-sm py-2 px-3 bg-slate-50 rounded-xl border border-slate-200"></div>
+    @endif
     <div id="sumup-card"></div>
 </div>
 @endif
@@ -118,6 +146,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const PENDING_URL = '{{ $pendingUrl }}';
     const METHOD_CARD = {{ $methodCard ? 'true' : 'false' }};
     const METHOD_PIX  = {{ $methodPix  ? 'true' : 'false' }};
+    const AMOUNT      = {{ $amount }};
+    const MAX_INSTALLMENTS   = {{ $maxInstallments }};
+    const NO_INTEREST_UP_TO  = {{ $noInterestUpTo }};
+    const INSTALLMENT_TAX    = {{ $installmentTax }};
+    const PASS_FEE_TO_CLIENT = {{ $passFeeToClient ? 'true' : 'false' }};
+
+    // Opções de parcelas pré-calculadas pelo PHP
+    const INSTALLMENT_OPTIONS = @json($installmentOptions);
 
     console.log('=== SumUp Form Initialization ===');
     console.log('Checkout ID:', CHECKOUT_ID);
@@ -181,7 +217,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     locale: 'pt-BR',
                     country: 'BR',
                     currency: 'BRL',
-                    showInstallments: true,
+                    showInstallments: MAX_INSTALLMENTS > 1,
+                    maxInstallments: MAX_INSTALLMENTS,
+                    onChangeInstallments: function(installments) {
+                        // Atualizar o resumo do pedido com o valor da parcela selecionada
+                        var option = INSTALLMENT_OPTIONS.find(function(o) { return o.n === installments; });
+                        if (option) {
+                            var summaryEl = document.getElementById('sumup-installment-summary');
+                            if (summaryEl) {
+                                var perStr = 'R$ ' + option.per_installment.toFixed(2).replace('.', ',');
+                                var totalStr = 'R$ ' + option.total.toFixed(2).replace('.', ',');
+                                if (option.has_interest) {
+                                    summaryEl.innerHTML = '<span class="text-amber-700 font-semibold">' + installments + 'x de ' + perStr + ' (total: ' + totalStr + ' com ' + INSTALLMENT_TAX + '% de juros)</span>';
+                                } else {
+                                    summaryEl.innerHTML = '<span class="text-teal-700 font-semibold">' + installments + 'x de ' + perStr + ' sem juros</span>';
+                                }
+                                summaryEl.classList.remove('hidden');
+                            }
+                        }
+                    },
                     onResponse: function(type, body) {
                         console.log('SumUp Card Response:', type, body);
                         if (type === 'success') {

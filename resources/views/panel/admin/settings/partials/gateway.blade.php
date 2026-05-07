@@ -635,6 +635,55 @@
         </div>
     </div>
 
+    {{-- Parcelamento SumUp --}}
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-4">
+        <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+            <i class="fas fa-layer-group text-slate-500 text-xs"></i>
+            <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Parcelamento SumUp</span>
+            <span class="ml-auto text-[10px] text-slate-400 font-medium">Disponível apenas para cartão de crédito no Brasil</span>
+        </div>
+        <div class="p-4 bg-white dark:bg-slate-900 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Máx. Parcelas</label>
+                <div class="relative">
+                    <input type="number" min="1" max="12" step="1" name="sumup_max_installments"
+                        value="{{ $settings['sumup_max_installments'] ?? '12' }}"
+                        class="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                    <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-xs pointer-events-none">x</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">1 = somente à vista (sem parcelamento)</p>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Parcelas sem Juros</label>
+                <div class="relative">
+                    <input type="number" min="1" max="12" step="1" name="sumup_installments_no_interest"
+                        value="{{ $settings['sumup_installments_no_interest'] ?? '1' }}"
+                        class="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                    <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-xs pointer-events-none">x</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">Parcelas até este número não têm juros</p>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Juros por Parcela (%)</label>
+                <div class="relative">
+                    <input type="number" min="0" max="99.99" step="0.01" name="sumup_installment_tax"
+                        value="{{ $settings['sumup_installment_tax'] ?? '0.00' }}"
+                        class="w-full px-4 py-3 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                    <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">%</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">Aplicado a partir da {{ ($settings['sumup_installments_no_interest'] ?? 1) + 1 }}ª parcela</p>
+            </div>
+        </div>
+        <div class="px-4 pb-4 bg-white dark:bg-slate-900">
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/40 rounded-xl p-3 text-xs text-blue-700 dark:text-blue-300">
+                <i class="fas fa-info-circle mr-1"></i>
+                <strong>Como funciona:</strong> O valor com juros é calculado automaticamente e exibido no seletor de parcelas do checkout.
+                Exemplo: R$ 100,00 em 3x com 2% de juros = R$ 34,00/parcela (R$ 102,00 total).
+                O repasse ao comprador é controlado pela opção "Repassar Taxa ao Comprador" acima.
+            </div>
+        </div>
+    </div>
+
     {{-- Métodos SumUp --}}
     <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
@@ -746,6 +795,25 @@
 
         /* ───────── METHOD CARD TOGGLE ───────── */
         function onMethodToggle(cb) {
+            // Validação: impedir desativar ambos os métodos
+            if (!cb.checked) {
+                const allMethodCheckboxes = document.querySelectorAll('.method-cb');
+                const anyChecked = Array.from(allMethodCheckboxes).some(c => c !== cb && c.checked);
+                
+                if (!anyChecked) {
+                    const Toast = Swal.mixin({
+                        toast: true, position: 'top-end',
+                        showConfirmButton: false, timer: 3000, timerProgressBar: true
+                    });
+                    Toast.fire({ 
+                        icon: 'warning', 
+                        title: 'Pelo menos um método de pagamento deve estar ativo!' 
+                    });
+                    cb.checked = true; // Reverter
+                    return;
+                }
+            }
+
             const card  = cb.closest('label');
             const color = cb.dataset.color;
             const badge = card.querySelector('.method-status-badge');
