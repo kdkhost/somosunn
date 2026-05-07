@@ -773,10 +773,13 @@ class EventReservationController extends Controller
             $sumupPublicKey = $merchantCode;
 
             return view('checkout.transparent', [
-                'order' => $order,
-                'checkoutId' => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
-                'publicKey' => $sumupPublicKey,
-                'gateway' => 'sumup',
+                'order'           => $order,
+                'checkoutId'      => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
+                'publicKey'       => $sumupPublicKey,
+                'gateway'         => 'sumup',
+                'sumupMethodCard' => (bool) \App\Models\Setting::get('sumup_method_card', 1),
+                'sumupMethodPix'  => (bool) \App\Models\Setting::get('sumup_method_pix', 1),
+                'sumupApiKey'     => $apiKey,
             ]);
         } catch (\Exception $e) {
             \Log::error('Falha ao iniciar pagamento SumUp de evento', [

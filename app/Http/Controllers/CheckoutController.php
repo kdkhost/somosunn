@@ -417,4 +417,78 @@ class CheckoutController extends Controller
             ->latest('id')
             ->first();
     }
+
+    /**
+     * Gera PIX via SumUp para o pedido informado.
+     */
+    public function sumupPix(Request $request, \App\Services\Payment\SumUpService $sumUpService)
+    {
+        $request->validate(['order_id' => 'required|integer']);
+
+        $order = Order::with('items', 'user')->findOrFail($request->order_id);
+
+        // Verificar acesso
+        abort_unless(Auth::check() && Auth::id() === $order->user_id, 403);
+
+        try {
+            $result = $sumUpService->processPixCheckout($order);
+
+            // Gerar QR Code base64 se não vier da API
+            $qrCodeBase64 = null;
+            $copyPaste    = $result['copy_paste'] ?? $result['qr_code'] ?? '';
+
+            if (!empty($copyPaste)) {
+                // Usar API pública para gerar QR Code
+                $qrResponse = \Illuminate\Support\Facades\Http::get('https://api.qrserver.com/v1/create-qr-code/', [
+                    'size' => '200x200',
+                    'data' => $copyPaste,
+                    'format' => 'png',
+                ]);
+
+                if ($qrResponse->successful()) {
+                    $qrCodeBase64 = base64_encode($qrResponse->body());
+                }
+            }
+
+            return response()->json([
+                'success'        => true,
+                'checkout_id'    => $result['checkout_id'] ?? null,
+                'qr_code'        => $result['qr_code'] ?? '',
+                'copy_paste'     => $copyPaste,
+                'qr_code_base64' => $qrCodeBase64,
+                'expires_at'     => now()->addMinutes(30)->toIso8601String(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('SumUp PIX error', ['order_id' => $request->order_id, 'error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'error' => 'Erro ao gerar PIX. Tente novamente.'], 500);
+        }
+    }
+
+    /**
+     * Consulta status de um checkout SumUp.
+     */
+    public function sumupStatus(Request $request, \App\Services\Payment\SumUpService $sumUpService)
+    {
+        $request->validate(['order_id' => 'required|integer']);
+
+        $order = Order::findOrFail($request->order_id);
+        abort_unless(Auth::check() && Auth::id() === $order->user_id, 403);
+
+        try {
+            $transaction = \App\Models\SumUpTransaction::where('order_id', $order->id)
+                ->latest()
+                ->first();
+
+            if (!$transaction) {
+                return response()->json(['status' => 'PENDING']);
+            }
+
+            return response()->json([
+                'status'      => $transaction->status,
+                'checkout_id' => $transaction->checkout_id,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json(['status' => 'PENDING']);
+        }
+    }
 }
