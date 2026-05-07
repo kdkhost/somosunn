@@ -46,6 +46,9 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **Wrapper DOMContentLoaded**: adicionado para garantir que DOM esteja pronto antes da inicialização
 - **Referência a variável checkoutId**: corrigida para usar `checkoutIdValue` consistentemente
 - **Verificação de existência do container**: adicionada antes de tentar renderizar o widget
+- **Métodos PIX/Cartão desabilitados**: `Setting::get('sumup_method_card', 1)` retornava `null` quando a chave não existia no banco — cast `(bool)null` = `false` ignorava o default; corrigido com verificação explícita null-coalesce
+- **QR Code PIX não exibido**: `processPixCheckout` usava `payment_type='boleto'` (incorreto); corrigido para `payment_type='pix'`; extração do QR Code agora tenta múltiplos campos da resposta da API SumUp com fallback encadeado
+- **Tratamento de erros PIX**: `sumupPix()` agora loga a resposta raw completa, retorna erro 422 claro quando API não retorna código PIX, e o frontend exibe a mensagem real do erro
 
 ---
 
