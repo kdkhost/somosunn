@@ -19,6 +19,16 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **Roteamento condicional** no `EventReservationController` para processar pagamentos via SumUp ou Mercado Pago baseado no gateway ativo
 - **Formulário de cartão SumUp** (`sumup-card-form.blade.php`) para checkout transparente de eventos
 - **Métodos dedicados** `processSumUpPayment()` e `processMercadoPagoPayment()` para processamento isolado de cada gateway
+- **Seleção de método de pagamento PIX/Cartão** no checkout SumUp com interface de botões
+- **Geração de QR Code PIX inline** via `SumUpService::processPixCheckout()`
+- **Polling automático** de status de pagamento PIX a cada 5 segundos
+- **Timer regressivo de 30 minutos** para expiração do PIX
+- **Botão "Copiar código PIX"** para facilitar pagamento
+- **Rotas dedicadas** `POST /checkout/sumup/pix` e `GET /checkout/sumup/status` para processamento PIX
+- **Métodos no CheckoutController**: `sumupPix()` e `sumupStatus()` para gerenciar pagamentos PIX
+- **Logs detalhados de debug** no formulário SumUp para diagnosticar problemas de renderização
+- **Bloco de debug visual** (apenas em modo debug) mostrando variáveis recebidas pelo formulário
+- **Logs de console** em cada etapa da inicialização do SumUp Card Widget
 
 ### Corrigido
 - Salvamento das credenciais SumUp do vendedor, incluindo API Key e Merchant Code em `gateway_accounts.extra`.
@@ -31,6 +41,11 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **Sincronização automática** entre `settings` e `gateway_accounts` ao ativar/desativar gateways no painel admin
 - **Migração `add_sumup_subscription_id_to_subscriptions_table`**: corrigida referência à coluna inexistente `gateway` para usar `next_billing_at` (coluna que existe na tabela `subscriptions`)
 - **Models SumUp**: adicionada propriedade `$table` explícita nos Models `SumUpTransaction`, `SumUpWebhookLog` e `SumUpSavedCard` para usar nomes corretos das tabelas (`sumup_*` em vez da convenção padrão `sum_up_*` do Laravel)
+- **Inicialização do SumUp Card Widget**: corrigido container ID de `sumup-checkout-container` para `sumup-card` (requerido pelo SDK)
+- **Renderização automática**: removida chamada incorreta `sumupCard.render()` - `SumUpCard.mount()` já renderiza automaticamente
+- **Wrapper DOMContentLoaded**: adicionado para garantir que DOM esteja pronto antes da inicialização
+- **Referência a variável checkoutId**: corrigida para usar `checkoutIdValue` consistentemente
+- **Verificação de existência do container**: adicionada antes de tentar renderizar o widget
 
 ---
 
