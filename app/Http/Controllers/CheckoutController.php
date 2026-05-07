@@ -427,27 +427,24 @@ class CheckoutController extends Controller
 
         $order = Order::with('items', 'user')->findOrFail($request->order_id);
 
-        // Verificar acesso
         abort_unless(Auth::check() && Auth::id() === $order->user_id, 403);
 
         try {
             $result = $sumUpService->processPixCheckout($order);
 
             Log::debug('SumUp PIX result', [
-                'order_id'    => $order->id,
-                'checkout_id' => $result['checkout_id'] ?? null,
-                'qr_code'     => !empty($result['qr_code']) ? 'presente (' . strlen($result['qr_code']) . ' chars)' : 'VAZIO',
-                'copy_paste'  => !empty($result['copy_paste']) ? 'presente (' . strlen($result['copy_paste']) . ' chars)' : 'VAZIO',
-                'raw_keys'    => array_keys($result['raw'] ?? []),
+                'order_id'       => $order->id,
+                'checkout_id'    => $result['checkout_id'] ?? null,
+                'has_qr_base64'  => !empty($result['qr_code_base64']),
+                'has_copy_paste' => !empty($result['copy_paste']),
+                'copy_paste_len' => strlen($result['copy_paste'] ?? ''),
             ]);
 
-            // O código para o QR Code é copy_paste (preferido) ou qr_code
-            $pixCode   = $result['copy_paste'] ?? $result['qr_code'] ?? '';
-            $qrDisplay = $result['qr_code'] ?? $pixCode;
+            $pixCode      = $result['copy_paste'] ?? '';
+            $qrCodeBase64 = $result['qr_code_base64'] ?? '';
 
-            // Gerar QR Code base64 a partir do código PIX
-            $qrCodeBase64 = null;
-            if (!empty($pixCode)) {
+            // Se a API não retornou base64, gerar via qrserver como fallback
+            if (empty($qrCodeBase64) && !empty($pixCode)) {
                 $qrResponse = \Illuminate\Support\Facades\Http::timeout(10)
                     ->get('https://api.qrserver.com/v1/create-qr-code/', [
                         'size'   => '200x200',
@@ -457,14 +454,10 @@ class CheckoutController extends Controller
 
                 if ($qrResponse->successful()) {
                     $qrCodeBase64 = base64_encode($qrResponse->body());
-                } else {
-                    Log::warning('SumUp PIX: falha ao gerar QR Code via qrserver', [
-                        'status' => $qrResponse->status(),
-                    ]);
                 }
             }
 
-            // Se a API não retornou código PIX, retornar erro claro
+            // Se não há código PIX, retornar erro claro
             if (empty($pixCode)) {
                 Log::error('SumUp PIX: API nao retornou codigo PIX', [
                     'order_id' => $order->id,
@@ -472,14 +465,14 @@ class CheckoutController extends Controller
                 ]);
                 return response()->json([
                     'success' => false,
-                    'error'   => 'A API SumUp não retornou o código PIX. Verifique se o PIX está habilitado na sua conta SumUp.',
+                    'error'   => 'A API SumUp não retornou o código PIX. Verifique se o PIX está habilitado na sua conta SumUp e se a moeda BRL está configurada.',
                 ], 422);
             }
 
             return response()->json([
                 'success'        => true,
                 'checkout_id'    => $result['checkout_id'] ?? null,
-                'qr_code'        => $qrDisplay,
+                'qr_code'        => $pixCode,
                 'copy_paste'     => $pixCode,
                 'qr_code_base64' => $qrCodeBase64,
                 'expires_at'     => now()->addMinutes(30)->toIso8601String(),

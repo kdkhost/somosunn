@@ -87,16 +87,18 @@ class SumUpService
     /**
      * Cria checkout PIX e retorna QR Code.
      *
-     * A API SumUp para PIX no Brasil usa payment_type = 'pix' no PUT.
-     * A resposta traz os dados do QR Code em transaction_data.pix ou
-     * diretamente em transaction_data dependendo da versão da API.
+     * A API SumUp retorna os dados do PIX em pix.artefacts[]:
+     *   - name="barcode" → imagem JPEG do QR Code (URL para download)
+     *   - name="code"    → código copia-e-cola (texto, campo "content")
+     *
+     * Também suporta qr_code_pix com a mesma estrutura.
      */
     public function processPixCheckout(Order $order): array
     {
         $config   = $this->getSellerConfig($order);
         $checkout = $this->createCheckout($order, ['payment_type' => 'PIX']);
 
-        // Submete o checkout como PIX
+        // Submete o checkout como PIX (sem personal_details — conta SumUp do vendedor)
         $payload = ['payment_type' => 'pix'];
 
         $response = $this->put("/v0.1/checkouts/{$checkout['checkout_id']}", $payload, $config['api_key']);
@@ -106,25 +108,59 @@ class SumUpService
             'response'    => $response,
         ]);
 
-        // Tentar extrair QR Code de diferentes estruturas de resposta da API SumUp
-        $qrCode = data_get($response, 'transaction_data.pix.qr_code')
-            ?? data_get($response, 'pix.qr_code')
-            ?? data_get($response, 'transaction_data.qr_code')
-            ?? data_get($response, 'qr_code')
-            ?? data_get($response, 'transaction_code')
-            ?? '';
+        // Extrair artefatos do PIX — estrutura oficial da API SumUp
+        // Tenta 'pix' primeiro, depois 'qr_code_pix' como fallback
+        $artefacts = data_get($response, 'pix.artefacts', [])
+            ?: data_get($response, 'qr_code_pix.artefacts', []);
 
-        $copyPaste = data_get($response, 'transaction_data.pix.copy_paste')
-            ?? data_get($response, 'pix.copy_paste')
-            ?? data_get($response, 'transaction_data.copy_paste')
-            ?? data_get($response, 'copy_paste')
-            ?? $qrCode; // fallback: usar o próprio qr_code como copia-e-cola
+        $qrCodeUrl  = '';
+        $copyPaste  = '';
+        $qrCodeBase64 = '';
+
+        foreach ($artefacts as $artefact) {
+            $name = $artefact['name'] ?? '';
+            if ($name === 'barcode') {
+                $qrCodeUrl = $artefact['location'] ?? '';
+            } elseif ($name === 'code') {
+                // O código copia-e-cola vem diretamente no campo "content"
+                $copyPaste = $artefact['content'] ?? '';
+                if (empty($copyPaste) && !empty($artefact['location'])) {
+                    // Fallback: buscar o conteúdo via URL
+                    try {
+                        $codeResponse = Http::withHeaders($this->headers($config['api_key']))
+                            ->timeout(10)
+                            ->get($artefact['location']);
+                        if ($codeResponse->successful()) {
+                            $copyPaste = trim($codeResponse->body());
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning('SumUp PIX: falha ao buscar codigo copia-e-cola', ['error' => $e->getMessage()]);
+                    }
+                }
+            }
+        }
+
+        // Baixar imagem do QR Code e converter para base64
+        if (!empty($qrCodeUrl)) {
+            try {
+                $imgResponse = Http::withHeaders($this->headers($config['api_key']))
+                    ->timeout(10)
+                    ->get($qrCodeUrl);
+                if ($imgResponse->successful()) {
+                    $qrCodeBase64 = base64_encode($imgResponse->body());
+                }
+            } catch (\Throwable $e) {
+                Log::warning('SumUp PIX: falha ao baixar imagem do QR Code', ['error' => $e->getMessage()]);
+            }
+        }
 
         return [
-            'checkout_id' => $checkout['checkout_id'],
-            'qr_code'     => $qrCode,
-            'copy_paste'  => $copyPaste,
-            'raw'         => $response,
+            'checkout_id'    => $checkout['checkout_id'],
+            'qr_code'        => $copyPaste,   // código copia-e-cola (texto EMV)
+            'copy_paste'     => $copyPaste,
+            'qr_code_base64' => $qrCodeBase64, // imagem base64 do QR Code
+            'qr_code_url'    => $qrCodeUrl,    // URL original da imagem
+            'raw'            => $response,
         ];
     }
 
