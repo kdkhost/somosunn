@@ -772,13 +772,19 @@ class EventReservationController extends Controller
             // Resolver chave pública do SumUp
             $sumupPublicKey = $merchantCode;
 
+            // Ler settings com fallback explícito para 1 (habilitado por padrão)
+            $methodCardRaw = \App\Models\Setting::get('sumup_method_card');
+            $methodPixRaw  = \App\Models\Setting::get('sumup_method_pix');
+            $methodCard = $methodCardRaw !== null ? (bool)(int)$methodCardRaw : true;
+            $methodPix  = $methodPixRaw  !== null ? (bool)(int)$methodPixRaw  : true;
+
             return view('checkout.transparent', [
                 'order'           => $order,
                 'checkoutId'      => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
                 'publicKey'       => $sumupPublicKey,
                 'gateway'         => 'sumup',
-                'sumupMethodCard' => (bool) \App\Models\Setting::get('sumup_method_card', 1),
-                'sumupMethodPix'  => (bool) \App\Models\Setting::get('sumup_method_pix', 1),
+                'sumupMethodCard' => $methodCard,
+                'sumupMethodPix'  => $methodPix,
                 'sumupApiKey'     => $apiKey,
             ]);
         } catch (\Exception $e) {

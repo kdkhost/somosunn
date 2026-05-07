@@ -1,11 +1,11 @@
 @php
-    $methodCard = $sumupMethodCard ?? true;
-    $methodPix  = $sumupMethodPix  ?? true;
-    $apiKey     = $sumupApiKey     ?? '';
-    $orderId    = $order->id       ?? 0;
-    $amount     = number_format($order->total_amount ?? 0, 2, '.', '');
-    $successUrl = route('events.payment.success', $orderId);
-    $pendingUrl = route('events.payment.pending', $orderId);
+    $methodCard      = $sumupMethodCard ?? true;
+    $methodPix       = $sumupMethodPix  ?? true;
+    $apiKey          = $sumupApiKey     ?? '';
+    $orderId         = $order->id       ?? 0;
+    $amount          = number_format($order->total_amount ?? 0, 2, '.', '');
+    $successUrl      = route('events.payment.success', $orderId);
+    $pendingUrl      = route('events.payment.pending', $orderId);
     $checkoutIdValue = $checkoutId ?? '';
 @endphp
 
@@ -22,6 +22,15 @@
 </div>
 @endif
 
+{{-- Aviso quando nenhum método está habilitado --}}
+@if(!$methodCard && !$methodPix)
+<div class="text-center py-10">
+    <i class="fas fa-exclamation-circle text-4xl mb-4 text-amber-400"></i>
+    <p class="font-semibold text-slate-700 mb-1">Nenhum método de pagamento disponível</p>
+    <p class="text-sm text-slate-500">Entre em contato com o organizador do evento.</p>
+</div>
+@endif
+
 {{-- Seletor de método de pagamento --}}
 @if($methodCard && $methodPix)
 <div class="mb-6">
@@ -29,7 +38,7 @@
     <div class="grid grid-cols-2 gap-3">
         <button type="button" id="btn-method-card"
             onclick="selectSumupMethod('card')"
-            class="sumup-method-btn active flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-blue-500 bg-blue-50 text-blue-700 font-semibold transition-all">
+            class="sumup-method-btn flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-blue-500 bg-blue-50 text-blue-700 font-semibold transition-all">
             <i class="fas fa-credit-card"></i> Cartão
         </button>
         <button type="button" id="btn-method-pix"
@@ -39,11 +48,25 @@
         </button>
     </div>
 </div>
+@elseif($methodPix && !$methodCard)
+{{-- Só PIX: mostrar título --}}
+<div class="mb-4">
+    <p class="text-sm font-semibold text-slate-600 uppercase tracking-wider flex items-center gap-2">
+        <i class="fa-brands fa-pix text-teal-500"></i> Pagamento via PIX
+    </p>
+</div>
+@elseif($methodCard && !$methodPix)
+{{-- Só Cartão: mostrar título --}}
+<div class="mb-4">
+    <p class="text-sm font-semibold text-slate-600 uppercase tracking-wider flex items-center gap-2">
+        <i class="fas fa-credit-card text-blue-500"></i> Pagamento com Cartão
+    </p>
+</div>
 @endif
 
 {{-- Formulário de Cartão (SumUp Card Widget) --}}
 @if($methodCard)
-<div id="sumup-card-section">
+<div id="sumup-card-section" class="{{ (!$methodCard || ($methodCard && $methodPix)) ? '' : '' }}">
     <div id="sumup-card"></div>
 </div>
 @endif
@@ -88,13 +111,13 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 (function() {
-    const CHECKOUT_ID  = '{{ $checkoutIdValue }}';
-    const API_KEY      = '{{ $apiKey }}';
-    const ORDER_ID     = {{ $orderId }};
-    const SUCCESS_URL  = '{{ $successUrl }}';
-    const PENDING_URL  = '{{ $pendingUrl }}';
-    const METHOD_CARD  = {{ $methodCard ? 'true' : 'false' }};
-    const METHOD_PIX   = {{ $methodPix  ? 'true' : 'false' }};
+    const CHECKOUT_ID = '{{ $checkoutIdValue }}';
+    const API_KEY     = '{{ $apiKey }}';
+    const ORDER_ID    = {{ $orderId }};
+    const SUCCESS_URL = '{{ $successUrl }}';
+    const PENDING_URL = '{{ $pendingUrl }}';
+    const METHOD_CARD = {{ $methodCard ? 'true' : 'false' }};
+    const METHOD_PIX  = {{ $methodPix  ? 'true' : 'false' }};
 
     console.log('=== SumUp Form Initialization ===');
     console.log('Checkout ID:', CHECKOUT_ID);
@@ -138,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (METHOD_CARD) {
         console.log('Initializing SumUp Card Widget...');
         const cardContainer = document.getElementById('sumup-card');
-        
+
         if (!cardContainer) {
             console.error('Container #sumup-card not found in DOM');
         } else if (!CHECKOUT_ID) {
@@ -160,14 +183,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (typeof toastr !== 'undefined') toastr.success('Pagamento aprovado!');
                             setTimeout(() => window.location.href = SUCCESS_URL, 1500);
                         } else if (type === 'error') {
-                            if (typeof toastr !== 'undefined') toastr.error(body.message || 'Erro ao processar pagamento.');
+                            if (typeof toastr !== 'undefined') toastr.error((body && body.message) || 'Erro ao processar pagamento.');
                         } else if (type === 'pending') {
                             if (typeof toastr !== 'undefined') toastr.info('Pagamento pendente de confirmação.');
                             setTimeout(() => window.location.href = PENDING_URL, 1500);
                         }
                     },
-                    onLoad: function() { 
-                        console.log('SumUp Card Widget loaded successfully'); 
+                    onLoad: function() {
+                        console.log('SumUp Card Widget loaded successfully');
                     },
                     onError: function(error) {
                         console.error('SumUp Widget Error:', error);
@@ -204,28 +227,44 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({ order_id: ORDER_ID })
         })
-        .then(r => r.json())
-        .then(data => {
+        .then(function(r) {
+            return r.json().then(function(data) {
+                return { ok: r.ok, status: r.status, data: data };
+            });
+        })
+        .then(function(res) {
             loading && loading.classList.add('hidden');
 
-            if (!data.success) {
-                throw new Error(data.error || 'Erro ao gerar PIX');
+            if (!res.ok || !res.data.success) {
+                throw new Error(res.data.error || 'Erro ao gerar PIX (HTTP ' + res.status + ')');
             }
+
+            const data = res.data;
+            console.log('PIX data received:', {
+                checkout_id: data.checkout_id,
+                has_qr_base64: !!data.qr_code_base64,
+                has_qr_code: !!data.qr_code,
+                has_copy_paste: !!data.copy_paste,
+            });
 
             pixLoaded = true;
 
-            // QR Code
+            // QR Code — preferir base64, depois gerar via qrserver
             const qrContainer = document.getElementById('sumup-pix-qr');
             if (data.qr_code_base64) {
-                qrContainer.innerHTML = `<img src="data:image/png;base64,${data.qr_code_base64}" alt="PIX QR Code" class="w-48 h-48 mx-auto rounded-xl border border-slate-200">`;
-            } else if (data.qr_code) {
-                // Gerar QR Code via API pública se não vier base64
-                qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=${encodeURIComponent(data.qr_code)}" alt="PIX QR Code" class="w-48 h-48 mx-auto rounded-xl border border-slate-200">`;
+                qrContainer.innerHTML = '<img src="data:image/png;base64,' + data.qr_code_base64 + '" alt="PIX QR Code" class="w-48 h-48 mx-auto rounded-xl border border-slate-200">';
+            } else if (data.copy_paste || data.qr_code) {
+                const pixData = encodeURIComponent(data.copy_paste || data.qr_code);
+                qrContainer.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=' + pixData + '" alt="PIX QR Code" class="w-48 h-48 mx-auto rounded-xl border border-slate-200">';
+            } else {
+                qrContainer.innerHTML = '<div class="w-48 h-48 mx-auto rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400 text-xs">QR Code indisponível</div>';
             }
 
             // Código copia e cola
             const codeInput = document.getElementById('sumup-pix-code');
-            if (codeInput) codeInput.value = data.copy_paste || data.qr_code || '';
+            if (codeInput) {
+                codeInput.value = data.copy_paste || data.qr_code || '';
+            }
 
             // Timer
             if (data.expires_at) {
@@ -237,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Polling de status
             startPixPolling(data.checkout_id || CHECKOUT_ID);
         })
-        .catch(err => {
+        .catch(function(err) {
             console.error('PIX error:', err);
             loading && loading.classList.add('hidden');
             errDiv  && errDiv.classList.remove('hidden');
@@ -247,24 +286,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.copySumupPix = function() {
         const el = document.getElementById('sumup-pix-code');
-        if (!el) return;
+        if (!el || !el.value) return;
         el.select();
-        document.execCommand('copy');
+        try {
+            document.execCommand('copy');
+        } catch (e) {
+            navigator.clipboard && navigator.clipboard.writeText(el.value);
+        }
         if (typeof toastr !== 'undefined') toastr.success('Código PIX copiado!');
     };
 
     function startPixTimer(expiresAtIso) {
-        const expiresAt   = new Date(expiresAtIso).getTime();
-        const timerDiv    = document.getElementById('sumup-pix-timer');
-        const timerValue  = document.getElementById('sumup-pix-timer-value');
+        const expiresAt  = new Date(expiresAtIso).getTime();
+        const timerDiv   = document.getElementById('sumup-pix-timer');
+        const timerValue = document.getElementById('sumup-pix-timer-value');
 
         if (!timerDiv || !timerValue) return;
         timerDiv.classList.remove('hidden');
 
         if (pixTimerInterval) clearInterval(pixTimerInterval);
 
-        const update = () => {
-            const diff = expiresAt - Date.now();
+        var update = function() {
+            var diff = expiresAt - Date.now();
             if (diff <= 0) {
                 clearInterval(pixTimerInterval);
                 timerValue.textContent = 'Expirado';
@@ -273,19 +316,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 timerDiv.classList.replace('text-amber-800', 'text-red-800');
                 return;
             }
-            const m = Math.floor(diff / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
-            timerValue.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+            var m = Math.floor(diff / 60000);
+            var s = Math.floor((diff % 60000) / 1000);
+            timerValue.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
         };
         update();
         pixTimerInterval = setInterval(update, 1000);
     }
 
     function startPixPolling(checkoutId) {
-        let attempts = 0;
-        const maxAttempts = 60; // 5 minutos (5s * 60)
+        var attempts    = 0;
+        var maxAttempts = 60; // 5 minutos
 
-        const poll = setInterval(() => {
+        var poll = setInterval(function() {
             attempts++;
             if (attempts > maxAttempts) {
                 clearInterval(poll);
@@ -293,20 +336,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             fetch('{{ route("checkout.sumup.status") }}?checkout_id=' + checkoutId + '&order_id=' + ORDER_ID, {
-                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
             })
-            .then(r => r.json())
-            .then(data => {
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
                 if (data.status === 'PAID' || data.status === 'SUCCESSFUL') {
                     clearInterval(poll);
                     if (typeof toastr !== 'undefined') toastr.success('Pagamento PIX confirmado!');
-                    setTimeout(() => window.location.href = SUCCESS_URL, 1500);
+                    setTimeout(function() { window.location.href = SUCCESS_URL; }, 1500);
                 } else if (data.status === 'FAILED') {
                     clearInterval(poll);
                     if (typeof toastr !== 'undefined') toastr.error('Pagamento PIX falhou. Tente novamente.');
                 }
             })
-            .catch(() => {}); // Silenciar erros de polling
+            .catch(function() {}); // silenciar erros de polling
         }, 5000);
     }
 
@@ -320,6 +366,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <style>
     #sumup-card { min-height: 400px; }
-    #sumup-card iframe { width: 100% !important; border: none !important; min-height: 400px !important; }
+    #sumup-card iframe {
+        width: 100% !important;
+        border: none !important;
+        min-height: 400px !important;
+    }
     #sumup-pix-section { min-height: 200px; }
+
+    /* Corrigir altura dos campos do formulário SumUp */
+    #sumup-card .sumup-card-input-wrapper,
+    #sumup-card .sumup-card-input,
+    #sumup-card input[type="text"],
+    #sumup-card input[type="tel"],
+    #sumup-card input[type="email"] {
+        height: 48px !important;
+        max-height: 48px !important;
+        min-height: 48px !important;
+        line-height: 48px !important;
+        padding: 0 12px !important;
+        font-size: 14px !important;
+    }
+
+    /* Corrigir altura dos iframes internos do SumUp */
+    #sumup-card iframe[name*="sumup"] {
+        height: 48px !important;
+        max-height: 48px !important;
+        min-height: 48px !important;
+    }
+
+    /* Corrigir containers dos campos */
+    #sumup-card [class*="input-container"],
+    #sumup-card [class*="field-container"],
+    #sumup-card .sumup-card-field {
+        height: 48px !important;
+        max-height: 48px !important;
+        min-height: 48px !important;
+        margin-bottom: 16px !important;
+    }
+
+    /* Corrigir labels */
+    #sumup-card label {
+        font-size: 13px !important;
+        margin-bottom: 6px !important;
+        display: block !important;
+    }
+
+    /* Corrigir botão de submit */
+    #sumup-card button[type="submit"],
+    #sumup-card .sumup-card-button {
+        height: 50px !important;
+        max-height: 50px !important;
+        min-height: 50px !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+    }
 </style>

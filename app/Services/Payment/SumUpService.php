@@ -86,18 +86,39 @@ class SumUpService
 
     /**
      * Cria checkout PIX e retorna QR Code.
+     *
+     * A API SumUp para PIX no Brasil usa payment_type = 'pix' no PUT.
+     * A resposta traz os dados do QR Code em transaction_data.pix ou
+     * diretamente em transaction_data dependendo da versão da API.
      */
     public function processPixCheckout(Order $order): array
     {
         $config   = $this->getSellerConfig($order);
         $checkout = $this->createCheckout($order, ['payment_type' => 'PIX']);
 
-        $payload = ['payment_type' => 'boleto'];
+        // Submete o checkout como PIX
+        $payload = ['payment_type' => 'pix'];
 
         $response = $this->put("/v0.1/checkouts/{$checkout['checkout_id']}", $payload, $config['api_key']);
 
-        $qrCode   = data_get($response, 'transaction_code') ?? data_get($response, 'pix.qr_code', '');
-        $copyPaste = data_get($response, 'pix.copy_paste', '');
+        Log::debug('SumUp PIX checkout response', [
+            'checkout_id' => $checkout['checkout_id'],
+            'response'    => $response,
+        ]);
+
+        // Tentar extrair QR Code de diferentes estruturas de resposta da API SumUp
+        $qrCode = data_get($response, 'transaction_data.pix.qr_code')
+            ?? data_get($response, 'pix.qr_code')
+            ?? data_get($response, 'transaction_data.qr_code')
+            ?? data_get($response, 'qr_code')
+            ?? data_get($response, 'transaction_code')
+            ?? '';
+
+        $copyPaste = data_get($response, 'transaction_data.pix.copy_paste')
+            ?? data_get($response, 'pix.copy_paste')
+            ?? data_get($response, 'transaction_data.copy_paste')
+            ?? data_get($response, 'copy_paste')
+            ?? $qrCode; // fallback: usar o próprio qr_code como copia-e-cola
 
         return [
             'checkout_id' => $checkout['checkout_id'],
