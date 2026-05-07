@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            $table->string('sumup_subscription_id')->nullable()->after('gateway')->index();
+            $table->string('sumup_subscription_id')->nullable()->after('next_billing_at')->index();
         });
     }
 
