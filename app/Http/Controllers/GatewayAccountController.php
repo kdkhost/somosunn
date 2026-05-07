@@ -14,8 +14,11 @@ class GatewayAccountController extends Controller
     public function index()
     {
         $gateway = GatewayAccount::firstOrNew(['user_id' => Auth::id(), 'provider' => 'mercadopago']);
+        $sumupAccount = GatewayAccount::where('user_id', Auth::id())
+            ->where('provider', 'sumup')
+            ->first();
 
-        return view('settings.payment', compact('gateway'));
+        return view('settings.payment', compact('gateway', 'sumupAccount'));
     }
 
     public function update(Request $request)
@@ -23,12 +26,38 @@ class GatewayAccountController extends Controller
         $provider = $request->input('provider', 'mercadopago');
 
         $validated = $request->validate([
+            'provider' => 'nullable|in:mercadopago,sumup',
             'public_key' => 'nullable|string',
             'access_token' => 'nullable|string',
             'max_installments' => 'nullable|integer|min:1|max:12',
             'pass_fee' => 'nullable|boolean',
             'methods' => 'nullable|array',
+            'sumup_access_token' => 'required_if:provider,sumup|nullable|string',
+            'sumup_merchant_code' => 'required_if:provider,sumup|nullable|string|max:80',
+        ], [
+            'provider.in' => 'Selecione um gateway de pagamento válido.',
+            'sumup_access_token.required_if' => 'Informe a API Key da SumUp para ativar este gateway.',
+            'sumup_merchant_code.required_if' => 'Informe o Merchant Code da SumUp para ativar este gateway.',
         ]);
+
+        if ($provider === 'sumup') {
+            $sumupAccount = GatewayAccount::firstOrNew([
+                'user_id' => Auth::id(),
+                'provider' => 'sumup',
+            ]);
+
+            $extra = (array) ($sumupAccount->extra ?? []);
+            $extra['merchant_code'] = strtoupper(trim((string) $validated['sumup_merchant_code']));
+
+            $sumupAccount->fill([
+                'access_token' => trim((string) $validated['sumup_access_token']),
+                'enabled' => true,
+                'extra' => $extra,
+            ]);
+            $sumupAccount->save();
+
+            return back()->with('success', 'Credenciais da SumUp salvas com sucesso.');
+        }
 
         $data = [];
 

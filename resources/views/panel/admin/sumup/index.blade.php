@@ -15,7 +15,11 @@
             <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Transações SumUp</h2>
             <p class="text-slate-500 dark:text-slate-400 text-sm">Gerencie todos os pagamentos processados via SumUp.</p>
         </div>
-        <div class="flex gap-3">
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ route('panel.admin.settings', ['group' => 'gateway']) }}"
+               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-2xl shadow-lg shadow-blue-500/30 transition flex items-center gap-2">
+                <i class="fas fa-cog"></i> Configurar Credenciais
+            </a>
             <a href="{{ route('panel.admin.sumup.report') }}"
                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-2xl shadow-lg shadow-indigo-500/30 transition flex items-center gap-2">
                 <i class="fas fa-chart-bar"></i> Relatório
@@ -24,6 +28,23 @@
                     class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold py-2.5 px-5 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition flex items-center gap-2">
                 <i class="fas fa-plug"></i> Testar Conexão
             </button>
+        </div>
+    </div>
+
+    <div class="bg-blue-50 dark:bg-blue-950/20 rounded-2xl p-4 border border-blue-100 dark:border-blue-900/50 shadow-sm">
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-key"></i>
+            </div>
+            <div class="min-w-0">
+                <h3 class="text-sm font-black text-blue-950 dark:text-blue-200">Antes de testar a SumUp</h3>
+                <p class="text-xs text-blue-900 dark:text-blue-200 mt-1 leading-relaxed">
+                    Preencha em <strong>Configurações &gt; Pagamentos</strong> a <strong>API Key secreta</strong> criada em
+                    <strong>me.sumup.com &gt; Settings &gt; For Developers &gt; Toolkit &gt; API Keys</strong> e o
+                    <strong>Merchant Code</strong> da mesma conta lojista. Client ID, Client Secret e Webhook Secret são opcionais
+                    e só devem ser usados quando OAuth ou assinatura HMAC estiverem configurados na SumUp.
+                </p>
+            </div>
         </div>
     </div>
 

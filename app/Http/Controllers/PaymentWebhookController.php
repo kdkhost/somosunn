@@ -37,7 +37,8 @@ class PaymentWebhookController extends Controller
     public function sumup(Request $request, int $orderId, string $token)
     {
         $rawPayload = $request->getContent();
-        $signature  = $request->header('X-SumUp-Signature', '');
+        $signature  = $request->header('X-SumUp-Signature', '')
+            ?: $request->header('X-Payload-Signature', '');
         $payload    = $request->all();
         $eventType  = $payload['event_type'] ?? $payload['type'] ?? 'unknown';
 

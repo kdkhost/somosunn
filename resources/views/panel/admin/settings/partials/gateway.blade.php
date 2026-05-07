@@ -499,12 +499,28 @@
         <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
             <i class="fas fa-key text-slate-500 text-xs"></i>
             <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Credenciais da API SumUp</span>
-            <a href="https://developer.sumup.com/docs/authorization" target="_blank"
+            <a href="https://developer.sumup.com/tools/authorization/api-keys" target="_blank" rel="noopener noreferrer"
                class="ml-auto text-[10px] text-blue-500 hover:underline flex items-center gap-1">
                 <i class="fas fa-external-link-alt text-[8px]"></i> Obter credenciais
             </a>
         </div>
         <div class="p-4 bg-white dark:bg-slate-900 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2 rounded-2xl border border-blue-100 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/20 p-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-info-circle text-sm"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-black text-blue-950 dark:text-blue-200 mb-2">Como preencher as credenciais SumUp</h3>
+                        <ol class="list-decimal ml-4 space-y-1.5 text-xs text-blue-900 dark:text-blue-200 leading-relaxed">
+                            <li><strong>API Key</strong>: acesse <a href="https://me.sumup.com" target="_blank" rel="noopener noreferrer" class="font-bold underline">me.sumup.com</a> &gt; perfil &gt; Settings &gt; For Developers &gt; Toolkit &gt; API Keys, crie uma chave secreta e cole aqui. Não cole a SumUp Public Key.</li>
+                            <li><strong>Merchant Code</strong>: use o código da mesma conta lojista da API Key. Se não souber, cole a API Key, clique em Testar Conexão e copie o Merchant Code retornado pela SumUp.</li>
+                            <li><strong>Client ID e Client Secret</strong>: opcionais para OAuth. Pegue em For Developers &gt; OAuth Apps &gt; Create client secret e baixe o JSON das credenciais.</li>
+                            <li><strong>Webhook Secret</strong>: preencha somente se você configurou assinatura HMAC nos webhooks da SumUp. Se deixar vazio, o sistema valida o webhook pela URL única da transação.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">API Key</label>
                 <div class="relative">
@@ -517,7 +533,7 @@
                         <i class="fas fa-eye text-sm"></i>
                     </button>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-1.5">Personal Access Token ou OAuth Bearer Token</p>
+                <p class="text-[10px] text-slate-400 mt-1.5">Chave secreta server-to-server criada em API Keys. Ela aparece uma única vez.</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Merchant Code</label>
@@ -525,7 +541,7 @@
                     value="{{ $settings['sumup_merchant_code'] ?? '' }}"
                     placeholder="MXXXXXXXX"
                     class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
-                <p class="text-[10px] text-slate-400 mt-1.5">Encontrado em: SumUp Dashboard → Perfil</p>
+                <p class="text-[10px] text-slate-400 mt-1.5">Código curto da conta lojista. Também aparece no retorno do teste de conexão.</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Client ID (OAuth)</label>
@@ -533,6 +549,7 @@
                     value="{{ $settings['sumup_client_id'] ?? '' }}"
                     placeholder="com.sumup.app.xxxxxxxx"
                     class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+                <p class="text-[10px] text-slate-400 mt-1.5">Opcional. Use apenas se a integração OAuth da SumUp estiver ativa.</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Client Secret (OAuth)</label>
@@ -546,6 +563,7 @@
                         <i class="fas fa-eye text-sm"></i>
                     </button>
                 </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">Baixado no JSON da credencial OAuth. Não é necessário para API Key simples.</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Webhook Secret (HMAC)</label>
@@ -559,7 +577,7 @@
                         <i class="fas fa-eye text-sm"></i>
                     </button>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-1.5">Usado para validar assinatura dos webhooks recebidos</p>
+                <p class="text-[10px] text-slate-400 mt-1.5">Opcional. Se preenchido, a assinatura enviada pela SumUp precisa bater com este segredo.</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Ambiente</label>

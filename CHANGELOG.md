@@ -8,6 +8,14 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Adicionado
+- Instruções detalhadas para configuração da SumUp nos painéis de gateway, com origem da API Key, Merchant Code, credenciais OAuth e Webhook Secret.
+- Atalho "Configurar Credenciais" e resumo operacional na tela administrativa de transações SumUp.
+
+### Corrigido
+- Salvamento das credenciais SumUp do vendedor, incluindo API Key e Merchant Code em `gateway_accounts.extra`.
+- Validação de webhooks SumUp compatível com o cabeçalho oficial `x-payload-signature`.
+
 ---
 
 ## [2026-04-23]

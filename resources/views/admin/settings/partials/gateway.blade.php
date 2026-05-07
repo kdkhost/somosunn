@@ -313,6 +313,21 @@
             </div>
         </div>
         <div class="card-body">
+            <div class="alert alert-info small">
+                <div class="font-weight-bold mb-2">
+                    <i class="fas fa-info-circle mr-1"></i> Como preencher as credenciais SumUp
+                </div>
+                <ol class="mb-2 pl-3">
+                    <li><strong>API Key:</strong> acesse <a href="https://me.sumup.com" target="_blank" rel="noopener noreferrer">me.sumup.com</a> &gt; perfil &gt; Settings &gt; For Developers &gt; Toolkit &gt; API Keys, crie uma chave secreta e cole aqui. Não use a SumUp Public Key.</li>
+                    <li><strong>Merchant Code:</strong> use o código da mesma conta lojista. Se não souber, cole a API Key, clique em Testar Conexão e copie o Merchant Code retornado pela SumUp.</li>
+                    <li><strong>Client ID e Client Secret:</strong> opcionais para OAuth. Pegue em For Developers &gt; OAuth Apps &gt; Create client secret e baixe o JSON das credenciais.</li>
+                    <li><strong>Webhook Secret:</strong> preencha somente se você configurou assinatura HMAC nos webhooks da SumUp. Se ficar vazio, o sistema valida pela URL única da transação.</li>
+                </ol>
+                <a href="https://developer.sumup.com/tools/authorization/api-keys" target="_blank" rel="noopener noreferrer" class="font-weight-bold">
+                    Abrir guia oficial de API Keys
+                </a>
+            </div>
+
             <div class="row">
                 <div class="col-md-6 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">API Key</label>
@@ -327,20 +342,21 @@
                             </button>
                         </div>
                     </div>
-                    <small class="text-muted">Personal Access Token ou OAuth Bearer Token</small>
+                    <small class="text-muted">Chave secreta server-to-server criada em API Keys. Ela aparece uma única vez.</small>
                 </div>
                 <div class="col-md-6 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Merchant Code</label>
                     <input type="text" name="sumup_merchant_code"
                         value="{{ $settings['sumup_merchant_code'] ?? '' }}"
                         class="form-control font-monospace" placeholder="MXXXXXXXX">
-                    <small class="text-muted">SumUp Dashboard → Perfil</small>
+                    <small class="text-muted">Código curto da conta lojista. Também aparece no retorno do teste de conexão.</small>
                 </div>
                 <div class="col-md-6 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Client ID (OAuth)</label>
                     <input type="text" name="sumup_client_id"
                         value="{{ $settings['sumup_client_id'] ?? '' }}"
                         class="form-control font-monospace" placeholder="com.sumup.app.xxxxxxxx">
+                    <small class="text-muted">Opcional. Use apenas se a integração OAuth da SumUp estiver ativa.</small>
                 </div>
                 <div class="col-md-6 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Client Secret (OAuth)</label>
@@ -355,6 +371,7 @@
                             </button>
                         </div>
                     </div>
+                    <small class="text-muted">Baixado no JSON da credencial OAuth. Não é necessário para API Key simples.</small>
                 </div>
                 <div class="col-md-6 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Webhook Secret (HMAC)</label>
@@ -369,6 +386,7 @@
                             </button>
                         </div>
                     </div>
+                    <small class="text-muted">Opcional. Se preenchido, a assinatura enviada pela SumUp precisa bater com este segredo.</small>
                 </div>
                 <div class="col-md-6 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Ambiente</label>
