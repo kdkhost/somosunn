@@ -11,6 +11,8 @@ class SumUpTransaction extends Model
 {
     use HasFactory;
 
+    protected $table = 'sumup_transactions';
+
     protected $fillable = [
         'order_id',
         'checkout_id',

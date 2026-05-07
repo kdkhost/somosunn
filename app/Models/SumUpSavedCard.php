@@ -10,6 +10,8 @@ class SumUpSavedCard extends Model
 {
     use HasFactory;
 
+    protected $table = 'sumup_saved_cards';
+
     protected $fillable = [
         'user_id',
         'token',

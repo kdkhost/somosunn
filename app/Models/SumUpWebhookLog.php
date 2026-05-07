@@ -9,6 +9,8 @@ class SumUpWebhookLog extends Model
 {
     use HasFactory;
 
+    protected $table = 'sumup_webhook_logs';
+
     protected $fillable = [
         'order_id',
         'event_type',
