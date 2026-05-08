@@ -684,7 +684,14 @@ class SettingController extends Controller
 
         if ($currentGroup === 'gateway') {
             foreach ($paymentMethodCheckboxes as $checkbox) {
-                $data[$checkbox] = $request->has($checkbox) ? 1 : 0;
+                // Usar o valor real (último) em vez de has(), pois o hidden input
+                // com value=0 + checkbox com value=1 sempre faz has() retornar true
+                $value = $request->input($checkbox);
+                // Pode vir como array se houver hidden+checkbox — pegar último
+                if (is_array($value)) {
+                    $value = end($value);
+                }
+                $data[$checkbox] = ((int) $value === 1) ? 1 : 0;
             }
 
             // VALIDAÇÃO: MercadoPago ativo deve ter ao menos um método

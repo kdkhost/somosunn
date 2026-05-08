@@ -38,7 +38,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">Configurações <small class="text-muted">> {{ $currentLabel }}</small></h1>
+                    <h1 class="m-0 text-dark">Configurações <small class="text-muted">&gt; {{ $currentLabel }}</small></h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -52,9 +52,7 @@
 
     <div class="content">
         <div class="container-fluid">
-            {{-- Redundant alerts removed as toastr is global in app.blade.php --}}
-
-            <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" novalidate>
                 @csrf
                 <input type="hidden" name="current_group" value="{{ $group }}">
 
@@ -62,8 +60,9 @@
                     @include('admin.settings.partials.' . $group, ['settings' => $settings, 'getUrl' => $getUrl])
 
                     <div class="card-footer">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Salvar
-                            Alterações</button>
+                        <button type="submit" id="btn-save-settings" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i> <span id="btn-save-label">Salvar Alterações</span>
+                        </button>
                     </div>
                 </div>
             </form>
@@ -76,15 +75,64 @@
     <script src="{{ asset('plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
     <script>
         $(function () {
-            // Initialize Colorpicker
             $('.colorpicker-element').colorpicker();
             $('.colorpicker-element').on('colorpickerChange', function (event) {
                 $(this).find('.fa-square').css('color', event.color.toString());
             });
-
-            // Initialize InputMask
             $('.mask-phone').inputmask('(99) 9999[9]-9999');
             $('.mask-cep').inputmask('99999-999');
+
+            // AJAX Submit - salva sem recarregar a tela
+            $('#settings-form').on('submit', function (e) {
+                e.preventDefault();
+
+                const form = this;
+                const btn  = document.getElementById('btn-save-settings');
+                const lbl  = document.getElementById('btn-save-label');
+                const origLbl = lbl.innerHTML;
+
+                btn.disabled = true;
+                lbl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(async (response) => {
+                    const text = await response.text();
+                    let data;
+                    try { data = JSON.parse(text); } catch (e) { data = { message: text }; }
+
+                    if (response.ok) {
+                        if (typeof toastr !== 'undefined') {
+                            toastr.success(data.message || 'Configurações salvas com sucesso.');
+                        }
+                    } else {
+                        const msg = data.message || (data.errors ? Object.values(data.errors).flat().join('<br>') : 'Erro ao salvar');
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error(msg);
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('Erro de conexão. Tente novamente.');
+                    }
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    lbl.innerHTML = origLbl;
+                });
+            });
         });
     </script>
 @endpush
