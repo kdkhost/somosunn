@@ -85,14 +85,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Override para usar notification customizada com MailTemplate.
-     */
-    public function sendPasswordResetNotification($token)
-    {
-        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
-    }
-
-    /**
      * Retorna o total de inscrições pagas/confirmadas.
      */
     public function getTotalTicketsCount(): int
