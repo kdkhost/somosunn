@@ -1306,20 +1306,28 @@
                                         class="w-full mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md text-center">
                                         Comprar no site externo
                                     </a>
-                                @elseif($product->supportsPointsRedemption() && !$product->supportsInternalCheckout() && $pointsCost > 0)
-                                    <a href="{{ route('panel.redemptions.shop') }}"
-                                        class="w-full mp-selling-action mp-selling-action-primary rounded-2xl bg-amber-500 px-4 py-2 text-sm font-black text-white shadow-md text-center">
-                                        Trocar por {{ number_format($pointsCost, 0, ',', '.') }} UNNBIT
-                                    </a>
                                 @else
-                                    <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="w-full">
-                                        @csrf
-                                        <input type="hidden" name="buy_now" value="1">
-                                        <button type="submit"
-                                            class="w-full mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
-                                            Comprar agora
-                                        </button>
-                                    </form>
+                                    {{-- Se suportar venda, mostrar botão de compra --}}
+                                    @if($product->supportsInternalCheckout())
+                                        <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="w-full">
+                                            @csrf
+                                            <input type="hidden" name="buy_now" value="1">
+                                            <button type="submit"
+                                                class="w-full mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md inline-flex items-center justify-center gap-2">
+                                                <i class="fas fa-shopping-cart"></i>
+                                                Comprar {{ $price > 0 ? 'R$ ' . number_format($price, 2, ',', '.') : 'agora' }}
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    {{-- Se suportar troca por pontos, mostrar botão de troca --}}
+                                    @if($product->supportsPointsRedemption() && $pointsCost > 0)
+                                        <a href="{{ route('panel.redemptions.shop') }}"
+                                            class="w-full mp-selling-action {{ $product->supportsInternalCheckout() ? 'mp-selling-action-secondary' : 'mp-selling-action-primary' }} rounded-2xl bg-amber-500 hover:bg-amber-600 px-4 py-2 text-sm font-black text-white shadow-md text-center inline-flex items-center justify-center gap-2">
+                                            <i class="fas fa-coins"></i>
+                                            Trocar por {{ number_format($pointsCost, 0, ',', '.') }} UNNBIT
+                                        </a>
+                                    @endif
                                 @endif
                             </div>
                         </article>
