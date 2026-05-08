@@ -188,7 +188,13 @@
     @if(($gateway ?? 'mercadopago') === 'mercadopago')
     <script src="https://sdk.mercadopago.com/js/v2"></script>
     <script>
-        const mp = new MercadoPago('{{ $publicKey }}', {
+        const mpPublicKey = '{{ $publicKey ?? '' }}';
+        if (!mpPublicKey || mpPublicKey.trim() === '') {
+            console.error('MercadoPago: publicKey está vazia. Verifique as configurações do gateway.');
+            document.getElementById('paymentBrick_container').innerHTML =
+                '<div class="text-center py-8 text-red-600"><i class="fas fa-exclamation-triangle text-3xl mb-4"></i><p class="font-semibold">Erro de configuração do gateway</p><p class="text-sm text-slate-500 mt-2">A chave pública do Mercado Pago não está configurada. Entre em contato com o administrador.</p></div>';
+        } else {
+        const mp = new MercadoPago(mpPublicKey, {
             locale: 'pt-BR'
         });
         const bricksBuilder = mp.bricks();
@@ -382,6 +388,7 @@
         };
 
         renderPaymentBrick(bricksBuilder);
+        } // fim do else (publicKey válida)
     </script>
     @endif
 @endsection
