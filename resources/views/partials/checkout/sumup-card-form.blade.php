@@ -128,6 +128,15 @@
 
     {{-- Widget SumUp (seletor de parcelas nativo sempre oculto — usamos o nosso) --}}
     <div id="sumup-card"></div>
+
+    {{-- Botão customizado de pagamento com valor atualizado --}}
+    @if($maxInstallments > 1 && $installmentTax > 0 && $passFeeToClient)
+    <button type="button" id="sumup-custom-pay-btn" onclick="submitSumupCard()"
+        class="w-full mt-4 py-4 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-base transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+        <i class="fas fa-lock text-sm"></i>
+        <span id="sumup-pay-btn-text">Pagar R$ {{ number_format($amount, 2, ',', '.') }}</span>
+    </button>
+    @endif
 </div>
 @endif
 
@@ -208,13 +217,23 @@ document.addEventListener('DOMContentLoaded', function() {
         var option = INSTALLMENT_OPTIONS.find(function(o) { return o.n === n; });
         var totalWithInterest = option ? option.total : AMOUNT;
 
-        // Atualizar o widget SumUp com o número de parcelas e o valor total correto
+        // Atualizar o widget SumUp com o número de parcelas
         if (sumupCardInstance && typeof sumupCardInstance.update === 'function') {
-            sumupCardInstance.update({
-                installments: n,
-                amount: totalWithInterest.toFixed(2),
-                currency: 'BRL'
-            });
+            sumupCardInstance.update({ installments: n });
+        }
+
+        // Atualizar o texto do botão customizado
+        var btnText = document.getElementById('sumup-pay-btn-text');
+        if (btnText) {
+            var formatted = totalWithInterest.toFixed(2).replace('.', ',');
+            btnText.textContent = 'Pagar R$ ' + formatted;
+        }
+    };
+
+    // Submeter o formulário SumUp via botão customizado
+    window.submitSumupCard = function() {
+        if (sumupCardInstance && typeof sumupCardInstance.submit === 'function') {
+            sumupCardInstance.submit();
         }
     };
 
@@ -273,6 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     amount: AMOUNT.toFixed(2),
                     showInstallments: false,
                     installments: 1,
+                    showSubmitButton: !(INSTALLMENT_TAX > 0 && PASS_FEE_TO_CLIENT && MAX_INSTALLMENTS > 1),
                     maxInstallments: MAX_INSTALLMENTS,
                     onChangeInstallments: function(installments) {
                         console.log('SumUp native installment changed:', installments);
