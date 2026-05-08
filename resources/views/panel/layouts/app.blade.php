@@ -448,6 +448,52 @@
 
     @include('panel.partials.quick-upload-modal')
 
+    {{-- Flash Messages Handler (Toastr-style via SweetAlert2) --}}
+    @if(session('success') || session('error') || session('warning') || session('info'))
+        <div id="flash-messages"
+             data-success="{{ session('success') }}"
+             data-error="{{ session('error') }}"
+             data-warning="{{ session('warning') }}"
+             data-info="{{ session('info') }}"
+             class="hidden"></div>
+    @endif
+
+    @prepend('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            // Handler global de flash messages
+            document.addEventListener('DOMContentLoaded', function () {
+                const flash = document.getElementById('flash-messages');
+                if (!flash || typeof Swal === 'undefined') return;
+
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    didOpen: (t) => {
+                        t.addEventListener('mouseenter', Swal.stopTimer);
+                        t.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                });
+
+                const messages = [
+                    { type: 'success', msg: flash.dataset.success },
+                    { type: 'error',   msg: flash.dataset.error   },
+                    { type: 'warning', msg: flash.dataset.warning },
+                    { type: 'info',    msg: flash.dataset.info    },
+                ];
+
+                messages.forEach(m => {
+                    if (m.msg && m.msg.trim() !== '') {
+                        Toast.fire({ icon: m.type, title: m.msg });
+                    }
+                });
+            });
+        </script>
+    @endprepend
+
     @prepend('scripts')
         <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.js') }}?v=3"></script>
         <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.js') }}?v=3"></script>

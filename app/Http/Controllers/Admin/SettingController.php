@@ -813,10 +813,11 @@ class SettingController extends Controller
 
         // Auto-save: Retornar JSON se for requisição AJAX
         if ($request->wantsJson() || $request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Configurações salvas automaticamente.']);
+            return response()->json(['success' => true, 'message' => 'Configurações salvas com sucesso.']);
         }
 
-        return response()->json(['reload' => true, 'message' => 'Configuracoes salvas']);
+        // Form submit normal: redirecionar com flash message
+        return redirect()->back()->with('success', 'Configurações salvas com sucesso.');
 
         try {
             Storage::disk('public')->putFileAs($relativeDir, $file, $name, ['visibility' => 'public']);
