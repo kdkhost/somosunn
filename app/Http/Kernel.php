@@ -42,6 +42,7 @@ class Kernel extends HttpKernel
         'check.connection' => \App\Http\Middleware\EnsureConnectionIsAccepted::class,
         'check.plan' => \App\Http\Middleware\EnsureUserHasActivePlan::class,
         'check.marketplace.seller' => \App\Http\Middleware\CheckMarketplaceSeller::class,
+        'check.sumup.permissions' => \App\Http\Middleware\CheckSumUpPermissions::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
 }

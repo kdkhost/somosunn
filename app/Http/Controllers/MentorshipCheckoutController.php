@@ -9,6 +9,7 @@ use App\Services\CouponService;
 use App\Services\OrderSettlementService;
 use App\Services\Payment\MercadoPagoService;
 use App\Support\MarketplaceFee;
+use App\Traits\SumUpIntegration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,7 @@ use Illuminate\Validation\ValidationException;
 
 class MentorshipCheckoutController extends Controller
 {
+    use SumUpIntegration;
     public function show(Mentorship $mentorship)
     {
         if (!Auth::check()) {

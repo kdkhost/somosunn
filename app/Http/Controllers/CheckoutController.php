@@ -12,6 +12,7 @@ use App\Services\CouponService;
 use App\Services\OrderSettlementService;
 use App\Services\Payment\MercadoPagoService;
 use App\Support\MarketplaceFee;
+use App\Traits\SumUpIntegration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,7 @@ use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
 {
+    use SumUpIntegration;
     public function show(Course $course)
     {
         if (!Auth::check()) {
@@ -38,21 +40,35 @@ class CheckoutController extends Controller
         if ($effectiveTotal <= 0) {
             $mpEnabled = false;
             $preferredGateway = null;
+            $availableGateways = [];
 
-            return view('checkout.index', compact('course', 'mpEnabled', 'preferredGateway'));
+            return view('checkout.index', compact('course', 'mpEnabled', 'preferredGateway', 'availableGateways'));
         }
 
         $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
         $mpEnabled = $gateways['mpEnabled'];
+        
+        // Verificar gateways disponíveis incluindo SumUp
+        $availableGateways = $this->getAvailableGateways($effectiveTotal, 'course');
+        $sumupAvailable = $this->shouldShowSumUp($effectiveTotal, 'course', $this->getUserType());
+        
+        // Determinar gateway preferido
         $preferredGateway = 'mercadopago';
-
-        if (!$mpEnabled) {
-            return redirect()
-                ->route('courses.show', $course->slug ?: $course->id)
-                ->with('error', 'Este curso nao esta disponivel para compra: o criador ainda nao configurou o MercadoPago.');
+        if ($sumupAvailable && !$mpEnabled) {
+            $preferredGateway = 'sumup';
         }
 
-        return view('checkout.index', compact('course', 'mpEnabled', 'preferredGateway'));
+        if (!$mpEnabled && !$sumupAvailable) {
+            return redirect()
+                ->route('courses.show', $course->slug ?: $course->id)
+                ->with('error', 'Este curso nao esta disponivel para compra: nenhum gateway de pagamento esta configurado.');
+        }
+
+        // Adicionar dados do SumUp ao contexto
+        $context = compact('course', 'mpEnabled', 'preferredGateway', 'availableGateways');
+        $context = $this->addSumUpToCheckoutContext($context, $effectiveTotal, 'course');
+
+        return view('checkout.index', $context);
     }
 
     public function process(

@@ -6,9 +6,62 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+# Changelog
+
+Todas as alterações relevantes deste projeto são documentadas neste arquivo.
+
+O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
+
+---
+
 ## [Unreleased]
 
 ### Adicionado
+- **Integração completa do SumUp**: implementação completa do gateway SumUp com suporte a cartão de crédito e PIX
+- **Interface administrativa reorganizada**: painel de gateways reorganizado com abas principais (MercadoPago | SumUp) e sub-abas específicas para cada gateway
+- **Controles granulares de permissões SumUp**: 
+  - Por tipo de usuário (Membros, Instrutores, Vendedores, Mentores)
+  - Por tipo de produto (Cursos, Mentorias, Eventos, Marketplace, Assinaturas, Serviços)
+  - Por valor (limites mínimo e máximo configuráveis)
+- **SumUpService**: classe completa para integração com API do SumUp incluindo criação de checkout, consulta de status, cálculo de taxas e parcelamento
+- **SumUpController**: endpoints RESTful para checkout, webhook, consultas de status e cálculo de parcelamento
+- **Middleware CheckSumUpPermissions**: verificação automática de permissões baseada em configurações granulares
+- **Trait SumUpIntegration**: integração reutilizável para controllers existentes com métodos para verificar disponibilidade e processar pagamentos
+- **Frontend JavaScript moderno**: classe `SumUpIntegration` para integração completa no frontend com monitoramento de status
+- **Estilos CSS responsivos**: interface moderna com suporte a dark mode e animações
+- **30+ configurações específicas do SumUp**: credenciais, métodos, taxas, parcelamento, permissões e configurações avançadas
+- **Fallback automático**: para MercadoPago quando SumUp não está disponível
+- **Webhook seguro**: validação opcional com HMAC para receber notificações do SumUp
+- **APIs RESTful**: endpoints para criar checkout (`POST /api/v1/sumup/checkout`), consultar status (`GET /api/v1/sumup/checkout/{id}`), calcular parcelamento (`POST /api/v1/sumup/installments`) e verificar disponibilidade (`POST /api/v1/sumup/availability`)
+- **Integração nos controllers existentes**: `CheckoutController` e `MentorshipCheckoutController` agora suportam SumUp automaticamente
+- **Documentação completa**: arquivo `SUMUP_IMPLEMENTATION.md` com guia completo de implementação e uso
+- **Multi-gateway checkout**: suporte a Mercado Pago e SumUp ativos simultaneamente, sem restrição de exclusividade.
+- **Gateway Selector**: seletor visual no checkout de eventos quando dois gateways estão disponíveis para o vendedor, com cards clicáveis por gateway.
+- **`GatewayAccount::resolveAllActiveGatewaysForSeller()`**: novo método que retorna todos os gateways ativos para um vendedor (seller → global), mantendo `resolveActiveGatewayForSeller()` para compatibilidade retroativa.
+- **Campos de parcelamento MP independentes**: `mercadopago_max_installments`, `mercadopago_installments_no_interest`, `mercadopago_installment_tax` — configuráveis em ambos os painéis.
+- **Expiração do PIX por gateway**: `mercadopago_pix_expiration_minutes` e `sumup_pix_expiration_minutes` (1–1440 min, padrão 10) — configuráveis em ambos os painéis.
+- **Validação de método mínimo por gateway**: ao salvar configurações, o `SettingController` rejeita com HTTP 422 se um gateway ativo ficar sem nenhum método de pagamento habilitado.
+- **Testes de integração** em `tests/Feature/MultiGateway/GatewayResolutionTest.php` cobrindo resolução de 0, 1 e 2 gateways, fallback global e independência de estado.
+- Instruções detalhadas para configuração da SumUp nos painéis de gateway, com origem da API Key, Merchant Code, credenciais OAuth e Webhook Secret.
+- Atalho "Configurar Credenciais" e resumo operacional na tela administrativa de transações SumUp.
+- **Detecção dinâmica de gateway ativo** no checkout de eventos: sistema agora detecta automaticamente qual gateway (Mercado Pago ou SumUp) o vendedor configurou como ativo
+- **Interface com abas separadas** no painel administrativo para configurações de gateway (Mercado Pago / SumUp)
+- **Feedback visual** com badges de status (Ativo/Inativo) nas abas de configuração de gateway
+- **Método unificado** `GatewayAccount::resolveActiveGatewayForSeller()` para detecção de gateway ativo independente do provedor
+- **Roteamento condicional** no `EventReservationController` para processar pagamentos via SumUp ou Mercado Pago baseado no gateway ativo
+- **Formulário de cartão SumUp** (`sumup-card-form.blade.php`) para checkout transparente de eventos
+- **Métodos dedicados** `processSumUpPayment()` e `processMercadoPagoPayment()` para processamento isolado de cada gateway
+- **Seleção de método de pagamento PIX/Cartão** no checkout SumUp com interface de botões
+- **Geração de QR Code PIX inline** via `SumUpService::processPixCheckout()`
+- **Polling automático** de status de pagamento PIX a cada 5 segundos
+- **Botão "Copiar código PIX"** para facilitar pagamento
+- **Rotas dedicadas** `POST /checkout/sumup/pix` e `GET /checkout/sumup/status` para processamento PIX
+- **Métodos no CheckoutController**: `sumupPix()` e `sumupStatus()` para gerenciar pagamentos PIX
+- **Logs detalhados de debug** no formulário SumUp para diagnosticar problemas de renderização
+- **Bloco de debug visual** (apenas em modo debug) mostrando variáveis recebidas pelo formulário
+- **Logs de console** em cada etapa da inicialização do SumUp Card Widget
+
+### Alterado
 - **Multi-gateway checkout**: suporte a Mercado Pago e SumUp ativos simultaneamente, sem restrição de exclusividade.
 - **Gateway Selector**: seletor visual no checkout de eventos quando dois gateways estão disponíveis para o vendedor, com cards clicáveis por gateway.
 - **`GatewayAccount::resolveAllActiveGatewaysForSeller()`**: novo método que retorna todos os gateways ativos para um vendedor (seller → global), mantendo `resolveActiveGatewayForSeller()` para compatibilidade retroativa.

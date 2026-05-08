@@ -57,4 +57,26 @@ Route::prefix('v1/webhooks')->withoutMiddleware([\Illuminate\Routing\Middleware\
     Route::match(['get', 'post'], '/mercadopago', [App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])
         ->defaults('seller_id', 'platform')
         ->name('api.webhooks.mercadopago');
+    
+    Route::post('/sumup', [App\Http\Controllers\SumUpController::class, 'webhook'])
+        ->name('api.webhooks.sumup');
+});
+
+// SumUp API Routes
+Route::prefix('v1/sumup')->group(function () {
+    Route::post('/checkout', [App\Http\Controllers\SumUpController::class, 'createCheckout'])
+        ->middleware(['auth:sanctum', 'check.sumup.permissions'])
+        ->name('api.sumup.checkout');
+    
+    Route::get('/checkout/{checkoutId}', [App\Http\Controllers\SumUpController::class, 'getCheckout'])
+        ->middleware('auth:sanctum')
+        ->name('api.sumup.checkout.status');
+    
+    Route::post('/installments', [App\Http\Controllers\SumUpController::class, 'calculateInstallments'])
+        ->middleware(['auth:sanctum', 'check.sumup.permissions'])
+        ->name('api.sumup.installments');
+    
+    Route::post('/availability', [App\Http\Controllers\SumUpController::class, 'checkAvailability'])
+        ->middleware('auth:sanctum')
+        ->name('api.sumup.availability');
 });

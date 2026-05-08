@@ -74,12 +74,83 @@
     @endforeach
 </div>
 
-<div class="space-y-6">
+{{-- ============================================================
+     CONTEÚDO DAS ABAS PRINCIPAIS
+     ============================================================ --}}
 
-    {{-- ============================================================
-         TAB 1: AUTENTICAÇÃO
-         ============================================================ --}}
-    <div id="gw-auth" class="gw-tab-panel space-y-5">
+{{-- TAB MERCADOPAGO --}}
+<div id="mercadopago-tab" class="main-gateway-tab-panel">
+    {{-- Header MercadoPago --}}
+    <div class="relative overflow-hidden rounded-2xl mb-6"
+         style="background: linear-gradient(135deg, #1548c0 0%, #2563eb 45%, #3b60d6 100%);">
+        <div class="absolute inset-0 opacity-[0.07]"
+             style="background-image: radial-gradient(circle at 20% 50%, #fff 1px, transparent 1px); background-size: 40px 40px;"></div>
+        
+        <div class="relative flex items-start justify-between p-6 gap-4 flex-wrap">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0 border border-white/20">
+                    <i class="fas fa-handshake text-white text-2xl"></i>
+                </div>
+                <div>
+                    <p class="text-blue-200 text-xs font-bold uppercase tracking-widest mb-0.5">Gateway de Pagamento</p>
+                    <h2 class="text-white text-2xl font-black leading-tight">MercadoPago</h2>
+                    <p class="text-blue-200 text-xs mt-1">Checkout transparente &bull; Split de pagamentos &bull; OAuth marketplace</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-end gap-2 pt-1">
+                {{-- Badge de ambiente ativo --}}
+                @php $mpEnv = $settings['mercadopago_env'] ?? 'sandbox'; @endphp
+                <span id="hero-env-badge"
+                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold
+                             {{ $mpEnv === 'production' ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/30' : 'bg-amber-400/20 text-amber-200 border border-amber-400/30' }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ $mpEnv === 'production' ? 'bg-emerald-400' : 'bg-amber-400' }} animate-pulse"></span>
+                    {{ $mpEnv === 'production' ? 'Produção' : 'Sandbox' }}
+                </span>
+                {{-- Toggle ativo/inativo --}}
+                <label class="relative inline-flex items-center cursor-pointer gap-2 mt-1">
+                    <span class="text-blue-200 text-xs font-semibold">Ativo</span>
+                    <input type="hidden" name="mercadopago_enabled" value="0">
+                    <input type="checkbox" class="sr-only peer" name="mercadopago_enabled" value="1"
+                        onchange="toggleSetting('mercadopago_enabled', this.checked)" {{ ($settings['mercadopago_enabled'] ?? 1) ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer border border-white/30
+                                 peer-checked:after:translate-x-full peer-checked:after:border-white
+                                 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white
+                                 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
+                                 after:transition-all peer-checked:bg-emerald-500 relative"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    {{-- Sub-tabs MercadoPago --}}
+    <div class="flex gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl mb-6" id="mp-sub-tabs">
+        @php
+            $mpTabs = [
+                ['id' => 'mp-auth',     'icon' => 'fa-key',          'label' => 'Autenticação'],
+                ['id' => 'mp-methods',  'icon' => 'fa-credit-card',  'label' => 'Métodos'],
+                ['id' => 'mp-billing',  'icon' => 'fa-sliders-h',    'label' => 'Cobrança'],
+                ['id' => 'mp-checkout', 'icon' => 'fa-magic',        'label' => 'Checkout'],
+                ['id' => 'mp-advanced', 'icon' => 'fa-cog',          'label' => 'Avançado'],
+            ];
+        @endphp
+        @foreach($mpTabs as $i => $tab)
+            <button type="button"
+                onclick="switchMpSubTab('{{ $tab['id'] }}')"
+                id="mp-sub-tab-btn-{{ $tab['id'] }}"
+                class="mp-sub-tab-btn flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all
+                       {{ $i === 0 ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300' }}">
+                <i class="fas {{ $tab['icon'] }}"></i>
+                <span class="hidden sm:inline">{{ $tab['label'] }}</span>
+            </button>
+        @endforeach
+    </div>
+
+    <div class="space-y-6">
+        {{-- ============================================================
+             MP SUB-TAB 1: AUTENTICAÇÃO
+             ============================================================ --}}
+        <div id="mp-auth" class="mp-sub-tab-panel space-y-5">
 
         {{-- Segmented control: Ambiente --}}
         <div>
@@ -240,65 +311,65 @@
             </div>
         </div>
 
-    </div>{{-- /gw-auth --}}
+        </div>{{-- /mp-auth --}}
 
-    {{-- ============================================================
-         TAB 2: MÉTODOS DE PAGAMENTO
-         ============================================================ --}}
-    <div id="gw-methods" class="gw-tab-panel hidden">
-        <p class="text-xs text-slate-400 mb-4 font-medium">Ative ou desative os métodos disponíveis no checkout para seus clientes.</p>
-        @php
-            $methods = [
-                ['name' => 'mercadopago_method_credit_card', 'label' => 'Cartão de Crédito', 'desc' => 'Parcele em até 12x', 'icon' => 'fa-credit-card', 'color' => 'blue', 'default' => 1],
-                ['name' => 'mercadopago_method_debit_card',  'label' => 'Cartão de Débito',  'desc' => 'Débito à vista',    'icon' => 'fa-credit-card', 'color' => 'violet', 'default' => 0],
-                ['name' => 'mercadopago_method_pix',         'label' => 'Pix',                'desc' => 'Aprovação imediata','icon' => 'fa-pix',         'color' => 'teal', 'default' => 1, 'brand' => true],
-                ['name' => 'mercadopago_method_ticket',      'label' => 'Boleto Bancário',    'desc' => 'Prazo de 1–3 dias', 'icon' => 'fa-barcode',     'color' => 'orange', 'default' => 0],
-                ['name' => 'mercadopago_method_mercadopago', 'label' => 'Carteira MP',        'desc' => 'Saldo MercadoPago', 'icon' => 'fa-wallet',      'color' => 'sky', 'default' => 0],
-            ];
-        @endphp
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            @foreach($methods as $m)
-                @php $checked = ($settings[$m['name']] ?? $m['default']); @endphp
-                <label for="method_{{ $m['name'] }}"
-                    class="method-card relative flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all select-none
-                           {{ $checked ? 'border-' . $m['color'] . '-400 bg-' . $m['color'] . '-50 dark:bg-' . $m['color'] . '-900/15 dark:border-' . $m['color'] . '-600/50' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700' }}">
-                    <input type="hidden" name="{{ $m['name'] }}" value="0">
-                    <input type="checkbox" id="method_{{ $m['name'] }}" class="sr-only method-cb" name="{{ $m['name'] }}" value="1"
-                        data-color="{{ $m['color'] }}"
-                        onchange="onMethodToggle(this)"
-                        {{ $checked ? 'checked' : '' }}>
+        {{-- ============================================================
+             MP SUB-TAB 2: MÉTODOS DE PAGAMENTO
+             ============================================================ --}}
+        <div id="mp-methods" class="mp-sub-tab-panel hidden">
+            <p class="text-xs text-slate-400 mb-4 font-medium">Ative ou desative os métodos disponíveis no checkout para seus clientes.</p>
+            @php
+                $methods = [
+                    ['name' => 'mercadopago_method_credit_card', 'label' => 'Cartão de Crédito', 'desc' => 'Parcele em até 12x', 'icon' => 'fa-credit-card', 'color' => 'blue', 'default' => 1],
+                    ['name' => 'mercadopago_method_debit_card',  'label' => 'Cartão de Débito',  'desc' => 'Débito à vista',    'icon' => 'fa-credit-card', 'color' => 'violet', 'default' => 0],
+                    ['name' => 'mercadopago_method_pix',         'label' => 'Pix',                'desc' => 'Aprovação imediata','icon' => 'fa-pix',         'color' => 'teal', 'default' => 1, 'brand' => true],
+                    ['name' => 'mercadopago_method_ticket',      'label' => 'Boleto Bancário',    'desc' => 'Prazo de 1–3 dias', 'icon' => 'fa-barcode',     'color' => 'orange', 'default' => 0],
+                    ['name' => 'mercadopago_method_mercadopago', 'label' => 'Carteira MP',        'desc' => 'Saldo MercadoPago', 'icon' => 'fa-wallet',      'color' => 'sky', 'default' => 0],
+                ];
+            @endphp
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                @foreach($methods as $m)
+                    @php $checked = ($settings[$m['name']] ?? $m['default']); @endphp
+                    <label for="method_{{ $m['name'] }}"
+                        class="method-card relative flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all select-none
+                               {{ $checked ? 'border-' . $m['color'] . '-400 bg-' . $m['color'] . '-50 dark:bg-' . $m['color'] . '-900/15 dark:border-' . $m['color'] . '-600/50' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700' }}">
+                        <input type="hidden" name="{{ $m['name'] }}" value="0">
+                        <input type="checkbox" id="method_{{ $m['name'] }}" class="sr-only method-cb" name="{{ $m['name'] }}" value="1"
+                            data-color="{{ $m['color'] }}"
+                            onchange="onMethodToggle(this)"
+                            {{ $checked ? 'checked' : '' }}>
 
-                    {{-- Icon --}}
-                    <div class="flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all
-                                {{ $checked ? 'bg-' . $m['color'] . '-100 dark:bg-' . $m['color'] . '-800/30' : 'bg-slate-100 dark:bg-slate-800' }}">
-                        <i class="{{ !empty($m['brand']) ? 'fa-brands' : 'fas' }} {{ $m['icon'] }} text-xl
-                                  {{ $checked ? 'text-' . $m['color'] . '-600 dark:text-' . $m['color'] . '-400' : 'text-slate-400' }}"></i>
-                    </div>
+                        {{-- Icon --}}
+                        <div class="flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all
+                                    {{ $checked ? 'bg-' . $m['color'] . '-100 dark:bg-' . $m['color'] . '-800/30' : 'bg-slate-100 dark:bg-slate-800' }}">
+                            <i class="{{ !empty($m['brand']) ? 'fa-brands' : 'fas' }} {{ $m['icon'] }} text-xl
+                                      {{ $checked ? 'text-' . $m['color'] . '-600 dark:text-' . $m['color'] . '-400' : 'text-slate-400' }}"></i>
+                        </div>
 
-                    {{-- Info --}}
-                    <div class="flex-1 min-w-0">
-                        <p class="font-black text-sm {{ $checked ? 'text-' . $m['color'] . '-800 dark:text-' . $m['color'] . '-300' : 'text-slate-700 dark:text-slate-300' }}">
-                            {{ $m['label'] }}
-                        </p>
-                        <p class="text-xs {{ $checked ? 'text-' . $m['color'] . '-500' : 'text-slate-400' }}">{{ $m['desc'] }}</p>
-                    </div>
+                        {{-- Info --}}
+                        <div class="flex-1 min-w-0">
+                            <p class="font-black text-sm {{ $checked ? 'text-' . $m['color'] . '-800 dark:text-' . $m['color'] . '-300' : 'text-slate-700 dark:text-slate-300' }}">
+                                {{ $m['label'] }}
+                            </p>
+                            <p class="text-xs {{ $checked ? 'text-' . $m['color'] . '-500' : 'text-slate-400' }}">{{ $m['desc'] }}</p>
+                        </div>
 
-                    {{-- Status badge --}}
-                    <div class="flex-shrink-0">
-                        <span class="method-status-badge px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
-                                     {{ $checked ? 'bg-' . $m['color'] . '-100 dark:bg-' . $m['color'] . '-900/30 text-' . $m['color'] . '-700 dark:text-' . $m['color'] . '-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400' }}">
-                            {{ $checked ? 'Ativo' : 'Off' }}
-                        </span>
-                    </div>
-                </label>
-            @endforeach
-        </div>
-    </div>{{-- /gw-methods --}}
+                        {{-- Status badge --}}
+                        <div class="flex-shrink-0">
+                            <span class="method-status-badge px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
+                                         {{ $checked ? 'bg-' . $m['color'] . '-100 dark:bg-' . $m['color'] . '-900/30 text-' . $m['color'] . '-700 dark:text-' . $m['color'] . '-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400' }}">
+                                {{ $checked ? 'Ativo' : 'Off' }}
+                            </span>
+                        </div>
+                    </label>
+                @endforeach
+            </div>
+        </div>{{-- /mp-methods --}}
 
-    {{-- ============================================================
-         TAB 3: COBRANÇA
-         ============================================================ --}}
-    <div id="gw-billing" class="gw-tab-panel hidden space-y-5">
+        {{-- ============================================================
+             MP SUB-TAB 3: COBRANÇA
+             ============================================================ --}}
+        <div id="mp-billing" class="mp-sub-tab-panel hidden space-y-5">
 
         {{-- Checkout transparente --}}
         <label for="gateway_transparent_checkout"
@@ -393,12 +464,12 @@
             </div>
         </div>
 
-    </div>{{-- /gw-billing --}}
+        </div>{{-- /mp-billing --}}
 
-    {{-- ============================================================
-         TAB 4: CHECKOUT
-         ============================================================ --}}
-    <div id="gw-checkout" class="gw-tab-panel hidden">
+        {{-- ============================================================
+             MP SUB-TAB 4: CHECKOUT
+             ============================================================ --}}
+        <div id="mp-checkout" class="mp-sub-tab-panel hidden">
         <p class="text-xs text-slate-400 mb-5 font-medium">Personalize a aparência do checkout para combinar com sua marca.</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
@@ -437,12 +508,12 @@
                 </div>
             </div>
         </div>
-    </div>{{-- /gw-checkout --}}
+        </div>{{-- /mp-checkout --}}
 
-    {{-- ============================================================
-         TAB 5: AVANÇADO
-         ============================================================ --}}
-    <div id="gw-advanced" class="gw-tab-panel hidden">
+        {{-- ============================================================
+             MP SUB-TAB 5: AVANÇADO
+             ============================================================ --}}
+        <div id="mp-advanced" class="mp-sub-tab-panel hidden">
         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div class="bg-slate-50 dark:bg-slate-900 px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center gap-2">
                 <i class="fas fa-fingerprint text-slate-400 text-sm"></i>
@@ -466,14 +537,16 @@
                 </div>
             </div>
         </div>
-    </div>{{-- /gw-advanced --}}
+        </div>{{-- /mp-advanced --}}
 
-</div>{{-- /space-y-6 wrapper --}}
+    </div>{{-- /space-y-6 wrapper --}}
+</div>{{-- /mercadopago-tab --}}
 
 {{-- ============================================================
-     SEÇÃO SUMUP
+     TAB SUMUP
      ============================================================ --}}
-<div class="mt-8">
+<div id="sumup-tab" class="main-gateway-tab-panel hidden">
+    {{-- Header SumUp --}}
     <div class="relative overflow-hidden rounded-2xl mb-6"
          style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
         <div class="absolute inset-0 opacity-[0.07]"
@@ -506,8 +579,231 @@
         </div>
     </div>
 
-    {{-- Credenciais SumUp --}}
-    <div class="rounded-2xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden mb-4">
+    {{-- Sub-tabs SumUp --}}
+    <div class="flex gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl mb-6" id="sumup-sub-tabs">
+        @php
+            $sumupTabs = [
+                ['id' => 'sumup-auth',     'icon' => 'fa-key',          'label' => 'Autenticação'],
+                ['id' => 'sumup-methods',  'icon' => 'fa-credit-card',  'label' => 'Métodos'],
+                ['id' => 'sumup-billing',  'icon' => 'fa-sliders-h',    'label' => 'Cobrança'],
+                ['id' => 'sumup-permissions', 'icon' => 'fa-shield-alt', 'label' => 'Permissões'],
+            ];
+        @endphp
+        @foreach($sumupTabs as $i => $tab)
+            <button type="button"
+                onclick="switchSumupSubTab('{{ $tab['id'] }}')"
+                id="sumup-sub-tab-btn-{{ $tab['id'] }}"
+                class="sumup-sub-tab-btn flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all
+                       {{ $i === 0 ? 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300' }}">
+                <i class="fas {{ $tab['icon'] }}"></i>
+                <span class="hidden sm:inline">{{ $tab['label'] }}</span>
+            </button>
+        @endforeach
+    </div>
+
+    <div class="space-y-6">
+        {{-- ============================================================
+             SUMUP SUB-TAB 1: AUTENTICAÇÃO
+             ============================================================ --}}
+        <div id="sumup-auth" class="sumup-sub-tab-panel space-y-5">
+    <div class="relative overflow-hidden rounded-2xl mb-6"
+         style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+        <div class="absolute inset-0 opacity-[0.07]"
+             style="background-image: radial-gradient(circle at 20% 50%, #fff 1px, transparent 1px); background-size: 40px 40px;"></div>
+        <div class="relative flex items-start justify-between p-6 gap-4 flex-wrap">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0 border border-white/20">
+                    <i class="fas fa-credit-card text-white text-2xl"></i>
+                </div>
+                <div>
+                    <p class="text-blue-200 text-xs font-bold uppercase tracking-widest mb-0.5">Gateway de Pagamento</p>
+                    <h2 class="text-white text-2xl font-black leading-tight">SumUp</h2>
+                    <p class="text-blue-200 text-xs mt-1">Checkout integrado &bull; Cartão de crédito &bull; PIX</p>
+                </div>
+            </div>
+            <div class="flex flex-col items-end gap-2 pt-1">
+                <label class="relative inline-flex items-center cursor-pointer gap-2 mt-1">
+                    <span class="text-blue-200 text-xs font-semibold">Ativo</span>
+                    <input type="hidden" name="sumup_enabled" value="0">
+                    <input type="checkbox" class="sr-only peer" name="sumup_enabled" value="1"
+                        onchange="toggleSetting('sumup_enabled', this.checked)"
+                        {{ ($settings['sumup_enabled'] ?? 0) ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer border border-white/30
+                                 peer-checked:after:translate-x-full peer-checked:after:border-white
+                                 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white
+                                 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
+                                 after:transition-all peer-checked:bg-emerald-500 relative"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+            {{-- Credenciais SumUp --}}
+            <div class="rounded-2xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden mb-4">
+                <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+                    <i class="fas fa-key text-slate-500 text-xs"></i>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Credenciais da API SumUp</span>
+                    <a href="https://developer.sumup.com/tools/authorization/api-keys" target="_blank" rel="noopener noreferrer"
+                       class="ml-auto text-[10px] text-blue-500 hover:underline flex items-center gap-1">
+                        <i class="fas fa-external-link-alt text-[8px]"></i> Obter credenciais
+                    </a>
+                </div>
+                <div class="p-4 bg-white dark:bg-slate-900 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2 rounded-2xl border border-blue-100 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/20 p-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-info-circle text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-sm font-black text-blue-950 dark:text-blue-200 mb-2">Como preencher as credenciais SumUp</h3>
+                                <ol class="list-decimal ml-4 space-y-1.5 text-xs text-blue-900 dark:text-blue-200 leading-relaxed">
+                                    <li><strong>API Key</strong>: acesse <a href="https://me.sumup.com" target="_blank" rel="noopener noreferrer" class="font-bold underline">me.sumup.com</a> &gt; perfil &gt; Settings &gt; For Developers &gt; Toolkit &gt; API Keys, crie uma chave secreta e cole aqui. Não cole a SumUp Public Key.</li>
+                                    <li><strong>Merchant Code</strong>: use o código da mesma conta lojista da API Key. Se não souber, cole a API Key, clique em Testar Conexão e copie o Merchant Code retornado pela SumUp.</li>
+                                    <li><strong>Client ID e Client Secret</strong>: opcionais para OAuth. Pegue em For Developers &gt; OAuth Apps &gt; Create client secret e baixe o JSON das credenciais.</li>
+                                    <li><strong>Webhook Secret</strong>: preencha somente se você configurou assinatura HMAC nos webhooks da SumUp. Se deixar vazio, o sistema valida o webhook pela URL única da transação.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">API Key</label>
+                        <div class="relative">
+                            <input type="password" name="sumup_api_key" id="sumup_api_key"
+                                value="{{ $settings['sumup_api_key'] ?? '' }}"
+                                placeholder="sup_sk_••••••••••••••••••••••••••••••••"
+                                class="w-full px-4 py-3 pr-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+                            <button type="button" onclick="toggleReveal('sumup_api_key', this)"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                                <i class="fas fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1.5">Chave secreta server-to-server criada em API Keys. Ela aparece uma única vez.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Merchant Code</label>
+                        <input type="text" name="sumup_merchant_code"
+                            value="{{ $settings['sumup_merchant_code'] ?? '' }}"
+                            placeholder="MXXXXXXXX"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+                        <p class="text-[10px] text-slate-400 mt-1.5">Código curto da conta lojista. Também aparece no retorno do teste de conexão.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Client ID (OAuth)</label>
+                        <input type="text" name="sumup_client_id"
+                            value="{{ $settings['sumup_client_id'] ?? '' }}"
+                            placeholder="com.sumup.app.xxxxxxxx"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+                        <p class="text-[10px] text-slate-400 mt-1.5">Opcional. Use apenas se a integração OAuth da SumUp estiver ativa.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Client Secret (OAuth)</label>
+                        <div class="relative">
+                            <input type="password" name="sumup_client_secret" id="sumup_client_secret"
+                                value="{{ $settings['sumup_client_secret'] ?? '' }}"
+                                placeholder="••••••••••••••••••••••••••••••••"
+                                class="w-full px-4 py-3 pr-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+                            <button type="button" onclick="toggleReveal('sumup_client_secret', this)"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                                <i class="fas fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1.5">Baixado no JSON da credencial OAuth. Não é necessário para API Key simples.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Webhook Secret (HMAC)</label>
+                        <div class="relative">
+                            <input type="password" name="sumup_webhook_secret" id="sumup_webhook_secret"
+                                value="{{ $settings['sumup_webhook_secret'] ?? '' }}"
+                                placeholder="••••••••••••••••••••••••••••••••"
+                                class="w-full px-4 py-3 pr-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-mono text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700">
+                            <button type="button" onclick="toggleReveal('sumup_webhook_secret', this)"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                                <i class="fas fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1.5">Opcional. Se preenchido, a assinatura enviada pela SumUp precisa bater com este segredo.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Ambiente</label>
+                        <select name="sumup_env"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                            <option value="sandbox"    {{ ($settings['sumup_env'] ?? 'sandbox') === 'sandbox'    ? 'selected' : '' }}>Sandbox (testes)</option>
+                            <option value="production" {{ ($settings['sumup_env'] ?? '') === 'production' ? 'selected' : '' }}>Produção (real)</option>
+                        </select>
+                    </div>
+                </div>
+                {{-- Botão de teste --}}
+                <div class="px-4 pb-4 bg-white dark:bg-slate-900">
+                    <button type="button" onclick="testSumUpConnection()" id="btn-test-sumup"
+                        class="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-bold text-sm transition-all
+                               bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white shadow-lg active:scale-[0.98]">
+                        <i class="fas fa-plug"></i>
+                        Testar Conexão com SumUp
+                    </button>
+                </div>
+            </div>
+
+            {{-- Webhook URL --}}
+            <div class="bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                        <i class="fas fa-link text-indigo-500 text-xs"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Webhook URL</span>
+                        <p class="text-[10px] text-slate-400">Cole este endereço no painel do SumUp &rsaquo; Webhooks</p>
+                    </div>
+                </div>
+                <div class="flex rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <input type="text" readonly value="{{ route('api.webhooks.sumup') }}"
+                        class="flex-1 px-4 py-2.5 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-mono focus:outline-none border-0">
+                    <button type="button" onclick="copyToClipboard('{{ route('api.webhooks.sumup') }}')"
+                        class="px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>
+                </div>
+            </div>
+        </div>{{-- /sumup-auth --}}
+
+        {{-- ============================================================
+             SUMUP SUB-TAB 2: MÉTODOS DE PAGAMENTO
+             ============================================================ --}}
+        <div id="sumup-methods" class="sumup-sub-tab-panel hidden">
+            <p class="text-xs text-slate-400 mb-4 font-medium">Configure os métodos de pagamento disponíveis no SumUp.</p>
+            @php
+                $sumupMethods = [
+                    ['name' => 'sumup_method_card', 'label' => 'Cartão de Crédito', 'desc' => 'Via SumUp.js (tokenizado)', 'icon' => 'fa-credit-card', 'color' => 'blue', 'default' => 1],
+                    ['name' => 'sumup_method_pix',  'label' => 'PIX',               'desc' => 'QR Code inline',           'icon' => 'fa-pix',         'color' => 'teal', 'default' => 1, 'brand' => true],
+                ];
+            @endphp
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                @foreach($sumupMethods as $m)
+                    @php $checked = ($settings[$m['name']] ?? $m['default']); @endphp
+                    <label for="sumup_method_{{ $m['name'] }}"
+                        class="flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all select-none
+                               {{ $checked ? 'border-' . $m['color'] . '-400 bg-' . $m['color'] . '-50 dark:bg-' . $m['color'] . '-900/15 dark:border-' . $m['color'] . '-600/50' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900' }}">
+                        <input type="hidden" name="{{ $m['name'] }}" value="0">
+                        <input type="checkbox" id="sumup_method_{{ $m['name'] }}" class="sr-only method-cb" name="{{ $m['name'] }}" value="1"
+                            data-color="{{ $m['color'] }}" onchange="onMethodToggle(this)" {{ $checked ? 'checked' : '' }}>
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center {{ $checked ? 'bg-' . $m['color'] . '-100 dark:bg-' . $m['color'] . '-800/30' : 'bg-slate-100 dark:bg-slate-800' }}">
+                            <i class="{{ !empty($m['brand']) ? 'fa-brands' : 'fas' }} {{ $m['icon'] }} text-lg {{ $checked ? 'text-' . $m['color'] . '-600 dark:text-' . $m['color'] . '-400' : 'text-slate-400' }}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-black text-sm {{ $checked ? 'text-' . $m['color'] . '-800 dark:text-' . $m['color'] . '-300' : 'text-slate-700 dark:text-slate-300' }}">
+                                {{ $m['label'] }}
+                            </p>
+                            <p class="text-xs {{ $checked ? 'text-' . $m['color'] . '-500' : 'text-slate-400' }}">{{ $m['desc'] }}</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <span class="method-status-badge px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
+                                         {{ $checked ? 'bg-' . $m['color'] . '-100 dark:bg-' . $m['color'] . '-900/30 text-' . $m['color'] . '-700 dark:text-' . $m['color'] . '-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400' }}">
+                                {{ $checked ? 'Ativo' : 'Off' }}
+                            </span>
+                        </div>
+                    </label>
+                @endforeach
+            </div>
+        </div>{{-- /sumup-methods --}}
         <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
             <i class="fas fa-key text-slate-500 text-xs"></i>
             <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Credenciais da API SumUp</span>
@@ -611,8 +907,125 @@
         </div>
     </div>
 
-    {{-- Taxas SumUp --}}
-    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-4">
+        {{-- ============================================================
+             SUMUP SUB-TAB 3: COBRANÇA
+             ============================================================ --}}
+        <div id="sumup-billing" class="sumup-sub-tab-panel hidden space-y-5">
+            {{-- Taxas SumUp --}}
+            <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-4">
+                <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+                    <i class="fas fa-percent text-slate-500 text-xs"></i>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Taxas SumUp</span>
+                </div>
+                <div class="p-4 bg-white dark:bg-slate-900 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Taxa Percentual (%)</label>
+                        <div class="relative">
+                            <input type="number" step="0.01" name="sumup_fee_percentage"
+                                value="{{ $settings['sumup_fee_percentage'] ?? '2.75' }}"
+                                class="w-full px-4 py-3 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                            <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Taxa Fixa (R$)</label>
+                        <div class="relative">
+                            <input type="number" step="0.01" name="sumup_fee_fixed"
+                                value="{{ $settings['sumup_fee_fixed'] ?? '0.00' }}"
+                                class="w-full px-4 py-3 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                            <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">R$</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Repassar Taxa ao Comprador</label>
+                        <select name="sumup_pass_fee"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                            <option value="0" {{ ($settings['sumup_pass_fee'] ?? 0) == 0 ? 'selected' : '' }}>Não — plataforma absorve</option>
+                            <option value="1" {{ ($settings['sumup_pass_fee'] ?? 0) == 1 ? 'selected' : '' }}>Sim — comprador paga</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Parcelamento SumUp --}}
+            <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-4">
+                <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+                    <i class="fas fa-layer-group text-slate-500 text-xs"></i>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Parcelamento SumUp</span>
+                    <span class="ml-auto text-[10px] text-slate-400 font-medium">Disponível apenas para cartão de crédito no Brasil</span>
+                </div>
+                <div class="p-4 bg-white dark:bg-slate-900 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Máx. Parcelas</label>
+                        <div class="relative">
+                            <input type="number" min="1" max="12" step="1" name="sumup_max_installments"
+                                value="{{ $settings['sumup_max_installments'] ?? '12' }}"
+                                class="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                            <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-xs pointer-events-none">x</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1.5">1 = somente à vista (sem parcelamento)</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Parcelas sem Juros</label>
+                        <div class="relative">
+                            <input type="number" min="1" max="12" step="1" name="sumup_installments_no_interest"
+                                value="{{ $settings['sumup_installments_no_interest'] ?? '1' }}"
+                                class="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                            <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-xs pointer-events-none">x</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1.5">Parcelas até este número não têm juros</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Juros por Parcela (%)</label>
+                        <div class="relative">
+                            <input type="number" min="0" max="99.99" step="0.01" name="sumup_installment_tax"
+                                value="{{ $settings['sumup_installment_tax'] ?? '0.00' }}"
+                                class="w-full px-4 py-3 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                            <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">%</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1.5">Aplicado a partir da {{ ($settings['sumup_installments_no_interest'] ?? 1) + 1 }}ª parcela</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tipo de Cálculo</label>
+                        <select name="sumup_interest_type"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                            <option value="per_installment" {{ ($settings['sumup_interest_type'] ?? 'per_installment') === 'per_installment' ? 'selected' : '' }}>Por parcela</option>
+                            <option value="on_total" {{ ($settings['sumup_interest_type'] ?? '') === 'on_total' ? 'selected' : '' }}>Sobre o total</option>
+                        </select>
+                        <p class="text-[10px] text-slate-400 mt-1.5">Por parcela: taxa × nº parcelas | Sobre total: taxa aplicada uma vez</p>
+                    </div>
+                </div>
+                <div class="px-4 pb-4 bg-white dark:bg-slate-900">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/40 rounded-xl p-3 text-xs text-blue-700 dark:text-blue-300">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        <strong>Como funciona:</strong><br>
+                        <strong>Por parcela:</strong> R$ 120 em 3x com 2% = R$ 120 × (1 + 2%×3) = R$ 127,20 (3x de R$ 42,40)<br>
+                        <strong>Sobre o total:</strong> R$ 120 em 3x com 2% = R$ 120 × (1 + 2%) = R$ 122,40 (3x de R$ 40,80)<br>
+                        O repasse ao comprador é controlado pela opção "Repassar Taxa ao Comprador" acima.
+                    </div>
+                </div>
+            </div>
+
+            {{-- Expiração PIX SumUp --}}
+            <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-4">
+                <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+                    <i class="fa-brands fa-pix text-teal-500 text-xs"></i>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Expiração do PIX SumUp</span>
+                </div>
+                <div class="p-4 bg-white dark:bg-slate-900">
+                    <div class="max-w-xs">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tempo de Expiração (minutos)</label>
+                        <div class="relative">
+                            <input type="number" min="1" max="1440" step="1" name="sumup_pix_expiration_minutes"
+                                value="{{ $settings['sumup_pix_expiration_minutes'] ?? '10' }}"
+                                class="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-teal-400 focus:ring-4 focus:ring-teal-400/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                            <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-xs pointer-events-none">min</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1.5">Tempo limite para o cliente pagar o PIX (1–1440 min). Padrão: 10 min.</p>
+                    </div>
+                </div>
+            </div>
+        </div>{{-- /sumup-billing --}}
         <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
             <i class="fas fa-percent text-slate-500 text-xs"></i>
             <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Taxas SumUp</span>
@@ -647,8 +1060,176 @@
         </div>
     </div>
 
-    {{-- Parcelamento SumUp --}}
-    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-4">
+        {{-- ============================================================
+             SUMUP SUB-TAB 4: PERMISSÕES
+             ============================================================ --}}
+        <div id="sumup-permissions" class="sumup-sub-tab-panel hidden space-y-5">
+            <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 mb-6">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-amber-600 text-white flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-shield-alt text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-amber-900 dark:text-amber-200 mb-2">Controle de Permissões SumUp</h3>
+                        <p class="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+                            Configure quais tipos de usuários podem usar o SumUp e para quais tipos de produtos/serviços. 
+                            Essas configurações permitem controle granular sobre onde o gateway será disponibilizado.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Permissões por Nível de Usuário --}}
+            <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-users text-slate-500 text-sm"></i>
+                        <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Permissões por Nível de Usuário</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">Defina quais tipos de usuários podem usar o SumUp como gateway de pagamento</p>
+                </div>
+                <div class="p-4 bg-white dark:bg-slate-900 space-y-4">
+                    @php
+                        $userLevels = [
+                            ['name' => 'sumup_allow_members', 'label' => 'Membros', 'desc' => 'Usuários regulares da plataforma', 'icon' => 'fa-user', 'color' => 'blue', 'default' => 1],
+                            ['name' => 'sumup_allow_instructors', 'label' => 'Instrutores', 'desc' => 'Criadores de cursos e conteúdo', 'icon' => 'fa-chalkboard-teacher', 'color' => 'green', 'default' => 1],
+                            ['name' => 'sumup_allow_sellers', 'label' => 'Vendedores', 'desc' => 'Usuários do marketplace', 'icon' => 'fa-store', 'color' => 'purple', 'default' => 1],
+                            ['name' => 'sumup_allow_mentors', 'label' => 'Mentores', 'desc' => 'Prestadores de mentoria', 'icon' => 'fa-user-graduate', 'color' => 'indigo', 'default' => 1],
+                        ];
+                    @endphp
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        @foreach($userLevels as $level)
+                            @php $checked = ($settings[$level['name']] ?? $level['default']); @endphp
+                            <label for="{{ $level['name'] }}"
+                                class="flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all select-none
+                                       {{ $checked ? 'border-' . $level['color'] . '-400 bg-' . $level['color'] . '-50 dark:bg-' . $level['color'] . '-900/15 dark:border-' . $level['color'] . '-600/50' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900' }}">
+                                <input type="hidden" name="{{ $level['name'] }}" value="0">
+                                <input type="checkbox" id="{{ $level['name'] }}" class="sr-only" name="{{ $level['name'] }}" value="1"
+                                    data-color="{{ $level['color'] }}" onchange="onPermissionToggle(this)" {{ $checked ? 'checked' : '' }}>
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center {{ $checked ? 'bg-' . $level['color'] . '-100 dark:bg-' . $level['color'] . '-800/30' : 'bg-slate-100 dark:bg-slate-800' }}">
+                                    <i class="fas {{ $level['icon'] }} text-lg {{ $checked ? 'text-' . $level['color'] . '-600 dark:text-' . $level['color'] . '-400' : 'text-slate-400' }}"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-black text-sm {{ $checked ? 'text-' . $level['color'] . '-800 dark:text-' . $level['color'] . '-300' : 'text-slate-700 dark:text-slate-300' }}">
+                                        {{ $level['label'] }}
+                                    </p>
+                                    <p class="text-xs {{ $checked ? 'text-' . $level['color'] . '-500' : 'text-slate-400' }}">{{ $level['desc'] }}</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="permission-status-badge px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
+                                                 {{ $checked ? 'bg-' . $level['color'] . '-100 dark:bg-' . $level['color'] . '-900/30 text-' . $level['color'] . '-700 dark:text-' . $level['color'] . '-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400' }}">
+                                        {{ $checked ? 'Permitido' : 'Bloqueado' }}
+                                    </span>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            {{-- Permissões por Tipo de Produto/Serviço --}}
+            <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-shopping-cart text-slate-500 text-sm"></i>
+                        <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Permissões por Tipo de Produto/Serviço</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">Defina para quais tipos de produtos/serviços o SumUp estará disponível</p>
+                </div>
+                <div class="p-4 bg-white dark:bg-slate-900 space-y-4">
+                    @php
+                        $productTypes = [
+                            ['name' => 'sumup_allow_courses', 'label' => 'Cursos', 'desc' => 'Cursos online e presenciais', 'icon' => 'fa-graduation-cap', 'color' => 'blue', 'default' => 1],
+                            ['name' => 'sumup_allow_mentorships', 'label' => 'Mentorias', 'desc' => 'Sessões de mentoria individual', 'icon' => 'fa-user-tie', 'color' => 'indigo', 'default' => 1],
+                            ['name' => 'sumup_allow_events', 'label' => 'Eventos', 'desc' => 'Workshops, palestras e eventos', 'icon' => 'fa-calendar-alt', 'color' => 'green', 'default' => 1],
+                            ['name' => 'sumup_allow_marketplace', 'label' => 'Marketplace', 'desc' => 'Produtos físicos e digitais', 'icon' => 'fa-store', 'color' => 'purple', 'default' => 1],
+                            ['name' => 'sumup_allow_subscriptions', 'label' => 'Assinaturas', 'desc' => 'Planos e assinaturas recorrentes', 'icon' => 'fa-sync-alt', 'color' => 'orange', 'default' => 1],
+                            ['name' => 'sumup_allow_services', 'label' => 'Serviços', 'desc' => 'Serviços diversos da plataforma', 'icon' => 'fa-concierge-bell', 'color' => 'teal', 'default' => 1],
+                        ];
+                    @endphp
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        @foreach($productTypes as $type)
+                            @php $checked = ($settings[$type['name']] ?? $type['default']); @endphp
+                            <label for="{{ $type['name'] }}"
+                                class="flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all select-none
+                                       {{ $checked ? 'border-' . $type['color'] . '-400 bg-' . $type['color'] . '-50 dark:bg-' . $type['color'] . '-900/15 dark:border-' . $type['color'] . '-600/50' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900' }}">
+                                <input type="hidden" name="{{ $type['name'] }}" value="0">
+                                <input type="checkbox" id="{{ $type['name'] }}" class="sr-only" name="{{ $type['name'] }}" value="1"
+                                    data-color="{{ $type['color'] }}" onchange="onPermissionToggle(this)" {{ $checked ? 'checked' : '' }}>
+                                <div class="w-8 h-8 rounded-xl flex items-center justify-center {{ $checked ? 'bg-' . $type['color'] . '-100 dark:bg-' . $type['color'] . '-800/30' : 'bg-slate-100 dark:bg-slate-800' }}">
+                                    <i class="fas {{ $type['icon'] }} text-sm {{ $checked ? 'text-' . $type['color'] . '-600 dark:text-' . $type['color'] . '-400' : 'text-slate-400' }}"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-black text-sm {{ $checked ? 'text-' . $type['color'] . '-800 dark:text-' . $type['color'] . '-300' : 'text-slate-700 dark:text-slate-300' }}">
+                                        {{ $type['label'] }}
+                                    </p>
+                                    <p class="text-xs {{ $checked ? 'text-' . $type['color'] . '-500' : 'text-slate-400' }}">{{ $type['desc'] }}</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="permission-status-badge px-2 py-1 rounded-full text-[9px] font-black uppercase tracking-wider
+                                                 {{ $checked ? 'bg-' . $type['color'] . '-100 dark:bg-' . $type['color'] . '-900/30 text-' . $type['color'] . '-700 dark:text-' . $type['color'] . '-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400' }}">
+                                        {{ $checked ? 'OK' : 'OFF' }}
+                                    </span>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            {{-- Configurações Avançadas de Permissão --}}
+            <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-cogs text-slate-500 text-sm"></i>
+                        <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Configurações Avançadas</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">Configurações adicionais de controle de acesso</p>
+                </div>
+                <div class="p-4 bg-white dark:bg-slate-900 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Valor Mínimo para SumUp (R$)</label>
+                            <div class="relative">
+                                <input type="number" step="0.01" min="0" name="sumup_minimum_amount"
+                                    value="{{ $settings['sumup_minimum_amount'] ?? '0.00' }}"
+                                    class="w-full px-4 py-3 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                                <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">R$</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1.5">Valor mínimo para exibir SumUp como opção. 0.00 = sem limite</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Valor Máximo para SumUp (R$)</label>
+                            <div class="relative">
+                                <input type="number" step="0.01" min="0" name="sumup_maximum_amount"
+                                    value="{{ $settings['sumup_maximum_amount'] ?? '0.00' }}"
+                                    class="w-full px-4 py-3 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                                <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">R$</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1.5">Valor máximo para exibir SumUp como opção. 0.00 = sem limite</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4 p-4 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+                        <input type="hidden" name="sumup_fallback_to_mercadopago" value="0">
+                        <input id="sumup_fallback_to_mercadopago" name="sumup_fallback_to_mercadopago" type="checkbox" value="1"
+                            class="mt-0.5 h-5 w-5 rounded-lg border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 dark:bg-slate-900 cursor-pointer"
+                            {{ ($settings['sumup_fallback_to_mercadopago'] ?? 1) ? 'checked' : '' }}>
+                        <div>
+                            <label for="sumup_fallback_to_mercadopago" class="font-black text-slate-800 dark:text-white cursor-pointer">
+                                Fallback para MercadoPago
+                            </label>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                Se o SumUp não estiver disponível ou falhar, usar automaticamente o MercadoPago como alternativa.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>{{-- /sumup-permissions --}}
+
+    </div>{{-- /space-y-6 wrapper --}}
+</div>{{-- /sumup-tab --}}
         <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
             <i class="fas fa-layer-group text-slate-500 text-xs"></i>
             <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Parcelamento SumUp</span>
@@ -766,17 +1347,98 @@
 
 @push('scripts')
     <script>
-        /* ───────── TABS ───────── */
-        function switchGwTab(activeId) {
-            document.querySelectorAll('.gw-tab-panel').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.gw-tab-btn').forEach(b => {
-                b.classList.remove('bg-white', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
-                b.classList.add('text-slate-500', 'dark:text-slate-400');
+        /* ───────── MAIN GATEWAY TAB SWITCHING ───────── */
+        function switchMainGatewayTab(tabId) {
+            // Hide all main tab panels
+            document.querySelectorAll('.main-gateway-tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
             });
-            document.getElementById(activeId).classList.remove('hidden');
-            const btn = document.getElementById('tab-btn-' + activeId);
-            btn.classList.remove('text-slate-500', 'dark:text-slate-400');
-            btn.classList.add('bg-white', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+            
+            // Show selected panel
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update tab buttons
+            document.querySelectorAll('.main-gateway-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400', 'text-slate-600', 'dark:text-slate-400', 'shadow-sm');
+                btn.classList.add('text-slate-500', 'dark:text-slate-400');
+            });
+            
+            const activeBtn = document.getElementById('main-tab-btn-' + tabId);
+            activeBtn.classList.remove('text-slate-500', 'dark:text-slate-400');
+            if (tabId === 'mercadopago-tab') {
+                activeBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+            } else {
+                activeBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400', 'shadow-sm');
+            }
+        }
+
+        /* ───────── MERCADOPAGO SUB-TAB SWITCHING ───────── */
+        function switchMpSubTab(tabId) {
+            // Hide all MP sub-tab panels
+            document.querySelectorAll('.mp-sub-tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            
+            // Show selected panel
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update tab buttons
+            document.querySelectorAll('.mp-sub-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                btn.classList.add('text-slate-500', 'dark:text-slate-400');
+            });
+            
+            const activeBtn = document.getElementById('mp-sub-tab-btn-' + tabId);
+            activeBtn.classList.remove('text-slate-500', 'dark:text-slate-400');
+            activeBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+        }
+
+        /* ───────── SUMUP SUB-TAB SWITCHING ───────── */
+        function switchSumupSubTab(tabId) {
+            // Hide all SumUp sub-tab panels
+            document.querySelectorAll('.sumup-sub-tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            
+            // Show selected panel
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update tab buttons
+            document.querySelectorAll('.sumup-sub-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400', 'shadow-sm');
+                btn.classList.add('text-slate-500', 'dark:text-slate-400');
+            });
+            
+            const activeBtn = document.getElementById('sumup-sub-tab-btn-' + tabId);
+            activeBtn.classList.remove('text-slate-500', 'dark:text-slate-400');
+            activeBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400', 'shadow-sm');
+        }
+
+        /* ───────── LEGACY TAB SWITCHING (COMPATIBILIDADE) ───────── */
+        function switchGwTab(activeId) {
+            // Redirect to new MP sub-tabs for compatibility
+            const tabMapping = {
+                'gw-auth': 'mp-auth',
+                'gw-methods': 'mp-methods', 
+                'gw-billing': 'mp-billing',
+                'gw-checkout': 'mp-checkout',
+                'gw-advanced': 'mp-advanced'
+            };
+            
+            if (tabMapping[activeId]) {
+                switchMpSubTab(tabMapping[activeId]);
+            } else {
+                // Legacy behavior
+                document.querySelectorAll('.gw-tab-panel').forEach(p => p.classList.add('hidden'));
+                document.querySelectorAll('.gw-tab-btn').forEach(b => {
+                    b.classList.remove('bg-white', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                    b.classList.add('text-slate-500', 'dark:text-slate-400');
+                });
+                document.getElementById(activeId).classList.remove('hidden');
+                const btn = document.getElementById('tab-btn-' + activeId);
+                btn.classList.remove('text-slate-500', 'dark:text-slate-400');
+                btn.classList.add('bg-white', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+            }
         }
 
         /* ───────── ENV SWITCHER ───────── */
@@ -819,6 +1481,10 @@
         // Init env on page load
         document.addEventListener('DOMContentLoaded', function () {
             switchEnv('{{ $mpEnvJs }}');
+            // Initialize main gateway tabs
+            switchMainGatewayTab('mercadopago-tab');
+            switchMpSubTab('mp-auth');
+            switchSumupSubTab('sumup-auth');
         });
 
         /* ───────── REVEAL/HIDE PASSWORD ───────── */
@@ -834,7 +1500,43 @@
             }
         }
 
-        /* ───────── METHOD CARD TOGGLE ───────── */
+        /* ───────── PERMISSION TOGGLE ───────── */
+        function onPermissionToggle(cb) {
+            const card  = cb.closest('label');
+            const color = cb.dataset.color;
+            const badge = card.querySelector('.permission-status-badge');
+            const icon  = card.querySelector('i.fas');
+            const iconBox = icon.closest('div');
+            const title = card.querySelector('p.font-black');
+            const desc  = card.querySelectorAll('p')[1];
+
+            if (cb.checked) {
+                card.className = card.className
+                    .replace(/border-slate-200 dark:border-slate-800/g, '')
+                    .replace(/bg-white dark:bg-slate-900/g, '');
+                card.classList.add(`border-${color}-400`, `bg-${color}-50`, `dark:bg-${color}-900/15`, `dark:border-${color}-600/50`);
+                iconBox.className = iconBox.className.replace('bg-slate-100 dark:bg-slate-800', `bg-${color}-100 dark:bg-${color}-800/30`);
+                icon.classList.remove('text-slate-400');
+                icon.classList.add(`text-${color}-600`, `dark:text-${color}-400`);
+                title.className = title.className.replace('text-slate-700 dark:text-slate-300', `text-${color}-800 dark:text-${color}-300`);
+                desc.className = desc.className.replace('text-slate-400', `text-${color}-500`);
+                badge.className = badge.className.replace(/bg-slate-100 dark:bg-slate-800 text-slate-400/g, '');
+                badge.classList.add(`bg-${color}-100`, `dark:bg-${color}-900/30`, `text-${color}-700`, `dark:text-${color}-400`);
+                badge.textContent = badge.textContent.includes('Permitido') ? 'Permitido' : 'OK';
+            } else {
+                card.classList.remove(`border-${color}-400`, `bg-${color}-50`, `dark:bg-${color}-900/15`, `dark:border-${color}-600/50`);
+                card.classList.add('border-slate-200', 'dark:border-slate-800', 'bg-white', 'dark:bg-slate-900');
+                iconBox.className = iconBox.className.replace(`bg-${color}-100 dark:bg-${color}-800/30`, 'bg-slate-100 dark:bg-slate-800');
+                icon.classList.add('text-slate-400');
+                icon.classList.remove(`text-${color}-600`, `dark:text-${color}-400`);
+                title.className = title.className.replace(`text-${color}-800 dark:text-${color}-300`, 'text-slate-700 dark:text-slate-300');
+                desc.className = desc.className.replace(`text-${color}-500`, 'text-slate-400');
+                badge.classList.remove(`bg-${color}-100`, `dark:bg-${color}-900/30`, `text-${color}-700`, `dark:text-${color}-400`);
+                badge.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-400');
+                badge.textContent = badge.textContent.includes('Bloqueado') ? 'Bloqueado' : 'OFF';
+            }
+            toggleSetting(cb.name, cb.checked);
+        }
         function onMethodToggle(cb) {
             // Validação: impedir desativar ambos os métodos
             if (!cb.checked) {
