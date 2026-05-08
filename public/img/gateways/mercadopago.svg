@@ -1,52 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
-  <!-- Fundo preto (como na imagem enviada) -->
-  <rect width="100" height="100" rx="16" fill="#000000"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Fundo amarelo oficial do MercadoPago -->
+  <rect width="64" height="64" rx="12" fill="#FFE600"/>
 
-  <!-- Container das 3 elipses concêntricas -->
-  <g transform="translate(50, 50)">
+  <!-- Handshake centralizado (azul oficial) -->
+  <g transform="translate(32, 32)">
     <!-- Elipse externa azul escuro -->
-    <ellipse cx="0" cy="0" rx="38" ry="25" fill="#0F1F7A"/>
+    <ellipse cx="0" cy="0" rx="22" ry="14" fill="#009EE3"/>
 
-    <!-- Elipse azul claro (meio) -->
-    <ellipse cx="0" cy="0" rx="35" ry="22" fill="#2DB8E5"/>
-
-    <!-- Hands (forma de olho aberto - parte branca superior e inferior) -->
-    <!-- Top white (eyebrow) -->
-    <path fill="#ffffff" d="M -35 0
-      C -35 -15 -20 -22 0 -22
-      C 20 -22 35 -15 35 0
-      L 30 0
-      C 30 -12 17 -17 0 -17
-      C -17 -17 -30 -12 -30 0
+    <!-- Parte interna clara (sorriso) -->
+    <path fill="#FFE600" d="M -18 -2
+      C -16 2 -10 6 0 6
+      C 10 6 16 2 18 -2
+      L 18 -2
+      C 16 -8 10 -11 0 -11
+      C -10 -11 -16 -8 -18 -2
       Z"/>
 
-    <!-- Bottom white (eyebrow) -->
-    <path fill="#ffffff" d="M -35 0
-      C -35 15 -20 22 0 22
-      C 20 22 35 15 35 0
-      L 30 0
-      C 30 12 17 17 0 17
-      C -17 17 -30 12 -30 0
-      Z"/>
+    <!-- Olho esquerdo -->
+    <circle cx="-9" cy="-4" r="2.2" fill="#009EE3"/>
+    <!-- Olho direito -->
+    <circle cx="9" cy="-4" r="2.2" fill="#009EE3"/>
 
-    <!-- Handshake (mãos apertando no centro) -->
-    <!-- Mão esquerda -->
-    <g fill="#0F1F7A">
-      <rect x="-22" y="-3" width="8" height="2.5" rx="1"/>
-      <rect x="-16" y="-4" width="7" height="2.5" rx="1"/>
-      <rect x="-10" y="-3" width="6" height="2.5" rx="1"/>
-      <rect x="-22" y="0.5" width="8" height="2.5" rx="1"/>
-      <rect x="-16" y="1.5" width="7" height="2.5" rx="1"/>
-      <rect x="-10" y="0.5" width="6" height="2.5" rx="1"/>
-    </g>
-    <!-- Mão direita -->
-    <g fill="#0F1F7A">
-      <rect x="14" y="-3" width="8" height="2.5" rx="1"/>
-      <rect x="9" y="-4" width="7" height="2.5" rx="1"/>
-      <rect x="4" y="-3" width="6" height="2.5" rx="1"/>
-      <rect x="14" y="0.5" width="8" height="2.5" rx="1"/>
-      <rect x="9" y="1.5" width="7" height="2.5" rx="1"/>
-      <rect x="4" y="0.5" width="6" height="2.5" rx="1"/>
-    </g>
+    <!-- Handshake (aperto de mão no sorriso) -->
+    <path fill="#009EE3" d="M -5 2
+      L -3 3
+      L -1 2
+      L 1 3
+      L 3 2
+      L 5 3
+      L 5 4
+      L 3 5
+      L 1 4
+      L -1 5
+      L -3 4
+      L -5 5
+      Z"/>
   </g>
 </svg>

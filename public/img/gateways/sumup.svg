@@ -1,19 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <!-- Fundo escuro oficial do SumUp -->
-  <rect width="100" height="100" rx="16" fill="#1E242F"/>
+  <rect width="64" height="64" rx="12" fill="#1E242F"/>
 
-  <!-- Letra "S" oficial do SumUp: dois semicírculos com fenda diagonal -->
-  <!-- Semicírculo superior (meia-lua abre para direita) -->
-  <path fill="#ffffff" d="M 50 20
-    C 33 20 20 33 20 50
-    C 28 48 36 44 44 38
-    C 52 32 64 28 72 30
-    C 68 24 60 20 50 20 Z"/>
+  <!-- Letra S oficial: dois semicírculos cortados em diagonal -->
+  <g transform="translate(32, 32)">
+    <!-- Semicírculo superior (meia-lua virada para direita) -->
+    <path fill="#ffffff" d="M 0 -20
+      C -11 -20 -20 -11 -20 0
+      L -20 0
+      C -8 0 4 -6 16 -12
+      L 16 -12
+      C 13 -17 7 -20 0 -20 Z"/>
 
-  <!-- Semicírculo inferior (meia-lua abre para esquerda) -->
-  <path fill="#ffffff" d="M 50 80
-    C 67 80 80 67 80 50
-    C 72 52 64 56 56 62
-    C 48 68 36 72 28 70
-    C 32 76 40 80 50 80 Z"/>
+    <!-- Semicírculo inferior (meia-lua virada para esquerda) -->
+    <path fill="#ffffff" d="M 0 20
+      C 11 20 20 11 20 0
+      L 20 0
+      C 8 0 -4 6 -16 12
+      L -16 12
+      C -13 17 -7 20 0 20 Z"/>
+  </g>
 </svg>
