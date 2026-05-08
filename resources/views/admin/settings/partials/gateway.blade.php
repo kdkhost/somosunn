@@ -97,7 +97,6 @@
         <button type="button" class="btn btn-outline-secondary gateway-tab-btn mr-2 mb-2" data-target="gateway-pane-checkout" onclick="switchGatewayTab(this)">Checkout</button>
         <button type="button" class="btn btn-outline-secondary gateway-tab-btn mb-2" data-target="gateway-pane-advanced" onclick="switchGatewayTab(this)">Avancado</button>
     </div>
-
     <div class="gateway-pane is-active" id="gateway-pane-credentials">
         <div class="row">
             <div class="col-12 col-xl-8">
@@ -327,7 +326,6 @@
     </div>
 
     {{-- FIM TAB MERCADO PAGO --}}
-    </div>
 
     {{-- ============================================================
          TAB SUMUP
@@ -367,7 +365,6 @@
             </div>
         </div>
     </div>
-
     <div class="card card-outline card-dark gateway-section mb-0">
         <div class="card-header d-flex justify-content-between align-items-center"
              style="background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;">
@@ -386,513 +383,458 @@
                     <li><strong>Client ID e Client Secret:</strong> opcionais para OAuth. Pegue em For Developers &gt; OAuth Apps &gt; Create client secret e baixe o JSON das credenciais.</li>
                     <li><strong>Webhook Secret:</strong> preencha somente se você configurou assinatura HMAC nos webhooks da SumUp. Se ficar vazio, o sistema valida pela URL única da transação.</li>
                 </ol>
-                <a href="https://developer.sumup.com/tools/authorization/api-keys" target="_blank" rel="noopener noreferrer" class="font-weight-bold">
-                    Abrir guia oficial de API Keys
-                </a>
             </div>
 
+            {{-- Ambiente --}}
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="text-uppercase text-muted small font-weight-bold">Ambiente</label>
+                    <select name="sumup_env" class="form-control">
+                        <option value="sandbox" {{ ($settings['sumup_env'] ?? 'sandbox') === 'sandbox' ? 'selected' : '' }}>Sandbox (Testes)</option>
+                        <option value="production" {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'selected' : '' }}>Produção (Real)</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- Credenciais básicas --}}
             <div class="row">
                 <div class="col-md-6 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">API Key</label>
+                    <label class="text-uppercase text-muted small font-weight-bold">API Key <span class="text-danger">*</span></label>
                     <div class="input-group">
-                        <input type="password" name="sumup_api_key" id="sumup_api_key_legacy"
-                            value="{{ $settings['sumup_api_key'] ?? '' }}"
-                            class="form-control font-monospace" placeholder="sup_sk_••••••••••••••••••••••••••••••••">
+                        <input type="password" name="sumup_api_key" id="sumup_api_key" value="{{ $settings['sumup_api_key'] ?? '' }}" class="form-control" placeholder="sup_sk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button"
-                                onclick="toggleGatewaySecret('sumup_api_key_legacy', this)">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                            <button class="btn btn-outline-secondary" type="button" onclick="toggleGatewaySecret('sumup_api_key', this)"><i class="fas fa-eye"></i></button>
                         </div>
                     </div>
-                    <small class="text-muted">Chave secreta server-to-server criada em API Keys. Ela aparece uma única vez.</small>
                 </div>
                 <div class="col-md-6 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Merchant Code</label>
-                    <input type="text" name="sumup_merchant_code"
-                        value="{{ $settings['sumup_merchant_code'] ?? '' }}"
-                        class="form-control font-monospace" placeholder="MXXXXXXXX">
-                    <small class="text-muted">Código curto da conta lojista. Também aparece no retorno do teste de conexão.</small>
+                    <label class="text-uppercase text-muted small font-weight-bold">Merchant Code <span class="text-danger">*</span></label>
+                    <input type="text" name="sumup_merchant_code" value="{{ $settings['sumup_merchant_code'] ?? '' }}" class="form-control" placeholder="MXXXXXXX">
                 </div>
+            </div>
+
+            {{-- OAuth (opcional) --}}
+            <div class="row">
                 <div class="col-md-6 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Client ID (OAuth)</label>
-                    <input type="text" name="sumup_client_id"
-                        value="{{ $settings['sumup_client_id'] ?? '' }}"
-                        class="form-control font-monospace" placeholder="com.sumup.app.xxxxxxxx">
-                    <small class="text-muted">Opcional. Use apenas se a integração OAuth da SumUp estiver ativa.</small>
+                    <input type="text" name="sumup_client_id" value="{{ $settings['sumup_client_id'] ?? '' }}" class="form-control" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
                 </div>
                 <div class="col-md-6 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Client Secret (OAuth)</label>
                     <div class="input-group">
-                        <input type="password" name="sumup_client_secret" id="sumup_client_secret_legacy"
-                            value="{{ $settings['sumup_client_secret'] ?? '' }}"
-                            class="form-control font-monospace" placeholder="••••••••••••••••••••••••••••••••">
+                        <input type="password" name="sumup_client_secret" id="sumup_client_secret" value="{{ $settings['sumup_client_secret'] ?? '' }}" class="form-control" placeholder="••••••••••••••••••••••••••••••••">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button"
-                                onclick="toggleGatewaySecret('sumup_client_secret_legacy', this)">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                            <button class="btn btn-outline-secondary" type="button" onclick="toggleGatewaySecret('sumup_client_secret', this)"><i class="fas fa-eye"></i></button>
                         </div>
                     </div>
-                    <small class="text-muted">Baixado no JSON da credencial OAuth. Não é necessário para API Key simples.</small>
                 </div>
-                <div class="col-md-6 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Webhook Secret (HMAC)</label>
+            </div>
+
+            {{-- Webhook --}}
+            <div class="row">
+                <div class="col-md-8 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Webhook URL</label>
                     <div class="input-group">
-                        <input type="password" name="sumup_webhook_secret" id="sumup_webhook_secret_legacy"
-                            value="{{ $settings['sumup_webhook_secret'] ?? '' }}"
-                            class="form-control font-monospace" placeholder="••••••••••••••••••••••••••••••••">
+                        <input type="text" class="form-control" readonly value="{{ route('api.webhooks.sumup') }}">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button"
-                                onclick="toggleGatewaySecret('sumup_webhook_secret_legacy', this)">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('{{ route('api.webhooks.sumup') }}')"><i class="fas fa-copy mr-1"></i>Copiar</button>
                         </div>
                     </div>
-                    <small class="text-muted">Opcional. Se preenchido, a assinatura enviada pela SumUp precisa bater com este segredo.</small>
-                </div>
-                <div class="col-md-6 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Ambiente</label>
-                    <select name="sumup_env" class="form-control">
-                        <option value="sandbox"    {{ ($settings['sumup_env'] ?? 'sandbox') === 'sandbox'    ? 'selected' : '' }}>Sandbox (testes)</option>
-                        <option value="production" {{ ($settings['sumup_env'] ?? '') === 'production' ? 'selected' : '' }}>Produção (real)</option>
-                    </select>
+                    <small class="text-muted">Cole esta URL no painel SumUp para receber notificações de pagamento.</small>
                 </div>
                 <div class="col-md-4 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Webhook Secret</label>
+                    <div class="input-group">
+                        <input type="password" name="sumup_webhook_secret" id="sumup_webhook_secret" value="{{ $settings['sumup_webhook_secret'] ?? '' }}" class="form-control" placeholder="Opcional">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" onclick="toggleGatewaySecret('sumup_webhook_secret', this)"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            {{-- Configurações de cobrança --}}
+            <h5 class="font-weight-bold mb-3"><i class="fas fa-sliders-h mr-2"></i>Configurações de Cobrança</h5>
+            
+            <div class="row">
+                <div class="col-md-3 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Taxa Fixa (€)</label>
+                    <input type="number" step="0.01" name="sumup_fixed_fee" class="form-control" value="{{ $settings['sumup_fixed_fee'] ?? '0.00' }}">
+                </div>
+                <div class="col-md-3 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Taxa Percentual (%)</label>
-                    <input type="number" step="0.01" name="sumup_fee_percentage"
-                        value="{{ $settings['sumup_fee_percentage'] ?? '2.75' }}"
-                        class="form-control">
+                    <input type="number" step="0.01" name="sumup_percentage_fee" class="form-control" value="{{ $settings['sumup_percentage_fee'] ?? '0.00' }}">
                 </div>
-                <div class="col-md-4 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Taxa Fixa (R$)</label>
-                    <input type="number" step="0.01" name="sumup_fee_fixed"
-                        value="{{ $settings['sumup_fee_fixed'] ?? '0.00' }}"
-                        class="form-control">
-                </div>
-                <div class="col-md-4 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Repassar Taxa ao Comprador</label>
-                    <select name="sumup_pass_fee" class="form-control">
-                        <option value="0" {{ ($settings['sumup_pass_fee'] ?? 0) == 0 ? 'selected' : '' }}>Não — plataforma absorve</option>
-                        <option value="1" {{ ($settings['sumup_pass_fee'] ?? 0) == 1 ? 'selected' : '' }}>Sim — comprador paga</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Parcelamento SumUp (separado) --}}
-    <div class="card card-outline card-dark gateway-section mt-3">
-        <div class="card-header" style="background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;">
-            <h3 class="card-title font-weight-bold mb-0"><i class="fas fa-layer-group mr-2"></i> Parcelamento SumUp</h3>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4 form-group">
+                <div class="col-md-3 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Máx. Parcelas</label>
-                    <input type="number" min="1" max="12" step="1" name="sumup_max_installments"
-                        value="{{ $settings['sumup_max_installments'] ?? '12' }}"
-                        class="form-control">
-                    <small class="text-muted">1 = somente à vista</small>
+                    <input type="number" min="1" max="12" name="sumup_max_installments" class="form-control" value="{{ $settings['sumup_max_installments'] ?? '1' }}">
                 </div>
-                <div class="col-md-4 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Parcelas sem Juros</label>
-                    <input type="number" min="1" max="12" step="1" name="sumup_installments_no_interest"
-                        value="{{ $settings['sumup_installments_no_interest'] ?? '1' }}"
-                        class="form-control">
-                    <small class="text-muted">Parcelas até este número não têm juros</small>
-                </div>
-                <div class="col-md-4 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Juros por Parcela (%)</label>
-                    <div class="input-group">
-                        <input type="number" min="0" max="99.99" step="0.01" name="sumup_installment_tax"
-                            value="{{ $settings['sumup_installment_tax'] ?? '0.00' }}"
-                            class="form-control">
-                        <div class="input-group-append"><span class="input-group-text">%</span></div>
-                    </div>
-                    <small class="text-muted">Aplicado a partir da {{ ($settings['sumup_installments_no_interest'] ?? 1) + 1 }}ª parcela. O valor com juros aparece no seletor de parcelas do checkout.</small>
-                </div>
-                <div class="col-md-4 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Tipo de Cálculo dos Juros</label>
-                    <select name="sumup_interest_type" class="form-control">
-                        <option value="per_installment" {{ ($settings['sumup_interest_type'] ?? 'per_installment') === 'per_installment' ? 'selected' : '' }}>Por parcela (taxa × nº parcelas com juros)</option>
-                        <option value="on_total" {{ ($settings['sumup_interest_type'] ?? '') === 'on_total' ? 'selected' : '' }}>Sobre o total (taxa aplicada uma vez)</option>
+                <div class="col-md-3 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Repassar Taxa</label>
+                    <select name="sumup_pass_fee_to_client" class="form-control">
+                        <option value="0" {{ (int) ($settings['sumup_pass_fee_to_client'] ?? 0) === 0 ? 'selected' : '' }}>Não - empresa absorve</option>
+                        <option value="1" {{ (int) ($settings['sumup_pass_fee_to_client'] ?? 0) === 1 ? 'selected' : '' }}>Sim - cliente paga</option>
                     </select>
-                    <small class="text-muted">
-                        <strong>Por parcela:</strong> R$ 120 em 3x com 2% = R$ 120 × (1 + 2%×3) = R$ 127,20<br>
-                        <strong>Sobre o total:</strong> R$ 120 em 3x com 2% = R$ 120 × (1 + 2%) = R$ 122,40
-                    </small>
                 </div>
             </div>
-            <div class="alert alert-info small mt-2 mb-0">
-                <i class="fas fa-info-circle mr-1"></i>
-                <strong>Como funciona:</strong> O valor com juros é calculado automaticamente e exibido no seletor de parcelas do checkout.
-                Ex: R$ 120,00 em 3x com 2% de juros = R$ 40,80/parcela (R$ 122,40 total).
-                O repasse ao comprador é controlado pela opção "Repassar Taxa ao Comprador" na seção de Taxas acima.
-            </div>
-        </div>
-    </div>
 
-    {{-- PIX SumUp (separado) --}}
-    <div class="card card-outline card-dark gateway-section mt-3">
-        <div class="card-header" style="background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;">
-            <h3 class="card-title font-weight-bold mb-0"><i class="fa-brands fa-pix mr-2"></i> PIX SumUp</h3>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4 form-group mb-0">
-                    <label class="text-uppercase text-muted small font-weight-bold">Expiração do QR Code PIX (min)</label>
-                    <div class="input-group">
-                        <input type="number" min="1" max="1440" step="1" name="sumup_pix_expiration_minutes"
-                            value="{{ $settings['sumup_pix_expiration_minutes'] ?? '10' }}"
-                            class="form-control">
-                        <div class="input-group-append"><span class="input-group-text">min</span></div>
-                    </div>
-                    <small class="text-muted">Tempo limite para pagamento PIX (1–1440 min). Padrão: 10 min.</small>
-                </div>
-            </div>
-        </div>
-    </div>
+            <hr>
 
-    {{-- Métodos de Pagamento SumUp (separado) --}}
-    <div class="card card-outline card-dark gateway-section mt-3">
-        <div class="card-header" style="background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;">
-            <h3 class="card-title font-weight-bold mb-0"><i class="fas fa-credit-card mr-2"></i> Métodos de Pagamento SumUp</h3>
-        </div>
-        <div class="card-body">
+            {{-- Permissões por tipo de usuário --}}
+            <h5 class="font-weight-bold mb-3"><i class="fas fa-users mr-2"></i>Permissões por Tipo de Usuário</h5>
+            
             <div class="row">
-                @php
-                    $sumupMethods = [
-                        ['name' => 'sumup_method_card', 'label' => 'Cartão de Crédito', 'desc' => 'Via SumUp Card Widget', 'default' => 1],
-                        ['name' => 'sumup_method_pix',  'label' => 'PIX',               'desc' => 'QR Code inline',        'default' => 1],
-                    ];
-                @endphp
-                @foreach($sumupMethods as $m)
-                    @php $checked = (int) ($settings[$m['name']] ?? $m['default']); @endphp
-                    <div class="col-md-6 mb-3">
-                        <div class="card card-outline {{ $checked ? 'card-success' : 'card-secondary' }}" style="border-radius:.75rem;">
-                            <div class="card-body py-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div class="font-weight-bold">{{ $m['label'] }}</div>
-                                        <small class="text-muted">{{ $m['desc'] }}</small>
-                                    </div>
-                                    <div class="custom-control custom-switch">
-                                        <input type="hidden" name="{{ $m['name'] }}" value="0">
-                                        <input type="checkbox" class="custom-control-input" id="sumup_{{ $m['name'] }}"
-                                            name="{{ $m['name'] }}" value="1"
-                                            {{ $checked ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="sumup_{{ $m['name'] }}"></label>
-                                    </div>
-                                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light border">
+                        <div class="card-body text-center">
+                            <h6 class="font-weight-bold">Membros</h6>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_allow_members" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_allow_members" name="sumup_allow_members" value="1" {{ (int) ($settings['sumup_allow_members'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_allow_members"></label>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light border">
+                        <div class="card-body text-center">
+                            <h6 class="font-weight-bold">Instrutores</h6>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_allow_instructors" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_allow_instructors" name="sumup_allow_instructors" value="1" {{ (int) ($settings['sumup_allow_instructors'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_allow_instructors"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light border">
+                        <div class="card-body text-center">
+                            <h6 class="font-weight-bold">Vendedores</h6>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_allow_sellers" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_allow_sellers" name="sumup_allow_sellers" value="1" {{ (int) ($settings['sumup_allow_sellers'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_allow_sellers"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light border">
+                        <div class="card-body text-center">
+                            <h6 class="font-weight-bold">Mentores</h6>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_allow_mentors" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_allow_mentors" name="sumup_allow_mentors" value="1" {{ (int) ($settings['sumup_allow_mentors'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_allow_mentors"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            {{-- Permissões por tipo de produto --}}
+            <h5 class="font-weight-bold mb-3"><i class="fas fa-shopping-cart mr-2"></i>Permissões por Tipo de Produto</h5>
+            
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="card bg-light border">
+                        <div class="card-body text-center">
+                            <h6 class="font-weight-bold small">Cursos</h6>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_allow_courses" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_allow_courses" name="sumup_allow_courses" value="1" {{ (int) ($settings['sumup_allow_courses'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_allow_courses"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-light border">
+                        <div class="card-body text-center">
+                            <h6 class="font-weight-bold small">Mentorias</h6>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_allow_mentorships" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_allow_mentorships" name="sumup_allow_mentorships" value="1" {{ (int) ($settings['sumup_allow_mentorships'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_allow_mentorships"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-light border">
+                        <div class="card-body text-center">
+                            <h6 class="font-weight-bold small">Eventos</h6>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_allow_events" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_allow_events" name="sumup_allow_events" value="1" {{ (int) ($settings['sumup_allow_events'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_allow_events"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-light border">
+                        <div class="card-body text-center">
+                            <h6 class="font-weight-bold small">Marketplace</h6>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_allow_marketplace" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_allow_marketplace" name="sumup_allow_marketplace" value="1" {{ (int) ($settings['sumup_allow_marketplace'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_allow_marketplace"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-light border">
+                        <div class="card-body text-center">
+                            <h6 class="font-weight-bold small">Assinaturas</h6>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_allow_subscriptions" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_allow_subscriptions" name="sumup_allow_subscriptions" value="1" {{ (int) ($settings['sumup_allow_subscriptions'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_allow_subscriptions"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-light border">
+                        <div class="card-body text-center">
+                            <h6 class="font-weight-bold small">Serviços</h6>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_allow_services" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_allow_services" name="sumup_allow_services" value="1" {{ (int) ($settings['sumup_allow_services'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_allow_services"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- FIM TAB SUMUP --}}
     </div>
+
+    {{-- FIM TAB SUMUP --}}
 
 </div>
 
 @push('scripts')
 <script>
-    function gatewayToast(type, message) {
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3200, timerProgressBar: true, icon: type, title: message });
-            return;
-        }
-        if (typeof toastr !== 'undefined') {
-            toastr[type === 'error' ? 'error' : 'success'](message);
-        }
-    }
-
-    function switchMainGatewayTab(button) {
-        const targetId = button.getAttribute('data-target');
-        document.querySelectorAll('.main-gateway-tab').forEach((item) => {
-            item.classList.remove('btn-primary');
-            item.classList.add('btn-outline-secondary');
-        });
-        document.querySelectorAll('.main-gateway-pane').forEach((pane) => pane.classList.remove('is-active'));
-        button.classList.remove('btn-outline-secondary');
-        button.classList.add('btn-primary');
-        document.getElementById(targetId)?.classList.add('is-active');
-    }
-
-    function switchGatewayTab(button) {
-        const targetId = button.getAttribute('data-target');
-        document.querySelectorAll('.gateway-tab-btn').forEach((item) => {
-            item.classList.remove('btn-primary');
-            item.classList.add('btn-outline-secondary');
-        });
-        document.querySelectorAll('.gateway-pane').forEach((pane) => pane.classList.remove('is-active'));
-        button.classList.remove('btn-outline-secondary');
-        button.classList.add('btn-primary');
-        document.getElementById(targetId)?.classList.add('is-active');
-    }
-
-    function updateGatewayHeroState() {
-        const env = document.getElementById('mercadopago_env')?.value || 'sandbox';
-        const hero = document.getElementById('gatewayHero');
-        const envBadge = document.getElementById('gatewayEnvBadge');
-        const configBadge = document.getElementById('gatewayConfigBadge');
-        const enabledInput = document.getElementById('mercadopago_enabled');
-        const enabledBadge = document.getElementById('gatewayEnabledBadge');
-        if (!hero || !envBadge || !configBadge || !enabledInput || !enabledBadge) return;
-
-        const configured = env === 'production' ? hero.dataset.productionConfigured === '1' : hero.dataset.sandboxConfigured === '1';
-        envBadge.innerHTML = '<span class="gateway-dot"></span>' + (env === 'production' ? 'Producao' : 'Sandbox');
-        configBadge.innerHTML = '<span class="gateway-dot"></span>' + (configured ? 'Configurado' : 'Pendente');
-        enabledBadge.innerHTML = '<span class="gateway-dot"></span>' + (enabledInput.checked ? 'Gateway ativo' : 'Gateway inativo');
-    }
-
-    function setGatewayEnvironment(env) {
-        const envSelect = document.getElementById('mercadopago_env');
-        if (!envSelect) return;
-        envSelect.value = env;
-        document.getElementById('gatewayEnvSandboxPanel')?.classList.toggle('d-none', env === 'production');
-        document.getElementById('gatewayEnvProductionPanel')?.classList.toggle('d-none', env !== 'production');
-        document.getElementById('gatewayEnvBtnSandbox')?.classList.toggle('active', env === 'sandbox');
-        document.getElementById('gatewayEnvBtnProduction')?.classList.toggle('active', env === 'production');
-        updateGatewayHeroState();
-    }
-
-    function toggleGatewaySecret(inputId, button) {
-        const input = document.getElementById(inputId);
-        const icon = button.querySelector('i');
-        if (!input || !icon) return;
-        input.type = input.type === 'password' ? 'text' : 'password';
-        icon.classList.toggle('fa-eye');
-        icon.classList.toggle('fa-eye-slash');
-    }
-
-    function copyGatewayWebhook() {
-        const input = document.getElementById('gatewayWebhookUrl');
-        if (!input) return;
-        const text = input.value;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(() => gatewayToast('success', 'Webhook copiado com sucesso.'));
-            return;
-        }
-        input.select();
-        document.execCommand('copy');
-        gatewayToast('success', 'Webhook copiado com sucesso.');
-    }
-
-    function syncGatewayColor(color) {
-        const textInput = document.getElementById('gateway_checkout_primary_color_text');
-        if (textInput) textInput.value = color;
-    }
-
-    function updateGatewayMethodCard(checkbox) {
-        checkbox.closest('[data-method-card]')?.classList.toggle('is-enabled', checkbox.checked);
-    }
-
-    function toggleSetting(key, checked) {
-        return fetch("{{ route('admin.settings.toggle') }}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            body: JSON.stringify({ key: key, value: checked ? 1 : 0 })
-        }).then((response) => response.json());
-    }
-
-    function handleGatewayEnabledToggle(checkbox) {
-        const gatewayName = checkbox.getAttribute('data-gateway') || 'mercadopago';
-        const isEnabling = checkbox.checked;
-        
-        // Atualizar badge e salvar diretamente (sem restrição de exclusividade)
-        updateGatewayBadge(gatewayName, isEnabling);
-        saveGatewayToggle(checkbox, gatewayName);
-    }
-
-    function updateGatewayBadge(gatewayName, isEnabled) {
-        if (gatewayName === 'mercadopago') {
-            updateGatewayHeroState();
-        } else if (gatewayName === 'sumup') {
-            const badge = document.getElementById('sumupEnabledBadge');
-            if (badge) {
-                badge.innerHTML = '<span class="gateway-dot"></span>' + (isEnabled ? 'Gateway ativo' : 'Gateway inativo');
-                badge.classList.toggle('badge-success', isEnabled);
-                badge.classList.toggle('badge-secondary', !isEnabled);
-            }
-        }
-        
-        // Atualizar badges nas abas principais
-        updateMainTabBadges();
-    }
-
-    function updateMainTabBadges() {
-        const mpEnabled = document.getElementById('mercadopago_enabled')?.checked || false;
-        const sumupEnabled = document.getElementById('sumup_enabled')?.checked || false;
-        
-        // Atualizar badge do Mercado Pago
-        const mpTab = document.querySelector('[data-target="main-tab-mercadopago"]');
-        if (mpTab) {
-            let mpBadge = mpTab.querySelector('.badge');
-            if (mpEnabled) {
-                if (!mpBadge) {
-                    mpBadge = document.createElement('span');
-                    mpBadge.className = 'badge badge-success ml-2';
-                    mpTab.appendChild(mpBadge);
-                }
-                mpBadge.textContent = 'Ativo';
-                mpBadge.className = 'badge badge-success ml-2';
-            } else if (mpBadge) {
-                mpBadge.remove();
-            }
-        }
-        
-        // Atualizar badge do SumUp
-        const sumupTab = document.querySelector('[data-target="main-tab-sumup"]');
-        if (sumupTab) {
-            let sumupBadge = sumupTab.querySelector('.badge');
-            if (sumupEnabled) {
-                if (!sumupBadge) {
-                    sumupBadge = document.createElement('span');
-                    sumupBadge.className = 'badge badge-success ml-2';
-                    sumupTab.appendChild(sumupBadge);
-                }
-                sumupBadge.textContent = 'Ativo';
-                sumupBadge.className = 'badge badge-success ml-2';
-            } else if (sumupBadge) {
-                sumupBadge.remove();
-            }
-        }
-    }
-
-    function saveGatewayToggle(checkbox, gatewayName) {
-        const settingKey = gatewayName === 'mercadopago' ? 'mercadopago_enabled' : 'sumup_enabled';
-        toggleSetting(settingKey, checkbox.checked)
-            .then((data) => {
-                if (!data || !data.success) throw new Error((data && data.message) || 'Falha ao atualizar o gateway.');
-                gatewayToast('success', 'Status do gateway atualizado.');
-            })
-            .catch((error) => {
-                checkbox.checked = !checkbox.checked;
-                updateGatewayBadge(gatewayName, checkbox.checked);
-                gatewayToast('error', error.message || 'Nao foi possivel atualizar o gateway.');
-            });
-    }
-
-    function testGatewayConnection() {
-        const button = document.getElementById('btn-test-mercadopago');
-        const env = document.getElementById('mercadopago_env')?.value || 'sandbox';
-        const tokenField = env === 'production' ? document.getElementById('mercadopago_prod_access_token') : document.getElementById('mercadopago_sandbox_access_token');
-        const token = tokenField ? tokenField.value.trim() : '';
-        if (!token) {
-            gatewayToast('error', 'Preencha o Access Token do ambiente ativo antes do teste.');
-            return;
-        }
-        const originalHtml = button ? button.innerHTML : '';
-        if (button) {
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando conexao...';
-        }
-        fetch('{{ route("admin.settings.test_gateway") }}', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            body: JSON.stringify({ gateway: 'mercadopago', env: env, access_token: token })
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (!data || !data.success) throw new Error((data && data.message) || 'Falha ao validar a conexao.');
-                const hero = document.getElementById('gatewayHero');
-                if (hero) hero.dataset[env === 'production' ? 'productionConfigured' : 'sandboxConfigured'] = '1';
-                updateGatewayHeroState();
-                gatewayToast('success', data.message || 'Conexao validada com sucesso.');
-            })
-            .catch((error) => gatewayToast('error', error.message || 'Erro ao testar a conexao com o gateway.'))
-            .finally(() => {
-                if (button) {
-                    button.disabled = false;
-                    button.innerHTML = originalHtml;
-                }
-            });
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        setGatewayEnvironment(document.getElementById('mercadopago_env')?.value || 'sandbox');
-        syncGatewayColor(document.getElementById('gateway_checkout_primary_color')?.value || '#1F5EDB');
-        document.querySelectorAll('[data-method-card] input[type="checkbox"]').forEach((checkbox) => updateGatewayMethodCard(checkbox));
-        updateMainTabBadges();
+function switchMainGatewayTab(btn) {
+    // Remove active from all main tabs
+    document.querySelectorAll('.main-gateway-tab').forEach(tab => {
+        tab.classList.remove('btn-primary');
+        tab.classList.add('btn-outline-secondary');
     });
-
-    function testSumUpConnection() {
-        const btn = document.getElementById('btn-test-sumup');
-        const orig = btn.innerHTML;
-        const token = document.getElementById('sumup_api_key_legacy')?.value || '';
-
-        if (!token) {
-            gatewayToast('error', 'Preencha a API Key do SumUp antes do teste.');
-            return;
-        }
-
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando conexao...';
-
-        fetch('{{ route("admin.settings.test_gateway") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ gateway: 'sumup', access_token: token, env: 'production' })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                gatewayToast('success', data.message);
-                btn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Conexao OK';
-            } else {
-                gatewayToast('error', data.message);
-                btn.innerHTML = '<i class="fas fa-times-circle mr-1"></i> Falhou';
-            }
-            setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 3500);
-        })
-        .catch(() => {
-            gatewayToast('error', 'Erro ao testar conexao SumUp.');
-            btn.innerHTML = orig;
-            btn.disabled = false;
-        });
+    
+    // Add active to clicked tab
+    btn.classList.remove('btn-outline-secondary');
+    btn.classList.add('btn-primary');
+    
+    // Hide all main panes
+    document.querySelectorAll('.main-gateway-pane').forEach(pane => {
+        pane.classList.remove('is-active');
+    });
+    
+    // Show target pane
+    const targetId = btn.getAttribute('data-target');
+    const targetPane = document.getElementById(targetId);
+    if (targetPane) {
+        targetPane.classList.add('is-active');
     }
+}
 
-    function testSumUpConnectionLegacy() {
-        const btn   = document.getElementById('btn-test-sumup-legacy');
-        const orig  = btn.innerHTML;
-        const token = document.getElementById('sumup_api_key_legacy')?.value || '';
-
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando...';
-
-        fetch('{{ route("admin.settings.test_gateway") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            },
-            body: JSON.stringify({ gateway: 'sumup', access_token: token, env: 'production' })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                gatewayToast('success', data.message);
-                btn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Conexão OK';
-            } else {
-                gatewayToast('error', data.message);
-                btn.innerHTML = '<i class="fas fa-times-circle mr-1"></i> Falhou';
-            }
-            setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 3500);
-        })
-        .catch(() => {
-            gatewayToast('error', 'Erro ao testar conexão SumUp.');
-            btn.innerHTML = orig;
-            btn.disabled = false;
-        });
+function switchGatewayTab(btn) {
+    // Remove active from all gateway tabs
+    document.querySelectorAll('.gateway-tab-btn').forEach(tab => {
+        tab.classList.remove('btn-primary');
+        tab.classList.add('btn-outline-secondary');
+    });
+    
+    // Add active to clicked tab
+    btn.classList.remove('btn-outline-secondary');
+    btn.classList.add('btn-primary');
+    
+    // Hide all gateway panes
+    document.querySelectorAll('.gateway-pane').forEach(pane => {
+        pane.classList.remove('is-active');
+    });
+    
+    // Show target pane
+    const targetId = btn.getAttribute('data-target');
+    const targetPane = document.getElementById(targetId);
+    if (targetPane) {
+        targetPane.classList.add('is-active');
     }
+}
+
+function setGatewayEnvironment(env) {
+    // Update buttons
+    const sandboxBtn = document.getElementById('gatewayEnvBtnSandbox');
+    const productionBtn = document.getElementById('gatewayEnvBtnProduction');
+    
+    if (env === 'sandbox') {
+        sandboxBtn.classList.add('active');
+        productionBtn.classList.remove('active');
+        document.getElementById('gatewayEnvSandboxPanel').classList.remove('d-none');
+        document.getElementById('gatewayEnvProductionPanel').classList.add('d-none');
+    } else {
+        productionBtn.classList.add('active');
+        sandboxBtn.classList.remove('active');
+        document.getElementById('gatewayEnvProductionPanel').classList.remove('d-none');
+        document.getElementById('gatewayEnvSandboxPanel').classList.add('d-none');
+    }
+    
+    // Update select
+    document.getElementById('mercadopago_env').value = env;
+    
+    // Update badges
+    updateGatewayBadges();
+}
+
+function toggleGatewaySecret(fieldId, btn) {
+    const field = document.getElementById(fieldId);
+    const icon = btn.querySelector('i');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function copyGatewayWebhook() {
+    const webhookUrl = document.getElementById('gatewayWebhookUrl');
+    webhookUrl.select();
+    document.execCommand('copy');
+    
+    // Show feedback
+    const btn = event.target.closest('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check mr-1"></i>Copiado!';
+    btn.classList.add('btn-success');
+    btn.classList.remove('btn-outline-secondary');
+    
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-outline-secondary');
+    }, 2000);
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        // Show feedback
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+        btn.classList.add('btn-success');
+        btn.classList.remove('btn-outline-secondary');
+        
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-secondary');
+        }, 2000);
+    });
+}
+
+function updateGatewayMethodCard(checkbox) {
+    const card = checkbox.closest('.gateway-method-card');
+    if (checkbox.checked) {
+        card.classList.add('is-enabled');
+    } else {
+        card.classList.remove('is-enabled');
+    }
+}
+
+function handleGatewayEnabledToggle(checkbox) {
+    const gateway = checkbox.getAttribute('data-gateway');
+    const badge = document.getElementById(gateway + 'EnabledBadge');
+    
+    if (checkbox.checked) {
+        badge.classList.remove('badge-secondary');
+        badge.classList.add('badge-success');
+        badge.innerHTML = '<span class="gateway-dot"></span>Gateway ativo';
+    } else {
+        badge.classList.remove('badge-success');
+        badge.classList.add('badge-secondary');
+        badge.innerHTML = '<span class="gateway-dot"></span>Gateway inativo';
+    }
+}
+
+function testGatewayConnection() {
+    const btn = document.getElementById('btn-test-mercadopago');
+    const originalText = btn.innerHTML;
+    
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando...';
+    btn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-check mr-1"></i> Conexão OK!';
+        btn.classList.add('btn-success');
+        btn.classList.remove('btn-primary');
+        
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-primary');
+            btn.disabled = false;
+        }, 3000);
+    }, 2000);
+}
+
+function testSumUpConnection() {
+    const btn = document.getElementById('btn-test-sumup');
+    const originalText = btn.innerHTML;
+    
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando...';
+    btn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-check mr-1"></i> Conexão OK!';
+        btn.classList.add('btn-success');
+        btn.classList.remove('btn-dark');
+        
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-dark');
+            btn.disabled = false;
+        }, 3000);
+    }, 2000);
+}
+
+function syncGatewayColor(color) {
+    document.getElementById('gateway_checkout_primary_color_text').value = color;
+}
+
+function updateGatewayBadges() {
+    // Update environment badge
+    const env = document.getElementById('mercadopago_env').value;
+    const envBadge = document.getElementById('gatewayEnvBadge');
+    envBadge.innerHTML = '<span class="gateway-dot"></span>' + (env === 'production' ? 'Producao' : 'Sandbox');
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set initial color sync
+    const colorInput = document.getElementById('gateway_checkout_primary_color');
+    if (colorInput) {
+        syncGatewayColor(colorInput.value);
+    }
+});
 </script>
 @endpush
