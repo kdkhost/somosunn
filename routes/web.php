@@ -713,6 +713,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
 
     // Traditional Admin Resources
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    Route::post('plans/{plan}/toggle-active', [\App\Http\Controllers\Admin\PlanController::class, 'toggleActive'])->name('plans.toggle-active');
+    Route::post('plans/reorder', [\App\Http\Controllers\Admin\PlanController::class, 'reorder'])->name('plans.reorder');
     Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class);
     Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class)->except(['show']);
     Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class);
