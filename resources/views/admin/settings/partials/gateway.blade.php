@@ -477,8 +477,17 @@
                         <option value="1" {{ ($settings['sumup_pass_fee'] ?? 0) == 1 ? 'selected' : '' }}>Sim — comprador paga</option>
                     </select>
                 </div>
-                {{-- Parcelamento SumUp --}}
-                <div class="col-12"><hr><h6 class="text-uppercase text-muted small font-weight-bold mb-3"><i class="fas fa-layer-group mr-1"></i> Parcelamento SumUp</h6></div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Parcelamento SumUp (separado) --}}
+    <div class="card card-outline card-dark gateway-section mt-3">
+        <div class="card-header" style="background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;">
+            <h3 class="card-title font-weight-bold mb-0"><i class="fas fa-layer-group mr-2"></i> Parcelamento SumUp</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
                 <div class="col-md-4 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Máx. Parcelas</label>
                     <input type="number" min="1" max="12" step="1" name="sumup_max_installments"
@@ -501,10 +510,27 @@
                             class="form-control">
                         <div class="input-group-append"><span class="input-group-text">%</span></div>
                     </div>
-                    <small class="text-muted">Aplicado a partir da {{ ($settings['sumup_installments_no_interest'] ?? 1) + 1 }}ª parcela</small>
+                    <small class="text-muted">Aplicado a partir da {{ ($settings['sumup_installments_no_interest'] ?? 1) + 1 }}ª parcela. O valor com juros aparece no seletor de parcelas do checkout.</small>
                 </div>
-                <div class="col-md-4 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Expiração do PIX SumUp (min)</label>
+            </div>
+            <div class="alert alert-info small mt-2 mb-0">
+                <i class="fas fa-info-circle mr-1"></i>
+                <strong>Como funciona:</strong> O valor com juros é calculado automaticamente e exibido no seletor de parcelas do checkout.
+                Ex: R$ 120,00 em 3x com 2% de juros = R$ 40,80/parcela (R$ 122,40 total).
+                O repasse ao comprador é controlado pela opção "Repassar Taxa ao Comprador" na seção de Taxas acima.
+            </div>
+        </div>
+    </div>
+
+    {{-- PIX SumUp (separado) --}}
+    <div class="card card-outline card-dark gateway-section mt-3">
+        <div class="card-header" style="background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;">
+            <h3 class="card-title font-weight-bold mb-0"><i class="fa-brands fa-pix mr-2"></i> PIX SumUp</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 form-group mb-0">
+                    <label class="text-uppercase text-muted small font-weight-bold">Expiração do QR Code PIX (min)</label>
                     <div class="input-group">
                         <input type="number" min="1" max="1440" step="1" name="sumup_pix_expiration_minutes"
                             value="{{ $settings['sumup_pix_expiration_minutes'] ?? '10' }}"
@@ -513,8 +539,17 @@
                     </div>
                     <small class="text-muted">Tempo limite para pagamento PIX (1–1440 min). Padrão: 10 min.</small>
                 </div>
-                {{-- Métodos de Pagamento SumUp --}}
-                <div class="col-12"><hr><h6 class="text-uppercase text-muted small font-weight-bold mb-3"><i class="fas fa-credit-card mr-1"></i> Métodos de Pagamento SumUp</h6></div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Métodos de Pagamento SumUp (separado) --}}
+    <div class="card card-outline card-dark gateway-section mt-3">
+        <div class="card-header" style="background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;">
+            <h3 class="card-title font-weight-bold mb-0"><i class="fas fa-credit-card mr-2"></i> Métodos de Pagamento SumUp</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
                 @php
                     $sumupMethods = [
                         ['name' => 'sumup_method_card', 'label' => 'Cartão de Crédito', 'desc' => 'Via SumUp Card Widget', 'default' => 1],
@@ -543,12 +578,21 @@
                         </div>
                     </div>
                 @endforeach
-                <div class="col-12">
-                    <button type="button" class="btn btn-dark btn-block font-weight-bold d-none" id="btn-test-sumup-legacy"
-                        onclick="testSumUpConnectionLegacy()">
-                        <i class="fas fa-plug mr-1"></i> Testar Conexão SumUp (Legacy)
-                    </button>
-                </div>
+                                        <div class="font-weight-bold">{{ $m['label'] }}</div>
+                                        <small class="text-muted">{{ $m['desc'] }}</small>
+                                    </div>
+                                    <div class="custom-control custom-switch">
+                                        <input type="hidden" name="{{ $m['name'] }}" value="0">
+                                        <input type="checkbox" class="custom-control-input" id="sumup_{{ $m['name'] }}"
+                                            name="{{ $m['name'] }}" value="1"
+                                            {{ $checked ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="sumup_{{ $m['name'] }}"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
