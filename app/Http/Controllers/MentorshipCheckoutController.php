@@ -95,27 +95,42 @@ class MentorshipCheckoutController extends Controller
 
         $request->validate([
             'coupon_code' => 'nullable|string|max:40',
+            'gateway_provider' => 'nullable|string|in:mercadopago,sumup',
         ]);
 
         $effectiveTotal = round((float) ($mentorship->effective_price ?? ($mentorship->price ?? 0)), 2);
         $gatewayProvider = 'free';
 
         if ($effectiveTotal > 0) {
-            $sellerId = (int) ($mentorship->mentor_id);
-            $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
-            $isPlatformOwner = $sellerId === (int) $platformOwnerId;
+            $chosenGateway = $request->input('gateway_provider', 'mercadopago');
 
-            $sellerMpAccount = null;
-            if (!$isPlatformOwner) {
-                $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+            if ($chosenGateway === 'sumup') {
+                if (!$this->shouldShowSumUp($effectiveTotal, 'mentorship', $this->getUserType())) {
+                    return back()->with('error', 'SumUp não disponível para esta mentoria.');
+                }
+                $gatewayProvider = 'sumup';
             } else {
-                $sellerMpAccount = \App\Models\GatewayAccount::resolveGlobalSettings();
-            }
+                $sellerId = (int) ($mentorship->mentor_id);
+                $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
+                $isPlatformOwner = $sellerId === (int) $platformOwnerId;
 
-            $gatewayProvider = 'mercadopago';
+                $sellerMpAccount = null;
+                if (!$isPlatformOwner) {
+                    $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+                } else {
+                    $sellerMpAccount = \App\Models\GatewayAccount::resolveGlobalSettings();
+                }
 
-            if (!($sellerMpAccount['mpEnabled'] ?? false)) {
-                return back()->with('error', 'Metodo de pagamento nao disponivel para esta mentoria. O mentor ainda nao configurou um gateway.');
+                $gatewayProvider = 'mercadopago';
+
+                if (!($sellerMpAccount['mpEnabled'] ?? false)) {
+                    // Fallback para SumUp se disponível
+                    if ($this->shouldShowSumUp($effectiveTotal, 'mentorship', $this->getUserType())) {
+                        $gatewayProvider = 'sumup';
+                    } else {
+                        return back()->with('error', 'Metodo de pagamento nao disponivel para esta mentoria.');
+                    }
+                }
             }
         } else {
             $existingFreeOrder = $this->findExistingFreeOrder((int) Auth::id(), 'mentorship', (int) $mentorship->id);

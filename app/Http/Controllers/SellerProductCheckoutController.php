@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 
 class SellerProductCheckoutController extends Controller
 {
+    use \App\Traits\SumUpIntegration;
     public function show(Request $request, SellerProductCartService $cartService, CorreiosShippingService $shippingService)
     {
         if (!Auth::check()) {
@@ -87,7 +88,7 @@ class SellerProductCheckoutController extends Controller
         abort_unless(app(\App\Services\Marketplace\SellerStoreService::class)->isPubliclyAvailable($sellerStore), 404);
 
         $data = $request->validate([
-            'gateway_provider' => ['nullable', 'in:mercadopago'],
+            'gateway_provider' => ['nullable', 'in:mercadopago,sumup'],
             'recipient_name' => ['nullable', 'string', 'max:120'],
             'recipient_email' => ['nullable', 'email', 'max:120'],
             'recipient_phone' => ['nullable', 'string', 'max:40'],
@@ -121,12 +122,24 @@ class SellerProductCheckoutController extends Controller
         $total = round($subtotal + $shippingAmount, 2);
 
         $gateways = GatewayAccount::resolveForSeller((int) $sellerStore->user_id);
-        if ($total > 0 && !($gateways['mpEnabled'] ?? false)) {
-            return back()->with('error', 'Mercado Pago nao configurado pelo vendedor.')->withInput();
+        $chosenGateway = $data['gateway_provider'] ?? 'mercadopago';
+
+        // Se escolheu SumUp, validar disponibilidade
+        if ($chosenGateway === 'sumup') {
+            if (!$this->shouldShowSumUp($total, 'marketplace', $this->getUserType())) {
+                return back()->with('error', 'SumUp não disponível para este pedido.')->withInput();
+            }
+        } elseif ($total > 0 && !($gateways['mpEnabled'] ?? false)) {
+            // Se MP não disponível, tentar fallback para SumUp
+            if ($this->shouldShowSumUp($total, 'marketplace', $this->getUserType())) {
+                $chosenGateway = 'sumup';
+            } else {
+                return back()->with('error', 'Mercado Pago nao configurado pelo vendedor.')->withInput();
+            }
         }
 
         $order = null;
-        DB::transaction(function () use (&$order, $totals, $subtotal, $shippingAmount, $total, $shippingQuote, $data, $sellerStore) {
+        DB::transaction(function () use (&$order, $totals, $subtotal, $shippingAmount, $total, $shippingQuote, $data, $sellerStore, $chosenGateway) {
             $platformFeeAmount = MarketplaceFee::amount($subtotal);
             $platformFeePercent = MarketplaceFee::percent();
 
@@ -152,7 +165,7 @@ class SellerProductCheckoutController extends Controller
                 'fee_amount' => 0,
                 'platform_fee_amount' => $platformFeeAmount,
                 'currency' => 'BRL',
-                'gateway' => $total <= 0 ? 'free' : 'mercadopago',
+                'gateway' => $total <= 0 ? 'free' : $chosenGateway,
                 'metadata' => [
                     'context' => 'marketplace',
                     'sale_type' => 'seller_product',
