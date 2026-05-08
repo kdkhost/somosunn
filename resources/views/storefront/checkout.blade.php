@@ -51,25 +51,57 @@
             $availableGateways = [];
 
             if ($mpEnabled) {
-                $availableGateways['mercadopago'] = [
-                    'id' => 'mercadopago',
-                    'label' => 'Mercado Pago',
-                    'description' => 'Cartão de crédito, débito, Pix ou Boleto',
-                    'icon' => 'fa-hand-holding-dollar',
-                    'methods' => ['Cartão', 'Pix', 'Boleto'],
-                    'gradient' => 'from-blue-600 to-indigo-700',
-                ];
+                // Ler métodos MP ativos do banco
+                $mpMethods = [];
+                if ((int) \App\Models\Setting::get('mercadopago_method_credit_card', 1) === 1) {
+                    $mpMethods[] = 'Cartão de crédito';
+                }
+                if ((int) \App\Models\Setting::get('mercadopago_method_debit_card', 0) === 1) {
+                    $mpMethods[] = 'Cartão de débito';
+                }
+                if ((int) \App\Models\Setting::get('mercadopago_method_pix', 1) === 1) {
+                    $mpMethods[] = 'Pix';
+                }
+                if ((int) \App\Models\Setting::get('mercadopago_method_ticket', 0) === 1) {
+                    $mpMethods[] = 'Boleto';
+                }
+                if ((int) \App\Models\Setting::get('mercadopago_method_mercadopago', 0) === 1) {
+                    $mpMethods[] = 'Carteira MP';
+                }
+
+                // Se nenhum método foi configurado, não mostrar MP
+                if (!empty($mpMethods)) {
+                    $availableGateways['mercadopago'] = [
+                        'id' => 'mercadopago',
+                        'label' => 'Mercado Pago',
+                        'description' => implode(', ', $mpMethods),
+                        'icon' => 'fa-hand-holding-dollar',
+                        'methods' => $mpMethods,
+                        'gradient' => 'from-blue-600 to-indigo-700',
+                    ];
+                }
             }
 
             if ($sumupAvailable) {
-                $availableGateways['sumup'] = [
-                    'id' => 'sumup',
-                    'label' => 'SumUp',
-                    'description' => 'Cartão de crédito ou Pix via SumUp',
-                    'icon' => 'fa-credit-card',
-                    'methods' => ['Cartão', 'Pix'],
-                    'gradient' => 'from-slate-800 to-slate-900',
-                ];
+                // Ler métodos SumUp ativos
+                $sumupMethods = [];
+                if ((int) \App\Models\Setting::get('sumup_method_card', 1) === 1) {
+                    $sumupMethods[] = 'Cartão';
+                }
+                if ((int) \App\Models\Setting::get('sumup_method_pix', 1) === 1) {
+                    $sumupMethods[] = 'Pix';
+                }
+
+                if (!empty($sumupMethods)) {
+                    $availableGateways['sumup'] = [
+                        'id' => 'sumup',
+                        'label' => 'SumUp',
+                        'description' => implode(' ou ', $sumupMethods) . ' via SumUp',
+                        'icon' => 'fa-credit-card',
+                        'methods' => $sumupMethods,
+                        'gradient' => 'from-slate-800 to-slate-900',
+                    ];
+                }
             }
 
             $gatewayCount = count($availableGateways);

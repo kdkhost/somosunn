@@ -78,7 +78,20 @@
                                 <div class="pt-4 border-t border-gray-100">
                                 <label class="block text-sm font-medium text-gray-700 mb-3">Forma de Pagamento</label>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    @if($mpEnabled ?? true)
+                                    @php
+                                        // Ler métodos MP e SumUp ativos do banco
+                                        $mpMethodsActive = [];
+                                        if ((int) \App\Models\Setting::get('mercadopago_method_credit_card', 1) === 1) $mpMethodsActive[] = 'Cartão';
+                                        if ((int) \App\Models\Setting::get('mercadopago_method_debit_card', 0) === 1) $mpMethodsActive[] = 'Débito';
+                                        if ((int) \App\Models\Setting::get('mercadopago_method_pix', 1) === 1) $mpMethodsActive[] = 'Pix';
+                                        if ((int) \App\Models\Setting::get('mercadopago_method_ticket', 0) === 1) $mpMethodsActive[] = 'Boleto';
+
+                                        $sumupMethodsActive = [];
+                                        if ((int) \App\Models\Setting::get('sumup_method_card', 1) === 1) $sumupMethodsActive[] = 'Cartão';
+                                        if ((int) \App\Models\Setting::get('sumup_method_pix', 1) === 1) $sumupMethodsActive[] = 'Pix';
+                                    @endphp
+
+                                    @if(($mpEnabled ?? true) && !empty($mpMethodsActive))
                                         <label class="cursor-pointer">
                                             <input type="radio" name="gateway_provider" value="mercadopago" class="peer sr-only"
                                                 data-gateway-summary="Pagamento via Mercado Pago."
@@ -92,14 +105,14 @@
                                                     </div>
                                                     <div>
                                                         <p class="font-bold text-gray-900">Mercado Pago</p>
-                                                        <p class="text-xs text-gray-500">Cartão, Pix, Boleto</p>
+                                                        <p class="text-xs text-gray-500">{{ implode(', ', $mpMethodsActive) }}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                         </label>
                                     @endif
 
-                                    @if(($sumup['available'] ?? false))
+                                    @if(($sumup['available'] ?? false) && !empty($sumupMethodsActive))
                                         <label class="cursor-pointer">
                                             <input type="radio" name="gateway_provider" value="sumup" class="peer sr-only"
                                                 data-gateway-summary="Pagamento via SumUp."
@@ -113,7 +126,7 @@
                                                     </div>
                                                     <div>
                                                         <p class="font-bold text-gray-900">SumUp</p>
-                                                        <p class="text-xs text-gray-500">Cartão, Pix</p>
+                                                        <p class="text-xs text-gray-500">{{ implode(', ', $sumupMethodsActive) }}</p>
                                                     </div>
                                                 </div>
                                             </div>

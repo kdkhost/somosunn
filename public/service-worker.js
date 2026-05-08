@@ -1,58 +1,82 @@
-const CACHE_NAME = 'unn-v1';
-const URLS_TO_CACHE = [
-  '/offline',
-  '/img/logo.svg'
+const CACHE_VERSION = 'unn-v3';
+const STATIC_CACHE = CACHE_VERSION + '-static';
+const OFFLINE_URL = '/offline';
+const STATIC_ASSETS = [
+    OFFLINE_URL,
+    '/img/logo.svg',
 ];
 
-self.addEventListener('install', function(event) {
-  console.log('[SW] Instalado');
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(function(cache) {
-        return cache.addAll(URLS_TO_CACHE);
-      })
-      .catch((err) => console.log('Cache error', err))
-  );
+self.addEventListener('install', function (event) {
+    console.log('[SW] Installing', CACHE_VERSION);
+    self.skipWaiting();
+    event.waitUntil(
+        caches.open(STATIC_CACHE)
+            .then(function (cache) {
+                return cache.addAll(STATIC_ASSETS);
+            })
+            .catch(function (err) { console.log('[SW] pre-cache error', err); })
+    );
 });
 
-self.addEventListener('activate', function(event) {
-  console.log('[SW] Ativado');
-  event.waitUntil(clients.claim());
+self.addEventListener('activate', function (event) {
+    console.log('[SW] Activating', CACHE_VERSION);
+    // Deletar caches antigos
+    event.waitUntil(
+        caches.keys().then(function (names) {
+            return Promise.all(
+                names
+                    .filter(function (name) { return name.indexOf(CACHE_VERSION) !== 0; })
+                    .map(function (name) { return caches.delete(name); })
+            );
+        }).then(function () { return self.clients.claim(); })
+    );
 });
 
-self.addEventListener('fetch', function(event) {
-  // Ignora requisições não-GET ou APIs/Admin
-  if (event.request.method !== 'GET' || event.request.url.includes('/api/') || event.request.url.includes('/admin')) {
-    return;
-  }
+self.addEventListener('fetch', function (event) {
+    var req = event.request;
+    if (req.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request)
-      .then(function(response) {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then(
-          function(response) {
-            // Check if we received a valid response
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
+    var url = new URL(req.url);
 
-            // Apenas cacheia assets estáticos (imagens, css, js)
-            if (event.request.url.match(/\.(js|css|png|jpg|svg|woff2)$/)) {
-                var responseToCache = response.clone();
-                caches.open(CACHE_NAME)
-                .then(function(cache) {
-                    cache.put(event.request, responseToCache);
+    // Nunca cachear API/admin/painel/checkout - sempre rede
+    if (
+        url.pathname.startsWith('/api/') ||
+        url.pathname.startsWith('/admin') ||
+        url.pathname.startsWith('/painel') ||
+        url.pathname.startsWith('/checkout') ||
+        url.pathname.startsWith('/loja') ||
+        url.pathname.startsWith('/marketplace')
+    ) {
+        return; // deixa o browser fazer a requisição direto
+    }
+
+    // Assets estáticos: cache-first
+    if (req.url.match(/\.(js|css|png|jpg|jpeg|svg|webp|woff2|ico|gif)$/)) {
+        event.respondWith(
+            caches.match(req).then(function (cached) {
+                if (cached) return cached;
+                return fetch(req).then(function (response) {
+                    if (!response || response.status !== 200 || response.type !== 'basic') {
+                        return response;
+                    }
+                    var copy = response.clone();
+                    caches.open(STATIC_CACHE).then(function (cache) { cache.put(req, copy); });
+                    return response;
                 });
-            }
-
-            return response;
-          }
+            }).catch(function () { return fetch(req); })
         );
-      })
-  );
+        return;
+    }
+
+    // HTML/navegação: network-first, fallback para offline
+    if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
+        event.respondWith(
+            fetch(req).catch(function () {
+                return caches.match(OFFLINE_URL);
+            })
+        );
+        return;
+    }
+
+    // Default: apenas fetch normal
 });
