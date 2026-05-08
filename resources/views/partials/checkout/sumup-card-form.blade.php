@@ -203,9 +203,18 @@ document.addEventListener('DOMContentLoaded', function() {
     window.onCustomInstallmentChange = function(value) {
         var n = parseInt(value, 10);
         console.log('Custom installment selected:', n);
-        // Atualizar o widget SumUp com o número de parcelas selecionado
+
+        // Encontrar o valor total da parcela selecionada
+        var option = INSTALLMENT_OPTIONS.find(function(o) { return o.n === n; });
+        var totalWithInterest = option ? option.total : AMOUNT;
+
+        // Atualizar o widget SumUp com o número de parcelas e o valor total correto
         if (sumupCardInstance && typeof sumupCardInstance.update === 'function') {
-            sumupCardInstance.update({ installments: n });
+            sumupCardInstance.update({
+                installments: n,
+                amount: totalWithInterest.toFixed(2),
+                currency: 'BRL'
+            });
         }
     };
 
@@ -261,6 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     locale: 'pt-BR',
                     country: 'BR',
                     currency: 'BRL',
+                    amount: AMOUNT.toFixed(2),
                     showInstallments: false,
                     installments: 1,
                     maxInstallments: MAX_INSTALLMENTS,
