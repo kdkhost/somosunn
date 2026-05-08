@@ -1,22 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 48" width="180" height="48">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 56" width="200" height="56">
   <defs>
-    <linearGradient id="mpSky" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00B1EA"/>
-      <stop offset="100%" stop-color="#009EE3"/>
-    </linearGradient>
-    <linearGradient id="mpHandshake" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFE600"/>
-      <stop offset="100%" stop-color="#FFD500"/>
+    <linearGradient id="mpBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00A8E0"/>
+      <stop offset="100%" stop-color="#0098D8"/>
     </linearGradient>
   </defs>
-  <rect width="180" height="48" rx="10" fill="url(#mpSky)"/>
-  <!-- Handshake shape -->
-  <g transform="translate(10, 12)">
-    <path fill="url(#mpHandshake)" d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12c3 0 5.8-1.1 7.9-3l-2.8-2.8c-1.4 1.2-3.2 1.9-5.1 1.9-4.4 0-8-3.6-8-8s3.6-8 8-8c1.9 0 3.7 0.7 5.1 1.9l2.8-2.8C17.8 1.1 15 0 12 0z"/>
-    <ellipse fill="url(#mpHandshake)" cx="16" cy="12" rx="7" ry="5"/>
-    <path fill="#009EE3" d="M13 11c0-1 0.8-2 2-2s2 1 2 2-0.8 2-2 2-2-1-2-2zm3 0c0-0.6-0.4-1-1-1s-1 0.4-1 1 0.4 1 1 1 1-0.4 1-1z"/>
+  <rect width="200" height="56" rx="10" fill="url(#mpBg)"/>
+
+  <!-- Handshake icon (amarelo oficial) -->
+  <g transform="translate(14, 14)">
+    <ellipse cx="14" cy="14" rx="14" ry="10" fill="#FFE600"/>
+    <path fill="#1A3B7B" d="M8 14c0-0.5 0.4-1 1-1h2c0.5 0 1 0.4 1 1v3c0 0.5-0.4 1-1 1H9c-0.5 0-1-0.4-1-1v-3z"/>
+    <path fill="#1A3B7B" d="M15 14c0-0.5 0.4-1 1-1h2c0.5 0 1 0.4 1 1v3c0 0.5-0.4 1-1 1h-2c-0.5 0-1-0.4-1-1v-3z"/>
+    <path fill="#1A3B7B" d="M12 14c0-0.3 0.3-0.5 0.5-0.5h1c0.3 0 0.5 0.3 0.5 0.5v3c0 0.3-0.3 0.5-0.5 0.5h-1c-0.3 0-0.5-0.3-0.5-0.5v-3z"/>
   </g>
+
   <!-- Text -->
-  <text x="48" y="22" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="13" fill="#ffffff" letter-spacing="-0.2">Mercado</text>
-  <text x="48" y="37" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="13" fill="#ffffff" letter-spacing="-0.2">Pago</text>
+  <text x="52" y="26" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="15" fill="#ffffff" letter-spacing="-0.3">Mercado</text>
+  <text x="52" y="44" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="15" fill="#ffffff" letter-spacing="-0.3">Pago</text>
 </svg>
