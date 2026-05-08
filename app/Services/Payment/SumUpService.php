@@ -44,12 +44,6 @@ class SumUpService
             'return_url'         => $options['return_url'] ?? route('checkout.success', $order),
         ];
 
-        // customer_id: identificador único do comprador no sistema do lojista
-        // Formato aceito pela SumUp: apenas alfanumérico, sem hífens ou prefixos
-        if ($order->user_id) {
-            $payload['customer_id'] = (string) $order->user_id;
-        }
-
         $response = $this->post('/v0.1/checkouts', $payload, $config['api_key']);
 
         if (empty($response['id'])) {
