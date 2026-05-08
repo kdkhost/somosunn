@@ -499,23 +499,31 @@
                 /* kept for backwards compat */
             }
 
-            .mp-selling-action {
-                min-height: 2.75rem;
-                padding: 0.625rem 1rem;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.5rem;
-                text-align: center;
-                font-size: 0.8125rem;
-                font-weight: 800;
-                line-height: 1.1;
-                white-space: nowrap;
+            .mp-selling-action span {
                 overflow: hidden;
                 text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+                max-width: 100%;
+            }
+
+            .mp-selling-action {
+                min-height: 2.75rem;
+                padding: 0.625rem 0.875rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.4rem;
+                text-align: center;
+                font-size: 0.78rem;
+                font-weight: 800;
+                line-height: 1.15;
                 border-radius: 0.75rem !important;
                 transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease, color .2s ease, filter .2s ease;
                 width: 100%;
+                word-break: normal;
+                overflow-wrap: break-word;
+                white-space: normal;
             }
 
             .mp-selling-action:hover {
@@ -1319,7 +1327,8 @@
                                 @if($product->supportsExternalCheckout())
                                     <a href="{{ $product->external_checkout_url }}" target="_blank" rel="noopener noreferrer"
                                         class="mp-selling-action mp-selling-action-primary">
-                                        <i class="fas fa-up-right-from-square"></i> Comprar no site externo
+                                        <i class="fas fa-up-right-from-square"></i>
+                                        <span>Site externo</span>
                                     </a>
                                 @else
                                     @if($product->supportsInternalCheckout())
@@ -1328,24 +1337,18 @@
                                             <input type="hidden" name="buy_now" value="1">
                                             <button type="submit" class="mp-selling-action mp-selling-action-primary">
                                                 <i class="fas fa-shopping-cart"></i>
-                                                {{ $price > 0 ? 'Comprar R$ ' . number_format($price, 2, ',', '.') : 'Obter grátis' }}
+                                                <span>{{ $price > 0 ? 'Comprar R$ ' . number_format($price, 2, ',', '.') : 'Obter grátis' }}</span>
                                             </button>
                                         </form>
                                     @endif
 
                                     @if($product->supportsPointsRedemption() && $pointsCost > 0)
                                         <a href="{{ route('panel.redemptions.shop') }}#item-{{ optional($product->redeemableItem)->id }}"
-                                            class="mp-selling-action {{ $product->supportsInternalCheckout() ? 'mp-selling-action-amber' : 'mp-selling-action-amber' }}">
+                                            class="mp-selling-action mp-selling-action-amber">
                                             <i class="fas fa-coins"></i>
-                                            {{ number_format($pointsCost, 0, ',', '.') }} UNNBIT
+                                            <span>{{ number_format($pointsCost, 0, ',', '.') }} UNNBIT</span>
                                         </a>
                                     @endif
-                                @endif
-
-                                @if($storeUrl)
-                                    <a href="{{ $storeUrl }}" class="mp-selling-action mp-selling-action-secondary">
-                                        <i class="fas fa-store"></i> Ver loja
-                                    </a>
                                 @endif
                             </div>
                         </article>
