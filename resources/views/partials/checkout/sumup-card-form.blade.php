@@ -109,27 +109,40 @@
 {{-- Formulário de Cartão (SumUp Card Widget) --}}
 @if($methodCard)
 <div id="sumup-card-section">
-    {{-- Widget SumUp --}}
-    <div id="sumup-card"></div>
-
-    {{-- Resumo de juros por parcela — exibido abaixo do widget após seleção --}}
-    @if($maxInstallments > 1 && $installmentTax > 0)
-    <div id="sumup-installment-summary" class="hidden mt-3 px-4 py-3 rounded-xl border text-sm font-medium text-center"></div>
-    <div class="mt-2 px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500">
-        <i class="fas fa-info-circle mr-1 text-blue-400"></i>
-        @if($passFeeToClient)
-            Parcelas acima de {{ $noInterestUpTo }}x incluem {{ number_format($installmentTax, 2, ',', '.') }}% de juros repassados ao valor total.
-        @else
-            Parcelas acima de {{ $noInterestUpTo }}x têm {{ number_format($installmentTax, 2, ',', '.') }}% de juros absorvidos pela plataforma.
-        @endif
+    {{-- Seletor de parcelas customizado (com valores reais incluindo juros) --}}
+    @if($maxInstallments > 1 && $installmentTax > 0 && $passFeeToClient)
+    <div class="mb-4">
+        <label class="block text-sm font-semibold text-slate-600 mb-2">Parcelas</label>
+        <select id="sumup-custom-installments"
+            onchange="onCustomInstallmentChange(this.value)"
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all appearance-none cursor-pointer"
+            style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px;">
+            @foreach($installmentOptions as $opt)
+                <option value="{{ $opt['n'] }}">
+                    {{ $opt['n'] }}x de R$ {{ number_format($opt['per_installment'], 2, ',', '.') }} = R$ {{ number_format($opt['total'], 2, ',', '.') }}{{ $opt['has_interest'] ? ' (+' . $installmentTax . '% juros)' : ' sem juros' }}
+                </option>
+            @endforeach
+        </select>
     </div>
     @elseif($maxInstallments > 1)
-    <div id="sumup-installment-summary" class="hidden mt-3 px-4 py-3 rounded-xl border text-sm font-medium text-center"></div>
-    <div class="mt-2 px-3 py-2 bg-teal-50 rounded-xl border border-teal-200 text-xs text-teal-700">
-        <i class="fas fa-check-circle mr-1"></i>
-        Parcelamento em até {{ $maxInstallments }}x sem juros.
+    {{-- Parcelas sem juros: mostrar seletor simples --}}
+    <div class="mb-4">
+        <label class="block text-sm font-semibold text-slate-600 mb-2">Parcelas</label>
+        <select id="sumup-custom-installments"
+            onchange="onCustomInstallmentChange(this.value)"
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all appearance-none cursor-pointer"
+            style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px;">
+            @foreach($installmentOptions as $opt)
+                <option value="{{ $opt['n'] }}">
+                    {{ $opt['n'] }}x de R$ {{ number_format($opt['per_installment'], 2, ',', '.') }} = R$ {{ number_format($opt['total'], 2, ',', '.') }} sem juros
+                </option>
+            @endforeach
+        </select>
     </div>
     @endif
+
+    {{-- Widget SumUp (seletor de parcelas nativo oculto quando temos o customizado) --}}
+    <div id="sumup-card"></div>
 </div>
 @endif
 
@@ -199,6 +212,18 @@ document.addEventListener('DOMContentLoaded', function() {
     let pixTimerInterval = null;
     let pixLoaded = false;
 
+    // ── Seletor customizado de parcelas ──────────────────────────────────────
+    var sumupCardInstance = null;
+
+    window.onCustomInstallmentChange = function(value) {
+        var n = parseInt(value, 10);
+        console.log('Custom installment selected:', n);
+        // Atualizar o widget SumUp com o número de parcelas selecionado
+        if (sumupCardInstance && typeof sumupCardInstance.update === 'function') {
+            sumupCardInstance.update({ installments: n });
+        }
+    };
+
     // ── Seletor de método ────────────────────────────────────────────────────
     window.selectSumupMethod = function(method) {
         const cardSection = document.getElementById('sumup-card-section');
@@ -245,51 +270,16 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             console.log('SumUpCard SDK loaded, mounting widget...');
             try {
-                SumUpCard.mount({
+                sumupCardInstance = SumUpCard.mount({
                     id: 'sumup-card',
                     checkoutId: CHECKOUT_ID,
                     locale: 'pt-BR',
                     country: 'BR',
                     currency: 'BRL',
-                    showInstallments: MAX_INSTALLMENTS > 1,
+                    showInstallments: (MAX_INSTALLMENTS <= 1 || (INSTALLMENT_TAX > 0 && PASS_FEE_TO_CLIENT)) ? false : (MAX_INSTALLMENTS > 1),
                     maxInstallments: MAX_INSTALLMENTS,
                     onChangeInstallments: function(installments) {
-                        var option = INSTALLMENT_OPTIONS.find(function(o) { return o.n === installments; });
-                        if (!option) return;
-
-                        var summaryEl = document.getElementById('sumup-installment-summary');
-                        if (!summaryEl) return;
-
-                        var fmt = function(v) {
-                            return 'R$ ' + v.toFixed(2).replace('.', ',');
-                        };
-
-                        if (option.has_interest && PASS_FEE_TO_CLIENT) {
-                            // Juros repassados ao cliente
-                            summaryEl.className = 'mt-3 px-4 py-3 rounded-xl border border-amber-200 bg-amber-50 text-sm font-medium text-center text-amber-800';
-                            summaryEl.innerHTML =
-                                '<i class="fas fa-exclamation-circle mr-1"></i>' +
-                                installments + 'x de <strong>' + fmt(option.per_installment) + '</strong>' +
-                                ' &nbsp;|&nbsp; Total: <strong>' + fmt(option.total) + '</strong>' +
-                                ' <span class="text-amber-600 text-xs">(+' + INSTALLMENT_TAX + '% juros)</span>';
-                        } else if (option.has_interest) {
-                            // Juros absorvidos pela plataforma
-                            summaryEl.className = 'mt-3 px-4 py-3 rounded-xl border border-blue-200 bg-blue-50 text-sm font-medium text-center text-blue-800';
-                            summaryEl.innerHTML =
-                                '<i class="fas fa-info-circle mr-1"></i>' +
-                                installments + 'x de <strong>' + fmt(option.per_installment) + '</strong>' +
-                                ' &nbsp;|&nbsp; Total: <strong>' + fmt(option.total) + '</strong>' +
-                                ' <span class="text-blue-500 text-xs">(juros absorvidos)</span>';
-                        } else {
-                            // Sem juros
-                            summaryEl.className = 'mt-3 px-4 py-3 rounded-xl border border-teal-200 bg-teal-50 text-sm font-medium text-center text-teal-800';
-                            summaryEl.innerHTML =
-                                '<i class="fas fa-check-circle mr-1"></i>' +
-                                installments + 'x de <strong>' + fmt(option.per_installment) + '</strong>' +
-                                ' &nbsp;|&nbsp; Total: <strong>' + fmt(option.total) + '</strong>' +
-                                ' <span class="text-teal-600 text-xs">(sem juros)</span>';
-                        }
-                        summaryEl.classList.remove('hidden');
+                        console.log('SumUp native installment changed:', installments);
                     },
                     onResponse: function(type, body) {
                         console.log('SumUp Card Response:', type, body);
