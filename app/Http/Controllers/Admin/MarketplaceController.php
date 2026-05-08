@@ -37,10 +37,46 @@ class MarketplaceController extends Controller
         $mpAccessToken = (string) (config('payments.mercadopago.access_token') ?? '');
         $mpPublicKey = (string) (config('payments.mercadopago.public_key') ?? '');
 
-        $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
-        $webhookUrl = route('api.webhooks.mercadopago');
+        $mpConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
+        $mpEnabled = (int) (\App\Models\Setting::get('mercadopago_enabled', 1)) === 1;
 
-        return view('admin.marketplace.payments', compact('paymentsConfigured', 'webhookUrl'));
+        // SumUp
+        $sumupEnabled = (int) (\App\Models\Setting::get('sumup_enabled', 0)) === 1;
+        $sumupApiKey = (string) (\App\Models\Setting::get('sumup_api_key', '') ?? '');
+        $sumupMerchantCode = (string) (\App\Models\Setting::get('sumup_merchant_code', '') ?? '');
+        $sumupConfigured = $sumupApiKey !== '' && $sumupMerchantCode !== '';
+
+        // Métodos ativos por gateway
+        $mpMethods = [];
+        if ((int) \App\Models\Setting::get('mercadopago_method_credit_card', 1) === 1) $mpMethods[] = 'Cartão de crédito';
+        if ((int) \App\Models\Setting::get('mercadopago_method_debit_card', 0) === 1) $mpMethods[] = 'Cartão de débito';
+        if ((int) \App\Models\Setting::get('mercadopago_method_pix', 1) === 1) $mpMethods[] = 'Pix';
+        if ((int) \App\Models\Setting::get('mercadopago_method_ticket', 0) === 1) $mpMethods[] = 'Boleto';
+
+        $sumupMethods = [];
+        if ((int) \App\Models\Setting::get('sumup_method_card', 1) === 1) $sumupMethods[] = 'Cartão';
+        if ((int) \App\Models\Setting::get('sumup_method_pix', 1) === 1) $sumupMethods[] = 'Pix';
+
+        $mpWebhookUrl = route('api.webhooks.mercadopago');
+        $sumupWebhookUrl = route('api.webhooks.sumup');
+
+        // Compatibilidade
+        $paymentsConfigured = $mpConfigured;
+        $webhookUrl = $mpWebhookUrl;
+
+        return view('admin.marketplace.payments', compact(
+            'mpConfigured',
+            'mpEnabled',
+            'mpMethods',
+            'mpWebhookUrl',
+            'sumupConfigured',
+            'sumupEnabled',
+            'sumupMethods',
+            'sumupWebhookUrl',
+            // Legado
+            'paymentsConfigured',
+            'webhookUrl',
+        ));
     }
 
     public function sales()
