@@ -688,14 +688,8 @@ class SettingController extends Controller
                 }
             }
 
-            if ($sumupEnabled === 1) {
-                $sumupMethodsActive = (int) ($data['sumup_method_card'] ?? 0)
-                    + (int) ($data['sumup_method_pix'] ?? 0);
-
-                if ($sumupMethodsActive === 0) {
-                    return response()->json(['message' => 'Ao menos um método de pagamento deve permanecer ativo para este gateway.'], 422);
-                }
-            }
+            // SumUp não precisa de validação de métodos específicos
+            // pois usa configuração diferente do MercadoPago
 
             // Remover chaves ANTIGAS e lixo que não pertencem ao gateway
             $trashKeys = ['video_plyr_options_json', 'gateway_checkout_theme_selected', 'gateway_checkout_primary_color_hex'];
