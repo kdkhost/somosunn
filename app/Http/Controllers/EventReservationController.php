@@ -1043,17 +1043,33 @@ class EventReservationController extends Controller
             $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
             $isPlatformOwner = $sellerId === (int) $platformOwnerId;
 
-            $sellerMpAccount = null;
-            if (!$isPlatformOwner) {
-                $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+            // Resolver a public key do MP
+            $mpPublicKey = null;
+
+            // 1. Tentar da config do gateway que já foi resolvida
+            if (!empty($gatewayConfig['config']['mpPublicKey'])) {
+                $mpPublicKey = $gatewayConfig['config']['mpPublicKey'];
             }
 
-            $mpPublicKey = (!$isPlatformOwner && is_array($sellerMpAccount)) ? ($sellerMpAccount['mpPublicKey'] ?? null) : null;
+            // 2. Fallback: resolver via GatewayAccount
+            if (empty($mpPublicKey) && !$isPlatformOwner) {
+                $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+                $mpPublicKey = $sellerMpAccount['mpPublicKey'] ?? null;
+            }
+
+            // 3. Fallback final: settings globais
+            if (empty($mpPublicKey)) {
+                $mpEnv = (string) \App\Models\Setting::get('mercadopago_env', 'sandbox');
+                $prefix = $mpEnv === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
+                $mpPublicKey = \App\Models\Setting::get($prefix . 'public_key')
+                    ?: config('payments.mercadopago.public_key')
+                    ?: \App\Models\Setting::get('mp_public_key', '');
+            }
 
             return view('checkout.transparent', [
                 'order' => $order,
                 'preferenceId' => $preference['id'] ?? '',
-                'publicKey' => $mpPublicKey ?: config('payments.mercadopago.public_key') ?: \App\Models\Setting::get('mp_public_key'),
+                'publicKey' => $mpPublicKey ?: '',
                 'gateway' => 'mercadopago',
             ]);
         } catch (\Exception $e) {
