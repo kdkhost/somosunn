@@ -37,10 +37,6 @@
 @endpush
 
 <div class="card-body gateway-shell">
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle mr-2"></i>
-        Configure os gateways de pagamento da plataforma. <strong>Apenas um gateway pode ficar ativo por vez.</strong>
-    </div>
 
     {{-- ============================================================
          TABS PRINCIPAIS: MERCADO PAGO | SUMUP
@@ -242,27 +238,31 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Juros (% a.m.)</label>
+                        <label class="text-uppercase text-muted small font-weight-bold">Juros (% a.m.) — MP</label>
                         <div class="input-group">
-                            <input type="number" step="0.01" name="gateway_installment_tax" class="form-control" value="{{ $settings['gateway_installment_tax'] ?? '0.00' }}">
+                            <input type="number" step="0.01" name="mercadopago_installment_tax" class="form-control" value="{{ $settings['mercadopago_installment_tax'] ?? $settings['gateway_installment_tax'] ?? '0.00' }}">
                             <div class="input-group-append"><span class="input-group-text">%</span></div>
                         </div>
                     </div>
                     <div class="col-md-4 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Parcelas sem juros</label>
-                        <input type="number" name="gateway_max_installments_no_interest" class="form-control" value="{{ $settings['gateway_max_installments_no_interest'] ?? '1' }}">
+                        <label class="text-uppercase text-muted small font-weight-bold">Máx. Parcelas — MP</label>
+                        <input type="number" min="1" max="12" name="mercadopago_max_installments" class="form-control" value="{{ $settings['mercadopago_max_installments'] ?? '12' }}">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label class="text-uppercase text-muted small font-weight-bold">Parcelas sem Juros — MP</label>
+                        <input type="number" min="1" max="12" name="mercadopago_installments_no_interest" class="form-control" value="{{ $settings['mercadopago_installments_no_interest'] ?? '1' }}">
                     </div>
                     <div class="col-md-3 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Repassar taxa</label>
+                        <label class="text-uppercase text-muted small font-weight-bold">Repassar taxa — MP</label>
                         <select name="gateway_pass_tax_to_client" class="form-control">
                             <option value="0" {{ (int) ($settings['gateway_pass_tax_to_client'] ?? 0) === 0 ? 'selected' : '' }}>Nao - empresa absorve</option>
                             <option value="1" {{ (int) ($settings['gateway_pass_tax_to_client'] ?? 1) === 1 ? 'selected' : '' }}>Sim - cliente paga</option>
                         </select>
                     </div>
                     <div class="col-md-3 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Expiração do Pix (min)</label>
+                        <label class="text-uppercase text-muted small font-weight-bold">Expiração do Pix MP (min)</label>
                         <div class="input-group">
-                            <input type="number" name="pix_expiration_minutes" class="form-control" value="{{ $settings['pix_expiration_minutes'] ?? '15' }}" min="5" max="1440">
+                            <input type="number" name="mercadopago_pix_expiration_minutes" class="form-control" value="{{ $settings['mercadopago_pix_expiration_minutes'] ?? $settings['pix_expiration_minutes'] ?? '10' }}" min="1" max="1440">
                             <div class="input-group-append"><span class="input-group-text">min</span></div>
                         </div>
                     </div>
@@ -503,6 +503,46 @@
                     </div>
                     <small class="text-muted">Aplicado a partir da {{ ($settings['sumup_installments_no_interest'] ?? 1) + 1 }}ª parcela</small>
                 </div>
+                <div class="col-md-4 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Expiração do PIX SumUp (min)</label>
+                    <div class="input-group">
+                        <input type="number" min="1" max="1440" step="1" name="sumup_pix_expiration_minutes"
+                            value="{{ $settings['sumup_pix_expiration_minutes'] ?? '10' }}"
+                            class="form-control">
+                        <div class="input-group-append"><span class="input-group-text">min</span></div>
+                    </div>
+                    <small class="text-muted">Tempo limite para pagamento PIX (1–1440 min). Padrão: 10 min.</small>
+                </div>
+                {{-- Métodos de Pagamento SumUp --}}
+                <div class="col-12"><hr><h6 class="text-uppercase text-muted small font-weight-bold mb-3"><i class="fas fa-credit-card mr-1"></i> Métodos de Pagamento SumUp</h6></div>
+                @php
+                    $sumupMethods = [
+                        ['name' => 'sumup_method_card', 'label' => 'Cartão de Crédito', 'desc' => 'Via SumUp Card Widget', 'default' => 1],
+                        ['name' => 'sumup_method_pix',  'label' => 'PIX',               'desc' => 'QR Code inline',        'default' => 1],
+                    ];
+                @endphp
+                @foreach($sumupMethods as $m)
+                    @php $checked = (int) ($settings[$m['name']] ?? $m['default']); @endphp
+                    <div class="col-md-6 mb-3">
+                        <div class="card card-outline {{ $checked ? 'card-success' : 'card-secondary' }}" style="border-radius:.75rem;">
+                            <div class="card-body py-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="font-weight-bold">{{ $m['label'] }}</div>
+                                        <small class="text-muted">{{ $m['desc'] }}</small>
+                                    </div>
+                                    <div class="custom-control custom-switch">
+                                        <input type="hidden" name="{{ $m['name'] }}" value="0">
+                                        <input type="checkbox" class="custom-control-input" id="sumup_{{ $m['name'] }}"
+                                            name="{{ $m['name'] }}" value="1"
+                                            {{ $checked ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="sumup_{{ $m['name'] }}"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
                 <div class="col-12">
                     <button type="button" class="btn btn-dark btn-block font-weight-bold d-none" id="btn-test-sumup-legacy"
                         onclick="testSumUpConnectionLegacy()">
@@ -623,54 +663,7 @@
         const gatewayName = checkbox.getAttribute('data-gateway') || 'mercadopago';
         const isEnabling = checkbox.checked;
         
-        // Se está ativando um gateway, verificar se outro está ativo
-        if (isEnabling) {
-            const otherGateway = gatewayName === 'mercadopago' ? 'sumup' : 'mercadopago';
-            const otherCheckbox = document.querySelector(`input[data-gateway="${otherGateway}"]`) || document.getElementById(otherGateway + '_enabled');
-            
-            if (otherCheckbox && otherCheckbox.checked) {
-                // Mostrar confirmação
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        title: 'Atenção!',
-                        html: `Apenas um gateway pode ficar ativo por vez.<br><br>Ativar <strong>${gatewayName === 'mercadopago' ? 'Mercado Pago' : 'SumUp'}</strong> irá desativar automaticamente <strong>${otherGateway === 'mercadopago' ? 'Mercado Pago' : 'SumUp'}</strong>.`,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Sim, ativar',
-                        cancelButtonText: 'Cancelar',
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Desativar o outro gateway
-                            otherCheckbox.checked = false;
-                            updateGatewayBadge(otherGateway, false);
-                            
-                            // Ativar o gateway atual
-                            updateGatewayBadge(gatewayName, true);
-                            saveGatewayToggle(checkbox, gatewayName);
-                        } else {
-                            // Cancelou, reverter o checkbox
-                            checkbox.checked = false;
-                        }
-                    });
-                } else {
-                    // Sem Swal, usar confirm nativo
-                    const confirmed = confirm(`Apenas um gateway pode ficar ativo por vez.\n\nAtivar ${gatewayName === 'mercadopago' ? 'Mercado Pago' : 'SumUp'} irá desativar automaticamente ${otherGateway === 'mercadopago' ? 'Mercado Pago' : 'SumUp'}.\n\nDeseja continuar?`);
-                    if (confirmed) {
-                        otherCheckbox.checked = false;
-                        updateGatewayBadge(otherGateway, false);
-                        updateGatewayBadge(gatewayName, true);
-                        saveGatewayToggle(checkbox, gatewayName);
-                    } else {
-                        checkbox.checked = false;
-                    }
-                }
-                return;
-            }
-        }
-        
-        // Se está desativando ou não há conflito, apenas atualizar
+        // Atualizar badge e salvar diretamente (sem restrição de exclusividade)
         updateGatewayBadge(gatewayName, isEnabling);
         saveGatewayToggle(checkbox, gatewayName);
     }

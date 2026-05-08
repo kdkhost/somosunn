@@ -62,14 +62,6 @@ class SettingController extends Controller
         $key = $request->input('key');
         $value = $request->boolean('value') ? 1 : 0;
 
-        // VALIDAÇÃO: Apenas um gateway pode ficar ativo por vez
-        if (in_array($key, ['mercadopago_enabled', 'sumup_enabled']) && $value === 1) {
-            // Se está ativando um gateway, desativar o outro
-            $otherGateway = $key === 'mercadopago_enabled' ? 'sumup_enabled' : 'mercadopago_enabled';
-            Setting::set($otherGateway, 0);
-            \Log::info("[GATEWAY TOGGLE] Ativando {$key}, desativando {$otherGateway} automaticamente.");
-        }
-
         Setting::set($key, $value);
 
         return response()->json(['success' => true, 'message' => 'Configuração atualizada.']);
@@ -435,8 +427,13 @@ class SettingController extends Controller
             // SumUp parcelamento
             'sumup_max_installments'        => ['min' => 1, 'max' => 12],
             'sumup_installments_no_interest' => ['min' => 1, 'max' => 12],
-        ] as $key => $limits) {
-            if (!array_key_exists($key, $data)) {
+            // MercadoPago parcelamento
+            'mercadopago_max_installments'        => ['min' => 1, 'max' => 12],
+            'mercadopago_installments_no_interest' => ['min' => 1, 'max' => 12],
+            // Expiração do PIX
+            'mercadopago_pix_expiration_minutes' => ['min' => 1, 'max' => 1440],
+            'sumup_pix_expiration_minutes'       => ['min' => 1, 'max' => 1440],
+        ] as $key => $limits) {            if (!array_key_exists($key, $data)) {
                 continue;
             }
 
@@ -476,6 +473,18 @@ class SettingController extends Controller
                 $value = (float) $raw;
                 $value = max(0.0, min(99.99, $value));
                 $data['sumup_installment_tax'] = number_format($value, 2, '.', '');
+            }
+        }
+
+        // Validação de taxa de parcelamento MercadoPago (0.00 a 99.99%)
+        if (array_key_exists('mercadopago_installment_tax', $data)) {
+            $raw = trim(str_replace(',', '.', (string) $data['mercadopago_installment_tax']));
+            if ($raw === '') {
+                $data['mercadopago_installment_tax'] = '0.00';
+            } else {
+                $value = (float) $raw;
+                $value = max(0.0, min(99.99, $value));
+                $data['mercadopago_installment_tax'] = number_format($value, 2, '.', '');
             }
         }
 
@@ -663,25 +672,28 @@ class SettingController extends Controller
                 $data[$checkbox] = $request->has($checkbox) ? 1 : 0;
             }
 
-            // VALIDAÇÃO: Apenas um gateway pode ficar ativo por vez
+            // VALIDAÇÃO: Cada gateway ativo deve ter ao menos um método de pagamento ativo
             $mpEnabled = isset($data['mercadopago_enabled']) ? (int) $data['mercadopago_enabled'] : 0;
             $sumupEnabled = isset($data['sumup_enabled']) ? (int) $data['sumup_enabled'] : 0;
 
-            // Se ambos estão tentando ficar ativos, desativar o outro
-            if ($mpEnabled === 1 && $sumupEnabled === 1) {
-                // Priorizar o que foi explicitamente marcado no request
-                if ($request->has('mercadopago_enabled') && !$request->has('sumup_enabled')) {
-                    // Mercado Pago foi ativado, desativar SumUp
-                    $data['sumup_enabled'] = 0;
-                    \Log::info('[GATEWAY VALIDATION] MercadoPago ativado, SumUp desativado automaticamente.');
-                } elseif ($request->has('sumup_enabled') && !$request->has('mercadopago_enabled')) {
-                    // SumUp foi ativado, desativar Mercado Pago
-                    $data['mercadopago_enabled'] = 0;
-                    \Log::info('[GATEWAY VALIDATION] SumUp ativado, MercadoPago desativado automaticamente.');
-                } else {
-                    // Ambos foram enviados, manter apenas o último alterado (SumUp por padrão)
-                    $data['mercadopago_enabled'] = 0;
-                    \Log::info('[GATEWAY VALIDATION] Conflito detectado, mantendo apenas SumUp ativo.');
+            if ($mpEnabled === 1) {
+                $mpMethodsActive = (int) ($data['mercadopago_method_credit_card'] ?? 0)
+                    + (int) ($data['mercadopago_method_debit_card'] ?? 0)
+                    + (int) ($data['mercadopago_method_pix'] ?? 0)
+                    + (int) ($data['mercadopago_method_ticket'] ?? 0)
+                    + (int) ($data['mercadopago_method_mercadopago'] ?? 0);
+
+                if ($mpMethodsActive === 0) {
+                    return response()->json(['message' => 'Ao menos um método de pagamento deve permanecer ativo para este gateway.'], 422);
+                }
+            }
+
+            if ($sumupEnabled === 1) {
+                $sumupMethodsActive = (int) ($data['sumup_method_card'] ?? 0)
+                    + (int) ($data['sumup_method_pix'] ?? 0);
+
+                if ($sumupMethodsActive === 0) {
+                    return response()->json(['message' => 'Ao menos um método de pagamento deve permanecer ativo para este gateway.'], 422);
                 }
             }
 

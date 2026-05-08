@@ -33,6 +33,7 @@ class EventReservationController extends Controller
         $isPaid = (float) $event->effective_price > 0;
         $mpEnabled = false;
         $preferredGateway = null;
+        $activeGateways = [];
         if ($isPaid) {
             $seller = $event->user ?: User::find($event->user_id);
             if (false && $seller && !$seller->canSellOnMarketplace()) {
@@ -41,28 +42,24 @@ class EventReservationController extends Controller
                     ->with('error', 'Este organizador não está habilitado para vender no marketplace.');
             }
 
-            $gatewayConfig = \App\Models\GatewayAccount::resolveActiveGatewayForSeller($seller ? (int) $seller->id : 0);
-            $activeGateway = $gatewayConfig['provider'];
-            $gatewayEnabled = $gatewayConfig['enabled'];
+            $activeGateways = \App\Models\GatewayAccount::resolveAllActiveGatewaysForSeller($seller ? (int) $seller->id : 0);
 
-            // Manter compatibilidade com código existente
-            $mpEnabled = $activeGateway === 'mercadopago' && $gatewayEnabled;
-            $preferredGateway = $activeGateway;
-
-            if (!$gatewayEnabled || !$activeGateway) {
+            if (empty($activeGateways)) {
                 \Illuminate\Support\Facades\Log::warning('EventCheckout: organizador sem gateway configurado', [
                     'event_id' => $event->id,
                     'event_user_id' => $event->user_id,
                     'seller_id' => $seller ? $seller->id : null,
                     'seller_found' => $seller !== null,
-                    'active_gateway' => $activeGateway,
-                    'gateway_enabled' => $gatewayEnabled,
-                    'gateway_source' => $gatewayConfig['source'] ?? null,
                 ]);
                 return redirect()
                     ->route('events.show', $event)
                     ->with('error', 'Este evento não está disponível para compra: o organizador ainda não configurou um método de pagamento.');
             }
+
+            // Manter compatibilidade com código existente
+            $firstGateway = $activeGateways[0];
+            $mpEnabled = $firstGateway['provider'] === 'mercadopago';
+            $preferredGateway = $firstGateway['provider'];
         }
 
         $registration = null;
@@ -72,7 +69,7 @@ class EventReservationController extends Controller
                 ->first();
         }
 
-        return view('events.checkout', compact('event', 'registration', 'mpEnabled', 'preferredGateway'));
+        return view('events.checkout', compact('event', 'registration', 'mpEnabled', 'preferredGateway', 'activeGateways'));
     }
 
     public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService, \App\Services\Payment\SumUpService $sumUpService, OrderSettlementService $orderSettlementService)
@@ -98,16 +95,67 @@ class EventReservationController extends Controller
         $seller = $event->user ?: User::find($event->user_id);
         $sellerId = $seller ? (int) $seller->id : (int) ($event->user_id ?? 0);
         
-        // Detectar gateway ativo dinamicamente
-        $gatewayConfig = \App\Models\GatewayAccount::resolveActiveGatewayForSeller($sellerId);
-        $gatewayProvider = $gatewayConfig['provider'] ?? null;
-        $paymentsConfigured = $gatewayConfig['enabled'] && $gatewayProvider !== null;
+        // Detectar todos os gateways ativos para o vendedor
+        $activeGateways = \App\Models\GatewayAccount::resolveAllActiveGatewaysForSeller($sellerId);
+        $activeProviders = array_column($activeGateways, 'provider');
+
+        // Determinar o gateway a usar
+        $gatewayProvider = null;
+        $gatewayConfig = null;
+        $paymentsConfigured = false;
+
+        if ($isPaid) {
+            if (empty($activeGateways)) {
+                return redirect()
+                    ->route('events.show', $event)
+                    ->with('error', 'Pagamento indisponível: o organizador ainda não configurou um método de pagamento.');
+            }
+
+            if (count($activeGateways) > 1) {
+                // Múltiplos gateways: exigir seleção explícita
+                $selectedGateway = $request->input('gateway');
+                if (!$selectedGateway) {
+                    return back()->withErrors(['gateway' => 'O campo gateway é obrigatório quando há múltiplos gateways disponíveis.'])->withInput();
+                }
+                if (!in_array($selectedGateway, $activeProviders, true)) {
+                    \Log::warning('EventReservation: gateway inválido informado pelo cliente', [
+                        'event_id' => $event->id,
+                        'gateway_informado' => $selectedGateway,
+                        'gateways_ativos' => $activeProviders,
+                    ]);
+                    return response()->json(['error' => 'Gateway de pagamento inválido ou não disponível para este evento.'], 422);
+                }
+                $gatewayProvider = $selectedGateway;
+            } else {
+                // Apenas 1 gateway: usar diretamente
+                $gatewayProvider = $activeGateways[0]['provider'];
+                // Se o cliente informou um gateway diferente, rejeitar
+                $selectedGateway = $request->input('gateway');
+                if ($selectedGateway && !in_array($selectedGateway, $activeProviders, true)) {
+                    \Log::warning('EventReservation: gateway inválido informado pelo cliente', [
+                        'event_id' => $event->id,
+                        'gateway_informado' => $selectedGateway,
+                        'gateways_ativos' => $activeProviders,
+                    ]);
+                    return response()->json(['error' => 'Gateway de pagamento inválido ou não disponível para este evento.'], 422);
+                }
+            }
+
+            // Encontrar a config do gateway selecionado
+            foreach ($activeGateways as $gw) {
+                if ($gw['provider'] === $gatewayProvider) {
+                    $gatewayConfig = $gw;
+                    break;
+                }
+            }
+            $paymentsConfigured = $gatewayConfig !== null;
+        }
 
         // Manter compatibilidade com código existente
         $gateways = [
             'mpEnabled' => $gatewayProvider === 'mercadopago' && $paymentsConfigured,
             'preferredGateway' => $gatewayProvider,
-            'mpPublicKey' => $gatewayProvider === 'mercadopago' ? ($gatewayConfig['config']['mpPublicKey'] ?? '') : '',
+            'mpPublicKey' => ($gatewayProvider === 'mercadopago' && $gatewayConfig) ? ($gatewayConfig['config']['mpPublicKey'] ?? '') : '',
         ];
 
         if ($isPaid) {
@@ -534,8 +582,18 @@ class EventReservationController extends Controller
 
         // Roteamento para o gateway correto
         if ($gatewayProvider === 'sumup') {
+            \Log::info('EventReservation: processando pagamento via SumUp', [
+                'order_id' => $order?->id,
+                'event_id' => $event->id,
+                'gateway' => 'sumup',
+            ]);
             return $this->processSumUpPayment($order, $event, $gatewayConfig, $sumUpService);
         } elseif ($gatewayProvider === 'mercadopago') {
+            \Log::info('EventReservation: processando pagamento via MercadoPago', [
+                'order_id' => $order?->id,
+                'event_id' => $event->id,
+                'gateway' => 'mercadopago',
+            ]);
             return $this->processMercadoPagoPayment($order, $event, $gatewayConfig, $mpService);
         } else {
             \Log::error('Gateway desconhecido ou não configurado', [
