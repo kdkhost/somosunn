@@ -578,21 +578,6 @@
                         </div>
                     </div>
                 @endforeach
-                                        <div class="font-weight-bold">{{ $m['label'] }}</div>
-                                        <small class="text-muted">{{ $m['desc'] }}</small>
-                                    </div>
-                                    <div class="custom-control custom-switch">
-                                        <input type="hidden" name="{{ $m['name'] }}" value="0">
-                                        <input type="checkbox" class="custom-control-input" id="sumup_{{ $m['name'] }}"
-                                            name="{{ $m['name'] }}" value="1"
-                                            {{ $checked ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="sumup_{{ $m['name'] }}"></label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
             </div>
         </div>
     </div>
