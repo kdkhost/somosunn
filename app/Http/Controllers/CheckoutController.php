@@ -103,11 +103,28 @@ class CheckoutController extends Controller
         $gatewayProvider = 'free';
 
         if ($effectiveTotal > 0) {
-            $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
-            $gatewayProvider = 'mercadopago';
+            // Determinar gateway: respeitar escolha do usuário, com fallback
+            $chosenGateway = $request->input('gateway_provider', 'mercadopago');
 
-            if (!$gateways['mpEnabled']) {
-                return back()->with('error', 'MercadoPago nao configurado pelo vendedor.');
+            if ($chosenGateway === 'sumup') {
+                $sumupAvailable = $this->shouldShowSumUp($effectiveTotal, 'course', $this->getUserType());
+                if (!$sumupAvailable) {
+                    return back()->with('error', 'SumUp não está disponível para esta compra.');
+                }
+                $gatewayProvider = 'sumup';
+            } else {
+                $gateways = \App\Models\GatewayAccount::resolveForSeller((int) $seller->id);
+                $gatewayProvider = 'mercadopago';
+
+                if (!$gateways['mpEnabled']) {
+                    // Se MP não está disponível, tentar fallback para SumUp
+                    $sumupAvailable = $this->shouldShowSumUp($effectiveTotal, 'course', $this->getUserType());
+                    if ($sumupAvailable) {
+                        $gatewayProvider = 'sumup';
+                    } else {
+                        return back()->with('error', 'Nenhum gateway de pagamento disponível.');
+                    }
+                }
             }
         } else {
             $existingFreeOrder = $this->findExistingFreeOrder((int) Auth::id(), 'course', (int) $course->id);
@@ -154,7 +171,7 @@ class CheckoutController extends Controller
                     'fee_amount' => 0,
                     'platform_fee_amount' => $platformFeeAmount,
                     'currency' => 'BRL',
-                    'gateway' => $finalTotal <= 0 ? 'free' : 'mercadopago',
+                    'gateway' => $finalTotal <= 0 ? 'free' : $gatewayProvider,
                     'gateway_account_id' => null,
                     'metadata' => [
                         'context' => 'course',
@@ -227,6 +244,11 @@ class CheckoutController extends Controller
         try {
             $order->load('items', 'user');
 
+            // Se o usuário escolheu SumUp, processar via SumUp
+            if ($gatewayProvider === 'sumup') {
+                return $this->processCourseSumUpPayment($order, $course);
+            }
+
             if ($course->is_recurring && !empty($course->mp_plan_id)) {
                 $subscription = $mpService->subscribeUser($course->mp_plan_id, [
                     'email' => Auth::user()->email,
@@ -281,6 +303,76 @@ class CheckoutController extends Controller
             ]);
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao processar pagamento: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Processa o checkout de curso via SumUp
+     */
+    protected function processCourseSumUpPayment(Order $order, Course $course)
+    {
+        try {
+            $sumUpService = app(\App\Services\Payment\SumUpService::class);
+
+            // Validar API Key
+            $apiKey = trim((string) (\App\Models\Setting::get('sumup_api_key')
+                ?: config('payments.sumup.api_key', '')));
+
+            if (empty($apiKey)) {
+                return back()->with('error', 'SumUp não configurado. Falta API Key.');
+            }
+
+            // Criar checkout SumUp
+            $checkout = $sumUpService->createCheckout($order, [
+                'description' => 'Curso: ' . $course->title,
+                'return_url'  => route('checkout.success', $order->id),
+            ]);
+
+            // Salvar dados do checkout no pedido
+            $order->update([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'sumup_checkout_id'  => $checkout['id'] ?? null,
+                    'sumup_checkout_url' => $checkout['checkout_url'] ?? null,
+                ]),
+            ]);
+
+            // Merchant Code (usado como public key no frontend)
+            $merchantCode = trim((string) (\App\Models\Setting::get('sumup_merchant_code')
+                ?: config('payments.sumup.merchant_code', '')));
+
+            // Métodos habilitados
+            $methodCardRaw = \App\Models\Setting::get('sumup_method_card');
+            $methodPixRaw  = \App\Models\Setting::get('sumup_method_pix');
+            $methodCard = $methodCardRaw !== null ? (bool)(int)$methodCardRaw : true;
+            $methodPix  = $methodPixRaw  !== null ? (bool)(int)$methodPixRaw  : true;
+
+            // Parcelamento e taxas
+            $maxInstallments = max(1, min(12, (int) (\App\Models\Setting::get('sumup_max_installments', 12))));
+            $noInterestUpTo  = max(1, min(12, (int) (\App\Models\Setting::get('sumup_installments_no_interest', 1))));
+            $installmentTax  = max(0.0, (float) (\App\Models\Setting::get('sumup_installment_tax', 0)));
+            $passFeeToClient = (bool)(int)(\App\Models\Setting::get('sumup_pass_fee', 0));
+
+            return view('checkout.transparent', [
+                'order'                    => $order,
+                'preferenceId'             => '',
+                'publicKey'                => '',
+                'gateway'                  => 'sumup',
+                'checkoutId'               => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
+                'sumupMerchantCode'        => $merchantCode,
+                'sumupMethodCard'          => $methodCard,
+                'sumupMethodPix'           => $methodPix,
+                'sumupMaxInstallments'     => $maxInstallments,
+                'sumupInstallmentsNoInterest' => $noInterestUpTo,
+                'sumupInstallmentTax'      => $installmentTax,
+                'sumupPassFeeToClient'     => $passFeeToClient,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('SumUp checkout creation failed: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'course_id' => $course->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->with('error', 'Erro ao processar pagamento via SumUp: ' . $e->getMessage());
         }
     }
 
