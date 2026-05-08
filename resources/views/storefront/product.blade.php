@@ -35,9 +35,9 @@
         ->values();
 
     $digitalDeliveryText = match ($product->digital_delivery_type) {
-        'external_url' => 'Acesso digital salvo no pedido apos a aprovacao do pagamento.',
-        'file' => 'Download protegido liberado na area do comprador apos a aprovacao do pagamento.',
-        default => 'Entrega digital liberada apos a aprovacao do pagamento.',
+        'external_url' => 'Acesso digital liberado após a aprovação do pagamento.',
+        'file' => 'Download protegido liberado na área do comprador após a aprovação do pagamento.',
+        default => 'Entrega digital liberada após a aprovação do pagamento.',
     };
 
     $whatsappUrl = null;
@@ -47,459 +47,718 @@
             $whatsappUrl = 'https://wa.me/' . $whatsappDigits;
         }
     }
+
+    // Calcular desconto
+    $hasDiscount = $product->sale_price !== null && (float) $product->sale_price < (float) $product->price;
+    $discountPercent = 0;
+    if ($hasDiscount && (float) $product->price > 0) {
+        $discountPercent = (int) round((((float) $product->price - (float) $product->sale_price) / (float) $product->price) * 100);
+    }
 @endphp
 
 @push('styles')
-    <style>
-        [x-cloak] { display: none !important; }
+<style>
+    [x-cloak] { display: none !important; }
 
-        .store-product-shell {
-            background:
-                radial-gradient(circle at top left, rgba(31, 94, 219, 0.16), transparent 24%),
-                radial-gradient(circle at 100% 0%, rgba(15, 23, 42, 0.12), transparent 28%),
-                linear-gradient(180deg, #f8fbff 0%, #eef4ff 22%, #ffffff 58%);
-        }
+    /* Shell da página */
+    .pd-shell {
+        background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 20%, #ffffff 100%);
+        min-height: 100vh;
+    }
 
-        .store-product-hero::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(135deg, rgba(2, 6, 23, 0.76) 0%, rgba(15, 23, 42, 0.52) 52%, rgba(30, 41, 59, 0.24) 100%),
-                linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 32%);
-            pointer-events: none;
-        }
+    /* Breadcrumb */
+    .pd-breadcrumb {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.875rem;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #475569;
+    }
+    .pd-breadcrumb a { color: #1e40af; }
+    .pd-breadcrumb a:hover { color: #1e3a8a; }
 
-        .product-surface-card {
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
-        }
+    /* Galeria */
+    .pd-gallery-main {
+        position: relative;
+        aspect-ratio: 4/3;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+    .pd-gallery-main img,
+    .pd-gallery-main video { width: 100%; height: 100%; object-fit: contain; background: #fff; }
 
-        .product-glass-card {
-            background: rgba(255, 255, 255, 0.14);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            box-shadow: 0 24px 60px rgba(2, 6, 23, 0.2);
-            backdrop-filter: blur(18px);
-        }
+    .pd-gallery-thumbs {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+    }
+    .pd-thumb {
+        aspect-ratio: 1/1;
+        border-radius: 0.875rem;
+        overflow: hidden;
+        background: #f1f5f9;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+    .pd-thumb:hover { border-color: #cbd5e1; }
+    .pd-thumb.is-active { border-color: var(--pd-primary, #1F5EDB); box-shadow: 0 0 0 3px rgba(31, 94, 219, 0.1); }
+    .pd-thumb img, .pd-thumb video { width: 100%; height: 100%; object-fit: cover; }
 
-        .product-richtext p,
-        .product-richtext ul,
-        .product-richtext ol,
-        .product-richtext blockquote {
-            margin-top: 0.8rem;
-            margin-bottom: 0;
-            line-height: 1.85;
-        }
+    /* Card de ação sticky */
+    .pd-action-card {
+        background: #fff;
+        border-radius: 1.5rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.12);
+    }
 
-        .product-richtext ul,
-        .product-richtext ol {
-            padding-left: 1.2rem;
-        }
+    /* Badges */
+    .pd-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.6875rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .pd-badge-blue { background: #dbeafe; color: #1e40af; }
+    .pd-badge-green { background: #d1fae5; color: #065f46; }
+    .pd-badge-amber { background: #fef3c7; color: #92400e; }
+    .pd-badge-red { background: #fee2e2; color: #991b1b; }
+    .pd-badge-slate { background: #f1f5f9; color: #475569; }
 
-        .product-richtext a {
-            color: #1d4ed8;
-            font-weight: 700;
-            text-decoration: underline;
-            text-underline-offset: 3px;
+    /* Botões padrão */
+    .pd-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.25rem;
+        border-radius: 0.875rem;
+        font-size: 0.875rem;
+        font-weight: 800;
+        line-height: 1.2;
+        transition: all .2s ease;
+        width: 100%;
+        cursor: pointer;
+        border: none;
+    }
+    .pd-btn:active { transform: scale(0.98); }
+
+    .pd-btn-primary {
+        background: linear-gradient(135deg, var(--pd-primary, #1F5EDB) 0%, var(--pd-accent, #0F172A) 100%);
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(31, 94, 219, 0.3);
+    }
+    .pd-btn-primary:hover { filter: brightness(1.1); box-shadow: 0 12px 28px rgba(31, 94, 219, 0.35); }
+
+    .pd-btn-amber {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+    }
+    .pd-btn-amber:hover { filter: brightness(1.1); box-shadow: 0 12px 28px rgba(245, 158, 11, 0.35); }
+
+    .pd-btn-outline {
+        background: #fff;
+        border: 1.5px solid #e2e8f0;
+        color: #334155;
+    }
+    .pd-btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+    .pd-btn-ghost {
+        background: transparent;
+        color: #64748b;
+        padding: 0.625rem 0.875rem;
+    }
+    .pd-btn-ghost:hover { color: #1e40af; background: #f1f5f9; }
+
+    /* Price display */
+    .pd-price-current {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #0f172a;
+        line-height: 1;
+    }
+    .pd-price-old {
+        font-size: 1rem;
+        color: #94a3b8;
+        text-decoration: line-through;
+        margin-left: 0.75rem;
+    }
+    .pd-price-discount {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.625rem;
+        border-radius: 9999px;
+        background: #dcfce7;
+        color: #166534;
+        font-size: 0.75rem;
+        font-weight: 800;
+        margin-left: 0.5rem;
+    }
+
+    /* Divisor OR */
+    .pd-or-divider {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0;
+    }
+    .pd-or-divider::before,
+    .pd-or-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e2e8f0;
+    }
+    .pd-or-divider span {
+        margin: 0 0.875rem;
+        font-size: 0.6875rem;
+        font-weight: 900;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+    }
+
+    /* Info rows */
+    .pd-info-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.625rem 0;
+        border-bottom: 1px dashed #e2e8f0;
+        font-size: 0.8125rem;
+    }
+    .pd-info-row:last-child { border-bottom: none; }
+    .pd-info-label { color: #64748b; font-weight: 600; }
+    .pd-info-value { color: #0f172a; font-weight: 800; }
+
+    /* Descrição */
+    .pd-richtext { color: #334155; line-height: 1.75; }
+    .pd-richtext p, .pd-richtext ul, .pd-richtext ol, .pd-richtext blockquote {
+        margin-top: 0.75rem;
+        line-height: 1.75;
+    }
+    .pd-richtext ul, .pd-richtext ol { padding-left: 1.25rem; }
+    .pd-richtext a { color: #2563eb; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+    .pd-richtext h1, .pd-richtext h2, .pd-richtext h3 { color: #0f172a; font-weight: 900; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+    .pd-richtext h2 { font-size: 1.25rem; }
+    .pd-richtext h3 { font-size: 1.125rem; }
+
+    /* Seller card */
+    .pd-seller-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+        border: 1px solid #e2e8f0;
+    }
+
+    /* Quantity input */
+    .pd-qty-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        background: #fff;
+    }
+    .pd-qty-btn {
+        width: 2.75rem;
+        height: 2.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 900;
+        cursor: pointer;
+        border: none;
+        transition: background .15s ease;
+    }
+    .pd-qty-btn:hover:not(:disabled) { background: #f1f5f9; color: #0f172a; }
+    .pd-qty-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .pd-qty-input {
+        width: 3.5rem;
+        height: 2.75rem;
+        text-align: center;
+        border: none;
+        background: #fff;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    .pd-qty-input:focus { outline: none; }
+
+    /* Tabs */
+    .pd-tabs {
+        display: flex;
+        gap: 0.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+        overflow-x: auto;
+    }
+    .pd-tab {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #64748b;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all .2s ease;
+    }
+    .pd-tab:hover { color: #0f172a; }
+    .pd-tab.is-active { color: var(--pd-primary, #1F5EDB); border-bottom-color: var(--pd-primary, #1F5EDB); }
+
+    @media (max-width: 1023px) {
+        .pd-sticky-mobile {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.08);
+            display: flex;
+            gap: 0.5rem;
         }
-    </style>
+    }
+</style>
 @endpush
 
 @section('title', $product->title . ' - ' . $store->brand_name)
 
 @section('content')
-    <div class="store-product-shell min-h-screen pt-24 pb-24">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <section class="store-product-hero relative overflow-hidden rounded-[2.75rem] border border-slate-200/70 bg-slate-950 shadow-[0_35px_100px_-35px_rgba(15,23,42,0.55)]" style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 88%);">
-                @if($store->banner_url)
-                    <img src="{{ $store->banner_url }}" alt="{{ $store->brand_name }}" class="absolute inset-0 h-full w-full object-cover opacity-30">
-                @endif
+<div class="pd-shell pt-24 pb-24 lg:pb-16" style="--pd-primary: {{ $primaryColor }}; --pd-accent: {{ $accentColor }};">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-                <div class="relative z-10 p-6 md:p-8 xl:p-10">
-                    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <a href="{{ route('seller-stores.show', $store->slug) }}" class="inline-flex items-center gap-2 text-sm font-bold text-white/80 transition hover:text-white">
-                            <i class="fas fa-arrow-left text-[12px]"></i> Voltar para a loja
-                        </a>
-                        <div class="flex flex-wrap gap-3">
-                            <a href="{{ route('seller-products.cart.show') }}" class="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15">
-                                <i class="fas fa-cart-shopping text-white/75"></i> Carrinho
-                            </a>
-                            <a href="{{ route('seller-stores.show', $store->slug) }}" class="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-lg shadow-slate-950/20 transition hover:brightness-110">
-                                Ver mais desta loja
-                            </a>
-                        </div>
-                    </div>
+        {{-- Breadcrumb --}}
+        <nav class="mb-6 flex flex-wrap items-center gap-2 text-xs">
+            <a href="{{ route('marketplace.index') }}" class="pd-breadcrumb">
+                <i class="fas fa-store text-[10px]"></i> Marketplace
+            </a>
+            <span class="text-slate-400">/</span>
+            <a href="{{ route('seller-stores.show', $store->slug) }}" class="pd-breadcrumb">
+                <i class="fas fa-shop text-[10px]"></i> {{ $store->brand_name }}
+            </a>
+            <span class="text-slate-400">/</span>
+            <span class="pd-breadcrumb bg-slate-100 !text-slate-900">
+                {{ \Illuminate\Support\Str::limit($product->title, 30) }}
+            </span>
+        </nav>
 
-                    <div class="mt-8 grid gap-8 xl:grid-cols-[1.1fr,0.9fr] xl:items-end">
-                        <div>
-                            <div class="flex flex-wrap items-center gap-3">
-                                <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.28em] text-white/80">
-                                    <i class="fas {{ $product->isPhysical() ? 'fa-truck-fast' : 'fa-bolt' }} text-[11px]"></i>
-                                    {{ $product->isPhysical() ? 'Produto fisico' : 'Produto digital' }}
-                                </span>
-                                @if($product->is_featured)
-                                    <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/25 px-4 py-2 text-xs font-black uppercase tracking-[0.28em] text-white/80">
-                                        <i class="fas fa-star text-[11px]"></i> Destaque
-                                    </span>
-                                @endif
-                                @if($product->sku)
-                                    <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/25 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-white/70">
-                                        SKU {{ $product->sku }}
-                                    </span>
-                                @endif
-                                <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/25 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-white/70">
-                                    {{ $product->salesChannelLabel() }}
-                                </span>
-                            </div>
+        {{-- Grid principal --}}
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1.3fr),420px]">
 
-                            <h1 class="mt-5 max-w-4xl text-4xl font-black tracking-tight text-white md:text-5xl">{{ $product->title }}</h1>
-                            <p class="mt-5 max-w-3xl text-base leading-8 text-white/78 md:text-lg">{{ $excerpt }}</p>
+            {{-- Coluna esquerda: Galeria + Descrição --}}
+            <div class="space-y-6">
 
-                            <div class="mt-7 flex flex-wrap items-center gap-4">
-                                <div class="product-glass-card rounded-[1.75rem] px-5 py-4 text-white">
-                                    <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/55">Preco atual</p>
-                                    <div class="mt-2 flex flex-wrap items-end gap-3">
-                                        <p class="text-4xl font-black">R$ {{ number_format((float) $product->effective_price, 2, ',', '.') }}</p>
-                                        @if($product->sale_price !== null && (float) $product->sale_price < (float) $product->price)
-                                            <span class="pb-1 text-sm font-bold text-white/55 line-through">R$ {{ number_format((float) $product->price, 2, ',', '.') }}</span>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <div class="product-glass-card rounded-[1.75rem] px-5 py-4 text-white">
-                                    <p class="text-[11px] font-black uppercase tracking-[0.22em] text-white/55">Anunciado e vendido por</p>
-                                    <div class="mt-3 flex items-center gap-3">
-                                        <div class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-white/90">
-                                            @if($store->logo_url)
-                                                <img src="{{ $store->logo_url }}" alt="{{ $store->brand_name }}" class="h-full w-full object-cover">
-                                            @else
-                                                <i class="fas fa-store text-lg" style="color: {{ $primaryColor }};"></i>
-                                            @endif
-                                        </div>
-                                        <div>
-                                            <p class="font-black">{{ $store->brand_name }}</p>
-                                            <p class="text-sm text-white/65">{{ $isPlatformStore ? 'Loja oficial da plataforma' : '/loja/' . $store->slug }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="product-glass-card rounded-[2rem] p-5 text-white">
-                            <p class="text-[11px] font-black uppercase tracking-[0.24em] text-white/55">Experiencia de compra</p>
-                            <div class="mt-4 space-y-4 text-sm text-white/78">
-                                <div class="flex items-start gap-3">
-                                    <div class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-white/75">
-                                        <i class="fas fa-shield-halved"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-black text-white">Compra protegida</p>
-                                        <p class="mt-1 leading-7">Pedido, split e pagamento seguem a mesma logica do marketplace da plataforma.</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start gap-3">
-                                    <div class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-white/75">
-                                        <i class="fas {{ $product->isPhysical() ? 'fa-truck-fast' : 'fa-cloud-arrow-down' }}"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-black text-white">{{ $product->isPhysical() ? 'Frete Correios' : 'Entrega digital' }}</p>
-                                        <p class="mt-1 leading-7">{{ $product->isPhysical() ? 'PAC e SEDEX calculados no checkout, conforme endereco do cliente.' : $digitalDeliveryText }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <div class="mt-10 grid gap-8 xl:grid-cols-[minmax(0,1.12fr),420px]">
-                <div class="space-y-8">
-                    <section class="product-surface-card overflow-hidden rounded-[2.25rem] p-4 md:p-6" x-data="{ activeIndex: 0, items: @js($galleryItems) }">
-                        <div class="overflow-hidden rounded-[1.75rem] bg-slate-100">
-                            <template x-if="items.length">
-                                <div class="aspect-[16/10]">
-                                    <template x-if="items[activeIndex].type === 'video'">
-                                        <video :src="items[activeIndex].url" controls class="h-full w-full bg-slate-950 object-contain"></video>
-                                    </template>
-                                    <template x-if="items[activeIndex].type === 'image'">
-                                        <img :src="items[activeIndex].url" :alt="items[activeIndex].alt || '{{ addslashes($product->title) }}'" class="h-full w-full object-cover">
-                                    </template>
-                                </div>
+                {{-- Galeria --}}
+                <div class="pd-action-card p-4 md:p-6" x-data="{ activeIndex: 0, items: @js($galleryItems) }">
+                    <div class="pd-gallery-main">
+                        <template x-if="items.length">
+                            <template x-if="items[activeIndex].type === 'video'">
+                                <video :src="items[activeIndex].url" controls></video>
                             </template>
+                        </template>
+                        <template x-if="items.length && items[activeIndex].type === 'image'">
+                            <img :src="items[activeIndex].url" :alt="items[activeIndex].alt || '{{ addslashes($product->title) }}'">
+                        </template>
 
-                            @if($galleryItems->isEmpty())
-                                <div class="flex aspect-[16/10] items-center justify-center text-5xl text-slate-300">
-                                    <i class="fas fa-box-open"></i>
-                                </div>
-                            @endif
-                        </div>
-
-                        @if($galleryItems->count() > 1)
-                            <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                                @foreach($galleryItems as $index => $item)
-                                    <button type="button" @click="activeIndex = {{ $index }}" :class="{ 'ring-2 ring-offset-2 ring-offset-white': activeIndex === {{ $index }} }" class="overflow-hidden rounded-[1.25rem] border border-slate-200 bg-slate-100 transition hover:border-blue-200">
-                                        @if($item['type'] === 'video')
-                                            <div class="relative aspect-[4/3]">
-                                                <video src="{{ $item['url'] }}" class="h-full w-full object-cover"></video>
-                                                <div class="absolute inset-0 flex items-center justify-center bg-slate-950/30 text-white">
-                                                    <i class="fas fa-play"></i>
-                                                </div>
-                                            </div>
-                                        @else
-                                            <img src="{{ $item['url'] }}" alt="{{ $item['alt'] }}" class="aspect-[4/3] h-full w-full object-cover">
-                                        @endif
-                                    </button>
-                                @endforeach
+                        @if($galleryItems->isEmpty())
+                            <div class="flex h-full w-full items-center justify-center text-6xl text-slate-300">
+                                <i class="fas fa-box-open"></i>
                             </div>
                         @endif
-                    </section>
 
-                    <section class="product-surface-card rounded-[2.25rem] p-6 md:p-8">
-                        <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-                            <div>
-                                <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Descricao detalhada</p>
-                                <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">Tudo sobre este produto</h2>
+                        {{-- Badge de desconto flutuante --}}
+                        @if($hasDiscount && $discountPercent > 0)
+                            <div class="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-gradient-to-r from-rose-500 to-red-600 text-white text-xs font-black shadow-lg">
+                                -{{ $discountPercent }}% OFF
                             </div>
-                            <div class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600">
-                                <i class="fas fa-circle-check"></i> Loja oficial dentro da UNN
+                        @endif
+
+                        {{-- Badge destaque --}}
+                        @if($product->is_featured)
+                            <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-white text-xs font-black shadow-lg">
+                                <i class="fas fa-star mr-1"></i> DESTAQUE
                             </div>
-                        </div>
+                        @endif
+                    </div>
 
-                        <div class="product-richtext mt-6 text-sm text-slate-600 md:text-base">
-                            {!! $descriptionHtml ?: '<p>Sem descricao detalhada cadastrada.</p>' !!}
-                        </div>
-                    </section>
-
-                    <section class="grid gap-6 lg:grid-cols-2">
-                        <div class="product-surface-card rounded-[2rem] p-6">
-                            <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">{{ $product->isPhysical() ? 'Logistica' : 'Entrega digital' }}</p>
-                            <h3 class="mt-3 text-2xl font-black tracking-tight text-slate-900">{{ $product->isPhysical() ? 'Frete e envio' : 'Como voce recebe' }}</h3>
-                            <p class="mt-4 text-sm leading-7 text-slate-600">
-                                {{ $product->isPhysical() ? 'O frete e calculado no checkout com base no endereco de entrega. O pedido fica vinculado ao vendedor e pode receber rastreio no painel.' : $digitalDeliveryText }}
-                            </p>
-                        </div>
-
-                        <div class="product-surface-card rounded-[2rem] p-6">
-                            <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Marca vendedora</p>
-                            <h3 class="mt-3 text-2xl font-black tracking-tight text-slate-900">{{ $store->brand_name }}</h3>
-                            <p class="mt-4 text-sm leading-7 text-slate-600">{{ $store->tagline ?: 'Loja oficial do vendedor dentro do ecossistema UNN, com atendimento e identidade proprios.' }}</p>
-                            <div class="mt-6 flex flex-wrap gap-3">
-                                <a href="{{ route('seller-stores.show', $store->slug) }}" class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-blue-200 hover:text-blue-700">
-                                    <i class="fas fa-store text-slate-400"></i> Ver loja
-                                </a>
-                                @if($whatsappUrl)
-                                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-black text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110">
-                                        <i class="fab fa-whatsapp"></i> Falar com a loja
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </section>
-
-                    @if($relatedProducts->isNotEmpty())
-                        <section class="product-surface-card rounded-[2.25rem] p-6 md:p-8">
-                            <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-                                <div>
-                                    <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Continuar comprando</p>
-                                    <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">Mais itens desta loja</h2>
-                                </div>
-                                <a href="{{ route('seller-stores.show', $store->slug) }}" class="text-sm font-black text-blue-700 transition hover:text-blue-800">Ver loja completa</a>
-                            </div>
-
-                            <div class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                                @foreach($relatedProducts as $relatedProduct)
-                                    <article class="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white">
-                                        <a href="{{ route('seller-stores.products.show', [$store->slug, $relatedProduct->slug]) }}" class="block aspect-[16/11] overflow-hidden bg-slate-100">
-                                            @if($relatedProduct->cover_url)
-                                                <img src="{{ $relatedProduct->cover_url }}" alt="{{ $relatedProduct->title }}" class="h-full w-full object-cover transition duration-500 hover:scale-[1.03]">
-                                            @else
-                                                <div class="flex h-full w-full items-center justify-center text-4xl text-slate-300">
-                                                    <i class="fas fa-box-open"></i>
-                                                </div>
-                                            @endif
-                                        </a>
-                                        <div class="p-4">
-                                            <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-400">{{ $relatedProduct->isPhysical() ? 'Fisico' : 'Digital' }}</p>
-                                            <h3 class="mt-2 text-lg font-black tracking-tight text-slate-900">{{ $relatedProduct->title }}</h3>
-                                            <p class="mt-3 text-xl font-black text-slate-900">R$ {{ number_format((float) $relatedProduct->effective_price, 2, ',', '.') }}</p>
-                                            <a href="{{ route('seller-stores.products.show', [$store->slug, $relatedProduct->slug]) }}" class="mt-4 inline-flex items-center gap-2 text-sm font-black text-blue-700">Ver detalhes <i class="fas fa-arrow-right text-[11px]"></i></a>
+                    {{-- Thumbnails --}}
+                    @if($galleryItems->count() > 1)
+                        <div class="pd-gallery-thumbs">
+                            @foreach($galleryItems as $index => $item)
+                                <button type="button" @click="activeIndex = {{ $index }}"
+                                    :class="activeIndex === {{ $index }} ? 'is-active' : ''"
+                                    class="pd-thumb">
+                                    @if($item['type'] === 'video')
+                                        <div class="relative w-full h-full">
+                                            <video src="{{ $item['url'] }}"></video>
+                                            <div class="absolute inset-0 flex items-center justify-center bg-slate-950/40 text-white text-xs">
+                                                <i class="fas fa-play"></i>
+                                            </div>
                                         </div>
-                                    </article>
-                                @endforeach
-                            </div>
-                        </section>
+                                    @else
+                                        <img src="{{ $item['url'] }}" alt="{{ $item['alt'] }}">
+                                    @endif
+                                </button>
+                            @endforeach
+                        </div>
                     @endif
                 </div>
 
-                <aside class="space-y-6 xl:sticky xl:top-28 xl:self-start">
-                    <section class="product-surface-card rounded-[2.25rem] p-6 md:p-7">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Ação principal</p>
-                        <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">
-                            @if($canBuyInStore && $canRedeemWithPoints)
-                                Escolha como obter
-                            @elseif($canBuyExternally)
-                                Comprar no site externo
-                            @elseif($canRedeemWithPoints)
-                                Trocar por {{ $coinName ?? 'UNNBIT' }}
-                            @elseif($canBuyInStore)
-                                Checkout rápido
-                            @else
-                                Produto indisponível
-                            @endif
-                        </h2>
-                        <p class="mt-3 text-sm leading-7 text-slate-600">
-                            @if($canBuyInStore && $canRedeemWithPoints)
-                                Você pode comprar em dinheiro no checkout do marketplace ou trocar por {{ $coinName ?? 'UNNBIT' }}.
-                            @elseif($canBuyExternally)
-                                Este item é exibido aqui, mas a compra será concluída no site externo do vendedor.
-                            @elseif($canRedeemWithPoints)
-                                Este item é obtido exclusivamente por resgate com seus {{ $coinName ?? 'UNNBIT' }}.
-                            @elseif($canBuyInStore)
-                                Adicione ao carrinho ou siga direto para o checkout.
-                            @else
-                                Este produto não está disponível para compra no momento.
-                            @endif
-                        </p>
+                {{-- Tabs: Descrição, Entrega, Loja --}}
+                <div class="pd-action-card p-6 md:p-8" x-data="{ tab: 'description' }">
+                    <div class="pd-tabs">
+                        <button type="button" @click="tab = 'description'" :class="tab === 'description' ? 'is-active' : ''" class="pd-tab">
+                            <i class="fas fa-align-left mr-1.5 text-xs"></i> Descrição
+                        </button>
+                        <button type="button" @click="tab = 'delivery'" :class="tab === 'delivery' ? 'is-active' : ''" class="pd-tab">
+                            <i class="fas fa-{{ $product->isPhysical() ? 'truck-fast' : 'cloud-arrow-down' }} mr-1.5 text-xs"></i>
+                            {{ $product->isPhysical() ? 'Entrega' : 'Acesso digital' }}
+                        </button>
+                        <button type="button" @click="tab = 'seller'" :class="tab === 'seller' ? 'is-active' : ''" class="pd-tab">
+                            <i class="fas fa-store mr-1.5 text-xs"></i> Sobre a loja
+                        </button>
+                    </div>
 
-                        <div class="mt-6 rounded-[1.75rem] bg-slate-50 p-5">
-                            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Valor do item</p>
-                            <div class="mt-2 flex flex-wrap items-end gap-3">
-                                <p class="text-4xl font-black text-slate-900">R$ {{ number_format((float) $product->effective_price, 2, ',', '.') }}</p>
-                                @if($product->sale_price !== null && (float) $product->sale_price < (float) $product->price)
-                                    <span class="pb-1 text-sm font-bold text-slate-400 line-through">R$ {{ number_format((float) $product->price, 2, ',', '.') }}</span>
-                                @endif
+                    <div x-show="tab === 'description'" x-cloak>
+                        <div class="pd-richtext">
+                            {!! $descriptionHtml ?: '<p class="text-slate-500 italic">Sem descrição detalhada cadastrada.</p>' !!}
+                        </div>
+                    </div>
+
+                    <div x-show="tab === 'delivery'" x-cloak class="space-y-4">
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-100">
+                            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-{{ $product->isPhysical() ? 'truck-fast' : 'cloud-arrow-down' }}"></i>
                             </div>
-                            @if($canRedeemWithPoints)
-                                <div class="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-50 border border-amber-200 px-3 py-1">
-                                    <i class="fas fa-coins text-amber-600 text-xs"></i>
-                                    <span class="text-xs font-black text-amber-700">{{ number_format($pointsCost, 0, ',', '.') }} {{ $coinName ?? 'UNNBIT' }}</span>
-                                </div>
-                            @endif
+                            <div>
+                                <p class="font-black text-slate-900">
+                                    {{ $product->isPhysical() ? 'Envio pelos Correios' : 'Entrega digital automática' }}
+                                </p>
+                                <p class="text-sm text-slate-600 mt-1 leading-relaxed">
+                                    {{ $product->isPhysical() ? 'Frete calculado no checkout baseado no seu endereço. PAC e SEDEX disponíveis. Rastreio no painel.' : $digitalDeliveryText }}
+                                </p>
+                            </div>
                         </div>
 
-                        {{-- AÇÕES --}}
-                        <div class="mt-6 space-y-3">
-                            {{-- Site externo: exclusivo --}}
-                            @if($canBuyExternally)
-                                <a href="{{ $product->external_checkout_url }}" target="_blank" rel="noopener noreferrer"
-                                    class="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition hover:brightness-110"
-                                    style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 100%);">
-                                    <i class="fas fa-up-right-from-square"></i> Comprar no site externo
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-shield-halved"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-slate-900">Compra protegida</p>
+                                <p class="text-sm text-slate-600 mt-1 leading-relaxed">
+                                    Pedido processado pelo marketplace da UNN com split automático. Reembolso em caso de não-entrega.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div x-show="tab === 'seller'" x-cloak class="pd-seller-card rounded-2xl p-5">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-2xl bg-white flex items-center justify-center overflow-hidden flex-shrink-0 border border-slate-200">
+                                @if($store->logo_url)
+                                    <img src="{{ $store->logo_url }}" alt="{{ $store->brand_name }}" class="h-full w-full object-cover">
+                                @else
+                                    <i class="fas fa-store text-xl" style="color: {{ $primaryColor }};"></i>
+                                @endif
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-black uppercase tracking-wider text-slate-400 mb-1">
+                                    Vendido por {!! $isPlatformStore ? '<span class="text-emerald-600">Loja oficial da plataforma</span>' : '/loja/' . $store->slug !!}
+                                </p>
+                                <h4 class="text-lg font-black text-slate-900">{{ $store->brand_name }}</h4>
+                                @if($store->tagline)
+                                    <p class="text-sm text-slate-600 mt-1">{{ $store->tagline }}</p>
+                                @endif
+
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    <a href="{{ route('seller-stores.show', $store->slug) }}" class="pd-btn pd-btn-outline !w-auto !py-2.5 !px-4 !text-xs">
+                                        <i class="fas fa-store"></i> Ver loja completa
+                                    </a>
+                                    @if($whatsappUrl)
+                                        <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="pd-btn !w-auto !py-2.5 !px-4 !text-xs" style="background: #25d366; color: white;">
+                                            <i class="fab fa-whatsapp"></i> WhatsApp
+                                        </a>
+                                    @endif
+                                    @if($store->support_email)
+                                        <a href="mailto:{{ $store->support_email }}" class="pd-btn pd-btn-outline !w-auto !py-2.5 !px-4 !text-xs">
+                                            <i class="fas fa-envelope"></i> E-mail
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Produtos relacionados --}}
+                @if($relatedProducts->isNotEmpty())
+                    <div class="pd-action-card p-6 md:p-8">
+                        <div class="flex items-end justify-between gap-3 mb-5">
+                            <div>
+                                <p class="text-xs font-black uppercase tracking-wider text-slate-400">Continuar comprando</p>
+                                <h2 class="mt-1 text-2xl font-black text-slate-900">Mais desta loja</h2>
+                            </div>
+                            <a href="{{ route('seller-stores.show', $store->slug) }}" class="text-sm font-black text-blue-700 hover:text-blue-800">
+                                Ver todos <i class="fas fa-arrow-right text-[10px] ml-1"></i>
+                            </a>
+                        </div>
+
+                        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                            @foreach($relatedProducts as $relatedProduct)
+                                <a href="{{ route('seller-stores.products.show', [$store->slug, $relatedProduct->slug]) }}"
+                                    class="group block overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:shadow-lg transition-all">
+                                    <div class="aspect-[4/3] overflow-hidden bg-slate-100">
+                                        @if($relatedProduct->cover_url)
+                                            <img src="{{ $relatedProduct->cover_url }}" alt="{{ $relatedProduct->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                        @else
+                                            <div class="flex h-full w-full items-center justify-center text-4xl text-slate-300">
+                                                <i class="fas fa-box-open"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="p-4">
+                                        <p class="text-[10px] font-black uppercase tracking-wider text-slate-400">{{ $relatedProduct->isPhysical() ? 'Físico' : 'Digital' }}</p>
+                                        <h3 class="mt-1 text-sm font-black text-slate-900 line-clamp-2">{{ $relatedProduct->title }}</h3>
+                                        <p class="mt-2 text-lg font-black text-slate-900">R$ {{ number_format((float) $relatedProduct->effective_price, 2, ',', '.') }}</p>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Coluna direita: Ações (sticky) --}}
+            <aside class="lg:sticky lg:top-28 lg:self-start space-y-4">
+
+                {{-- Título e badges --}}
+                <div class="pd-action-card p-6">
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <span class="pd-badge pd-badge-blue">
+                            <i class="fas fa-{{ $product->isPhysical() ? 'box' : 'cloud' }}"></i>
+                            {{ $product->isPhysical() ? 'Físico' : 'Digital' }}
+                        </span>
+                        @if($product->is_featured)
+                            <span class="pd-badge pd-badge-amber">
+                                <i class="fas fa-star"></i> Destaque
+                            </span>
+                        @endif
+                        @if($canRedeemWithPoints && $canBuyInStore)
+                            <span class="pd-badge pd-badge-green">
+                                <i class="fas fa-circle-check"></i> Dinheiro ou Pontos
+                            </span>
+                        @elseif($canRedeemWithPoints)
+                            <span class="pd-badge pd-badge-amber">
+                                <i class="fas fa-coins"></i> Troca de pontos
+                            </span>
+                        @elseif($canBuyExternally)
+                            <span class="pd-badge pd-badge-slate">
+                                <i class="fas fa-up-right-from-square"></i> Site externo
+                            </span>
+                        @endif
+                    </div>
+
+                    <h1 class="text-2xl md:text-3xl font-black text-slate-900 leading-tight">{{ $product->title }}</h1>
+
+                    @if($excerpt)
+                        <p class="mt-3 text-sm text-slate-600 leading-relaxed">{{ $excerpt }}</p>
+                    @endif
+
+                    @if($product->sku)
+                        <p class="mt-3 text-xs text-slate-400">SKU: <span class="font-mono font-bold text-slate-600">{{ $product->sku }}</span></p>
+                    @endif
+                </div>
+
+                {{-- Card de ação principal (compra/troca) --}}
+                <div class="pd-action-card p-6">
+                    {{-- Preço --}}
+                    @if($canBuyInStore || $canBuyExternally)
+                        <div class="mb-5">
+                            <p class="text-xs font-black uppercase tracking-wider text-slate-400 mb-2">Preço à vista</p>
+                            <div class="flex items-end flex-wrap gap-2">
+                                <span class="pd-price-current">R$ {{ number_format((float) $product->effective_price, 2, ',', '.') }}</span>
+                                @if($hasDiscount)
+                                    <span class="pd-price-old">R$ {{ number_format((float) $product->price, 2, ',', '.') }}</span>
+                                    @if($discountPercent > 0)
+                                        <span class="pd-price-discount">-{{ $discountPercent }}%</span>
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Preço em pontos (quando só tem troca) --}}
+                    @if(!$canBuyInStore && !$canBuyExternally && $canRedeemWithPoints)
+                        <div class="mb-5">
+                            <p class="text-xs font-black uppercase tracking-wider text-slate-400 mb-2">Custo em pontos</p>
+                            <div class="flex items-end flex-wrap gap-2">
+                                <span class="pd-price-current text-amber-600">{{ number_format($pointsCost, 0, ',', '.') }}</span>
+                                <span class="text-lg font-black text-amber-600 pb-1">{{ $coinName }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- SITE EXTERNO --}}
+                    @if($canBuyExternally)
+                        <a href="{{ $product->external_checkout_url }}" target="_blank" rel="noopener noreferrer" class="pd-btn pd-btn-primary">
+                            <i class="fas fa-up-right-from-square"></i>
+                            <span>Comprar no site do vendedor</span>
+                        </a>
+                        <p class="text-[11px] text-slate-500 text-center mt-2">
+                            A compra será concluída no site externo do vendedor
+                        </p>
+                    @else
+                        {{-- COMPRA NO MARKETPLACE --}}
+                        @if($canBuyInStore)
+                            <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="space-y-3" x-data="{ qty: 1, stock: {{ (int) ($product->stock ?? 999) }} }">
+                                @csrf
+
+                                {{-- Quantidade --}}
+                                <div class="flex items-center gap-3">
+                                    <label class="text-xs font-black uppercase tracking-wider text-slate-500">Quantidade</label>
+                                    <div class="pd-qty-wrapper">
+                                        <button type="button" class="pd-qty-btn" @click="qty = Math.max(1, qty - 1)" :disabled="qty <= 1">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <input type="number" name="quantity" min="1" :max="stock" x-model="qty" class="pd-qty-input" readonly>
+                                        <button type="button" class="pd-qty-btn" @click="qty = Math.min(stock, qty + 1)" :disabled="qty >= stock">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                    @if($product->isPhysical())
+                                        <span class="text-xs text-slate-400 ml-auto">
+                                            <i class="fas fa-box text-[10px]"></i> {{ max(0, (int) ($product->stock ?? 0)) }} em estoque
+                                        </span>
+                                    @endif
+                                </div>
+
+                                {{-- Botão Comprar agora --}}
+                                <button type="submit" name="buy_now" value="1" class="pd-btn pd-btn-primary">
+                                    <i class="fas fa-bolt"></i>
+                                    <span>Comprar agora com dinheiro</span>
+                                </button>
+
+                                {{-- Botão Adicionar ao carrinho --}}
+                                <button type="submit" class="pd-btn pd-btn-outline">
+                                    <i class="fas fa-cart-plus"></i>
+                                    <span>Adicionar ao carrinho</span>
+                                </button>
+                            </form>
+                        @endif
+
+                        {{-- TROCA POR PONTOS --}}
+                        @if($canRedeemWithPoints)
+                            @if($canBuyInStore)
+                                <div class="pd-or-divider">
+                                    <span>Ou pague com pontos</span>
+                                </div>
+                            @endif
+
+                            @if(!$canBuyInStore)
+                                {{-- Só troca - botão único em destaque --}}
+                                <a href="{{ route('panel.redemptions.shop') }}#item-{{ optional($product->redeemableItem)->id }}" class="pd-btn pd-btn-amber">
+                                    <i class="fas fa-coins"></i>
+                                    <span>Trocar por {{ number_format($pointsCost, 0, ',', '.') }} {{ $coinName }}</span>
                                 </a>
                             @else
-                                {{-- Compra no marketplace --}}
-                                @if($canBuyInStore)
-                                    <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="space-y-3">
-                                        @csrf
-                                        <div>
-                                            <label for="product-quantity" class="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Quantidade</label>
-                                            <input id="product-quantity" type="number" min="1" value="1" name="quantity"
-                                                class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition">
-                                        </div>
-
-                                        <button type="submit" name="buy_now" value="1"
-                                            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition hover:brightness-110"
-                                            style="background: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $accentColor }} 100%);">
-                                            <i class="fas fa-bolt"></i> Comprar agora &bull; R$ {{ number_format((float) $product->effective_price, 2, ',', '.') }}
-                                        </button>
-
-                                        <button type="submit"
-                                            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-blue-300 hover:bg-slate-50 hover:text-blue-700">
-                                            <i class="fas fa-cart-shopping"></i> Adicionar ao carrinho
-                                        </button>
-                                    </form>
-                                @endif
-
-                                {{-- Trocar por pontos --}}
-                                @if($canRedeemWithPoints)
-                                    @if($canBuyInStore)
-                                        <div class="relative flex items-center py-1">
-                                            <div class="flex-grow border-t border-dashed border-slate-200"></div>
-                                            <span class="mx-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">ou</span>
-                                            <div class="flex-grow border-t border-dashed border-slate-200"></div>
-                                        </div>
-                                    @endif
-                                    <a href="{{ route('panel.redemptions.shop') }}#item-{{ optional($product->redeemableItem)->id }}"
-                                        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-4 py-3 text-sm font-black text-white shadow-lg shadow-amber-500/30 transition">
-                                        <i class="fas fa-coins"></i>
-                                        Trocar por {{ number_format($pointsCost, 0, ',', '.') }} {{ $coinName ?? 'UNNBIT' }}
-                                    </a>
-                                @endif
-
-                                {{-- Nenhum canal ativo --}}
-                                @if(!$canBuyInStore && !$canRedeemWithPoints)
-                                    <div class="rounded-2xl bg-slate-50 border border-dashed border-slate-200 p-5 text-center">
-                                        <i class="fas fa-lock text-2xl text-slate-300 mb-2"></i>
-                                        <p class="text-sm font-bold text-slate-600">Este produto não está disponível no momento.</p>
-                                    </div>
-                                @endif
+                                {{-- Tem ambos - botão secundário --}}
+                                <a href="{{ route('panel.redemptions.shop') }}#item-{{ optional($product->redeemableItem)->id }}" class="pd-btn pd-btn-amber">
+                                    <i class="fas fa-coins"></i>
+                                    <span>Trocar por {{ number_format($pointsCost, 0, ',', '.') }} {{ $coinName }}</span>
+                                </a>
+                                <p class="text-[11px] text-slate-500 text-center mt-2">
+                                    Você ainda pode usar seus pontos como forma de pagamento
+                                </p>
                             @endif
-                        </div>
+                        @endif
 
-                        <div class="mt-6 space-y-3 border-t border-slate-100 pt-6 text-sm text-slate-600">
-                            <div class="flex items-center justify-between gap-3">
-                                <span class="font-semibold text-slate-500">Tipo</span>
-                                <span class="font-bold text-slate-900">{{ $product->isPhysical() ? 'Produto físico' : 'Produto digital' }}</span>
+                        {{-- Sem nenhum canal ativo --}}
+                        @if(!$canBuyInStore && !$canRedeemWithPoints)
+                            <div class="text-center py-6">
+                                <i class="fas fa-lock text-3xl text-slate-300 mb-2"></i>
+                                <p class="text-sm font-bold text-slate-600">Produto indisponível no momento</p>
+                                <p class="text-xs text-slate-400 mt-1">O vendedor não configurou a forma de compra</p>
                             </div>
-                            <div class="flex items-center justify-between gap-3">
-                                <span class="font-semibold text-slate-500">Canal</span>
-                                <span class="font-bold text-slate-900">{{ $product->salesChannelLabel() }}</span>
-                            </div>
-                            @if($product->isPhysical())
-                                <div class="flex items-center justify-between gap-3">
-                                    <span class="font-semibold text-slate-500">Estoque</span>
-                                    <span class="font-bold text-slate-900">{{ max(0, (int) ($product->stock ?? 0)) }} unidade(s)</span>
-                                </div>
-                            @endif
-                            @if($canRedeemWithPoints)
-                                <div class="flex items-center justify-between gap-3">
-                                    <span class="font-semibold text-slate-500">Troca por pontos</span>
-                                    <span class="font-bold text-slate-900">{{ number_format($pointsCost, 0, ',', '.') }} {{ $coinName ?? 'UNNBIT' }}</span>
-                                </div>
-                            @endif
-                            <div class="flex items-center justify-between gap-3">
-                                <span class="font-semibold text-slate-500">Entrega</span>
-                                <span class="font-bold text-slate-900">
-                                    @if($canBuyExternally)
-                                        Site externo
-                                    @elseif($product->isPhysical() && $canBuyInStore)
-                                        Correios no checkout
-                                    @elseif($canRedeemWithPoints)
-                                        Resgate com o vendedor
-                                    @else
-                                        Área do comprador
-                                    @endif
-                                </span>
-                            </div>
-                        </div>
-                    </section>
+                        @endif
+                    @endif
+                </div>
 
-                    <section class="product-surface-card rounded-[2rem] p-6">
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Atendimento</p>
-                        <div class="mt-5 space-y-4 text-sm text-slate-600">
-                            @if($store->support_email)
-                                <div>
-                                    <p class="font-black text-slate-900">E-mail</p>
-                                    <p class="mt-1 break-all leading-6">{{ $store->support_email }}</p>
-                                </div>
-                            @endif
-                            @if($store->support_phone)
-                                <div>
-                                    <p class="font-black text-slate-900">Telefone</p>
-                                    <p class="mt-1 leading-6">{{ $store->support_phone }}</p>
-                                </div>
-                            @endif
-                            @if($store->whatsapp)
-                                <div>
-                                    <p class="font-black text-slate-900">WhatsApp</p>
-                                    <p class="mt-1 leading-6">{{ $store->whatsapp }}</p>
-                                </div>
-                            @endif
+                {{-- Informações do produto --}}
+                <div class="pd-action-card p-6">
+                    <p class="text-xs font-black uppercase tracking-wider text-slate-400 mb-3">
+                        <i class="fas fa-circle-info mr-1"></i> Detalhes
+                    </p>
+                    <div class="space-y-0">
+                        <div class="pd-info-row">
+                            <span class="pd-info-label">Tipo</span>
+                            <span class="pd-info-value">
+                                <i class="fas fa-{{ $product->isPhysical() ? 'box' : 'cloud' }} mr-1 text-xs"></i>
+                                {{ $product->isPhysical() ? 'Físico' : 'Digital' }}
+                            </span>
                         </div>
-                    </section>
-                </aside>
-            </div>
+                        <div class="pd-info-row">
+                            <span class="pd-info-label">Canal</span>
+                            <span class="pd-info-value">{{ $product->salesChannelLabel() }}</span>
+                        </div>
+                        @if($product->isPhysical())
+                            <div class="pd-info-row">
+                                <span class="pd-info-label">Estoque</span>
+                                <span class="pd-info-value">{{ max(0, (int) ($product->stock ?? 0)) }} un.</span>
+                            </div>
+                            @if($product->weight_grams)
+                                <div class="pd-info-row">
+                                    <span class="pd-info-label">Peso</span>
+                                    <span class="pd-info-value">{{ number_format((int) $product->weight_grams / 1000, 2, ',', '.') }} kg</span>
+                                </div>
+                            @endif
+                        @endif
+                        @if($canRedeemWithPoints)
+                            <div class="pd-info-row">
+                                <span class="pd-info-label">Em pontos</span>
+                                <span class="pd-info-value text-amber-600">{{ number_format($pointsCost, 0, ',', '.') }} {{ $coinName }}</span>
+                            </div>
+                        @endif
+                        <div class="pd-info-row">
+                            <span class="pd-info-label">Entrega</span>
+                            <span class="pd-info-value">
+                                @if($canBuyExternally)
+                                    <i class="fas fa-up-right-from-square text-xs"></i> Site externo
+                                @elseif($product->isPhysical())
+                                    <i class="fas fa-truck-fast text-xs"></i> Correios
+                                @else
+                                    <i class="fas fa-cloud-arrow-down text-xs"></i> Digital
+                                @endif
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Call pro carrinho --}}
+                <a href="{{ route('seller-products.cart.show') }}" class="block text-center text-sm font-bold text-slate-600 hover:text-blue-700 py-3">
+                    <i class="fas fa-cart-shopping mr-1"></i> Ver meu carrinho
+                </a>
+            </aside>
         </div>
     </div>
+</div>
 @endsection
