@@ -45,9 +45,9 @@ class SumUpService
         ];
 
         // customer_id: identificador único do comprador no sistema do lojista
-        // Permite rastrear o cliente no painel SumUp
+        // Formato aceito pela SumUp: apenas alfanumérico, sem hífens ou prefixos
         if ($order->user_id) {
-            $payload['customer_id'] = 'user-' . $order->user_id;
+            $payload['customer_id'] = (string) $order->user_id;
         }
 
         $response = $this->post('/v0.1/checkouts', $payload, $config['api_key']);
