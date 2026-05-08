@@ -1322,7 +1322,7 @@
 
                                     {{-- Se suportar troca por pontos, mostrar botão de troca --}}
                                     @if($product->supportsPointsRedemption() && $pointsCost > 0)
-                                        <a href="{{ route('panel.redemptions.shop') }}"
+                                        <a href="{{ route('panel.redemptions.shop') }}#item-{{ optional($product->redeemableItem)->id }}"
                                             class="w-full mp-selling-action {{ $product->supportsInternalCheckout() ? 'mp-selling-action-secondary' : 'mp-selling-action-primary' }} rounded-2xl bg-amber-500 hover:bg-amber-600 px-4 py-2 text-sm font-black text-white shadow-md text-center inline-flex items-center justify-center gap-2">
                                             <i class="fas fa-coins"></i>
                                             Trocar por {{ number_format($pointsCost, 0, ',', '.') }} UNNBIT
