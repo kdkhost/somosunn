@@ -98,6 +98,27 @@
                                             </div>
                                         </label>
                                     @endif
+
+                                    @if(($sumup['available'] ?? false))
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="gateway_provider" value="sumup" class="peer sr-only"
+                                                data-gateway-summary="Pagamento via SumUp."
+                                                {{ $selectedGateway === 'sumup' ? 'checked' : '' }}>
+                                            <div
+                                                class="p-4 rounded-xl border-2 border-gray-200 hover:border-slate-700 peer-checked:border-slate-900 peer-checked:bg-slate-50 transition-all">
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center">
+                                                        <i class="fas fa-credit-card"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="font-bold text-gray-900">SumUp</p>
+                                                        <p class="text-xs text-gray-500">Cartão, Pix</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    @endif
                                 </div>
                                 </div>
                             @endif

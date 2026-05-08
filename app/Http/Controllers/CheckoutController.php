@@ -91,7 +91,7 @@ class CheckoutController extends Controller
 
         $request->validate([
             'coupon_code' => 'nullable|string|max:40',
-            'gateway_provider' => 'nullable|string|in:mercadopago',
+            'gateway_provider' => 'nullable|string|in:mercadopago,sumup',
         ]);
 
         $effectiveTotal = round((float) ($course->effective_price ?? ($course->price ?? 0)), 2);
