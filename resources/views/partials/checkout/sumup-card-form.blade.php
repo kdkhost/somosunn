@@ -109,8 +109,8 @@
 {{-- Formulário de Cartão (SumUp Card Widget) --}}
 @if($methodCard)
 <div id="sumup-card-section">
-    {{-- Seletor de parcelas customizado (com valores reais incluindo juros) --}}
-    @if($maxInstallments > 1 && $installmentTax > 0 && $passFeeToClient)
+    {{-- Seletor de parcelas customizado (sempre visível quando maxInstallments > 1) --}}
+    @if($maxInstallments > 1)
     <div class="mb-4">
         <label class="block text-sm font-semibold text-slate-600 mb-2">Parcelas</label>
         <select id="sumup-custom-installments"
@@ -119,29 +119,14 @@
             style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px;">
             @foreach($installmentOptions as $opt)
                 <option value="{{ $opt['n'] }}">
-                    {{ $opt['n'] }}x de R$ {{ number_format($opt['per_installment'], 2, ',', '.') }} = R$ {{ number_format($opt['total'], 2, ',', '.') }}{{ $opt['has_interest'] ? ' (+' . $installmentTax . '% juros)' : ' sem juros' }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-    @elseif($maxInstallments > 1)
-    {{-- Parcelas sem juros: mostrar seletor simples --}}
-    <div class="mb-4">
-        <label class="block text-sm font-semibold text-slate-600 mb-2">Parcelas</label>
-        <select id="sumup-custom-installments"
-            onchange="onCustomInstallmentChange(this.value)"
-            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all appearance-none cursor-pointer"
-            style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px;">
-            @foreach($installmentOptions as $opt)
-                <option value="{{ $opt['n'] }}">
-                    {{ $opt['n'] }}x de R$ {{ number_format($opt['per_installment'], 2, ',', '.') }} = R$ {{ number_format($opt['total'], 2, ',', '.') }} sem juros
+                    {{ $opt['n'] }}x de R$ {{ number_format($opt['per_installment'], 2, ',', '.') }} = R$ {{ number_format($opt['total'], 2, ',', '.') }}@if($opt['has_interest']) (+{{ number_format($installmentTax, 2, ',', '.') }}% juros)@else{{ ' sem juros' }}@endif
                 </option>
             @endforeach
         </select>
     </div>
     @endif
 
-    {{-- Widget SumUp (seletor de parcelas nativo oculto quando temos o customizado) --}}
+    {{-- Widget SumUp (seletor de parcelas nativo sempre oculto — usamos o nosso) --}}
     <div id="sumup-card"></div>
 </div>
 @endif
@@ -276,7 +261,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     locale: 'pt-BR',
                     country: 'BR',
                     currency: 'BRL',
-                    showInstallments: (MAX_INSTALLMENTS <= 1 || (INSTALLMENT_TAX > 0 && PASS_FEE_TO_CLIENT)) ? false : (MAX_INSTALLMENTS > 1),
+                    showInstallments: false,
+                    installments: 1,
                     maxInstallments: MAX_INSTALLMENTS,
                     onChangeInstallments: function(installments) {
                         console.log('SumUp native installment changed:', installments);
