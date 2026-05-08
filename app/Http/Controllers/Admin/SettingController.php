@@ -665,6 +665,21 @@ class SettingController extends Controller
             'mercadopago_method_pix',
             'mercadopago_method_ticket',
             'mercadopago_method_mercadopago',
+            // SumUp - checkboxes
+            'sumup_enabled',
+            'sumup_method_card',
+            'sumup_method_pix',
+            'sumup_allow_members',
+            'sumup_allow_instructors',
+            'sumup_allow_sellers',
+            'sumup_allow_mentors',
+            'sumup_allow_courses',
+            'sumup_allow_mentorships',
+            'sumup_allow_events',
+            'sumup_allow_marketplace',
+            'sumup_allow_subscriptions',
+            'sumup_allow_services',
+            'sumup_fallback_to_mercadopago',
         ];
 
         if ($currentGroup === 'gateway') {
@@ -672,11 +687,10 @@ class SettingController extends Controller
                 $data[$checkbox] = $request->has($checkbox) ? 1 : 0;
             }
 
-            // VALIDAÇÃO: Cada gateway ativo deve ter ao menos um método de pagamento ativo
-            $mpEnabled = isset($data['mercadopago_enabled']) ? (int) $data['mercadopago_enabled'] : 0;
-            $sumupEnabled = isset($data['sumup_enabled']) ? (int) $data['sumup_enabled'] : 0;
+            // VALIDAÇÃO: MercadoPago ativo deve ter ao menos um método
+            $mpEnabled = (int) ($data['mercadopago_enabled'] ?? 0) === 1;
 
-            if ($mpEnabled === 1) {
+            if ($mpEnabled) {
                 $mpMethodsActive = (int) ($data['mercadopago_method_credit_card'] ?? 0)
                     + (int) ($data['mercadopago_method_debit_card'] ?? 0)
                     + (int) ($data['mercadopago_method_pix'] ?? 0)
@@ -684,12 +698,26 @@ class SettingController extends Controller
                     + (int) ($data['mercadopago_method_mercadopago'] ?? 0);
 
                 if ($mpMethodsActive === 0) {
-                    return response()->json(['message' => 'Ao menos um método de pagamento deve permanecer ativo para este gateway.'], 422);
+                    if ($request->expectsJson() || $request->ajax()) {
+                        return response()->json(['message' => 'Ao menos um método de pagamento deve permanecer ativo para o MercadoPago.'], 422);
+                    }
+                    return redirect()->back()
+                        ->with('error', 'Ao menos um método de pagamento deve permanecer ativo para o MercadoPago.')
+                        ->withInput();
                 }
             }
 
-            // SumUp não precisa de validação de métodos específicos
-            // pois usa configuração diferente do MercadoPago
+            // SumUp: se ativo, garantir que pelo menos um método esteja ativo
+            $sumupEnabled = (int) ($data['sumup_enabled'] ?? 0) === 1;
+            if ($sumupEnabled) {
+                $sumupMethodsActive = (int) ($data['sumup_method_card'] ?? 0)
+                    + (int) ($data['sumup_method_pix'] ?? 0);
+
+                // Se nenhum método SumUp está marcado, ativar card por padrão
+                if ($sumupMethodsActive === 0) {
+                    $data['sumup_method_card'] = 1;
+                }
+            }
 
             // Remover chaves ANTIGAS e lixo que não pertencem ao gateway
             $trashKeys = ['video_plyr_options_json', 'gateway_checkout_theme_selected', 'gateway_checkout_primary_color_hex'];
@@ -699,7 +727,7 @@ class SettingController extends Controller
                 }
             }
 
-            \Log::info('[SETTINGS DEBUG] Gateway settings updated by Admin.');
+            \Log::info('[SETTINGS DEBUG] Gateway settings updated. MP enabled=' . ($mpEnabled ? 1 : 0) . ' SumUp enabled=' . ($sumupEnabled ? 1 : 0));
         }
 
         foreach ($data as $key => $value) {
