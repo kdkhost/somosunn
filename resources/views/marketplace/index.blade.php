@@ -488,51 +488,73 @@
             }
 
             .mp-selling-actions {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 0.75rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
                 margin-top: auto;
                 padding-top: 1rem;
             }
 
             .mp-selling-actions--single {
-                grid-template-columns: minmax(0, 1fr);
+                /* kept for backwards compat */
             }
 
             .mp-selling-action {
-                min-height: 3.5rem;
+                min-height: 2.75rem;
+                padding: 0.625rem 1rem;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
+                gap: 0.5rem;
                 text-align: center;
-                border-radius: 0.85rem !important;
-                transition: transform .3s ease, box-shadow .3s ease, background-color .3s ease, border-color .3s ease, color .3s ease, filter .3s ease;
+                font-size: 0.8125rem;
+                font-weight: 800;
+                line-height: 1.1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                border-radius: 0.75rem !important;
+                transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease, color .2s ease, filter .2s ease;
+                width: 100%;
             }
 
             .mp-selling-action:hover {
-                transform: translateY(-2px);
+                transform: translateY(-1px);
             }
 
             .mp-selling-action-primary {
                 background: linear-gradient(135deg, var(--unn-azul-1) 0%, var(--unn-azul-2) 50%, var(--unn-azul-3) 100%);
                 color: #fff !important;
-                box-shadow: 0 10px 26px rgba(37, 99, 235, 0.22);
+                box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18);
+                border: none;
             }
 
             .mp-selling-action-primary:hover {
                 filter: brightness(1.08);
-                box-shadow: 0 16px 30px rgba(37, 99, 235, 0.26);
+                box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
             }
 
             .mp-selling-action-secondary {
-                border: 2px solid rgba(191, 219, 254, 0.95) !important;
-                color: #1e3a8a !important;
-                background: rgba(255, 255, 255, 0.9) !important;
+                border: 1.5px solid #e2e8f0 !important;
+                color: #334155 !important;
+                background: #ffffff !important;
             }
 
             .mp-selling-action-secondary:hover {
-                background: rgba(239, 246, 255, 1) !important;
-                border-color: rgba(96, 165, 250, 0.9) !important;
+                background: #f8fafc !important;
+                border-color: #cbd5e1 !important;
+            }
+
+            .mp-selling-action-amber {
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                color: #fff !important;
+                box-shadow: 0 8px 20px rgba(245, 158, 11, 0.22);
+                border: none;
+            }
+
+            .mp-selling-action-amber:hover {
+                filter: brightness(1.05);
+                box-shadow: 0 12px 24px rgba(245, 158, 11, 0.28);
             }
 
             .mp-selling-action-disabled {
@@ -1294,40 +1316,36 @@
                             </a>
 
                             <div class="mp-selling-actions">
-                                @if($storeUrl)
-                                    <a href="{{ $storeUrl }}"
-                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
-                                        Ver mais desse vendedor
-                                    </a>
-                                @endif
-
                                 @if($product->supportsExternalCheckout())
                                     <a href="{{ $product->external_checkout_url }}" target="_blank" rel="noopener noreferrer"
-                                        class="w-full mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md text-center">
-                                        Comprar no site externo
+                                        class="mp-selling-action mp-selling-action-primary">
+                                        <i class="fas fa-up-right-from-square"></i> Comprar no site externo
                                     </a>
                                 @else
-                                    {{-- Se suportar venda, mostrar botão de compra --}}
                                     @if($product->supportsInternalCheckout())
                                         <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="w-full">
                                             @csrf
                                             <input type="hidden" name="buy_now" value="1">
-                                            <button type="submit"
-                                                class="w-full mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md inline-flex items-center justify-center gap-2">
+                                            <button type="submit" class="mp-selling-action mp-selling-action-primary">
                                                 <i class="fas fa-shopping-cart"></i>
-                                                Comprar {{ $price > 0 ? 'R$ ' . number_format($price, 2, ',', '.') : 'agora' }}
+                                                {{ $price > 0 ? 'Comprar R$ ' . number_format($price, 2, ',', '.') : 'Obter grátis' }}
                                             </button>
                                         </form>
                                     @endif
 
-                                    {{-- Se suportar troca por pontos, mostrar botão de troca --}}
                                     @if($product->supportsPointsRedemption() && $pointsCost > 0)
                                         <a href="{{ route('panel.redemptions.shop') }}#item-{{ optional($product->redeemableItem)->id }}"
-                                            class="w-full mp-selling-action {{ $product->supportsInternalCheckout() ? 'mp-selling-action-secondary' : 'mp-selling-action-primary' }} rounded-2xl bg-amber-500 hover:bg-amber-600 px-4 py-2 text-sm font-black text-white shadow-md text-center inline-flex items-center justify-center gap-2">
+                                            class="mp-selling-action {{ $product->supportsInternalCheckout() ? 'mp-selling-action-amber' : 'mp-selling-action-amber' }}">
                                             <i class="fas fa-coins"></i>
-                                            Trocar por {{ number_format($pointsCost, 0, ',', '.') }} UNNBIT
+                                            {{ number_format($pointsCost, 0, ',', '.') }} UNNBIT
                                         </a>
                                     @endif
+                                @endif
+
+                                @if($storeUrl)
+                                    <a href="{{ $storeUrl }}" class="mp-selling-action mp-selling-action-secondary">
+                                        <i class="fas fa-store"></i> Ver loja
+                                    </a>
                                 @endif
                             </div>
                         </article>
@@ -1448,34 +1466,24 @@
                             </a>
 
                             <div class="mp-selling-actions">
-                                <a href="{{ route('courses.show', $showParam) }}"
-                                    class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
-                                    Ver
-                                </a>
-
-                                @if($storeUrl = $sellerStoreUrl($sellerId))
-                                    <a href="{{ $storeUrl }}"
-                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
-                                        Ver mais desse vendedor
-                                    </a>
-                                @endif
-
                                 @if($hasAccess)
-                                    <a href="{{ route('courses.show', $showParam) }}"
-                                        class="mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
-                                        Acessar
+                                    <a href="{{ route('courses.show', $showParam) }}" class="mp-selling-action mp-selling-action-primary">
+                                        <i class="fas fa-play-circle"></i> Acessar curso
                                     </a>
                                 @elseif($buyEnabled)
-                                    <a href="{{ route('checkout.show', $course->id) }}"
-                                        class="mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
-                                        Comprar
+                                    <a href="{{ route('checkout.show', $course->id) }}" class="mp-selling-action mp-selling-action-primary">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        {{ $price > 0 ? 'Comprar R$ ' . number_format($price, 2, ',', '.') : 'Obter grátis' }}
                                     </a>
                                 @else
-                                    <span
-                                        class="mp-selling-action mp-selling-action-disabled rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                    <span class="mp-selling-action mp-selling-action-disabled">
                                         {{ $disabledBuyLabel }}
                                     </span>
                                 @endif
+
+                                <a href="{{ route('courses.show', $showParam) }}" class="mp-selling-action mp-selling-action-secondary">
+                                    <i class="fas fa-info-circle"></i> Detalhes
+                                </a>
                             </div>
                         </article>
                     @empty
@@ -1616,35 +1624,25 @@
                             @endif
 
                             <div class="mp-selling-actions">
-                                @if($mentorshipShowUrl)
-                                    <a href="{{ $mentorshipShowUrl }}"
-                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
-                                        Ver
-                                    </a>
-                                @else
-                                    <span
-                                        class="mp-selling-action mp-selling-action-disabled rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
-                                        Encerrada
-                                    </span>
-                                @endif
-
-                                @if($storeUrl = $sellerStoreUrl($sellerId))
-                                    <a href="{{ $storeUrl }}"
-                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
-                                        Ver mais desse vendedor
-                                    </a>
-                                @endif
-
                                 @if($buyEnabled && !$isMentorshipClosed)
-                                    <a href="{{ route('mentorships.checkout.show', $mentorship) }}"
-                                        class="mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
-                                        Comprar
+                                    <a href="{{ route('mentorships.checkout.show', $mentorship) }}" class="mp-selling-action mp-selling-action-primary">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        {{ $price > 0 ? 'Comprar R$ ' . number_format($price, 2, ',', '.') : 'Participar grátis' }}
                                     </a>
+                                @elseif($isMentorshipClosed)
+                                    <span class="mp-selling-action mp-selling-action-disabled">
+                                        Mentoria encerrada
+                                    </span>
                                 @else
-                                    <span
-                                        class="mp-selling-action mp-selling-action-disabled rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
+                                    <span class="mp-selling-action mp-selling-action-disabled">
                                         {{ $disabledBuyLabel }}
                                     </span>
+                                @endif
+
+                                @if($mentorshipShowUrl)
+                                    <a href="{{ $mentorshipShowUrl }}" class="mp-selling-action mp-selling-action-secondary">
+                                        <i class="fas fa-info-circle"></i> Detalhes
+                                    </a>
                                 @endif
                             </div>
                         </article>
@@ -1789,35 +1787,25 @@
                             @endif
 
                             <div class="mp-selling-actions">
-                                @if($eventShowUrl)
-                                    <a href="{{ $eventShowUrl }}"
-                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
-                                        Ver
-                                    </a>
-                                @else
-                                    <span
-                                        class="mp-selling-action mp-selling-action-disabled rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
-                                        Encerrado
-                                    </span>
-                                @endif
-
-                                @if($storeUrl = $sellerStoreUrl($sellerId))
-                                    <a href="{{ $storeUrl }}"
-                                        class="mp-selling-action mp-selling-action-secondary rounded-2xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
-                                        Ver mais desse vendedor
-                                    </a>
-                                @endif
-
                                 @if($buyEnabled && !$isEventClosed)
-                                    <a href="{{ route('events.checkout', $event) }}"
-                                        class="mp-selling-action mp-selling-action-primary rounded-2xl btn-primary px-4 py-2 text-sm font-black text-white shadow-md">
-                                        {{ $price > 0 ? 'Comprar' : 'Reservar' }}
+                                    <a href="{{ route('events.checkout', $event) }}" class="mp-selling-action mp-selling-action-primary">
+                                        <i class="fas fa-{{ $price > 0 ? 'ticket-alt' : 'hand-point-up' }}"></i>
+                                        {{ $price > 0 ? 'Comprar R$ ' . number_format($price, 2, ',', '.') : 'Reservar grátis' }}
                                     </a>
-                                @else
-                                    <span
-                                        class="mp-selling-action mp-selling-action-disabled rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-400 cursor-not-allowed">
-                                        {{ $isEventClosed ? 'Encerrado' : $disabledBuyLabel }}
+                                @elseif($isEventClosed)
+                                    <span class="mp-selling-action mp-selling-action-disabled">
+                                        Evento encerrado
                                     </span>
+                                @else
+                                    <span class="mp-selling-action mp-selling-action-disabled">
+                                        {{ $disabledBuyLabel }}
+                                    </span>
+                                @endif
+
+                                @if($eventShowUrl)
+                                    <a href="{{ $eventShowUrl }}" class="mp-selling-action mp-selling-action-secondary">
+                                        <i class="fas fa-info-circle"></i> Detalhes
+                                    </a>
                                 @endif
                             </div>
                         </article>

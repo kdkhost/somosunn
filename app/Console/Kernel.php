@@ -103,6 +103,16 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar aquecimento de cache das dashboards: ' . $e->getMessage());
         }
 
+        // Cancela pedidos não pagos após expiração do prazo (PIX, cartão, boleto)
+        try {
+            $schedule->command('orders:cancel-unpaid')
+                ->everyFiveMinutes()
+                ->withoutOverlapping()
+                ->name('orders-cancel-unpaid');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar cancelamento automático de pedidos: ' . $e->getMessage());
+        }
+
         // Carregar tarefas dinamicas do banco
         try {
             if (\Schema::hasTable('scheduled_tasks')) {

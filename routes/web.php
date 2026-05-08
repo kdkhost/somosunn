@@ -399,6 +399,7 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
     Route::post('/notificacoes/read/{id?}', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.markRead');
     Route::delete('/notificacoes/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
     Route::get('/painel/compras', [\App\Http\Controllers\Panel\MarketplacePurchaseController::class, 'index'])->name('panel.purchases.index');
+    Route::post('/painel/compras/{order}/retry', [\App\Http\Controllers\Panel\MarketplacePurchaseController::class, 'retry'])->name('panel.purchases.retry');
     Route::get('/painel/compras/{order}/itens/{item}/download', [\App\Http\Controllers\Panel\MarketplacePurchaseController::class, 'downloadDigital'])->name('panel.purchases.download');
 });
 
