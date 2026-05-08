@@ -75,9 +75,8 @@
                         'id' => 'mercadopago',
                         'label' => 'Mercado Pago',
                         'description' => implode(', ', $mpMethods),
-                        'icon' => 'fa-hand-holding-dollar',
+                        'logo' => asset('img/gateways/mercadopago.svg'),
                         'methods' => $mpMethods,
-                        'gradient' => 'from-blue-600 to-indigo-700',
                     ];
                 }
             }
@@ -97,9 +96,8 @@
                         'id' => 'sumup',
                         'label' => 'SumUp',
                         'description' => implode(' ou ', $sumupMethods) . ' via SumUp',
-                        'icon' => 'fa-credit-card',
+                        'logo' => asset('img/gateways/sumup.svg'),
                         'methods' => $sumupMethods,
-                        'gradient' => 'from-slate-800 to-slate-900',
                     ];
                 }
             }
@@ -245,9 +243,7 @@
                         <input type="hidden" name="gateway_provider" value="{{ $g['id'] }}">
                         <div class="rounded-2xl border-2 border-blue-400 bg-blue-50 p-5">
                             <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br {{ $g['gradient'] }} text-white flex items-center justify-center flex-shrink-0">
-                                    <i class="fas {{ $g['icon'] }}"></i>
-                                </div>
+                                <img src="{{ $g['logo'] }}" alt="{{ $g['label'] }}" class="h-10 w-auto flex-shrink-0 rounded-lg shadow-sm">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2">
                                         <p class="font-black text-slate-900">{{ $g['label'] }}</p>
@@ -274,9 +270,7 @@
                                         {{ old('gateway_provider', $defaultGateway) === $g['id'] ? 'checked' : '' }}>
                                     <div class="rounded-2xl border-2 border-slate-200 bg-white p-5 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:ring-2 peer-checked:ring-blue-100 hover:border-slate-300 transition-all h-full">
                                         <div class="flex items-start gap-3">
-                                            <div class="w-11 h-11 rounded-xl bg-gradient-to-br {{ $g['gradient'] }} text-white flex items-center justify-center flex-shrink-0">
-                                                <i class="fas {{ $g['icon'] }}"></i>
-                                            </div>
+                                            <img src="{{ $g['logo'] }}" alt="{{ $g['label'] }}" class="h-10 w-auto flex-shrink-0 rounded-lg shadow-sm">
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-center gap-2">
                                                     <p class="font-black text-slate-900">{{ $g['label'] }}</p>

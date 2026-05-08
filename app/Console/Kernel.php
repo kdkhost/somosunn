@@ -113,6 +113,16 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar cancelamento automático de pedidos: ' . $e->getMessage());
         }
 
+        // Limpa itens de carrinho expirados (24h padrão, configurável)
+        try {
+            $schedule->command('cart:cleanup-expired')
+                ->hourly()
+                ->withoutOverlapping()
+                ->name('cart-cleanup-expired');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar cleanup de carrinho: ' . $e->getMessage());
+        }
+
         // Carregar tarefas dinamicas do banco
         try {
             if (\Schema::hasTable('scheduled_tasks')) {

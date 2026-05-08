@@ -97,15 +97,12 @@
                                                 data-gateway-summary="Pagamento via Mercado Pago."
                                                 {{ $selectedGateway === 'mercadopago' ? 'checked' : '' }}>
                                             <div
-                                                class="p-4 rounded-xl border-2 border-gray-200 hover:border-blue-500 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
+                                                class="p-4 rounded-xl border-2 border-gray-200 hover:border-blue-500 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all h-full">
                                                 <div class="flex items-center gap-3">
-                                                    <div
-                                                        class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                                                        <i class="fas fa-hand-holding-dollar"></i>
-                                                    </div>
-                                                    <div>
-                                                        <p class="font-bold text-gray-900">Mercado Pago</p>
-                                                        <p class="text-xs text-gray-500">{{ implode(', ', $mpMethodsActive) }}</p>
+                                                    <img src="{{ asset('img/gateways/mercadopago.svg') }}" alt="Mercado Pago" class="h-9 w-auto flex-shrink-0 rounded-lg">
+                                                    <div class="min-w-0">
+                                                        <p class="font-bold text-gray-900 text-sm">Mercado Pago</p>
+                                                        <p class="text-xs text-gray-500 truncate">{{ implode(', ', $mpMethodsActive) }}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -118,15 +115,12 @@
                                                 data-gateway-summary="Pagamento via SumUp."
                                                 {{ $selectedGateway === 'sumup' ? 'checked' : '' }}>
                                             <div
-                                                class="p-4 rounded-xl border-2 border-gray-200 hover:border-slate-700 peer-checked:border-slate-900 peer-checked:bg-slate-50 transition-all">
+                                                class="p-4 rounded-xl border-2 border-gray-200 hover:border-slate-700 peer-checked:border-slate-900 peer-checked:bg-slate-50 transition-all h-full">
                                                 <div class="flex items-center gap-3">
-                                                    <div
-                                                        class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center">
-                                                        <i class="fas fa-credit-card"></i>
-                                                    </div>
-                                                    <div>
-                                                        <p class="font-bold text-gray-900">SumUp</p>
-                                                        <p class="text-xs text-gray-500">{{ implode(', ', $sumupMethodsActive) }}</p>
+                                                    <img src="{{ asset('img/gateways/sumup.svg') }}" alt="SumUp" class="h-9 w-auto flex-shrink-0 rounded-lg">
+                                                    <div class="min-w-0">
+                                                        <p class="font-bold text-gray-900 text-sm">SumUp</p>
+                                                        <p class="text-xs text-gray-500 truncate">{{ implode(', ', $sumupMethodsActive) }}</p>
                                                     </div>
                                                 </div>
                                             </div>

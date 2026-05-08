@@ -3,23 +3,179 @@
 namespace App\Services\Marketplace;
 
 use App\Models\SellerProduct;
+use App\Models\Setting;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 
 class SellerProductCartService
 {
     private const SESSION_KEY = 'seller_product_cart_v1';
+    private const TABLE_NAME = 'seller_product_cart_items';
 
+    /**
+     * Verifica se a tabela persistente está disponível.
+     */
+    private function hasPersistentStorage(): bool
+    {
+        try {
+            return Schema::hasTable(self::TABLE_NAME);
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * Retorna a janela de expiração configurada (horas). Padrão 24h.
+     */
+    private function expirationHours(): int
+    {
+        $hours = (int) (Setting::get('cart_expiration_hours', 24) ?? 24);
+        return max(1, $hours);
+    }
+
+    /**
+     * Identificador do carrinho atual: user_id se logado, session_id caso contrário.
+     */
+    private function cartOwner(): array
+    {
+        $userId = Auth::id();
+        if ($userId) {
+            return ['user_id' => (int) $userId, 'session_id' => null];
+        }
+
+        return ['user_id' => null, 'session_id' => Session::getId()];
+    }
+
+    /**
+     * Retorna o carrinho no formato legacy (usado por outros métodos).
+     */
     public function getCart(): array
     {
-        $cart = Session::get(self::SESSION_KEY, []);
+        // Se tiver tabela persistente, ler dela
+        if ($this->hasPersistentStorage()) {
+            $this->syncSessionToDatabase();
+            $this->purgeExpired();
 
+            $owner = $this->cartOwner();
+            $query = DB::table(self::TABLE_NAME);
+            if ($owner['user_id']) {
+                $query->where('user_id', $owner['user_id']);
+            } else {
+                $query->where('session_id', $owner['session_id']);
+            }
+
+            $rows = $query->get();
+            if ($rows->isEmpty()) {
+                return [];
+            }
+
+            $first = $rows->first();
+            $items = [];
+            foreach ($rows as $row) {
+                $items[(int) $row->product_id] = [
+                    'product_id' => (int) $row->product_id,
+                    'quantity' => (int) $row->quantity,
+                ];
+            }
+
+            return [
+                'seller_id' => (int) $first->seller_id,
+                'store_id' => (int) $first->store_id,
+                'items' => $items,
+            ];
+        }
+
+        // Fallback para session
+        $cart = Session::get(self::SESSION_KEY, []);
         return is_array($cart) ? $cart : [];
+    }
+
+    /**
+     * Migra carrinho de session para banco quando usuário loga.
+     */
+    private function syncSessionToDatabase(): void
+    {
+        if (!$this->hasPersistentStorage() || !Auth::check()) {
+            return;
+        }
+
+        $sessionCart = Session::get(self::SESSION_KEY, []);
+        if (!is_array($sessionCart) || empty($sessionCart['items'] ?? null)) {
+            return;
+        }
+
+        $userId = (int) Auth::id();
+        $sellerId = (int) ($sessionCart['seller_id'] ?? 0);
+        $storeId = (int) ($sessionCart['store_id'] ?? 0);
+
+        $expiresAt = Carbon::now()->addHours($this->expirationHours());
+
+        foreach ($sessionCart['items'] as $item) {
+            $productId = (int) ($item['product_id'] ?? 0);
+            $quantity = max(1, (int) ($item['quantity'] ?? 1));
+            if (!$productId) continue;
+
+            $existing = DB::table(self::TABLE_NAME)
+                ->where('user_id', $userId)
+                ->where('product_id', $productId)
+                ->first();
+
+            if ($existing) {
+                DB::table(self::TABLE_NAME)->where('id', $existing->id)->update([
+                    'quantity' => $quantity,
+                    'expires_at' => $expiresAt,
+                    'updated_at' => now(),
+                ]);
+            } else {
+                DB::table(self::TABLE_NAME)->insert([
+                    'user_id' => $userId,
+                    'session_id' => null,
+                    'product_id' => $productId,
+                    'seller_id' => $sellerId,
+                    'store_id' => $storeId,
+                    'quantity' => $quantity,
+                    'expires_at' => $expiresAt,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        // Limpar session depois de migrar
+        Session::forget(self::SESSION_KEY);
+    }
+
+    /**
+     * Remove itens expirados do carrinho.
+     */
+    public function purgeExpired(): int
+    {
+        if (!$this->hasPersistentStorage()) {
+            return 0;
+        }
+
+        return DB::table(self::TABLE_NAME)
+            ->where('expires_at', '<', now())
+            ->delete();
     }
 
     public function clear(): void
     {
         Session::forget(self::SESSION_KEY);
+
+        if ($this->hasPersistentStorage()) {
+            $owner = $this->cartOwner();
+            $query = DB::table(self::TABLE_NAME);
+            if ($owner['user_id']) {
+                $query->where('user_id', $owner['user_id'])->delete();
+            } elseif ($owner['session_id']) {
+                $query->where('session_id', $owner['session_id'])->delete();
+            }
+        }
     }
 
     public function add(SellerProduct $product, int $quantity = 1, bool $replace = false): array
@@ -44,7 +200,16 @@ class SellerProductCartService
             ];
         }
 
-        if ($currentSellerId !== $sellerId) {
+        // Se mudou de vendedor e é replace, limpar
+        if ($currentSellerId !== $sellerId && $replace) {
+            $this->clear();
+            $cart = [
+                'seller_id' => $sellerId,
+                'store_id' => (int) $product->seller_store_id,
+                'items' => [],
+            ];
+        } elseif ($currentSellerId !== $sellerId) {
+            // Primeiro item
             $cart = [
                 'seller_id' => $sellerId,
                 'store_id' => (int) $product->seller_store_id,
@@ -59,15 +224,54 @@ class SellerProductCartService
             ? 1
             : max(1, (int) ($product->stock ?? 999999));
 
+        $finalQuantity = min($maxQuantity, $existingQuantity + $quantity);
+
         $items[$product->id] = [
             'product_id' => (int) $product->id,
-            'quantity' => min($maxQuantity, $existingQuantity + $quantity),
+            'quantity' => $finalQuantity,
         ];
 
         $cart['items'] = $items;
         unset($cart['shipping']);
 
-        Session::put(self::SESSION_KEY, $cart);
+        // Persistir: banco (se logado/tabela existe) OU session
+        if ($this->hasPersistentStorage()) {
+            $owner = $this->cartOwner();
+            $expiresAt = Carbon::now()->addHours($this->expirationHours());
+
+            $query = DB::table(self::TABLE_NAME);
+            if ($owner['user_id']) {
+                $existing = $query->where('user_id', $owner['user_id'])
+                    ->where('product_id', $product->id)->first();
+            } else {
+                $existing = $query->where('session_id', $owner['session_id'])
+                    ->where('product_id', $product->id)->first();
+            }
+
+            if ($existing) {
+                DB::table(self::TABLE_NAME)->where('id', $existing->id)->update([
+                    'quantity' => $finalQuantity,
+                    'seller_id' => $sellerId,
+                    'store_id' => (int) $product->seller_store_id,
+                    'expires_at' => $expiresAt,
+                    'updated_at' => now(),
+                ]);
+            } else {
+                DB::table(self::TABLE_NAME)->insert([
+                    'user_id' => $owner['user_id'],
+                    'session_id' => $owner['session_id'],
+                    'product_id' => (int) $product->id,
+                    'seller_id' => $sellerId,
+                    'store_id' => (int) $product->seller_store_id,
+                    'quantity' => $finalQuantity,
+                    'expires_at' => $expiresAt,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        } else {
+            Session::put(self::SESSION_KEY, $cart);
+        }
 
         return [
             'status' => 'added',
@@ -113,22 +317,50 @@ class SellerProductCartService
 
         if ($nextItems === []) {
             $this->clear();
-
             return [];
         }
 
-        $cart['items'] = $nextItems;
-        unset($cart['shipping']);
-        Session::put(self::SESSION_KEY, $cart);
+        // Persistir
+        if ($this->hasPersistentStorage()) {
+            $owner = $this->cartOwner();
+            $expiresAt = Carbon::now()->addHours($this->expirationHours());
 
-        return $cart;
+            foreach ($nextItems as $productId => $item) {
+                $query = DB::table(self::TABLE_NAME);
+                if ($owner['user_id']) {
+                    $query->where('user_id', $owner['user_id'])->where('product_id', $productId);
+                } else {
+                    $query->where('session_id', $owner['session_id'])->where('product_id', $productId);
+                }
+                $query->update([
+                    'quantity' => $item['quantity'],
+                    'expires_at' => $expiresAt,
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Remover items que não estão em $nextItems
+            $keepIds = array_keys($nextItems);
+            $removeQuery = DB::table(self::TABLE_NAME);
+            if ($owner['user_id']) {
+                $removeQuery->where('user_id', $owner['user_id']);
+            } else {
+                $removeQuery->where('session_id', $owner['session_id']);
+            }
+            $removeQuery->whereNotIn('product_id', $keepIds)->delete();
+        } else {
+            $cart['items'] = $nextItems;
+            unset($cart['shipping']);
+            Session::put(self::SESSION_KEY, $cart);
+        }
+
+        return array_merge($cart, ['items' => $nextItems]);
     }
 
     public function items(): Collection
     {
         if (!SellerProduct::tableAvailable()) {
             $this->clear();
-
             return collect();
         }
 
@@ -172,24 +404,6 @@ class SellerProductCartService
             })
             ->filter()
             ->values();
-
-        $nextItems = [];
-        foreach ($resolvedItems as $row) {
-            $nextItems[(int) $row['product']->id] = [
-                'product_id' => (int) $row['product']->id,
-                'quantity' => (int) $row['quantity'],
-            ];
-        }
-
-        if ($nextItems === []) {
-            $this->clear();
-        } elseif ($nextItems !== $items) {
-            $cart['store_id'] = (int) $resolvedItems->first()['product']->seller_store_id;
-            $cart['seller_id'] = (int) $resolvedItems->first()['product']->user_id;
-            $cart['items'] = $nextItems;
-            unset($cart['shipping']);
-            Session::put(self::SESSION_KEY, $cart);
-        }
 
         return $resolvedItems;
     }
