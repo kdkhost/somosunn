@@ -112,20 +112,22 @@ class EventReservationController extends Controller
             }
 
             if (count($activeGateways) > 1) {
-                // Múltiplos gateways: exigir seleção explícita
+                // Múltiplos gateways: verificar se o gateway foi informado
                 $selectedGateway = $request->input('gateway');
                 if (!$selectedGateway) {
-                    return back()->withErrors(['gateway' => 'O campo gateway é obrigatório quando há múltiplos gateways disponíveis.'])->withInput();
-                }
-                if (!in_array($selectedGateway, $activeProviders, true)) {
+                    // Não informado: será redirecionado para seleção após criar o pedido
+                    $gatewayProvider = null;
+                    $paymentsConfigured = true; // Permitir continuar para criar o pedido
+                } elseif (!in_array($selectedGateway, $activeProviders, true)) {
                     \Log::warning('EventReservation: gateway inválido informado pelo cliente', [
                         'event_id' => $event->id,
                         'gateway_informado' => $selectedGateway,
                         'gateways_ativos' => $activeProviders,
                     ]);
-                    return response()->json(['error' => 'Gateway de pagamento inválido ou não disponível para este evento.'], 422);
+                    return back()->with('error', 'Gateway de pagamento inválido ou não disponível para este evento.')->withInput();
+                } else {
+                    $gatewayProvider = $selectedGateway;
                 }
-                $gatewayProvider = $selectedGateway;
             } else {
                 // Apenas 1 gateway: usar diretamente
                 $gatewayProvider = $activeGateways[0]['provider'];
@@ -581,7 +583,10 @@ class EventReservationController extends Controller
         }
 
         // Roteamento para o gateway correto
-        if ($gatewayProvider === 'sumup') {
+        if ($gatewayProvider === null && count($activeGateways) > 1) {
+            // Múltiplos gateways e nenhum selecionado: redirecionar para página de seleção
+            return redirect()->route('events.payment.select-gateway', $order->id);
+        } elseif ($gatewayProvider === 'sumup') {
             \Log::info('EventReservation: processando pagamento via SumUp', [
                 'order_id' => $order?->id,
                 'event_id' => $event->id,
@@ -603,6 +608,139 @@ class EventReservationController extends Controller
             ]);
 
             return back()->with('error', 'Método de pagamento não configurado. Entre em contato com o organizador.');
+        }
+    }
+
+    /**
+     * Exibe a página de seleção de gateway quando há múltiplos gateways ativos.
+     */
+    public function selectGateway(Order $order, Request $request)
+    {
+        $this->abortIfOrderNotAccessible($order, $request);
+
+        // Verificar se o pedido ainda está pendente
+        if ($order->status === 'paid') {
+            return redirect()->route('events.payment.success', $order);
+        }
+
+        // Obter o evento do pedido
+        $event = $this->getEventFromOrder($order);
+        if (!$event) {
+            return redirect()->route('panel.dashboard')->with('error', 'Pedido não encontrado.');
+        }
+
+        // Resolver gateways ativos para o vendedor
+        $seller = $event->user ?: User::find($event->user_id);
+        $sellerId = $seller ? (int) $seller->id : 0;
+        $activeGateways = \App\Models\GatewayAccount::resolveAllActiveGatewaysForSeller($sellerId);
+
+        // Se só tem 1 gateway, processar diretamente
+        if (count($activeGateways) === 1) {
+            return $this->processGateway($order, $request, $activeGateways[0]['provider']);
+        }
+
+        // Se não tem nenhum gateway, erro
+        if (empty($activeGateways)) {
+            return redirect()->route('events.show', $event)
+                ->with('error', 'Nenhum gateway de pagamento disponível.');
+        }
+
+        // Preparar dados dos gateways para a view
+        $gatewayOptions = [];
+        foreach ($activeGateways as $gw) {
+            if ($gw['provider'] === 'mercadopago') {
+                $methods = [];
+                if ((int) (\App\Models\Setting::get('mercadopago_method_credit_card', 1))) $methods[] = 'Cartão de Crédito';
+                if ((int) (\App\Models\Setting::get('mercadopago_method_pix', 1))) $methods[] = 'PIX';
+                if ((int) (\App\Models\Setting::get('mercadopago_method_debit_card', 0))) $methods[] = 'Débito';
+                if ((int) (\App\Models\Setting::get('mercadopago_method_ticket', 0))) $methods[] = 'Boleto';
+
+                $gatewayOptions[] = [
+                    'provider'    => 'mercadopago',
+                    'name'        => 'Mercado Pago',
+                    'icon'        => 'fas fa-handshake',
+                    'color'       => 'blue',
+                    'description' => 'Pague com ' . implode(', ', $methods),
+                    'methods'     => $methods,
+                ];
+            } elseif ($gw['provider'] === 'sumup') {
+                $methods = [];
+                $methodCardRaw = \App\Models\Setting::get('sumup_method_card');
+                $methodPixRaw  = \App\Models\Setting::get('sumup_method_pix');
+                if ($methodCardRaw !== null ? (bool)(int)$methodCardRaw : true) $methods[] = 'Cartão de Crédito';
+                if ($methodPixRaw !== null ? (bool)(int)$methodPixRaw : true) $methods[] = 'PIX';
+
+                $gatewayOptions[] = [
+                    'provider'    => 'sumup',
+                    'name'        => 'SumUp',
+                    'icon'        => 'fas fa-credit-card',
+                    'color'       => 'slate',
+                    'description' => 'Pague com ' . implode(', ', $methods),
+                    'methods'     => $methods,
+                ];
+            }
+        }
+
+        return view('events.payment.select-gateway', compact('order', 'event', 'gatewayOptions'));
+    }
+
+    /**
+     * Processa o pagamento pelo gateway selecionado pelo cliente.
+     */
+    public function processGateway(Order $order, Request $request, ?string $gatewayOverride = null)
+    {
+        $this->abortIfOrderNotAccessible($order, $request);
+
+        if ($order->status === 'paid') {
+            return redirect()->route('events.payment.success', $order);
+        }
+
+        $selectedGateway = $gatewayOverride ?: $request->input('gateway');
+        if (!$selectedGateway || !in_array($selectedGateway, ['mercadopago', 'sumup'], true)) {
+            return back()->with('error', 'Selecione um método de pagamento.');
+        }
+
+        // Obter o evento do pedido
+        $event = $this->getEventFromOrder($order);
+        if (!$event) {
+            return redirect()->route('panel.dashboard')->with('error', 'Pedido não encontrado.');
+        }
+
+        // Resolver gateways ativos
+        $seller = $event->user ?: User::find($event->user_id);
+        $sellerId = $seller ? (int) $seller->id : 0;
+        $activeGateways = \App\Models\GatewayAccount::resolveAllActiveGatewaysForSeller($sellerId);
+        $activeProviders = array_column($activeGateways, 'provider');
+
+        if (!in_array($selectedGateway, $activeProviders, true)) {
+            return back()->with('error', 'Gateway de pagamento não disponível para este evento.');
+        }
+
+        // Encontrar a config do gateway selecionado
+        $gatewayConfig = null;
+        foreach ($activeGateways as $gw) {
+            if ($gw['provider'] === $selectedGateway) {
+                $gatewayConfig = $gw;
+                break;
+            }
+        }
+
+        // Atualizar o gateway no pedido
+        $order->update(['gateway' => $selectedGateway]);
+
+        \Log::info('EventReservation: processando pagamento via gateway selecionado', [
+            'order_id' => $order->id,
+            'event_id' => $event->id,
+            'gateway'  => $selectedGateway,
+        ]);
+
+        // Rotear para o processador correto
+        if ($selectedGateway === 'sumup') {
+            $sumUpService = app(\App\Services\Payment\SumUpService::class);
+            return $this->processSumUpPayment($order, $event, $gatewayConfig, $sumUpService);
+        } else {
+            $mpService = app(\App\Services\Payment\MercadoPagoService::class);
+            return $this->processMercadoPagoPayment($order, $event, $gatewayConfig, $mpService);
         }
     }
 

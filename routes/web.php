@@ -250,6 +250,8 @@ Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservation
 Route::get('/eventos/pagamento/sucesso/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentSuccess'])->name('events.payment.success');
 Route::get('/eventos/pagamento/pendente/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentPending'])->name('events.payment.pending');
 Route::get('/eventos/pagamento/falha/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentFailure'])->name('events.payment.failure');
+Route::get('/eventos/pagamento/selecionar-gateway/{order}', [\App\Http\Controllers\EventReservationController::class, 'selectGateway'])->name('events.payment.select-gateway');
+Route::post('/eventos/pagamento/processar-gateway/{order}', [\App\Http\Controllers\EventReservationController::class, 'processGateway'])->name('events.payment.process-gateway');
 
 // PWA & Utils
 Route::get('/service-worker.js', function () {
