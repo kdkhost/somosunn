@@ -1,21 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 56" width="200" height="56">
-  <defs>
-    <linearGradient id="mpBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00A8E0"/>
-      <stop offset="100%" stop-color="#0098D8"/>
-    </linearGradient>
-  </defs>
-  <rect width="200" height="56" rx="10" fill="url(#mpBg)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Fundo preto (como na imagem enviada) -->
+  <rect width="100" height="100" rx="16" fill="#000000"/>
 
-  <!-- Handshake icon (amarelo oficial) -->
-  <g transform="translate(14, 14)">
-    <ellipse cx="14" cy="14" rx="14" ry="10" fill="#FFE600"/>
-    <path fill="#1A3B7B" d="M8 14c0-0.5 0.4-1 1-1h2c0.5 0 1 0.4 1 1v3c0 0.5-0.4 1-1 1H9c-0.5 0-1-0.4-1-1v-3z"/>
-    <path fill="#1A3B7B" d="M15 14c0-0.5 0.4-1 1-1h2c0.5 0 1 0.4 1 1v3c0 0.5-0.4 1-1 1h-2c-0.5 0-1-0.4-1-1v-3z"/>
-    <path fill="#1A3B7B" d="M12 14c0-0.3 0.3-0.5 0.5-0.5h1c0.3 0 0.5 0.3 0.5 0.5v3c0 0.3-0.3 0.5-0.5 0.5h-1c-0.3 0-0.5-0.3-0.5-0.5v-3z"/>
+  <!-- Container das 3 elipses concêntricas -->
+  <g transform="translate(50, 50)">
+    <!-- Elipse externa azul escuro -->
+    <ellipse cx="0" cy="0" rx="38" ry="25" fill="#0F1F7A"/>
+
+    <!-- Elipse azul claro (meio) -->
+    <ellipse cx="0" cy="0" rx="35" ry="22" fill="#2DB8E5"/>
+
+    <!-- Hands (forma de olho aberto - parte branca superior e inferior) -->
+    <!-- Top white (eyebrow) -->
+    <path fill="#ffffff" d="M -35 0
+      C -35 -15 -20 -22 0 -22
+      C 20 -22 35 -15 35 0
+      L 30 0
+      C 30 -12 17 -17 0 -17
+      C -17 -17 -30 -12 -30 0
+      Z"/>
+
+    <!-- Bottom white (eyebrow) -->
+    <path fill="#ffffff" d="M -35 0
+      C -35 15 -20 22 0 22
+      C 20 22 35 15 35 0
+      L 30 0
+      C 30 12 17 17 0 17
+      C -17 17 -30 12 -30 0
+      Z"/>
+
+    <!-- Handshake (mãos apertando no centro) -->
+    <!-- Mão esquerda -->
+    <g fill="#0F1F7A">
+      <rect x="-22" y="-3" width="8" height="2.5" rx="1"/>
+      <rect x="-16" y="-4" width="7" height="2.5" rx="1"/>
+      <rect x="-10" y="-3" width="6" height="2.5" rx="1"/>
+      <rect x="-22" y="0.5" width="8" height="2.5" rx="1"/>
+      <rect x="-16" y="1.5" width="7" height="2.5" rx="1"/>
+      <rect x="-10" y="0.5" width="6" height="2.5" rx="1"/>
+    </g>
+    <!-- Mão direita -->
+    <g fill="#0F1F7A">
+      <rect x="14" y="-3" width="8" height="2.5" rx="1"/>
+      <rect x="9" y="-4" width="7" height="2.5" rx="1"/>
+      <rect x="4" y="-3" width="6" height="2.5" rx="1"/>
+      <rect x="14" y="0.5" width="8" height="2.5" rx="1"/>
+      <rect x="9" y="1.5" width="7" height="2.5" rx="1"/>
+      <rect x="4" y="0.5" width="6" height="2.5" rx="1"/>
+    </g>
   </g>
-
-  <!-- Text -->
-  <text x="52" y="26" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="15" fill="#ffffff" letter-spacing="-0.3">Mercado</text>
-  <text x="52" y="44" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="15" fill="#ffffff" letter-spacing="-0.3">Pago</text>
 </svg>

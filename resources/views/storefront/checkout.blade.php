@@ -241,20 +241,23 @@
                     @elseif($gatewayCount === 1)
                         @php $g = reset($availableGateways); @endphp
                         <input type="hidden" name="gateway_provider" value="{{ $g['id'] }}">
-                        <div class="rounded-2xl border-2 border-blue-500 bg-blue-50 overflow-hidden">
-                            <div class="flex items-center justify-between p-4 bg-white">
-                                <img src="{{ $g['logo'] }}" alt="{{ $g['label'] }}" class="h-10 w-auto">
-                                <i class="fas fa-circle-check text-blue-600 text-xl"></i>
-                            </div>
-                            <div class="p-4 bg-blue-50 border-t border-blue-100">
-                                <p class="text-xs font-black uppercase tracking-wider text-slate-500 mb-1.5">Métodos disponíveis</p>
-                                <div class="flex flex-wrap gap-1.5">
-                                    @foreach($g['methods'] as $method)
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-700">
-                                            <i class="fas fa-circle-check text-emerald-500 text-[10px]"></i>
-                                            {{ $method }}
-                                        </span>
-                                    @endforeach
+                        <div class="rounded-2xl border-2 border-blue-500 bg-blue-50 p-4">
+                            <div class="flex items-start gap-3">
+                                <img src="{{ $g['logo'] }}" alt="{{ $g['label'] }}" class="h-12 w-12 flex-shrink-0 rounded-lg">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <p class="font-black text-slate-900">{{ $g['label'] }}</p>
+                                        <i class="fas fa-circle-check text-blue-600 text-xs"></i>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-0.5">{{ $g['description'] }}</p>
+                                    <div class="flex flex-wrap gap-1 mt-2">
+                                        @foreach($g['methods'] as $method)
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-[11px] font-bold text-slate-600">
+                                                <i class="fas fa-check text-emerald-500 text-[8px]"></i>
+                                                {{ $method }}
+                                            </span>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -266,24 +269,23 @@
                                 <label class="relative cursor-pointer block">
                                     <input type="radio" name="gateway_provider" value="{{ $g['id'] }}" class="peer sr-only"
                                         {{ old('gateway_provider', $defaultGateway) === $g['id'] ? 'checked' : '' }}>
-                                    <div class="rounded-2xl border-2 border-slate-200 bg-white overflow-hidden peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-100 hover:border-slate-300 transition-all h-full">
-                                        {{-- Top: Logo + check --}}
-                                        <div class="flex items-center justify-between p-4 bg-slate-50 peer-checked:bg-white border-b border-slate-100">
-                                            <img src="{{ $g['logo'] }}" alt="{{ $g['label'] }}" class="h-10 w-auto">
-                                            <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center peer-checked:border-blue-500 peer-checked:bg-blue-500">
-                                                <i class="fas fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100"></i>
-                                            </div>
-                                        </div>
-                                        {{-- Bottom: Métodos --}}
-                                        <div class="p-4">
-                                            <p class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2">Métodos disponíveis</p>
-                                            <div class="flex flex-wrap gap-1.5">
-                                                @foreach($g['methods'] as $method)
-                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-[11px] font-bold text-slate-600">
-                                                        <i class="fas fa-check text-emerald-500 text-[8px]"></i>
-                                                        {{ $method }}
-                                                    </span>
-                                                @endforeach
+                                    <div class="rounded-2xl border-2 border-slate-200 bg-white p-4 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-100 hover:border-slate-300 transition-all h-full">
+                                        <div class="flex items-start gap-3">
+                                            <img src="{{ $g['logo'] }}" alt="{{ $g['label'] }}" class="h-12 w-12 flex-shrink-0 rounded-lg">
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <p class="font-black text-slate-900">{{ $g['label'] }}</p>
+                                                    <div class="w-4 h-4 rounded-full border-2 border-slate-300 peer-checked:border-blue-500 peer-checked:bg-blue-500 flex-shrink-0"></div>
+                                                </div>
+                                                <p class="text-xs text-slate-500 mt-0.5 leading-tight">{{ $g['description'] }}</p>
+                                                <div class="flex flex-wrap gap-1 mt-2">
+                                                    @foreach($g['methods'] as $method)
+                                                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-600">
+                                                            <i class="fas fa-check text-emerald-500 text-[8px]"></i>
+                                                            {{ $method }}
+                                                        </span>
+                                                    @endforeach
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

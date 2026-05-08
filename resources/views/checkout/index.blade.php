@@ -96,20 +96,17 @@
                                             <input type="radio" name="gateway_provider" value="mercadopago" class="peer sr-only"
                                                 data-gateway-summary="Pagamento via Mercado Pago."
                                                 {{ $selectedGateway === 'mercadopago' ? 'checked' : '' }}>
-                                            <div class="rounded-xl border-2 border-gray-200 overflow-hidden peer-checked:border-blue-600 peer-checked:ring-2 peer-checked:ring-blue-100 transition-all">
-                                                <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
-                                                    <img src="{{ asset('img/gateways/mercadopago.svg') }}" alt="Mercado Pago" class="h-9 w-auto">
-                                                    <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center peer-checked:border-blue-600 peer-checked:bg-blue-600">
-                                                        <i class="fas fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100"></i>
+                                            <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:ring-2 peer-checked:ring-blue-100 transition-all">
+                                                <div class="flex items-start gap-3">
+                                                    <img src="{{ asset('img/gateways/mercadopago.svg') }}" alt="Mercado Pago" class="h-10 w-10 flex-shrink-0 rounded-lg">
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="font-bold text-gray-900 text-sm">Mercado Pago</p>
+                                                        <div class="flex flex-wrap gap-1 mt-1">
+                                                            @foreach($mpMethodsActive as $method)
+                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-600">{{ $method }}</span>
+                                                            @endforeach
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="px-4 py-3 flex flex-wrap gap-1.5">
-                                                    @foreach($mpMethodsActive as $method)
-                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-[11px] font-bold text-gray-600">
-                                                            <i class="fas fa-check text-emerald-500 text-[8px]"></i>
-                                                            {{ $method }}
-                                                        </span>
-                                                    @endforeach
                                                 </div>
                                             </div>
                                         </label>
@@ -120,20 +117,17 @@
                                             <input type="radio" name="gateway_provider" value="sumup" class="peer sr-only"
                                                 data-gateway-summary="Pagamento via SumUp."
                                                 {{ $selectedGateway === 'sumup' ? 'checked' : '' }}>
-                                            <div class="rounded-xl border-2 border-gray-200 overflow-hidden peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200 transition-all">
-                                                <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
-                                                    <img src="{{ asset('img/gateways/sumup.svg') }}" alt="SumUp" class="h-9 w-auto">
-                                                    <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center peer-checked:border-slate-900 peer-checked:bg-slate-900">
-                                                        <i class="fas fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100"></i>
+                                            <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200 transition-all">
+                                                <div class="flex items-start gap-3">
+                                                    <img src="{{ asset('img/gateways/sumup.svg') }}" alt="SumUp" class="h-10 w-10 flex-shrink-0 rounded-lg">
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="font-bold text-gray-900 text-sm">SumUp</p>
+                                                        <div class="flex flex-wrap gap-1 mt-1">
+                                                            @foreach($sumupMethodsActive as $method)
+                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-600">{{ $method }}</span>
+                                                            @endforeach
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="px-4 py-3 flex flex-wrap gap-1.5">
-                                                    @foreach($sumupMethodsActive as $method)
-                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-[11px] font-bold text-gray-600">
-                                                            <i class="fas fa-check text-emerald-500 text-[8px]"></i>
-                                                            {{ $method }}
-                                                        </span>
-                                                    @endforeach
                                                 </div>
                                             </div>
                                         </label>
