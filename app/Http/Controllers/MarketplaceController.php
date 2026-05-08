@@ -86,6 +86,7 @@ class MarketplaceController extends Controller
             $sellerProductsQuery = SellerProduct::query()
                 ->with(['store.user', 'media', 'redeemableItem'])
                 ->published()
+                ->orderByDesc('is_featured')
                 ->latest('id');
 
             if ($q !== '') {

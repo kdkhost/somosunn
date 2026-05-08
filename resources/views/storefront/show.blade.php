@@ -422,12 +422,10 @@
                         @foreach($gridProducts as $product)
                             @php
                                 $productDiscount = $discountPercent($product);
-                                $ctaLabel = 'Mais detalhes';
-                                if ($product->supportsExternalCheckout()) {
-                                    $ctaLabel = 'Comprar no site externo';
-                                } elseif ($product->supportsPointsRedemption() && !$product->supportsInternalCheckout() && $product->redeemableItem) {
-                                    $ctaLabel = 'Trocar por pontos';
-                                }
+                                $canBuy = $product->supportsInternalCheckout();
+                                $canRedeem = $product->supportsPointsRedemption() && $product->redeemableItem;
+                                $canExternal = $product->supportsExternalCheckout();
+                                $pointsCost = $canRedeem ? (int) $product->redeemableItem->points_cost : 0;
                             @endphp
                             <article class="store-grid-card rounded-[1.65rem] bg-white">
                                 <div class="relative">
@@ -470,7 +468,31 @@
                                     </div>
 
                                     <div class="mt-5 space-y-2">
-                                        <a href="{{ route('seller-stores.products.show', [$store->slug, $product->slug]) }}" class="store-button-primary inline-flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-black shadow-lg shadow-blue-700/20">{{ $ctaLabel }}</a>
+                                        @if($canExternal)
+                                            <a href="{{ $product->external_checkout_url }}" target="_blank" rel="noopener noreferrer" class="store-button-primary inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black shadow-lg shadow-blue-700/20">
+                                                <i class="fas fa-up-right-from-square"></i> Comprar no site externo
+                                            </a>
+                                        @else
+                                            @if($canBuy)
+                                                <form action="{{ route('seller-products.cart.add', $product) }}" method="POST" class="w-full">
+                                                    @csrf
+                                                    <input type="hidden" name="buy_now" value="1">
+                                                    <button type="submit" class="store-button-primary inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black shadow-lg shadow-blue-700/20">
+                                                        <i class="fas fa-shopping-cart"></i> Comprar agora
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            @if($canRedeem)
+                                                <a href="{{ route('panel.redemptions.shop') }}" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 px-4 py-3 text-sm font-black text-white shadow-lg shadow-amber-500/20 transition">
+                                                    <i class="fas fa-coins"></i> Trocar por {{ number_format($pointsCost, 0, ',', '.') }} {{ $coinName }}
+                                                </a>
+                                            @endif
+                                            @if(!$canBuy && !$canRedeem && !$canExternal)
+                                                <a href="{{ route('seller-stores.products.show', [$store->slug, $product->slug]) }}" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-black text-slate-700 hover:bg-slate-50 transition">
+                                                    Mais detalhes
+                                                </a>
+                                            @endif
+                                        @endif
                                         <div class="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
                                             <span>{{ $product->isPhysical() ? 'Produto fisico' : 'Produto digital' }}</span>
                                             @if($product->sku)
