@@ -75,6 +75,9 @@ class OrderSettlementService
         $this->fulfillDigitalItemsForOrder($order);
         app(SellerProductFulfillmentService::class)->fulfillPaidOrder($order);
 
+        // Limpar carrinho do comprador após pagamento aprovado
+        $this->clearBuyerCart($order);
+
         $invoice = app(InvoiceService::class)->issueAndQueueForOrder($order, $queueInvoiceEmail);
         if ($invoice && $isManualApproval) {
             $invoiceMeta = is_array($invoice->metadata) ? $invoice->metadata : [];
@@ -249,5 +252,38 @@ class OrderSettlementService
             'anual' => now()->addYear(),
             default => now()->addMonth(),
         };
+    }
+
+    /**
+     * Remove os itens do carrinho do comprador após pagamento aprovado.
+     * Só remove itens que estão no pedido (não limpa carrinho inteiro caso
+     * haja outros itens de outro vendedor/sessão).
+     */
+    private function clearBuyerCart(Order $order): void
+    {
+        if (!\Schema::hasTable('seller_product_cart_items')) {
+            return;
+        }
+
+        $userId = (int) $order->user_id;
+        if (!$userId) {
+            return;
+        }
+
+        // Pegar IDs dos produtos do pedido (só seller_product)
+        $productIds = $order->items()
+            ->where('item_type', 'seller_product')
+            ->pluck('item_id')
+            ->filter()
+            ->values();
+
+        if ($productIds->isEmpty()) {
+            return;
+        }
+
+        \DB::table('seller_product_cart_items')
+            ->where('user_id', $userId)
+            ->whereIn('product_id', $productIds->toArray())
+            ->delete();
     }
 }

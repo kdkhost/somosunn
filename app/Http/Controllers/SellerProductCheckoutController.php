@@ -260,7 +260,9 @@ class SellerProductCheckoutController extends Controller
             }
         });
 
-        $cartService->clear();
+        // NÃO limpar carrinho aqui - só quando pagamento for aprovado
+        // Se o usuário voltar atrás, o carrinho continua com os itens
+        // O carrinho expira automaticamente após 24h
 
         if ($total <= 0) {
             $orderSettlementService->settleAsPaid($order, [
@@ -273,6 +275,9 @@ class SellerProductCheckoutController extends Controller
                     'automatic' => true,
                 ],
             ]);
+
+            // Pedido free: limpar carrinho imediatamente
+            $cartService->clear();
 
             return redirect()->route('checkout.success', $order);
         }
@@ -321,10 +326,12 @@ class SellerProductCheckoutController extends Controller
                 'return_url'  => route('checkout.success', $order->id),
             ]);
 
+            $checkoutId = $checkout['checkout_id'] ?? $checkout['id'] ?? null;
+
             $order->update([
                 'metadata' => array_merge($order->metadata ?? [], [
-                    'sumup_checkout_id'  => $checkout['id'] ?? null,
-                    'sumup_checkout_url' => $checkout['checkout_url'] ?? null,
+                    'sumup_checkout_id'  => $checkoutId,
+                    'sumup_checkout_url' => $checkout['checkout_url'] ?? data_get($checkout, 'raw.checkout_url'),
                 ]),
             ]);
 
@@ -346,7 +353,7 @@ class SellerProductCheckoutController extends Controller
                 'preferenceId'                => '',
                 'publicKey'                   => '',
                 'gateway'                     => 'sumup',
-                'checkoutId'                  => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
+                'checkoutId'                  => $checkoutId ?? '',
                 'sumupMerchantCode'           => $merchantCode,
                 'sumupMethodCard'             => $methodCard,
                 'sumupMethodPix'              => $methodPix,

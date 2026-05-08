@@ -243,7 +243,9 @@
                         <input type="hidden" name="gateway_provider" value="{{ $g['id'] }}">
                         <div class="rounded-2xl border-2 border-blue-500 bg-blue-50 p-4">
                             <div class="flex items-start gap-3">
-                                <img src="{{ $g['logo'] }}" alt="{{ $g['label'] }}" class="h-12 w-12 flex-shrink-0 rounded-lg">
+                                <div class="w-10 h-10 rounded-xl {{ $g['id'] === 'sumup' ? 'bg-slate-900' : 'bg-blue-600' }} text-white flex items-center justify-center flex-shrink-0">
+                                    <i class="fas {{ $g['id'] === 'sumup' ? 'fa-credit-card' : 'fa-hand-holding-dollar' }}"></i>
+                                </div>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2">
                                         <p class="font-black text-slate-900">{{ $g['label'] }}</p>
@@ -271,7 +273,9 @@
                                         {{ old('gateway_provider', $defaultGateway) === $g['id'] ? 'checked' : '' }}>
                                     <div class="rounded-2xl border-2 border-slate-200 bg-white p-4 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-100 hover:border-slate-300 transition-all h-full">
                                         <div class="flex items-start gap-3">
-                                            <img src="{{ $g['logo'] }}" alt="{{ $g['label'] }}" class="h-12 w-12 flex-shrink-0 rounded-lg">
+                                            <div class="w-10 h-10 rounded-xl {{ $g['id'] === 'sumup' ? 'bg-slate-900' : 'bg-blue-600' }} text-white flex items-center justify-center flex-shrink-0">
+                                                <i class="fas {{ $g['id'] === 'sumup' ? 'fa-credit-card' : 'fa-hand-holding-dollar' }}"></i>
+                                            </div>
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-center justify-between gap-2">
                                                     <p class="font-black text-slate-900">{{ $g['label'] }}</p>

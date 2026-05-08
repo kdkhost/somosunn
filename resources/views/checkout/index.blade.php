@@ -98,7 +98,9 @@
                                                 {{ $selectedGateway === 'mercadopago' ? 'checked' : '' }}>
                                             <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:ring-2 peer-checked:ring-blue-100 transition-all">
                                                 <div class="flex items-start gap-3">
-                                                    <img src="{{ asset('img/gateways/mercadopago.svg') }}" alt="Mercado Pago" class="h-10 w-10 flex-shrink-0 rounded-lg">
+                                                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
+                                                        <i class="fas fa-hand-holding-dollar"></i>
+                                                    </div>
                                                     <div class="flex-1 min-w-0">
                                                         <p class="font-bold text-gray-900 text-sm">Mercado Pago</p>
                                                         <div class="flex flex-wrap gap-1 mt-1">
@@ -119,7 +121,9 @@
                                                 {{ $selectedGateway === 'sumup' ? 'checked' : '' }}>
                                             <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200 transition-all">
                                                 <div class="flex items-start gap-3">
-                                                    <img src="{{ asset('img/gateways/sumup.svg') }}" alt="SumUp" class="h-10 w-10 flex-shrink-0 rounded-lg">
+                                                    <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
+                                                        <i class="fas fa-credit-card"></i>
+                                                    </div>
                                                     <div class="flex-1 min-w-0">
                                                         <p class="font-bold text-gray-900 text-sm">SumUp</p>
                                                         <div class="flex flex-wrap gap-1 mt-1">
