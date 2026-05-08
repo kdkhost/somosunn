@@ -77,6 +77,22 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasApiTokens, HasFactory, Notifiable, HasRoles, Traits\HasFeatureAccess;
 
     /**
+     * Override para usar notification customizada com MailTemplate.
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new \App\Notifications\VerifyEmailNotification());
+    }
+
+    /**
+     * Override para usar notification customizada com MailTemplate.
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
+
+    /**
      * Retorna o total de inscrições pagas/confirmadas.
      */
     public function getTotalTicketsCount(): int

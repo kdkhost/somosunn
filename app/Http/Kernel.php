@@ -35,14 +35,21 @@ class Kernel extends HttpKernel
 
     protected $routeMiddleware = [
         'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
+        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
+        'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+        'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
+        'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'redirect.members.admin' => \App\Http\Middleware\RedirectMembersFromAdmin::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'check.feature' => \App\Http\Middleware\CheckFeature::class,
         'check.connection' => \App\Http\Middleware\EnsureConnectionIsAccepted::class,
         'check.plan' => \App\Http\Middleware\EnsureUserHasActivePlan::class,
         'check.marketplace.seller' => \App\Http\Middleware\CheckMarketplaceSeller::class,
         'check.sumup.permissions' => \App\Http\Middleware\CheckSumUpPermissions::class,
-        'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
 }
