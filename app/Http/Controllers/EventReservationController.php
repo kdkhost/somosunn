@@ -997,6 +997,7 @@ class EventReservationController extends Controller
                 'sumupNoInterestUpTo'      => $noInterestUpTo,
                 'sumupInstallmentTax'      => $installmentTax,
                 'sumupPassFeeToClient'     => $passFeeToClient,
+                'sumupInterestType'        => \App\Models\Setting::get('sumup_interest_type', 'per_installment'),
             ]);
         } catch (\Throwable $e) {
             \Log::error('Falha ao iniciar pagamento SumUp de evento', [

@@ -512,6 +512,17 @@
                     </div>
                     <small class="text-muted">Aplicado a partir da {{ ($settings['sumup_installments_no_interest'] ?? 1) + 1 }}ª parcela. O valor com juros aparece no seletor de parcelas do checkout.</small>
                 </div>
+                <div class="col-md-4 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Tipo de Cálculo dos Juros</label>
+                    <select name="sumup_interest_type" class="form-control">
+                        <option value="per_installment" {{ ($settings['sumup_interest_type'] ?? 'per_installment') === 'per_installment' ? 'selected' : '' }}>Por parcela (taxa × nº parcelas com juros)</option>
+                        <option value="on_total" {{ ($settings['sumup_interest_type'] ?? '') === 'on_total' ? 'selected' : '' }}>Sobre o total (taxa aplicada uma vez)</option>
+                    </select>
+                    <small class="text-muted">
+                        <strong>Por parcela:</strong> R$ 120 em 3x com 2% = R$ 120 × (1 + 2%×3) = R$ 127,20<br>
+                        <strong>Sobre o total:</strong> R$ 120 em 3x com 2% = R$ 120 × (1 + 2%) = R$ 122,40
+                    </small>
+                </div>
             </div>
             <div class="alert alert-info small mt-2 mb-0">
                 <i class="fas fa-info-circle mr-1"></i>

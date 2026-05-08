@@ -12,24 +12,41 @@
     $noInterestUpTo      = (int) ($sumupNoInterestUpTo   ?? 1);
     $installmentTax      = (float) ($sumupInstallmentTax ?? 0);
     $passFeeToClient     = (bool) ($sumupPassFeeToClient ?? false);
+    $interestType        = $sumupInterestType ?? \App\Models\Setting::get('sumup_interest_type', 'per_installment');
     $pixExpirationMinutes = (int) ($sumupPixExpirationMinutes ?? \App\Models\Setting::get('sumup_pix_expiration_minutes', 10) ?? 10);
 
     // Pré-calcular as opções de parcelas para exibição no debug e no JS
+    // Dois tipos de cálculo:
+    //   'per_installment' = juros aplicados POR PARCELA (juros compostos simplificados)
+    //     total = amount * (1 + taxa/100 * n_parcelas_com_juros)
+    //   'on_total' = juros aplicados UMA VEZ sobre o total
+    //     total = amount * (1 + taxa/100)
     $installmentOptions = [];
     for ($i = 1; $i <= $maxInstallments; $i++) {
-        if ($i <= $noInterestUpTo || $installmentTax <= 0) {
+        if ($i <= $noInterestUpTo || $installmentTax <= 0 || !$passFeeToClient) {
+            // Sem juros ou juros absorvidos pela plataforma
             $total = $amount;
             $perInstallment = $amount / $i;
+            $hasInterest = false;
         } else {
-            // Juros simples: valor_parcela = (total * (1 + taxa/100)) / n
-            $total = $passFeeToClient ? $amount * (1 + $installmentTax / 100) : $amount;
+            $hasInterest = true;
+            $parcelsWithInterest = $i - $noInterestUpTo;
+
+            if ($interestType === 'on_total') {
+                // Juros sobre o total: aplica a taxa uma vez sobre o valor total
+                $total = $amount * (1 + $installmentTax / 100);
+            } else {
+                // Juros por parcela: aplica a taxa multiplicada pelo número de parcelas com juros
+                $total = $amount * (1 + ($installmentTax / 100) * $parcelsWithInterest);
+            }
+
             $perInstallment = $total / $i;
         }
         $installmentOptions[] = [
             'n'               => $i,
             'per_installment' => round($perInstallment, 2),
             'total'           => round($total, 2),
-            'has_interest'    => $i > $noInterestUpTo && $installmentTax > 0,
+            'has_interest'    => $hasInterest,
         ];
     }
 @endphp

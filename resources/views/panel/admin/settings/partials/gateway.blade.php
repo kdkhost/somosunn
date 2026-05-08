@@ -685,12 +685,22 @@
                 </div>
                 <p class="text-[10px] text-slate-400 mt-1.5">Aplicado a partir da {{ ($settings['sumup_installments_no_interest'] ?? 1) + 1 }}ª parcela</p>
             </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tipo de Cálculo</label>
+                <select name="sumup_interest_type"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                    <option value="per_installment" {{ ($settings['sumup_interest_type'] ?? 'per_installment') === 'per_installment' ? 'selected' : '' }}>Por parcela</option>
+                    <option value="on_total" {{ ($settings['sumup_interest_type'] ?? '') === 'on_total' ? 'selected' : '' }}>Sobre o total</option>
+                </select>
+                <p class="text-[10px] text-slate-400 mt-1.5">Por parcela: taxa × nº parcelas | Sobre total: taxa aplicada uma vez</p>
+            </div>
         </div>
         <div class="px-4 pb-4 bg-white dark:bg-slate-900">
             <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/40 rounded-xl p-3 text-xs text-blue-700 dark:text-blue-300">
                 <i class="fas fa-info-circle mr-1"></i>
-                <strong>Como funciona:</strong> O valor com juros é calculado automaticamente e exibido no seletor de parcelas do checkout.
-                Exemplo: R$ 100,00 em 3x com 2% de juros = R$ 34,00/parcela (R$ 102,00 total).
+                <strong>Como funciona:</strong><br>
+                <strong>Por parcela:</strong> R$ 120 em 3x com 2% = R$ 120 × (1 + 2%×3) = R$ 127,20 (3x de R$ 42,40)<br>
+                <strong>Sobre o total:</strong> R$ 120 em 3x com 2% = R$ 120 × (1 + 2%) = R$ 122,40 (3x de R$ 40,80)<br>
                 O repasse ao comprador é controlado pela opção "Repassar Taxa ao Comprador" acima.
             </div>
         </div>
