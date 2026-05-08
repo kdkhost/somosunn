@@ -9,11 +9,17 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Unreleased]
 
 ### Adicionado
+- **Multi-gateway checkout**: suporte a Mercado Pago e SumUp ativos simultaneamente, sem restrição de exclusividade.
+- **Gateway Selector**: seletor visual no checkout de eventos quando dois gateways estão disponíveis para o vendedor, com cards clicáveis por gateway.
+- **`GatewayAccount::resolveAllActiveGatewaysForSeller()`**: novo método que retorna todos os gateways ativos para um vendedor (seller → global), mantendo `resolveActiveGatewayForSeller()` para compatibilidade retroativa.
+- **Campos de parcelamento MP independentes**: `mercadopago_max_installments`, `mercadopago_installments_no_interest`, `mercadopago_installment_tax` — configuráveis em ambos os painéis.
+- **Expiração do PIX por gateway**: `mercadopago_pix_expiration_minutes` e `sumup_pix_expiration_minutes` (1–1440 min, padrão 10) — configuráveis em ambos os painéis.
+- **Validação de método mínimo por gateway**: ao salvar configurações, o `SettingController` rejeita com HTTP 422 se um gateway ativo ficar sem nenhum método de pagamento habilitado.
+- **Testes de integração** em `tests/Feature/MultiGateway/GatewayResolutionTest.php` cobrindo resolução de 0, 1 e 2 gateways, fallback global e independência de estado.
 - Instruções detalhadas para configuração da SumUp nos painéis de gateway, com origem da API Key, Merchant Code, credenciais OAuth e Webhook Secret.
 - Atalho "Configurar Credenciais" e resumo operacional na tela administrativa de transações SumUp.
 - **Detecção dinâmica de gateway ativo** no checkout de eventos: sistema agora detecta automaticamente qual gateway (Mercado Pago ou SumUp) o vendedor configurou como ativo
-- **Interface com abas separadas** no painel administrativo para configurações de gateway (Mercado Pago / SumUp) com validação de exclusividade
-- **Validação de gateway único**: apenas um gateway pode ficar ativo por vendedor, com desativação automática do gateway concorrente
+- **Interface com abas separadas** no painel administrativo para configurações de gateway (Mercado Pago / SumUp)
 - **Feedback visual** com badges de status (Ativo/Inativo) nas abas de configuração de gateway
 - **Método unificado** `GatewayAccount::resolveActiveGatewayForSeller()` para detecção de gateway ativo independente do provedor
 - **Roteamento condicional** no `EventReservationController` para processar pagamentos via SumUp ou Mercado Pago baseado no gateway ativo
@@ -22,13 +28,24 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **Seleção de método de pagamento PIX/Cartão** no checkout SumUp com interface de botões
 - **Geração de QR Code PIX inline** via `SumUpService::processPixCheckout()`
 - **Polling automático** de status de pagamento PIX a cada 5 segundos
-- **Timer regressivo de 30 minutos** para expiração do PIX
 - **Botão "Copiar código PIX"** para facilitar pagamento
 - **Rotas dedicadas** `POST /checkout/sumup/pix` e `GET /checkout/sumup/status` para processamento PIX
 - **Métodos no CheckoutController**: `sumupPix()` e `sumupStatus()` para gerenciar pagamentos PIX
 - **Logs detalhados de debug** no formulário SumUp para diagnosticar problemas de renderização
 - **Bloco de debug visual** (apenas em modo debug) mostrando variáveis recebidas pelo formulário
 - **Logs de console** em cada etapa da inicialização do SumUp Card Widget
+
+### Alterado
+- **`SettingController::toggle()`**: removida a lógica que desativava o outro gateway ao ativar um.
+- **`SettingController::update()`**: removida a validação de exclusividade entre gateways; adicionado clamping para `mercadopago_max_installments`, `mercadopago_installments_no_interest`, `mercadopago_installment_tax`, `mercadopago_pix_expiration_minutes` e `sumup_pix_expiration_minutes`.
+- **`EventReservationController::checkout()`**: substituída chamada a `resolveActiveGatewayForSeller()` por `resolveAllActiveGatewaysForSeller()`; passa `$activeGateways` (array) para a view.
+- **`EventReservationController::reserve()`**: roteamento pelo gateway selecionado pelo cliente; valida gateway contra lista de ativos; exige campo `gateway` quando há múltiplos gateways; registra logs com `order_id`, `event_id` e `gateway`.
+- **`CheckoutController::sumupPix()`**: expiração do PIX agora usa `sumup_pix_expiration_minutes` (padrão 10 min) em vez de 30 min hardcoded.
+- **`MercadoPagoService::createPixPayment()`**: expiração do PIX agora usa `mercadopago_pix_expiration_minutes` com fallback para `pix_expiration_minutes` e depois para 10 min.
+- **Painel moderno** (`panel/admin/settings/partials/gateway.blade.php`): removido aviso de exclusividade; adicionados campos de parcelamento MP e expiração PIX por gateway.
+- **Painel legado** (`admin/settings/partials/gateway.blade.php`): removido `alert-info` de exclusividade e JS de confirmação de troca; adicionados campos de parcelamento MP e expiração PIX por gateway.
+- **`sumup-card-form.blade.php`**: recebe `sumupPixExpirationMinutes` da view pai.
+- **`events/checkout.blade.php`**: exibe Gateway Selector quando `count($activeGateways) === 2`; envia campo `gateway` no POST.
 
 ### Corrigido
 - Salvamento das credenciais SumUp do vendedor, incluindo API Key e Merchant Code em `gateway_accounts.extra`.

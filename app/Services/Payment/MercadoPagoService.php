@@ -153,7 +153,7 @@ class MercadoPagoService
             ];
         }
 
-        $pixExpirationMinutes = (int) Setting::get('pix_expiration_minutes', 15);
+        $pixExpirationMinutes = (int) (Setting::get('mercadopago_pix_expiration_minutes') ?: Setting::get('pix_expiration_minutes', 10) ?: 10);
         $dateOfExpiration = now()->addMinutes($pixExpirationMinutes)->format('Y-m-d\\TH:i:s.vP');
 
         $paymentData = [

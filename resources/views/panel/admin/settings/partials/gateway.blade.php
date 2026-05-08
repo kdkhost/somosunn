@@ -324,15 +324,15 @@
                     <div class="w-8 h-8 rounded-xl bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
                         <i class="fas fa-percent text-orange-500 text-xs"></i>
                     </div>
-                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Juros de Parcelas</label>
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Juros de Parcelas (MP)</label>
                 </div>
                 <div class="relative">
-                    <input type="number" step="0.01" name="gateway_installment_tax"
-                        value="{{ $settings['gateway_installment_tax'] ?? '0.00' }}"
+                    <input type="number" step="0.01" name="mercadopago_installment_tax"
+                        value="{{ $settings['mercadopago_installment_tax'] ?? $settings['gateway_installment_tax'] ?? '0.00' }}"
                         class="w-full px-4 py-3 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
                     <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">%</span>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-1.5">0.00 = usa config do gateway</p>
+                <p class="text-[10px] text-slate-400 mt-1.5">0.00 = sem juros</p>
             </div>
 
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
@@ -340,12 +340,25 @@
                     <div class="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
                         <i class="fas fa-layer-group text-purple-500 text-xs"></i>
                     </div>
-                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Parcelas sem Juros</label>
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Máx. Parcelas (MP)</label>
                 </div>
-                <input type="number" name="gateway_max_installments_no_interest"
-                    value="{{ $settings['gateway_max_installments_no_interest'] ?? '1' }}"
+                <input type="number" min="1" max="12" name="mercadopago_max_installments"
+                    value="{{ $settings['mercadopago_max_installments'] ?? '12' }}"
                     class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-purple-400 focus:ring-4 focus:ring-purple-400/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
-                <p class="text-[10px] text-slate-400 mt-1.5">Máx. parcelas sem acréscimo</p>
+                <p class="text-[10px] text-slate-400 mt-1.5">1–12 parcelas</p>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center">
+                        <i class="fas fa-star text-indigo-500 text-xs"></i>
+                    </div>
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Parcelas s/ Juros (MP)</label>
+                </div>
+                <input type="number" min="1" max="12" name="mercadopago_installments_no_interest"
+                    value="{{ $settings['mercadopago_installments_no_interest'] ?? '1' }}"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-400/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                <p class="text-[10px] text-slate-400 mt-1.5">Parcelas sem acréscimo</p>
             </div>
 
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
@@ -353,7 +366,7 @@
                     <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
                         <i class="fas fa-exchange-alt text-blue-500 text-xs"></i>
                     </div>
-                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Repassar Taxas</label>
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Repassar Taxas (MP)</label>
                 </div>
                 <select name="gateway_pass_tax_to_client"
                     class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
@@ -363,21 +376,20 @@
                 <p class="text-[10px] text-slate-400 mt-1.5">Taxas de parcelamento</p>
             </div>
 
-
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
                 <div class="flex items-center gap-2 mb-3">
                     <div class="w-8 h-8 rounded-xl bg-teal-100 dark:bg-teal-900/20 flex items-center justify-center">
                         <i class="fa-brands fa-pix text-teal-500 text-xs"></i>
                     </div>
-                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Expiração do Pix</label>
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Expiração PIX (MP)</label>
                 </div>
                 <div class="relative">
-                    <input type="number" name="pix_expiration_minutes"
-                        value="{{ $settings['pix_expiration_minutes'] ?? '15' }}" min="5" max="1440"
+                    <input type="number" name="mercadopago_pix_expiration_minutes"
+                        value="{{ $settings['mercadopago_pix_expiration_minutes'] ?? $settings['pix_expiration_minutes'] ?? '10' }}" min="1" max="1440"
                         class="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-teal-400 focus:ring-4 focus:ring-teal-400/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
                     <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-xs pointer-events-none">min</span>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-1.5">Tempo limite para pagamento</p>
+                <p class="text-[10px] text-slate-400 mt-1.5">Tempo limite para pagamento PIX</p>
             </div>
         </div>
 
@@ -684,8 +696,27 @@
         </div>
     </div>
 
-    {{-- Métodos SumUp --}}
-    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+    {{-- Expiração PIX SumUp --}}
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-4">
+        <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+            <i class="fa-brands fa-pix text-teal-500 text-xs"></i>
+            <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Expiração do PIX SumUp</span>
+        </div>
+        <div class="p-4 bg-white dark:bg-slate-900">
+            <div class="max-w-xs">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tempo de Expiração (minutos)</label>
+                <div class="relative">
+                    <input type="number" min="1" max="1440" step="1" name="sumup_pix_expiration_minutes"
+                        value="{{ $settings['sumup_pix_expiration_minutes'] ?? '10' }}"
+                        class="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-teal-400 focus:ring-4 focus:ring-teal-400/10 outline-none transition-all font-bold text-sm text-slate-800 dark:text-white">
+                    <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-xs pointer-events-none">min</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">Tempo limite para o cliente pagar o PIX (1–1440 min). Padrão: 10 min.</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Métodos SumUp --}}    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
             <i class="fas fa-credit-card text-slate-500 text-xs"></i>
             <span class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Métodos de Pagamento SumUp</span>

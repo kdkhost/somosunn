@@ -18,6 +18,8 @@
             $selectedGateway = ($preferredGateway ?? null) ?: 'mercadopago';
         }
 
+        $activeGateways = $activeGateways ?? [];
+
         $fieldLabelClasses = 'mb-2 block text-[11px] font-black uppercase tracking-[0.24em] text-slate-500';
         $fieldHintClasses = 'mt-2 text-xs text-slate-500';
         $fieldPanelClasses = 'rounded-3xl border border-slate-100 bg-slate-50/80 p-5';
@@ -117,6 +119,57 @@
                             <form action="{{ route('events.reserve', $event) }}" method="POST" class="space-y-6"
                                 data-no-ajax="true" data-no-spa="true">
                                 @csrf
+
+                                @if($isPaid && isset($activeGateways) && count($activeGateways) > 1)
+                                {{-- Gateway Selector: exibido apenas quando há 2 gateways ativos --}}
+                                <div id="gateway-selector" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                                    <p class="mb-3 text-xs font-black uppercase tracking-widest text-slate-500">Forma de Pagamento</p>
+                                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        @foreach($activeGateways as $gw)
+                                        @php
+                                            $gwProvider = $gw['provider'];
+                                            $gwLabel = $gwProvider === 'mercadopago' ? 'Mercado Pago' : 'SumUp';
+                                            $gwIcon = $gwProvider === 'mercadopago' ? 'fas fa-handshake' : 'fas fa-credit-card';
+                                            $gwColor = $gwProvider === 'mercadopago' ? 'blue' : 'slate';
+                                            $gwMethods = [];
+                                            if ($gwProvider === 'mercadopago') {
+                                                if (\App\Models\Setting::get('mercadopago_method_credit_card', 1)) $gwMethods[] = 'Cartão';
+                                                if (\App\Models\Setting::get('mercadopago_method_pix', 1)) $gwMethods[] = 'PIX';
+                                                if (\App\Models\Setting::get('mercadopago_method_ticket', 0)) $gwMethods[] = 'Boleto';
+                                            } else {
+                                                if (\App\Models\Setting::get('sumup_method_card', 1)) $gwMethods[] = 'Cartão';
+                                                if (\App\Models\Setting::get('sumup_method_pix', 1)) $gwMethods[] = 'PIX';
+                                            }
+                                        @endphp
+                                        <label for="gateway_{{ $gwProvider }}"
+                                            class="gateway-option-card flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all
+                                                   {{ old('gateway') === $gwProvider ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50 hover:border-slate-300' }}">
+                                            <input type="radio" id="gateway_{{ $gwProvider }}" name="gateway"
+                                                value="{{ $gwProvider }}"
+                                                class="sr-only gateway-radio"
+                                                {{ old('gateway') === $gwProvider ? 'checked' : '' }}
+                                                onchange="onGatewaySelect(this)">
+                                            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm border border-slate-100">
+                                                <i class="{{ $gwIcon }} text-xl text-slate-600"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-black text-slate-800">{{ $gwLabel }}</p>
+                                                <p class="text-xs text-slate-500">{{ implode(' · ', $gwMethods) }}</p>
+                                            </div>
+                                            <div class="gateway-check hidden h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-600">
+                                                <i class="fas fa-check text-[10px] text-white"></i>
+                                            </div>
+                                        </label>
+                                        @endforeach
+                                    </div>
+                                    @error('gateway')
+                                        <p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                @elseif($isPaid && isset($activeGateways) && count($activeGateways) === 1)
+                                {{-- 1 gateway: campo hidden com o provider --}}
+                                <input type="hidden" name="gateway" value="{{ $activeGateways[0]['provider'] }}">
+                                @endif
 
                                 <div class="grid gap-4 sm:grid-cols-2">
                                     <div class="{{ $fieldPanelClasses }}">
@@ -266,6 +319,31 @@
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                // Gateway selector
+                function onGatewaySelect(radio) {
+                    document.querySelectorAll('.gateway-option-card').forEach(function(card) {
+                        const r = card.querySelector('.gateway-radio');
+                        const check = card.querySelector('.gateway-check');
+                        if (r && r.checked) {
+                            card.classList.add('border-blue-500', 'bg-blue-50');
+                            card.classList.remove('border-slate-200', 'bg-slate-50');
+                            check && check.classList.remove('hidden');
+                            check && check.classList.add('flex');
+                        } else {
+                            card.classList.remove('border-blue-500', 'bg-blue-50');
+                            card.classList.add('border-slate-200', 'bg-slate-50');
+                            check && check.classList.add('hidden');
+                            check && check.classList.remove('flex');
+                        }
+                    });
+                }
+                window.onGatewaySelect = onGatewaySelect;
+
+                // Init state for pre-selected gateway
+                document.querySelectorAll('.gateway-radio').forEach(function(r) {
+                    if (r.checked) onGatewaySelect(r);
+                });
+
                 const radios = document.querySelectorAll('input[name="gateway_provider"]');
                 const display = document.getElementById('display_selected_gateway');
 

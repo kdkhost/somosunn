@@ -475,7 +475,7 @@ class CheckoutController extends Controller
                 'qr_code'        => $pixCode,
                 'copy_paste'     => $pixCode,
                 'qr_code_base64' => $qrCodeBase64,
-                'expires_at'     => now()->addMinutes(30)->toIso8601String(),
+                'expires_at'     => now()->addMinutes((int) (\App\Models\Setting::get('sumup_pix_expiration_minutes', 10) ?: 10))->toIso8601String(),
             ]);
         } catch (\Throwable $e) {
             Log::error('SumUp PIX error', [
