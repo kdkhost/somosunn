@@ -58,6 +58,10 @@ class SellerProductCheckoutController extends Controller
 
         $gateways = GatewayAccount::resolveForSeller((int) $sellerStore->user_id);
 
+        // Verificar se SumUp está disponível para marketplace
+        $subtotal = round((float) $totals['subtotal'], 2);
+        $sumupAvailable = $this->shouldShowSumUp($subtotal, 'marketplace', $this->getUserType());
+
         return view('storefront.checkout', [
             'sellerStore' => $sellerStore,
             'totals' => $totals,
@@ -65,6 +69,7 @@ class SellerProductCheckoutController extends Controller
             'shippingError' => $shippingError,
             'shippingAddress' => $shippingAddress,
             'mpEnabled' => (bool) ($gateways['mpEnabled'] ?? false),
+            'sumupAvailable' => (bool) $sumupAvailable,
         ]);
     }
 
@@ -272,6 +277,11 @@ class SellerProductCheckoutController extends Controller
             return redirect()->route('checkout.success', $order);
         }
 
+        // Processar via SumUp se escolhido
+        if ($chosenGateway === 'sumup') {
+            return $this->processSumUpCheckout($order, $sellerStore);
+        }
+
         $preference = $mpService->createPreference($order, [
             'statement_descriptor' => 'UNN LOJA',
         ]);
@@ -289,5 +299,68 @@ class SellerProductCheckoutController extends Controller
             'preferenceId' => $preference['id'] ?? '',
             'publicKey' => $gateways['mpPublicKey'] ?: config('payments.mercadopago.public_key') ?: \App\Models\Setting::get('mp_public_key'),
         ]);
+    }
+
+    /**
+     * Processa checkout do marketplace via SumUp
+     */
+    protected function processSumUpCheckout(Order $order, SellerStore $sellerStore)
+    {
+        try {
+            $sumUpService = app(\App\Services\Payment\SumUpService::class);
+
+            $apiKey = trim((string) (\App\Models\Setting::get('sumup_api_key')
+                ?: config('payments.sumup.api_key', '')));
+
+            if (empty($apiKey)) {
+                return back()->with('error', 'SumUp não configurado. Falta API Key.');
+            }
+
+            $checkout = $sumUpService->createCheckout($order, [
+                'description' => 'Pedido #' . $order->id . ' - ' . $sellerStore->brand_name,
+                'return_url'  => route('checkout.success', $order->id),
+            ]);
+
+            $order->update([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'sumup_checkout_id'  => $checkout['id'] ?? null,
+                    'sumup_checkout_url' => $checkout['checkout_url'] ?? null,
+                ]),
+            ]);
+
+            $merchantCode = trim((string) (\App\Models\Setting::get('sumup_merchant_code')
+                ?: config('payments.sumup.merchant_code', '')));
+
+            $methodCardRaw = \App\Models\Setting::get('sumup_method_card');
+            $methodPixRaw  = \App\Models\Setting::get('sumup_method_pix');
+            $methodCard = $methodCardRaw !== null ? (bool)(int)$methodCardRaw : true;
+            $methodPix  = $methodPixRaw  !== null ? (bool)(int)$methodPixRaw  : true;
+
+            $maxInstallments = max(1, min(12, (int) (\App\Models\Setting::get('sumup_max_installments', 12))));
+            $noInterestUpTo  = max(1, min(12, (int) (\App\Models\Setting::get('sumup_installments_no_interest', 1))));
+            $installmentTax  = max(0.0, (float) (\App\Models\Setting::get('sumup_installment_tax', 0)));
+            $passFeeToClient = (bool)(int)(\App\Models\Setting::get('sumup_pass_fee', 0));
+
+            return view('checkout.transparent', [
+                'order'                       => $order->fresh('items', 'user'),
+                'preferenceId'                => '',
+                'publicKey'                   => '',
+                'gateway'                     => 'sumup',
+                'checkoutId'                  => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
+                'sumupMerchantCode'           => $merchantCode,
+                'sumupMethodCard'             => $methodCard,
+                'sumupMethodPix'              => $methodPix,
+                'sumupMaxInstallments'        => $maxInstallments,
+                'sumupInstallmentsNoInterest' => $noInterestUpTo,
+                'sumupInstallmentTax'         => $installmentTax,
+                'sumupPassFeeToClient'        => $passFeeToClient,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('SumUp marketplace checkout failed: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->with('error', 'Erro ao processar pagamento via SumUp: ' . $e->getMessage());
+        }
     }
 }
