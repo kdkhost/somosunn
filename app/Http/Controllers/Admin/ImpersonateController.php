@@ -41,7 +41,8 @@ class ImpersonateController extends Controller
         // Loga como o novo usuário
         Auth::login($userToImpersonate);
 
-        return redirect()->route('panel.dashboard')->with('success', "Você está acessando como {$userToImpersonate->name}");
+        return redirect()->route('panel.dashboard')
+            ->with('toastr_info', "Acesso supervisionado ativo. Você está como {$userToImpersonate->name}.");
     }
 
     public function stop()
@@ -51,12 +52,20 @@ class ImpersonateController extends Controller
         }
 
         $originalId = session()->pull('impersonator_id');
+        $impersonatedName = auth()->user()?->name ?? 'usuário';
         session()->forget(['impersonator_is_admin', 'impersonator_name']);
         $originalUser = User::find($originalId);
 
         if ($originalUser) {
             Auth::login($originalUser);
-            return redirect()->route('admin.users.index')->with('success', 'Voltou para sua conta original.');
+
+            // Superadmin volta para o painel legado, admin para o painel novo
+            $redirectRoute = $originalUser->isSuperAdmin()
+                ? route('admin.dashboard')
+                : route('panel.admin.dashboard');
+
+            return redirect($redirectRoute)
+                ->with('toastr_success', "Sessão supervisionada encerrada. Você estava como {$impersonatedName}.");
         }
 
         Auth::logout();

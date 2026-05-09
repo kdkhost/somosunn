@@ -47,9 +47,16 @@ class LoginController extends Controller
             }
 
             $user = Auth::user();
-            $defaultRoute = ($user && method_exists($user, 'isAdmin') && $user->isAdmin())
-                ? route('panel.admin.dashboard')
-                : route('panel.dashboard');
+
+            // Superadmin → painel legado (/admin)
+            // Admin e demais → painel novo (/painel/admin ou /painel)
+            if ($user && $user->isSuperAdmin()) {
+                $defaultRoute = route('admin.dashboard');
+            } elseif ($user && method_exists($user, 'isAdmin') && $user->isAdmin()) {
+                $defaultRoute = route('panel.admin.dashboard');
+            } else {
+                $defaultRoute = route('panel.dashboard');
+            }
 
             return $this->redirectToSafeIntended($request, $defaultRoute);
         }

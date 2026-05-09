@@ -449,12 +449,15 @@
     @include('panel.partials.quick-upload-modal')
 
     {{-- Flash Messages Handler (Toastr-style via SweetAlert2) --}}
-    @if(session('success') || session('error') || session('warning') || session('info'))
+    @if(session('success') || session('error') || session('warning') || session('info') || session('toastr_success') || session('toastr_error') || session('toastr_info'))
         <div id="flash-messages"
              data-success="{{ session('success') }}"
              data-error="{{ session('error') }}"
              data-warning="{{ session('warning') }}"
              data-info="{{ session('info') }}"
+             data-toastr-success="{{ session('toastr_success') }}"
+             data-toastr-error="{{ session('toastr_error') }}"
+             data-toastr-info="{{ session('toastr_info') }}"
              class="hidden"></div>
     @endif
 
@@ -483,6 +486,9 @@
                     { type: 'error',   msg: flash.dataset.error   },
                     { type: 'warning', msg: flash.dataset.warning },
                     { type: 'info',    msg: flash.dataset.info    },
+                    { type: 'success', msg: flash.dataset.toastrSuccess },
+                    { type: 'error',   msg: flash.dataset.toastrError },
+                    { type: 'info',    msg: flash.dataset.toastrInfo },
                 ];
 
                 messages.forEach(m => {

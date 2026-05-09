@@ -1121,6 +1121,19 @@
     @include('partials.form-draft-autosave')
     <script>
         $(document).ready(function () {
+            // Notificações Toastr (sem popup intrusivo)
+            @if(session('toastr_success'))
+                toastr.success("{{ session('toastr_success') }}");
+            @endif
+
+            @if(session('toastr_error'))
+                toastr.error("{{ session('toastr_error') }}");
+            @endif
+
+            @if(session('toastr_info'))
+                toastr.info("{{ session('toastr_info') }}");
+            @endif
+
             // Notificações Globais SweetAlert2 (Laravel Flash Messages)
             @if(session('success'))
                 Swal.fire({
