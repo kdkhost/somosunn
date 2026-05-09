@@ -333,44 +333,45 @@
 
                             @if($hasMultipleGateways)
                                 <div class="mb-6">
-                                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Gateway de pagamento</p>
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <label class="cursor-pointer block">
-                                            <input type="radio" name="gateway_provider" value="mercadopago" class="peer sr-only" checked>
-                                            <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:ring-2 peer-checked:ring-blue-100 transition-all">
-                                                <div class="flex items-start gap-3">
-                                                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
-                                                        <i class="fas fa-hand-holding-dollar"></i>
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="font-bold text-gray-900 text-sm">Mercado Pago</p>
-                                                        <div class="flex flex-wrap gap-1 mt-1">
-                                                            @foreach(($mpMethods ?? ['Cartão', 'Pix']) as $m)
-                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-600">{{ $m }}</span>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
+                                    <p class="mb-3 text-xs font-black uppercase tracking-widest text-slate-500">Forma de Pagamento</p>
+                                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        @php
+                                            $gwList = [
+                                                ['provider' => 'mercadopago', 'label' => 'Mercado Pago', 'icon' => 'fas fa-handshake', 'color' => 'blue'],
+                                                ['provider' => 'sumup', 'label' => 'SumUp', 'icon' => 'fas fa-credit-card', 'color' => 'slate'],
+                                            ];
+                                        @endphp
+                                        @foreach($gwList as $gw)
+                                            @php
+                                                $gwProvider = $gw['provider'];
+                                                $gwMethods = [];
+                                                if ($gwProvider === 'mercadopago') {
+                                                    if ((int) \App\Models\Setting::get('mercadopago_method_credit_card', 1) === 1) $gwMethods[] = 'Cartão';
+                                                    if ((int) \App\Models\Setting::get('mercadopago_method_pix', 1) === 1) $gwMethods[] = 'PIX';
+                                                    if ((int) \App\Models\Setting::get('mercadopago_method_ticket', 0) === 1) $gwMethods[] = 'Boleto';
+                                                } else {
+                                                    if ((int) \App\Models\Setting::get('sumup_method_card', 1) === 1) $gwMethods[] = 'Cartão';
+                                                    if ((int) \App\Models\Setting::get('sumup_method_pix', 1) === 1) $gwMethods[] = 'PIX';
+                                                }
+                                            @endphp
+                                            <label for="gw_{{ $gwProvider }}"
+                                                class="gateway-option-card flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all border-slate-200 bg-slate-50 hover:border-slate-300">
+                                                <input type="radio" id="gw_{{ $gwProvider }}" name="gateway_provider"
+                                                    value="{{ $gwProvider }}"
+                                                    class="sr-only"
+                                                    {{ $gwProvider === 'mercadopago' ? 'checked' : '' }}>
+                                                <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm border border-slate-100">
+                                                    <i class="{{ $gw['icon'] }} text-xl text-slate-600"></i>
                                                 </div>
-                                            </div>
-                                        </label>
-                                        <label class="cursor-pointer block">
-                                            <input type="radio" name="gateway_provider" value="sumup" class="peer sr-only">
-                                            <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200 transition-all">
-                                                <div class="flex items-start gap-3">
-                                                    <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
-                                                        <i class="fas fa-credit-card"></i>
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="font-bold text-gray-900 text-sm">SumUp</p>
-                                                        <div class="flex flex-wrap gap-1 mt-1">
-                                                            @foreach(($sumupMethods ?? ['Cartão', 'Pix']) as $m)
-                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-600">{{ $m }}</span>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="font-black text-slate-800">{{ $gw['label'] }}</p>
+                                                    <p class="text-xs text-slate-500">{{ implode(' · ', $gwMethods) }}</p>
                                                 </div>
-                                            </div>
-                                        </label>
+                                                <div class="gateway-check hidden h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-600">
+                                                    <i class="fas fa-check text-[10px] text-white"></i>
+                                                </div>
+                                            </label>
+                                        @endforeach
                                     </div>
                                 </div>
                             @else
@@ -417,81 +418,26 @@
 
                             <!-- SumUp Payment Form (quando SumUp selecionado) -->
                             <div id="sumupPaymentInfo" class="hidden" data-gateway="sumup">
-                                {{-- Seletor Cartão/Pix SumUp --}}
-                                <div class="grid grid-cols-2 gap-4 mb-6">
-                                    <label class="cursor-pointer" id="label-sumup-card">
-                                        <input type="radio" name="sumup_method" value="card" class="peer sr-only" checked
-                                            onchange="toggleSumupMethod('card')">
-                                        <div class="p-4 border-2 border-gray-200 rounded-xl peer-checked:border-slate-900 peer-checked:bg-slate-50 transition text-center hover:border-slate-400">
-                                            <i class="fas fa-credit-card text-2xl mb-2 text-slate-700"></i>
-                                            <p class="font-bold text-gray-900">Cartão de Crédito</p>
-                                        </div>
-                                    </label>
-                                    <label class="cursor-pointer" id="label-sumup-pix">
-                                        <input type="radio" name="sumup_method" value="pix" class="peer sr-only"
-                                            onchange="toggleSumupMethod('pix')">
-                                        <div class="p-4 border-2 border-gray-200 rounded-xl peer-checked:border-teal-600 peer-checked:bg-teal-50 transition text-center hover:border-teal-300">
-                                            <i class="fa-brands fa-pix text-2xl mb-2 text-teal-600"></i>
-                                            <p class="font-bold text-gray-900">Pix</p>
-                                        </div>
-                                    </label>
-                                </div>
-
-                                {{-- Formulário de cartão SumUp (mesmo visual do MP) --}}
-                                <div id="sumup-card-form-section" class="space-y-5">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <h3 class="text-base font-bold text-gray-800">Cartão de crédito ou débito</h3>
-                                        <div class="flex gap-1">
-                                            <img src="https://cdn.jsdelivr.net/gh/nicepay-dev/nicepay-assets@main/visa.svg" alt="Visa" class="h-6 w-auto" onerror="this.style.display='none'">
-                                            <img src="https://cdn.jsdelivr.net/gh/nicepay-dev/nicepay-assets@main/mastercard.svg" alt="Mastercard" class="h-6 w-auto" onerror="this.style.display='none'">
-                                        </div>
+                                <div class="text-center py-6">
+                                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-700">
+                                        <i class="fas fa-credit-card text-3xl"></i>
                                     </div>
-
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Número do cartão</label>
-                                        <input type="text" name="sumup_card_number" id="sumup_card_number" placeholder="1234 1234 1234 1234"
-                                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
-                                            maxlength="19" autocomplete="cc-number">
+                                    <h3 class="font-bold text-gray-900 mb-2">Pagamento via SumUp</h3>
+                                    <p class="text-gray-600 text-sm max-w-sm mx-auto mb-4">
+                                        Ao clicar no botão abaixo, o formulário seguro da SumUp será carregado com as opções de Cartão e PIX.
+                                    </p>
+                                    <div class="flex justify-center gap-3 mb-2">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-sm font-bold text-slate-700">
+                                            <i class="fas fa-credit-card text-xs"></i> Cartão
+                                        </span>
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-sm font-bold text-teal-700">
+                                            <i class="fa-brands fa-pix text-xs"></i> PIX
+                                        </span>
                                     </div>
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Data de vencimento</label>
-                                            <input type="text" name="sumup_card_expiry" id="sumup_card_expiry" placeholder="MM/AA"
-                                                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
-                                                maxlength="5" autocomplete="cc-exp">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Código de segurança</label>
-                                            <input type="text" name="sumup_card_cvv" id="sumup_card_cvv" placeholder="CVV"
-                                                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
-                                                maxlength="4" autocomplete="cc-csc">
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nome do titular como aparece no cartão</label>
-                                        <input type="text" name="sumup_card_name" id="sumup_card_name" placeholder="NOME COMPLETO"
-                                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
-                                            autocomplete="cc-name">
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">CPF do titular</label>
-                                        <input type="text" name="sumup_card_cpf" id="sumup_card_cpf" placeholder="000.000.000-00"
-                                            value="{{ Auth::user()?->doc ?? '' }}"
-                                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-4 py-3">
-                                    </div>
-                                </div>
-
-                                {{-- Pix SumUp --}}
-                                <div id="sumup-pix-form-section" class="hidden text-center py-8">
-                                    <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-600">
-                                        <i class="fa-brands fa-pix text-4xl"></i>
-                                    </div>
-                                    <h3 class="font-bold text-gray-900 mb-2">Pix Instantâneo via SumUp</h3>
-                                    <p class="text-gray-600 max-w-sm mx-auto">
-                                        Ao finalizar, será gerado um QR Code Pix para pagamento imediato. Seu acesso será liberado automaticamente.
+                                    <p class="text-xs text-slate-400 mt-3">
+                                        <i class="fas fa-lock text-emerald-500 mr-1"></i> Ambiente criptografado
+                                        <span class="mx-2">•</span>
+                                        <i class="fas fa-shield-halved text-emerald-500 mr-1"></i> Compra garantida
                                     </p>
                                 </div>
                             </div>
@@ -547,6 +493,25 @@
                 const gatewayRadios = document.querySelectorAll('input[name="gateway_provider"]');
                 let currentGateway = 'mercadopago';
 
+                // Visual: highlight selected gateway card (same as events)
+                function updateGatewayCards() {
+                    document.querySelectorAll('.gateway-option-card').forEach(function(card) {
+                        const radio = card.querySelector('input[type="radio"]');
+                        const check = card.querySelector('.gateway-check');
+                        if (radio && radio.checked) {
+                            card.classList.remove('border-slate-200', 'bg-slate-50');
+                            card.classList.add('border-blue-500', 'bg-blue-50');
+                            if (check) check.classList.remove('hidden');
+                            if (check) check.classList.add('flex');
+                        } else {
+                            card.classList.remove('border-blue-500', 'bg-blue-50');
+                            card.classList.add('border-slate-200', 'bg-slate-50');
+                            if (check) check.classList.add('hidden');
+                            if (check) check.classList.remove('flex');
+                        }
+                    });
+                }
+
                 function switchGateway(gateway) {
                     currentGateway = gateway;
 
@@ -593,34 +558,13 @@
                     }
                 }
 
-                // Listener para radios de método SumUp
-                document.querySelectorAll('input[name="sumup_method"]').forEach(function(radio) {
-                    radio.addEventListener('change', function() {
-                        hiddenMethod.value = this.value === 'pix' ? 'pix' : 'credit_card';
-                    });
-                });
-
-                // Toggle SumUp card/pix sections
-                window.toggleSumupMethod = function(method) {
-                    const cardSection = document.getElementById('sumup-card-form-section');
-                    const pixSection = document.getElementById('sumup-pix-form-section');
-
-                    if (method === 'pix') {
-                        cardSection.classList.add('hidden');
-                        pixSection.classList.remove('hidden');
-                        hiddenMethod.value = 'pix';
-                        submitBtn.innerHTML = '<i class="fas fa-qrcode mr-2"></i> Gerar QR Code Pix (SumUp)';
-                    } else {
-                        cardSection.classList.remove('hidden');
-                        pixSection.classList.add('hidden');
-                        hiddenMethod.value = 'credit_card';
-                        submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> Pagar com SumUp';
-                    }
-                };
+                // Listener para radios de método SumUp (não mais necessário - form SumUp é na próxima página)
+                // O formulário real da SumUp (com SDK) é renderizado após o submit via processSubscriptionSumUp()
 
                 gatewayRadios.forEach(function (radio) {
                     radio.addEventListener('change', function () {
                         switchGateway(this.value);
+                        updateGatewayCards();
                     });
                 });
 
@@ -628,6 +572,7 @@
                 const checkedGateway = document.querySelector('input[name="gateway_provider"]:checked');
                 if (checkedGateway) {
                     switchGateway(checkedGateway.value);
+                    updateGatewayCards();
                 } else {
                     // Só 1 gateway (hidden input) - mostrar formulário direto
                     const hiddenGateway = document.querySelector('input[name="gateway_provider"][type="hidden"]');
