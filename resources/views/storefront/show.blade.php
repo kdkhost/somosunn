@@ -125,15 +125,20 @@
 
     $contentCards = collect();
     foreach ($courses as $course) {
-        $contentCards->push(['type' => 'Curso', 'title' => $course->title, 'excerpt' => \Illuminate\Support\Str::limit(strip_tags((string) $course->short_description), 120), 'href' => route('courses.show', $course->slug ?: $course->id), 'icon' => 'fas fa-graduation-cap']);
+        $contentCards->push(['type' => 'Curso', 'title' => $course->title, 'excerpt' => \Illuminate\Support\Str::limit(strip_tags((string) $course->short_description), 120), 'href' => route('courses.show', $course->slug ?: $course->id), 'icon' => 'fas fa-graduation-cap', 'image' => $course->thumbnail_url ?? null, 'price' => (float) ($course->price ?? 0)]);
     }
     foreach ($mentorships as $mentorship) {
-        $contentCards->push(['type' => 'Mentoria', 'title' => $mentorship->title, 'excerpt' => \Illuminate\Support\Str::limit(strip_tags((string) $mentorship->description), 120), 'href' => route('mentorships.show', $mentorship), 'icon' => 'fas fa-user-tie']);
+        $contentCards->push(['type' => 'Mentoria', 'title' => $mentorship->title, 'excerpt' => \Illuminate\Support\Str::limit(strip_tags((string) $mentorship->description), 120), 'href' => route('mentorships.show', $mentorship), 'icon' => 'fas fa-user-tie', 'image' => $mentorship->thumbnail_url ?? $mentorship->image_url ?? null, 'price' => (float) ($mentorship->price ?? 0)]);
     }
     foreach ($events as $event) {
-        $contentCards->push(['type' => 'Evento', 'title' => $event->title, 'excerpt' => \Illuminate\Support\Str::limit(strip_tags((string) $event->description), 120), 'href' => route('events.show', $event), 'icon' => 'fas fa-calendar-days']);
+        $contentCards->push(['type' => 'Evento', 'title' => $event->title, 'excerpt' => \Illuminate\Support\Str::limit(strip_tags((string) $event->description), 120), 'href' => route('events.show', $event), 'icon' => 'fas fa-calendar-days', 'image' => $event->image_url ?? null, 'price' => (float) ($event->price ?? 0)]);
     }
-    $contentCards = $contentCards->take(6)->values();
+    $contentCards = $contentCards->take(12)->values();
+
+    // Lógica de organização: se total de itens (produtos + conteúdos) <= 4, mostra tudo junto
+    // Se > 4, separa por categoria
+    $totalItems = $filteredProducts->count() + $contentCards->count();
+    $showMixed = $totalItems <= 4;
 
     $catalogCount = $filteredProducts->count();
     $activeChannelCount = collect([
@@ -583,6 +588,45 @@
                                 </div>
                             </article>
                         @endforeach
+
+                        {{-- Quando poucos itens, mistura conteúdos na mesma grade --}}
+                        @if($showMixed && $contentCards->isNotEmpty())
+                            @foreach($contentCards as $contentCard)
+                                <a href="{{ $contentCard['href'] }}" class="store-grid-card rounded-[1.65rem] bg-white">
+                                    <div class="relative">
+                                        <div class="store-card-image overflow-hidden">
+                                            @if(!empty($contentCard['image']))
+                                                <img src="{{ $contentCard['image'] }}" alt="{{ $contentCard['title'] }}" class="h-full w-full object-cover transition duration-500 hover:scale-[1.03]">
+                                            @else
+                                                <div class="flex h-full w-full items-center justify-center text-5xl text-slate-200" style="background: linear-gradient(135deg, #f8fafc, #eef2ff);">
+                                                    <i class="{{ $contentCard['icon'] }}"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="absolute left-3 top-3">
+                                            <span class="inline-flex rounded-full bg-slate-900/80 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white backdrop-blur">{{ $contentCard['type'] }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-1 flex-col px-4 py-4">
+                                        <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">{{ $store->brand_name }}</p>
+                                        <h3 class="store-line-clamp-2 mt-2 text-base font-black leading-tight text-slate-900">{{ $contentCard['title'] }}</h3>
+                                        <p class="store-line-clamp-2 mt-2 text-sm leading-6 text-slate-600">{{ $contentCard['excerpt'] }}</p>
+                                        <div class="mt-auto pt-4">
+                                            @if($contentCard['price'] > 0)
+                                                <span class="text-xl font-black text-slate-900">R$ {{ number_format($contentCard['price'], 2, ',', '.') }}</span>
+                                            @else
+                                                <span class="text-sm font-bold text-emerald-600">Gratuito</span>
+                                            @endif
+                                        </div>
+                                        <div class="mt-3">
+                                            <span class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition">
+                                                Ver detalhes
+                                            </span>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        @endif
                     </div>
                 @elseif($products->isNotEmpty())
                     <div class="store-home-card rounded-[1.65rem] bg-white p-8 text-center">
@@ -616,33 +660,52 @@
                 </div>
             </section>
 
-            @if($contentCards->isNotEmpty())
+            @if(!$showMixed && $contentCards->isNotEmpty())
                 <section id="conteudos" class="mt-10">
                     <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                         <div>
                             <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Ecossistema da marca</p>
-                            <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">Mais do vendedor dentro da plataforma</h2>
+                            <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">Cursos, mentorias e eventos</h2>
                         </div>
-                        <p class="text-sm font-medium text-slate-500">Cursos, mentorias e eventos publicados por {{ $store->brand_name }}.</p>
+                        <p class="text-sm font-medium text-slate-500">Conteúdos publicados por {{ $store->brand_name }}.</p>
                     </div>
 
-                    <div class="grid gap-4 lg:grid-cols-3">
+                    <div class="store-product-grid">
                         @foreach($contentCards as $contentCard)
-                            <a href="{{ $contentCard['href'] }}" class="store-home-card flex h-full flex-col rounded-[1.65rem] bg-white p-6 transition hover:-translate-y-1">
-                                <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
-                                    <i class="{{ $contentCard['icon'] }}"></i>
+                            <a href="{{ $contentCard['href'] }}" class="store-grid-card rounded-[1.65rem] bg-white">
+                                <div class="relative">
+                                    <div class="store-card-image overflow-hidden">
+                                        @if(!empty($contentCard['image']))
+                                            <img src="{{ $contentCard['image'] }}" alt="{{ $contentCard['title'] }}" class="h-full w-full object-cover transition duration-500 hover:scale-[1.03]">
+                                        @else
+                                            <div class="flex h-full w-full items-center justify-center text-4xl text-slate-200">
+                                                <i class="{{ $contentCard['icon'] }}"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="absolute left-3 top-3">
+                                        <span class="inline-flex rounded-full bg-slate-900/80 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white backdrop-blur">{{ $contentCard['type'] }}</span>
+                                    </div>
                                 </div>
-                                <p class="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">{{ $contentCard['type'] }}</p>
-                                <h3 class="mt-2 text-2xl font-black tracking-tight text-slate-900">{{ $contentCard['title'] }}</h3>
-                                <p class="store-line-clamp-4 mt-3 flex-1 text-sm leading-7 text-slate-600">{{ $contentCard['excerpt'] }}</p>
-                                <span class="mt-5 inline-flex items-center gap-2 text-sm font-black" style="color: {{ $themePrimary }};">Ver mais <i class="fas fa-arrow-right text-[11px]"></i></span>
+                                <div class="flex flex-1 flex-col px-4 py-4">
+                                    <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">{{ $store->brand_name }}</p>
+                                    <h3 class="store-line-clamp-2 mt-2 text-base font-black leading-tight text-slate-900">{{ $contentCard['title'] }}</h3>
+                                    <p class="store-line-clamp-2 mt-2 text-sm leading-6 text-slate-600">{{ $contentCard['excerpt'] }}</p>
+                                    <div class="mt-auto pt-4">
+                                        @if($contentCard['price'] > 0)
+                                            <span class="text-lg font-black text-slate-900">R$ {{ number_format($contentCard['price'], 2, ',', '.') }}</span>
+                                        @else
+                                            <span class="text-sm font-bold text-emerald-600">Gratuito</span>
+                                        @endif
+                                    </div>
+                                </div>
                             </a>
                         @endforeach
                     </div>
                 </section>
             @endif
 
-            <section class="mt-10 grid items-stretch gap-5 lg:grid-cols-3">
+            <section class="mt-10 grid items-stretch gap-5 lg:grid-cols-2">
                 <article id="sobre-loja" class="store-home-card flex flex-col rounded-[1.65rem] bg-white p-6">
                     <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Sobre a loja</p>
                     <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900">{{ $store->brand_name }}</h2>
@@ -702,39 +765,6 @@
                                 <i class="fas fa-globe mr-1"></i> Site
                             </a>
                         @endif
-                    </div>
-                </article>
-
-                <article class="store-home-card flex flex-col rounded-[1.65rem] bg-white p-6">
-                    <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Resumo da operação</p>
-                    <div class="mt-4 flex-1 flex flex-col gap-3">
-                        <div class="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
-                            <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50" style="color: {{ $themePrimary }};">
-                                <i class="fas fa-box-open"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Produtos</p>
-                                <p class="text-xl font-black text-slate-900">{{ $products->count() }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
-                            <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Conteúdos</p>
-                                <p class="text-xl font-black text-slate-900">{{ $courses->count() + $mentorships->count() + $events->count() }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
-                            <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                                <i class="fas fa-link"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Loja pública</p>
-                                <p class="text-sm font-black text-slate-900">/loja/{{ $store->slug }}</p>
-                            </div>
-                        </div>
                     </div>
                 </article>
             </section>
