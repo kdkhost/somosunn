@@ -131,12 +131,20 @@
 
         .external-event {
             color: #fff;
-            padding: 6px 10px;
-            border-radius: 6px;
+            padding: 8px 12px;
+            border-radius: 10px;
             margin-bottom: 8px;
             cursor: move;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .external-event:hover {
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.15);
         }
 
         .color-chooser {
@@ -146,19 +154,27 @@
         }
 
         .color-chooser .color-item {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             cursor: pointer;
             border: 2px solid transparent;
+            transition: all 0.15s ease;
+        }
+
+        .color-chooser .color-item:hover {
+            transform: scale(1.1);
         }
 
         .color-chooser .color-item.active {
             border-color: #111827;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111827;
         }
 
         .calendar-card {
-            border-top: 3px solid var(--unn-calendar-primary);
+            border-top: 4px solid var(--unn-calendar-primary);
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         #calendar {
@@ -170,65 +186,77 @@
 @section('content')
     <div class="row">
         <div class="col-md-3">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Eventos Recentes</h4>
+            <div class="card card-outline card-primary shadow-sm">
+                <div class="card-header border-0">
+                    <h4 class="card-title font-weight-bold">
+                        <i class="fas fa-clock-rotate-left mr-2 text-primary"></i>Eventos Recentes
+                    </h4>
                 </div>
                 <div class="card-body">
                     <div id="recent-events" class="small text-muted">Carregando...</div>
                 </div>
             </div>
             @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('events.create'))
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Eventos Arrastáveis</h3>
+                <div class="card card-outline card-success shadow-sm">
+                    <div class="card-header border-0">
+                        <h3 class="card-title font-weight-bold">
+                            <i class="fas fa-arrows-alt mr-2 text-success"></i>Eventos Arrastáveis
+                        </h3>
                     </div>
                     <div class="card-body">
+                        <p class="text-muted small mb-2"><i class="fas fa-hand-pointer mr-1"></i>Arraste um modelo para o calendário</p>
                         <div id="external-events" class="external-events">
                             @foreach($calendarTemplates as $tpl)
-                                <div class="external-event" data-title="{{ $tpl['title'] }}" data-color="{{ $tpl['color'] }}"
+                                <div class="external-event shadow-sm" data-title="{{ $tpl['title'] }}" data-color="{{ $tpl['color'] }}"
                                     style="background:{{ $tpl['color'] }};">
-                                    {{ $tpl['title'] }}
+                                    <i class="fas fa-grip-vertical mr-1"></i>{{ $tpl['title'] }}
                                 </div>
                             @endforeach
                         </div>
-                        <div class="form-check mt-2">
+                        <div class="form-check mt-3 p-2 rounded border bg-light">
                             <input type="checkbox" class="form-check-input" id="drop-remove" {{ $defaultRemoveAfterDrop ? 'checked' : '' }}>
-                            <label class="form-check-label" for="drop-remove">Remover após soltar</label>
+                            <label class="form-check-label small font-weight-bold" for="drop-remove">Remover modelo após soltar</label>
                         </div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Criar Evento Rápido</h3>
+                <div class="card card-outline card-info shadow-sm">
+                    <div class="card-header border-0">
+                        <h3 class="card-title font-weight-bold">
+                            <i class="fas fa-bolt mr-2 text-info"></i>Criar Evento Rápido
+                        </h3>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <input type="text" class="form-control" id="new-event-title" placeholder="Título do evento">
+                            <label class="small font-weight-bold text-muted">Título</label>
+                            <input type="text" class="form-control" id="new-event-title" placeholder="Digite o título do evento">
                         </div>
+                        <label class="small font-weight-bold text-muted mb-2">Cor do evento</label>
                         <div class="color-chooser mb-3" id="new-event-colors">
                             @foreach($calendarQuickColors as $idx => $color)
                                 <span class="color-item {{ $idx === 0 ? 'active' : '' }}" data-color="{{ $color }}"
                                     style="background:{{ $color }};"></span>
                             @endforeach
                         </div>
-                        <button id="add-new-event" class="btn btn-primary btn-block"><i class="fas fa-plus"></i>
-                            Adicionar</button>
-                        <button class="btn btn-outline-secondary btn-block mt-2" data-toggle="modal" data-target="#eventModal">
-                            <i class="fas fa-pen"></i> Novo Evento Completo
+                        <button id="add-new-event" class="btn btn-primary btn-block rounded-pill elevation-1">
+                            <i class="fas fa-plus mr-1"></i> Adicionar ao Calendário
+                        </button>
+                        <button class="btn btn-outline-secondary btn-block mt-2 rounded-pill" data-toggle="modal" data-target="#eventModal">
+                            <i class="fas fa-pen mr-1"></i> Novo Evento Completo
                         </button>
                     </div>
                 </div>
             @endif
         </div>
         <div class="col-md-9">
-            <div class="card calendar-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title m-0">Calendário</h3>
+            <div class="card calendar-card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center border-0">
+                    <h3 class="card-title m-0 font-weight-bold">
+                        <i class="fas fa-calendar-alt mr-2 text-primary"></i>Calendário
+                    </h3>
                     @if(auth()->user()->isAdmin())
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal"
+                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 elevation-1" data-toggle="modal"
                             data-target="#calendarSettingsModal">
-                            <i class="fas fa-sliders-h"></i> Personalizar
+                            <i class="fas fa-sliders-h mr-1"></i> Personalizar
                         </button>
                     @endif
                 </div>

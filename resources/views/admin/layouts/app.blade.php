@@ -506,6 +506,23 @@
             min-width: auto;
         }
 
+        /* Card tools sempre alinhado à direita por padrão */
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-header .card-title {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .card-header .card-tools {
+            margin-left: auto;
+            float: none !important;
+        }
+
         .note-editor.note-frame {
             border-color: var(--summernote-border) !important;
             background-color: var(--summernote-surface) !important;
