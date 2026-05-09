@@ -485,6 +485,27 @@
             color: #475569 !important;
         }
 
+        /* Garantir que botões nunca quebrem o texto em linhas estreitas */
+        .btn {
+            white-space: nowrap;
+        }
+
+        .btn.btn-block,
+        .btn[class*="btn-wrap"] {
+            white-space: normal;
+        }
+
+        /* Modais sempre com largura adequada */
+        .modal-dialog {
+            margin: 1.75rem auto;
+        }
+
+        .modal-footer .btn,
+        .modal-body .text-right .btn,
+        .modal-body .d-flex .btn {
+            min-width: auto;
+        }
+
         .note-editor.note-frame {
             border-color: var(--summernote-border) !important;
             background-color: var(--summernote-surface) !important;

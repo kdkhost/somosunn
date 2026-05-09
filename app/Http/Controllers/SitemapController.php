@@ -42,8 +42,8 @@ class SitemapController extends Controller
             $urls[] = route('mentorships.show', $mentorship);
         }
 
-        // 4. Dynamic Content - Events (Active/Upcoming)
-        $events = Event::where('status', 'published')->get(); // Adjust status if needed
+        // 4. Dynamic Content - Events (Published)
+        $events = Event::where('published', true)->get();
         foreach ($events as $event) {
             $urls[] = route('events.show', $event);
         }

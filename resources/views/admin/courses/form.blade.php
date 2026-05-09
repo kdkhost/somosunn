@@ -1217,9 +1217,11 @@
                                 role="progressbar" id="uploadProgressBar" style="width: 0%">0%</div>
                         </div>
 
-                        <div class="text-right mt-3">
-                            <button type="button" class="btn btn-primary" id="btnSaveLesson" data-toggle="tooltip"
-                                title="Salvar e fechar modal">Salvar Dados da Aula</button>
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-primary px-4" id="btnSaveLesson" data-toggle="tooltip"
+                                title="Salvar e fechar modal" style="white-space:nowrap;">
+                                <i class="fas fa-save mr-1"></i> Salvar Dados da Aula
+                            </button>
                         </div>
                     </form>
 
