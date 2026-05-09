@@ -183,9 +183,9 @@
                 @csrf
                 <input type="hidden" name="site_theme" id="site_theme_input"
                     value="{{ $settings['site_theme'] ?? 'light' }}">
-                <button type="button" class="btn btn-sm btn-outline-light d-flex align-items-center" id="themeToggleBtn"
-                    title="Alternar tema">
-                    <i class="fas {{ ($settings['site_theme'] ?? 'light') === 'dark' ? 'fa-sun' : 'fa-moon' }}"></i>
+                <button type="button" class="btn btn-sm nav-link p-1 d-flex align-items-center" id="themeToggleBtn"
+                    title="Alternar tema" style="border:none; background:none;">
+                    <i class="fas {{ ($settings['site_theme'] ?? 'light') === 'dark' ? 'fa-sun text-warning' : 'fa-moon' }}"></i>
                 </button>
             </form>
         </li>
