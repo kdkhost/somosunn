@@ -316,6 +316,7 @@ Route::get('/robots.txt', function () {
 // Courses (Public)
 Route::get('courses', [\App\Http\Controllers\CourseController::class, 'index'])->name('courses.index');
 Route::get('courses/{course}', [\App\Http\Controllers\CourseController::class, 'show'])->name('courses.show');
+Route::post('courses/{course}/complete', [\App\Http\Controllers\CourseController::class, 'complete'])->middleware(['auth'])->name('courses.complete');
 
 // Mentorships (Public)
 Route::get('mentorships', [\App\Http\Controllers\MentorshipController::class, 'index'])->name('mentorships.index');
@@ -721,6 +722,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class);
     Route::post('courses/{course}/lessons/content-image', [\App\Http\Controllers\LessonController::class, 'uploadContentImage'])->name('courses.lessons.content-image');
     Route::post('courses/{course}/lessons/reorder', [\App\Http\Controllers\Admin\CourseController::class, 'reorderLessons'])->name('courses.lessons.reorder');
+    Route::delete('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('courses.lessons.destroy');
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
     Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
     Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'pdf'])->name('invoices.pdf');
@@ -748,6 +750,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('mailtemplates/{mailtemplate}/sendpreview', [\App\Http\Controllers\Admin\MailTemplateController::class, 'sendPreview'])->name('mailtemplates.sendpreview');
     Route::resource('mailtemplates', \App\Http\Controllers\Admin\MailTemplateController::class)->except(['show']);
     Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class)->except(['show']);
+
+    // CMS
+    Route::get('cms/{slug?}', [\App\Http\Controllers\Admin\CMSController::class, 'index'])->name('cms.index');
+    Route::post('cms/{slug}', [\App\Http\Controllers\Admin\CMSController::class, 'update'])->name('cms.update');
 
     // Media Routes (Standardized)
     Route::post('events/{event}/media', [\App\Http\Controllers\Admin\EventMediaController::class, 'store'])->name('events.media.store');

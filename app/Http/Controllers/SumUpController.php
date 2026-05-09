@@ -149,6 +149,15 @@ class SumUpController extends Controller
      */
     public function webhook(Request $request)
     {
+        // GET = health check (gateways e browsers fazem isso)
+        if ($request->isMethod('GET')) {
+            return response()->json([
+                'status' => 'ok',
+                'service' => 'sumup-webhook',
+                'message' => 'Webhook endpoint active. Use POST to send notifications.',
+            ]);
+        }
+
         try {
             $payload = $request->getContent();
             $signature = $request->header('X-SumUp-Signature');

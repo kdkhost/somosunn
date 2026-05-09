@@ -58,7 +58,7 @@ Route::prefix('v1/webhooks')->withoutMiddleware([\Illuminate\Routing\Middleware\
         ->defaults('seller_id', 'platform')
         ->name('api.webhooks.mercadopago');
     
-    Route::post('/sumup', [App\Http\Controllers\SumUpController::class, 'webhook'])
+    Route::match(['get', 'post'], '/sumup', [App\Http\Controllers\SumUpController::class, 'webhook'])
         ->name('api.webhooks.sumup');
 });
 
