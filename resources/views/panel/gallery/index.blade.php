@@ -60,60 +60,90 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.25rem;
             flex-wrap: wrap;
         }
 
+        .gallery-panel-pagination .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .gallery-panel-pagination .page-item .page-link,
         .gallery-panel-pagination span[aria-current="page"] span,
         .gallery-panel-pagination a,
         .gallery-panel-pagination span[aria-disabled="true"] span {
             display: inline-flex;
-            min-width: 2.25rem;
-            height: 2.25rem;
+            min-width: 2rem;
+            height: 2rem;
             align-items: center;
             justify-content: center;
-            border-radius: 0.5rem;
+            border-radius: 0.375rem;
             font-size: 0.75rem;
-            font-weight: 700;
+            font-weight: 600;
+            padding: 0 0.5rem;
             transition: all 0.15s ease;
+            text-decoration: none;
         }
 
+        .gallery-panel-pagination .page-item .page-link,
         .gallery-panel-pagination a {
-            border: 1px solid rgba(148, 163, 184, 0.2);
+            border: 1px solid #e2e8f0;
             background: #fff;
             color: #334155;
         }
 
+        .gallery-panel-pagination .page-item .page-link:hover,
         .gallery-panel-pagination a:hover {
             border-color: #3b82f6;
             background: #eff6ff;
             color: #1d4ed8;
         }
 
-        .dark .gallery-panel-pagination a {
-            border-color: rgba(51, 65, 85, 0.8);
-            background: #0f172a;
-            color: #e2e8f0;
-        }
-
-        .dark .gallery-panel-pagination a:hover {
-            background: #1e293b;
-            color: #93c5fd;
-        }
-
+        .gallery-panel-pagination .page-item.active .page-link,
         .gallery-panel-pagination span[aria-current="page"] span {
             background: #2563eb;
+            border-color: #2563eb;
             color: #fff;
         }
 
+        .gallery-panel-pagination .page-item.disabled .page-link,
         .gallery-panel-pagination span[aria-disabled="true"] span {
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border: 1px solid #f1f5f9;
             background: #f8fafc;
             color: #94a3b8;
+            pointer-events: none;
         }
 
+        .dark .gallery-panel-pagination .page-item .page-link,
+        .dark .gallery-panel-pagination a {
+            border-color: #334155;
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .dark .gallery-panel-pagination .page-item .page-link:hover,
+        .dark .gallery-panel-pagination a:hover {
+            background: #334155;
+            color: #93c5fd;
+        }
+
+        .dark .gallery-panel-pagination .page-item.active .page-link,
+        .dark .gallery-panel-pagination span[aria-current="page"] span {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff;
+        }
+
+        .dark .gallery-panel-pagination .page-item.disabled .page-link,
         .dark .gallery-panel-pagination span[aria-disabled="true"] span {
-            border-color: rgba(51, 65, 85, 0.8);
+            border-color: #1e293b;
             background: #0f172a;
             color: #475569;
         }

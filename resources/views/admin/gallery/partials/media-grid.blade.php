@@ -1,153 +1,116 @@
 <div class="card card-outline card-primary">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-photo-video mr-2"></i>{{ $selectedEvent ? 'Midias do evento filtrado' : 'Todas as midias da galeria' }}
+            <i class="fas fa-photo-video mr-2"></i>{{ $selectedEvent ? 'Mídias do evento filtrado' : 'Todas as mídias' }}
         </h3>
-
         <div class="card-tools">
-            <span class="badge badge-primary"><span id="adminGalleryResultCount">{{ number_format($media->total(), 0, ',', '.') }}</span> registro(s)</span>
+            <span class="badge badge-primary">
+                <span id="adminGalleryResultCount">{{ $media->total() }}</span> registro(s)
+            </span>
         </div>
     </div>
 
-    <div class="card-body">
-        <div class="row" id="gallery-container">
-            @forelse($media as $item)
-                @php
-                    $assetUrl = \App\Support\UploadStorage::url($item->file_path, asset('img/logo.svg'));
-                    $eventTitle = optional($item->event)->title ?: 'Evento sem titulo';
-                    $ownerName = optional($item->user)->name ?: 'Sistema';
-                    $ownerInitial = strtoupper(\Illuminate\Support\Str::substr($ownerName, 0, 1));
-                    $avatarUrl = optional($item->user)->profile_photo_url ?? null;
-                    $hasAvatar = $avatarUrl && !str_contains((string) $avatarUrl, 'default-user.svg');
-                    $isCoverFromMedia = blank(optional($item->event)->gallery_cover_image)
-                        && (int) optional($item->event)->gallery_cover_media_id === (int) $item->id;
-                    $eventDate = optional($item->event)->start_at
-                        ? \Carbon\Carbon::parse($item->event->start_at)->format('d/m/Y')
-                        : null;
-                    $uploadedDate = $item->created_at?->format('d/m/Y H:i') ?: '--';
-                @endphp
+    <div class="card-body p-3">
+        @if($media->count() > 0)
+            <div class="row" id="gallery-container">
+                @foreach($media as $item)
+                    @php
+                        $assetUrl = \App\Support\UploadStorage::url($item->file_path, asset('img/logo.svg'));
+                        $eventTitle = optional($item->event)->title ?: 'Evento sem título';
+                        $ownerName = optional($item->user)->name ?: 'Sistema';
+                        $isCoverFromMedia = blank(optional($item->event)->gallery_cover_image)
+                            && (int) optional($item->event)->gallery_cover_media_id === (int) $item->id;
+                        $isVideo = $item->type === 'video';
+                    @endphp
 
-                <div class="col-sm-6 col-xl-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="gallery-admin-thumb">
-                            @if($item->type === 'video')
-                                <a href="{{ $assetUrl }}" target="_blank" rel="noopener" class="gallery-admin-video-link">
-                                    <video src="{{ $assetUrl }}" muted playsinline preload="metadata"></video>
-                                    <span class="gallery-admin-video-overlay">
-                                        <i class="fas fa-play-circle fa-2x mb-2"></i>
-                                        <span class="font-weight-bold">Abrir video</span>
-                                    </span>
-                                </a>
-                            @else
-                                <a href="{{ $assetUrl }}" target="_blank" rel="noopener">
-                                    <img src="{{ $assetUrl }}" alt="{{ $eventTitle }}" loading="lazy" decoding="async">
-                                </a>
-                            @endif
-                        </div>
+                    <div class="col-6 col-sm-4 col-md-3 col-xl-2 mb-3">
+                        <div class="card h-100 shadow-sm border position-relative">
+                            {{-- Thumbnail --}}
+                            <div class="position-relative" style="padding-top:100%; overflow:hidden; background:#f1f5f9;">
+                                @if($isVideo)
+                                    <a href="{{ $assetUrl }}" target="_blank" rel="noopener"
+                                        class="position-absolute d-flex align-items-center justify-content-center"
+                                        style="inset:0; background:#0f172a; text-decoration:none;">
+                                        <video src="{{ $assetUrl }}" muted playsinline preload="none"
+                                            class="position-absolute" style="inset:0; width:100%; height:100%; object-fit:cover; opacity:.5;"
+                                            loading="lazy"></video>
+                                        <i class="fas fa-play-circle text-white fa-2x position-relative" style="z-index:1;"></i>
+                                    </a>
+                                @else
+                                    <a href="{{ $assetUrl }}" target="_blank" rel="noopener"
+                                        class="position-absolute" style="inset:0;">
+                                        <img src="{{ $assetUrl }}" alt="{{ $eventTitle }}"
+                                            class="w-100 h-100" style="object-fit:cover;"
+                                            loading="lazy" decoding="async">
+                                    </a>
+                                @endif
 
-                        <div class="card-body d-flex flex-column">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="gallery-admin-avatar mr-2">
-                                    @if($hasAvatar)
-                                        <img src="{{ $avatarUrl }}"
-                                            alt="{{ $ownerName }}"
-                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                    @else
-                                        <span>{{ $ownerInitial }}</span>
-                                    @endif
-                                </div>
-
-                                <div class="flex-grow-1">
-                                    <div class="font-weight-bold text-truncate">{{ $ownerName }}</div>
-                                    <small class="text-muted">Enviado em {{ $uploadedDate }}</small>
-                                </div>
-                            </div>
-
-                            <h3 class="h6 font-weight-bold mb-2">{{ \Illuminate\Support\Str::limit($eventTitle, 48) }}</h3>
-
-                            <ul class="list-unstyled text-muted small mb-3">
-                                <li class="mb-1">
-                                    <i class="far fa-calendar-alt mr-1"></i>{{ $eventDate ?: '--/--/----' }}
-                                </li>
-                                <li class="mb-1">
-                                    <i class="fas {{ $item->type === 'video' ? 'fa-film' : 'fa-image' }} mr-1"></i>{{ $item->type === 'video' ? 'Video' : 'Imagem' }}
-                                </li>
-                                <li>
-                                    <i class="fas fa-certificate mr-1"></i>{{ $item->watermarked ? 'Com marca d\'agua' : 'Sem marca d\'agua' }}
-                                </li>
-                            </ul>
-
-                            <div class="mb-3">
+                                {{-- Cover badge --}}
                                 @if($isCoverFromMedia)
-                                    <span class="badge badge-warning mr-1">
-                                        <i class="fas fa-star mr-1"></i>Capa do album
+                                    <span class="badge badge-warning position-absolute" style="top:4px; left:4px; font-size:10px;">
+                                        <i class="fas fa-star"></i> Capa
                                     </span>
                                 @endif
 
-                                @if($item->watermarked)
-                                    <span class="badge badge-primary">Watermark</span>
+                                {{-- Type badge --}}
+                                @if($isVideo)
+                                    <span class="badge badge-dark position-absolute" style="top:4px; right:4px; font-size:9px;">
+                                        Vídeo
+                                    </span>
                                 @endif
                             </div>
 
-                            <div class="mt-auto">
-                                <div class="row">
-                                    @if($item->type === 'image')
-                                        <div class="col-8 pr-1">
-                                            <form action="{{ route('admin.gallery.cover.media', $item) }}" method="POST" class="mb-0">
-                                                @csrf
-                                                <button type="submit" class="btn {{ $isCoverFromMedia ? 'btn-warning' : 'btn-outline-warning' }} btn-sm btn-block">
-                                                    <i class="fas fa-star mr-1"></i>{{ $isCoverFromMedia ? 'Capa ativa' : 'Definir capa' }}
-                                                </button>
-                                            </form>
-                                        </div>
+                            {{-- Info --}}
+                            <div class="card-body p-2">
+                                <p class="mb-0 text-truncate font-weight-bold" style="font-size:11px;" title="{{ $eventTitle }}">
+                                    {{ \Illuminate\Support\Str::limit($eventTitle, 20) }}
+                                </p>
+                                <p class="mb-0 text-muted text-truncate" style="font-size:10px;">
+                                    {{ $ownerName }} • {{ $item->created_at?->format('d/m') }}
+                                </p>
+                            </div>
 
-                                        <div class="col-4 pl-1">
-                                            <form action="{{ route('admin.gallery.destroy', $item) }}"
-                                                method="POST"
-                                                class="delete-form mb-0"
-                                                data-confirm-title="Remover da galeria?"
-                                                data-confirm-text="Esta midia sera excluida permanentemente.">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger btn-sm btn-block">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @else
-                                        <div class="col-12">
-                                            <form action="{{ route('admin.gallery.destroy', $item) }}"
-                                                method="POST"
-                                                class="delete-form mb-0"
-                                                data-confirm-title="Remover da galeria?"
-                                                data-confirm-text="Esta midia sera excluida permanentemente.">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger btn-sm btn-block">
-                                                    <i class="fas fa-trash mr-1"></i>Remover video
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @endif
-                                </div>
+                            {{-- Actions --}}
+                            <div class="card-footer p-1 d-flex justify-content-between border-top">
+                                @if($item->type === 'image')
+                                    <form action="{{ route('admin.gallery.cover.media', $item) }}" method="POST" class="mb-0">
+                                        @csrf
+                                        <button type="submit" class="btn btn-xs {{ $isCoverFromMedia ? 'btn-warning' : 'btn-outline-secondary' }}" title="Definir como capa">
+                                            <i class="fas fa-star"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <span></span>
+                                @endif
+
+                                <form action="{{ route('admin.gallery.destroy', $item) }}" method="POST"
+                                    class="delete-form mb-0"
+                                    data-confirm-title="Remover?"
+                                    data-confirm-text="Esta mídia será excluída permanentemente.">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-xs btn-outline-danger" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
-                </div>
-            @empty
-                <div class="col-12">
-                    <div class="callout callout-info mb-0" id="adminGalleryEmptyState">
-                        <h5><i class="fas fa-camera mr-2"></i>Nenhuma midia encontrada</h5>
-                        <p class="mb-0">Ajuste o filtro ou envie novas imagens para popular a galeria do evento.</p>
-                    </div>
-                </div>
-            @endforelse
-        </div>
+                @endforeach
+            </div>
+        @else
+            <div class="callout callout-info mb-0" id="adminGalleryEmptyState">
+                <h5><i class="fas fa-camera mr-2"></i>Nenhuma mídia encontrada</h5>
+                <p class="mb-0">Ajuste o filtro ou envie novas imagens para popular a galeria.</p>
+            </div>
+        @endif
     </div>
 
     @if($media->hasPages())
-        <div class="card-footer clearfix gallery-admin-pagination">
-            {{ $media->appends(request()->query())->links() }}
+        <div class="card-footer clearfix">
+            <div class="d-flex justify-content-center">
+                {{ $media->appends(request()->query())->links() }}
+            </div>
         </div>
     @endif
 </div>
