@@ -6,53 +6,161 @@
 @endsection
 
 @section('content')
-    <div class="card card-outline card-primary">
-        <div class="card-header d-flex align-items-center">
-            <h3 class="card-title"><i class="fas fa-history mr-2"></i>Histórico de Ações</h3>
-            <div class="card-tools ml-auto">
-                <form action="{{ route('admin.activity_logs.clear') }}" method="POST" id="form-clear-logs">
+    @php
+        $totalLogs = $logs->count();
+        $uniqueUsers = $logs->pluck('user_id')->filter()->unique()->count();
+        $uniqueActions = $logs->pluck('action')->unique()->count();
+    @endphp
+
+    {{-- KPI Cards --}}
+    <div class="row mb-4">
+        <div class="col-lg-4 col-sm-6">
+            <div class="info-box shadow-sm elevation-1">
+                <span class="info-box-icon bg-gradient-primary elevation-1"><i class="fas fa-history"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text font-weight-bold">Total de Registros</span>
+                    <span class="info-box-number">{{ $totalLogs }}</span>
+                    <span class="progress-description text-xs">Ações registradas no sistema</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6">
+            <div class="info-box shadow-sm elevation-1">
+                <span class="info-box-icon bg-gradient-info elevation-1"><i class="fas fa-users"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text font-weight-bold">Usuários Ativos</span>
+                    <span class="info-box-number text-info">{{ $uniqueUsers }}</span>
+                    <span class="progress-description text-xs">Com atividade registrada</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-12">
+            <div class="info-box shadow-sm elevation-1">
+                <span class="info-box-icon bg-gradient-warning elevation-1"><i class="fas fa-bolt"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text font-weight-bold">Tipos de Ação</span>
+                    <span class="info-box-number text-warning">{{ $uniqueActions }}</span>
+                    <span class="progress-description text-xs">Categorias distintas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Tabela principal --}}
+    <div class="card card-outline card-primary shadow-sm">
+        <div class="card-header border-0">
+            <h3 class="card-title font-weight-bold">
+                <i class="fas fa-stream mr-2 text-primary"></i>Histórico de Ações
+            </h3>
+            <div class="card-tools">
+                <form action="{{ route('admin.activity_logs.clear') }}" method="POST" id="form-clear-logs" class="d-inline">
                     @csrf
-                    <button type="button" class="btn btn-sm btn-danger btn-clear-logs">
+                    <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 elevation-1 btn-clear-logs">
                         <i class="fas fa-trash-alt mr-1"></i> Limpar Histórico
                     </button>
                 </form>
             </div>
         </div>
-        <div class="card-body">
-            <table id="table_logs" class="table table-bordered table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th style="width: 15%">Data/Hora</th>
-                        <th style="width: 20%">Usuário</th>
-                        <th style="width: 15%">Ação</th>
-                        <th style="width: 15%">IP</th>
-                        <th>Descrição</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($logs as $log)
-                        <tr>
-                            <td data-sort="{{ $log->created_at->format('YmdHis') }}">
-                                {{ $log->created_at->format('d/m/Y H:i:s') }}
-                            </td>
-                            <td>
-                                @if($log->user)
-                                    <a href="{{ route('admin.users.edit', $log->user_id) }}" class="font-weight-bold">
-                                        {{ $log->user->name }}
-                                    </a>
-                                @else
-                                    <span class="badge badge-secondary">Sistema / Visitante</span>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="badge badge-info">{{ $log->action }}</span>
-                            </td>
-                            <td>{{ $log->ip_address }}</td>
-                            <td>{{ $log->description }}</td>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="table_logs" class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="bg-light">
+                            <th class="border-0 pl-4" style="width:15%;">Data/Hora</th>
+                            <th class="border-0" style="width:20%;">Usuário</th>
+                            <th class="border-0 text-center" style="width:15%;">Ação</th>
+                            <th class="border-0" style="width:12%;">IP</th>
+                            <th class="border-0">Descrição</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($logs as $log)
+                            <tr>
+                                <td class="pl-4" data-sort="{{ $log->created_at->format('YmdHis') }}">
+                                    <div class="text-sm font-weight-bold">{{ $log->created_at->format('d/m/Y') }}</div>
+                                    <small class="text-muted">{{ $log->created_at->format('H:i:s') }}</small>
+                                </td>
+                                <td>
+                                    @if($log->user)
+                                        <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center justify-content-center rounded-circle bg-gradient-primary mr-2"
+                                                style="width:32px; height:32px; flex-shrink:0;">
+                                                <i class="fas fa-user text-white" style="font-size:12px;"></i>
+                                            </div>
+                                            <div>
+                                                <a href="{{ route('admin.users.edit', $log->user_id) }}" class="font-weight-bold text-sm">
+                                                    {{ $log->user->name }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center justify-content-center rounded-circle bg-gradient-secondary mr-2"
+                                                style="width:32px; height:32px; flex-shrink:0;">
+                                                <i class="fas fa-robot text-white" style="font-size:12px;"></i>
+                                            </div>
+                                            <span class="badge badge-secondary px-2 py-1">Sistema / Visitante</span>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge badge-info px-3 py-2" style="font-size:11px;">
+                                        <i class="fas fa-bolt mr-1" style="font-size:9px;"></i>{{ $log->action }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <code class="bg-light border rounded px-2 py-1 text-xs">{{ $log->ip_address }}</code>
+                                </td>
+                                <td>
+                                    <span class="text-sm text-muted">{{ $log->description }}</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="mb-3">
+                                        <i class="fas fa-history fa-3x text-muted"></i>
+                                    </div>
+                                    <h5 class="text-muted font-weight-bold">Nenhum registro de atividade</h5>
+                                    <p class="text-muted">As ações dos usuários serão registradas automaticamente aqui.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {{-- Info card --}}
+    <div class="card card-outline card-secondary shadow-sm">
+        <div class="card-header border-0 py-2">
+            <h3 class="card-title text-sm font-weight-bold"><i class="fas fa-info-circle mr-2 text-info"></i>Sobre os Logs de Atividade</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="font-weight-bold mb-2">O que é registrado:</h6>
+                    <ul class="list-unstyled mb-0 text-sm text-muted">
+                        <li class="mb-1"><i class="fas fa-check text-success mr-2"></i>Login e logout de usuários</li>
+                        <li class="mb-1"><i class="fas fa-check text-success mr-2"></i>Criação e edição de registros</li>
+                        <li class="mb-1"><i class="fas fa-check text-success mr-2"></i>Exclusão de dados</li>
+                        <li class="mb-1"><i class="fas fa-check text-success mr-2"></i>Alterações de permissões</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="font-weight-bold mb-2">Retenção:</h6>
+                    <ul class="list-unstyled mb-0 text-sm text-muted">
+                        <li class="mb-1"><i class="fas fa-info-circle text-info mr-2"></i>Logs são mantidos indefinidamente</li>
+                        <li class="mb-1"><i class="fas fa-exclamation-triangle text-warning mr-2"></i>Limpar histórico é irreversível</li>
+                        <li class="mb-1"><i class="fas fa-shield-alt text-primary mr-2"></i>IPs são registrados para auditoria</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -62,6 +170,19 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css">
+    <style>
+        .align-middle td { vertical-align: middle !important; }
+        #table_logs_wrapper .dataTables_paginate {
+            display: flex;
+            justify-content: center;
+            padding: 0.75rem;
+        }
+        #table_logs_wrapper .dataTables_info {
+            margin: 0.95rem 0 0 0.75rem;
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+    </style>
 @endpush
 
 @push('scripts')

@@ -4,6 +4,154 @@
 @section('breadcrumb')<li class="breadcrumb-item active">Planos</li>@endsection
 
 @section('content')
+<div class="container-fluid">
+    {{-- KPI Cards --}}
+    <div class="row">
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="info-box bg-gradient-primary elevation-1">
+                <span class="info-box-icon"><i class="fas fa-layer-group"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Total de Planos</span>
+                    <span class="info-box-number">{{ $plans->total() }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="info-box bg-gradient-success elevation-1">
+                <span class="info-box-icon"><i class="fas fa-check-circle"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Ativos</span>
+                    <span class="info-box-number">{{ $plans->where('is_active', true)->count() }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="info-box bg-gradient-warning elevation-1">
+                <span class="info-box-icon"><i class="fas fa-star"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Destaques</span>
+                    <span class="info-box-number">{{ $plans->filter(fn($p) => $p->highlight || $p->is_featured)->count() }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="info-box bg-gradient-secondary elevation-1">
+                <span class="info-box-icon"><i class="fas fa-eye-slash"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Ocultos</span>
+                    <span class="info-box-number">{{ $plans->where('is_active', false)->count() }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Main Card --}}
+    <div class="card card-outline card-primary shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-layer-group mr-2"></i>Planos / Pacotes</h3>
+            <div class="card-tools d-flex align-items-center">
+                <span id="kanban-saving" class="kanban-saving mr-3">
+                    <i class="fas fa-circle-notch fa-spin"></i> Salvando ordem...
+                </span>
+                <a href="{{ route('admin.plans.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
+                    <i class="fas fa-plus mr-1"></i> Novo plano
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-light border-left border-primary highlight-note mb-3">
+                <i class="fas fa-arrows-alt text-primary mr-1"></i>
+                <strong>Arraste</strong> para reordenar os cards. O plano com <i class="fas fa-star" style="color:#f59e0b"></i> <strong>Destaque</strong> sempre ficará <strong>centralizado</strong> na página pública independente da posição aqui.
+            </div>
+
+            <div class="plan-kanban-wrap" id="plans-kanban">
+                @forelse($plans as $plan)
+                @php
+                    $periods = $plan->getAvailablePeriods();
+                    $multiPeriod = count(array_filter($periods, fn($v) => $v > 0)) > 1;
+                @endphp
+                <div class="plan-card {{ ($plan->is_featured || $plan->highlight) ? 'is-highlighted' : '' }}"
+                     data-id="{{ $plan->id }}">
+
+                    <div class="plan-header">
+                        <span class="plan-drag-handle" title="Arrastar"><i class="fas fa-grip-vertical"></i></span>
+                        <div class="font-weight-bold flex-grow-1 text-truncate small" title="{{ $plan->name }}">
+                            {{ $plan->name }}
+                            @if($plan->highlight || $plan->is_featured)
+                                <i class="fas fa-star ml-1" title="Destaque" style="color:#fbbf24;font-size:10px"></i>
+                            @endif
+                        </div>
+                        <span class="badge plan-badge js-plan-status {{ $plan->is_active ? 'badge-success' : 'badge-secondary' }}">
+                            {{ $plan->is_active ? 'Ativo' : 'Oculto' }}
+                        </span>
+                    </div>
+
+                    @if($plan->image)
+                        <img src="{{ asset('storage/'.$plan->image) }}" alt="{{ $plan->name }}"
+                             style="width:100%;height:90px;object-fit:cover;">
+                    @endif
+
+                    <div class="plan-body">
+                        <div class="plan-price">R$ {{ number_format($plan->price, 2, ',', '.') }}</div>
+                        <div class="plan-cycle">{{ ucfirst($plan->period ?? 'mensal') }}</div>
+
+                        @if($multiPeriod)
+                            <div class="period-pills">
+                                @foreach($periods as $pk => $pv)
+                                    @if($pv > 0)
+                                    <span class="period-pill">{{ ucfirst($pk) }} R${{ number_format($pv,0,',','.') }}</span>
+                                    @endif
+                                @endforeach
+                            </div>
+                        @endif
+
+                        @if($plan->description)
+                            <p class="mt-2 mb-0 text-muted" style="font-size:11px;line-height:1.4">
+                                {{ Str::limit($plan->description, 65) }}
+                            </p>
+                        @endif
+                    </div>
+
+                    <div class="plan-footer">
+                        <button type="button"
+                            class="btn btn-sm rounded-pill {{ $plan->is_active ? 'btn-outline-warning' : 'btn-outline-success' }} js-toggle-plan-active"
+                            data-url="{{ route('admin.plans.toggle-active', $plan) }}"
+                            data-active="{{ $plan->is_active ? 1 : 0 }}"
+                            title="{{ $plan->is_active ? 'Ocultar' : 'Ativar' }}">
+                            <i class="fas {{ $plan->is_active ? 'fa-eye-slash' : 'fa-eye' }}"></i>
+                        </button>
+                        <a href="{{ route('admin.plans.edit', $plan) }}" class="btn btn-sm btn-secondary rounded-pill" title="Editar">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <form action="{{ route('admin.plans.destroy', $plan) }}" method="POST" class="d-inline mb-0">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-sm btn-danger rounded-pill" title="Excluir"
+                                data-confirm-delete
+                                data-confirm-title="Remover plano?"
+                                data-confirm-text="O plano será excluído permanentemente.">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-5 w-100">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-2">Nenhum plano cadastrado ainda.</p>
+                    <a href="{{ route('admin.plans.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
+                        <i class="fas fa-plus mr-1"></i> Criar primeiro plano
+                    </a>
+                </div>
+                @endforelse
+            </div>
+
+            <div class="mt-3">{{ $plans->links() }}</div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('styles')
 <style>
     .plan-kanban-wrap {
         display: flex;
@@ -24,6 +172,11 @@
         overflow: hidden;
         width: 230px;
         flex-shrink: 0;
+    }
+
+    .plan-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,.1);
     }
 
     .plan-card.sortable-ghost { opacity: .35; transform: scale(.97); }
@@ -85,109 +238,12 @@
     .highlight-note {
         font-size: 12px;
         color: #374151;
-        background: #eff6ff;
-        border: 1px dashed #93c5fd;
-        border-radius: 6px;
-        padding: 8px 12px;
+        border-left: 4px solid #007bff !important;
+        border-radius: 4px;
+        padding: 10px 14px;
     }
 </style>
-
-<div class="card">
-    <div class="card-body">
-        <div class="d-flex justify-content-between flex-wrap align-items-center mb-2 gap-2">
-            <div class="d-flex align-items-center gap-3 flex-wrap">
-                <h3 class="m-0 mr-3">Planos / Pacotes</h3>
-                <span id="kanban-saving" class="kanban-saving">
-                    <i class="fas fa-circle-notch fa-spin"></i> Salvando ordem...
-                </span>
-            </div>
-            <a href="{{ route('admin.plans.create') }}" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus mr-1"></i> Novo plano
-            </a>
-        </div>
-
-        <div class="highlight-note mb-3">
-            <i class="fas fa-arrows-alt text-primary mr-1"></i>
-            <strong>Arraste</strong> para reordenar os cards. O plano com <i class="fas fa-star" style="color:#f59e0b"></i> <strong>Destaque</strong> sempre ficará <strong>centralizado</strong> na página pública independente da posição aqui.
-        </div>
-
-        <div class="plan-kanban-wrap" id="plans-kanban">
-            @foreach($plans as $plan)
-            @php
-                $periods = $plan->getAvailablePeriods();
-                $multiPeriod = count(array_filter($periods, fn($v) => $v > 0)) > 1;
-            @endphp
-            <div class="plan-card {{ ($plan->is_featured || $plan->highlight) ? 'is-highlighted' : '' }}"
-                 data-id="{{ $plan->id }}">
-
-                <div class="plan-header">
-                    <span class="plan-drag-handle" title="Arrastar"><i class="fas fa-grip-vertical"></i></span>
-                    <div class="font-weight-bold flex-grow-1 text-truncate small" title="{{ $plan->name }}">
-                        {{ $plan->name }}
-                        @if($plan->highlight || $plan->is_featured)
-                            <i class="fas fa-star ml-1" title="Destaque" style="color:#fbbf24;font-size:10px"></i>
-                        @endif
-                    </div>
-                    <span class="badge plan-badge js-plan-status {{ $plan->is_active ? 'badge-success' : 'badge-secondary' }}">
-                        {{ $plan->is_active ? 'Ativo' : 'Oculto' }}
-                    </span>
-                </div>
-
-                @if($plan->image)
-                    <img src="{{ asset('storage/'.$plan->image) }}" alt="{{ $plan->name }}"
-                         style="width:100%;height:90px;object-fit:cover;">
-                @endif
-
-                <div class="plan-body">
-                    <div class="plan-price">R$ {{ number_format($plan->price, 2, ',', '.') }}</div>
-                    <div class="plan-cycle">{{ ucfirst($plan->period ?? 'mensal') }}</div>
-
-                    @if($multiPeriod)
-                        <div class="period-pills">
-                            @foreach($periods as $pk => $pv)
-                                @if($pv > 0)
-                                <span class="period-pill">{{ ucfirst($pk) }} R${{ number_format($pv,0,',','.') }}</span>
-                                @endif
-                            @endforeach
-                        </div>
-                    @endif
-
-                    @if($plan->description)
-                        <p class="mt-2 mb-0 text-muted" style="font-size:11px;line-height:1.4">
-                            {{ Str::limit($plan->description, 65) }}
-                        </p>
-                    @endif
-                </div>
-
-                <div class="plan-footer">
-                    <button type="button"
-                        class="btn btn-sm {{ $plan->is_active ? 'btn-outline-warning' : 'btn-outline-success' }} js-toggle-plan-active"
-                        data-url="{{ route('admin.plans.toggle-active', $plan) }}"
-                        data-active="{{ $plan->is_active ? 1 : 0 }}"
-                        title="{{ $plan->is_active ? 'Ocultar' : 'Ativar' }}">
-                        <i class="fas {{ $plan->is_active ? 'fa-eye-slash' : 'fa-eye' }}"></i>
-                    </button>
-                    <a href="{{ route('admin.plans.edit', $plan) }}" class="btn btn-sm btn-secondary" title="Editar">
-                        <i class="fas fa-pencil-alt"></i>
-                    </a>
-                    <form action="{{ route('admin.plans.destroy', $plan) }}" method="POST" class="d-inline mb-0">
-                        @csrf @method('DELETE')
-                        <button class="btn btn-sm btn-danger" title="Excluir"
-                            data-confirm-delete
-                            data-confirm-title="Remover plano?"
-                            data-confirm-text="O plano será excluído permanentemente.">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-            @endforeach
-        </div>
-
-        <div class="mt-3">{{ $plans->links() }}</div>
-    </div>
-</div>
-@endsection
+@endpush
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>

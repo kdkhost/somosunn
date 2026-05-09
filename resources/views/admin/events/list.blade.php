@@ -11,40 +11,85 @@
 
 @section('content')
     <div class="container-fluid">
+        {{-- KPI Cards --}}
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="info-box bg-gradient-primary elevation-1">
+                    <span class="info-box-icon"><i class="fas fa-{{ (isset($type) && $type === 'album') ? 'images' : 'calendar-alt' }}"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total</span>
+                        <span class="info-box-number">{{ count($events) }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="info-box bg-gradient-success elevation-1">
+                    <span class="info-box-icon"><i class="fas fa-eye"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Publicados</span>
+                        <span class="info-box-number">{{ $events->where('published', true)->count() }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="info-box bg-gradient-warning elevation-1">
+                    <span class="info-box-icon"><i class="fas fa-photo-video"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Na Galeria</span>
+                        <span class="info-box-number">{{ $events->where('show_on_gallery', true)->count() }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="info-box bg-gradient-secondary elevation-1">
+                    <span class="info-box-icon"><i class="fas fa-eye-slash"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Ocultos</span>
+                        <span class="info-box-number">{{ $events->where('published', false)->count() }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Action Buttons --}}
         <div class="row mb-3">
             <div class="col-12 text-right">
                 <div class="d-inline-flex" style="gap: 10px;">
                     @if(!(isset($type) && $type === 'album'))
                     <a href="{{ route('admin.quick-scanner') }}"
-                        class="btn btn-success shadow-sm hover:translate-y-[-2px] transition-all">
+                        class="btn btn-success rounded-pill elevation-1">
                         <i class="fas fa-qrcode mr-2"></i> Scanner Universal
                     </a>
                     @endif
                     <a href="{{ (isset($type) && $type === 'album') ? route('admin.acervo.create') : route('admin.events.create') }}"
-                        class="btn btn-primary shadow-sm hover:translate-y-[-2px] transition-all">
+                        class="btn btn-primary rounded-pill elevation-1">
                         <i class="fas fa-plus mr-2"></i> Novo {{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}
                     </a>
                 </div>
             </div>
         </div>
+
+        {{-- Main Card --}}
         <div class="row">
             <div class="col-12">
-                <div class="card card-outline card-primary shadow-lg border-0">
+                <div class="card card-outline card-primary shadow-sm">
                     <div class="card-header">
-                        <h3 class="card-title">Listagem de {{ (isset($type) && $type === 'album') ? 'Álbuns de Mídia' : 'Eventos' }}</h3>
+                        <h3 class="card-title">
+                            <i class="fas fa-{{ (isset($type) && $type === 'album') ? 'images' : 'calendar-check' }} mr-2"></i>
+                            Listagem de {{ (isset($type) && $type === 'album') ? 'Álbuns de Mídia' : 'Eventos' }}
+                        </h3>
                     </div>
-                    <!-- /.card-header -->
                     <div class="card-body p-0">
                         <table id="admin-events-table" class="table table-hover align-middle mb-0 w-100">
-                            <thead>
+                            <thead class="bg-light">
                                 <tr>
-                                    <th>{{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}</th>
+                                    <th><i class="fas fa-{{ (isset($type) && $type === 'album') ? 'images' : 'calendar-star' }} text-muted mr-1"></i>{{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}</th>
                                     @if(!(isset($type) && $type === 'album'))
-                                    <th>Data/Hora</th>
-                                    <th>Local</th>
+                                    <th><i class="fas fa-clock text-muted mr-1"></i>Data/Hora</th>
+                                    <th><i class="fas fa-map-marker-alt text-muted mr-1"></i>Local</th>
                                     @endif
-                                    <th class="text-center">Visível</th>
-                                    <th class="text-center">Galeria</th>
+                                    <th class="text-center"><i class="fas fa-eye text-muted mr-1"></i>Visível</th>
+                                    <th class="text-center"><i class="fas fa-images text-muted mr-1"></i>Galeria</th>
                                     <th class="text-right">Ações</th>
                                 </tr>
                             </thead>
@@ -55,10 +100,10 @@
                                             <div class="d-flex align-items-center">
                                                 @if($event->image)
                                                     <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
-                                                        class="img-size-50 mr-3 img-rounded shadow-sm"
-                                                        style="object-fit: cover; width: 50px; height: 35px;">
+                                                        class="img-rounded mr-3 shadow-sm"
+                                                        style="object-fit: cover; width: 50px; height: 35px; border-radius: 4px;">
                                                 @else
-                                                    <div class="img-size-50 mr-3 d-flex align-items-center justify-content-center bg-light img-rounded"
+                                                    <div class="mr-3 d-flex align-items-center justify-content-center bg-light rounded"
                                                         style="width: 50px; height: 35px;">
                                                         <i class="fas fa-{{ $event->type === 'album' ? 'images' : 'calendar-star' }} text-muted"></i>
                                                     </div>
@@ -67,7 +112,7 @@
                                                     <span class="font-weight-bold d-block text-truncate" style="max-width: 300px;"
                                                         title="{{ $event->title }}">{{ $event->title }}</span>
                                                     @if($event->type === 'album')
-                                                        <small class="badge badge-info uppercase">Acervo</small>
+                                                        <span class="badge badge-info"><i class="fas fa-images mr-1"></i>Acervo</span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -76,15 +121,15 @@
                                         <td data-order="{{ $event->start_at ? \Carbon\Carbon::parse($event->start_at)->timestamp : 0 }}">
                                             @if($event->start_at)
                                                 <div class="d-flex flex-column">
-                                                    <span>{{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y') }}</span>
-                                                    <small class="text-muted">{{ \Carbon\Carbon::parse($event->start_at)->format('H:i') }}</small>
+                                                    <span class="font-weight-bold">{{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y') }}</span>
+                                                    <small class="text-muted"><i class="far fa-clock mr-1"></i>{{ \Carbon\Carbon::parse($event->start_at)->format('H:i') }}</small>
                                                 </div>
                                             @else
-                                                <span class="text-muted">Sem data</span>
+                                                <span class="badge badge-light border"><i class="fas fa-minus mr-1"></i>Sem data</span>
                                             @endif
                                         </td>
                                         <td>
-                                            <i class="fas fa-map-marker-alt mr-1 text-muted"></i>
+                                            <i class="fas fa-map-marker-alt mr-1 text-danger"></i>
                                             {{ $event->location ?: 'Online' }}
                                         </td>
                                         @endif
@@ -110,17 +155,17 @@
                                         </td>
                                         <td class="text-right">
                                             <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('admin.events.edit', ['event' => $event, 'tab' => 'gallery']) }}" class="btn btn-warning"
+                                                <a href="{{ route('admin.events.edit', ['event' => $event, 'tab' => 'gallery']) }}" class="btn btn-outline-warning rounded-left elevation-1"
                                                     title="Gerenciar Mídia">
                                                     <i class="fas fa-photo-video"></i>
                                                 </a>
                                                 @if($event->is_ticket_enabled)
-                                                    <a href="{{ route('admin.events.scanner', $event) }}" class="btn btn-success"
+                                                    <a href="{{ route('admin.events.scanner', $event) }}" class="btn btn-outline-success elevation-1"
                                                         title="Escanear Ingressos">
                                                         <i class="fas fa-qrcode"></i>
                                                     </a>
                                                 @endif
-                                                <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-info"
+                                                <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-outline-info elevation-1"
                                                     title="Editar">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
@@ -130,7 +175,7 @@
                                                     style="display:inline-block;">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="button" class="btn btn-danger btn-delete" title="Excluir">
+                                                    <button type="button" class="btn btn-outline-danger rounded-right elevation-1 btn-delete" title="Excluir">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -141,7 +186,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div>  <!-- /.card -->
+                </div>
             </div>
         </div>
     </div>
@@ -213,9 +258,11 @@
                     url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json',
                     emptyTable: `
                         <div class="text-center py-5 text-muted">
-                            <i class="fas fa-folder-open fa-3x mb-3"></i>
-                            <p>Nenhum registro encontrado.</p>
-                            <a href="{{ isset($type) && $type === 'album' ? route('admin.acervo.create') : route('admin.events.create') }}" class="btn btn-primary btn-sm">Criar meu primeiro registro</a>
+                            <i class="fas fa-folder-open fa-3x mb-3 d-block"></i>
+                            <p class="mb-2">Nenhum registro encontrado.</p>
+                            <a href="{{ isset($type) && $type === 'album' ? route('admin.acervo.create') : route('admin.events.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
+                                <i class="fas fa-plus mr-1"></i> Criar meu primeiro registro
+                            </a>
                         </div>
                     `
                 },
