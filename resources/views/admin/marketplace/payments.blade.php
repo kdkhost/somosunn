@@ -20,22 +20,53 @@
         $totalGateways = ($mpEnabled && $mpConfigured ? 1 : 0) + ($sumupEnabled && $sumupConfigured ? 1 : 0);
     @endphp
 
+    {{-- KPI Cards --}}
+    <div class="row">
+        <div class="col-lg-4 col-md-6">
+            <div class="info-box elevation-1">
+                <span class="info-box-icon bg-gradient-primary"><i class="fas fa-credit-card"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Gateways ativos</span>
+                    <span class="info-box-number">{{ $totalGateways }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="info-box elevation-1">
+                <span class="info-box-icon bg-gradient-{{ $mpEnabled && $mpConfigured ? 'success' : 'secondary' }}"><i class="fas fa-hand-holding-dollar"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">MercadoPago</span>
+                    <span class="info-box-number">{{ $mpEnabled && $mpConfigured ? 'Ativo' : ($mpConfigured ? 'Desativado' : 'Nao configurado') }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="info-box elevation-1">
+                <span class="info-box-icon bg-gradient-{{ $sumupEnabled && $sumupConfigured ? 'success' : 'secondary' }}"><i class="fas fa-credit-card"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">SumUp</span>
+                    <span class="info-box-number">{{ $sumupEnabled && $sumupConfigured ? 'Ativo' : ($sumupConfigured ? 'Desativado' : 'Nao configurado') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Resumo geral --}}
-    <div class="alert alert-{{ $totalGateways === 0 ? 'danger' : ($totalGateways >= 2 ? 'success' : 'warning') }}">
+    <div class="alert alert-{{ $totalGateways === 0 ? 'danger' : ($totalGateways >= 2 ? 'success' : 'warning') }} shadow-sm">
         <i class="fas fa-info-circle mr-2"></i>
         @if($totalGateways === 0)
             <strong>Nenhum gateway ativo.</strong> Configure ao menos um gateway para aceitar pagamentos na plataforma.
         @elseif($totalGateways === 1)
-            <strong>1 gateway ativo.</strong> Você pode adicionar o segundo gateway para oferecer mais opções aos compradores.
+            <strong>1 gateway ativo.</strong> Voce pode adicionar o segundo gateway para oferecer mais opcoes aos compradores.
         @else
-            <strong>{{ $totalGateways }} gateways ativos em paralelo.</strong> Os compradores poderão escolher entre {{ implode(' e ', array_filter([($mpEnabled && $mpConfigured ? 'MercadoPago' : null), ($sumupEnabled && $sumupConfigured ? 'SumUp' : null)])) }} no checkout.
+            <strong>{{ $totalGateways }} gateways ativos em paralelo.</strong> Os compradores poderao escolher entre {{ implode(' e ', array_filter([($mpEnabled && $mpConfigured ? 'MercadoPago' : null), ($sumupEnabled && $sumupConfigured ? 'SumUp' : null)])) }} no checkout.
         @endif
     </div>
 
     <div class="row">
         {{-- MercadoPago --}}
         <div class="col-lg-6">
-            <div class="card card-outline card-primary h-100">
+            <div class="card card-outline card-primary shadow-sm h-100">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h3 class="card-title font-weight-bold mb-0">
                         <span class="d-inline-flex align-items-center justify-content-center rounded-lg bg-primary text-white mr-2" style="width:32px;height:32px;">
@@ -49,7 +80,7 @@
                         @elseif($mpConfigured)
                             <span class="badge badge-warning"><i class="fas fa-pause mr-1"></i> Configurado (desativado)</span>
                         @else
-                            <span class="badge badge-secondary"><i class="fas fa-times mr-1"></i> Não configurado</span>
+                            <span class="badge badge-secondary"><i class="fas fa-times mr-1"></i> Nao configurado</span>
                         @endif
                     </div>
                 </div>
@@ -60,16 +91,16 @@
                         </div>
                     @elseif($mpConfigured)
                         <div class="alert alert-warning mb-3">
-                            <i class="fas fa-pause-circle mr-2"></i> Credenciais configuradas, mas o gateway está desativado.
+                            <i class="fas fa-pause-circle mr-2"></i> Credenciais configuradas, mas o gateway esta desativado.
                         </div>
                     @else
                         <div class="alert alert-danger mb-3">
-                            <i class="fas fa-exclamation-triangle mr-2"></i> MercadoPago ainda não foi configurado.
+                            <i class="fas fa-exclamation-triangle mr-2"></i> MercadoPago ainda nao foi configurado.
                         </div>
                     @endif
 
                     @if(!empty($mpMethods))
-                        <p class="text-muted small mb-2"><strong>Métodos ativos:</strong></p>
+                        <p class="text-muted small mb-2"><strong>Metodos ativos:</strong></p>
                         <div class="mb-3">
                             @foreach($mpMethods as $method)
                                 <span class="badge badge-light border mr-1 mb-1">
@@ -80,11 +111,11 @@
                     @endif
 
                     <p class="text-muted small mb-3">
-                        Configuração única multi-tenant. Cada venda é registrada com vendedor e tipo (curso, mentoria, evento, marketplace).
+                        Configuracao unica multi-tenant. Cada venda e registrada com vendedor e tipo (curso, mentoria, evento, marketplace).
                     </p>
 
                     @if($isAdmin)
-                        <a href="{{ route('admin.settings', ['group' => 'gateway']) }}" class="btn btn-primary btn-block">
+                        <a href="{{ route('admin.settings', ['group' => 'gateway']) }}" class="btn btn-primary btn-block rounded-pill elevation-1">
                             <i class="fas fa-cogs mr-1"></i> Configurar MercadoPago
                         </a>
                     @endif
@@ -111,7 +142,7 @@
 
         {{-- SumUp --}}
         <div class="col-lg-6">
-            <div class="card card-outline card-dark h-100">
+            <div class="card card-outline card-dark shadow-sm h-100">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h3 class="card-title font-weight-bold mb-0">
                         <span class="d-inline-flex align-items-center justify-content-center rounded-lg bg-dark text-white mr-2" style="width:32px;height:32px;">
@@ -125,7 +156,7 @@
                         @elseif($sumupConfigured)
                             <span class="badge badge-warning"><i class="fas fa-pause mr-1"></i> Configurado (desativado)</span>
                         @else
-                            <span class="badge badge-secondary"><i class="fas fa-times mr-1"></i> Não configurado</span>
+                            <span class="badge badge-secondary"><i class="fas fa-times mr-1"></i> Nao configurado</span>
                         @endif
                     </div>
                 </div>
@@ -136,16 +167,16 @@
                         </div>
                     @elseif($sumupConfigured)
                         <div class="alert alert-warning mb-3">
-                            <i class="fas fa-pause-circle mr-2"></i> Credenciais configuradas, mas o gateway está desativado.
+                            <i class="fas fa-pause-circle mr-2"></i> Credenciais configuradas, mas o gateway esta desativado.
                         </div>
                     @else
                         <div class="alert alert-info mb-3">
-                            <i class="fas fa-info-circle mr-2"></i> SumUp ainda não foi configurado. Use-o em paralelo ao MercadoPago ou como gateway único.
+                            <i class="fas fa-info-circle mr-2"></i> SumUp ainda nao foi configurado. Use-o em paralelo ao MercadoPago ou como gateway unico.
                         </div>
                     @endif
 
                     @if(!empty($sumupMethods))
-                        <p class="text-muted small mb-2"><strong>Métodos ativos:</strong></p>
+                        <p class="text-muted small mb-2"><strong>Metodos ativos:</strong></p>
                         <div class="mb-3">
                             @foreach($sumupMethods as $method)
                                 <span class="badge badge-light border mr-1 mb-1">
@@ -160,7 +191,7 @@
                     </p>
 
                     @if($isAdmin)
-                        <a href="{{ route('admin.settings', ['group' => 'gateway']) }}#sumup-tab" class="btn btn-dark btn-block">
+                        <a href="{{ route('admin.settings', ['group' => 'gateway']) }}#sumup-tab" class="btn btn-dark btn-block rounded-pill elevation-1">
                             <i class="fas fa-cogs mr-1"></i> Configurar SumUp
                         </a>
                     @endif
@@ -186,8 +217,8 @@
         </div>
     </div>
 
-    {{-- Info técnica --}}
-    <div class="card mt-3">
+    {{-- Info tecnica --}}
+    <div class="card card-outline card-primary shadow-sm mt-3">
         <div class="card-header">
             <h3 class="card-title font-weight-bold"><i class="fas fa-info-circle mr-2"></i>Como funciona</h3>
         </div>
@@ -200,7 +231,7 @@
                         </div>
                         <div>
                             <h6 class="font-weight-bold mb-1">Multi-gateway</h6>
-                            <p class="text-muted small mb-0">Você pode manter MercadoPago e SumUp ativos simultaneamente ou usar apenas um.</p>
+                            <p class="text-muted small mb-0">Voce pode manter MercadoPago e SumUp ativos simultaneamente ou usar apenas um.</p>
                         </div>
                     </div>
                 </div>
@@ -211,7 +242,7 @@
                         </div>
                         <div>
                             <h6 class="font-weight-bold mb-1">Escolha do cliente</h6>
-                            <p class="text-muted small mb-0">Quando ambos estão ativos, o comprador escolhe qual gateway prefere no checkout.</p>
+                            <p class="text-muted small mb-0">Quando ambos estao ativos, o comprador escolhe qual gateway prefere no checkout.</p>
                         </div>
                     </div>
                 </div>
@@ -221,7 +252,7 @@
                             <i class="fas fa-shield-alt"></i>
                         </div>
                         <div>
-                            <h6 class="font-weight-bold mb-1">Fallback automático</h6>
+                            <h6 class="font-weight-bold mb-1">Fallback automatico</h6>
                             <p class="text-muted small mb-0">Se um gateway falhar, o sistema tenta usar o outro (quando configurado).</p>
                         </div>
                     </div>

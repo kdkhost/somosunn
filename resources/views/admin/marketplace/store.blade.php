@@ -14,7 +14,7 @@
 
     <div class="row">
         <div class="col-12">
-            <div class="card card-primary card-outline">
+            <div class="card card-outline card-primary shadow-sm">
                 <div class="card-header d-flex flex-wrap align-items-center justify-content-between">
                     <div>
                         <h3 class="card-title font-weight-bold mb-1">
@@ -24,9 +24,9 @@
                             {{ $isPlatformStore ? 'Esta loja institucional fica vinculada ao superadmin e nao depende da elegibilidade comum do vendedor.' : 'Configure a identidade da sua marca, confirme o slug publico e publique sua vitrine.' }}
                         </p>
                     </div>
-                    <div class="mt-3 mt-md-0 d-flex flex-wrap gap-2">
+                    <div class="mt-3 mt-md-0 d-flex flex-wrap" style="gap: 8px;">
                         @if($storeUrl)
-                            <a href="{{ $storeUrl }}" target="_blank" class="btn btn-outline-primary">
+                            <a href="{{ $storeUrl }}" target="_blank" class="btn btn-outline-primary rounded-pill elevation-1">
                                 <i class="fas fa-external-link-alt mr-1"></i> Ver loja
                             </a>
                         @endif
@@ -48,9 +48,9 @@
 
         <div class="row">
             <div class="col-lg-8">
-                <div class="card">
+                <div class="card shadow-sm">
                     <div class="card-header">
-                        <h3 class="card-title font-weight-bold">Identidade da loja</h3>
+                        <h3 class="card-title font-weight-bold"><i class="fas fa-palette mr-2"></i>Identidade da loja</h3>
                     </div>
                     <div class="card-body">
                         <div class="form-row">
@@ -133,9 +133,9 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card shadow-sm">
                     <div class="card-header">
-                        <h3 class="card-title font-weight-bold">Contato e redes</h3>
+                        <h3 class="card-title font-weight-bold"><i class="fas fa-address-book mr-2"></i>Contato e redes</h3>
                     </div>
                     <div class="card-body">
                         <div class="form-row">
@@ -173,9 +173,9 @@
             </div>
 
             <div class="col-lg-4">
-                <div class="card">
+                <div class="card shadow-sm">
                     <div class="card-header">
-                        <h3 class="card-title font-weight-bold">Logo</h3>
+                        <h3 class="card-title font-weight-bold"><i class="fas fa-image mr-2"></i>Logo</h3>
                     </div>
                     <div class="card-body">
                         @if($store->logo_url)
@@ -192,9 +192,9 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card shadow-sm">
                     <div class="card-header">
-                        <h3 class="card-title font-weight-bold">Banner</h3>
+                        <h3 class="card-title font-weight-bold"><i class="fas fa-panorama mr-2"></i>Banner</h3>
                     </div>
                     <div class="card-body">
                         @if($store->banner_url)
@@ -211,9 +211,9 @@
                     </div>
                 </div>
 
-                <div class="card text-white" id="store_live_preview" style="background: linear-gradient(135deg, {{ $primaryColor }}, {{ $accentColor }});">
+                <div class="card text-white shadow-sm" id="store_live_preview" style="background: linear-gradient(135deg, {{ $primaryColor }}, {{ $accentColor }});">
                     <div class="card-body">
-                        <div class="text-uppercase small font-weight-bold text-white-50">Preview</div>
+                        <div class="text-uppercase small font-weight-bold text-white-50"><i class="fas fa-eye mr-1"></i> Preview</div>
                         <div class="mt-3 d-flex flex-wrap" style="gap: 8px;">
                             <span id="store_preview_primary_badge" class="badge badge-pill px-3 py-2" style="background-color: {{ $primaryColor }};">Primaria</span>
                             <span id="store_preview_accent_badge" class="badge badge-pill px-3 py-2" style="background-color: {{ $accentColor }};">Destaque</span>
@@ -231,7 +231,7 @@
 
         <div class="row">
             <div class="col-12 text-right">
-                <button type="submit" class="btn btn-primary btn-lg">
+                <button type="submit" class="btn btn-primary btn-lg rounded-pill elevation-1">
                     <i class="fas fa-save mr-1"></i> Salvar loja
                 </button>
             </div>

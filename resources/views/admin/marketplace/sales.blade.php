@@ -12,10 +12,11 @@
         $paidCount = (int) ($paidCount ?? 0);
     @endphp
 
+    {{-- KPI Cards --}}
     <div class="row">
         <div class="col-md-4">
-            <div class="info-box bg-success">
-                <span class="info-box-icon"><i class="fas fa-check-circle"></i></span>
+            <div class="info-box elevation-1">
+                <span class="info-box-icon bg-gradient-success"><i class="fas fa-check-circle"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Vendas pagas</span>
                     <span class="info-box-number">{{ $paidCount }}</span>
@@ -23,33 +24,32 @@
             </div>
         </div>
         <div class="col-md-8">
-            <div class="info-box bg-info">
-                <span class="info-box-icon"><i class="fas fa-hand-holding-usd"></i></span>
+            <div class="info-box elevation-1">
+                <span class="info-box-icon bg-gradient-info"><i class="fas fa-hand-holding-usd"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Total líquido (pagos)</span>
+                    <span class="info-box-text">Total liquido (pagos)</span>
                     <span class="info-box-number">R$ {{ number_format($netTotal, 2, ',', '.') }}</span>
-                    <span class="progress-description">
-                        Bruto: R$ {{ number_format($paidTotal, 2, ',', '.') }} | Comissão: R$ {{ number_format($platformFeeTotal, 2, ',', '.') }}
+                    <span class="progress-description text-muted small">
+                        Bruto: R$ {{ number_format($paidTotal, 2, ',', '.') }} | Comissao: R$ {{ number_format($platformFeeTotal, 2, ',', '.') }}
                     </span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header">
+    {{-- Orders table --}}
+    <div class="card card-outline card-primary shadow-sm">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
             <h3 class="card-title font-weight-bold"><i class="fas fa-receipt mr-2"></i>Pedidos</h3>
-            <div class="card-tools">
-                <a href="{{ route('admin.marketplace.index') }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="fas fa-store mr-1"></i> Voltar
-                </a>
-            </div>
+            <a href="{{ route('admin.marketplace.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill elevation-1">
+                <i class="fas fa-store mr-1"></i> Voltar
+            </a>
         </div>
 
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <thead>
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
                         <tr>
                             <th style="width: 90px;">Pedido</th>
                             <th>Comprador</th>
@@ -84,6 +84,13 @@
                                     'refunded' => 'badge-secondary',
                                     default => 'badge-secondary',
                                 };
+                                $statusIcon = match ($status) {
+                                    'paid' => 'fa-check-circle',
+                                    'pending' => 'fa-hourglass-half',
+                                    'failed' => 'fa-times-circle',
+                                    'refunded' => 'fa-undo',
+                                    default => 'fa-circle',
+                                };
                             @endphp
                             <tr>
                                 <td class="font-weight-bold">#{{ $order->id }}</td>
@@ -93,12 +100,18 @@
                                 </td>
                                 <td>{{ $itemsLabel !== '' ? $itemsLabel : '—' }}</td>
                                 <td class="font-weight-bold">R$ {{ number_format((float) ($order->total_amount ?? 0), 2, ',', '.') }}</td>
-                                <td><span class="badge {{ $statusClass }}">{{ $statusLabel }}</span></td>
+                                <td><span class="badge {{ $statusClass }}"><i class="fas {{ $statusIcon }} mr-1"></i>{{ $statusLabel }}</span></td>
                                 <td class="text-muted">{{ optional($order->created_at)->format('d/m/Y H:i') }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted p-4">Nenhuma venda encontrada.</td>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-receipt mb-3" style="font-size: 3rem;"></i>
+                                        <h5 class="font-weight-bold">Nenhuma venda encontrada</h5>
+                                        <p class="mb-0">Suas vendas aparecerao aqui quando forem realizadas.</p>
+                                    </div>
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
