@@ -642,81 +642,100 @@
                 </section>
             @endif
 
-            <section class="mt-10 grid items-start gap-6 lg:grid-cols-3">
-                <article id="sobre-loja" class="store-home-card self-start rounded-[1.65rem] bg-white p-6 md:p-8">
+            <section class="mt-10 grid items-stretch gap-5 lg:grid-cols-3">
+                <article id="sobre-loja" class="store-home-card flex flex-col rounded-[1.65rem] bg-white p-6">
                     <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Sobre a loja</p>
-                    <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">Conheca {{ $store->brand_name }}</h2>
+                    <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900">{{ $store->brand_name }}</h2>
                     @if($storeBioHtml)
-                        <div class="store-richtext mt-5 text-sm md:text-base">{!! $storeBioHtml !!}</div>
+                        <div class="store-richtext mt-4 flex-1 text-sm">{!! $storeBioHtml !!}</div>
                     @else
-                        <p class="mt-5 text-sm leading-8 text-slate-600 md:text-base">A loja oficial de {{ $store->brand_name }} opera dentro do marketplace UNN com produtos proprios, identidade dedicada e os mesmos fluxos de pagamento e governanca usados pela plataforma.</p>
+                        <p class="mt-4 flex-1 text-sm leading-7 text-slate-600">A loja oficial de {{ $store->brand_name }} opera dentro do marketplace UNN com produtos proprios, identidade dedicada e os mesmos fluxos de pagamento e governanca usados pela plataforma.</p>
                     @endif
                 </article>
 
-                <article id="atendimento" class="store-home-card self-start rounded-[1.65rem] bg-white p-6">
-                        <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Atendimento</p>
-                        <div class="mt-5 space-y-4 text-sm text-slate-600">
-                            @if($store->support_email)
-                                <div class="flex items-start gap-3">
-                                    <div class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
-                                        <i class="fas fa-envelope"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-black text-slate-900">E-mail</p>
-                                        <p class="mt-1 break-all leading-7">{{ $store->support_email }}</p>
-                                    </div>
+                <article id="atendimento" class="store-home-card flex flex-col rounded-[1.65rem] bg-white p-6">
+                    <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Atendimento</p>
+                    <div class="mt-4 flex-1 space-y-4 text-sm text-slate-600">
+                        @if($store->support_email)
+                            <div class="flex items-center gap-3">
+                                <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50" style="color: {{ $themePrimary }};">
+                                    <i class="fas fa-envelope"></i>
                                 </div>
-                            @endif
-                            @if($store->support_phone)
-                                <div class="flex items-start gap-3">
-                                    <div class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
-                                        <i class="fas fa-phone"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-black text-slate-900">Telefone</p>
-                                        <p class="mt-1 leading-7">{{ $store->support_phone }}</p>
-                                    </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-slate-900 text-xs">E-mail</p>
+                                    <p class="text-sm text-slate-600 truncate">{{ $store->support_email }}</p>
                                 </div>
-                            @endif
-                            @if($store->whatsapp)
-                                <div class="flex items-start gap-3">
-                                    <div class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
-                                        <i class="fab fa-whatsapp"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-black text-slate-900">WhatsApp</p>
-                                        <p class="mt-1 leading-7">{{ $store->whatsapp }}</p>
-                                    </div>
+                            </div>
+                        @endif
+                        @if($store->support_phone)
+                            <div class="flex items-center gap-3">
+                                <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50" style="color: {{ $themePrimary }};">
+                                    <i class="fas fa-phone"></i>
                                 </div>
-                            @endif
-                        </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-slate-900 text-xs">Telefone</p>
+                                    <p class="text-sm text-slate-600">{{ $store->support_phone }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        @if($store->whatsapp)
+                            <div class="flex items-center gap-3">
+                                <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600">
+                                    <i class="fab fa-whatsapp"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-slate-900 text-xs">WhatsApp</p>
+                                    <p class="text-sm text-slate-600">{{ $store->whatsapp }}</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
 
-                        <div class="mt-6 flex flex-wrap gap-3">
-                            @if($whatsappUrl)
-                                <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="store-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-blue-700/20">Falar no WhatsApp</a>
-                            @endif
-                            @if($store->website_url)
-                                <a href="{{ $store->website_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">Visitar site</a>
-                            @endif
-                        </div>
+                    <div class="mt-5 flex flex-wrap gap-2 pt-4 border-t border-slate-100">
+                        @if($whatsappUrl)
+                            <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="store-button-primary inline-flex items-center justify-center rounded-full px-4 py-2.5 text-xs font-bold shadow-md">
+                                <i class="fab fa-whatsapp mr-1"></i> WhatsApp
+                            </a>
+                        @endif
+                        @if($store->website_url)
+                            <a href="{{ $store->website_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
+                                <i class="fas fa-globe mr-1"></i> Site
+                            </a>
+                        @endif
+                    </div>
                 </article>
 
-                <article class="store-home-card self-start rounded-[1.65rem] bg-white p-6">
-                        <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Resumo da operacao</p>
-                        <div class="mt-5 grid gap-4 text-sm text-slate-600">
-                            <div class="rounded-[1.25rem] bg-slate-50 px-4 py-4">
-                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Produtos</p>
-                                <p class="mt-2 text-3xl font-black text-slate-900">{{ $products->count() }}</p>
+                <article class="store-home-card flex flex-col rounded-[1.65rem] bg-white p-6">
+                    <p class="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Resumo da operação</p>
+                    <div class="mt-4 flex-1 flex flex-col gap-3">
+                        <div class="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
+                            <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50" style="color: {{ $themePrimary }};">
+                                <i class="fas fa-box-open"></i>
                             </div>
-                            <div class="rounded-[1.25rem] bg-slate-50 px-4 py-4">
-                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Conteudos</p>
-                                <p class="mt-2 text-3xl font-black text-slate-900">{{ $courses->count() + $mentorships->count() + $events->count() }}</p>
-                            </div>
-                            <div class="rounded-[1.25rem] bg-slate-50 px-4 py-4">
-                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Loja publica</p>
-                                <p class="mt-2 text-lg font-black text-slate-900">/loja/{{ $store->slug }}</p>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Produtos</p>
+                                <p class="text-xl font-black text-slate-900">{{ $products->count() }}</p>
                             </div>
                         </div>
+                        <div class="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
+                            <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Conteúdos</p>
+                                <p class="text-xl font-black text-slate-900">{{ $courses->count() + $mentorships->count() + $events->count() }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
+                            <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Loja pública</p>
+                                <p class="text-sm font-black text-slate-900">/loja/{{ $store->slug }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </article>
             </section>
         </div>
