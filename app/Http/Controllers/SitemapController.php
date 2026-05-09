@@ -36,8 +36,8 @@ class SitemapController extends Controller
             $urls[] = route('courses.show', $course);
         }
 
-        // 3. Dynamic Content - Mentorships (Active)
-        $mentorships = Mentorship::where('status', 'active')->get(); // Adjust status if needed
+        // 3. Dynamic Content - Mentorships (All published - table has no 'status' column)
+        $mentorships = Mentorship::all();
         foreach ($mentorships as $mentorship) {
             $urls[] = route('mentorships.show', $mentorship);
         }
