@@ -159,7 +159,11 @@ class ReferralController extends Controller
 
         $token->delete();
 
-        return response()->json(['ok' => true, 'message' => 'Token revogado com sucesso.']);
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'message' => 'Token revogado com sucesso.']);
+        }
+
+        return redirect()->back()->with('success', 'Token revogado com sucesso.');
     }
 
     public function track(Request $request, AffiliateTrackingService $tracking)
@@ -187,7 +191,7 @@ class ReferralController extends Controller
         ]);
     }
 
-    public function updateSandboxRequest(Request $request, AffiliateApiSandboxRequest $sandboxRequest): RedirectResponse
+    public function updateSandboxRequest(Request $request, AffiliateApiSandboxRequest $sandboxRequest): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
         abort_unless($this->hasSandboxRequestsTable(), 404);
 

@@ -630,7 +630,7 @@
                             </div>
                             @endif
 
-                            <a href="{{ route('panel.settings.index') }}"
+                            <a href="{{ route('panel.admin.settings') }}"
                                class="d-block text-center mt-3 py-2 rounded-xl"
                                style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
                                       color: #94a3b8; font-size:0.7rem; text-decoration:none;

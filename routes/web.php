@@ -300,6 +300,11 @@ Route::prefix('install')->group(function () {
     Route::post('/run', [\App\Http\Controllers\InstallController::class, 'run'])->name('install.run');
     Route::post('/test-connection', [\App\Http\Controllers\InstallController::class, 'testConnection'])->name('install.test-connection');
 });
+// Legacy installer routes (backward compat)
+Route::prefix('backend/install')->group(function () {
+    Route::post('/run', [\App\Http\Controllers\InstallController::class, 'run'])->name('install.run.legacy');
+    Route::post('/test-connection', [\App\Http\Controllers\InstallController::class, 'testConnection'])->name('install.test-connection.legacy');
+});
 
 Route::post('/api/interactions', [InteractionController::class, 'store'])->middleware('auth')->name('api.interactions.store');
 Route::post('/api/satisfactions', [SatisfactionController::class, 'store'])->middleware('auth')->name('api.satisfactions.store');
@@ -754,6 +759,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     // CMS
     Route::get('cms/{slug?}', [\App\Http\Controllers\Admin\CMSController::class, 'index'])->name('cms.index');
     Route::post('cms/{slug}', [\App\Http\Controllers\Admin\CMSController::class, 'update'])->name('cms.update');
+
+    // Mail Test
+    Route::get('mailtest', [\App\Http\Controllers\MailTestController::class, 'showForm'])->name('mailtest.index');
+    Route::post('mailtest/send', [\App\Http\Controllers\MailTestController::class, 'sendTest'])->name('mailtest.send');
 
     // Media Routes (Standardized)
     Route::post('events/{event}/media', [\App\Http\Controllers\Admin\EventMediaController::class, 'store'])->name('events.media.store');
