@@ -411,26 +411,49 @@
                                 <input type="hidden" name="cpf" id="cpf_hidden" value="{{ Auth::user()?->doc ?? '' }}">
                             </div>
 
-                            <!-- SumUp Info (quando SumUp selecionado) -->
-                            <div id="sumupPaymentInfo" class="hidden text-center py-8" data-gateway="sumup">
-                                <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-700">
-                                    <i class="fas fa-credit-card text-4xl"></i>
+                            <!-- SumUp Payment Form (quando SumUp selecionado) -->
+                            <div id="sumupPaymentInfo" class="hidden" data-gateway="sumup">
+                                {{-- Seletor Cartão/Pix SumUp --}}
+                                <div class="grid grid-cols-2 gap-4 mb-6">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="sumup_method" value="card" class="peer sr-only" checked>
+                                        <div class="p-4 border-2 border-gray-200 rounded-xl peer-checked:border-slate-900 peer-checked:bg-slate-50 transition text-center hover:border-slate-400">
+                                            <i class="fas fa-credit-card text-2xl mb-2 text-slate-700"></i>
+                                            <p class="font-bold text-gray-900">Cartão de Crédito</p>
+                                            <p class="text-xs text-gray-500 mt-1">Via SumUp</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="sumup_method" value="pix" class="peer sr-only">
+                                        <div class="p-4 border-2 border-gray-200 rounded-xl peer-checked:border-teal-600 peer-checked:bg-teal-50 transition text-center hover:border-teal-300">
+                                            <i class="fa-brands fa-pix text-2xl mb-2 text-teal-600"></i>
+                                            <p class="font-bold text-gray-900">Pix</p>
+                                            <p class="text-xs text-gray-500 mt-1">QR Code instantâneo</p>
+                                        </div>
+                                    </label>
                                 </div>
-                                <h3 class="font-bold text-gray-900 mb-2">Pagamento via SumUp</h3>
-                                <p class="text-gray-600 max-w-sm mx-auto mb-4">
-                                    Ao finalizar, você será redirecionado para o checkout seguro da SumUp para concluir o pagamento com cartão ou Pix.
-                                </p>
-                                <div class="flex justify-center gap-2">
-                                    @if(($sumupMethods ?? null) && in_array('Cartão', $sumupMethods ?? []))
-                                        <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-100 text-sm font-bold text-slate-700">
-                                            <i class="fas fa-credit-card text-xs"></i> Cartão
-                                        </span>
-                                    @endif
-                                    @if(($sumupMethods ?? null) && in_array('Pix', $sumupMethods ?? []))
-                                        <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-100 text-sm font-bold text-slate-700">
-                                            <i class="fa-brands fa-pix text-xs"></i> Pix
-                                        </span>
-                                    @endif
+
+                                {{-- Info do método selecionado --}}
+                                <div class="rounded-2xl bg-slate-50 border border-slate-200 p-5">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-shield-halved text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-900">Checkout seguro SumUp</h4>
+                                            <p class="text-sm text-slate-600 mt-1">
+                                                Ao clicar em "Pagar com SumUp", o formulário de pagamento será carregado com o SDK da SumUp para processar seu cartão ou gerar o QR Code Pix de forma segura.
+                                            </p>
+                                            <div class="flex flex-wrap gap-2 mt-3">
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600">
+                                                    <i class="fas fa-lock text-emerald-500 text-[10px]"></i> Dados criptografados
+                                                </span>
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600">
+                                                    <i class="fas fa-bolt text-amber-500 text-[10px]"></i> Aprovação imediata
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -494,17 +517,25 @@
                         pixInfo.classList.add('hidden');
                         if (mpMethodSelector) mpMethodSelector.classList.add('hidden');
 
-                        // Mostrar info SumUp
+                        // Mostrar formulário SumUp
                         sumupInfo.classList.remove('hidden');
 
-                        // Mostrar botão submit
+                        // Mostrar botão submit com texto SumUp
                         submitBtn.classList.remove('hidden');
-                        submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> Pagar com SumUp';
                         submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> Pagar com SumUp';
+
+                        // Sincronizar payment_method com seleção SumUp
+                        const sumupMethodRadio = document.querySelector('input[name="sumup_method"]:checked');
+                        if (sumupMethodRadio) {
+                            hiddenMethod.value = sumupMethodRadio.value === 'pix' ? 'pix' : 'credit_card';
+                        }
                     } else {
-                        // Mostrar formulários MP
-                        if (mpMethodSelector) mpMethodSelector.classList.remove('hidden');
+                        // Esconder SumUp
                         sumupInfo.classList.add('hidden');
+
+                        // Mostrar seletor MP
+                        if (mpMethodSelector) mpMethodSelector.classList.remove('hidden');
 
                         // Restaurar estado baseado no método selecionado (cartão ou pix)
                         const selectedMethod = document.querySelector('input[name="payment_method_radio"]:checked');
@@ -512,6 +543,7 @@
                             cardForm.classList.add('hidden');
                             pixInfo.classList.remove('hidden');
                             submitBtn.classList.remove('hidden');
+                            submitBtn.disabled = false;
                             submitBtn.innerHTML = '<i class="fas fa-qrcode mr-2"></i> Gerar QR Code Pix';
                         } else {
                             cardForm.classList.remove('hidden');
@@ -521,6 +553,13 @@
                         }
                     }
                 }
+
+                // Listener para radios de método SumUp
+                document.querySelectorAll('input[name="sumup_method"]').forEach(function(radio) {
+                    radio.addEventListener('change', function() {
+                        hiddenMethod.value = this.value === 'pix' ? 'pix' : 'credit_card';
+                    });
+                });
 
                 gatewayRadios.forEach(function (radio) {
                     radio.addEventListener('change', function () {
