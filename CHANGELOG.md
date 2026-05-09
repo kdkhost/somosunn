@@ -6,11 +6,97 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
-# Changelog
+## [2026-05-08] - Sessão Completa de Correções e Melhorias
 
-Todas as alterações relevantes deste projeto são documentadas neste arquivo.
+### Adicionado
 
-O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
+#### Multi-Gateway (MercadoPago + SumUp em paralelo)
+- **Checkout de assinatura com multi-gateway**: seletor de gateway (MP/SumUp) com formulário dinâmico inline
+- **Widget SumUp SDK inline**: carrega via AJAX sem redirect, com cartão + PIX na mesma página
+- **Checkout de marketplace com multi-gateway**: `/loja/checkout` mostra ambos gateways quando ativos
+- **Checkout de cursos com multi-gateway**: `/checkout/{course}` respeita gateway escolhido
+- **Checkout de mentorias com multi-gateway**: mesma lógica aplicada
+- **Permissões granulares para MercadoPago** (idênticas ao SumUp):
+  - Por tipo de usuário: Membros, Instrutores, Vendedores, Mentores
+  - Por tipo de produto: Cursos, Mentorias, Eventos, Marketplace, Assinaturas, Serviços
+- **Página de Pagamentos do Marketplace** (`/admin/marketplace/payments`): mostra ambos gateways lado a lado com status, métodos e webhooks
+- **Métodos de pagamento SumUp (Cartão/PIX)** adicionados ao painel legado AdminLTE
+
+#### Carrinho Persistente
+- **Tabela `seller_product_cart_items`**: carrinho salvo no banco (não mais em session)
+- **Expiração configurável**: `cart_expiration_hours` (padrão 24h)
+- **Migração automática**: session → banco quando usuário loga
+- **Comando `cart:cleanup-expired`**: limpa carrinhos expirados (agendado a cada hora)
+- **Carrinho não perde itens** ao navegar, recarregar ou fechar navegador
+
+#### Retry de Pagamento
+- **Rota `panel.purchases.retry`**: retoma pagamento de pedidos pendentes
+- **Countdown em tempo real**: mostra tempo restante para pagar
+- **Suporte MP e SumUp**: recria preferência/checkout se necessário
+- **Cancelamento automático**: pedidos expirados são cancelados via cron
+
+#### Cancelamento Automático de Pedidos
+- **Comando `orders:cancel-unpaid`** melhorado com prazos por método:
+  - PIX: minutos configurados no painel
+  - Cartão: 24 horas
+  - Boleto: 3 dias
+  - Default: 48 horas
+- **Cancela via API do gateway** (MP ou SumUp) quando possível
+- **Agendado a cada 5 minutos** no scheduler
+
+#### Proteção Anti-Duplicidade
+- **Trait `PreventsDoubleSubmit`**: previne pedidos duplicados em todos os checkouts
+- **Cache lock (15s)**: impede double-click no botão de pagar
+- **Reutilização de pedido pending**: não cria novo se já existe um recente
+- **Aplicado em**: SubscriptionController, CheckoutController, SellerProductCheckoutController
+
+#### Marketplace
+- **Botões padronizados**: layout vertical, sem corte de texto, ícones em todos
+- **Ambos canais visíveis**: produtos com `store_and_points` mostram Comprar + Trocar
+- **Página do produto reestruturada** (`/loja/{store}/p/{product}`): design moderno com galeria, tabs, ações sticky
+- **Storefront**: botões de compra + troca em cards de produto
+
+#### Emails Personalizados
+- **`VerifyEmailNotification`**: usa MailTemplate do banco (editável no admin)
+- **Override em User model**: `sendEmailVerificationNotification()` usa template customizado
+- **Templates criados**: `email_verification`, `welcome`
+
+#### Planos Premium
+- **Filtro por período**: planos sem preço para o período selecionado ficam ocultos
+- **Toggle Semestral/Anual**: só mostra planos que têm aquele período configurado
+
+### Corrigido
+
+#### Gateway Settings
+- **Bug crítico `$request->has()` vs `$request->input()`**: checkboxes sempre salvavam como 1
+- **Validação SumUp removida**: não mais erro "Ao menos um método deve permanecer ativo"
+- **AJAX save sem reload**: painel novo salva sem piscar a tela
+- **Flash messages globais**: SweetAlert2 adicionado ao layout do painel novo
+- **Inputs legíveis em dark mode**: classes CSS customizadas `.gw-input`
+- **Métodos dinâmicos no checkout**: só mostra métodos ativos (sem Boleto hardcoded)
+- **`mercadopago_enabled` respeitado**: toggle desativa MP em todos os checkouts
+
+#### Middleware e Rotas
+- **`Target class [signed] does not exist`**: registrados middlewares faltantes (signed, guest, can, password.confirm, auth.basic)
+- **`admin.plans.toggle-active`**: rota registrada para painel legado
+- **`admin.plans.reorder`**: rota registrada
+
+#### Service Worker
+- **Cache agressivo corrigido**: HTML agora é network-first (não mais cache-first)
+- **Rotas dinâmicas ignoradas**: `/loja`, `/marketplace`, `/checkout`, `/painel`, `/admin`
+- **Cache antigo deletado**: versão v1 → v3 com cleanup automático
+
+#### Checkout
+- **SumUp selecionado ia para MercadoPago**: corrigido `gateway_provider` respeitado
+- **`checkout_id` extraído corretamente** do retorno do SumUpService
+- **Carrinho não limpa prematuramente**: só limpa após pagamento aprovado (não no submit)
+
+### Alterado
+- **`SellerProductCartService`**: refatorado para persistência em banco
+- **`OrderSettlementService`**: limpa carrinho do comprador após pagamento
+- **`CancelUnpaidOrders`**: prazos por método de pagamento
+- **`MarketplaceController`**: produtos ordenados por `is_featured`
+- **Checkout views**: ícones FontAwesome em vez de logos SVG nos seletores de gateway
 
 ---
 
