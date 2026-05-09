@@ -123,6 +123,36 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar cleanup de carrinho: ' . $e->getMessage());
         }
 
+        // Verifica assinaturas expiradas e envia lembretes de renovação
+        try {
+            $schedule->command('subscriptions:check-expired')
+                ->dailyAt('06:00')
+                ->withoutOverlapping()
+                ->name('subscriptions-check-expired');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar verificação de assinaturas: ' . $e->getMessage());
+        }
+
+        // Envia emails de carrinho abandonado (marketplace)
+        try {
+            $schedule->command('abandoned-cart:send')
+                ->everyFourHours()
+                ->withoutOverlapping()
+                ->name('abandoned-cart-emails');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar emails de carrinho abandonado: ' . $e->getMessage());
+        }
+
+        // Limpa notificações antigas (mais de 90 dias)
+        try {
+            $schedule->command('notifications:cleanup')
+                ->dailyAt('03:00')
+                ->withoutOverlapping()
+                ->name('notifications-cleanup');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar limpeza de notificações: ' . $e->getMessage());
+        }
+
         // Carregar tarefas dinamicas do banco
         try {
             if (\Schema::hasTable('scheduled_tasks')) {

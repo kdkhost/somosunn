@@ -2,77 +2,204 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use App\Models\MailTemplate;
+use App\Models\Setting;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Services\Mail\SystemMailLayoutData;
+use App\Support\EmailQueueSettings;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
 class SubscriptionsCheckExpired extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'subscriptions:check-expired';
+    protected $description = 'Verifica assinaturas expiradas, envia lembretes de renovação e desativa planos vencidos';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Checks for expired subscriptions and updates user plan status';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        $this->info('Checking for expired subscriptions...');
+        if ((int) Setting::get('cron_subscriptions_enabled', 1) !== 1) {
+            $this->info('Cron de assinaturas desativado.');
+            return self::SUCCESS;
+        }
 
-        // Find users with plan_expires_at < now() and plan_id != null
-        // We assume plan_id is nullable or there is a default free plan.
-        // Adjust logic based on system requirements:
-        // If expired, maybe set plan_id to null (free) or a specific free plan ID.
+        $this->info('Verificando assinaturas...');
 
-        $expiredUsers = User::whereNotNull('plan_expires_at')
-            ->where('plan_expires_at', '<', now())
-            ->whereNotNull('plan_id') // Only check users who actually have a plan
+        $reminderDays = (int) Setting::get('subscription_reminder_days', 3);
+        $now = now();
+
+        // 1. Enviar lembretes para quem vai expirar em X dias
+        $expiringUsers = User::whereNotNull('plan_id')
+            ->whereNotNull('plan_expires_at')
+            ->whereDate('plan_expires_at', '=', $now->copy()->addDays($reminderDays)->toDateString())
             ->get();
 
-        $count = 0;
-
-        foreach ($expiredUsers as $user) {
-            $this->expireUserPlan($user);
-            $count++;
+        $remindersCount = 0;
+        foreach ($expiringUsers as $user) {
+            $this->sendRenewalReminder($user);
+            $remindersCount++;
         }
 
-        $this->info("Processed $count expired subscriptions.");
+        // 2. Desativar planos expirados
+        $expiredUsers = User::whereNotNull('plan_id')
+            ->whereNotNull('plan_expires_at')
+            ->where('plan_expires_at', '<', $now)
+            ->get();
+
+        $expiredCount = 0;
+        foreach ($expiredUsers as $user) {
+            $this->expirePlan($user);
+            $expiredCount++;
+        }
+
+        $this->info("Lembretes enviados: {$remindersCount} | Planos expirados: {$expiredCount}");
+
+        return self::SUCCESS;
     }
 
-    private function expireUserPlan(User $user)
+    private function sendRenewalReminder(User $user): void
     {
-        $this->info("Expiring plan for User ID: {$user->id} ({$user->email})");
-
         try {
-            // Logic to revert to free plan. 
-            // We need to know what the 'free' plan ID is, or just nullify.
-            // For now, let's assume nullifying plan_id makes them 'free' or 'no plan'.
-            // OR find a plan with price 0?
-            // Safer: Set plan_id to null and plan_expires_at to null.
+            $plan = $user->plan;
+            $daysLeft = (int) now()->diffInDays($user->plan_expires_at, false);
 
-            $user->update([
-                'plan_id' => null, // Or set to a default free plan ID if exists
-                'plan_expires_at' => null,
-            ]);
+            $template = MailTemplate::where('slug', 'subscription_expiring')->where('is_active', true)->first();
 
-            // Optional: Notify user
-            // $user->notify(new PlanExpiredNotification());
+            if (!$template) {
+                $template = MailTemplate::firstOrCreate(
+                    ['slug' => 'subscription_expiring'],
+                    [
+                        'name' => 'Lembrete de Renovação',
+                        'category' => 'assinatura',
+                        'subject' => 'Sua assinatura expira em {{subscription.days_left}} dias - {{site.name}}',
+                        'body' => '<h2>Olá, {{user.name}}!</h2>
+<p>Sua assinatura do plano <strong>{{subscription.plan_name}}</strong> expira em <strong>{{subscription.days_left}} dias</strong> ({{subscription.expires_at}}).</p>
+<p>Renove agora para não perder acesso aos conteúdos exclusivos.</p>
+<p style="text-align: center; margin: 26px 0;">
+    <a href="{{subscription.renew_url}}" style="display: inline-block; background-color: {{site.primary_color}}; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">Renovar Assinatura</a>
+</p>
+<p>Atenciosamente,<br>Equipe {{site.name}}</p>',
+                        'is_active' => true,
+                        'locale' => 'pt-BR',
+                    ]
+                );
+            }
 
-            Log::info("User #{$user->id} plan expired via Cron.");
+            $layout = app(SystemMailLayoutData::class)->make();
 
-        } catch (\Exception $e) {
-            Log::error("Failed to expire plan for User #{$user->id}: " . $e->getMessage());
+            $data = [
+                'user' => ['name' => $user->name],
+                'subscription' => [
+                    'plan_name' => $plan->name ?? 'Premium',
+                    'days_left' => (string) max(0, $daysLeft),
+                    'expires_at' => $user->plan_expires_at->format('d/m/Y'),
+                    'renew_url' => $plan ? route('subscription.checkout', $plan->id) : url('/premium'),
+                ],
+                'site' => [
+                    'name' => $layout['siteName'],
+                    'primary_color' => $layout['primaryColor'],
+                ],
+            ];
+
+            $rendered = (string) $template->body;
+            $subject = (string) $template->subject;
+
+            foreach ($data as $key => $values) {
+                foreach ($values as $k => $v) {
+                    $pattern = '/\{\{\s*' . $key . '\.' . $k . '\s*\}\}/';
+                    $rendered = preg_replace($pattern, (string) $v, $rendered);
+                    $subject = preg_replace($pattern, (string) $v, $subject);
+                }
+            }
+
+            Mail::to($user->email)->send(
+                new \Illuminate\Mail\Mailable() === null // Usar view system
+                    ? null
+                    : (new class($subject, $rendered, $layout) extends \Illuminate\Mail\Mailable {
+                        use \Illuminate\Bus\Queueable;
+                        private string $subj;
+                        private string $content;
+                        private array $layout;
+
+                        public function __construct(string $subject, string $content, array $layout)
+                        {
+                            $this->subj = $subject;
+                            $this->content = $content;
+                            $this->layout = $layout;
+                            $this->onConnection(EmailQueueSettings::connection());
+                            $this->onQueue(EmailQueueSettings::queueName());
+                        }
+
+                        public function build()
+                        {
+                            return $this->subject($this->subj)
+                                ->view('emails.system', array_merge($this->layout, ['content' => $this->content]));
+                        }
+                    })
+            );
+
+            Log::info("Renewal reminder sent to {$user->email} (plan expires {$user->plan_expires_at})");
+        } catch (\Throwable $e) {
+            Log::error("Failed to send renewal reminder to {$user->email}: " . $e->getMessage());
         }
+    }
+
+    private function expirePlan(User $user): void
+    {
+        $planName = $user->plan->name ?? 'Premium';
+
+        $user->update([
+            'plan_id' => null,
+            'plan_expires_at' => null,
+        ]);
+
+        // Enviar email de expiração
+        try {
+            $template = MailTemplate::where('slug', 'subscription_expired')->where('is_active', true)->first();
+
+            if (!$template) {
+                $template = MailTemplate::firstOrCreate(
+                    ['slug' => 'subscription_expired'],
+                    [
+                        'name' => 'Assinatura Expirada',
+                        'category' => 'assinatura',
+                        'subject' => 'Sua assinatura expirou - {{site.name}}',
+                        'body' => '<h2>Olá, {{user.name}}!</h2>
+<p>Sua assinatura do plano <strong>{{subscription.plan_name}}</strong> expirou.</p>
+<p>Renove agora para recuperar o acesso aos conteúdos exclusivos.</p>
+<p style="text-align: center; margin: 26px 0;">
+    <a href="{{site.url}}/premium" style="display: inline-block; background-color: {{site.primary_color}}; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">Ver Planos</a>
+</p>',
+                        'is_active' => true,
+                        'locale' => 'pt-BR',
+                    ]
+                );
+            }
+
+            // Enviar via queue (simplificado)
+            $layout = app(SystemMailLayoutData::class)->make();
+            $data = [
+                'user' => ['name' => $user->name],
+                'subscription' => ['plan_name' => $planName],
+                'site' => ['name' => $layout['siteName'], 'primary_color' => $layout['primaryColor'], 'url' => url('/')],
+            ];
+
+            $rendered = (string) $template->body;
+            $subject = (string) $template->subject;
+            foreach ($data as $key => $values) {
+                foreach ($values as $k => $v) {
+                    $pattern = '/\{\{\s*' . $key . '\.' . $k . '\s*\}\}/';
+                    $rendered = preg_replace($pattern, (string) $v, $rendered);
+                    $subject = preg_replace($pattern, (string) $v, $subject);
+                }
+            }
+
+            // Dispatch como job simples
+            \App\Jobs\SendGenericTemplateEmail::dispatch($user->email, $subject, $rendered);
+        } catch (\Throwable $e) {
+            Log::error("Failed to send expiration email to {$user->email}: " . $e->getMessage());
+        }
+
+        Log::info("Plan expired for user {$user->id} ({$user->email}). Plan '{$planName}' removed.");
     }
 }

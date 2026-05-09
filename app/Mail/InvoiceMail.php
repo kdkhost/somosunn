@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Mail\Concerns\UsesMailTemplate;
 use App\Models\Invoice;
 use App\Services\InvoiceService;
 use App\Services\Mail\SystemMailLayoutData;
@@ -11,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 
 class InvoiceMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, UsesMailTemplate;
 
     public Invoice $invoice;
     private string $pdfBytes;
@@ -26,26 +27,33 @@ class InvoiceMail extends Mailable
     {
         $company = app(InvoiceService::class)->companyInfo();
         $number = $this->invoice->number ?: ('#' . $this->invoice->id);
-
         $filename = 'Fatura-' . ($this->invoice->number ?: $this->invoice->id) . '.pdf';
 
-        $layout = app(SystemMailLayoutData::class)->make();
-        if (!empty($company['name'])) {
-            $layout['siteName'] = (string) $company['name'];
-        }
-        if (!empty($company['logo_url'])) {
-            $layout['logoUrl'] = (string) $company['logo_url'];
-        }
-        if (!empty($company['primary_color'])) {
-            $layout['primaryColor'] = (string) $company['primary_color'];
-        }
+        $mail = $this->buildFromTemplate('invoice_sent', [
+            'user' => [
+                'name' => $this->invoice->user->name ?? 'Cliente',
+                'email' => $this->invoice->user->email ?? '',
+            ],
+            'invoice' => [
+                'number' => $number,
+                'amount' => 'R$ ' . number_format((float) $this->invoice->total_amount, 2, ',', '.'),
+                'due_date' => optional($this->invoice->due_at)->format('d/m/Y') ?? '-',
+                'status' => $this->invoice->status ?? 'pending',
+            ],
+            'company' => [
+                'name' => $company['name'] ?? config('app.name'),
+            ],
+        ], [
+            'name' => 'Fatura Enviada',
+            'category' => 'financeiro',
+            'subject' => 'Fatura {{invoice.number}} - {{company.name}}',
+            'body' => '<h2>Olá, {{user.name}}!</h2>
+<p>Sua fatura <strong>{{invoice.number}}</strong> no valor de <strong>{{invoice.amount}}</strong> foi gerada.</p>
+<p>Vencimento: <strong>{{invoice.due_date}}</strong></p>
+<p>O PDF da fatura está anexo a este e-mail.</p>
+<p style="margin-top: 22px;">Atenciosamente,<br>{{company.name}}</p>',
+        ]);
 
-        return $this
-            ->subject('Fatura ' . $number . ' - ' . ($company['name'] ?? config('app.name')))
-            ->view('emails.invoice', array_merge($layout, [
-                'invoice' => $this->invoice,
-                'company' => $company,
-            ]))
-            ->attachData($this->pdfBytes, $filename, ['mime' => 'application/pdf']);
+        return $mail->attachData($this->pdfBytes, $filename, ['mime' => 'application/pdf']);
     }
 }
