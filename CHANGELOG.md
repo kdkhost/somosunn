@@ -6,6 +6,48 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [2026-05-09] - Cron Autônomo, Otimizações e System Health
+
+### Adicionado
+
+#### Widget de Saúde do Sistema (Dashboard)
+- **Widget "Saúde do Sistema"** na dashboard admin (legado e Tailwind) com dados em tempo real via AJAX
+- Exibe: uso de disco (%), banco de dados (MB), capacidade estimada de usuários simultâneos, status do cron
+- Exibe: usuários online agora, pedidos pendentes, jobs na fila
+- Alertas visuais automáticos quando disco > 90% ou cron inativo
+- Botão de refresh manual para atualizar dados sob demanda
+
+#### Crons Faltantes Criados/Corrigidos
+- **`abandoned-cart:send`**: comando criado com assinatura correta (antes era `orders:abandoned-cart`)
+- **`users:send-birthday-emails`**: agendado diariamente às 07:00
+- **`invoices:send-overdue-reminders`**: agendado diariamente às 08:00
+- **`events:update-batches`**: agendado a cada 15 minutos para virada automática de lotes
+- Todos os comandos agora usam `MailTemplate` personalizado (nunca enviam email sem template)
+
+#### Métricas de Dashboard
+- `revenueToday` (receita do dia) adicionada ao payload admin
+- `usersToday` (novos usuários do dia) adicionada ao payload admin
+- `getMpBalance()` endpoint criado para consulta de saldo MercadoPago via AJAX
+
+### Corrigido
+- **Assinatura do comando de carrinho abandonado**: `orders:abandoned-cart` → `abandoned-cart:send` (corrigido em Kernel, seeders, views de cron)
+- **`systemHealth` endpoint**: tratamento seguro do `cron_heartbeat` (aceita Carbon, timestamp ou string)
+- **`systemHealth` endpoint**: verifica existência da coluna `last_activity_at` antes de consultar
+- **`SubscriptionsCheckExpired`**: removida classe anônima problemática, agora usa `SendGenericTemplateEmail` (padrão do sistema)
+- **Regex de templates**: adicionado `preg_quote()` para evitar erros com caracteres especiais em chaves de substituição
+
+### Otimizado
+- **`DashboardMetricsService` (customerHealth)**: substituído loop `cursor()` por 3 queries agregadas COUNT (reduz de N+1 para 3 queries fixas)
+- **`CancelUnpaidOrders`**: usa `chunkById(100)` ao invés de carregar todos os pedidos pendentes na memória
+- **`SubscriptionsCheckExpired`**: usa `chunkById(50)` para expirar planos em lotes
+- **`CleanupNotifications`**: deleta em lotes de 500 com `usleep(100ms)` entre lotes para não travar o banco
+- **`SendBirthdayEmails`**: query otimizada com `select()` limitado (id, name, email, birth_date)
+- **`SendAbandonedCartEmails`**: usa `with('user')` e `whereHas('user')` para evitar N+1
+- **`systemHealth` endpoint**: cache de 5min para tamanho do banco, cache de 60s para total de usuários
+- **Dashboard cache**: tamanho do banco de dados cacheado por 5 minutos (query pesada em `information_schema`)
+
+---
+
 ## [2026-05-08] - Sessão Completa de Correções e Melhorias
 
 ### Adicionado

@@ -25,19 +25,25 @@ class CancelUnpaidOrders extends Command
         $cardHours = 24;   // cartão: 24h padrão
         $defaultHours = 48; // sem método: 48h
 
-        $orders = Order::where('status', 'pending')
-            ->whereNotNull('created_at')
-            ->get();
+        // Otimização: só buscar pedidos pendentes criados há mais de X minutos (mínimo possível)
+        $minDeadline = min($mpPixMinutes, $sumupPixMinutes);
+        $maxAge = Carbon::now()->subMinutes($minDeadline);
 
         $count = 0;
-        foreach ($orders as $order) {
-            $deadline = $this->computeDeadline($order, $mpPixMinutes, $sumupPixMinutes, $cardHours, $defaultHours);
 
-            if ($order->created_at->lt($deadline)) {
-                $this->cancelOrder($order);
-                $count++;
-            }
-        }
+        Order::where('status', 'pending')
+            ->where('created_at', '<', $maxAge)
+            ->with('items')
+            ->chunkById(100, function ($orders) use ($mpPixMinutes, $sumupPixMinutes, $cardHours, $defaultHours, &$count) {
+                foreach ($orders as $order) {
+                    $deadline = $this->computeDeadline($order, $mpPixMinutes, $sumupPixMinutes, $cardHours, $defaultHours);
+
+                    if ($order->created_at->lt($deadline)) {
+                        $this->cancelOrder($order);
+                        $count++;
+                    }
+                }
+            });
 
         $this->info("Processed $count orders.");
 

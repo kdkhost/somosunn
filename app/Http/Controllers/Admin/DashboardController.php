@@ -35,6 +35,31 @@ class DashboardController extends Controller
     }
 
     /**
+     * Retorna o saldo do MercadoPago via AJAX.
+     */
+    public function getMpBalance(Request $request)
+    {
+        if (!$request->expectsJson() && !$request->ajax()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        try {
+            $mpService = new \App\Services\Payment\MercadoPagoService();
+            $balance = $mpService->getBalance(null);
+
+            return response()->json([
+                'success' => true,
+                'balance' => $balance,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Não foi possível obter o saldo.',
+            ], 500);
+        }
+    }
+
+    /**
      * Retorna informações de saúde do sistema para exibição na dashboard.
      */
     public function systemHealth()
@@ -44,20 +69,54 @@ class DashboardController extends Controller
         $diskUsed = $diskTotal - $diskFree;
         $diskPercent = $diskTotal > 0 ? round(($diskUsed / $diskTotal) * 100, 1) : 0;
 
-        $dbSize = \DB::select("SELECT SUM(data_length + index_length) / 1024 / 1024 AS size FROM information_schema.tables WHERE table_schema = ?", [\DB::getDatabaseName()]);
-        $dbSizeMB = round($dbSize[0]->size ?? 0, 2);
+        // Tamanho do banco de dados (query otimizada com cache de 5 min)
+        $dbSizeMB = \Illuminate\Support\Facades\Cache::remember('system_health_db_size', 300, function () {
+            $result = \DB::select("SELECT SUM(data_length + index_length) / 1024 / 1024 AS size FROM information_schema.tables WHERE table_schema = ?", [\DB::getDatabaseName()]);
+            return round($result[0]->size ?? 0, 2);
+        });
 
         $memoryLimit = ini_get('memory_limit');
         $memLimitMB = (int) str_replace(['M', 'G'], ['', '000'], $memoryLimit);
         $estimatedConcurrent = max(10, (int) ($memLimitMB / 32));
 
-        $totalUsers = \App\Models\User::count();
-        $onlineRecent = \App\Models\User::where('last_activity_at', '>', now()->subMinutes(5))->count();
+        // Contagens otimizadas (cache curto de 60s)
+        $totalUsers = \Illuminate\Support\Facades\Cache::remember('system_health_total_users', 60, function () {
+            return \App\Models\User::count();
+        });
+
+        $onlineRecent = 0;
+        try {
+            if (\Schema::hasColumn('users', 'last_activity_at')) {
+                $onlineRecent = \App\Models\User::where('last_activity_at', '>', now()->subMinutes(5))->count();
+            }
+        } catch (\Throwable $e) {
+        }
 
         $cronHeartbeat = \Illuminate\Support\Facades\Cache::get('cron_heartbeat');
-        $cronActive = $cronHeartbeat && (time() - $cronHeartbeat) < 300;
+        $cronActive = false;
+        $cronLastRun = null;
+
+        if ($cronHeartbeat) {
+            if ($cronHeartbeat instanceof \Carbon\Carbon || $cronHeartbeat instanceof \DateTimeInterface) {
+                $cronActive = $cronHeartbeat->diffInSeconds(now()) < 300;
+                $cronLastRun = $cronHeartbeat->format('H:i:s');
+            } else {
+                $ts = is_numeric($cronHeartbeat) ? (int) $cronHeartbeat : strtotime((string) $cronHeartbeat);
+                $cronActive = $ts && (time() - $ts) < 300;
+                $cronLastRun = $ts ? date('H:i:s', $ts) : null;
+            }
+        }
 
         $pendingOrders = \App\Models\Order::where('status', 'pending')->count();
+
+        // Informações de fila
+        $queuePending = 0;
+        try {
+            if (\Schema::hasTable('jobs')) {
+                $queuePending = \DB::table('jobs')->count();
+            }
+        } catch (\Throwable $e) {
+        }
 
         return response()->json([
             'disk' => [
@@ -74,6 +133,9 @@ class DashboardController extends Controller
                 'estimated_concurrent' => $estimatedConcurrent,
                 'recommended_max' => min(100, $estimatedConcurrent * 2),
                 'hosting_type' => 'Compartilhada',
+                'note' => $estimatedConcurrent < 30
+                    ? 'Capacidade limitada. Considere upgrade de plano.'
+                    : 'Capacidade adequada para uso atual.',
             ],
             'users' => [
                 'total' => $totalUsers,
@@ -81,10 +143,14 @@ class DashboardController extends Controller
             ],
             'cron' => [
                 'active' => $cronActive,
-                'last_run' => $cronHeartbeat ? date('H:i:s', $cronHeartbeat) : null,
+                'last_run' => $cronLastRun,
+            ],
+            'queue' => [
+                'pending_jobs' => $queuePending,
             ],
             'orders_pending' => $pendingOrders,
             'php_version' => phpversion(),
+            'laravel_version' => app()->version(),
         ]);
     }
 }

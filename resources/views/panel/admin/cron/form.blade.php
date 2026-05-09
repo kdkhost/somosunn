@@ -13,7 +13,7 @@
             'auth:clear-resets' => 'Limpar tokens de senha',
             'sanctum:prune-expired' => 'Limpar tokens de API',
             'orders:cancel-unpaid' => 'Cancelar pedidos nao pagos',
-            'orders:abandoned-cart' => 'Disparo de carrinho abandonado',
+            'abandoned-cart:send' => 'Disparo de carrinho abandonado',
             'subscriptions:check-expired' => 'Expirar planos vencidos',
             'queue:work --stop-when-empty --tries=3' => 'Processar fila de jobs',
         ];

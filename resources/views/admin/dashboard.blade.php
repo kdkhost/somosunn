@@ -508,6 +508,25 @@
                     </div>
                 </div>
             </div>
+
+            {{-- SYSTEM HEALTH WIDGET --}}
+            <div class="col-12 mt-3">
+                <div class="card card-outline card-dark shadow-sm">
+                    <div class="card-header border-0">
+                        <h3 class="card-title"><i class="fas fa-server mr-2"></i>Saúde do Sistema</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" id="btn-refresh-health" title="Atualizar">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body" id="system-health-body">
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-spinner fa-spin mr-2"></i> Carregando informações do sistema...
+                        </div>
+                    </div>
+                </div>
+            </div>
         @endif
 
         {{-- MEMBER DASHBOARD (If not admin, or simplified view) --}}
@@ -872,6 +891,107 @@
                         }
                     });
                 }
+
+                // System Health Widget
+                function loadSystemHealth() {
+                    const container = document.getElementById('system-health-body');
+                    if (!container) return;
+
+                    fetch(@json(route('admin.dashboard.system-health')), {
+                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        const diskColor = data.disk.percent > 90 ? '#ef4444' : (data.disk.percent > 75 ? '#f59e0b' : '#10b981');
+                        const cronColor = data.cron.active ? '#10b981' : '#ef4444';
+                        const cronLabel = data.cron.active ? 'Ativo' : 'Inativo';
+
+                        container.innerHTML = `
+                            <div class="row">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="info-box bg-light shadow-sm mb-0">
+                                        <span class="info-box-icon" style="background:${diskColor}20; color:${diskColor}"><i class="fas fa-hdd"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Disco</span>
+                                            <span class="info-box-number">${data.disk.percent}%</span>
+                                            <small class="text-muted">${data.disk.used_gb} GB / ${data.disk.total_gb} GB</small>
+                                            <div class="progress mt-1" style="height:4px;">
+                                                <div class="progress-bar" style="width:${data.disk.percent}%; background:${diskColor};"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="info-box bg-light shadow-sm mb-0">
+                                        <span class="info-box-icon bg-info"><i class="fas fa-database"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Banco de Dados</span>
+                                            <span class="info-box-number">${data.database.size_mb} MB</span>
+                                            <small class="text-muted">PHP ${data.php_version}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="info-box bg-light shadow-sm mb-0">
+                                        <span class="info-box-icon bg-primary"><i class="fas fa-users-cog"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Capacidade</span>
+                                            <span class="info-box-number">~${data.capacity.estimated_concurrent} simultâneos</span>
+                                            <small class="text-muted">${data.capacity.hosting_type} (${data.capacity.memory_limit})</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="info-box bg-light shadow-sm mb-0">
+                                        <span class="info-box-icon" style="background:${cronColor}20; color:${cronColor}"><i class="fas fa-clock"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Cron Interno</span>
+                                            <span class="info-box-number" style="color:${cronColor}">${cronLabel}</span>
+                                            <small class="text-muted">${data.cron.last_run ? 'Último: ' + data.cron.last_run : 'Nunca executou'}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 col-sm-6 mb-2">
+                                    <div class="d-flex align-items-center p-2 rounded" style="background:#f8f9fa;">
+                                        <i class="fas fa-user-clock text-primary mr-2"></i>
+                                        <div>
+                                            <div class="text-xs text-muted">Online agora</div>
+                                            <strong>${data.users.online_now}</strong> <small class="text-muted">/ ${data.users.total} total</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6 mb-2">
+                                    <div class="d-flex align-items-center p-2 rounded" style="background:#f8f9fa;">
+                                        <i class="fas fa-shopping-cart text-warning mr-2"></i>
+                                        <div>
+                                            <div class="text-xs text-muted">Pedidos Pendentes</div>
+                                            <strong>${data.orders_pending}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6 mb-2">
+                                    <div class="d-flex align-items-center p-2 rounded" style="background:#f8f9fa;">
+                                        <i class="fas fa-tasks text-info mr-2"></i>
+                                        <div>
+                                            <div class="text-xs text-muted">Jobs na Fila</div>
+                                            <strong>${data.queue.pending_jobs}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            ${data.disk.percent > 90 ? '<div class="alert alert-danger mt-2 mb-0 py-2"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Atenção:</strong> Disco com ' + data.disk.percent + '% de uso. Apenas ' + data.disk.free_gb + ' GB livres. Considere limpar arquivos antigos.</div>' : ''}
+                            ${!data.cron.active ? '<div class="alert alert-warning mt-2 mb-0 py-2"><i class="fas fa-exclamation-circle mr-2"></i><strong>Cron inativo.</strong> Verifique se o middleware RunInternalCron está ativo e se há acessos regulares ao sistema.</div>' : ''}
+                        `;
+                    })
+                    .catch(() => {
+                        container.innerHTML = '<div class="alert alert-secondary mb-0"><i class="fas fa-exclamation-circle mr-2"></i>Não foi possível carregar informações do sistema.</div>';
+                    });
+                }
+
+                loadSystemHealth();
+                document.getElementById('btn-refresh-health')?.addEventListener('click', loadSystemHealth);
             @endif
                                 });
     </script>

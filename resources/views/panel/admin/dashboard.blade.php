@@ -304,6 +304,24 @@
                 @endif
             </div>
         </div>
+
+        {{-- SYSTEM HEALTH WIDGET --}}
+        <div>
+            <div class="flex items-center gap-3 mb-6 px-2">
+                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+                    <i class="fas fa-server text-sm"></i>
+                </div>
+                <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Saúde do Sistema</h3>
+                <button type="button" id="btn-refresh-health-panel" class="ml-auto text-slate-400 hover:text-blue-500 transition-colors" title="Atualizar">
+                    <i class="fas fa-sync-alt text-sm"></i>
+                </button>
+            </div>
+            <div id="system-health-panel" class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2.5rem] border border-white/50 dark:border-slate-800/60 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.3)] p-8">
+                <div class="text-center text-slate-400 py-4">
+                    <i class="fas fa-spinner fa-spin mr-2"></i> Carregando informações do sistema...
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -391,6 +409,109 @@
                 refreshMs: @json($dashboardRefreshMs),
                 onPayload: renderPanelAdminServiceVisits,
             });
+
+            // System Health Widget
+            function loadSystemHealthPanel() {
+                const container = document.getElementById('system-health-panel');
+                if (!container) return;
+
+                fetch(@json(route('panel.admin.dashboard.system-health')), {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    const diskColor = data.disk.percent > 90 ? 'rose' : (data.disk.percent > 75 ? 'amber' : 'emerald');
+                    const cronColor = data.cron.active ? 'emerald' : 'rose';
+                    const cronLabel = data.cron.active ? 'Ativo' : 'Inativo';
+
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-xl bg-${diskColor}-50 dark:bg-${diskColor}-900/20 text-${diskColor}-600 dark:text-${diskColor}-300 flex items-center justify-center">
+                                        <i class="fas fa-hdd"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-400 uppercase">Disco</p>
+                                        <p class="text-lg font-black text-slate-900 dark:text-white">${data.disk.percent}%</p>
+                                    </div>
+                                </div>
+                                <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-${diskColor}-500 rounded-full transition-all" style="width:${data.disk.percent}%"></div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">${data.disk.used_gb} GB / ${data.disk.total_gb} GB (${data.disk.free_gb} GB livres)</p>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 flex items-center justify-center">
+                                        <i class="fas fa-database"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-400 uppercase">Banco de Dados</p>
+                                        <p class="text-lg font-black text-slate-900 dark:text-white">${data.database.size_mb} MB</p>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">PHP ${data.php_version} • Laravel ${data.laravel_version}</p>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                                        <i class="fas fa-users-cog"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-400 uppercase">Capacidade</p>
+                                        <p class="text-lg font-black text-slate-900 dark:text-white">~${data.capacity.estimated_concurrent}</p>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">${data.capacity.hosting_type} (${data.capacity.memory_limit})</p>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-xl bg-${cronColor}-50 dark:bg-${cronColor}-900/20 text-${cronColor}-600 dark:text-${cronColor}-300 flex items-center justify-center">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-400 uppercase">Cron</p>
+                                        <p class="text-lg font-black text-${cronColor}-600 dark:text-${cronColor}-300">${cronLabel}</p>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">${data.cron.last_run ? 'Último: ' + data.cron.last_run : 'Nunca executou'}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40">
+                                <i class="fas fa-user-clock text-blue-500"></i>
+                                <div>
+                                    <p class="text-xs text-slate-400">Online agora</p>
+                                    <p class="font-bold text-slate-900 dark:text-white">${data.users.online_now} <span class="text-xs text-slate-400 font-normal">/ ${data.users.total} total</span></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40">
+                                <i class="fas fa-shopping-cart text-amber-500"></i>
+                                <div>
+                                    <p class="text-xs text-slate-400">Pedidos Pendentes</p>
+                                    <p class="font-bold text-slate-900 dark:text-white">${data.orders_pending}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40">
+                                <i class="fas fa-tasks text-indigo-500"></i>
+                                <div>
+                                    <p class="text-xs text-slate-400">Jobs na Fila</p>
+                                    <p class="font-bold text-slate-900 dark:text-white">${data.queue.pending_jobs}</p>
+                                </div>
+                            </div>
+                        </div>
+                        ${data.disk.percent > 90 ? '<div class="mt-4 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800"><p class="text-sm text-rose-700 dark:text-rose-300 font-semibold"><i class="fas fa-exclamation-triangle mr-2"></i>Disco com ' + data.disk.percent + '% de uso. Apenas ' + data.disk.free_gb + ' GB livres.</p></div>' : ''}
+                        ${!data.cron.active ? '<div class="mt-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"><p class="text-sm text-amber-700 dark:text-amber-300 font-semibold"><i class="fas fa-exclamation-circle mr-2"></i>Cron inativo. Verifique o middleware RunInternalCron.</p></div>' : ''}
+                    `;
+                })
+                .catch(() => {
+                    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fas fa-exclamation-circle mr-2"></i>Não foi possível carregar informações do sistema.</p>';
+                });
+            }
+
+            loadSystemHealthPanel();
+            document.getElementById('btn-refresh-health-panel')?.addEventListener('click', loadSystemHealthPanel);
         });
     </script>
 @endpush

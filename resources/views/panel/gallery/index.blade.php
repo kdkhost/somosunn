@@ -13,10 +13,10 @@
         $selectedEventDate = $selectedEvent?->start_at
             ? \Carbon\Carbon::parse($selectedEvent->start_at)->format('d/m/Y')
             : null;
-        $visibleLabel = $selectedEvent ? 'Resultados do filtro' : 'Midias visiveis';
+        $visibleLabel = $selectedEvent ? 'Resultados do filtro' : 'Mídias visíveis';
     @endphp
 
-    <div class="space-y-6">
+    <div class="space-y-4">
         @include('panel.gallery.partials.hero')
         @include('panel.gallery.partials.filter-bar')
         @include('panel.gallery.partials.cover-manager')
@@ -30,18 +30,16 @@
 @push('styles')
     <style>
         .gallery-modal-panel {
-            animation: gallery-modal-enter 0.28s ease-out;
+            animation: gallery-modal-enter 0.2s ease-out;
         }
 
         .gallery-dropzone.is-dragover {
             border-color: #2563eb;
-            background: rgba(37, 99, 235, 0.06);
-            transform: translateY(-2px);
-            box-shadow: 0 24px 50px rgba(37, 99, 235, 0.12);
+            background: rgba(37, 99, 235, 0.04);
         }
 
         .lightbox-image {
-            animation: gallery-lightbox-enter 0.24s ease-out;
+            animation: gallery-lightbox-enter 0.2s ease-out;
         }
 
         .gallery-panel-pagination nav {
@@ -62,7 +60,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
         }
 
@@ -70,83 +68,64 @@
         .gallery-panel-pagination a,
         .gallery-panel-pagination span[aria-disabled="true"] span {
             display: inline-flex;
-            min-width: 3rem;
+            min-width: 2.25rem;
+            height: 2.25rem;
             align-items: center;
             justify-content: center;
-            border-radius: 9999px;
-            padding: 0.85rem 1rem;
-            font-weight: 800;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            transition: all 0.24s ease;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: all 0.15s ease;
         }
 
         .gallery-panel-pagination a {
-            border: 1px solid rgba(148, 163, 184, 0.24);
-            background: rgba(255, 255, 255, 0.95);
-            color: #0f172a;
-            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            background: #fff;
+            color: #334155;
         }
 
         .gallery-panel-pagination a:hover {
-            transform: translateY(-2px);
-            border-color: rgba(37, 99, 235, 0.24);
+            border-color: #3b82f6;
             background: #eff6ff;
             color: #1d4ed8;
         }
 
         .dark .gallery-panel-pagination a {
-            border-color: rgba(51, 65, 85, 0.9);
-            background: rgba(15, 23, 42, 0.88);
+            border-color: rgba(51, 65, 85, 0.8);
+            background: #0f172a;
             color: #e2e8f0;
-            box-shadow: none;
         }
 
         .dark .gallery-panel-pagination a:hover {
-            background: rgba(30, 41, 59, 0.98);
+            background: #1e293b;
             color: #93c5fd;
         }
 
         .gallery-panel-pagination span[aria-current="page"] span {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            background: #2563eb;
             color: #fff;
-            box-shadow: 0 18px 30px rgba(37, 99, 235, 0.24);
         }
 
         .gallery-panel-pagination span[aria-disabled="true"] span {
-            border: 1px solid rgba(226, 232, 240, 0.9);
-            background: rgba(248, 250, 252, 0.88);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            background: #f8fafc;
             color: #94a3b8;
         }
 
         .dark .gallery-panel-pagination span[aria-disabled="true"] span {
-            border-color: rgba(51, 65, 85, 0.9);
-            background: rgba(15, 23, 42, 0.7);
-            color: #64748b;
+            border-color: rgba(51, 65, 85, 0.8);
+            background: #0f172a;
+            color: #475569;
         }
 
         @keyframes gallery-modal-enter {
-            from {
-                opacity: 0;
-                transform: translateY(16px) scale(0.98);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(8px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         @keyframes gallery-lightbox-enter {
-            from {
-                opacity: 0;
-                transform: scale(0.96);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
         }
     </style>
 @endpush

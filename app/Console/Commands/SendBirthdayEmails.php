@@ -22,9 +22,10 @@ class SendBirthdayEmails extends Command
         }
 
         $today = now();
-        $users = User::whereNotNull('birthday')
-            ->whereMonth('birthday', $today->month)
-            ->whereDay('birthday', $today->day)
+        $users = User::whereNotNull('birth_date')
+            ->whereMonth('birth_date', $today->month)
+            ->whereDay('birth_date', $today->day)
+            ->select(['id', 'name', 'email', 'birth_date'])
             ->get();
 
         if ($users->isEmpty()) {

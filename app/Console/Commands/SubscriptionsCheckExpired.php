@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\SendGenericTemplateEmail;
 use App\Models\MailTemplate;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\Mail\SystemMailLayoutData;
-use App\Support\EmailQueueSettings;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
 class SubscriptionsCheckExpired extends Command
@@ -16,7 +15,7 @@ class SubscriptionsCheckExpired extends Command
     protected $signature = 'subscriptions:check-expired';
     protected $description = 'Verifica assinaturas expiradas, envia lembretes de renovação e desativa planos vencidos';
 
-    public function handle()
+    public function handle(): int
     {
         if ((int) Setting::get('cron_subscriptions_enabled', 1) !== 1) {
             $this->info('Cron de assinaturas desativado.');
@@ -32,6 +31,8 @@ class SubscriptionsCheckExpired extends Command
         $expiringUsers = User::whereNotNull('plan_id')
             ->whereNotNull('plan_expires_at')
             ->whereDate('plan_expires_at', '=', $now->copy()->addDays($reminderDays)->toDateString())
+            ->select(['id', 'name', 'email', 'plan_id', 'plan_expires_at'])
+            ->with('plan:id,name')
             ->get();
 
         $remindersCount = 0;
@@ -40,17 +41,20 @@ class SubscriptionsCheckExpired extends Command
             $remindersCount++;
         }
 
-        // 2. Desativar planos expirados
-        $expiredUsers = User::whereNotNull('plan_id')
+        // 2. Desativar planos expirados (em lotes para não sobrecarregar)
+        $expiredCount = 0;
+
+        User::whereNotNull('plan_id')
             ->whereNotNull('plan_expires_at')
             ->where('plan_expires_at', '<', $now)
-            ->get();
-
-        $expiredCount = 0;
-        foreach ($expiredUsers as $user) {
-            $this->expirePlan($user);
-            $expiredCount++;
-        }
+            ->select(['id', 'name', 'email', 'plan_id', 'plan_expires_at'])
+            ->with('plan:id,name')
+            ->chunkById(50, function ($users) use (&$expiredCount) {
+                foreach ($users as $user) {
+                    $this->expirePlan($user);
+                    $expiredCount++;
+                }
+            });
 
         $this->info("Lembretes enviados: {$remindersCount} | Planos expirados: {$expiredCount}");
 
@@ -87,17 +91,20 @@ class SubscriptionsCheckExpired extends Command
 
             $layout = app(SystemMailLayoutData::class)->make();
 
+            $renewUrl = $plan ? route('subscription.checkout', $plan->id) : url('/premium');
+
             $data = [
                 'user' => ['name' => $user->name],
                 'subscription' => [
                     'plan_name' => $plan->name ?? 'Premium',
                     'days_left' => (string) max(0, $daysLeft),
                     'expires_at' => $user->plan_expires_at->format('d/m/Y'),
-                    'renew_url' => $plan ? route('subscription.checkout', $plan->id) : url('/premium'),
+                    'renew_url' => $renewUrl,
                 ],
                 'site' => [
                     'name' => $layout['siteName'],
                     'primary_color' => $layout['primaryColor'],
+                    'url' => url('/'),
                 ],
             ];
 
@@ -106,37 +113,13 @@ class SubscriptionsCheckExpired extends Command
 
             foreach ($data as $key => $values) {
                 foreach ($values as $k => $v) {
-                    $pattern = '/\{\{\s*' . $key . '\.' . $k . '\s*\}\}/';
+                    $pattern = '/\{\{\s*' . preg_quote($key, '/') . '\.' . preg_quote($k, '/') . '\s*\}\}/';
                     $rendered = preg_replace($pattern, (string) $v, $rendered);
                     $subject = preg_replace($pattern, (string) $v, $subject);
                 }
             }
 
-            Mail::to($user->email)->send(
-                new \Illuminate\Mail\Mailable() === null // Usar view system
-                    ? null
-                    : (new class($subject, $rendered, $layout) extends \Illuminate\Mail\Mailable {
-                        use \Illuminate\Bus\Queueable;
-                        private string $subj;
-                        private string $content;
-                        private array $layout;
-
-                        public function __construct(string $subject, string $content, array $layout)
-                        {
-                            $this->subj = $subject;
-                            $this->content = $content;
-                            $this->layout = $layout;
-                            $this->onConnection(EmailQueueSettings::connection());
-                            $this->onQueue(EmailQueueSettings::queueName());
-                        }
-
-                        public function build()
-                        {
-                            return $this->subject($this->subj)
-                                ->view('emails.system', array_merge($this->layout, ['content' => $this->content]));
-                        }
-                    })
-            );
+            SendGenericTemplateEmail::dispatch($user->email, $subject, $rendered);
 
             Log::info("Renewal reminder sent to {$user->email} (plan expires {$user->plan_expires_at})");
         } catch (\Throwable $e) {
@@ -153,7 +136,7 @@ class SubscriptionsCheckExpired extends Command
             'plan_expires_at' => null,
         ]);
 
-        // Enviar email de expiração
+        // Enviar email de expiração via job
         try {
             $template = MailTemplate::where('slug', 'subscription_expired')->where('is_active', true)->first();
 
@@ -176,7 +159,6 @@ class SubscriptionsCheckExpired extends Command
                 );
             }
 
-            // Enviar via queue (simplificado)
             $layout = app(SystemMailLayoutData::class)->make();
             $data = [
                 'user' => ['name' => $user->name],
@@ -188,14 +170,13 @@ class SubscriptionsCheckExpired extends Command
             $subject = (string) $template->subject;
             foreach ($data as $key => $values) {
                 foreach ($values as $k => $v) {
-                    $pattern = '/\{\{\s*' . $key . '\.' . $k . '\s*\}\}/';
+                    $pattern = '/\{\{\s*' . preg_quote($key, '/') . '\.' . preg_quote($k, '/') . '\s*\}\}/';
                     $rendered = preg_replace($pattern, (string) $v, $rendered);
                     $subject = preg_replace($pattern, (string) $v, $subject);
                 }
             }
 
-            // Dispatch como job simples
-            \App\Jobs\SendGenericTemplateEmail::dispatch($user->email, $subject, $rendered);
+            SendGenericTemplateEmail::dispatch($user->email, $subject, $rendered);
         } catch (\Throwable $e) {
             Log::error("Failed to send expiration email to {$user->email}: " . $e->getMessage());
         }

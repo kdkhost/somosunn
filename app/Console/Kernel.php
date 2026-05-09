@@ -133,6 +133,36 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar verificação de assinaturas: ' . $e->getMessage());
         }
 
+        // Envia emails de aniversário personalizados
+        try {
+            $schedule->command('users:send-birthday-emails')
+                ->dailyAt('07:00')
+                ->withoutOverlapping()
+                ->name('users-birthday-emails');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar emails de aniversário: ' . $e->getMessage());
+        }
+
+        // Envia lembretes de faturas em atraso
+        try {
+            $schedule->command('invoices:send-overdue-reminders')
+                ->dailyAt('08:00')
+                ->withoutOverlapping()
+                ->name('invoices-overdue-reminders');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar lembretes de faturas: ' . $e->getMessage());
+        }
+
+        // Verifica virada de lotes de ingressos dos eventos
+        try {
+            $schedule->command('events:update-batches')
+                ->everyFifteenMinutes()
+                ->withoutOverlapping()
+                ->name('events-update-batches');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar atualização de lotes de eventos: ' . $e->getMessage());
+        }
+
         // Envia emails de carrinho abandonado (marketplace)
         try {
             $schedule->command('abandoned-cart:send')

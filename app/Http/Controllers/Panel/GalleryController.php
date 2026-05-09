@@ -31,9 +31,10 @@ class GalleryController extends Controller
             $query->where('event_id', $request->event_id);
         }
 
-        $media = $query->paginate(20);
+        $media = $query->paginate(10);
 
         $events = Event::where('published', true)
+            ->has('media')
             ->with('galleryCoverMedia')
             ->withCount('media')
             ->orderBy('start_at', 'desc')

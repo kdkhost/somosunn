@@ -31,8 +31,8 @@ class ScheduledTasksSeeder extends Seeder
                 'active' => true,
             ],
             [
-                'command' => 'orders:abandoned-cart',
-                'frequency' => '0 * * * *', // A cada hora
+                'command' => 'abandoned-cart:send',
+                'frequency' => '0 */4 * * *', // A cada 4 horas
                 'active' => true,
             ],
             [

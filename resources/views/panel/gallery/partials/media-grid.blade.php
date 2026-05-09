@@ -3,176 +3,134 @@
 @endphp
 
 @if(count($items) > 0)
-    <section class="space-y-5">
-        <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-                <p class="text-xs font-black uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">Colecao</p>
-                <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                    {{ $selectedEvent ? 'Cobertura filtrada do evento' : 'Painel de midias publicadas' }}
+    <section class="space-y-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">
+                    {{ $selectedEvent ? $selectedEvent->title : 'Todas as mídias' }}
                 </h2>
-                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                    {{ $selectedEvent ? 'Cada card traz contexto do evento, autor e data do envio.' : 'Uma visao consolidada da galeria, pronta para moderacao e consulta rapida.' }}
-                </p>
+                <span id="panel-gallery-total-pill" class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                    <i class="fas fa-layer-group text-[10px]"></i>
+                    <span id="panel-gallery-total-value">{{ $media->total() }}</span>
+                </span>
             </div>
-
-            <div id="panel-gallery-total-pill" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-                <i class="fas fa-layer-group text-blue-500"></i>
-                <span id="panel-gallery-total-value">{{ $media->total() }}</span> registro(s)
+            <div class="text-xs text-slate-400">
+                Página {{ $media->currentPage() }} de {{ $media->lastPage() }}
             </div>
         </div>
 
-        <div id="panel-gallery-grid" class="columns-1 md:columns-2 lg:columns-3 2xl:columns-4 gap-6 space-y-6">
+        <div id="panel-gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             @foreach($items as $item)
                 @php
                     $assetUrl = \App\Support\UploadStorage::url($item->file_path, asset('img/default-user.svg'));
-                    $eventTitle = optional($item->event)->title ?: 'Evento sem titulo';
+                    $eventTitle = optional($item->event)->title ?: 'Evento sem título';
                     $ownerName = optional($item->user)->name ?: 'Sistema';
-                    $ownerInitial = strtoupper(\Illuminate\Support\Str::substr($ownerName, 0, 1));
-                    $avatarUrl = optional($item->user)->profile_photo_url ?? null;
-                    $showAvatar = $avatarUrl && !str_contains((string) $avatarUrl, 'default-user.svg');
                     $isEventOwner = (int) optional($item->event)->user_id === (int) auth()->id();
                     $canDelete = $isAdmin || (int) $item->user_id === (int) auth()->id() || $isEventOwner;
                     $isVideo = $item->type === 'video';
                     $canSetCover = !$isVideo && ($isAdmin || $isEventOwner);
                     $isCover = blank(optional($item->event)->gallery_cover_image)
                         && (int) optional($item->event)->gallery_cover_media_id === (int) $item->id;
-                    $eventDate = optional(optional($item->event)->start_at)?->format('d/m/Y');
                 @endphp
 
-                <article class="group break-inside-avoid overflow-hidden rounded-[2rem] border border-slate-200/70 bg-white shadow-sm shadow-slate-200/60 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
-                    <div class="relative overflow-hidden bg-slate-950">
-                        <button type="button"
-                            data-lightbox-src="{{ $assetUrl }}"
-                            data-lightbox-title="{{ $eventTitle }}"
-                            data-lightbox-type="{{ $isVideo ? 'video' : 'image' }}"
-                            class="block w-full text-left">
-                            @if($isVideo)
-                                <video src="{{ $assetUrl }}" muted playsinline preload="metadata"
-                                    class="block w-full h-auto object-cover transition duration-500 group-hover:scale-[1.04]"></video>
-                            @else
-                                <img src="{{ $assetUrl }}" alt="{{ $eventTitle }}"
-                                    class="block w-full h-auto object-cover transition duration-500 group-hover:scale-[1.04]">
-                            @endif
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-transparent opacity-90"></div>
-                            <div class="absolute left-5 right-5 top-5 flex items-start justify-between gap-4">
-                                <span class="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
-                                    {{ \Illuminate\Support\Str::limit($eventTitle, 28) }}
-                                </span>
-                                <div class="flex flex-col items-end gap-2">
-                                    <span class="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">
-                                        {{ $isVideo ? 'Video' : 'Imagem' }}
-                                    </span>
-
-                                    @if($isCover)
-                                        <span class="rounded-full border border-amber-300/25 bg-amber-400/20 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-amber-100 backdrop-blur">
-                                            Capa do album
-                                        </span>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="absolute inset-x-5 bottom-5 flex items-end justify-between gap-3">
-                                <div>
-                                    <p class="text-xs font-black uppercase tracking-[0.18em] text-blue-200">{{ $isVideo ? 'Abrir video' : 'Abrir imagem' }}</p>
-                                    <p class="mt-1 text-lg font-black text-white">{{ $ownerName }}</p>
-                                </div>
-                                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-white backdrop-blur transition group-hover:bg-white/20">
-                                    <i class="fas {{ $isVideo ? 'fa-play' : 'fa-up-right-and-down-left-from-center' }}"></i>
+                <article class="group relative overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700/80 dark:bg-slate-900">
+                    {{-- Thumbnail --}}
+                    <button type="button"
+                        data-lightbox-src="{{ $assetUrl }}"
+                        data-lightbox-title="{{ $eventTitle }}"
+                        data-lightbox-type="{{ $isVideo ? 'video' : 'image' }}"
+                        class="relative block w-full aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800">
+                        @if($isVideo)
+                            <video src="{{ $assetUrl }}" muted playsinline preload="none"
+                                class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                loading="lazy"></video>
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow">
+                                    <i class="fas fa-play text-xs ml-0.5"></i>
                                 </span>
                             </div>
-                        </button>
+                        @else
+                            <img src="{{ $assetUrl }}" alt="{{ $eventTitle }}"
+                                class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                loading="lazy" decoding="async">
+                        @endif
+
+                        {{-- Overlay badges --}}
+                        @if($isCover)
+                            <span class="absolute top-1.5 left-1.5 rounded-md bg-amber-500 px-1.5 py-0.5 text-[9px] font-bold uppercase text-white shadow">
+                                <i class="fas fa-star mr-0.5"></i> Capa
+                            </span>
+                        @endif
+
+                        @if($isVideo)
+                            <span class="absolute top-1.5 right-1.5 rounded-md bg-slate-900/70 px-1.5 py-0.5 text-[9px] font-bold uppercase text-white backdrop-blur-sm">
+                                Vídeo
+                            </span>
+                        @endif
+                    </button>
+
+                    {{-- Info footer --}}
+                    <div class="p-2">
+                        <p class="truncate text-[11px] font-semibold text-slate-700 dark:text-slate-200" title="{{ $eventTitle }}">
+                            {{ \Illuminate\Support\Str::limit($eventTitle, 22) }}
+                        </p>
+                        <p class="truncate text-[10px] text-slate-400 dark:text-slate-500">
+                            {{ $ownerName }} • {{ $item->created_at?->format('d/m') }}
+                        </p>
                     </div>
 
-                    <div class="p-5">
-                        <div class="flex items-center justify-between gap-4">
-                            <div class="flex min-w-0 items-center gap-3">
-                                <div class="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 text-white shadow-lg shadow-blue-500/20">
-                                    @if($showAvatar)
-                                        <img src="{{ $avatarUrl }}" alt="{{ $ownerName }}" class="h-full w-full object-cover"
-                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
-                                    @else
-                                        <span class="flex h-full w-full items-center justify-center text-sm font-black uppercase">{{ $ownerInitial }}</span>
-                                    @endif
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="truncate text-sm font-black text-slate-900 dark:text-white">{{ $ownerName }}</p>
-                                    <p class="mt-1 truncate text-xs font-medium text-slate-500 dark:text-slate-400">
-                                        Enviado em {{ $item->created_at?->format('d/m/Y H:i') ?? '--' }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            @if($canDelete)
-                                <div class="flex items-center gap-2 shrink-0">
-                                    @if($canSetCover)
-                                        <form method="POST" action="{{ route('panel.gallery.cover.media', $item) }}">
-                                            @csrf
-                                            <button type="submit"
-                                                class="inline-flex h-11 items-center justify-center rounded-2xl border px-4 text-xs font-black uppercase tracking-[0.14em] transition {{ $isCover ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200' : 'border-blue-200 bg-blue-50 text-blue-700 hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-300' }}">
-                                                <i class="fas fa-star mr-2"></i>
-                                                {{ $isCover ? 'Capa ativa' : 'Definir capa' }}
-                                            </button>
-                                        </form>
-                                    @endif
-
-                                    <form method="POST" action="{{ route('panel.gallery.destroy', $item) }}" class="gallery-delete-form shrink-0">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 transition hover:border-rose-300 hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-900/20 dark:text-rose-300">
-                                            <i class="fas fa-trash-can"></i>
-                                        </button>
-                                    </form>
-                                </div>
+                    {{-- Hover actions --}}
+                    @if($canDelete)
+                        <div class="absolute top-1.5 right-1.5 flex flex-col gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                            @if($canSetCover && !$isCover)
+                                <form method="POST" action="{{ route('panel.gallery.cover.media', $item) }}">
+                                    @csrf
+                                    <button type="submit" title="Definir como capa"
+                                        class="flex h-7 w-7 items-center justify-center rounded-lg bg-white/90 text-blue-600 shadow-sm backdrop-blur transition hover:bg-blue-50 dark:bg-slate-800/90 dark:text-blue-400">
+                                        <i class="fas fa-star text-[10px]"></i>
+                                    </button>
+                                </form>
                             @endif
+                            <form method="POST" action="{{ route('panel.gallery.destroy', $item) }}" class="gallery-delete-form">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" title="Excluir"
+                                    class="flex h-7 w-7 items-center justify-center rounded-lg bg-white/90 text-rose-600 shadow-sm backdrop-blur transition hover:bg-rose-50 dark:bg-slate-800/90 dark:text-rose-400">
+                                    <i class="fas fa-trash text-[10px]"></i>
+                                </button>
+                            </form>
                         </div>
-
-                        <div class="mt-5 grid grid-cols-2 gap-3 text-sm">
-                            <div class="rounded-[1.4rem] bg-slate-50 px-4 py-3 dark:bg-slate-950">
-                                <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Evento</p>
-                                <p class="mt-1 line-clamp-2 font-bold text-slate-800 dark:text-slate-100">{{ $eventTitle }}</p>
-                            </div>
-                            <div class="rounded-[1.4rem] bg-slate-50 px-4 py-3 dark:bg-slate-950">
-                                <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Data base</p>
-                                <p class="mt-1 font-bold text-slate-800 dark:text-slate-100">{{ $eventDate ?: '--/--/----' }}</p>
-                            </div>
-                        </div>
-                    </div>
+                    @endif
                 </article>
             @endforeach
         </div>
 
-        <div class="pt-2 gallery-panel-pagination">
+        {{-- Pagination --}}
+        <div class="pt-3 gallery-panel-pagination">
             {{ $media->appends(request()->query())->links() }}
         </div>
     </section>
 @else
-    <section id="panel-gallery-empty-state" class="overflow-hidden rounded-[2.5rem] border border-dashed border-slate-300 bg-white/90 p-8 shadow-sm shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-900">
-        <div class="mx-auto max-w-3xl text-center">
-            <div class="mx-auto flex h-28 w-28 items-center justify-center rounded-[2rem] bg-slate-100 text-4xl text-slate-300 shadow-inner dark:bg-slate-800 dark:text-slate-600">
+    <section id="panel-gallery-empty-state" class="rounded-2xl border border-dashed border-slate-300 bg-white/90 p-8 dark:border-slate-700 dark:bg-slate-900">
+        <div class="mx-auto max-w-md text-center">
+            <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100 text-3xl text-slate-300 dark:bg-slate-800 dark:text-slate-600">
                 <i class="fas fa-camera"></i>
             </div>
-
-            <h2 class="mt-8 text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-                {{ $selectedEvent ? 'Nenhuma midia encontrada para este evento' : 'Sua galeria ainda nao tem registros para exibir' }}
+            <h2 class="mt-5 text-xl font-bold text-slate-900 dark:text-white">
+                {{ $selectedEvent ? 'Nenhuma mídia neste evento' : 'Galeria vazia' }}
             </h2>
-            <p class="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-500 dark:text-slate-400">
-                {{ $selectedEvent ? 'Troque o filtro ou publique novas midias para construir a narrativa visual desse evento.' : 'Assim que voce subir imagens e videos, esta area passa a mostrar os cards com preview, autor, contexto do evento e acoes rapidas.' }}
+            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                {{ $selectedEvent ? 'Troque o filtro ou envie novas mídias.' : 'Envie imagens e vídeos para começar.' }}
             </p>
-
-            <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <button type="button"
-                    data-gallery-open-upload
-                    class="inline-flex items-center justify-center gap-3 rounded-[1.6rem] bg-blue-600 px-7 py-4 text-sm font-black uppercase tracking-[0.16em] text-white shadow-[0_18px_40px_rgba(37,99,235,0.28)] transition hover:-translate-y-0.5 hover:bg-blue-500">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    Subir minhas midias
+            <div class="mt-5 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
+                <button type="button" data-gallery-open-upload
+                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow transition hover:bg-blue-500">
+                    <i class="fas fa-cloud-upload-alt"></i> Enviar mídias
                 </button>
-
                 @if($selectedEventId > 0)
                     <a href="{{ route('panel.gallery.index') }}"
-                        class="inline-flex items-center justify-center gap-3 rounded-[1.6rem] border border-slate-200 bg-white px-7 py-4 text-sm font-bold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:text-white">
-                        <i class="fas fa-rotate-left"></i>
-                        Ver todos os eventos
+                        class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-5 py-3 text-sm font-medium text-slate-600 transition hover:border-slate-300 dark:border-slate-700 dark:text-slate-300">
+                        <i class="fas fa-rotate-left"></i> Ver todos
                     </a>
                 @endif
             </div>

@@ -7,29 +7,30 @@ use Illuminate\Console\Command;
 
 class CleanupNotifications extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'notifications:cleanup';
+    protected $signature = 'notifications:cleanup {--days=90 : Dias para manter notificações}';
+    protected $description = 'Remove notificações antigas em lotes para evitar travamento do banco';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Remove notificações com mais de 30 dias';
-
-    /**
-     * Execute the console command.
-     */
-    public function handle()
+    public function handle(): int
     {
-        $this->info('Iniciando limpeza de notificações antigas...');
+        $days = max(7, (int) $this->option('days'));
+        $this->info("Iniciando limpeza de notificações com mais de {$days} dias...");
 
-        $count = Notification::where('created_at', '<', now()->subDays(30))->delete();
+        $totalDeleted = 0;
+        $batchSize = 500;
 
-        $this->info("Sucesso! {$count} notificações removidas.");
+        do {
+            $deleted = Notification::where('created_at', '<', now()->subDays($days))
+                ->limit($batchSize)
+                ->delete();
+
+            $totalDeleted += $deleted;
+
+            if ($deleted > 0) {
+                usleep(100000); // 100ms entre lotes para não sobrecarregar
+            }
+        } while ($deleted >= $batchSize);
+
+        $this->info("Sucesso! {$totalDeleted} notificações removidas.");
+        return self::SUCCESS;
     }
 }

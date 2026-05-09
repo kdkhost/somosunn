@@ -152,9 +152,12 @@ class DashboardMetricsService
 
         $payload = [
             'totalRevenue' => 0,
+            'revenueToday' => 0,
             'refundedAmount' => 0,
             'totalOrders' => 0,
             'totalUsers' => 0,
+            'usersToday' => 0,
+            'isAdmin' => $isAdmin,
             'salesChartData' => array_fill(0, 6, 0),
             'months' => $months,
             'calendarEvents' => collect(),
@@ -183,9 +186,11 @@ class DashboardMetricsService
         try {
             if ($isAdmin) {
                 $payload['totalRevenue'] = (float) Order::financialPaid()->sum('total_amount');
+                $payload['revenueToday'] = (float) Order::financialPaid()->whereDate('created_at', now()->toDateString())->sum('total_amount');
                 $payload['refundedAmount'] = (float) Order::where('status', 'refunded')->sum('total_amount');
                 $payload['totalOrders'] = (int) Order::count();
                 $payload['totalUsers'] = (int) User::count();
+                $payload['usersToday'] = (int) User::whereDate('created_at', now()->toDateString())->count();
                 $payload['coursesCount'] = (int) Course::count();
                 $payload['mentorshipsCount'] = $this->tableExists('mentorships') ? (int) Mentorship::count() : 0;
                 $payload['eventsCount'] = $this->tableExists('events') ? (int) Event::count() : 0;
@@ -193,18 +198,37 @@ class DashboardMetricsService
                 $payload['pendingJobsCount'] = $this->tableExists('jobs') ? (int) DB::table('jobs')->count() : 0;
                 $payload['logsCount'] = $this->tableExists('activity_logs') ? (int) ActivityLog::count() : 0;
 
-                foreach (User::query()->select('id', 'plan_id', 'plan_expires_at', 'phone', 'occupation', 'bio', 'city', 'state', 'photo', 'company')->cursor() as $listedUser) {
-                    $hasPlan = $listedUser->plan_id && (!$listedUser->plan_expires_at || $listedUser->plan_expires_at->isFuture());
-                    $isComplete = method_exists($listedUser, 'isProfileComplete') ? $listedUser->isProfileComplete() : false;
+                // Otimização: calcular saúde do cliente via queries agregadas ao invés de iterar todos
+                $now = now()->toDateTimeString();
+                $totalUsersCount = (int) User::count();
 
-                    if (!$hasPlan) {
-                        $payload['customerHealth']['Baixa']++;
-                    } elseif ($isComplete) {
-                        $payload['customerHealth']['Alta']++;
-                    } else {
-                        $payload['customerHealth']['Média']++;
-                    }
-                }
+                // Usuários com plano ativo (plan_id preenchido E (sem expiração OU expiração futura))
+                $withActivePlan = (int) User::whereNotNull('plan_id')
+                    ->where('plan_id', '>', 0)
+                    ->where(function ($q) use ($now) {
+                        $q->whereNull('plan_expires_at')
+                          ->orWhere('plan_expires_at', '>', $now);
+                    })
+                    ->count();
+
+                // Usuários com plano ativo E perfil completo (campos essenciais preenchidos)
+                $withActivePlanComplete = (int) User::whereNotNull('plan_id')
+                    ->where('plan_id', '>', 0)
+                    ->where(function ($q) use ($now) {
+                        $q->whereNull('plan_expires_at')
+                          ->orWhere('plan_expires_at', '>', $now);
+                    })
+                    ->where(function ($q) {
+                        $q->whereNotNull('phone')->where('phone', '!=', '')
+                          ->whereNotNull('occupation')->where('occupation', '!=', '')
+                          ->whereNotNull('city')->where('city', '!=', '')
+                          ->whereNotNull('state')->where('state', '!=', '');
+                    })
+                    ->count();
+
+                $payload['customerHealth']['Alta'] = $withActivePlanComplete;
+                $payload['customerHealth']['Média'] = $withActivePlan - $withActivePlanComplete;
+                $payload['customerHealth']['Baixa'] = $totalUsersCount - $withActivePlan;
 
                 $statusMap = [
                     'paid' => 'Pago',

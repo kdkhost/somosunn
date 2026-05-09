@@ -6,18 +6,40 @@ $kernel->bootstrap();
 
 echo "=== CORRIGINDO SCHEDULED_TASKS ===\n\n";
 
-// Desativar comandos que não existem
-$invalidCommands = [
-    'users:send-birthday-emails',
-    'invoices:send-overdue-reminders',
-    'orders:abandoned-cart',
+// Corrigir comandos com assinatura antiga
+$renames = [
+    'orders:abandoned-cart' => 'abandoned-cart:send',
 ];
 
-foreach ($invalidCommands as $cmd) {
+foreach ($renames as $old => $new) {
     $affected = DB::table('scheduled_tasks')
-        ->where('command', $cmd)
-        ->update(['active' => 0]);
-    echo "Desativado: {$cmd} ({$affected} registros)\n";
+        ->where('command', $old)
+        ->update(['command' => $new, 'active' => 1]);
+    echo "Renomeado: {$old} -> {$new} ({$affected} registros)\n";
+}
+
+// Reativar comandos que agora existem
+$validCommands = [
+    'users:send-birthday-emails',
+    'invoices:send-overdue-reminders',
+    'abandoned-cart:send',
+    'notifications:cleanup',
+    'events:update-batches',
+    'subscriptions:check-expired',
+    'orders:cancel-unpaid',
+    'cart:cleanup-expired',
+    'dashboard:warm-cache',
+    'points:award-top-ranking',
+    'points:award-birthday-bonus',
+    'share-requests:expire',
+];
+
+foreach ($validCommands as $cmd) {
+    $exists = DB::table('scheduled_tasks')->where('command', $cmd)->exists();
+    if ($exists) {
+        DB::table('scheduled_tasks')->where('command', $cmd)->update(['active' => 1]);
+        echo "Reativado: {$cmd}\n";
+    }
 }
 
 echo "\n=== TASKS ATIVAS RESTANTES ===\n";

@@ -30,19 +30,19 @@
                     </optgroup>
                     <optgroup label="Pedidos e Vendas">
                         <option value="orders:cancel-unpaid" {{ $task->command == 'orders:cancel-unpaid' ? 'selected' : '' }}>Cancelar Pedidos Não Pagos (orders:cancel-unpaid)</option>
-                        <option value="orders:abandoned-cart" {{ $task->command == 'orders:abandoned-cart' ? 'selected' : '' }}>Email Carrinho Abandonado (orders:abandoned-cart)</option>
+                        <option value="abandoned-cart:send" {{ $task->command == 'abandoned-cart:send' ? 'selected' : '' }}>Email Carrinho Abandonado (abandoned-cart:send)</option>
                         <option value="subscriptions:check-expired" {{ $task->command == 'subscriptions:check-expired' ? 'selected' : '' }}>Expira Planos Vencidos (subscriptions:check-expired)</option>
                     </optgroup>
                     <optgroup label="Infraestrutura">
                         <option value="queue:work --stop-when-empty --tries=3" {{ $task->command == 'queue:work --stop-when-empty --tries=3' ? 'selected' : '' }}>Processar Fila de Jobs (queue:work)
                         </option>
                     </optgroup>
-                    <option value="custom" {{ !in_array($task->command, ['notifications:cleanup', 'queue:work --stop-when-empty --tries=3', 'orders:cancel-unpaid', 'orders:abandoned-cart', 'subscriptions:check-expired', 'auth:clear-resets', 'sanctum:prune-expired']) && $task->exists ? 'selected' : '' }}>Outro (Personalizado)</option>
+                    <option value="custom" {{ !in_array($task->command, ['notifications:cleanup', 'queue:work --stop-when-empty --tries=3', 'orders:cancel-unpaid', 'abandoned-cart:send', 'subscriptions:check-expired', 'auth:clear-resets', 'sanctum:prune-expired']) && $task->exists ? 'selected' : '' }}>Outro (Personalizado)</option>
                 </select>
             </div>
 
             <!-- Custom Command Input -->
-            <div class="form-group {{ !in_array($task->command, ['notifications:cleanup', 'queue:work --stop-when-empty --tries=3', 'orders:cancel-unpaid', 'orders:abandoned-cart', 'subscriptions:check-expired', 'auth:clear-resets', 'sanctum:prune-expired']) && $task->exists ? '' : 'd-none' }}"
+            <div class="form-group {{ !in_array($task->command, ['notifications:cleanup', 'queue:work --stop-when-empty --tries=3', 'orders:cancel-unpaid', 'abandoned-cart:send', 'subscriptions:check-expired', 'auth:clear-resets', 'sanctum:prune-expired']) && $task->exists ? '' : 'd-none' }}"
                 id="custom_command_div">
                 <label>Comando Personalizado</label>
                 <div class="input-group">
