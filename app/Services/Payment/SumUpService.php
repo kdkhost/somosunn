@@ -305,10 +305,24 @@ class SumUpService
 
     private function getSellerConfig(Order $order): array
     {
-        // SumUp não suporta split automático como MercadoPago.
-        // Para garantir que a plataforma receba e distribua os valores,
-        // SEMPRE usamos as credenciais da plataforma (conta centralizadora).
-        // Os splits são calculados após confirmação e pagos via PIX ao vendedor.
+        // Tenta credenciais do vendedor primeiro
+        if ($order->seller_id) {
+            $account = GatewayAccount::where('user_id', $order->seller_id)
+                ->where('provider', 'sumup')
+                ->where('enabled', true)
+                ->first();
+
+            if ($account && !empty($account->access_token)) {
+                $extra = $account->extra ?? [];
+                return [
+                    'api_key'       => $account->access_token,
+                    'merchant_code' => $extra['merchant_code'] ?? $this->merchantCode(),
+                    'source'        => 'seller',
+                ];
+            }
+        }
+
+        // Fallback para credenciais globais (conta do admin da plataforma)
         return [
             'api_key'       => $this->apiKey(),
             'merchant_code' => $this->merchantCode(),

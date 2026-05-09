@@ -253,13 +253,8 @@ class PaymentWebhookController extends Controller
             ->orWhere('level', 'superadmin')
             ->first();
 
-        // Determinar se o pagamento foi centralizado na plataforma (SumUp sempre centraliza)
+        // Determinar gateway usado (informativo para o painel de splits)
         $gateway = (string) ($order->gateway ?? '');
-        $isCentralized = in_array($gateway, ['sumup'], true);
-
-        // Para MercadoPago com split automático via application_fee,
-        // o vendedor já recebe direto (menos a taxa). Splits são informativos.
-        // Para SumUp, a plataforma recebeu tudo e precisa pagar o vendedor.
 
         $splits = [
             [
@@ -303,24 +298,10 @@ class PaymentWebhookController extends Controller
                 $pixKey = Setting::get('marketplace_split_traffic_pix');
             }
 
-            // Status automático:
-            // - SumUp (centralizado): plataforma/superadmin/tráfego já receberam (dinheiro na conta da plataforma)
-            //   Vendedor fica "pending" até transferência PIX ser feita
-            // - MercadoPago com split: vendedor já recebeu via MP, plataforma já recebeu via application_fee
+            // Status: sempre "pending" até confirmação manual pelo admin/superadmin.
+            // SumUp não tem split automático — o sistema registra quem deve o quê.
+            // MercadoPago com application_fee: o gateway distribui, mas o admin confirma no painel.
             $status = 'pending';
-
-            if ($isCentralized) {
-                // SumUp: plataforma já tem o dinheiro, marca como pago exceto vendedor
-                if (in_array($split['type'], ['platform', 'superadmin', 'traffic'], true)) {
-                    $status = 'paid';
-                }
-            } else {
-                // MercadoPago com split automático: todos já receberam via gateway
-                $hasMpSplit = (float) Setting::get('marketplace_platform_fee_percent', 0) > 0;
-                if ($hasMpSplit) {
-                    $status = 'paid';
-                }
-            }
 
             \App\Models\OrderSplit::create([
                 'order_id' => $order->id,
