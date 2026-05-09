@@ -506,21 +506,51 @@
             min-width: auto;
         }
 
-        /* Card tools sempre alinhado à direita por padrão */
-        .card-header {
+        /* Card tools sempre alinhado à direita por padrão (apenas dentro de cards, não navbar) */
+        .card > .card-header,
+        .card-body > .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
-        .card-header .card-title {
+        .card > .card-header .card-title,
+        .card-body > .card-header .card-title {
             margin-bottom: 0;
-            flex: 1;
+            flex: 1 1 auto;
+            min-width: 0;
         }
 
-        .card-header .card-tools {
+        .card > .card-header .card-tools,
+        .card-body > .card-header .card-tools {
             margin-left: auto;
             float: none !important;
+            flex-shrink: 0;
+        }
+
+        /* Garantir que card-title sempre seja legível */
+        .card .card-title {
+            color: #1f2937;
+        }
+
+        .dark-mode .card .card-title {
+            color: #f1f5f9 !important;
+        }
+
+        /* Navbar nunca deve ser afetada pelo padrão de card-header */
+        .main-header.navbar {
+            display: flex !important;
+        }
+
+        /* Impersonation badge e back-to-top não devem ficar sobre avatar */
+        .admin-back-to-top {
+            z-index: 1055;
+        }
+
+        #impersonation-badge {
+            z-index: 9999;
         }
 
         .note-editor.note-frame {
