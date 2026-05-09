@@ -61,6 +61,24 @@ class SubscriptionController extends Controller
         ['public_key' => $publicKey, 'access_token' => $accessToken] = $this->mercadoPagoCredentials();
         $paymentConfigured = trim((string) $accessToken) !== '' && trim((string) $publicKey) !== '';
 
+        // SumUp disponibilidade
+        $sumupEnabled = (int) (\App\Models\Setting::get('sumup_enabled', 0)) === 1;
+        $sumupApiKey = (string) (\App\Models\Setting::get('sumup_api_key', '') ?? '');
+        $sumupConfigured = $sumupEnabled && $sumupApiKey !== '';
+        $sumupAllowSubscriptions = (int) (\App\Models\Setting::get('sumup_allow_subscriptions', 1)) === 1;
+        $sumupAvailable = $sumupConfigured && $sumupAllowSubscriptions;
+
+        // Métodos ativos
+        $mpMethods = [];
+        if ((int) \App\Models\Setting::get('mercadopago_method_credit_card', 1) === 1) $mpMethods[] = 'Cartão';
+        if ((int) \App\Models\Setting::get('mercadopago_method_pix', 1) === 1) $mpMethods[] = 'Pix';
+
+        $sumupMethods = [];
+        if ($sumupAvailable) {
+            if ((int) \App\Models\Setting::get('sumup_method_card', 1) === 1) $sumupMethods[] = 'Cartão';
+            if ((int) \App\Models\Setting::get('sumup_method_pix', 1) === 1) $sumupMethods[] = 'Pix';
+        }
+
         return view('site.subscription.checkout', compact(
             'plan',
             'publicKey',
@@ -71,7 +89,10 @@ class SubscriptionController extends Controller
             'prorataAmount',
             'isUpgrade',
             'isDowngrade',
-            'currentPlan'
+            'currentPlan',
+            'sumupAvailable',
+            'mpMethods',
+            'sumupMethods'
         ));
     }
 

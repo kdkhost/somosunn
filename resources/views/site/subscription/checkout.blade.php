@@ -166,7 +166,14 @@
                         </div>
 
                         <div class="bg-blue-50 rounded-xl p-4 text-sm text-blue-700">
-                            <i class="fas fa-shield-alt mr-2"></i> Pagamento 100% seguro via MercadoPago
+                            <i class="fas fa-shield-alt mr-2"></i> Pagamento 100% seguro
+                            @if(($paymentConfigured ?? false) && ($sumupAvailable ?? false))
+                                via MercadoPago ou SumUp
+                            @elseif($sumupAvailable ?? false)
+                                via SumUp
+                            @else
+                                via MercadoPago
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -312,6 +319,60 @@
                                     class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm">2</span>
                                 Pagamento
                             </h2>
+
+                            {{-- Seletor de Gateway (MP e/ou SumUp) --}}
+                            @php
+                                $hasMultipleGateways = ($paymentConfigured ?? false) && ($sumupAvailable ?? false);
+                                $defaultGatewayProvider = 'mercadopago';
+                            @endphp
+
+                            @if($hasMultipleGateways)
+                                <div class="mb-6">
+                                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Gateway de pagamento</p>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <label class="cursor-pointer block">
+                                            <input type="radio" name="gateway_provider" value="mercadopago" class="peer sr-only" checked>
+                                            <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:ring-2 peer-checked:ring-blue-100 transition-all">
+                                                <div class="flex items-start gap-3">
+                                                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
+                                                        <i class="fas fa-hand-holding-dollar"></i>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="font-bold text-gray-900 text-sm">Mercado Pago</p>
+                                                        <div class="flex flex-wrap gap-1 mt-1">
+                                                            @foreach(($mpMethods ?? ['Cartão', 'Pix']) as $m)
+                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-600">{{ $m }}</span>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer block">
+                                            <input type="radio" name="gateway_provider" value="sumup" class="peer sr-only">
+                                            <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200 transition-all">
+                                                <div class="flex items-start gap-3">
+                                                    <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
+                                                        <i class="fas fa-credit-card"></i>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="font-bold text-gray-900 text-sm">SumUp</p>
+                                                        <div class="flex flex-wrap gap-1 mt-1">
+                                                            @foreach(($sumupMethods ?? ['Cartão', 'Pix']) as $m)
+                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-600">{{ $m }}</span>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            @elseif($sumupAvailable ?? false)
+                                <input type="hidden" name="gateway_provider" value="sumup">
+                            @else
+                                <input type="hidden" name="gateway_provider" value="mercadopago">
+                            @endif
 
                             <div class="grid grid-cols-2 gap-4 mb-8">
                                 <label class="cursor-pointer" id="label-credit-card">
