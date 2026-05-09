@@ -136,6 +136,98 @@
             --summernote-link: #60a5fa;
         }
 
+        /* Dark mode: corrigir legibilidade de textos em formulários */
+        .dark-mode label,
+        .dark-mode .form-group label,
+        .dark-mode .custom-control-label,
+        .dark-mode h6,
+        .dark-mode .font-weight-bold,
+        .dark-mode .card-title {
+            color: #e2e8f0 !important;
+        }
+
+        .dark-mode .text-muted,
+        .dark-mode small.form-text,
+        .dark-mode .form-text {
+            color: #94a3b8 !important;
+        }
+
+        .dark-mode .form-control,
+        .dark-mode .custom-select,
+        .dark-mode .input-group-text {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #f1f5f9;
+        }
+
+        .dark-mode .form-control::placeholder {
+            color: #64748b;
+        }
+
+        .dark-mode .form-control:focus {
+            background-color: #1e293b;
+            border-color: #3b82f6;
+            color: #f1f5f9;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+        }
+
+        .dark-mode .card {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+
+        .dark-mode .card-header {
+            border-color: #334155;
+        }
+
+        .dark-mode .card-footer {
+            border-color: #334155;
+            background-color: rgba(15, 23, 42, 0.4);
+        }
+
+        .dark-mode .table thead th {
+            color: #cbd5e1;
+        }
+
+        .dark-mode .table td {
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+
+        .dark-mode .table-hover tbody tr:hover {
+            background-color: rgba(51, 65, 85, 0.3);
+        }
+
+        .dark-mode .badge-light {
+            background-color: #334155;
+            color: #e2e8f0;
+        }
+
+        .dark-mode .alert-light,
+        .dark-mode .bg-light {
+            background-color: #1e293b !important;
+            color: #e2e8f0;
+        }
+
+        .dark-mode .border {
+            border-color: #334155 !important;
+        }
+
+        .dark-mode .callout {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        .dark-mode .info-box-content .info-box-text {
+            color: #cbd5e1;
+        }
+
+        .dark-mode code {
+            background-color: #334155;
+            color: #93c5fd;
+        }
+
         .note-editor.note-frame {
             border-color: var(--summernote-border) !important;
             background-color: var(--summernote-surface) !important;
