@@ -20,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        // Paginação: usar Bootstrap-5 como padrão (AdminLTE usa Bootstrap)
+        // O painel Tailwind usa ->links() que herda este padrão mas funciona OK
+        // pois Bootstrap-5 pagination é compatível com ambos os temas
+        \Illuminate\Pagination\Paginator::useBootstrapFive();
+
         // Corrige erro do tipo "enum" nas migrations usando Doctrine DBAL (executa logo no início)
         try {
             if (
