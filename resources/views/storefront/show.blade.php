@@ -343,49 +343,63 @@
             </section>
 
             <section class="store-home-card overflow-hidden rounded-b-[1.65rem] bg-white">
-                <div class="grid gap-5 px-4 py-5 sm:px-5 lg:grid-cols-[280px,minmax(0,1fr),auto] lg:items-center">
-                    <div class="flex items-center gap-4">
-                        <div class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.35rem] border border-slate-200 bg-white">
+                <div class="flex flex-wrap items-center gap-4 px-4 py-4 sm:px-5 lg:flex-nowrap">
+                    {{-- Logo + Brand (mais espaço) --}}
+                    <div class="flex items-center gap-4 flex-shrink-0">
+                        <div class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[1.2rem] border border-slate-200 bg-white shadow-sm">
                             @if($store->logo_url)
                                 <img src="{{ $store->logo_url }}" alt="{{ $store->brand_name }}" class="h-full w-full object-cover">
                             @else
-                                <div class="flex h-full w-full items-center justify-center text-3xl text-slate-300">
+                                <div class="flex h-full w-full items-center justify-center text-2xl text-slate-300">
                                     <i class="fas fa-store"></i>
                                 </div>
                             @endif
                         </div>
                         <div class="min-w-0">
-                            <h1 class="text-2xl font-black tracking-tight text-slate-900">{{ $store->brand_name }}</h1>
-                            <p class="mt-1 text-sm font-medium text-slate-500">{{ $store->tagline ?: ($isPlatformStore ? 'Loja institucional oficial dentro do ecossistema UNN.' : 'Loja virtual oficial dentro do marketplace UNN.') }}</p>
+                            <h1 class="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">{{ $store->brand_name }}</h1>
+                            <p class="mt-0.5 text-xs font-medium text-slate-500 sm:text-sm">{{ $store->tagline ?: ($isPlatformStore ? 'Loja institucional oficial dentro do ecossistema UNN.' : 'Loja virtual oficial dentro do marketplace UNN.') }}</p>
                         </div>
                     </div>
 
-                    <form method="GET" class="store-header-search flex min-w-0 items-center rounded-full px-3 py-2.5">
-                        <i class="fas fa-magnifying-glass ml-2 mr-3 text-slate-400"></i>
-                        <input type="text" name="q" value="{{ $catalogSearch }}" placeholder="Buscar produtos, ofertas e destaques da loja" class="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-sm font-semibold text-slate-900 outline-none focus:ring-0">
+                    {{-- Busca (menor) --}}
+                    <form method="GET" class="store-header-search hidden lg:flex items-center rounded-full px-3 py-2 flex-1 max-w-sm ml-auto">
+                        <i class="fas fa-magnifying-glass ml-1 mr-2 text-slate-400 text-xs"></i>
+                        <input type="text" name="q" value="{{ $catalogSearch }}" placeholder="Buscar produtos..." class="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-sm font-medium text-slate-900 outline-none focus:ring-0">
                         <input type="hidden" name="tipo" value="{{ $catalogType }}">
                         <input type="hidden" name="canal" value="{{ $catalogChannel }}">
                         <input type="hidden" name="preco" value="{{ $catalogPrice }}">
                         <input type="hidden" name="ordem" value="{{ $catalogSort }}">
-                        <button type="submit" class="store-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black shadow-lg shadow-blue-700/20">Buscar</button>
+                        <button type="submit" class="store-button-primary inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-bold shadow-md">Buscar</button>
                     </form>
 
-                    <div class="flex items-center justify-end gap-2">
+                    {{-- Ícones --}}
+                    <div class="flex items-center gap-2 flex-shrink-0 ml-auto lg:ml-0">
                         @if($whatsappUrl)
-                            <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:-translate-y-0.5">
+                            <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:-translate-y-0.5">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
                         @endif
                         @if($store->website_url)
-                            <a href="{{ $store->website_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:-translate-y-0.5">
+                            <a href="{{ $store->website_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:-translate-y-0.5">
                                 <i class="fas fa-globe"></i>
                             </a>
                         @endif
-                        <a href="{{ route('seller-products.cart.show') }}" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:-translate-y-0.5">
+                        <a href="{{ route('seller-products.cart.show') }}" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:-translate-y-0.5">
                             <i class="fas fa-cart-shopping"></i>
                         </a>
                     </div>
                 </div>
+
+                {{-- Busca mobile --}}
+                <form method="GET" class="store-header-search flex lg:hidden items-center rounded-full px-3 py-2 mx-4 mb-3">
+                    <i class="fas fa-magnifying-glass ml-1 mr-2 text-slate-400 text-xs"></i>
+                    <input type="text" name="q" value="{{ $catalogSearch }}" placeholder="Buscar produtos..." class="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-sm font-medium text-slate-900 outline-none focus:ring-0">
+                    <input type="hidden" name="tipo" value="{{ $catalogType }}">
+                    <input type="hidden" name="canal" value="{{ $catalogChannel }}">
+                    <input type="hidden" name="preco" value="{{ $catalogPrice }}">
+                    <input type="hidden" name="ordem" value="{{ $catalogSort }}">
+                    <button type="submit" class="store-button-primary inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-bold shadow-md">Buscar</button>
+                </form>
 
                 <nav class="store-main-nav overflow-x-auto px-4 py-3 text-white sm:px-5">
                     <div class="flex min-w-max items-center gap-5 text-sm font-bold">
