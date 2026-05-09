@@ -253,6 +253,14 @@ class PaymentWebhookController extends Controller
             ->orWhere('level', 'superadmin')
             ->first();
 
+        // Determinar se o pagamento foi centralizado na plataforma (SumUp sempre centraliza)
+        $gateway = (string) ($order->gateway ?? '');
+        $isCentralized = in_array($gateway, ['sumup'], true);
+
+        // Para MercadoPago com split automático via application_fee,
+        // o vendedor já recebe direto (menos a taxa). Splits são informativos.
+        // Para SumUp, a plataforma recebeu tudo e precisa pagar o vendedor.
+
         $splits = [
             [
                 'type' => 'seller',
@@ -295,6 +303,25 @@ class PaymentWebhookController extends Controller
                 $pixKey = Setting::get('marketplace_split_traffic_pix');
             }
 
+            // Status automático:
+            // - SumUp (centralizado): plataforma/superadmin/tráfego já receberam (dinheiro na conta da plataforma)
+            //   Vendedor fica "pending" até transferência PIX ser feita
+            // - MercadoPago com split: vendedor já recebeu via MP, plataforma já recebeu via application_fee
+            $status = 'pending';
+
+            if ($isCentralized) {
+                // SumUp: plataforma já tem o dinheiro, marca como pago exceto vendedor
+                if (in_array($split['type'], ['platform', 'superadmin', 'traffic'], true)) {
+                    $status = 'paid';
+                }
+            } else {
+                // MercadoPago com split automático: todos já receberam via gateway
+                $hasMpSplit = (float) Setting::get('marketplace_platform_fee_percent', 0) > 0;
+                if ($hasMpSplit) {
+                    $status = 'paid';
+                }
+            }
+
             \App\Models\OrderSplit::create([
                 'order_id' => $order->id,
                 'receiver_id' => $split['user_id'],
@@ -302,8 +329,14 @@ class PaymentWebhookController extends Controller
                 'percentage' => $percent,
                 'amount' => $amount,
                 'pix_key' => $pixKey,
-                'status' => 'pending',
+                'status' => $status,
             ]);
+        }
+
+        // Registrar platform_fee_amount no pedido para referência
+        $platformFee = round($total * (($platformPercent + $superadminPercent + $trafficPercent) / 100), 2);
+        if ($platformFee > 0 && !(float) $order->platform_fee_amount) {
+            $order->update(['platform_fee_amount' => $platformFee]);
         }
     }
 
