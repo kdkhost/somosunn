@@ -324,6 +324,11 @@
                             @php
                                 $hasMultipleGateways = ($paymentConfigured ?? false) && ($sumupAvailable ?? false);
                                 $defaultGatewayProvider = 'mercadopago';
+                                $onlyOneGateway = !$hasMultipleGateways;
+                                $singleGateway = null;
+                                if ($onlyOneGateway) {
+                                    $singleGateway = ($sumupAvailable ?? false) ? 'sumup' : 'mercadopago';
+                                }
                             @endphp
 
                             @if($hasMultipleGateways)
@@ -368,10 +373,9 @@
                                         </label>
                                     </div>
                                 </div>
-                            @elseif($sumupAvailable ?? false)
-                                <input type="hidden" name="gateway_provider" value="sumup">
                             @else
-                                <input type="hidden" name="gateway_provider" value="mercadopago">
+                                {{-- Só 1 gateway: input hidden, sem seletor --}}
+                                <input type="hidden" name="gateway_provider" value="{{ $singleGateway }}">
                             @endif
 
                             <div class="grid grid-cols-2 gap-4 mb-8">
@@ -624,6 +628,12 @@
                 const checkedGateway = document.querySelector('input[name="gateway_provider"]:checked');
                 if (checkedGateway) {
                     switchGateway(checkedGateway.value);
+                } else {
+                    // Só 1 gateway (hidden input) - mostrar formulário direto
+                    const hiddenGateway = document.querySelector('input[name="gateway_provider"][type="hidden"]');
+                    if (hiddenGateway) {
+                        switchGateway(hiddenGateway.value);
+                    }
                 }
 
                 function selectedTransactionAmount() {
