@@ -104,6 +104,7 @@ class SubscriptionController extends Controller
 
         $request->validate([
             'payment_method' => $isPaidPlan ? 'required|in:credit_card,pix' : 'nullable',
+            'gateway_provider' => 'nullable|string|in:mercadopago,sumup',
             'period' => 'nullable|string|in:mensal,trimestral,semestral,anual',
             'name' => Auth::check() ? 'nullable' : 'required|string|max:255',
             'email' => Auth::check() ? 'nullable' : 'required|email|unique:users,email',
@@ -160,7 +161,16 @@ class SubscriptionController extends Controller
             $paymentsConfigured = trim((string) $mpAccessToken) !== '' && trim((string) $mpPublicKey) !== '';
             $isSimulation = !$paymentsConfigured && config('app.debug');
 
-            if (!$paymentsConfigured && !$isSimulation) {
+            $chosenGateway = $request->input('gateway_provider', 'mercadopago');
+
+            // Se escolheu SumUp, verificar disponibilidade
+            if ($chosenGateway === 'sumup') {
+                $sumupEnabled = (int) (\App\Models\Setting::get('sumup_enabled', 0)) === 1;
+                $sumupApiKey = trim((string) (\App\Models\Setting::get('sumup_api_key', '') ?? ''));
+                if (!$sumupEnabled || $sumupApiKey === '') {
+                    throw new \RuntimeException('SumUp não está configurado para assinaturas.');
+                }
+            } elseif (!$paymentsConfigured && !$isSimulation) {
                 throw new \RuntimeException('MercadoPago nao configurado para assinaturas.');
             }
 
@@ -183,7 +193,7 @@ class SubscriptionController extends Controller
                 'fee_amount' => 0,
                 'platform_fee_amount' => 0,
                 'currency' => 'BRL',
-                'gateway' => 'mercadopago',
+                'gateway' => $chosenGateway,
                 'gateway_account_id' => null,
                 'metadata' => [
                     'context' => 'subscription',
@@ -208,6 +218,12 @@ class SubscriptionController extends Controller
             ]);
 
             $tracking->recordCheckoutStarted($request, $order, $plan);
+
+            // Processar via SumUp se escolhido
+            if ($chosenGateway === 'sumup') {
+                DB::commit();
+                return $this->processSubscriptionSumUp($order, $plan, $period);
+            }
 
             if ($isSimulation) {
                 if ($request->payment_method === 'pix') {
@@ -366,5 +382,58 @@ class SubscriptionController extends Controller
                 ?: \App\Models\Setting::get('mercadopago_access_token')
                 ?: config('payments.mercadopago.access_token', ''),
         ];
+    }
+
+    /**
+     * Processa assinatura via SumUp - renderiza checkout.transparent com formulário SumUp inline.
+     */
+    private function processSubscriptionSumUp(Order $order, Plan $plan, string $period)
+    {
+        try {
+            $sumUpService = app(\App\Services\Payment\SumUpService::class);
+
+            $checkout = $sumUpService->createCheckout($order, [
+                'description' => 'Assinatura: ' . $plan->name . ' (' . ucfirst($period) . ')',
+                'return_url'  => route('subscription.success', $order->id),
+            ]);
+
+            $checkoutId = $checkout['checkout_id'] ?? $checkout['id'] ?? null;
+
+            $order->update([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'sumup_checkout_id'  => $checkoutId,
+                    'sumup_checkout_url' => $checkout['checkout_url'] ?? data_get($checkout, 'raw.checkout_url'),
+                ]),
+            ]);
+
+            $merchantCode = trim((string) (\App\Models\Setting::get('sumup_merchant_code') ?? ''));
+            $methodCard = (bool)(int)(\App\Models\Setting::get('sumup_method_card', 1));
+            $methodPix  = (bool)(int)(\App\Models\Setting::get('sumup_method_pix', 1));
+            $maxInstallments = max(1, min(12, (int) (\App\Models\Setting::get('sumup_max_installments', 12))));
+            $noInterestUpTo  = max(1, min(12, (int) (\App\Models\Setting::get('sumup_installments_no_interest', 1))));
+            $installmentTax  = max(0.0, (float) (\App\Models\Setting::get('sumup_installment_tax', 0)));
+            $passFeeToClient = (bool)(int)(\App\Models\Setting::get('sumup_pass_fee', 0));
+
+            return view('checkout.transparent', [
+                'order'                       => $order->fresh('items', 'user'),
+                'preferenceId'                => '',
+                'publicKey'                   => '',
+                'gateway'                     => 'sumup',
+                'checkoutId'                  => $checkoutId ?? '',
+                'sumupMerchantCode'           => $merchantCode,
+                'sumupMethodCard'             => $methodCard,
+                'sumupMethodPix'              => $methodPix,
+                'sumupMaxInstallments'        => $maxInstallments,
+                'sumupInstallmentsNoInterest' => $noInterestUpTo,
+                'sumupInstallmentTax'         => $installmentTax,
+                'sumupPassFeeToClient'        => $passFeeToClient,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('SumUp subscription checkout failed: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'plan_id' => $plan->id,
+            ]);
+            return back()->with('error', 'Erro ao processar pagamento via SumUp: ' . $e->getMessage());
+        }
     }
 }
