@@ -310,8 +310,21 @@
                     try { prices = JSON.parse(el.getAttribute('data-prices')); } catch(e) {}
                     if (!prices) return;
 
-                    var price = prices[period] !== undefined ? prices[period] : prices[Object.keys(prices)[0]];
-                    if (!price) return;
+                    var card = el.closest('[data-plan-id]');
+                    if (!card) return;
+
+                    // Se o plano NÃO tem preço para este período, esconder o card
+                    var price = prices[period];
+                    var isFree = card.querySelector('.plan-checkout-link') && card.querySelector('.plan-checkout-link').dataset.free === '1';
+
+                    if (!isFree && (price === undefined || price === null || price === 0)) {
+                        card.style.display = 'none';
+                        return;
+                    } else {
+                        card.style.display = '';
+                    }
+
+                    if (isFree) return; // Plano grátis não muda preço
 
                     // Format
                     el.textContent = 'R$ ' + Number(price).toLocaleString('pt-BR', {
@@ -320,8 +333,6 @@
                     });
 
                     // Period label
-                    var card = el.closest('[data-plan-id]');
-                    if (!card) return;
                     var lbl = card.querySelector('.plan-period-label');
                     if (lbl) lbl.textContent = periodLabels[period] || '/' + period;
 
