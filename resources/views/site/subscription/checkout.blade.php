@@ -395,8 +395,8 @@
                                 </label>
                             </div>
 
-                            <!-- Formulário Cartão -->
-                            <div id="creditCardForm" class="space-y-6">
+                            <!-- Formulário Cartão (MercadoPago) -->
+                            <div id="creditCardForm" class="space-y-6" data-gateway="mercadopago">
                                 <!-- SDK MercadoPago será injetado aqui -->
                                 <div id="cardPaymentBrick_container"></div>
 
@@ -411,8 +411,31 @@
                                 <input type="hidden" name="cpf" id="cpf_hidden" value="{{ Auth::user()?->doc ?? '' }}">
                             </div>
 
-                            <!-- Pix Info -->
-                            <div id="pixInfo" class="hidden text-center py-8">
+                            <!-- SumUp Info (quando SumUp selecionado) -->
+                            <div id="sumupPaymentInfo" class="hidden text-center py-8" data-gateway="sumup">
+                                <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-700">
+                                    <i class="fas fa-credit-card text-4xl"></i>
+                                </div>
+                                <h3 class="font-bold text-gray-900 mb-2">Pagamento via SumUp</h3>
+                                <p class="text-gray-600 max-w-sm mx-auto mb-4">
+                                    Ao finalizar, você será redirecionado para o checkout seguro da SumUp para concluir o pagamento com cartão ou Pix.
+                                </p>
+                                <div class="flex justify-center gap-2">
+                                    @if(($sumupMethods ?? null) && in_array('Cartão', $sumupMethods ?? []))
+                                        <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-100 text-sm font-bold text-slate-700">
+                                            <i class="fas fa-credit-card text-xs"></i> Cartão
+                                        </span>
+                                    @endif
+                                    @if(($sumupMethods ?? null) && in_array('Pix', $sumupMethods ?? []))
+                                        <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-100 text-sm font-bold text-slate-700">
+                                            <i class="fa-brands fa-pix text-xs"></i> Pix
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Pix Info (MercadoPago) -->
+                            <div id="pixInfo" class="hidden text-center py-8" data-gateway="mercadopago">
                                 <div
                                     class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600">
                                     <i class="fa-brands fa-pix text-4xl"></i>
@@ -424,7 +447,8 @@
 
                             <button type="submit"
                                 class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg mt-8 shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                                {{ (($plan->price ?? 0) > 0 && !($paymentConfigured ?? false) && !config('app.debug')) ? 'disabled' : '' }}>
+                                id="subscription-submit-btn"
+                                {{ (($plan->price ?? 0) > 0 && !($paymentConfigured ?? false) && !($sumupAvailable ?? false) && !config('app.debug')) ? 'disabled' : '' }}>
                                 <i class="fas fa-lock"></i> Finalizar Pagamento
                             </button>
                         </div>
@@ -452,8 +476,63 @@
                 const hiddenMethod = document.getElementById('payment_method_hidden');
                 const cardForm = document.getElementById('creditCardForm');
                 const pixInfo = document.getElementById('pixInfo');
-                const submitBtn = document.querySelector('button[type="submit"]');
+                const sumupInfo = document.getElementById('sumupPaymentInfo');
+                const submitBtn = document.getElementById('subscription-submit-btn');
                 const amountInput = document.getElementById('transaction_amount');
+                const mpMethodSelector = document.querySelector('.grid.grid-cols-2.gap-4.mb-8'); // cartão/pix selector
+
+                // Gateway toggle
+                const gatewayRadios = document.querySelectorAll('input[name="gateway_provider"]');
+                let currentGateway = 'mercadopago';
+
+                function switchGateway(gateway) {
+                    currentGateway = gateway;
+
+                    if (gateway === 'sumup') {
+                        // Esconder formulários MP
+                        cardForm.classList.add('hidden');
+                        pixInfo.classList.add('hidden');
+                        if (mpMethodSelector) mpMethodSelector.classList.add('hidden');
+
+                        // Mostrar info SumUp
+                        sumupInfo.classList.remove('hidden');
+
+                        // Mostrar botão submit
+                        submitBtn.classList.remove('hidden');
+                        submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> Pagar com SumUp';
+                        submitBtn.disabled = false;
+                    } else {
+                        // Mostrar formulários MP
+                        if (mpMethodSelector) mpMethodSelector.classList.remove('hidden');
+                        sumupInfo.classList.add('hidden');
+
+                        // Restaurar estado baseado no método selecionado (cartão ou pix)
+                        const selectedMethod = document.querySelector('input[name="payment_method_radio"]:checked');
+                        if (selectedMethod && selectedMethod.value === 'pix') {
+                            cardForm.classList.add('hidden');
+                            pixInfo.classList.remove('hidden');
+                            submitBtn.classList.remove('hidden');
+                            submitBtn.innerHTML = '<i class="fas fa-qrcode mr-2"></i> Gerar QR Code Pix';
+                        } else {
+                            cardForm.classList.remove('hidden');
+                            pixInfo.classList.add('hidden');
+                            // Brick tem seu próprio botão
+                            submitBtn.classList.add('hidden');
+                        }
+                    }
+                }
+
+                gatewayRadios.forEach(function (radio) {
+                    radio.addEventListener('change', function () {
+                        switchGateway(this.value);
+                    });
+                });
+
+                // Inicializar com gateway padrão
+                const checkedGateway = document.querySelector('input[name="gateway_provider"]:checked');
+                if (checkedGateway) {
+                    switchGateway(checkedGateway.value);
+                }
 
                 function selectedTransactionAmount() {
                     var selectedPeriod = document.querySelector('.period-radio:checked');
