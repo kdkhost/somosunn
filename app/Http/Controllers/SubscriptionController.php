@@ -387,6 +387,91 @@ class SubscriptionController extends Controller
     }
 
     /**
+     * AJAX: Cria pedido + checkout SumUp e retorna checkoutId para renderizar widget inline.
+     */
+    public function prepareSumUp(Request $request, Plan $plan)
+    {
+        $period = $this->resolvePlanPeriod($plan, $request->input('period'));
+        $effectivePrice = $plan->getPriceForPeriod($period);
+
+        if ($effectivePrice <= 0) {
+            return response()->json(['error' => 'Plano gratuito não precisa de pagamento.'], 422);
+        }
+
+        $user = auth()->user();
+
+        // Verificar prorrata
+        $prorataAmount = 0.0;
+        if ($user->plan_id && $user->plan_id != $plan->id) {
+            $currentPlan = Plan::find($user->plan_id);
+            if ($currentPlan && $effectivePrice > $currentPlan->getPriceForPeriod($period)) {
+                $prorataAmount = Plan::calculateProrata($currentPlan, $plan, $period);
+                $effectivePrice = min($effectivePrice, $prorataAmount > 0 ? $prorataAmount : $effectivePrice);
+            }
+        }
+
+        // Criar pedido
+        $order = Order::create([
+            'user_id' => $user->id,
+            'seller_id' => null,
+            'status' => 'pending',
+            'total_amount' => $effectivePrice,
+            'fee_amount' => 0,
+            'platform_fee_amount' => 0,
+            'currency' => 'BRL',
+            'gateway' => 'sumup',
+            'gateway_account_id' => null,
+            'metadata' => [
+                'context' => 'subscription',
+                'sale_type' => 'subscription',
+                'period' => $period,
+                'prorata' => $prorataAmount > 0 ? $prorataAmount : null,
+                'public_token' => Str::random(40),
+            ],
+        ]);
+
+        $order->items()->create([
+            'item_type' => 'plan',
+            'item_id' => $plan->id,
+            'title' => $plan->name . ' (' . ucfirst($period) . ')',
+            'price' => $effectivePrice,
+            'quantity' => 1,
+            'data' => [
+                'plan_slug' => $plan->slug,
+                'period' => $period,
+            ],
+        ]);
+
+        // Criar checkout SumUp
+        try {
+            $sumUpService = app(\App\Services\Payment\SumUpService::class);
+            $checkout = $sumUpService->createCheckout($order, [
+                'description' => 'Assinatura: ' . $plan->name . ' (' . ucfirst($period) . ')',
+                'return_url'  => route('subscription.success', $order->id),
+            ]);
+
+            $checkoutId = $checkout['checkout_id'] ?? $checkout['id'] ?? null;
+
+            $order->update([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'sumup_checkout_id' => $checkoutId,
+                ]),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'checkout_id' => $checkoutId,
+                'order_id' => $order->id,
+                'amount' => (float) $effectivePrice,
+                'success_url' => route('subscription.success', $order->id),
+            ]);
+        } catch (\Throwable $e) {
+            $order->update(['status' => 'failed']);
+            return response()->json(['error' => 'Erro ao criar checkout SumUp: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Processa assinatura via SumUp - renderiza checkout.transparent com formulário SumUp inline.
      */
     private function processSubscriptionSumUp(Order $order, Plan $plan, string $period)

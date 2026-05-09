@@ -418,27 +418,20 @@
 
                             <!-- SumUp Payment Form (quando SumUp selecionado) -->
                             <div id="sumupPaymentInfo" class="hidden" data-gateway="sumup">
-                                <div class="text-center py-6">
-                                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-700">
-                                        <i class="fas fa-credit-card text-3xl"></i>
-                                    </div>
-                                    <h3 class="font-bold text-gray-900 mb-2">Pagamento via SumUp</h3>
-                                    <p class="text-gray-600 text-sm max-w-sm mx-auto mb-4">
-                                        Ao clicar no botão abaixo, o formulário seguro da SumUp será carregado com as opções de Cartão e PIX.
-                                    </p>
-                                    <div class="flex justify-center gap-3 mb-2">
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-sm font-bold text-slate-700">
-                                            <i class="fas fa-credit-card text-xs"></i> Cartão
-                                        </span>
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-sm font-bold text-teal-700">
-                                            <i class="fa-brands fa-pix text-xs"></i> PIX
-                                        </span>
-                                    </div>
-                                    <p class="text-xs text-slate-400 mt-3">
-                                        <i class="fas fa-lock text-emerald-500 mr-1"></i> Ambiente criptografado
-                                        <span class="mx-2">•</span>
-                                        <i class="fas fa-shield-halved text-emerald-500 mr-1"></i> Compra garantida
-                                    </p>
+                                <div id="sumup-loading" class="text-center py-6">
+                                    <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mx-auto mb-3"></div>
+                                    <p class="text-slate-600 text-sm">Carregando formulário SumUp...</p>
+                                </div>
+                                <div id="sumup-widget-container">
+                                    {{-- Widget SumUp será carregado aqui via JS --}}
+                                    <div id="sumup-card"></div>
+                                </div>
+                                <div id="sumup-error" class="hidden text-center py-6">
+                                    <i class="fas fa-exclamation-triangle text-3xl text-red-400 mb-3"></i>
+                                    <p id="sumup-error-msg" class="text-red-600 font-bold">Erro ao carregar formulário</p>
+                                    <button type="button" onclick="initSumUpWidget()" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold">
+                                        Tentar novamente
+                                    </button>
                                 </div>
                             </div>
 
@@ -516,32 +509,22 @@
                     currentGateway = gateway;
 
                     if (gateway === 'sumup') {
-                        // Esconder formulários MP
                         cardForm.classList.add('hidden');
                         pixInfo.classList.add('hidden');
                         if (mpMethodSelector) mpMethodSelector.classList.add('hidden');
-
-                        // Mostrar formulário SumUp
                         sumupInfo.classList.remove('hidden');
 
-                        // Mostrar botão submit com texto SumUp
+                        // Esconder botão submit (SumUp SDK tem o próprio)
                         submitBtn.classList.remove('hidden');
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> Pagar com SumUp';
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Carregando SumUp...';
 
-                        // Sincronizar payment_method com seleção SumUp
-                        const sumupMethodRadio = document.querySelector('input[name="sumup_method"]:checked');
-                        if (sumupMethodRadio) {
-                            hiddenMethod.value = sumupMethodRadio.value === 'pix' ? 'pix' : 'credit_card';
-                        }
+                        // Carregar widget SumUp via AJAX
+                        initSumUpWidget();
                     } else {
-                        // Esconder SumUp
                         sumupInfo.classList.add('hidden');
-
-                        // Mostrar seletor MP
                         if (mpMethodSelector) mpMethodSelector.classList.remove('hidden');
 
-                        // Restaurar estado baseado no método selecionado (cartão ou pix)
                         const selectedMethod = document.querySelector('input[name="payment_method_radio"]:checked');
                         if (selectedMethod && selectedMethod.value === 'pix') {
                             cardForm.classList.add('hidden');
@@ -552,14 +535,90 @@
                         } else {
                             cardForm.classList.remove('hidden');
                             pixInfo.classList.add('hidden');
-                            // Brick tem seu próprio botão
                             submitBtn.classList.add('hidden');
                         }
                     }
                 }
 
-                // Listener para radios de método SumUp (não mais necessário - form SumUp é na próxima página)
-                // O formulário real da SumUp (com SDK) é renderizado após o submit via processSubscriptionSumUp()
+                // SumUp Widget: cria pedido via AJAX e monta SDK inline
+                let sumupLoaded = false;
+                window.initSumUpWidget = function() {
+                    const loading = document.getElementById('sumup-loading');
+                    const container = document.getElementById('sumup-widget-container');
+                    const errorDiv = document.getElementById('sumup-error');
+
+                    if (loading) loading.classList.remove('hidden');
+                    if (errorDiv) errorDiv.classList.add('hidden');
+                    if (container) container.classList.add('hidden');
+
+                    const period = document.querySelector('.period-radio:checked')?.value || '{{ $period ?? "mensal" }}';
+
+                    fetch('{{ route("subscription.prepare-sumup", $plan->id) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ period: period })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (loading) loading.classList.add('hidden');
+
+                        if (data.error) {
+                            if (errorDiv) {
+                                document.getElementById('sumup-error-msg').textContent = data.error;
+                                errorDiv.classList.remove('hidden');
+                            }
+                            submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> Pagar com SumUp';
+                            submitBtn.disabled = false;
+                            return;
+                        }
+
+                        if (container) container.classList.remove('hidden');
+                        submitBtn.classList.add('hidden'); // SDK tem botão próprio
+
+                        // Carregar SDK e montar
+                        if (!document.getElementById('sumup-sdk-script')) {
+                            const script = document.createElement('script');
+                            script.id = 'sumup-sdk-script';
+                            script.src = 'https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js';
+                            script.onload = () => mountSumUpCard(data.checkout_id, data.success_url);
+                            document.head.appendChild(script);
+                        } else {
+                            mountSumUpCard(data.checkout_id, data.success_url);
+                        }
+                    })
+                    .catch(err => {
+                        if (loading) loading.classList.add('hidden');
+                        if (errorDiv) {
+                            document.getElementById('sumup-error-msg').textContent = 'Erro de conexão.';
+                            errorDiv.classList.remove('hidden');
+                        }
+                    });
+                };
+
+                function mountSumUpCard(checkoutId, successUrl) {
+                    const el = document.getElementById('sumup-card');
+                    if (!el || typeof SumUpCard === 'undefined') return;
+                    el.innerHTML = '';
+
+                    SumUpCard.mount({
+                        id: 'sumup-card',
+                        checkoutId: checkoutId,
+                        onResponse: function(type, body) {
+                            if (type === 'success' || (body && body.status === 'PAID')) {
+                                window.location.href = successUrl;
+                            } else if (type === 'error') {
+                                if (typeof Swal !== 'undefined') {
+                                    Swal.fire({ icon: 'error', title: 'Erro', text: body?.message || 'Tente novamente.' });
+                                }
+                            }
+                        }
+                    });
+                }
 
                 gatewayRadios.forEach(function (radio) {
                     radio.addEventListener('change', function () {
