@@ -25,10 +25,8 @@ class SendOverdueInvoiceReminders extends Command
             ->where('status', 'pending')
             ->whereNotNull('due_at')
             ->where('due_at', '<', now())
-            ->where(function ($q) {
-                $q->whereNull('last_reminder_at')
-                    ->orWhere('last_reminder_at', '<', now()->subDays(3));
-            })
+            ->where('updated_at', '<', now()->subDays(3))
+            ->limit(50)
             ->get();
 
         if ($invoices->isEmpty()) {
@@ -85,7 +83,8 @@ class SendOverdueInvoiceReminders extends Command
 
             SendGenericTemplateEmail::dispatch($invoice->user->email, $subject, $rendered);
 
-            $invoice->update(['last_reminder_at' => now()]);
+            // Marcar como atualizado para não reenviar em 3 dias
+            $invoice->touch();
             $count++;
         }
 

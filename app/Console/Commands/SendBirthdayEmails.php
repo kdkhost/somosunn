@@ -22,7 +22,8 @@ class SendBirthdayEmails extends Command
         }
 
         $today = now();
-        $users = User::whereMonth('birthday', $today->month)
+        $users = User::whereNotNull('birthday')
+            ->whereMonth('birthday', $today->month)
             ->whereDay('birthday', $today->day)
             ->get();
 
