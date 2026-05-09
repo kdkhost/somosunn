@@ -59,7 +59,9 @@ class SubscriptionController extends Controller
         }
 
         ['public_key' => $publicKey, 'access_token' => $accessToken] = $this->mercadoPagoCredentials();
-        $paymentConfigured = trim((string) $accessToken) !== '' && trim((string) $publicKey) !== '';
+        $mpHasCredentials = trim((string) $accessToken) !== '' && trim((string) $publicKey) !== '';
+        $mpEnabled = (int) (\App\Models\Setting::get('mercadopago_enabled', 1)) === 1;
+        $paymentConfigured = $mpHasCredentials && $mpEnabled;
 
         // SumUp disponibilidade
         $sumupEnabled = (int) (\App\Models\Setting::get('sumup_enabled', 0)) === 1;
