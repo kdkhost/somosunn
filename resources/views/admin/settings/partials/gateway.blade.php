@@ -321,6 +321,64 @@
                 </div>
             </div>
         </div>
+
+        {{-- Permissões por tipo de usuário --}}
+        <div class="card card-outline card-info gateway-section mt-3">
+            <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-users mr-2"></i>Permissões por Tipo de Usuário</h3></div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach([
+                        ['name' => 'mercadopago_allow_members', 'label' => 'Membros'],
+                        ['name' => 'mercadopago_allow_instructors', 'label' => 'Instrutores'],
+                        ['name' => 'mercadopago_allow_sellers', 'label' => 'Vendedores'],
+                        ['name' => 'mercadopago_allow_mentors', 'label' => 'Mentores'],
+                    ] as $perm)
+                        <div class="col-md-3">
+                            <div class="card bg-light border">
+                                <div class="card-body text-center">
+                                    <h6 class="font-weight-bold">{{ $perm['label'] }}</h6>
+                                    <div class="custom-control custom-switch">
+                                        <input type="hidden" name="{{ $perm['name'] }}" value="0">
+                                        <input type="checkbox" class="custom-control-input" id="{{ $perm['name'] }}" name="{{ $perm['name'] }}" value="1" {{ (int) ($settings[$perm['name']] ?? 1) === 1 ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="{{ $perm['name'] }}"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- Permissões por tipo de produto --}}
+        <div class="card card-outline card-info gateway-section mt-3">
+            <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-shopping-cart mr-2"></i>Permissões por Tipo de Produto</h3></div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach([
+                        ['name' => 'mercadopago_allow_courses', 'label' => 'Cursos'],
+                        ['name' => 'mercadopago_allow_mentorships', 'label' => 'Mentorias'],
+                        ['name' => 'mercadopago_allow_events', 'label' => 'Eventos'],
+                        ['name' => 'mercadopago_allow_marketplace', 'label' => 'Marketplace'],
+                        ['name' => 'mercadopago_allow_subscriptions', 'label' => 'Assinaturas'],
+                        ['name' => 'mercadopago_allow_services', 'label' => 'Serviços'],
+                    ] as $perm)
+                        <div class="col-md-2">
+                            <div class="card bg-light border">
+                                <div class="card-body text-center">
+                                    <h6 class="font-weight-bold small">{{ $perm['label'] }}</h6>
+                                    <div class="custom-control custom-switch">
+                                        <input type="hidden" name="{{ $perm['name'] }}" value="0">
+                                        <input type="checkbox" class="custom-control-input" id="{{ $perm['name'] }}" name="{{ $perm['name'] }}" value="1" {{ (int) ($settings[$perm['name']] ?? 1) === 1 ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="{{ $perm['name'] }}"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
     </div>
 
     </div>

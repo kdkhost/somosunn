@@ -665,6 +665,17 @@ class SettingController extends Controller
             'mercadopago_method_pix',
             'mercadopago_method_ticket',
             'mercadopago_method_mercadopago',
+            // MercadoPago - permissões
+            'mercadopago_allow_members',
+            'mercadopago_allow_instructors',
+            'mercadopago_allow_sellers',
+            'mercadopago_allow_mentors',
+            'mercadopago_allow_courses',
+            'mercadopago_allow_mentorships',
+            'mercadopago_allow_events',
+            'mercadopago_allow_marketplace',
+            'mercadopago_allow_subscriptions',
+            'mercadopago_allow_services',
             // SumUp - checkboxes
             'sumup_enabled',
             'sumup_method_card',

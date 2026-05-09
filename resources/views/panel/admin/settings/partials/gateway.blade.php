@@ -403,7 +403,7 @@
     </div>
 
     {{-- MP > ADVANCED --}}
-    <div id="mp-advanced" class="mp-subpanel hidden">
+    <div id="mp-advanced" class="mp-subpanel hidden space-y-4">
         <div class="gw-card grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="gw-label">Integrator ID</label>
@@ -416,6 +416,62 @@
                 <input type="text" name="mercadopago_platform_id"
                     value="{{ $settings['mercadopago_platform_id'] ?? '' }}" placeholder="plat_123"
                     class="gw-input w-full px-4 py-3 rounded-xl font-mono text-sm">
+            </div>
+        </div>
+
+        {{-- Permissões por tipo de usuário --}}
+        <div>
+            <h4 class="text-sm font-black text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+                <i class="fas fa-users text-blue-500"></i> Permissões por Tipo de Usuário
+            </h4>
+            @php
+                $mpUserPerms = [
+                    ['name' => 'mercadopago_allow_members',     'label' => 'Membros',     'icon' => 'fa-user'],
+                    ['name' => 'mercadopago_allow_instructors', 'label' => 'Instrutores', 'icon' => 'fa-chalkboard-teacher'],
+                    ['name' => 'mercadopago_allow_sellers',     'label' => 'Vendedores',  'icon' => 'fa-store'],
+                    ['name' => 'mercadopago_allow_mentors',     'label' => 'Mentores',    'icon' => 'fa-user-tie'],
+                ];
+            @endphp
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                @foreach($mpUserPerms as $perm)
+                    @php $checked = (int) ($settings[$perm['name']] ?? 1) === 1; @endphp
+                    <label class="gw-card flex flex-col items-center gap-2 cursor-pointer transition-all hover:border-blue-400 {{ $checked ? '!border-blue-500' : '' }}">
+                        <input type="hidden" name="{{ $perm['name'] }}" value="0">
+                        <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-blue-600" name="{{ $perm['name'] }}" value="1"
+                            {{ $checked ? 'checked' : '' }}>
+                        <i class="fas {{ $perm['icon'] }} text-xl text-slate-500"></i>
+                        <p class="text-xs font-black text-slate-700 dark:text-slate-200">{{ $perm['label'] }}</p>
+                    </label>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Permissões por tipo de produto --}}
+        <div>
+            <h4 class="text-sm font-black text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+                <i class="fas fa-box text-emerald-500"></i> Permissões por Tipo de Produto
+            </h4>
+            @php
+                $mpProductPerms = [
+                    ['name' => 'mercadopago_allow_courses',       'label' => 'Cursos',       'icon' => 'fa-graduation-cap'],
+                    ['name' => 'mercadopago_allow_mentorships',   'label' => 'Mentorias',    'icon' => 'fa-user-tie'],
+                    ['name' => 'mercadopago_allow_events',        'label' => 'Eventos',      'icon' => 'fa-calendar'],
+                    ['name' => 'mercadopago_allow_marketplace',   'label' => 'Marketplace',  'icon' => 'fa-store'],
+                    ['name' => 'mercadopago_allow_subscriptions', 'label' => 'Assinaturas',  'icon' => 'fa-crown'],
+                    ['name' => 'mercadopago_allow_services',      'label' => 'Serviços',     'icon' => 'fa-concierge-bell'],
+                ];
+            @endphp
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                @foreach($mpProductPerms as $perm)
+                    @php $checked = (int) ($settings[$perm['name']] ?? 1) === 1; @endphp
+                    <label class="gw-card flex flex-col items-center gap-2 cursor-pointer transition-all hover:border-blue-400 {{ $checked ? '!border-blue-500' : '' }}">
+                        <input type="hidden" name="{{ $perm['name'] }}" value="0">
+                        <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-blue-600" name="{{ $perm['name'] }}" value="1"
+                            {{ $checked ? 'checked' : '' }}>
+                        <i class="fas {{ $perm['icon'] }} text-xl text-slate-500"></i>
+                        <p class="text-xs font-black text-slate-700 dark:text-slate-200">{{ $perm['label'] }}</p>
+                    </label>
+                @endforeach
             </div>
         </div>
     </div>
