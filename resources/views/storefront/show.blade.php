@@ -232,17 +232,17 @@
             overflow: hidden;
             border: 1px solid rgba(148, 163, 184, 0.18);
             box-shadow: 0 14px 34px rgba(15, 23, 42, 0.05);
-            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+            transition: transform 0.28s cubic-bezier(.4,0,.2,1), box-shadow 0.28s cubic-bezier(.4,0,.2,1), border-color 0.28s ease;
         }
 
         .store-grid-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(31, 94, 219, 0.18);
-            box-shadow: 0 24px 45px rgba(15, 23, 42, 0.1);
+            transform: translateY(-6px);
+            border-color: rgba(31, 94, 219, 0.22);
+            box-shadow: 0 28px 55px rgba(15, 23, 42, 0.12);
         }
 
         .store-card-image {
-            aspect-ratio: 4 / 4.3;
+            aspect-ratio: 1 / 1;
             background: linear-gradient(180deg, #fafafa 0%, #f0f4fb 100%);
         }
 
@@ -395,20 +395,86 @@
                     </div>
                 </nav>
             </section>
-            <section class="mt-5 grid auto-rows-fr gap-4 md:grid-cols-2 lg:grid-cols-4">
-                @foreach($serviceHighlights as $highlight)
-                    <article class="store-home-card flex h-full rounded-[1.65rem] bg-white p-5">
-                        <div class="flex w-full items-start gap-4">
-                            <div class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
-                                <i class="{{ $highlight['icon'] }}"></i>
-                            </div>
-                            <div class="min-w-0">
-                                <h3 class="text-lg font-black leading-tight text-slate-900">{{ $highlight['title'] }}</h3>
-                                <p class="mt-2 text-sm leading-7 text-slate-600">{{ $highlight['text'] }}</p>
+            <section class="mt-5">
+                {{-- Hero Banner --}}
+                @if($store->banner_url)
+                    <div class="store-home-card overflow-hidden rounded-[1.65rem] mb-5">
+                        <div class="relative" style="min-height:200px; max-height:320px;">
+                            <img src="{{ $store->banner_url }}" alt="{{ $store->brand_name }}" class="w-full h-full object-cover" style="min-height:200px; max-height:320px;">
+                            <div class="absolute inset-0" style="background: linear-gradient(90deg, rgba(15,23,42,.7) 0%, rgba(15,23,42,.2) 60%, transparent 100%);"></div>
+                            <div class="absolute inset-0 flex items-center px-8 md:px-12">
+                                <div class="max-w-lg">
+                                    <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">{{ $store->brand_name }}</h2>
+                                    <p class="mt-2 text-sm md:text-base text-white/80 leading-relaxed">{{ $store->tagline ?: 'Explore nossa vitrine com produtos exclusivos e condições especiais.' }}</p>
+                                    <div class="mt-4 flex flex-wrap gap-3">
+                                        <a href="#produtos" class="store-button-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold shadow-lg">
+                                            <i class="fas fa-shopping-bag"></i> Ver produtos
+                                        </a>
+                                        @if($whatsappUrl)
+                                            <a href="{{ $whatsappUrl }}" target="_blank" class="inline-flex items-center gap-2 rounded-full bg-white/20 backdrop-blur px-5 py-2.5 text-sm font-bold text-white border border-white/20 hover:bg-white/30 transition">
+                                                <i class="fab fa-whatsapp"></i> Falar conosco
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </article>
-                @endforeach
+                    </div>
+                @endif
+
+                {{-- Filtros rápidos --}}
+                <div class="store-home-card rounded-[1.65rem] bg-white p-4 mb-5">
+                    <form method="GET" class="flex flex-wrap items-center gap-3">
+                        <input type="hidden" name="q" value="{{ $catalogSearch }}">
+                        <select name="tipo" class="store-filter-field rounded-lg px-3 py-2 text-sm font-semibold text-slate-700" onchange="this.form.submit()">
+                            <option value="">Todos os tipos</option>
+                            <option value="digital" {{ $catalogType === 'digital' ? 'selected' : '' }}>Digital</option>
+                            <option value="physical" {{ $catalogType === 'physical' ? 'selected' : '' }}>Físico</option>
+                        </select>
+                        <select name="canal" class="store-filter-field rounded-lg px-3 py-2 text-sm font-semibold text-slate-700" onchange="this.form.submit()">
+                            <option value="">Todos os canais</option>
+                            <option value="store" {{ $catalogChannel === 'store' ? 'selected' : '' }}>Loja virtual</option>
+                            <option value="points" {{ $catalogChannel === 'points' ? 'selected' : '' }}>Troca de pontos</option>
+                            <option value="external" {{ $catalogChannel === 'external' ? 'selected' : '' }}>Site externo</option>
+                        </select>
+                        <select name="preco" class="store-filter-field rounded-lg px-3 py-2 text-sm font-semibold text-slate-700" onchange="this.form.submit()">
+                            <option value="">Qualquer preço</option>
+                            <option value="under_100" {{ $catalogPrice === 'under_100' ? 'selected' : '' }}>Até R$100</option>
+                            <option value="100_300" {{ $catalogPrice === '100_300' ? 'selected' : '' }}>R$100 - R$300</option>
+                            <option value="300_700" {{ $catalogPrice === '300_700' ? 'selected' : '' }}>R$300 - R$700</option>
+                            <option value="above_700" {{ $catalogPrice === 'above_700' ? 'selected' : '' }}>Acima de R$700</option>
+                        </select>
+                        <select name="ordem" class="store-filter-field rounded-lg px-3 py-2 text-sm font-semibold text-slate-700" onchange="this.form.submit()">
+                            <option value="featured" {{ $catalogSort === 'featured' ? 'selected' : '' }}>Destaques</option>
+                            <option value="latest" {{ $catalogSort === 'latest' ? 'selected' : '' }}>Mais recentes</option>
+                            <option value="lowest" {{ $catalogSort === 'lowest' ? 'selected' : '' }}>Menor preço</option>
+                            <option value="highest" {{ $catalogSort === 'highest' ? 'selected' : '' }}>Maior preço</option>
+                        </select>
+                        @if($catalogType || $catalogChannel || $catalogPrice || $catalogSort !== 'featured')
+                            <a href="{{ route('seller-stores.show', $store->slug) }}" class="inline-flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-red-500 transition">
+                                <i class="fas fa-times"></i> Limpar
+                            </a>
+                        @endif
+                        <span class="ml-auto text-xs font-bold text-slate-400">{{ $catalogCount }} resultado(s)</span>
+                    </form>
+                </div>
+
+                {{-- Service highlights --}}
+                <div class="grid auto-rows-fr gap-4 md:grid-cols-2 lg:grid-cols-4 mb-5">
+                    @foreach($serviceHighlights as $highlight)
+                        <article class="store-home-card flex h-full rounded-[1.65rem] bg-white p-5">
+                            <div class="flex w-full items-start gap-4">
+                                <div class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-lg" style="color: {{ $themePrimary }};">
+                                    <i class="{{ $highlight['icon'] }}"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="text-base font-black leading-tight text-slate-900">{{ $highlight['title'] }}</h3>
+                                    <p class="mt-1 text-xs leading-5 text-slate-500">{{ $highlight['text'] }}</p>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
             </section>
             <section id="ofertas" class="mt-8">
                 <div class="mb-5 text-center">
