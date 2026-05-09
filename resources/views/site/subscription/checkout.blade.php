@@ -415,45 +415,80 @@
                             <div id="sumupPaymentInfo" class="hidden" data-gateway="sumup">
                                 {{-- Seletor Cartão/Pix SumUp --}}
                                 <div class="grid grid-cols-2 gap-4 mb-6">
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="sumup_method" value="card" class="peer sr-only" checked>
+                                    <label class="cursor-pointer" id="label-sumup-card">
+                                        <input type="radio" name="sumup_method" value="card" class="peer sr-only" checked
+                                            onchange="toggleSumupMethod('card')">
                                         <div class="p-4 border-2 border-gray-200 rounded-xl peer-checked:border-slate-900 peer-checked:bg-slate-50 transition text-center hover:border-slate-400">
                                             <i class="fas fa-credit-card text-2xl mb-2 text-slate-700"></i>
                                             <p class="font-bold text-gray-900">Cartão de Crédito</p>
-                                            <p class="text-xs text-gray-500 mt-1">Via SumUp</p>
                                         </div>
                                     </label>
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="sumup_method" value="pix" class="peer sr-only">
+                                    <label class="cursor-pointer" id="label-sumup-pix">
+                                        <input type="radio" name="sumup_method" value="pix" class="peer sr-only"
+                                            onchange="toggleSumupMethod('pix')">
                                         <div class="p-4 border-2 border-gray-200 rounded-xl peer-checked:border-teal-600 peer-checked:bg-teal-50 transition text-center hover:border-teal-300">
                                             <i class="fa-brands fa-pix text-2xl mb-2 text-teal-600"></i>
                                             <p class="font-bold text-gray-900">Pix</p>
-                                            <p class="text-xs text-gray-500 mt-1">QR Code instantâneo</p>
                                         </div>
                                     </label>
                                 </div>
 
-                                {{-- Info do método selecionado --}}
-                                <div class="rounded-2xl bg-slate-50 border border-slate-200 p-5">
-                                    <div class="flex items-start gap-4">
-                                        <div class="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
-                                            <i class="fas fa-shield-halved text-lg"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="font-bold text-slate-900">Checkout seguro SumUp</h4>
-                                            <p class="text-sm text-slate-600 mt-1">
-                                                Ao clicar em "Pagar com SumUp", o formulário de pagamento será carregado com o SDK da SumUp para processar seu cartão ou gerar o QR Code Pix de forma segura.
-                                            </p>
-                                            <div class="flex flex-wrap gap-2 mt-3">
-                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600">
-                                                    <i class="fas fa-lock text-emerald-500 text-[10px]"></i> Dados criptografados
-                                                </span>
-                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600">
-                                                    <i class="fas fa-bolt text-amber-500 text-[10px]"></i> Aprovação imediata
-                                                </span>
-                                            </div>
+                                {{-- Formulário de cartão SumUp (mesmo visual do MP) --}}
+                                <div id="sumup-card-form-section" class="space-y-5">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h3 class="text-base font-bold text-gray-800">Cartão de crédito ou débito</h3>
+                                        <div class="flex gap-1">
+                                            <img src="https://cdn.jsdelivr.net/gh/nicepay-dev/nicepay-assets@main/visa.svg" alt="Visa" class="h-6 w-auto" onerror="this.style.display='none'">
+                                            <img src="https://cdn.jsdelivr.net/gh/nicepay-dev/nicepay-assets@main/mastercard.svg" alt="Mastercard" class="h-6 w-auto" onerror="this.style.display='none'">
                                         </div>
                                     </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Número do cartão</label>
+                                        <input type="text" name="sumup_card_number" id="sumup_card_number" placeholder="1234 1234 1234 1234"
+                                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
+                                            maxlength="19" autocomplete="cc-number">
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Data de vencimento</label>
+                                            <input type="text" name="sumup_card_expiry" id="sumup_card_expiry" placeholder="MM/AA"
+                                                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
+                                                maxlength="5" autocomplete="cc-exp">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Código de segurança</label>
+                                            <input type="text" name="sumup_card_cvv" id="sumup_card_cvv" placeholder="CVV"
+                                                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
+                                                maxlength="4" autocomplete="cc-csc">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nome do titular como aparece no cartão</label>
+                                        <input type="text" name="sumup_card_name" id="sumup_card_name" placeholder="NOME COMPLETO"
+                                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
+                                            autocomplete="cc-name">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">CPF do titular</label>
+                                        <input type="text" name="sumup_card_cpf" id="sumup_card_cpf" placeholder="000.000.000-00"
+                                            value="{{ Auth::user()?->doc ?? '' }}"
+                                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-4 py-3">
+                                    </div>
+                                </div>
+
+                                {{-- Pix SumUp --}}
+                                <div id="sumup-pix-form-section" class="hidden text-center py-8">
+                                    <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-600">
+                                        <i class="fa-brands fa-pix text-4xl"></i>
+                                    </div>
+                                    <h3 class="font-bold text-gray-900 mb-2">Pix Instantâneo via SumUp</h3>
+                                    <p class="text-gray-600 max-w-sm mx-auto">
+                                        Ao finalizar, será gerado um QR Code Pix para pagamento imediato. Seu acesso será liberado automaticamente.
+                                    </p>
                                 </div>
                             </div>
 
@@ -560,6 +595,24 @@
                         hiddenMethod.value = this.value === 'pix' ? 'pix' : 'credit_card';
                     });
                 });
+
+                // Toggle SumUp card/pix sections
+                window.toggleSumupMethod = function(method) {
+                    const cardSection = document.getElementById('sumup-card-form-section');
+                    const pixSection = document.getElementById('sumup-pix-form-section');
+
+                    if (method === 'pix') {
+                        cardSection.classList.add('hidden');
+                        pixSection.classList.remove('hidden');
+                        hiddenMethod.value = 'pix';
+                        submitBtn.innerHTML = '<i class="fas fa-qrcode mr-2"></i> Gerar QR Code Pix (SumUp)';
+                    } else {
+                        cardSection.classList.remove('hidden');
+                        pixSection.classList.add('hidden');
+                        hiddenMethod.value = 'credit_card';
+                        submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> Pagar com SumUp';
+                    }
+                };
 
                 gatewayRadios.forEach(function (radio) {
                     radio.addEventListener('change', function () {
