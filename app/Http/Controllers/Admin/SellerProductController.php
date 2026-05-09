@@ -31,7 +31,7 @@ class SellerProductController extends Controller
             ->where('user_id', auth()->id())
             ->with(['media', 'redeemableItem'])
             ->latest('id')
-            ->paginate(12);
+            ->paginate(10);
 
         return view('admin.marketplace.products.index', compact('store', 'products'));
     }
