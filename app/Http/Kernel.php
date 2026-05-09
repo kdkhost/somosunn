@@ -51,5 +51,6 @@ class Kernel extends HttpKernel
         'check.plan' => \App\Http\Middleware\EnsureUserHasActivePlan::class,
         'check.marketplace.seller' => \App\Http\Middleware\CheckMarketplaceSeller::class,
         'check.sumup.permissions' => \App\Http\Middleware\CheckSumUpPermissions::class,
+        'superadmin.legacy' => \App\Http\Middleware\RedirectSuperadminToLegacy::class,
     ];
 }
