@@ -19,6 +19,7 @@ use Illuminate\Support\Str;
 class SellerProductCheckoutController extends Controller
 {
     use \App\Traits\SumUpIntegration;
+    use \App\Traits\PreventsDoubleSubmit;
     public function show(Request $request, SellerProductCartService $cartService, CorreiosShippingService $shippingService)
     {
         if (!Auth::check()) {

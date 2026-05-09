@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
 
 class SubscriptionController extends Controller
 {
+    use \App\Traits\PreventsDoubleSubmit;
+
     protected MercadoPagoService $mpService;
 
     public function __construct(MercadoPagoService $mpService)
@@ -61,7 +63,8 @@ class SubscriptionController extends Controller
         ['public_key' => $publicKey, 'access_token' => $accessToken] = $this->mercadoPagoCredentials();
         $mpHasCredentials = trim((string) $accessToken) !== '' && trim((string) $publicKey) !== '';
         $mpEnabled = (int) (\App\Models\Setting::get('mercadopago_enabled', 1)) === 1;
-        $paymentConfigured = $mpHasCredentials && $mpEnabled;
+        $mpAllowSubscriptions = (int) (\App\Models\Setting::get('mercadopago_allow_subscriptions', 1)) === 1;
+        $paymentConfigured = $mpHasCredentials && $mpEnabled && $mpAllowSubscriptions;
 
         // SumUp disponibilidade
         $sumupEnabled = (int) (\App\Models\Setting::get('sumup_enabled', 0)) === 1;
@@ -100,6 +103,11 @@ class SubscriptionController extends Controller
 
     public function process(Request $request, Plan $plan, AffiliateTrackingService $tracking)
     {
+        // Proteção contra double-submit
+        if ($this->isDoubleSubmit("subscription:{$plan->id}", 15)) {
+            return back()->with('error', 'Processando seu pagamento. Aguarde...');
+        }
+
         $period = $this->resolvePlanPeriod($plan, $request->input('period'));
         $effectivePrice = $plan->getPriceForPeriod($period);
         $isPaidPlan = $effectivePrice > 0;
@@ -388,6 +396,7 @@ class SubscriptionController extends Controller
 
     /**
      * AJAX: Cria pedido + checkout SumUp e retorna checkoutId para renderizar widget inline.
+     * Protege contra duplicidade: reutiliza pedido pending existente se houver.
      */
     public function prepareSumUp(Request $request, Plan $plan)
     {
@@ -399,6 +408,31 @@ class SubscriptionController extends Controller
         }
 
         $user = auth()->user();
+
+        // PROTEÇÃO CONTRA DUPLICIDADE: verificar se já existe pedido pending para este plano
+        $existingOrder = Order::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->where('gateway', 'sumup')
+            ->whereHas('items', function ($q) use ($plan) {
+                $q->where('item_type', 'plan')->where('item_id', $plan->id);
+            })
+            ->where('created_at', '>', now()->subHours(24))
+            ->first();
+
+        if ($existingOrder) {
+            // Reutilizar pedido existente se já tem checkout_id
+            $checkoutId = data_get($existingOrder->metadata, 'sumup_checkout_id');
+            if ($checkoutId) {
+                return response()->json([
+                    'success' => true,
+                    'checkout_id' => $checkoutId,
+                    'order_id' => $existingOrder->id,
+                    'amount' => (float) $existingOrder->total_amount,
+                    'success_url' => route('subscription.success', $existingOrder->id),
+                    'reused' => true,
+                ]);
+            }
+        }
 
         // Verificar prorrata
         $prorataAmount = 0.0;

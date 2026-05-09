@@ -23,6 +23,7 @@ use Illuminate\Validation\ValidationException;
 class CheckoutController extends Controller
 {
     use SumUpIntegration;
+    use \App\Traits\PreventsDoubleSubmit;
     public function show(Course $course)
     {
         if (!Auth::check()) {
