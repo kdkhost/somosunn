@@ -61,13 +61,13 @@
 
     <!-- preview modal -->
     <div class="modal fade" id="previewModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Pré-visualização</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body" id="previewBody"></div>
+                <div class="modal-body p-0" id="previewBody" style="overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;"></div>
                 <div class="modal-footer">
                     <input type="email" id="previewEmail" class="form-control" placeholder="Enviar para e-mail de teste">
                     <button class="btn btn-primary" id="sendPreviewBtn">Enviar</button>
