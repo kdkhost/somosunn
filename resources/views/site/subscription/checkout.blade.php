@@ -203,22 +203,21 @@
                             </div>
                         @endif
 
-                        @if(($plan->price ?? 0) > 0 && !($paymentConfigured ?? false))
+                        @if(($plan->price ?? 0) > 0 && !($paymentConfigured ?? false) && !($sumupAvailable ?? false))
                             @if(config('app.debug'))
                                 <div
                                     class="bg-amber-50 border border-amber-200 text-amber-700 p-4 rounded-xl mb-6 flex items-center gap-3">
                                     <i class="fas fa-flask-vial text-xl text-amber-500"></i>
                                     <div>
                                         <p class="font-bold">Modo de Simulação (Debug)</p>
-                                        <p class="text-sm">As credenciais do MercadoPago não foram detectadas. Como o site está em
+                                        <p class="text-sm">Nenhum gateway de pagamento configurado. Como o site está em
                                             modo de testes, você pode finalizar a compra para validar o fluxo.</p>
                                     </div>
                                 </div>
                             @else
                                 <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6">
                                     <i class="fas fa-triangle-exclamation mr-2"></i>
-                                    Pagamento indisponível no momento. Configure as credenciais do MercadoPago no painel para
-                                    habilitar assinaturas.
+                                    Pagamento indisponível no momento. Nenhum gateway configurado.
                                 </div>
                             @endif
                         @endif
@@ -422,10 +421,54 @@
                                     <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mx-auto mb-3"></div>
                                     <p class="text-slate-600 text-sm">Carregando formulário SumUp...</p>
                                 </div>
-                                <div id="sumup-widget-container">
-                                    {{-- Widget SumUp será carregado aqui via JS --}}
+
+                                {{-- Seletor Cartão/PIX SumUp --}}
+                                <div id="sumup-method-selector" class="hidden mb-6">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <button type="button" id="sumup-btn-card" onclick="switchSumupMethod('card')"
+                                            class="p-4 border-2 border-blue-600 bg-blue-50 rounded-xl text-center transition-all">
+                                            <i class="fas fa-credit-card text-2xl mb-2 text-blue-700"></i>
+                                            <p class="font-bold text-gray-900">Cartão</p>
+                                        </button>
+                                        <button type="button" id="sumup-btn-pix" onclick="switchSumupMethod('pix')"
+                                            class="p-4 border-2 border-gray-200 bg-white rounded-xl text-center transition-all hover:border-teal-400">
+                                            <i class="fa-brands fa-pix text-2xl mb-2 text-teal-600"></i>
+                                            <p class="font-bold text-gray-900">PIX</p>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {{-- Widget de cartão SumUp --}}
+                                <div id="sumup-widget-container" class="hidden">
                                     <div id="sumup-card"></div>
                                 </div>
+
+                                {{-- PIX SumUp --}}
+                                <div id="sumup-pix-container" class="hidden">
+                                    <div id="sumup-pix-loading" class="text-center py-6">
+                                        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-teal-500 mx-auto mb-3"></div>
+                                        <p class="text-slate-600 text-sm">Gerando QR Code PIX...</p>
+                                    </div>
+                                    <div id="sumup-pix-content" class="hidden text-center">
+                                        <div class="bg-teal-50 border border-teal-200 rounded-xl p-4 mb-4">
+                                            <p class="text-teal-800 font-semibold text-sm">Escaneie o QR Code ou copie o código PIX</p>
+                                        </div>
+                                        <div id="sumup-pix-qr" class="flex justify-center mb-4"></div>
+                                        <div class="bg-slate-100 rounded-xl p-3 flex items-center gap-2 mb-4">
+                                            <input type="text" id="sumup-pix-code" readonly
+                                                class="bg-transparent border-none text-xs flex-1 outline-none text-slate-700 font-mono">
+                                            <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('sumup-pix-code').value); if(typeof Swal!=='undefined') Swal.fire({icon:'success',title:'Copiado!',toast:true,position:'top-end',showConfirmButton:false,timer:2000});"
+                                                class="text-teal-600 font-bold text-sm px-2 hover:text-teal-800">
+                                                <i class="fas fa-copy mr-1"></i>Copiar
+                                            </button>
+                                        </div>
+                                        <div id="sumup-pix-timer" class="mb-4 py-2 px-4 bg-amber-50 rounded-lg border border-amber-200 text-amber-800 font-bold text-lg flex items-center justify-center gap-2">
+                                            <i class="fas fa-clock"></i> <span id="sumup-pix-timer-value">10:00</span>
+                                        </div>
+                                        <p class="text-xs text-slate-500">O acesso será liberado automaticamente após a confirmação.</p>
+                                    </div>
+                                </div>
+
                                 <div id="sumup-error" class="hidden text-center py-6">
                                     <i class="fas fa-exclamation-triangle text-3xl text-red-400 mb-3"></i>
                                     <p id="sumup-error-msg" class="text-red-600 font-bold">Erro ao carregar formulário</p>
@@ -542,14 +585,20 @@
 
                 // SumUp Widget: cria pedido via AJAX e monta SDK inline
                 let sumupLoaded = false;
+                let sumupCheckoutData = null;
+
                 window.initSumUpWidget = function() {
                     const loading = document.getElementById('sumup-loading');
+                    const methodSelector = document.getElementById('sumup-method-selector');
                     const container = document.getElementById('sumup-widget-container');
+                    const pixContainer = document.getElementById('sumup-pix-container');
                     const errorDiv = document.getElementById('sumup-error');
 
                     if (loading) loading.classList.remove('hidden');
-                    if (errorDiv) errorDiv.classList.add('hidden');
+                    if (methodSelector) methodSelector.classList.add('hidden');
                     if (container) container.classList.add('hidden');
+                    if (pixContainer) pixContainer.classList.add('hidden');
+                    if (errorDiv) errorDiv.classList.add('hidden');
 
                     const period = document.querySelector('.period-radio:checked')?.value || '{{ $period ?? "mensal" }}';
 
@@ -572,24 +621,17 @@
                                 document.getElementById('sumup-error-msg').textContent = data.error;
                                 errorDiv.classList.remove('hidden');
                             }
-                            submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> Pagar com SumUp';
-                            submitBtn.disabled = false;
                             return;
                         }
 
-                        if (container) container.classList.remove('hidden');
-                        submitBtn.classList.add('hidden'); // SDK tem botão próprio
+                        sumupCheckoutData = data;
 
-                        // Carregar SDK e montar
-                        if (!document.getElementById('sumup-sdk-script')) {
-                            const script = document.createElement('script');
-                            script.id = 'sumup-sdk-script';
-                            script.src = 'https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js';
-                            script.onload = () => mountSumUpCard(data.checkout_id, data.success_url);
-                            document.head.appendChild(script);
-                        } else {
-                            mountSumUpCard(data.checkout_id, data.success_url);
-                        }
+                        // Mostrar seletor de método
+                        if (methodSelector) methodSelector.classList.remove('hidden');
+                        submitBtn.classList.add('hidden');
+
+                        // Mostrar cartão por padrão
+                        switchSumupMethod('card');
                     })
                     .catch(err => {
                         if (loading) loading.classList.add('hidden');
@@ -599,6 +641,54 @@
                         }
                     });
                 };
+
+                window.switchSumupMethod = function(method) {
+                    const container = document.getElementById('sumup-widget-container');
+                    const pixContainer = document.getElementById('sumup-pix-container');
+                    const btnCard = document.getElementById('sumup-btn-card');
+                    const btnPix = document.getElementById('sumup-btn-pix');
+
+                    if (method === 'card') {
+                        if (container) container.classList.remove('hidden');
+                        if (pixContainer) pixContainer.classList.add('hidden');
+                        btnCard.classList.add('border-blue-600', 'bg-blue-50');
+                        btnCard.classList.remove('border-gray-200', 'bg-white');
+                        btnPix.classList.remove('border-teal-600', 'bg-teal-50');
+                        btnPix.classList.add('border-gray-200', 'bg-white');
+
+                        // Montar widget de cartão
+                        if (sumupCheckoutData && !sumupLoaded) {
+                            loadSumUpSDK(() => {
+                                mountSumUpCard(sumupCheckoutData.checkout_id, sumupCheckoutData.success_url);
+                                sumupLoaded = true;
+                            });
+                        }
+                    } else {
+                        if (container) container.classList.add('hidden');
+                        if (pixContainer) pixContainer.classList.remove('hidden');
+                        btnPix.classList.add('border-teal-600', 'bg-teal-50');
+                        btnPix.classList.remove('border-gray-200', 'bg-white');
+                        btnCard.classList.remove('border-blue-600', 'bg-blue-50');
+                        btnCard.classList.add('border-gray-200', 'bg-white');
+
+                        // Gerar PIX
+                        if (sumupCheckoutData) {
+                            loadSumUpPix(sumupCheckoutData.order_id, sumupCheckoutData.success_url);
+                        }
+                    }
+                };
+
+                function loadSumUpSDK(callback) {
+                    if (document.getElementById('sumup-sdk-script')) {
+                        callback();
+                        return;
+                    }
+                    const script = document.createElement('script');
+                    script.id = 'sumup-sdk-script';
+                    script.src = 'https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js';
+                    script.onload = callback;
+                    document.head.appendChild(script);
+                }
 
                 function mountSumUpCard(checkoutId, successUrl) {
                     const el = document.getElementById('sumup-card');
@@ -618,6 +708,78 @@
                             }
                         }
                     });
+                }
+
+                function loadSumUpPix(orderId, successUrl) {
+                    const pixLoading = document.getElementById('sumup-pix-loading');
+                    const pixContent = document.getElementById('sumup-pix-content');
+                    if (pixLoading) pixLoading.classList.remove('hidden');
+                    if (pixContent) pixContent.classList.add('hidden');
+
+                    fetch('{{ route("checkout.sumup.pix") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ order_id: orderId })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (pixLoading) pixLoading.classList.add('hidden');
+
+                        if (data.error || !data.qr_code) {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({ icon: 'error', title: 'Erro PIX', text: data.error || 'Não foi possível gerar o QR Code.' });
+                            }
+                            return;
+                        }
+
+                        if (pixContent) pixContent.classList.remove('hidden');
+
+                        // QR Code
+                        const qrDiv = document.getElementById('sumup-pix-qr');
+                        if (qrDiv && data.qr_code_base64) {
+                            qrDiv.innerHTML = '<img src="data:image/png;base64,' + data.qr_code_base64 + '" class="w-48 h-48 mx-auto border rounded-xl">';
+                        } else if (qrDiv && data.qr_code_url) {
+                            qrDiv.innerHTML = '<img src="' + data.qr_code_url + '" class="w-48 h-48 mx-auto border rounded-xl">';
+                        }
+
+                        // Código copia-e-cola
+                        const codeInput = document.getElementById('sumup-pix-code');
+                        if (codeInput) codeInput.value = data.qr_code || '';
+
+                        // Timer
+                        const expMinutes = data.expiration_minutes || 10;
+                        startPixTimer(expMinutes, successUrl);
+                    })
+                    .catch(() => {
+                        if (pixLoading) pixLoading.classList.add('hidden');
+                    });
+                }
+
+                function startPixTimer(minutes, successUrl) {
+                    const timerEl = document.getElementById('sumup-pix-timer-value');
+                    let remaining = minutes * 60;
+
+                    const interval = setInterval(() => {
+                        remaining--;
+                        if (remaining <= 0) {
+                            clearInterval(interval);
+                            timerEl.textContent = 'EXPIRADO';
+                            return;
+                        }
+                        const m = Math.floor(remaining / 60);
+                        const s = remaining % 60;
+                        timerEl.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+                    }, 1000);
+
+                    // Poll para verificar pagamento
+                    const pollInterval = setInterval(() => {
+                        if (remaining <= 0) { clearInterval(pollInterval); return; }
+                        // Verificar status (simplificado)
+                    }, 5000);
                 }
 
                 gatewayRadios.forEach(function (radio) {
