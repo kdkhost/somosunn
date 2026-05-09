@@ -462,21 +462,30 @@
                                         </div>
 
                                         @if($course->exists)
+                                            @php
+                                                $courseFullUrl = route('courses.show', $course->slug ?: $course->id);
+                                                $courseParsed = parse_url($courseFullUrl);
+                                                $courseShortUrl = ($courseParsed['host'] ?? '') . ($courseParsed['path'] ?? '');
+                                            @endphp
                                             <div class="card shadow-sm border-0 mt-3">
                                                 <div class="card-body">
-                                                    <label class="mb-2">Link do Curso</label>
+                                                    <label class="mb-2"><i class="fas fa-link mr-1 text-muted"></i>Link do Curso</label>
                                                     <div class="input-group mb-2">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text bg-light"><i class="fas fa-globe text-muted"></i></span>
+                                                        </div>
                                                         <input type="text" class="form-control form-control-sm" id="courseLink"
-                                                            value="{{ route('courses.show', $course->slug ?: $course->id) }}"
+                                                            value="{{ $courseShortUrl }}"
+                                                            data-full-url="{{ $courseFullUrl }}"
                                                             readonly>
                                                         <div class="input-group-append">
                                                             <button class="btn btn-outline-secondary btn-sm" type="button"
-                                                                onclick="copyLink()">
+                                                                onclick="copyLink()" title="Copiar link completo">
                                                                 <i class="fas fa-copy"></i>
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <a href="{{ route('courses.show', $course->slug ?: $course->id) }}"
+                                                    <a href="{{ $courseFullUrl }}"
                                                         target="_blank" class="btn btn-sm btn-outline-info btn-block">
                                                         Visualizar Página <i class="fas fa-external-link-alt ml-1"></i>
                                                     </a>
@@ -2249,11 +2258,21 @@
                 });
             });
             function copyLink() {
-                var copyText = document.getElementById("courseLink");
-                copyText.select();
-                copyText.setSelectionRange(0, 99999);
-                document.execCommand("copy");
-                toastr.success('Link copiado!');
+                var el = document.getElementById("courseLink");
+                var fullUrl = el.getAttribute('data-full-url') || el.value;
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(fullUrl).then(function() {
+                        toastr.success('Link copiado!');
+                    });
+                } else {
+                    var temp = document.createElement('input');
+                    temp.value = fullUrl;
+                    document.body.appendChild(temp);
+                    temp.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(temp);
+                    toastr.success('Link copiado!');
+                }
             }
         </script>
 

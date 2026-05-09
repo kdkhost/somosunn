@@ -181,6 +181,46 @@
             color: #7cb3f7 !important;
         }
 
+        /* Tabs / Nav */
+        .dark-mode .nav-tabs {
+            border-color: #334155 !important;
+        }
+
+        .dark-mode .nav-tabs .nav-link {
+            color: #a1b4cc !important;
+            border-color: transparent !important;
+        }
+
+        .dark-mode .nav-tabs .nav-link:hover {
+            color: #ffffff !important;
+            border-color: #475569 #475569 #334155 !important;
+            background-color: #162032 !important;
+        }
+
+        .dark-mode .nav-tabs .nav-link.active,
+        .dark-mode .nav-tabs .nav-item.show .nav-link {
+            color: #ffffff !important;
+            background-color: #1e293b !important;
+            border-color: #475569 #475569 #1e293b !important;
+        }
+
+        .dark-mode .nav-pills .nav-link {
+            color: #a1b4cc !important;
+        }
+
+        .dark-mode .nav-pills .nav-link.active {
+            color: #ffffff !important;
+            background-color: #2563eb !important;
+        }
+
+        .dark-mode .tab-content {
+            color: #f1f5f9 !important;
+        }
+
+        .dark-mode .tab-pane {
+            color: #f1f5f9 !important;
+        }
+
         /* Inputs e selects */
         .dark-mode .form-control,
         .dark-mode .custom-select,
