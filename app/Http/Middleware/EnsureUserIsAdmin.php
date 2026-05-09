@@ -32,16 +32,21 @@ class EnsureUserIsAdmin
 
         $user = auth()->user();
 
-        // Superadmin sem impersonação ativa: redireciona para o painel legado
-        // O superadmin só acessa o painel novo via login supervisionado
+        // Superadmin sem impersonação: bloquear apenas no painel NOVO (/painel/admin)
+        // No painel legado (/admin) o superadmin tem acesso total
         if ($user->isSuperAdmin() && !session()->has('impersonator_id')) {
-            if ($request->expectsJson()) {
-                return $next($request); // APIs continuam funcionando
-            }
+            $routeName = (string) optional($request->route())->getName();
+            $isNewPanelRoute = str_starts_with($routeName, 'panel.admin.');
 
-            return redirect()
-                ->route('admin.dashboard')
-                ->with('toastr_info', 'Superadmin utiliza o painel legado. Use o acesso supervisionado para ver o painel novo.');
+            if ($isNewPanelRoute) {
+                if ($request->expectsJson()) {
+                    return $next($request); // APIs continuam funcionando
+                }
+
+                return redirect()
+                    ->route('admin.dashboard')
+                    ->with('toastr_info', 'Superadmin utiliza o painel legado. Use o acesso supervisionado para ver o painel novo.');
+            }
         }
 
         if ($user->isAdmin()) {
