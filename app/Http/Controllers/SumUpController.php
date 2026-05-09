@@ -149,17 +149,9 @@ class SumUpController extends Controller
      */
     public function webhook(Request $request)
     {
-        // GET = acesso via navegador - redirecionar para home
+        // GET = acesso via navegador ou health-check do gateway
         if ($request->isMethod('GET')) {
-            if (!config('app.debug')) {
-                return redirect('/');
-            }
-
-            return response()->json([
-                'status' => 'ok',
-                'service' => 'sumup-webhook',
-                'message' => 'Webhook endpoint active. Use POST to send notifications.',
-            ]);
+            return response('OK', 200);
         }
 
         try {

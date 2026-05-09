@@ -76,12 +76,9 @@ class PaymentWebhookController extends Controller
 
     public function mercadopago(Request $request, $seller_id = 'platform')
     {
-        // GET via navegador: redirecionar para home (não é webhook real)
+        // GET sem parâmetros de webhook = acesso direto via navegador
         if ($request->isMethod('GET') && !$request->has('type') && !$request->has('topic') && !$request->has('data')) {
-            if (!config('app.debug')) {
-                return redirect('/');
-            }
-            return response()->json(['status' => 'ok', 'service' => 'mercadopago-webhook']);
+            return response('OK', 200);
         }
 
         $type = $request->input('type') ?? $request->input('topic');
