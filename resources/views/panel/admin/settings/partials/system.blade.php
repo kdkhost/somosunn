@@ -33,7 +33,73 @@
         }
 
         $maintenanceEffective = $maintenanceManualEnabled || $maintenanceScheduledActive;
+        $debugEnabled = config('app.debug');
     @endphp
+
+    <!-- Debug Mode -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl {{ $debugEnabled ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500' }} flex items-center justify-center">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 dark:text-white text-lg">Modo Debug</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        {{ $debugEnabled ? 'ATIVO - Erros detalhados visíveis. Desative em produção!' : 'Desativado - Erros ocultos para usuários.' }}
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded-full text-xs font-black {{ $debugEnabled ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
+                    {{ $debugEnabled ? 'DEBUG ON' : 'PRODUÇÃO' }}
+                </span>
+                <button type="button" onclick="toggleDebugMode()" class="px-4 py-2 rounded-xl text-sm font-bold {{ $debugEnabled ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-amber-500 text-white hover:bg-amber-600' }} transition-all">
+                    {{ $debugEnabled ? 'Desativar Debug' : 'Ativar Debug' }}
+                </button>
+            </div>
+        </div>
+        @if($debugEnabled)
+            <div class="mt-4 p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/40 rounded-xl text-xs text-amber-800 dark:text-amber-300">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                <strong>Atenção:</strong> Com debug ativo, erros detalhados, stack traces e informações sensíveis ficam visíveis para qualquer visitante. Desative antes de ir para produção.
+            </div>
+        @endif
+    </div>
+
+    @push('scripts')
+    <script>
+        function toggleDebugMode() {
+            if (!confirm('Tem certeza que deseja ' + ({{ $debugEnabled ? 'true' : 'false' }} ? 'DESATIVAR' : 'ATIVAR') + ' o modo debug?')) return;
+
+            fetch('{{ route("panel.admin.settings.toggle") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ key: 'app_debug', value: {{ $debugEnabled ? '0' : '1' }} })
+            })
+            .then(r => r.json())
+            .then(data => {
+                // Alterar .env via API
+                fetch('{{ route("panel.admin.settings.toggle") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ key: 'toggle_env_debug', value: {{ $debugEnabled ? '0' : '1' }} })
+                }).then(() => {
+                    window.location.reload();
+                });
+            });
+        }
+    </script>
+    @endpush
+
     <!-- Security (reCAPTCHA) -->
     <div
         class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-8 space-y-6">

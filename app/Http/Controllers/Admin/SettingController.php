@@ -56,15 +56,42 @@ class SettingController extends Controller
     {
         $request->validate([
             'key' => 'required|string',
-            'value' => 'required|boolean',
+            'value' => 'required',
         ]);
 
         $key = $request->input('key');
-        $value = $request->boolean('value') ? 1 : 0;
+        $value = $request->input('value');
 
-        Setting::set($key, $value);
+        // Tratamento especial: alterar APP_DEBUG no .env
+        if ($key === 'toggle_env_debug') {
+            $this->setEnvValue('APP_DEBUG', $value ? 'true' : 'false');
+            \Artisan::call('config:clear');
+            return response()->json(['success' => true, 'message' => 'Debug ' . ($value ? 'ativado' : 'desativado') . '.']);
+        }
+
+        Setting::set($key, (int) $value);
 
         return response()->json(['success' => true, 'message' => 'Configuração atualizada.']);
+    }
+
+    /**
+     * Altera um valor no arquivo .env
+     */
+    private function setEnvValue(string $key, string $value): void
+    {
+        $envPath = base_path('.env');
+        if (!file_exists($envPath)) return;
+
+        $content = file_get_contents($envPath);
+        $pattern = "/^{$key}=.*/m";
+
+        if (preg_match($pattern, $content)) {
+            $content = preg_replace($pattern, "{$key}={$value}", $content);
+        } else {
+            $content .= "\n{$key}={$value}\n";
+        }
+
+        file_put_contents($envPath, $content);
     }
 
     public function update(Request $request)

@@ -149,8 +149,13 @@ class SumUpController extends Controller
      */
     public function webhook(Request $request)
     {
-        // GET = health check (gateways e browsers fazem isso)
+        // GET = acesso via navegador
         if ($request->isMethod('GET')) {
+            // Se não está em debug, retornar página simples sem detalhes técnicos
+            if (!config('app.debug')) {
+                return response('', 200);
+            }
+
             return response()->json([
                 'status' => 'ok',
                 'service' => 'sumup-webhook',
