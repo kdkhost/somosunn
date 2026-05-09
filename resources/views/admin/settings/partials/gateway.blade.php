@@ -513,6 +513,54 @@
 
             <hr>
 
+            {{-- Métodos de pagamento SumUp --}}
+            <h5 class="font-weight-bold mb-3"><i class="fas fa-credit-card mr-2"></i>Métodos de Pagamento</h5>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card bg-light border">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-3" style="width:40px;height:40px;border-radius:10px;background:#1e40af;display:flex;align-items:center;justify-content:center;">
+                                    <i class="fas fa-credit-card text-white"></i>
+                                </div>
+                                <div>
+                                    <h6 class="font-weight-bold mb-0">Cartão de Crédito</h6>
+                                    <small class="text-muted">Via SumUp.js (tokenizado)</small>
+                                </div>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_method_card" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_method_card" name="sumup_method_card" value="1" {{ (int) ($settings['sumup_method_card'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_method_card"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light border">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-3" style="width:40px;height:40px;border-radius:10px;background:#0d9488;display:flex;align-items:center;justify-content:center;">
+                                    <i class="fa-brands fa-pix text-white"></i>
+                                </div>
+                                <div>
+                                    <h6 class="font-weight-bold mb-0">PIX</h6>
+                                    <small class="text-muted">QR Code inline</small>
+                                </div>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input type="hidden" name="sumup_method_pix" value="0">
+                                <input type="checkbox" class="custom-control-input" id="sumup_method_pix" name="sumup_method_pix" value="1" {{ (int) ($settings['sumup_method_pix'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="sumup_method_pix"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
             {{-- Configurações de cobrança --}}
             <h5 class="font-weight-bold mb-3"><i class="fas fa-sliders-h mr-2"></i>Configurações de Cobrança</h5>
             
