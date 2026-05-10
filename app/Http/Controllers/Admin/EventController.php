@@ -185,6 +185,14 @@ class EventController extends Controller
             ? $request->boolean('published')
             : true;
 
+        // Eventos sem imagem ficam automaticamente como rascunho (não publicados).
+        // Só são publicados quando a imagem de capa está presente.
+        $hasImage = $request->hasFile('image')
+            || (!empty($validated['image'] ?? null));
+        if (!$hasImage) {
+            $validated['published'] = false;
+        }
+
         if (($request->hasFile('image') || $request->boolean('remove_image')) && !Schema::hasColumn('events', 'image')) {
             $message = 'Seu banco de dados está desatualizado: falta a coluna events.image. Atualize o código e rode: php artisan migrate';
 
@@ -317,6 +325,13 @@ class EventController extends Controller
 
         if ($request->has('published')) {
             $validated['published'] = $request->boolean('published');
+        }
+
+        // Eventos sem imagem (nem atual nem nova) ficam como rascunho
+        $hasImage = $request->hasFile('image')
+            || (filled($event->image) && !$request->boolean('remove_image'));
+        if (!$hasImage && ($validated['published'] ?? false)) {
+            $validated['published'] = false;
         }
 
         if (($request->hasFile('image') || $request->boolean('remove_image')) && !Schema::hasColumn('events', 'image')) {
@@ -623,9 +638,9 @@ class EventController extends Controller
 
     protected function eventImageRule(Request $request, ?Event $event = null): string
     {
-        $hasCurrentImage = $event && filled($event->image) && !$request->boolean('remove_image');
-
-        return $hasCurrentImage ? 'nullable|image|max:5120' : 'required|image|max:5120';
+        // Imagem sempre opcional. Eventos sem imagem ficam como rascunho (published=false)
+        // e aparecem como "incompletos" até que a imagem seja adicionada.
+        return 'nullable|image|max:5120';
     }
 
     /**

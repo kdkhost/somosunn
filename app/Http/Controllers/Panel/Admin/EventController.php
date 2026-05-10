@@ -170,6 +170,12 @@ class EventController extends Controller
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
         $data['user_id'] = Auth::id();
+
+        // Eventos sem imagem ficam como rascunho (não publicados)
+        if (empty($data['image'] ?? null) && !$request->hasFile('image')) {
+            $data['published'] = false;
+        }
+
         $data = $this->applyVisibilityData($request, $data, null, false, 'events');
 
         Event::create($data);
@@ -234,6 +240,14 @@ class EventController extends Controller
         $data['all_day'] = $request->boolean('all_day');
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
+
+        // Eventos sem imagem (nem atual nem nova) ficam como rascunho
+        $hasImage = $request->hasFile('image')
+            || (filled($event->image) && !$request->boolean('remove_image'));
+        if (!$hasImage && ($data['published'] ?? false)) {
+            $data['published'] = false;
+        }
+
         $data = $this->applyVisibilityData(
             $request,
             $data,
@@ -256,8 +270,21 @@ class EventController extends Controller
         $this->ensurePermission('events.edit');
         $this->ensureCanManage($event);
 
+        $newPublished = !$event->published;
+
+        // Bloqueia publicação sem imagem
+        if ($newPublished && empty($event->image)) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Adicione uma imagem de capa antes de publicar este evento.',
+                ], 422);
+            }
+            return back()->with('error', 'Adicione uma imagem de capa antes de publicar este evento.');
+        }
+
         $event->forceFill([
-            'published' => !$event->published,
+            'published' => $newPublished,
         ])->save();
 
         $message = $event->published ? 'Evento ativado com sucesso' : 'Evento desativado com sucesso';
@@ -374,9 +401,9 @@ class EventController extends Controller
 
     private function resolveImageRule(Request $request, ?Event $event = null): string
     {
-        $hasCurrentImage = $event && filled($event->image) && !$request->boolean('remove_image');
-
-        return $hasCurrentImage ? 'nullable|image|max:5120' : 'required|image|max:5120';
+        // Imagem sempre opcional. Eventos sem imagem ficam como rascunho (published=false)
+        // e aparecem como "incompletos" até que a imagem seja adicionada.
+        return 'nullable|image|max:5120';
     }
 
     private function normalizeMoney($value): float

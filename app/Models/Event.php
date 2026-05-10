@@ -76,11 +76,23 @@ class Event extends Model
         'scanner_radius_meters' => 'integer',
     ];
 
-    protected $appends = ['start', 'end', 'image_url', 'thumbnail_url', 'gallery_cover_url'];
+    protected $appends = ['start', 'end', 'image_url', 'thumbnail_url', 'gallery_cover_url', 'is_ready_to_publish'];
 
     public function getImageUrlAttribute(): ?string
     {
         return UploadStorage::url($this->image);
+    }
+
+    /**
+     * Indica se o evento tem todos os campos obrigatórios preenchidos para publicação.
+     * Usado nos atalhos rápidos do calendário: evento criado sem imagem fica como rascunho
+     * até que a capa seja adicionada.
+     */
+    public function getIsReadyToPublishAttribute(): bool
+    {
+        return !empty($this->title)
+            && !empty($this->image)
+            && !empty($this->start_at);
     }
 
     public function getThumbnailUrlAttribute(): ?string
