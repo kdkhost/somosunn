@@ -265,6 +265,42 @@
                     </li>
                 @endif
 
+                {{-- Revistas Digitais --}}
+                @php
+                    $magazinesVisible = auth()->user()->isAdmin()
+                        || (auth()->check() && \App\Models\Magazine::userHasNewsInterest(auth()->user()));
+                @endphp
+                @if($magazinesVisible)
+                    <li class="nav-item has-treeview {{ $open('admin.magazines.*') }}">
+                        <a href="#" class="nav-link {{ $is('admin.magazines.*') }}">
+                            <i class="nav-icon fas fa-book-open"></i>
+                            <p>Revistas<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item">
+                                <a href="{{ route('magazines.index') }}" target="_blank" class="nav-link">
+                                    <i class="fas fa-eye nav-icon"></i>
+                                    <p>Ver banca</p>
+                                </a>
+                            </li>
+                            @if(auth()->user()->isAdmin())
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.magazines.index') }}" class="nav-link {{ $is('admin.magazines.index') }}">
+                                        <i class="fas fa-cog nav-icon"></i>
+                                        <p>Gerenciar</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.magazines.create') }}" class="nav-link {{ $is('admin.magazines.create') }}">
+                                        <i class="fas fa-plus nav-icon"></i>
+                                        <p>Nova Revista</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
                 {{-- Itens exclusivos de Admin --}}
                 @if(auth()->user()->isAdmin())
                     @php

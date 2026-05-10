@@ -330,6 +330,13 @@ Route::get('mentorships/{mentorship}', [\App\Http\Controllers\MentorshipControll
 Route::get('mentorships/{mentorship}/checkout', [\App\Http\Controllers\MentorshipCheckoutController::class, 'show'])->name('mentorships.checkout.show');
 Route::post('mentorships/{mentorship}/checkout', [\App\Http\Controllers\MentorshipCheckoutController::class, 'process'])->name('mentorships.checkout.process');
 
+// Revistas (Public/Members) — flipbook viewer
+// Autenticacao exigida para leitura; a proteção de visibilidade ocorre no controller
+Route::middleware(['auth'])->group(function () {
+    Route::get('revistas', [\App\Http\Controllers\MagazineController::class, 'index'])->name('magazines.index');
+    Route::get('revistas/{magazine:slug}', [\App\Http\Controllers\MagazineController::class, 'show'])->name('magazines.show');
+});
+
 // Reviews
 Route::post('courses/{course}/reviews', [\App\Http\Controllers\ItemReviewController::class, 'storeCourse'])->middleware(['auth', 'check.feature:courses_review'])->name('courses.reviews.store');
 Route::post('mentorships/{mentorship}/reviews', [\App\Http\Controllers\ItemReviewController::class, 'storeMentorship'])->middleware(['auth', 'check.feature:mentorships_review'])->name('mentorships.reviews.store');
@@ -568,6 +575,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'supe
         Route::post('mentorships/{mentorship}/media', [\App\Http\Controllers\Panel\MentorshipMediaController::class, 'store'])->name('mentorships.media.store');
         Route::delete('mentorships/{mentorship}/media/{media}', [\App\Http\Controllers\Panel\MentorshipMediaController::class, 'destroy'])->name('mentorships.media.destroy');
 
+        // Revistas (digitais — flipbook)
+        Route::resource('magazines', \App\Http\Controllers\Admin\MagazineController::class)->except(['show']);
+
         // Certificates
         Route::post('certificates/generate', [\App\Http\Controllers\Panel\Admin\CertificateController::class, 'generate'])->name('certificates.generate');
         Route::resource('certificates', \App\Http\Controllers\Panel\Admin\CertificateController::class);
@@ -736,6 +746,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::delete('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('courses.lessons.destroy');
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
     Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
+    Route::resource('magazines', \App\Http\Controllers\Admin\MagazineController::class)->except(['show']);
     Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'pdf'])->name('invoices.pdf');
     Route::post('invoices/{invoice}/send', [\App\Http\Controllers\Admin\InvoiceController::class, 'send'])->name('invoices.send');
     Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class);
