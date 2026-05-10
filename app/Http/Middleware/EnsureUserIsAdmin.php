@@ -32,21 +32,10 @@ class EnsureUserIsAdmin
 
         $user = auth()->user();
 
-        // Superadmin sem impersonação: bloquear apenas no painel NOVO (/painel/admin)
-        // No painel legado (/admin) o superadmin tem acesso total
-        if ($user->isSuperAdmin() && !session()->has('impersonator_id')) {
-            $routeName = (string) optional($request->route())->getName();
-            $isNewPanelRoute = str_starts_with($routeName, 'panel.admin.');
-
-            if ($isNewPanelRoute) {
-                if ($request->expectsJson()) {
-                    return $next($request); // APIs continuam funcionando
-                }
-
-                return redirect()
-                    ->route('admin.dashboard')
-                    ->with('toastr_info', 'Superadmin utiliza o painel legado. Use o acesso supervisionado para ver o painel novo.');
-            }
+        // Superadmin (sem excecao): tem acesso irrestrito a todos os modulos,
+        // tanto no painel legado (/admin) quanto no painel novo (/painel).
+        if ($user->isSuperAdmin()) {
+            return $next($request);
         }
 
         if ($user->isAdmin()) {
@@ -94,6 +83,13 @@ class EnsureUserIsAdmin
 
         if (method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace()) {
             $allowedPrefixes[] = 'panel.admin.redemptions.';
+        }
+
+        // Editor de Revistas (feature magazines.publish) pode acessar o modulo de revistas
+        if (method_exists($user, 'canAccessFeature') && (
+            $user->canAccessFeature('magazines.publish') || $user->canAccessFeature('magazines_create')
+        )) {
+            $allowedPrefixes[] = 'panel.admin.magazines.';
         }
 
         if ($allowedPrefixes === []) {

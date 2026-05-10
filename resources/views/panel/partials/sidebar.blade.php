@@ -315,7 +315,7 @@
         ['label' => 'Cursos', 'route' => route('panel.admin.courses.index'), 'icon' => 'fas fa-graduation-cap', 'active' => request()->routeIs('panel.admin.courses.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Mentorias', 'route' => route('panel.admin.mentorships.index'), 'icon' => 'fas fa-chalkboard-teacher', 'active' => request()->routeIs('panel.admin.mentorships.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Eventos', 'route' => route('panel.admin.events.index'), 'icon' => 'fas fa-calendar-alt', 'active' => request()->routeIs('panel.admin.events.*'), 'visible' => $user->isAdmin()],
-        ['label' => 'Revistas', 'route' => route('panel.admin.magazines.index'), 'icon' => 'fas fa-book-open', 'active' => request()->routeIs('panel.admin.magazines.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Revistas', 'route' => route('panel.admin.magazines.index'), 'icon' => 'fas fa-book-open', 'active' => request()->routeIs('panel.admin.magazines.*'), 'visible' => $user->isAdmin() || $user->canAccessFeature('magazines.publish') || $user->canAccessFeature('magazines_create')],
         ['label' => 'Acervo de Mídia', 'route' => route('panel.admin.events.acervo'), 'icon' => 'fas fa-photo-video', 'active' => request()->routeIs('panel.admin.events.acervo'), 'visible' => $user->isAdmin()],
         ['label' => 'Certificados', 'route' => route('panel.admin.certificates.index'), 'icon' => 'fas fa-certificate', 'active' => request()->routeIs('panel.admin.certificates.*'), 'visible' => $user->isAdmin()],
         ['label' => 'FAQ', 'route' => route('panel.admin.faqs.index'), 'icon' => 'fas fa-question-circle', 'active' => request()->routeIs('panel.admin.faqs.*'), 'visible' => $user->isAdmin()],

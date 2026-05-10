@@ -267,8 +267,14 @@
 
                 {{-- Revistas Digitais --}}
                 @php
-                    $magazinesVisible = auth()->user()->isAdmin()
-                        || (auth()->check() && \App\Models\Magazine::userHasNewsInterest(auth()->user()));
+                    $currentUser = auth()->user();
+                    $canManageMagazines = $currentUser && (
+                        $currentUser->isAdmin()
+                        || $currentUser->canAccessFeature('magazines.publish')
+                        || $currentUser->canAccessFeature('magazines_create')
+                    );
+                    $magazinesVisible = $canManageMagazines
+                        || ($currentUser && \App\Models\Magazine::userHasNewsInterest($currentUser));
                 @endphp
                 @if($magazinesVisible)
                     <li class="nav-item has-treeview {{ $open('panel.admin.magazines.*') }}">
@@ -283,7 +289,7 @@
                                     <p>Ver banca</p>
                                 </a>
                             </li>
-                            @if(auth()->user()->isAdmin())
+                            @if($canManageMagazines)
                                 <li class="nav-item">
                                     <a href="{{ route('panel.admin.magazines.index') }}" class="nav-link {{ $is('panel.admin.magazines.index') }}">
                                         <i class="fas fa-cog nav-icon"></i>
