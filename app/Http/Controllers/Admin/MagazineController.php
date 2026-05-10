@@ -43,6 +43,10 @@ class MagazineController extends Controller
     {
         $this->ensureCanCreate();
 
+        // Uploads grandes (ate 100 MB) precisam de mais tempo/memoria
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         $data = $this->validateData($request);
 
         $data['user_id'] = Auth::id();
@@ -60,19 +64,20 @@ class MagazineController extends Controller
         // PDF (watermark DESLIGADO — PDFs nao sao imagens)
         if ($request->hasFile('pdf_file')) {
             $file = $request->file('pdf_file');
+            // IMPORTANTE: pegar o tamanho ANTES do storeUploadedFile, pois ele move o arquivo tmp
+            $data['file_size_kb'] = (int) round($file->getSize() / 1024);
             $data['pdf_file']     = UploadStorage::storeUploadedFile(
                 $file,
                 'magazines/pdfs',
                 null,
                 ['watermark' => false, 'prefix' => 'magazine-pdf']
             );
-            $data['file_size_kb'] = (int) round($file->getSize() / 1024);
         }
 
         $magazine = Magazine::create($data);
 
         return redirect()
-            ->route(request()->routeIs('panel.*') ? 'panel.admin.magazines.index' : 'admin.magazines.index')
+            ->route('panel.admin.magazines.index')
             ->with('success', 'Revista criada com sucesso.');
     }
 
@@ -85,6 +90,9 @@ class MagazineController extends Controller
     public function update(Request $request, Magazine $magazine)
     {
         $this->ensureCanManage($magazine);
+
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
 
         $data = $this->validateData($request, $magazine);
 
@@ -101,19 +109,20 @@ class MagazineController extends Controller
         if ($request->hasFile('pdf_file')) {
             $this->deleteFileIfExists($magazine->pdf_file);
             $file = $request->file('pdf_file');
+            // IMPORTANTE: pegar o tamanho ANTES do storeUploadedFile, pois ele move o arquivo tmp
+            $data['file_size_kb'] = (int) round($file->getSize() / 1024);
             $data['pdf_file']     = UploadStorage::storeUploadedFile(
                 $file,
                 'magazines/pdfs',
                 null,
                 ['watermark' => false, 'prefix' => 'magazine-pdf']
             );
-            $data['file_size_kb'] = (int) round($file->getSize() / 1024);
         }
 
         $magazine->update($data);
 
         return redirect()
-            ->route(request()->routeIs('panel.*') ? 'panel.admin.magazines.index' : 'admin.magazines.index')
+            ->route('panel.admin.magazines.index')
             ->with('success', 'Revista atualizada com sucesso.');
     }
 
