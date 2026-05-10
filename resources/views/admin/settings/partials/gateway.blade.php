@@ -563,26 +563,51 @@
 
             {{-- Configurações de cobrança --}}
             <h5 class="font-weight-bold mb-3"><i class="fas fa-sliders-h mr-2"></i>Configurações de Cobrança</h5>
-            
+
             <div class="row">
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Taxa Fixa (€)</label>
-                    <input type="number" step="0.01" name="sumup_fixed_fee" class="form-control" value="{{ $settings['sumup_fixed_fee'] ?? '0.00' }}">
+                    <label class="text-uppercase text-muted small font-weight-bold">Taxa Percentual (%)</label>
+                    <input type="number" step="0.01" name="sumup_fee_percentage" class="form-control" value="{{ $settings['sumup_fee_percentage'] ?? '2.75' }}">
                 </div>
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Taxa Percentual (%)</label>
-                    <input type="number" step="0.01" name="sumup_percentage_fee" class="form-control" value="{{ $settings['sumup_percentage_fee'] ?? '0.00' }}">
+                    <label class="text-uppercase text-muted small font-weight-bold">Taxa Fixa (R$)</label>
+                    <input type="number" step="0.01" name="sumup_fee_fixed" class="form-control" value="{{ $settings['sumup_fee_fixed'] ?? '0.00' }}">
                 </div>
                 <div class="col-md-3 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Máx. Parcelas</label>
-                    <input type="number" min="1" max="12" name="sumup_max_installments" class="form-control" value="{{ $settings['sumup_max_installments'] ?? '1' }}">
+                    <input type="number" min="1" max="12" name="sumup_max_installments" class="form-control" value="{{ $settings['sumup_max_installments'] ?? '12' }}">
                 </div>
                 <div class="col-md-3 form-group">
                     <label class="text-uppercase text-muted small font-weight-bold">Repassar Taxa</label>
-                    <select name="sumup_pass_fee_to_client" class="form-control">
-                        <option value="0" {{ (int) ($settings['sumup_pass_fee_to_client'] ?? 0) === 0 ? 'selected' : '' }}>Não - empresa absorve</option>
-                        <option value="1" {{ (int) ($settings['sumup_pass_fee_to_client'] ?? 0) === 1 ? 'selected' : '' }}>Sim - cliente paga</option>
+                    <select name="sumup_pass_fee" class="form-control">
+                        <option value="0" {{ (int) ($settings['sumup_pass_fee'] ?? 0) === 0 ? 'selected' : '' }}>Não - empresa absorve</option>
+                        <option value="1" {{ (int) ($settings['sumup_pass_fee'] ?? 0) === 1 ? 'selected' : '' }}>Sim - cliente paga</option>
                     </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Parcelas sem Juros</label>
+                    <input type="number" min="1" max="12" name="sumup_installments_no_interest" class="form-control"
+                        value="{{ $settings['sumup_installments_no_interest'] ?? '1' }}">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Juros por Parcela (%)</label>
+                    <input type="number" step="0.01" name="sumup_installment_tax" class="form-control"
+                        value="{{ $settings['sumup_installment_tax'] ?? '0.00' }}">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Tipo de Cálculo</label>
+                    <select name="sumup_interest_type" class="form-control">
+                        <option value="per_installment" {{ ($settings['sumup_interest_type'] ?? 'per_installment') === 'per_installment' ? 'selected' : '' }}>Por parcela</option>
+                        <option value="on_total" {{ ($settings['sumup_interest_type'] ?? '') === 'on_total' ? 'selected' : '' }}>Sobre o total</option>
+                    </select>
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="text-uppercase text-muted small font-weight-bold">Expiração PIX SumUp (minutos)</label>
+                    <input type="number" min="1" max="1440" name="sumup_pix_expiration_minutes" class="form-control"
+                        value="{{ $settings['sumup_pix_expiration_minutes'] ?? '10' }}">
                 </div>
             </div>
 
