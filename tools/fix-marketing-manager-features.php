@@ -24,6 +24,7 @@ $marketingFeatures = [
     'courses_access',
     'events_access',
     'mentorships_access',
+    'certificates_access',
 ];
 
 $extra = $u->extra_features ?? [];

@@ -159,7 +159,7 @@ class UserController extends Controller
         $action = $request->input('action', 'set');
         $currentId = (int) \App\Models\Setting::get('platform_marketing_user_id', 0);
 
-        // Features que o marketing manager precisa para vender/instruir
+        // Features que o marketing manager precisa para vender/instruir/certificar
         $marketingFeatures = [
             'marketplace.sell',
             'courses.create',
@@ -168,18 +168,17 @@ class UserController extends Controller
             'courses_access',
             'events_access',
             'mentorships_access',
+            'certificates_access',
         ];
 
         if ($action === 'unset' || $currentId === $user->id) {
             \App\Models\Setting::set('platform_marketing_user_id', '');
 
-            // Remover features extras concedidas pelo marketing (se o usuario nao tinha antes)
+            // Remover APENAS features que o plano do usuario NAO concede
             if ($currentId === $user->id) {
                 $currentUser = User::find($currentId);
                 if ($currentUser) {
-                    $extra = $currentUser->extra_features ?? [];
-                    $extra = array_values(array_diff($extra, $marketingFeatures));
-                    $currentUser->update(['extra_features' => $extra]);
+                    $this->revokeMarketingFeatures($currentUser, $marketingFeatures);
                 }
             }
 
@@ -190,19 +189,17 @@ class UserController extends Controller
             ]);
         }
 
-        // Remover do anterior se houver
+        // Remover do anterior se houver (respeitando plano)
         if ($currentId > 0 && $currentId !== $user->id) {
             $previousUser = User::find($currentId);
             if ($previousUser) {
-                $extra = $previousUser->extra_features ?? [];
-                $extra = array_values(array_diff($extra, $marketingFeatures));
-                $previousUser->update(['extra_features' => $extra]);
+                $this->revokeMarketingFeatures($previousUser, $marketingFeatures);
             }
         }
 
         \App\Models\Setting::set('platform_marketing_user_id', (string) $user->id);
 
-        // Conceder features de vendedor/instrutor ao novo marketing manager
+        // Conceder features de vendedor/instrutor/certificado ao novo marketing manager
         $extra = $user->extra_features ?? [];
         $extra = array_unique(array_merge($extra, $marketingFeatures));
         $user->update(['extra_features' => array_values($extra)]);
@@ -219,5 +216,28 @@ class UserController extends Controller
             'user_id'  => $user->id,
             'message'  => 'Usuario definido como Responsavel de Marketing com acesso de vendedor/instrutor. Notificacao enviada.',
         ]);
+    }
+
+    /**
+     * Remove features de marketing do usuario, mas preserva as que o plano dele ja concede.
+     */
+    private function revokeMarketingFeatures(User $user, array $marketingFeatures): void
+    {
+        $extra = $user->extra_features ?? [];
+
+        // Verificar quais features o plano do usuario ja concede
+        $plan = $user->activePlan();
+        $planFeatures = [];
+        if ($plan && method_exists($plan, 'resolvedPermissions')) {
+            $planFeatures = $plan->resolvedPermissions();
+        } elseif ($plan && isset($plan->permissions)) {
+            $planFeatures = (array) $plan->permissions;
+        }
+
+        // So remover features que o plano NAO concede
+        $featuresToRemove = array_diff($marketingFeatures, $planFeatures);
+        $extra = array_values(array_diff($extra, $featuresToRemove));
+
+        $user->update(['extra_features' => $extra]);
     }
 }
