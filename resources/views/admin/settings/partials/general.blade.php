@@ -106,4 +106,63 @@
             </div>
         </div>
     </div>
+
+    <hr class="my-4">
+
+    {{-- APIs de Localização (busca de estabelecimentos em eventos) --}}
+    <h5 class="text-primary mb-3"><i class="fas fa-map-marked-alt mr-2"></i> APIs de Localização</h5>
+    <div class="alert alert-light border mb-3">
+        <small class="text-muted">
+            <i class="fas fa-info-circle mr-1"></i>
+            Usadas na busca de estabelecimentos ao cadastrar eventos. Se ambas estiverem configuradas, o Google Places tem prioridade. LocationIQ é usado como fallback.
+        </small>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="text-uppercase text-muted small font-weight-bold">Google Places API Key</label>
+                <input type="text" name="google_places_api_key" class="form-control"
+                    value="{{ $settings['google_places_api_key'] ?? '' }}"
+                    placeholder="AIzaSy... (opcional)">
+                <small class="text-muted">Obtenha em console.cloud.google.com (ative Places API + Geocoding API)</small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="text-uppercase text-muted small font-weight-bold">LocationIQ API Key</label>
+                <input type="text" name="locationiq_api_key" class="form-control"
+                    value="{{ $settings['locationiq_api_key'] ?? '' }}"
+                    placeholder="pk.xxxx... (gratuito)">
+                <small class="text-muted">Obtenha em locationiq.com (5.000 req/dia gratuito)</small>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="text-uppercase text-muted small font-weight-bold">Raio de busca (km)</label>
+                <input type="number" min="10" max="500" name="venue_search_radius_km" class="form-control"
+                    value="{{ $settings['venue_search_radius_km'] ?? '150' }}">
+                <small class="text-muted">Distancia maxima para considerar "proximo"</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="text-uppercase text-muted small font-weight-bold">Provedor preferido</label>
+                <select name="venue_search_provider" class="form-control">
+                    <option value="auto" {{ ($settings['venue_search_provider'] ?? 'auto') === 'auto' ? 'selected' : '' }}>Automatico (Google > LocationIQ)</option>
+                    <option value="google" {{ ($settings['venue_search_provider'] ?? '') === 'google' ? 'selected' : '' }}>Apenas Google Places</option>
+                    <option value="locationiq" {{ ($settings['venue_search_provider'] ?? '') === 'locationiq' ? 'selected' : '' }}>Apenas LocationIQ</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="text-uppercase text-muted small font-weight-bold">Limite de resultados</label>
+                <input type="number" min="5" max="40" name="venue_search_limit" class="form-control"
+                    value="{{ $settings['venue_search_limit'] ?? '20' }}">
+            </div>
+        </div>
+    </div>
 </div>

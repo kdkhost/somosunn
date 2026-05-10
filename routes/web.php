@@ -309,6 +309,7 @@ Route::prefix('backend/install')->group(function () {
 Route::post('/api/interactions', [InteractionController::class, 'store'])->middleware('auth')->name('api.interactions.store');
 Route::post('/api/satisfactions', [SatisfactionController::class, 'store'])->middleware('auth')->name('api.satisfactions.store');
 Route::get('/api/ranking', [RankingController::class, 'index'])->name('api.ranking.index');
+Route::get('/api/venue-search', [\App\Http\Controllers\Api\VenueSearchController::class, 'search'])->middleware('auth')->name('api.venue-search');
 
 Route::get('/manifest.webmanifest', [\App\Http\Controllers\PwaController::class, 'manifest'])->name('manifest');
 Route::get('/offline', fn() => view('offline'))->name('offline');

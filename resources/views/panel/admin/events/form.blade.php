@@ -952,7 +952,10 @@
             var userCep = @json(auth()->user()->cep ?? '');
             var userNeighbourhood = @json(auth()->user()->neighborhood ?? '');
             var locationIqKey = @json(\App\Models\Setting::get('locationiq_api_key', ''));
-            var RADIUS_KM = 150;
+            var googlePlacesKey = @json(\App\Models\Setting::get('google_places_api_key', ''));
+            var RADIUS_KM = {{ (int) (\App\Models\Setting::get('venue_search_radius_km', 150)) }};
+            var SEARCH_LIMIT = {{ (int) (\App\Models\Setting::get('venue_search_limit', 20)) }};
+            var PROVIDER = @json(\App\Models\Setting::get('venue_search_provider', 'auto'));
             var userLat = null;
             var userLon = null;
 
@@ -992,59 +995,54 @@
                 venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando estabelecimentos...</div>';
                 venueResults.classList.remove('hidden');
 
-                var promises = [];
-
-                // LocationIQ (cobertura completa, rapido e estavel)
-                if (locationIqKey) {
-                    var liqUrl = 'https://us1.locationiq.com/v1/search?key=' + locationIqKey + '&q=' + encodeURIComponent(text) + '&countrycodes=br&format=json&limit=30&addressdetails=1&dedupe=1';
-                    promises.push(fetch(liqUrl).then(function(r) { return r.json(); }).then(function(data) {
-                        if (data.error) return [];
-                        return (data || []).map(function(item) {
-                            var addr = item.address || {};
-                            var city = addr.city || addr.town || addr.village || '';
-                            var state = addr.state || '';
-                            var road = addr.road || ''; var number = addr.house_number || '';
-                            var neighbourhood = addr.suburb || addr.neighbourhood || '';
-                            var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
-                            var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.shop || '').trim();
-                            return { lat: parseFloat(item.lat), lon: parseFloat(item.lon), name: shortName || item.display_name.split(',')[0], address: fullAddress || item.display_name };
-                        });
-                    }).catch(function() { return []; }));
+                var params = 'q=' + encodeURIComponent(text);
+                if (userLat !== null && userLon !== null) {
+                    params += '&lat=' + userLat + '&lon=' + userLon;
                 }
 
-                if (promises.length === 0) {
-                    venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-red-500">API de busca nao configurada.</div>';
-                    return;
-                }
-
-                Promise.all(promises).then(function(results) {
-                    var seen = {}; var combined = [];
-                    results.forEach(function(items) { (items || []).forEach(function(item) {
-                        var key = item.lat.toFixed(4) + ',' + item.lon.toFixed(4);
-                        if (!seen[key]) {
-                            seen[key] = true;
-                            // Calcular distancia do usuario
-                            if (userLat !== null && userLon !== null) {
-                                item.distance = haversineKm(userLat, userLon, item.lat, item.lon);
-                                item.isNearby = item.distance <= RADIUS_KM;
-                            } else {
-                                item.distance = null;
-                                item.isNearby = false;
-                            }
-                            combined.push(item);
-                        }
-                    }); });
-
-                    // Ordenar: proximos primeiro, depois por distancia
-                    combined.sort(function(a, b) {
-                        if (a.isNearby && !b.isNearby) return -1;
-                        if (!a.isNearby && b.isNearby) return 1;
-                        if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
-                        return 0;
+                fetch('/api/venue-search?' + params, {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var items = (data.results || []).map(function(place) {
+                        return {
+                            lat: parseFloat(place.lat),
+                            lon: parseFloat(place.lng || place.lon),
+                            name: place.name || '',
+                            address: place.address || ''
+                        };
                     });
-
-                    renderResults(combined);
+                    processResults(items);
+                })
+                .catch(function() {
+                    venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-red-500"><i class="fas fa-exclamation-triangle mr-1"></i>Erro na busca. Tente novamente.</div>';
                 });
+            }
+
+            function processResults(items) {
+                var seen = {}; var combined = [];
+                items.forEach(function(item) {
+                    if (!item.lat || !item.lon) return;
+                    var key = item.lat.toFixed(4) + ',' + item.lon.toFixed(4);
+                    if (seen[key]) return;
+                    seen[key] = true;
+                    if (userLat !== null && userLon !== null) {
+                        item.distance = haversineKm(userLat, userLon, item.lat, item.lon);
+                        item.isNearby = item.distance <= RADIUS_KM;
+                    } else {
+                        item.distance = null;
+                        item.isNearby = false;
+                    }
+                    combined.push(item);
+                });
+                combined.sort(function(a, b) {
+                    if (a.isNearby && !b.isNearby) return -1;
+                    if (!a.isNearby && b.isNearby) return 1;
+                    if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
+                    return 0;
+                });
+                renderResults(combined);
             }
 
             function renderResults(data) {
@@ -1053,7 +1051,7 @@
                     return;
                 }
 
-                var items = data.slice(0, 20);
+                var items = data.slice(0, SEARCH_LIMIT);
                 var totalFound = data.length;
                 var nearbyCount = items.filter(function(i) { return i.isNearby; }).length;
 
