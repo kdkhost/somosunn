@@ -204,14 +204,19 @@
             'active' => request()->routeIs('panel.splits.index'),
             'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace(),
         ],
-        [
-            'label' => 'Marketing da Plataforma',
-            'route' => route('panel.marketing.index'),
-            'icon' => 'fas fa-bullhorn',
-            'active' => request()->routeIs('panel.marketing.*'),
-            'visible' => (int) \App\Models\Setting::get('platform_marketing_user_id', 0) === (int) $user->id,
-        ],
     ], fn(array $item) => $item['visible']));
+
+    // Responsavel de Marketing (menu proprio, independente de vendedor/instrutor)
+    $isMarketingManager = (int) \App\Models\Setting::get('platform_marketing_user_id', 0) === (int) $user->id;
+    $marketingItems = $isMarketingManager ? [
+        [
+            'label' => 'Painel de Marketing',
+            'route' => route('panel.marketing.index'),
+            'icon' => 'fas fa-chart-line',
+            'active' => request()->routeIs('panel.marketing.index'),
+            'visible' => true,
+        ],
+    ] : [];
 
     $instructorItems = array_values(array_filter([
         [
@@ -323,6 +328,7 @@
     $mainOpen = $hasActiveItem($mainItems);
     $vendorOpen = $hasActiveItem($vendorItems);
     $instructorOpen = $hasActiveItem($instructorItems);
+    $marketingOpen = $hasActiveItem($marketingItems);
     $adminManagementOpen = $hasActiveItem($adminManagementItems);
     $adminContentOpen = $hasActiveItem($adminContentItems);
     $adminSettingsOpen = $hasActiveItem($adminSettingsItems);
@@ -444,6 +450,27 @@
                 </summary>
                 <div class="mt-2 ml-4 pl-3 border-l border-slate-100 dark:border-slate-800 space-y-1">
                     @foreach($instructorItems as $item)
+                        <a href="{{ $item['route'] }}" class="{{ $submenuItemClass($item['active']) }}">
+                            <i class="{{ $item['icon'] }} w-4 opacity-80"></i>
+                            <span>{{ $item['label'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </details>
+        @endif
+
+        @if(count($marketingItems))
+            <details name="sidebar-menu" {{ $marketingOpen ? 'open' : '' }}>
+                <summary class="{{ $submenuToggleClass($marketingOpen) }}">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-bullhorn w-5 opacity-80 text-purple-500"></i>
+                        <span>Marketing da Plataforma</span>
+                        <span class="ml-auto text-[9px] font-black px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 uppercase tracking-widest">Exclusivo</span>
+                    </div>
+                    <i class="fas fa-chevron-down submenu-chevron text-[10px] transition-transform"></i>
+                </summary>
+                <div class="mt-2 ml-4 pl-3 border-l border-purple-100 dark:border-purple-900/50 space-y-1">
+                    @foreach($marketingItems as $item)
                         <a href="{{ $item['route'] }}" class="{{ $submenuItemClass($item['active']) }}">
                             <i class="{{ $item['icon'] }} w-4 opacity-80"></i>
                             <span>{{ $item['label'] }}</span>
