@@ -100,7 +100,7 @@
             </span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             @forelse($items as $item)
                 @php
                     $canAfford = $userPoints >= (int) $item->points_cost;
@@ -108,89 +108,87 @@
                     $available = $canAfford && $hasStock;
                 @endphp
 
-                <div class="group flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-200">
+                <div class="group flex flex-col rounded-2xl border border-slate-200 dark:border-slate-700/60 bg-white dark:bg-slate-800/50 overflow-hidden hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg dark:hover:shadow-blue-900/20 transition-all duration-300">
                     {{-- Imagem --}}
-                    <div class="relative aspect-[4/3] w-full overflow-hidden bg-slate-50 dark:bg-slate-950">
+                    <div class="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
                         @if($item->image)
                             <img src="{{ \App\Support\UploadStorage::url($item->image) }}"
                                 alt="{{ $item->name }}"
                                 loading="lazy"
                                 class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
                         @else
-                            <div class="flex h-full w-full items-center justify-center text-slate-300 dark:text-slate-700">
-                                <i class="fas fa-gift text-3xl"></i>
+                            <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900">
+                                <i class="fas fa-gift text-4xl text-slate-300 dark:text-slate-600"></i>
                             </div>
                         @endif
 
+                        {{-- Badge custo (sempre visivel) --}}
+                        <div class="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-lg bg-blue-600/90 backdrop-blur-sm px-2.5 py-1.5 shadow-lg">
+                            <i class="fas fa-coins text-[10px] text-blue-200"></i>
+                            <span class="text-xs font-black text-white">{{ number_format((int) $item->points_cost, 0, ',', '.') }}</span>
+                            <span class="text-[9px] font-bold text-blue-200">{{ $coinName }}</span>
+                        </div>
+
                         @if((int) $item->stock === 0)
-                            <div class="absolute top-2 right-2 rounded-md bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider shadow">Esgotado</div>
+                            <div class="absolute top-3 right-3 rounded-lg bg-red-600/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-black text-white uppercase tracking-wider shadow-lg">Esgotado</div>
                         @elseif((int) $item->stock > 0 && (int) $item->stock <= 5)
-                            <div class="absolute top-2 right-2 rounded-md bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider shadow">Ultimas {{ $item->stock }}</div>
+                            <div class="absolute top-3 right-3 rounded-lg bg-amber-500/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-black text-white uppercase tracking-wider shadow-lg">Ultimas {{ $item->stock }}</div>
                         @endif
                     </div>
 
                     {{-- Body --}}
-                    <div class="flex flex-1 flex-col p-4">
-                        <div class="mb-2 flex items-center justify-between gap-2">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    <div class="flex flex-1 flex-col p-5">
+                        <div class="mb-3 flex items-center justify-between gap-2">
+                            <span class="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-700/50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                                 {{ $item->item_type_label }}
                             </span>
                             @if($item->reference_value !== null)
-                                <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                                <span class="text-sm font-black text-emerald-600 dark:text-emerald-400">
                                     R$ {{ number_format((float) $item->reference_value, 2, ',', '.') }}
                                 </span>
                             @endif
                         </div>
 
-                        <h3 class="text-base font-black text-slate-900 dark:text-white leading-snug line-clamp-2 mb-2" title="{{ $item->name }}">
+                        <h3 class="text-lg font-black text-slate-900 dark:text-white leading-snug line-clamp-2 mb-2" title="{{ $item->name }}">
                             {{ $item->name }}
                         </h3>
 
-                        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-3 flex-1">
-                            {{ \Illuminate\Support\Str::limit(strip_tags((string) $item->description), 90) }}
+                        <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 mb-4 flex-1 leading-relaxed">
+                            {{ \Illuminate\Support\Str::limit(strip_tags((string) $item->description), 120) }}
                         </p>
 
-                        <div class="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 mb-3">
-                            <span class="inline-flex items-center gap-1" title="Fornecedor">
-                                <i class="fas fa-store-alt text-[10px]"></i>
-                                {{ \Illuminate\Support\Str::limit($item->provider_label, 20) }}
+                        <div class="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mb-4">
+                            <span class="inline-flex items-center gap-1.5" title="Fornecedor">
+                                <i class="fas fa-store-alt text-[10px] text-slate-400"></i>
+                                <span class="font-semibold">{{ \Illuminate\Support\Str::limit($item->provider_label, 22) }}</span>
                             </span>
-                            <span class="inline-flex items-center gap-1" title="Prazo de entrega">
-                                <i class="fas fa-clock text-[10px]"></i>
-                                {{ (int) ($item->delivery_lead_days ?? 7) }}d
+                            <span class="inline-flex items-center gap-1.5" title="Prazo de entrega">
+                                <i class="fas fa-clock text-[10px] text-slate-400"></i>
+                                <span class="font-semibold">{{ (int) ($item->delivery_lead_days ?? 7) }} dias</span>
                             </span>
                         </div>
 
-                        <div class="flex items-center justify-between gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                            <div class="min-w-0">
-                                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Custa</div>
-                                <div class="font-black text-blue-600 dark:text-blue-400 text-sm leading-tight">
-                                    {{ number_format((int) $item->points_cost, 0, ',', '.') }}
-                                    <span class="text-[10px] font-bold opacity-75">{{ $coinName }}</span>
-                                </div>
-                            </div>
-
-                            <form action="{{ route('panel.redemptions.redeem', $item) }}" method="POST" class="redeem-form">
-                                @csrf
-                                <button type="button"
-                                    class="btn-redeem inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-black transition-all
-                                        {{ $available
-                                            ? 'bg-blue-600 text-white shadow hover:bg-blue-700 active:scale-95'
-                                            : 'cursor-not-allowed bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600' }}"
-                                    {{ !$available ? 'disabled' : '' }}
-                                    data-name="{{ $item->name }}"
-                                    data-cost="{{ (int) $item->points_cost }}"
-                                    data-coin="{{ $coinName }}">
-                                    @if(!$hasStock)
-                                        <i class="fas fa-ban text-[10px]"></i> Indisponivel
-                                    @elseif(!$canAfford)
-                                        <i class="fas fa-lock text-[10px]"></i> Sem saldo
-                                    @else
-                                        <i class="fas fa-exchange-alt text-[10px]"></i> Resgatar
-                                    @endif
-                                </button>
-                            </form>
-                        </div>
+                        {{-- Botao --}}
+                        <form action="{{ route('panel.redemptions.redeem', $item) }}" method="POST" class="redeem-form mt-auto">
+                            @csrf
+                            <button type="button"
+                                class="btn-redeem w-full inline-flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-black transition-all
+                                    {{ $available
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700 hover:shadow-blue-500/30 active:scale-[0.98]'
+                                        : 'cursor-not-allowed bg-slate-100 dark:bg-slate-700/50 text-slate-400 dark:text-slate-500' }}"
+                                {{ !$available ? 'disabled' : '' }}
+                                data-name="{{ $item->name }}"
+                                data-cost="{{ (int) $item->points_cost }}"
+                                data-coin="{{ $coinName }}">
+                                @if(!$hasStock)
+                                    <i class="fas fa-ban text-xs"></i> Indisponivel
+                                @elseif(!$canAfford)
+                                    <i class="fas fa-lock text-xs"></i> Sem saldo
+                                @else
+                                    <i class="fas fa-exchange-alt text-xs"></i> Resgatar agora
+                                @endif
+                            </button>
+                        </form>
                     </div>
                 </div>
             @empty
