@@ -22,25 +22,32 @@
 @endphp
 
 @section('panel_content')
-    <div class="space-y-8">
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-                <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-                    Meus Resgates
-                </h1>
-                <p class="mt-1 font-medium text-slate-500 dark:text-slate-400">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    {{-- HERO --}}
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 p-6 md:p-8 text-white shadow-xl">
+        <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-blue-500/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none"></div>
+
+        <div class="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex-1 min-w-0">
+                <div class="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-white/75 mb-2">
+                    <i class="fas fa-history"></i> Historico
+                </div>
+                <h1 class="text-2xl md:text-3xl font-black mb-1">Meus Resgates</h1>
+                <p class="text-sm text-white/85 max-w-2xl">
                     Acompanhe aprovacao, envio, prazo e responsavel pela entrega dos seus resgates em {{ $coinName }}.
                 </p>
             </div>
 
             <a href="{{ route('panel.redemptions.shop') }}"
-                class="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-6 py-3 font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700">
-                <i class="fas fa-store"></i>
-                Voltar para a Loja
+                class="inline-flex items-center gap-2 rounded-full bg-white text-slate-900 px-5 py-2.5 text-sm font-black shadow-lg hover:bg-slate-100 transition-all">
+                <i class="fas fa-store"></i> Voltar para a Loja
             </a>
         </div>
+    </div>
 
-        <div class="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[1180px] text-left">
                     <thead>

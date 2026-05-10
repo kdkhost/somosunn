@@ -25,7 +25,8 @@ class RedemptionItemController extends Controller
         $items = RedeemableItem::query()
             ->where('is_active', true)
             ->latest()
-            ->paginate(12);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('panel.redemptions.shop', [
             'items' => $items,
@@ -38,7 +39,8 @@ class RedemptionItemController extends Controller
         $redemptions = Redemption::with(['item', 'providerUser'])
             ->where('user_id', Auth::id())
             ->latest()
-            ->paginate(12);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('panel.redemptions.history', [
             'redemptions' => $redemptions,
