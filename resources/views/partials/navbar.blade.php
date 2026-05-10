@@ -282,71 +282,113 @@
                             <div
                                 class="rounded-2xl bg-white shadow-2xl border border-slate-100 min-w-[280px] py-3 overflow-hidden">
                                 <div class="px-5 py-2 border-b border-slate-50 mb-2">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membro UNN</p>
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                        {{ $currentUser?->role === 'superadmin' ? 'SUPERADMIN' : 'MEMBRO UNN' }}
+                                    </p>
                                     <p class="text-sm font-bold text-gray-800 truncate">{{ $currentUser?->name }}</p>
                                 </div>
 
-                                <a href="{{ route('panel.dashboard') }}"
-                                    class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                    <i class="fas fa-th-large w-5 opacity-70"></i>
-                                    Painel do membro
-                                </a>
-
-                                <a href="{{ route('panel.profile.edit') }}"
-                                    class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                    <i class="fas fa-user-circle w-5 opacity-70"></i>
-                                    Meu perfil
-                                </a>
-
-                                <a href="{{ route('portal') }}"
-                                    class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                    <i class="fas fa-home w-5 opacity-70"></i>
-                                    Portal
-                                </a>
-
-                                <a href="{{ route('marketplace.index') }}"
-                                    class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                    <i class="fas fa-store w-5 opacity-70"></i>
-                                    Marketplace
-                                </a>
-
-                                @if($currentUser && method_exists($currentUser, 'canSellOnMarketplace') && $currentUser->canSellOnMarketplace())
-                                    <a href="{{ route('panel.marketplace.payments') }}"
+                                @if($currentUser?->role === 'superadmin')
+                                    {{-- Menu do Superadmin: vai para o painel legado /admin --}}
+                                    <a href="{{ url('/admin') }}"
                                         class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                        <i class="fas fa-credit-card w-5 opacity-70"></i>
-                                        Configurar pagamentos
+                                        <i class="fas fa-shield-alt w-5 opacity-70"></i>
+                                        Painel Administrativo
                                     </a>
 
-                                    <a href="{{ route('panel.marketplace.sales') }}"
+                                    <a href="{{ url('/admin/users') }}"
                                         class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                        <i class="fas fa-receipt w-5 opacity-70"></i>
-                                        Minhas vendas
+                                        <i class="fas fa-users-cog w-5 opacity-70"></i>
+                                        Usuarios
                                     </a>
-                                @endif
 
-                                @if($currentUser && method_exists($currentUser, 'isAdmin') && $currentUser->isAdmin())
-                                    <div class="mt-2 pt-2 border-t border-slate-50">
-                                        <p class="px-5 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                            Administracao</p>
+                                    <a href="{{ url('/admin/settings') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-cogs w-5 opacity-70"></i>
+                                        Configuracoes
+                                    </a>
 
-                                        <a href="{{ route('panel.admin.dashboard') }}"
+                                    <a href="{{ url('/admin/orders') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-shopping-cart w-5 opacity-70"></i>
+                                        Pedidos
+                                    </a>
+
+                                    <a href="{{ url('/admin/splits') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-money-bill-wave w-5 opacity-70"></i>
+                                        Splits
+                                    </a>
+
+                                    <a href="{{ route('marketplace.index') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-store w-5 opacity-70"></i>
+                                        Marketplace
+                                    </a>
+                                @else
+                                    {{-- Menu de membros/admins: vai para o painel novo /painel --}}
+                                    <a href="{{ route('panel.dashboard') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-th-large w-5 opacity-70"></i>
+                                        Painel do membro
+                                    </a>
+
+                                    <a href="{{ route('panel.profile.edit') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-user-circle w-5 opacity-70"></i>
+                                        Meu perfil
+                                    </a>
+
+                                    <a href="{{ route('portal') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-home w-5 opacity-70"></i>
+                                        Portal
+                                    </a>
+
+                                    <a href="{{ route('marketplace.index') }}"
+                                        class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                        <i class="fas fa-store w-5 opacity-70"></i>
+                                        Marketplace
+                                    </a>
+
+                                    @if($currentUser && method_exists($currentUser, 'canSellOnMarketplace') && $currentUser->canSellOnMarketplace())
+                                        <a href="{{ route('panel.marketplace.payments') }}"
                                             class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                            <i class="fas fa-shield-alt w-5 opacity-70"></i>
-                                            Painel administrativo
+                                            <i class="fas fa-credit-card w-5 opacity-70"></i>
+                                            Configurar pagamentos
                                         </a>
 
-                                        <a href="{{ route('panel.admin.users.index') }}"
+                                        <a href="{{ route('panel.marketplace.sales') }}"
                                             class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                            <i class="fas fa-users-cog w-5 opacity-70"></i>
-                                            Usuarios
+                                            <i class="fas fa-receipt w-5 opacity-70"></i>
+                                            Minhas vendas
                                         </a>
+                                    @endif
 
-                                        <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
-                                            class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
-                                            <i class="fas fa-cogs w-5 opacity-70"></i>
-                                            Configuracoes
-                                        </a>
-                                    </div>
+                                    @if($currentUser && method_exists($currentUser, 'isAdmin') && $currentUser->isAdmin())
+                                        <div class="mt-2 pt-2 border-t border-slate-50">
+                                            <p class="px-5 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                Administracao</p>
+
+                                            <a href="{{ route('panel.admin.dashboard') }}"
+                                                class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                                <i class="fas fa-shield-alt w-5 opacity-70"></i>
+                                                Painel administrativo
+                                            </a>
+
+                                            <a href="{{ route('panel.admin.users.index') }}"
+                                                class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                                <i class="fas fa-users-cog w-5 opacity-70"></i>
+                                                Usuarios
+                                            </a>
+
+                                            <a href="{{ route('panel.admin.settings', ['group' => 'general']) }}"
+                                                class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-[#1F5EDB] transition-all">
+                                                <i class="fas fa-cogs w-5 opacity-70"></i>
+                                                Configuracoes
+                                            </a>
+                                        </div>
+                                    @endif
                                 @endif
 
                                 <div class="mt-2 pt-2 border-t border-slate-50">
@@ -394,7 +436,9 @@
 
         @if($isLogged)
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-100">
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Membro UNN</p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+                    {{ $currentUser?->role === 'superadmin' ? 'SUPERADMIN' : 'MEMBRO UNN' }}
+                </p>
                 <p class="font-bold text-gray-800 truncate">{{ $currentUser?->name }}</p>
             </div>
         @endif
@@ -442,20 +486,40 @@
             @if($isLogged)
                 <div class="border-t border-slate-100 my-2"></div>
 
-                @php($isPanelActive = request()->is('painel*'))
-                <a href="{{ route('panel.dashboard') }}"
-                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold {{ request()->routeIs('panel.dashboard') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-700 hover:bg-slate-100' }} transition-all">
-                    <i class="fas fa-th-large w-4 {{ request()->routeIs('panel.dashboard') ? 'text-white' : 'opacity-70' }}"></i> Painel
-                </a>
+                @if($currentUser?->role === 'superadmin')
+                    {{-- Superadmin: links para painel legado /admin --}}
+                    <a href="{{ url('/admin') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition-all">
+                        <i class="fas fa-shield-alt w-4 opacity-70"></i> Painel Administrativo
+                    </a>
+                    <a href="{{ url('/admin/users') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition-all">
+                        <i class="fas fa-users-cog w-4 opacity-70"></i> Usuarios
+                    </a>
+                    <a href="{{ url('/admin/settings') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition-all">
+                        <i class="fas fa-cogs w-4 opacity-70"></i> Configuracoes
+                    </a>
+                    <a href="{{ route('marketplace.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-slate-100 transition-all">
+                        <i class="fas fa-store w-4 opacity-70"></i> Marketplace
+                    </a>
+                @else
+                    {{-- Membros/Admins: links para painel novo /painel --}}
+                    @php($isPanelActive = request()->is('painel*'))
+                    <a href="{{ route('panel.dashboard') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold {{ request()->routeIs('panel.dashboard') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-700 hover:bg-slate-100' }} transition-all">
+                        <i class="fas fa-th-large w-4 {{ request()->routeIs('panel.dashboard') ? 'text-white' : 'opacity-70' }}"></i> Painel
+                    </a>
 
-                <a href="{{ route('panel.profile.edit') }}"
-                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold {{ request()->routeIs('panel.profile.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-700 hover:bg-slate-100' }} transition-all">
-                    <i class="fas fa-user-circle w-4 {{ request()->routeIs('panel.profile.*') ? 'text-white' : 'opacity-70' }}"></i> Meu perfil
-                </a>
+                    <a href="{{ route('panel.profile.edit') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold {{ request()->routeIs('panel.profile.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-700 hover:bg-slate-100' }} transition-all">
+                        <i class="fas fa-user-circle w-4 {{ request()->routeIs('panel.profile.*') ? 'text-white' : 'opacity-70' }}"></i> Meu perfil
+                    </a>
 
-                <a href="{{ route('marketplace.index') }}"
-                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold {{ request()->routeIs('marketplace.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-700 hover:bg-slate-100' }} transition-all">
-                    <i class="fas fa-store w-4 {{ request()->routeIs('marketplace.*') ? 'text-white' : 'opacity-70' }}"></i> Marketplace
+                    <a href="{{ route('marketplace.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold {{ request()->routeIs('marketplace.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-700 hover:bg-slate-100' }} transition-all">
+                        <i class="fas fa-store w-4 {{ request()->routeIs('marketplace.*') ? 'text-white' : 'opacity-70' }}"></i> Marketplace
                 </a>
 
                 @if($currentUser && method_exists($currentUser, 'isAdmin') && $currentUser->isAdmin())
@@ -469,6 +533,7 @@
                         <i class="fas fa-sliders-h w-4 opacity-70"></i> Configuracoes
                     </a>
                 @endif
+                @endif {{-- end superadmin/member check --}}
             @endif
         </nav>
 
