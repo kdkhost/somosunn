@@ -339,8 +339,7 @@
                                                 ['provider' => 'mercadopago', 'label' => 'Mercado Pago', 'icon' => 'fas fa-handshake', 'color' => 'blue'],
                                                 ['provider' => 'sumup', 'label' => 'SumUp', 'icon' => 'fas fa-credit-card', 'color' => 'slate'],
                                             ];
-                                        @endphp
-                                        @foreach($gwList as $gw)
+                                        @endphp                                        @foreach($gwList as $gw)
                                             @php
                                                 $gwProvider = $gw['provider'];
                                                 $gwMethods = [];
@@ -378,7 +377,7 @@
                                 <input type="hidden" name="gateway_provider" value="{{ $singleGateway }}">
                             @endif
 
-                            <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div class="grid grid-cols-2 gap-4 mb-8 {{ $singleGateway === 'sumup' ? 'hidden' : '' }}">
                                 <label class="cursor-pointer" id="label-credit-card">
                                     <input type="radio" name="payment_method_radio" value="credit_card"
                                         id="radio-credit-card" class="peer sr-only" checked>
@@ -400,7 +399,7 @@
                             </div>
 
                             <!-- Formulário Cartão (MercadoPago) -->
-                            <div id="creditCardForm" class="space-y-6" data-gateway="mercadopago">
+                            <div id="creditCardForm" class="space-y-6 {{ $singleGateway === 'sumup' ? 'hidden' : '' }}" data-gateway="mercadopago">
                                 <!-- SDK MercadoPago será injetado aqui -->
                                 <div id="cardPaymentBrick_container"></div>
 

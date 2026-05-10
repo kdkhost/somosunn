@@ -45,6 +45,18 @@ class GatewayAccount extends Model
      */
     public static function resolveForSeller(int $sellerId): array
     {
+        // Respeita o toggle global do admin: se MP foi desativado em Settings,
+        // nenhuma credencial (do vendedor ou global) pode ativa-lo.
+        $mpToggle = (int) Setting::get('mercadopago_enabled', 0) === 1;
+        if (!$mpToggle) {
+            return [
+                'mpEnabled'           => false,
+                'mpPublicKey'         => '',
+                'useGlobalCredentials' => true,
+                'source'              => 'disabled',
+            ];
+        }
+
         if ($sellerId > 0) {
             $account = self::query()
                 ->where('user_id', $sellerId)
@@ -74,6 +86,17 @@ class GatewayAccount extends Model
      */
     public static function resolveForSellerSumUp(int $sellerId): array
     {
+        // Respeita o toggle global do admin
+        $sumupToggle = (int) Setting::get('sumup_enabled', 0) === 1;
+        if (!$sumupToggle) {
+            return [
+                'sumupEnabled' => false,
+                'apiKey'       => '',
+                'merchantCode' => '',
+                'source'       => 'disabled',
+            ];
+        }
+
         if ($sellerId > 0) {
             $account = self::query()
                 ->where('user_id', $sellerId)
@@ -159,18 +182,21 @@ class GatewayAccount extends Model
 
     private static function resolveGlobalSettings(): array
     {
+        // Respeita o toggle global - se desativado, nao retorna como habilitado
+        $mpToggle = (int) Setting::get('mercadopago_enabled', 0) === 1;
+
         $mpEnv    = (string) Setting::get('mercadopago_env', 'sandbox');
         $mpPrefix = $mpEnv === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
 
         $mpPublicKey = trim((string) (Setting::get($mpPrefix . 'public_key') ?: Setting::get('mercadopago_public_key', '')));
         $mpToken     = trim((string) (Setting::get($mpPrefix . 'access_token') ?: Setting::get('mercadopago_access_token', '')));
-        $mpEnabled   = $mpPublicKey !== '' && $mpToken !== '';
+        $mpEnabled   = $mpToggle && $mpPublicKey !== '' && $mpToken !== '';
 
         return [
             'mpEnabled'           => $mpEnabled,
             'mpPublicKey'         => $mpEnabled ? $mpPublicKey : '',
             'useGlobalCredentials' => true,
-            'source'              => 'global',
+            'source'              => $mpToggle ? 'global' : 'disabled',
         ];
     }
 

@@ -112,6 +112,43 @@ class SubscriptionController extends Controller
         $effectivePrice = $plan->getPriceForPeriod($period);
         $isPaidPlan = $effectivePrice > 0;
 
+        // Determina o gateway efetivo ja considerando o que o admin habilitou.
+        // Se MP estiver desativado, muda o default para SumUp e vice-versa.
+        $mpEnabledAdmin    = (int) \App\Models\Setting::get('mercadopago_enabled', 1) === 1;
+        $sumupEnabledAdmin = (int) \App\Models\Setting::get('sumup_enabled', 0) === 1;
+
+        $requestedGateway = $request->input('gateway_provider');
+        if (!in_array($requestedGateway, ['mercadopago', 'sumup'], true)) {
+            $requestedGateway = null;
+        }
+
+        // Se o gateway requisitado esta desativado, usa o outro disponivel
+        if ($requestedGateway === 'mercadopago' && !$mpEnabledAdmin) {
+            $requestedGateway = $sumupEnabledAdmin ? 'sumup' : null;
+        } elseif ($requestedGateway === 'sumup' && !$sumupEnabledAdmin) {
+            $requestedGateway = $mpEnabledAdmin ? 'mercadopago' : null;
+        }
+
+        // Fallback quando nao houver seletor (so 1 gateway ativo)
+        if ($requestedGateway === null) {
+            if ($mpEnabledAdmin) {
+                $requestedGateway = 'mercadopago';
+            } elseif ($sumupEnabledAdmin) {
+                $requestedGateway = 'sumup';
+            } else {
+                return back()->with('error', 'Nenhum gateway de pagamento esta ativo. Contate o administrador.');
+            }
+        }
+
+        // Sincroniza o gateway_provider resolvido com o request para o restante do metodo.
+        $request->merge(['gateway_provider' => $requestedGateway]);
+
+        // Sumup processa o cartao dentro do widget (iframe) e nao envia estes campos.
+        // Por isso os campos abaixo so sao obrigatorios se o gateway resolvido for MercadoPago.
+        $requireMpCard = $isPaidPlan
+            && $requestedGateway === 'mercadopago'
+            && $request->input('payment_method') === 'credit_card';
+
         $request->validate([
             'payment_method' => $isPaidPlan ? 'required|in:credit_card,pix' : 'nullable',
             'gateway_provider' => 'nullable|string|in:mercadopago,sumup',
@@ -120,10 +157,10 @@ class SubscriptionController extends Controller
             'email' => Auth::check() ? 'nullable' : 'required|email|unique:users,email',
             'cpf' => (Auth::check() && Auth::user()?->doc) ? 'nullable|string' : 'required|string',
             'password' => Auth::check() ? 'nullable' : 'required|min:8|confirmed',
-            'token' => $isPaidPlan ? 'required_if:payment_method,credit_card' : 'nullable',
-            'installments' => $isPaidPlan ? 'required_if:payment_method,credit_card' : 'nullable',
-            'payment_method_id' => $isPaidPlan ? 'required_if:payment_method,credit_card' : 'nullable',
-            'issuer_id' => $isPaidPlan ? 'required_if:payment_method,credit_card' : 'nullable',
+            'token' => $requireMpCard ? 'required' : 'nullable',
+            'installments' => $requireMpCard ? 'required' : 'nullable',
+            'payment_method_id' => $requireMpCard ? 'required' : 'nullable',
+            'issuer_id' => $requireMpCard ? 'required' : 'nullable',
         ]);
 
         DB::beginTransaction();
