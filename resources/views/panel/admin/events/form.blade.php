@@ -394,7 +394,7 @@
                                 <input type="checkbox" id="panelOutOfState" name="event_out_of_state" value="1"
                                     {{ old('event_out_of_state', $event->event_out_of_state ?? false) ? 'checked' : '' }}
                                     class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
-                                <span><i class="fas fa-plane-departure mr-1"></i>Evento fora do meu estado</span>
+                                <span><i class="fas fa-plane-departure mr-1"></i>Evento fora do raio de 70km da minha localidade</span>
                             </label>
                         </div>
                         <p class="mt-2 text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
@@ -949,7 +949,32 @@
 
             var userState = @json(auth()->user()->state ?? '');
             var userCity = @json(auth()->user()->city ?? '');
+            var userCep = @json(auth()->user()->cep ?? '');
             var locationIqKey = @json(\App\Models\Setting::get('locationiq_api_key', ''));
+            var RADIUS_KM = 70;
+            var userLat = null;
+            var userLon = null;
+
+            // Geocodificar endereco do usuario logado para calcular distancias
+            (function() {
+                var geoQuery = [userCity, userState, 'Brasil'].filter(Boolean).join(', ');
+                if (!geoQuery || geoQuery === 'Brasil') return;
+                if (locationIqKey) {
+                    fetch('https://us1.locationiq.com/v1/search?key=' + locationIqKey + '&q=' + encodeURIComponent(geoQuery) + '&countrycodes=br&format=json&limit=1')
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (data && data[0]) { userLat = parseFloat(data[0].lat); userLon = parseFloat(data[0].lon); }
+                        }).catch(function() {});
+                }
+            })();
+
+            function haversineKm(lat1, lon1, lat2, lon2) {
+                var R = 6371;
+                var dLat = (lat2 - lat1) * Math.PI / 180;
+                var dLon = (lon2 - lon1) * Math.PI / 180;
+                var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+                return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            }
 
             function searchVenue() {
                 var text = locationInput.value.trim();
@@ -962,7 +987,7 @@
 
                 // 1. LocationIQ (melhor cobertura)
                 if (locationIqKey) {
-                    var liqUrl = 'https://us1.locationiq.com/v1/search?key=' + locationIqKey + '&q=' + encodeURIComponent(text) + '&countrycodes=br&format=json&limit=20&addressdetails=1&dedupe=1';
+                    var liqUrl = 'https://us1.locationiq.com/v1/search?key=' + locationIqKey + '&q=' + encodeURIComponent(text) + '&countrycodes=br&format=json&limit=30&addressdetails=1&dedupe=1';
                     promises.push(fetch(liqUrl).then(function(r) { return r.json(); }).then(function(data) {
                         if (data.error) return [];
                         return (data || []).map(function(item) {
@@ -973,14 +998,13 @@
                             var neighbourhood = addr.suburb || addr.neighbourhood || '';
                             var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
                             var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.shop || '').trim();
-                            var isLocal = userState && state.toLowerCase().indexOf(userState.toLowerCase()) !== -1;
-                            return { lat: item.lat, lon: item.lon, name: shortName || item.display_name.split(',')[0], address: fullAddress || item.display_name, isLocal: isLocal };
+                            return { lat: parseFloat(item.lat), lon: parseFloat(item.lon), name: shortName || item.display_name.split(',')[0], address: fullAddress || item.display_name };
                         });
                     }).catch(function() { return []; }));
                 }
 
                 // 2. Overpass (OSM direto)
-                var overpassQuery = '[out:json][timeout:10];(node["name"~"' + text.replace(/"/g, '') + '",i]["amenity"](area:3600059470);node["name"~"' + text.replace(/"/g, '') + '",i]["shop"](area:3600059470););out body 20;';
+                var overpassQuery = '[out:json][timeout:10];(node["name"~"' + text.replace(/"/g, '') + '",i]["amenity"](area:3600059470);node["name"~"' + text.replace(/"/g, '') + '",i]["shop"](area:3600059470););out body 30;';
                 promises.push(fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(overpassQuery)).then(function(r) { return r.json(); }).then(function(data) {
                     return (data.elements || []).filter(function(el) { return el.lat && el.lon; }).map(function(el) {
                         var tags = el.tags || {};
@@ -988,18 +1012,36 @@
                         var road = tags['addr:street'] || ''; var number = tags['addr:housenumber'] || '';
                         var neighbourhood = tags['addr:suburb'] || '';
                         var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
-                        var isLocal = userState && (state.toLowerCase().indexOf(userState.toLowerCase()) !== -1 || city.toLowerCase().indexOf(userCity.toLowerCase()) !== -1);
-                        return { lat: el.lat, lon: el.lon, name: tags.name || text, address: fullAddress || 'Sem endereco detalhado', isLocal: isLocal };
+                        return { lat: parseFloat(el.lat), lon: parseFloat(el.lon), name: tags.name || text, address: fullAddress || 'Sem endereco detalhado' };
                     });
                 }).catch(function() { return []; }));
 
                 Promise.all(promises).then(function(results) {
                     var seen = {}; var combined = [];
                     results.forEach(function(items) { (items || []).forEach(function(item) {
-                        var key = parseFloat(item.lat).toFixed(4) + ',' + parseFloat(item.lon).toFixed(4);
-                        if (!seen[key]) { seen[key] = true; combined.push(item); }
+                        var key = item.lat.toFixed(4) + ',' + item.lon.toFixed(4);
+                        if (!seen[key]) {
+                            seen[key] = true;
+                            // Calcular distancia do usuario
+                            if (userLat !== null && userLon !== null) {
+                                item.distance = haversineKm(userLat, userLon, item.lat, item.lon);
+                                item.isNearby = item.distance <= RADIUS_KM;
+                            } else {
+                                item.distance = null;
+                                item.isNearby = false;
+                            }
+                            combined.push(item);
+                        }
                     }); });
-                    combined.sort(function(a, b) { return (a.isLocal ? 0 : 1) - (b.isLocal ? 0 : 1); });
+
+                    // Ordenar: proximos primeiro, depois por distancia
+                    combined.sort(function(a, b) {
+                        if (a.isNearby && !b.isNearby) return -1;
+                        if (!a.isNearby && b.isNearby) return 1;
+                        if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
+                        return 0;
+                    });
+
                     renderResults(combined);
                 });
             }
@@ -1012,23 +1054,33 @@
 
                 var items = data.slice(0, 20);
                 var totalFound = data.length;
+                var nearbyCount = items.filter(function(i) { return i.isNearby; }).length;
 
-                var html = '<div class="px-4 py-2 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-500">'
-                    + '<i class="fas fa-list mr-1"></i> ' + Math.min(totalFound, 20) + ' de ' + totalFound + ' resultados'
-                    + (totalFound > 20 ? ' (refine sua busca)' : '')
+                var html = '<div class="px-4 py-2 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-500 flex items-center justify-between">'
+                    + '<span><i class="fas fa-list mr-1"></i>' + Math.min(totalFound, 20) + ' resultados</span>'
+                    + (nearbyCount > 0 ? '<span class="text-emerald-600"><i class="fas fa-map-pin mr-1"></i>' + nearbyCount + ' dentro de ' + RADIUS_KM + 'km</span>' : '')
                     + '</div>';
 
                 items.forEach(function(item, idx) {
+                    var distLabel = '';
+                    if (item.distance !== null) {
+                        distLabel = item.distance < 1 ? '< 1 km' : Math.round(item.distance) + ' km';
+                    }
+
                     html += '<button type="button" class="venue-item w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-slate-800 last:border-0 transition-colors" '
                         + 'data-lat="' + item.lat + '" data-lon="' + item.lon + '" '
                         + 'data-name="' + item.name.replace(/"/g, '&quot;') + '" '
-                        + 'data-address="' + item.address.replace(/"/g, '&quot;') + '">'
+                        + 'data-address="' + item.address.replace(/"/g, '&quot;') + '" '
+                        + 'data-nearby="' + (item.isNearby ? '1' : '0') + '">'
                         + '<div class="flex items-start gap-2">'
-                        + '<span class="mt-0.5 text-xs font-black ' + (item.isLocal ? 'text-emerald-500' : 'text-slate-400') + '">' + (idx + 1) + '.</span>'
+                        + '<span class="mt-0.5 text-xs font-black ' + (item.isNearby ? 'text-emerald-500' : 'text-slate-400') + '">' + (idx + 1) + '.</span>'
                         + '<div class="flex-1 min-w-0">'
                         + '<p class="text-sm font-bold text-slate-900 dark:text-white truncate">' + item.name + '</p>'
                         + '<p class="text-xs text-slate-500 dark:text-slate-400 truncate">' + item.address + '</p>'
-                        + (item.isLocal ? '<span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold"><i class="fas fa-check text-[8px]"></i>Proximo</span>' : '')
+                        + '<div class="flex items-center gap-2 mt-1">'
+                        + (distLabel ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ' + (item.isNearby ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300') + '"><i class="fas fa-route text-[8px]"></i>' + distLabel + '</span>' : '')
+                        + (item.isNearby ? '<span class="text-[10px] font-bold text-emerald-600">Proximo</span>' : '<span class="text-[10px] font-bold text-amber-600">Fora do raio</span>')
+                        + '</div>'
                         + '</div></div></button>';
                 });
 
@@ -1041,11 +1093,19 @@
                         if (latInput) latInput.value = this.dataset.lat;
                         if (lngInput) lngInput.value = this.dataset.lon;
                         venueResults.classList.add('hidden');
+
+                        // Auto-marcar "fora do estado" se o local esta fora do raio
+                        var isNearby = this.dataset.nearby === '1';
+                        if (!isNearby && outOfStateCheck) {
+                            outOfStateCheck.checked = true;
+                        } else if (isNearby && outOfStateCheck) {
+                            outOfStateCheck.checked = false;
+                        }
+
                         if (typeof toastr !== 'undefined') toastr.success('Local selecionado: ' + this.dataset.name);
                     });
                 });
             }
-
             searchBtn.addEventListener('click', searchVenue);
             locationInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); searchVenue(); } });
             document.addEventListener('click', function(e) {
