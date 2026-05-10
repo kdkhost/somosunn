@@ -77,6 +77,11 @@
                             <i class="fas fa-user-plus text-[10px]"></i> Conectar
                         </button>
                     @endif
+
+                    <button onclick="blockUser({{ $member->id }})"
+                        class="w-full text-[10px] text-gray-400 hover:text-red-500 py-1 transition flex items-center justify-center gap-1">
+                        <i class="fas fa-ban text-[8px]"></i> Bloquear
+                    </button>
                 @elseif(!auth()->check())
                     <a href="{{ route('login') }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-xs text-center transition">
                         Conectar

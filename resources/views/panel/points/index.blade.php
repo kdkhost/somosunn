@@ -126,12 +126,15 @@
                             </div>
                         </div>
                     @empty
-                        <div class="flex flex-col items-center justify-center px-8 py-20 text-center">
-                            <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-                                <i class="fas fa-star text-2xl text-slate-300 dark:text-slate-600"></i>
+                        <div class="flex flex-col items-center justify-center px-6 py-12 text-center">
+                            <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                                <i class="fas fa-star text-xl text-slate-300 dark:text-slate-600"></i>
                             </div>
-                            <p class="font-bold text-slate-500 dark:text-slate-400">Nenhum {{ $coinName }} registrado ainda</p>
-                            <p class="mt-1 max-w-xs text-sm text-slate-400">Realize acoes na plataforma para comecar a acumular {{ $coinName }}.</p>
+                            <p class="font-bold text-sm text-slate-500 dark:text-slate-400">Nenhum {{ $coinName }} registrado ainda</p>
+                            <p class="mt-1 max-w-xs text-xs text-slate-400">Realize acoes na plataforma para comecar a acumular.</p>
+                            <a href="{{ route('panel.dashboard') }}" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2 text-xs font-bold text-white transition">
+                                <i class="fas fa-bolt"></i> Ver como ganhar
+                            </a>
                         </div>
                     @endforelse
 
