@@ -600,16 +600,55 @@ class WatermarkService
             return;
         }
 
-        $cut = imagecreatetruecolor($sourceWidth, $sourceHeight);
-        imagealphablending($cut, false);
-        imagesavealpha($cut, true);
-        $transparent = imagecolorallocatealpha($cut, 0, 0, 0, 127);
-        imagefilledrectangle($cut, 0, 0, $sourceWidth, $sourceHeight, $transparent);
+        // Abordagem pixel-a-pixel que preserva a transparencia do logo PNG.
+        // Para cada pixel do logo, aplica a opacidade desejada sobre o pixel de destino
+        // SEM converter transparencia em cor escura.
+        $opacityFactor = $opacityPercent / 100;
 
-        imagecopy($cut, $destinationImage, 0, 0, $destinationX, $destinationY, $sourceWidth, $sourceHeight);
-        imagecopy($cut, $sourceImage, 0, 0, $sourceX, $sourceY, $sourceWidth, $sourceHeight);
-        imagecopymerge($destinationImage, $cut, $destinationX, $destinationY, 0, 0, $sourceWidth, $sourceHeight, $opacityPercent);
-        imagedestroy($cut);
+        for ($x = 0; $x < $sourceWidth; $x++) {
+            for ($y = 0; $y < $sourceHeight; $y++) {
+                $srcColor = imagecolorat($sourceImage, $sourceX + $x, $sourceY + $y);
+                $srcAlpha = ($srcColor >> 24) & 0x7F; // 0 = opaco, 127 = totalmente transparente
+
+                // Se o pixel do logo e totalmente transparente, pula (nao desenha nada)
+                if ($srcAlpha >= 127) {
+                    continue;
+                }
+
+                $srcR = ($srcColor >> 16) & 0xFF;
+                $srcG = ($srcColor >> 8) & 0xFF;
+                $srcB = $srcColor & 0xFF;
+
+                // Calcula a opacidade efetiva do pixel: alpha original do logo * opacidade configurada
+                // srcAlpha 0 = opaco no GD, queremos converter para fator 0-1 onde 1 = opaco
+                $srcOpacity = (1 - ($srcAlpha / 127)) * $opacityFactor;
+
+                if ($srcOpacity <= 0.01) {
+                    continue;
+                }
+
+                $destX = $destinationX + $x;
+                $destY = $destinationY + $y;
+
+                // Verificar limites
+                if ($destX < 0 || $destY < 0 || $destX >= imagesx($destinationImage) || $destY >= imagesy($destinationImage)) {
+                    continue;
+                }
+
+                $dstColor = imagecolorat($destinationImage, $destX, $destY);
+                $dstR = ($dstColor >> 16) & 0xFF;
+                $dstG = ($dstColor >> 8) & 0xFF;
+                $dstB = $dstColor & 0xFF;
+
+                // Blend: resultado = src * srcOpacity + dst * (1 - srcOpacity)
+                $finalR = (int) round($srcR * $srcOpacity + $dstR * (1 - $srcOpacity));
+                $finalG = (int) round($srcG * $srcOpacity + $dstG * (1 - $srcOpacity));
+                $finalB = (int) round($srcB * $srcOpacity + $dstB * (1 - $srcOpacity));
+
+                $finalColor = imagecolorallocate($destinationImage, min(255, $finalR), min(255, $finalG), min(255, $finalB));
+                imagesetpixel($destinationImage, $destX, $destY, $finalColor);
+            }
+        }
     }
 
     private function normalizeDirectory(string $directory): string
