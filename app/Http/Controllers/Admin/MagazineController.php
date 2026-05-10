@@ -29,14 +29,14 @@ class MagazineController extends Controller
 
         $magazines = $query->paginate(15)->withQueryString();
 
-        return view('admin.magazines.index', compact('magazines', 'q'));
+        return view($this->pickView('index'), compact('magazines', 'q'));
     }
 
     public function create()
     {
         $this->ensureCanCreate();
         $magazine = new Magazine();
-        return view('admin.magazines.form', compact('magazine'));
+        return view($this->pickView('form'), compact('magazine'));
     }
 
     public function store(Request $request)
@@ -77,14 +77,14 @@ class MagazineController extends Controller
         $magazine = Magazine::create($data);
 
         return redirect()
-            ->route('panel.admin.magazines.index')
+            ->route($this->indexRouteName())
             ->with('success', 'Revista criada com sucesso.');
     }
 
     public function edit(Magazine $magazine)
     {
         $this->ensureCanManage($magazine);
-        return view('admin.magazines.form', compact('magazine'));
+        return view($this->pickView('form'), compact('magazine'));
     }
 
     public function update(Request $request, Magazine $magazine)
@@ -122,7 +122,7 @@ class MagazineController extends Controller
         $magazine->update($data);
 
         return redirect()
-            ->route('panel.admin.magazines.index')
+            ->route($this->indexRouteName())
             ->with('success', 'Revista atualizada com sucesso.');
     }
 
@@ -138,6 +138,29 @@ class MagazineController extends Controller
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
+
+    /**
+     * Escolhe a view correta baseada na rota de origem.
+     * - /admin/magazines/* (painel antigo AdminLTE, superadmin)
+     * - /painel/admin/magazines/* (painel novo, demais users)
+     */
+    protected function pickView(string $name): string
+    {
+        if (request()->routeIs('panel.*')) {
+            return 'panel.admin.magazines.' . $name;
+        }
+        return 'admin.magazines.' . $name;
+    }
+
+    /**
+     * Retorna o nome da rota index correta conforme o painel de origem.
+     */
+    protected function indexRouteName(): string
+    {
+        return request()->routeIs('panel.*')
+            ? 'panel.admin.magazines.index'
+            : 'admin.magazines.index';
+    }
 
     protected function validateData(Request $request, ?Magazine $magazine = null): array
     {
