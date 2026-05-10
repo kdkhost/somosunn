@@ -277,8 +277,8 @@
                         || ($currentUser && \App\Models\Magazine::userHasNewsInterest($currentUser));
                 @endphp
                 @if($magazinesVisible)
-                    <li class="nav-item has-treeview {{ $open('panel.admin.magazines.*') }}">
-                        <a href="#" class="nav-link {{ $is('panel.admin.magazines.*') }}">
+                    <li class="nav-item has-treeview {{ $open('admin.magazines.*') }}">
+                        <a href="#" class="nav-link {{ $is('admin.magazines.*') }}">
                             <i class="nav-icon fas fa-book-open"></i>
                             <p>Revistas<i class="right fas fa-angle-left"></i></p>
                         </a>
@@ -291,13 +291,13 @@
                             </li>
                             @if($canManageMagazines)
                                 <li class="nav-item">
-                                    <a href="{{ route('panel.admin.magazines.index') }}" class="nav-link {{ $is('panel.admin.magazines.index') }}">
+                                    <a href="{{ route('admin.magazines.index') }}" class="nav-link {{ $is('admin.magazines.index') }}">
                                         <i class="fas fa-cog nav-icon"></i>
                                         <p>Gerenciar</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('panel.admin.magazines.create') }}" class="nav-link {{ $is('panel.admin.magazines.create') }}">
+                                    <a href="{{ route('admin.magazines.create') }}" class="nav-link {{ $is('admin.magazines.create') }}">
                                         <i class="fas fa-plus nav-icon"></i>
                                         <p>Nova Revista</p>
                                     </a>
