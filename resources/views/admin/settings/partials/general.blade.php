@@ -114,12 +114,21 @@
     <div class="alert alert-light border mb-3">
         <small class="text-muted">
             <i class="fas fa-info-circle mr-1"></i>
-            Usadas na busca de estabelecimentos ao cadastrar eventos. Se ambas estiverem configuradas, o Google Places tem prioridade. LocationIQ é usado como fallback.
+            Usadas na busca de estabelecimentos ao cadastrar eventos. Prioridade automatica: <strong>TomTom</strong> (melhor cobertura de empresas no Brasil) &gt; <strong>Google Places</strong> &gt; <strong>LocationIQ</strong> (fallback).
         </small>
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="text-uppercase text-muted small font-weight-bold">TomTom API Key</label>
+                <input type="text" name="tomtom_api_key" class="form-control"
+                    value="{{ $settings['tomtom_api_key'] ?? '' }}"
+                    placeholder="q1Jg... (recomendado)">
+                <small class="text-muted">Obtenha em developer.tomtom.com (2.500 req/dia gratuito). Melhor cobertura de SMBs no Brasil.</small>
+            </div>
+        </div>
+        <div class="col-md-4">
             <div class="form-group">
                 <label class="text-uppercase text-muted small font-weight-bold">Google Places API Key</label>
                 <input type="text" name="google_places_api_key" class="form-control"
@@ -128,7 +137,7 @@
                 <small class="text-muted">Obtenha em console.cloud.google.com (ative Places API + Geocoding API)</small>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label class="text-uppercase text-muted small font-weight-bold">LocationIQ API Key</label>
                 <input type="text" name="locationiq_api_key" class="form-control"
@@ -151,7 +160,8 @@
             <div class="form-group">
                 <label class="text-uppercase text-muted small font-weight-bold">Provedor preferido</label>
                 <select name="venue_search_provider" class="form-control">
-                    <option value="auto" {{ ($settings['venue_search_provider'] ?? 'auto') === 'auto' ? 'selected' : '' }}>Automatico (Google > LocationIQ)</option>
+                    <option value="auto" {{ ($settings['venue_search_provider'] ?? 'auto') === 'auto' ? 'selected' : '' }}>Automatico (TomTom &gt; Google &gt; LocationIQ)</option>
+                    <option value="tomtom" {{ ($settings['venue_search_provider'] ?? '') === 'tomtom' ? 'selected' : '' }}>Apenas TomTom</option>
                     <option value="google" {{ ($settings['venue_search_provider'] ?? '') === 'google' ? 'selected' : '' }}>Apenas Google Places</option>
                     <option value="locationiq" {{ ($settings['venue_search_provider'] ?? '') === 'locationiq' ? 'selected' : '' }}>Apenas LocationIQ</option>
                 </select>
