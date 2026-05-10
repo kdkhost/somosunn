@@ -506,37 +506,103 @@
             min-width: auto;
         }
 
-        /* Card tools sempre alinhado à direita por padrão (apenas dentro de cards, não navbar) */
-        .card > .card-header,
-        .card-body > .card-header {
-            display: flex;
+        /* Modal footer com botões: título/info esquerda, botões direita */
+        .modal-footer {
+            display: flex !important;
             align-items: center;
-            justify-content: space-between;
             flex-wrap: wrap;
             gap: 0.5rem;
+            justify-content: flex-end;
         }
 
-        .card > .card-header .card-title,
-        .card-body > .card-header .card-title {
-            margin-bottom: 0;
+        .modal-footer > .mr-auto,
+        .modal-footer > .me-auto {
+            margin-right: auto !important;
+        }
+
+        /* Botão em modal/form à direita sempre tem largura mínima adequada */
+        .text-right > .btn,
+        .d-flex.justify-content-end > .btn,
+        .modal-footer > .btn {
+            min-width: auto;
+            white-space: nowrap;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           PADRÃO ADMINLTE CARD-HEADER (título esquerda + tools direita)
+           ═══════════════════════════════════════════════════════════════ */
+
+        /* Card-header: layout AdminLTE nativo usa float, padronizamos com flex */
+        .card > .card-header {
+            display: flex !important;
+            align-items: center;
+            flex-wrap: wrap;
+            min-height: 3rem;
+            padding: 0.75rem 1.25rem;
+        }
+
+        /* Título sempre à esquerda, ocupando espaço flexível */
+        .card > .card-header > .card-title,
+        .card > .card-header > h3.card-title,
+        .card > .card-header > h4.card-title,
+        .card > .card-header > h5.card-title {
+            margin: 0 !important;
+            padding: 0 !important;
+            float: none !important;
             flex: 1 1 auto;
             min-width: 0;
+            line-height: 1.5;
+            font-size: 1.1rem;
+            font-weight: 600;
         }
 
-        .card > .card-header .card-tools,
-        .card-body > .card-header .card-tools {
-            margin-left: auto;
+        /* Tools/botões SEMPRE à direita */
+        .card > .card-header > .card-tools {
+            margin-left: auto !important;
+            margin-right: 0 !important;
             float: none !important;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
         }
 
-        /* Garantir que card-title sempre seja legível */
+        /* Remove o float:right nativo do AdminLTE dentro de card-tools para usar flex */
+        .card > .card-header > .card-tools > * {
+            float: none !important;
+            margin: 0 !important;
+        }
+
+        /* Quando há apenas .card-title, ocupa toda largura */
+        .card > .card-header:has(> .card-title:only-child) > .card-title {
+            flex: 1 1 100%;
+        }
+
+        /* Garantir que card-title sempre seja legível em ambos os temas */
         .card .card-title {
-            color: #1f2937;
+            color: #343a40;
         }
 
         .dark-mode .card .card-title {
             color: #f1f5f9 !important;
+        }
+
+        /* Mobile: ajuste responsivo */
+        @media (max-width: 576px) {
+            .card > .card-header {
+                padding: 0.65rem 1rem;
+                gap: 0.5rem;
+            }
+            .card > .card-header > .card-title {
+                font-size: 1rem;
+                flex: 1 1 100%;
+            }
+            .card > .card-header > .card-tools {
+                flex: 1 1 100%;
+                justify-content: flex-end;
+                margin-top: 0.25rem;
+            }
         }
 
         /* Navbar nunca deve ser afetada pelo padrão de card-header */

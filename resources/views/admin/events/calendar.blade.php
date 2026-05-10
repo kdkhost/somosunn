@@ -249,15 +249,17 @@
         </div>
         <div class="col-md-9">
             <div class="card calendar-card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center border-0">
-                    <h3 class="card-title m-0 font-weight-bold">
+                <div class="card-header border-0">
+                    <h3 class="card-title">
                         <i class="fas fa-calendar-alt mr-2 text-primary"></i>Calendário
                     </h3>
                     @if(auth()->user()->isAdmin())
-                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 elevation-1" data-toggle="modal"
-                            data-target="#calendarSettingsModal">
-                            <i class="fas fa-sliders-h mr-1"></i> Personalizar
-                        </button>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 elevation-1" data-toggle="modal"
+                                data-target="#calendarSettingsModal">
+                                <i class="fas fa-sliders-h mr-1"></i> Personalizar
+                            </button>
+                        </div>
                     @endif
                 </div>
                 <div class="card-body p-0">
