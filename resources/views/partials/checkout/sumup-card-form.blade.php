@@ -148,7 +148,7 @@
             style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px;">
             @foreach($installmentOptions as $opt)
                 <option value="{{ $opt['n'] }}">
-                    {{ $opt['n'] }}x de R$ {{ number_format($opt['per_installment'], 2, ',', '.') }} = R$ {{ number_format($opt['total'], 2, ',', '.') }}@if($opt['has_interest']) (com taxas)@else sem juros@endif
+                    {{ $opt['n'] }}x de R$ {{ number_format($opt['per_installment'], 2, ',', '.') }} = R$ {{ number_format($opt['total'], 2, ',', '.') }} {{ $opt['has_interest'] ? '(com taxas)' : 'sem juros' }}
                 </option>
             @endforeach
         </select>
