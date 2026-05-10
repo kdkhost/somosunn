@@ -5,321 +5,104 @@
 @section('content')
     @php $pageData = $pageData ?? []; @endphp
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
-        <!-- Hero Section -->
-        <section class="pt-10 md:pt-24 pb-8 px-4 md:px-12 lg:px-24">
+        <!-- Hero -->
+        <section class="pt-10 md:pt-20 pb-6 px-4 md:px-8">
             <div class="max-w-7xl mx-auto text-center">
-                <h1
-                    class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
-                    <span class="unn-title-gradient">{{ ($pageData['hero_title'] ?? null) ?: 'Membros UNN' }}</span>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-black leading-tight mb-3 unn-title-gradient">
+                    {{ ($pageData['hero_title'] ?? null) ?: 'Membros UNN' }}
                 </h1>
-                <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                    {!! ($pageData['hero_subtitle'] ?? null) ?: 'Conheça os empreendedores que fazem parte da nossa comunidade exclusiva de networking empresarial.' !!}
+                <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                    {!! ($pageData['hero_subtitle'] ?? null) ?: 'Conecte-se com empreendedores da nossa comunidade exclusiva.' !!}
                 </p>
             </div>
         </section>
 
         @if(isset($isDemo) && $isDemo)
-            <div class="max-w-7xl mx-auto px-6 mb-8">
-                <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 flex items-center gap-3">
-                    <i class="fas fa-info-circle text-yellow-600 text-xl"></i>
-                    <p class="text-yellow-800">
-                        <strong>Dados de Demonstração:</strong> Estes perfis são exemplos. Membros reais aparecerão quando
-                        houver cadastros.
-                    </p>
+            <div class="max-w-7xl mx-auto px-4 mb-6">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 flex items-center gap-2 text-sm">
+                    <i class="fas fa-info-circle text-yellow-600"></i>
+                    <p class="text-yellow-800"><strong>Demonstracao:</strong> Perfis de exemplo. Membros reais aparecerao com cadastros.</p>
                 </div>
             </div>
         @endif
 
         <!-- Stats -->
         @if($pageData['stats_enabled'] ?? true)
-            <section class="pb-8 px-4 md:px-12 lg:px-24">
+            <section class="pb-6 px-4 md:px-8">
                 <div class="max-w-7xl mx-auto">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                        <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                            <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">
-                                {{ $pageData['stat_1_value'] ?? '500+' }}</p>
-                            <p class="text-xs sm:text-sm text-gray-500 break-words">
-                                {{ $pageData['stat_1_label'] ?? 'Empreendedores' }}</p>
-                        </div>
-                        <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                            <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">
-                                {{ $pageData['stat_2_value'] ?? '50+' }}</p>
-                            <p class="text-xs sm:text-sm text-gray-500">{{ $pageData['stat_2_label'] ?? 'Mentores' }}</p>
-                        </div>
-                        <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                            <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">
-                                {{ $pageData['stat_3_value'] ?? '27' }}</p>
-                            <p class="text-xs sm:text-sm text-gray-500">{{ $pageData['stat_3_label'] ?? 'Estados' }}</p>
-                        </div>
-                        <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
-                            <p class="text-2xl sm:text-3xl font-black" style="color: var(--unn-azul-1)">
-                                {{ $pageData['stat_4_value'] ?? '1.2k+' }}</p>
-                            <p class="text-xs sm:text-sm text-gray-500">{{ $pageData['stat_4_label'] ?? 'Conexões feitas' }}</p>
-                        </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        @php
+                            $stats = [
+                                ['value' => $pageData['stat_1_value'] ?? '500+', 'label' => $pageData['stat_1_label'] ?? 'Empreendedores'],
+                                ['value' => $pageData['stat_2_value'] ?? '50+', 'label' => $pageData['stat_2_label'] ?? 'Mentores'],
+                                ['value' => $pageData['stat_3_value'] ?? '27', 'label' => $pageData['stat_3_label'] ?? 'Estados'],
+                                ['value' => $pageData['stat_4_value'] ?? '1.2k+', 'label' => $pageData['stat_4_label'] ?? 'Conexoes feitas'],
+                            ];
+                        @endphp
+                        @foreach($stats as $stat)
+                            <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-slate-100">
+                                <p class="text-xl sm:text-2xl font-black text-blue-600">{{ $stat['value'] }}</p>
+                                <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider">{{ $stat['label'] }}</p>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </section>
         @endif
 
-        <!-- Members Grid -->
-        <section class="pb-20 px-6 md:px-12 lg:px-24">
+        <!-- Members -->
+        <section class="pb-16 px-4 md:px-8">
             <div class="max-w-7xl mx-auto">
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                {{-- Desktop/Tablet Grid (hidden on mobile) --}}
+                <div class="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     @forelse($members as $member)
-                        @php
-                            $isDemo = $member->is_demo ?? false;
-                            $initials = collect(explode(' ', $member->name))->take(2)->map(fn($n) => strtoupper(substr($n, 0, 1)))->join('');
-                        @endphp
-                        <article
-                            class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 {{ $isDemo ? 'ring-2 ring-yellow-400' : '' }}">
-                            <!-- Header Azul Sólido -->
-                            <div class="h-20 bg-[#1F5EDB] relative">
-                                @if($isDemo)
-                                    <span
-                                        class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-[10px] px-2 py-0.5 rounded-full font-semibold">DEMO</span>
-                                @endif
-                            </div>
-
-                            <!-- Avatar Centralizado e Sobreposto -->
-                            <div class="flex justify-center -mt-12 px-4 relative z-10">
-                                <div class="p-1 bg-white rounded-full shadow-sm">
-                                    @if(isset($member->avatar) && $member->avatar)
-                                        <img src="{{ $member->avatar }}" alt="{{ $member->name }}"
-                                            class="w-24 h-24 rounded-full border-4 border-white object-cover">
-                                    @else
-                                        <div
-                                            class="w-24 h-24 rounded-full border-4 border-white bg-[#1F5EDB] flex items-center justify-center text-white text-2xl font-bold">
-                                            {{ $initials }}
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <!-- Content -->
-                            <div class="pt-3 pb-5 px-4 text-center">
-                                <!-- Nome -->
-                                <h3 class="text-lg font-bold text-gray-900 mb-0.5">{{ $member->name }}</h3>
-
-                                <!-- Localização -->
-                                @if(isset($member->city) && $member->city)
-                                    <p class="text-xs text-gray-500 mb-4 flex items-center justify-center gap-1">
-                                        <i class="fas fa-map-marker-alt text-[#1F5EDB]"></i>
-                                        {{ $member->city }}
-                                    </p>
-                                @endif
-
-                                <!-- Linha Divisória -->
-                                <div class="border-t border-gray-100 w-full mb-3"></div>
-
-                                <!-- Conexões -->
-                                <div class="mb-4">
-                                    <p class="text-xl font-bold text-gray-900">{{ $member->connections ?? 0 }}</p>
-                                    <p class="text-[10px] uppercase tracking-wide text-gray-400 font-bold">Conexões</p>
-                                </div>
-
-                                <!-- Botões de Ação -->
-                                <div class="flex flex-col gap-2">
-                                    @if(!$isDemo)
-                                        <div class="grid grid-cols-2 gap-2">
-                                            <a href="{{ route('social.profile', $member->id) }}"
-                                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-lg font-bold text-sm text-center transition shadow-sm">
-                                                Perfil
-                                            </a>
-
-                                            @if(auth()->check() && auth()->id() !== $member->id)
-                                                @php
-                                                    $conn = $connectionMap[$member->id] ?? null;
-                                                    $status = $conn ? $conn['status'] : null;
-                                                    $isRequester = $conn && $conn['requester_id'] === auth()->id();
-                                                @endphp
-
-                                                @if($status === 'accepted')
-                                                    <button onclick="openChat({{ $member->id }}, '{{ $member->name }}')"
-                                                        class="bg-green-500 hover:bg-green-600 text-white py-2.5 rounded-lg font-bold text-sm transition shadow-sm flex items-center justify-center gap-1">
-                                                        <i class="fas fa-comment"></i> Chat
-                                                    </button>
-                                                @elseif($status === 'pending')
-                                                    @if($isRequester)
-                                                        <button
-                                                            class="bg-gray-200 text-gray-500 py-2.5 rounded-lg font-bold text-sm cursor-not-allowed flex items-center justify-center gap-1">
-                                                            <i class="fas fa-clock"></i> ...
-                                                        </button>
-                                                    @else
-                                                        <button onclick="acceptConnection({{ $member->id }})"
-                                                            class="bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg font-bold text-sm transition shadow-sm flex items-center justify-center gap-1">
-                                                            <i class="fas fa-check"></i> Aceitar
-                                                        </button>
-                                                    @endif
-                                                @else
-                                                    <button onclick="requestConnection({{ $member->id }}, this)"
-                                                        class="bg-[#1F5EDB] hover:bg-blue-700 text-white py-2.5 rounded-lg font-bold text-sm transition shadow-sm flex items-center justify-center gap-1">
-                                                        <i class="fas fa-user-plus"></i> Conectar
-                                                    </button>
-                                                @endif
-                                            @else
-                                                <a href="{{ route('login') }}"
-                                                    class="bg-[#1F5EDB] hover:bg-blue-700 text-white py-2.5 rounded-lg font-bold text-sm text-center transition shadow-sm">
-                                                    Conectar
-                                                </a>
-                                            @endif
-                                        </div>
-
-                                        @if(auth()->check() && auth()->id() !== $member->id)
-                                            <button onclick="blockUser({{ $member->id }})"
-                                                class="text-[10px] text-gray-400 hover:text-red-600 transition flex items-center justify-center gap-1 mt-1">
-                                                <i class="fas fa-ban"></i> Bloquear usuário
-                                            </button>
-                                        @endif
-                                    @else
-                                        <button onclick="Swal.fire({
-                                                                title: 'Perfil Demo',
-                                                                text: 'Este é um perfil de demonstração.',
-                                                                icon: 'info',
-                                                                confirmButtonColor: '#1F5EDB'
-                                                            })"
-                                            class="block w-full bg-[#1F5EDB] text-white py-2.5 rounded-lg font-bold text-sm opacity-75 cursor-not-allowed">
-                                            Ver Perfil
-                                        </button>
-                                    @endif
-                                </div>
-                            </div>
-                        </article>
+                        @include('site.partials.member-card', ['member' => $member, 'connectionMap' => $connectionMap])
                     @empty
-                        <div class="col-span-full text-center py-16">
-                            <div class="bg-white rounded-3xl p-12 shadow-lg max-w-md mx-auto">
-                                <i class="fas fa-users text-6xl text-gray-300 mb-6"></i>
-                                <h3 class="text-2xl font-bold text-gray-900 mb-2">Nenhum membro ainda</h3>
-                                <p class="text-gray-500 mb-6">Seja o primeiro a fazer parte da nossa comunidade!</p>
-                                <a href="{{ route('register') }}"
-                                    class="btn-primary text-white px-8 py-3 rounded-full font-semibold inline-flex items-center gap-2">
+                        <div class="col-span-full text-center py-12">
+                            <div class="bg-white rounded-2xl p-10 shadow-sm max-w-sm mx-auto border border-slate-100">
+                                <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
+                                <h3 class="text-lg font-black text-gray-900 mb-1">Nenhum membro ainda</h3>
+                                <p class="text-sm text-gray-500 mb-4">Seja o primeiro!</p>
+                                <a href="{{ route('register') }}" class="btn-primary text-white px-6 py-2 rounded-full font-bold text-sm inline-flex items-center gap-2">
                                     <i class="fas fa-user-plus"></i> Fazer parte
                                 </a>
                             </div>
                         </div>
                     @endforelse
                 </div>
+
+                {{-- Mobile Swiper (visible only on mobile) --}}
+                <div class="sm:hidden">
+                    <div class="swiper members-swiper">
+                        <div class="swiper-wrapper">
+                            @foreach($members as $member)
+                                <div class="swiper-slide">
+                                    @include('site.partials.member-card', ['member' => $member, 'connectionMap' => $connectionMap])
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="swiper-pagination mt-4"></div>
+                    </div>
+                </div>
+
+                {{-- Paginacao --}}
+                @if(method_exists($members, 'hasPages') && $members->hasPages())
+                    <div class="mt-8">
+                        {{ $members->links() }}
+                    </div>
+                @endif
             </div>
         </section>
 
-        @push('scripts')
-            <script>
-                function requestConnection(userId, btn) {
-                    const originalHtml = btn.innerHTML;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    btn.disabled = true;
-
-                    fetch(`/connect/${userId}`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: 'Sucesso!',
-                                    text: data.message,
-                                    icon: 'success',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => location.reload());
-                            } else {
-                                Swal.fire('Erro!', data.message, 'error');
-                                btn.innerHTML = originalHtml;
-                                btn.disabled = false;
-                            }
-                        })
-                        .catch(() => {
-                            Swal.fire('Erro!', 'Nao foi possivel processar o pedido.', 'error');
-                            btn.innerHTML = originalHtml;
-                            btn.disabled = false;
-                        });
-                }
-
-                function acceptConnection(userId) {
-                    fetch(`/connection/accept/${userId}`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success) {
-                                toastr.success(data.message);
-                                location.reload();
-                            } else {
-                                toastr.error(data.message);
-                            }
-                        });
-                }
-
-                function blockUser(userId) {
-                    Swal.fire({
-                        title: 'Bloquear usuario?',
-                        text: 'Voce deixara de ver este membro e ele nao podera te enviar mensagens.',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Sim, bloquear',
-                        cancelButtonText: 'Cancelar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetch(`/connection/block/${userId}`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    'Content-Type': 'application/json'
-                                }
-                            })
-                                .then(r => r.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        Swal.fire({
-                                            title: 'Bloqueado!',
-                                            text: data.message,
-                                            icon: 'success',
-                                            timer: 1500,
-                                            showConfirmButton: false
-                                        }).then(() => location.reload());
-                                    } else {
-                                        Swal.fire('Erro!', data.message, 'error');
-                                    }
-                                });
-                        }
-                    });
-                }
-
-                const chatStartBaseUrl = @json(url('/chat/start'));
-
-                function openChat(userId) {
-                    const targetId = parseInt(userId, 10);
-                    if (!Number.isInteger(targetId) || targetId <= 0) {
-                        toastr.error('Usuário inválido para iniciar o chat.');
-                        return;
-                    }
-
-                    window.location.href = `${chatStartBaseUrl}/${targetId}`;
-                }
-            </script>
-        @endpush
-
-        <!-- CTA Section -->
+        <!-- CTA -->
         @if($pageData['cta_enabled'] ?? true)
-            <section class="py-16 px-6 md:px-12 lg:px-24"
-                style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-                <div class="max-w-4xl mx-auto text-center text-white">
-                    <h2 class="text-3xl lg:text-4xl font-black mb-4">{{ $pageData['cta_title'] ?? 'Faça parte desta comunidade' }}</h2>
-                    <p class="text-lg opacity-90 mb-8">{!! $pageData['cta_subtitle'] ?? 'Conecte-se com empreendedores de sucesso e expanda sua rede de negócios.' !!}</p>
-                    <a href="{{ route('register') }}"
-                        class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition"
-                        style="color: var(--unn-azul-1)">
-                        <i class="fas fa-rocket"></i>
-                        {{ $pageData['cta_btn'] ?? 'Quero fazer parte' }}
+            <section class="py-12 px-4 md:px-8" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
+                <div class="max-w-3xl mx-auto text-center text-white">
+                    <h2 class="text-2xl lg:text-3xl font-black mb-3">{{ $pageData['cta_title'] ?? 'Faca parte desta comunidade' }}</h2>
+                    <p class="text-base opacity-90 mb-6">{!! $pageData['cta_subtitle'] ?? 'Conecte-se com empreendedores de sucesso.' !!}</p>
+                    <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-white px-6 py-3 rounded-full font-bold text-sm hover:bg-blue-50 transition" style="color: var(--unn-azul-1)">
+                        <i class="fas fa-rocket"></i> {{ $pageData['cta_btn'] ?? 'Quero fazer parte' }}
                     </a>
                 </div>
             </section>
@@ -327,27 +110,60 @@
     </div>
 
     <style>
-        .text-gradient {
-            background: linear-gradient(135deg, var(--unn-azul-1) 0%, var(--unn-azul-3) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-    </style>
-    <style>
         .unn-title-gradient {
             background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            color: transparent;
         }
     </style>
+
+    @push('styles')
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    @endpush
+
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new Swiper('.members-swiper', {
+                    slidesPerView: 1,
+                    spaceBetween: 16,
+                    autoplay: { delay: 4000, disableOnInteraction: false },
+                    pagination: { el: '.swiper-pagination', clickable: true },
+                    grabCursor: true,
+                    loop: {{ $members->count() > 2 ? 'true' : 'false' }},
+                    breakpoints: {
+                        480: { slidesPerView: 1.2 },
+                    }
+                });
+            });
+
+            function requestConnection(userId, btn) {
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+                fetch('/connect/' + userId, { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' } })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) { toastr.success(data.message); setTimeout(() => location.reload(), 1000); }
+                        else { toastr.error(data.message); btn.innerHTML = originalHtml; btn.disabled = false; }
+                    })
+                    .catch(() => { toastr.error('Erro ao processar.'); btn.innerHTML = originalHtml; btn.disabled = false; });
+            }
+
+            function acceptConnection(userId) {
+                fetch('/connection/accept/' + userId, { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' } })
+                    .then(r => r.json())
+                    .then(data => { if (data.success) { toastr.success(data.message); location.reload(); } else { toastr.error(data.message); } });
+            }
+
+            function blockUser(userId) {
+                Swal.fire({ title: 'Bloquear?', text: 'Este membro nao podera te enviar mensagens.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Bloquear', cancelButtonText: 'Cancelar' })
+                    .then(r => { if (r.isConfirmed) { fetch('/connection/block/' + userId, { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' } }).then(r => r.json()).then(data => { if (data.success) { toastr.success(data.message); location.reload(); } }); } });
+            }
+
+            function openChat(userId) { window.location.href = '{{ url("/chat/start") }}/' + userId; }
+        </script>
+    @endpush
 @endsection

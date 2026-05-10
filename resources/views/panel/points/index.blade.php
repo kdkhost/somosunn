@@ -16,19 +16,24 @@
         $defaultColor = ['bg' => 'bg-slate-100 dark:bg-slate-800', 'text' => 'text-slate-500', 'icon' => 'fas fa-star'];
     @endphp
 
-    <div class="space-y-8">
-        <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
-            <div>
-                <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Meus {{ $coinName }}</h1>
-                <p class="mt-1 font-medium text-slate-500 dark:text-slate-400">Acompanhe seu saldo, a cotacao atual e sua evolucao no ranking.</p>
+    <div class="space-y-6">
+        {{-- Header card --}}
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 md:p-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <p class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">PONTOS</p>
+                    <h1 class="mt-2 text-2xl md:text-3xl font-black text-slate-900 dark:text-white">Meus {{ $coinName }}</h1>
+                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Acompanhe seu saldo, a cotacao atual e sua evolucao no ranking.</p>
+                </div>
+                <a href="{{ route('panel.redemptions.shop') }}"
+                   class="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-blue-600 px-6 py-3 font-bold text-white shadow-lg shadow-blue-500/20 transition-all active:scale-95 hover:bg-blue-700">
+                    <i class="fas fa-gift"></i>
+                    Trocar {{ $coinName }} por premios
+                </a>
             </div>
-            <a href="{{ route('panel.redemptions.shop') }}"
-               class="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-blue-600 px-6 py-3 font-bold text-white shadow-lg shadow-blue-500/20 transition-all active:scale-95 hover:bg-blue-700">
-                <i class="fas fa-gift"></i>
-                Trocar {{ $coinName }} por premios
-            </a>
         </div>
 
+        {{-- KPI cards --}}
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <div class="flex items-center gap-5 rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 text-white shadow-lg shadow-blue-500/20">
                 <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20">
@@ -66,22 +71,27 @@
             </div>
         </div>
 
-        <div class="rounded-[2rem] border border-blue-100 bg-blue-50/70 px-6 py-4 text-sm text-blue-800 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-200">
-            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <span class="font-black">Cotacao atual:</span>
-                    1 {{ $coinName }} = R$ {{ number_format($unitValue, 4, ',', '.') }}
-                </div>
-                <div class="text-blue-700/80 dark:text-blue-300/80">
-                    O saldo de membros e os resgates da plataforma usam {{ $coinName }} como moeda interna.
+        {{-- Exchange rate info --}}
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 md:p-8">
+            <div class="rounded-2xl border border-blue-100 bg-blue-50/70 px-6 py-4 text-sm text-blue-800 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-200">
+                <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <span class="font-black">Cotacao atual:</span>
+                        1 {{ $coinName }} = R$ {{ number_format($unitValue, 4, ',', '.') }}
+                    </div>
+                    <div class="text-blue-700/80 dark:text-blue-300/80">
+                        O saldo de membros e os resgates da plataforma usam {{ $coinName }} como moeda interna.
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        {{-- Content: History + Ranking sidebar --}}
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {{-- History card --}}
             <div class="lg:col-span-2">
-                <div class="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                    <div class="border-b border-slate-100 px-8 py-6 dark:border-slate-800">
+                <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                    <div class="border-b border-slate-100 px-6 md:px-8 py-6 dark:border-slate-800">
                         <h2 class="text-xl font-black text-slate-900 dark:text-white">Historico de {{ $coinName }}</h2>
                         <p class="mt-0.5 text-sm text-slate-400">Todas as acoes que movimentaram {{ $coinName }} para voce.</p>
                     </div>
@@ -94,7 +104,7 @@
                             $icon = $rule->icon ?? $colors['icon'];
                             $label = $rule->label ?? ucfirst(str_replace('_', ' ', $log->action_key));
                         @endphp
-                        <div class="flex items-center gap-4 border-b border-slate-50 px-8 py-5 transition-colors last:border-0 hover:bg-slate-50/50 dark:border-slate-800/60 dark:hover:bg-slate-800/20">
+                        <div class="flex items-center gap-4 border-b border-slate-50 px-6 md:px-8 py-5 transition-colors last:border-0 hover:bg-slate-50/50 dark:border-slate-800/60 dark:hover:bg-slate-800/20">
                             <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl {{ $colors['bg'] }}">
                                 <i class="{{ $icon }} {{ $colors['text'] }}"></i>
                             </div>
@@ -126,15 +136,17 @@
                     @endforelse
 
                     @if($logs->hasPages())
-                        <div class="border-t border-slate-100 px-8 py-5 dark:border-slate-800">
+                        <div class="border-t border-slate-100 px-6 md:px-8 py-5 dark:border-slate-800">
                             {{ $logs->links() }}
                         </div>
                     @endif
                 </div>
             </div>
 
+            {{-- Sidebar --}}
             <div class="space-y-5">
-                <div class="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                {{-- Top 10 Ranking card --}}
+                <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
                     <div class="border-b border-slate-100 px-6 py-5 dark:border-slate-800">
                         <h3 class="flex items-center gap-2 text-base font-black text-slate-900 dark:text-white">
                             <i class="fas fa-ranking-star text-amber-500"></i>
@@ -193,7 +205,8 @@
                     </div>
                 </div>
 
-                <div class="rounded-[2rem] border border-slate-700/50 bg-gradient-to-br from-slate-900 to-slate-800 p-6 text-white shadow-sm dark:from-slate-800 dark:to-slate-900">
+                {{-- Tips card --}}
+                <div class="rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-900 to-slate-800 p-6 text-white shadow-sm dark:from-slate-800 dark:to-slate-900">
                     <h3 class="mb-4 flex items-center gap-2 text-sm font-black"><i class="fas fa-bolt text-yellow-400"></i> Como ganhar mais {{ $coinName }}</h3>
                     <ul class="space-y-2.5 text-sm">
                         <li class="flex items-start gap-2 text-slate-300">

@@ -65,9 +65,8 @@ class MemberController extends Controller
             }
 
             $members = $query->latest()
-                ->take(12)
-                ->get()
-                ->map(function ($user) {
+                ->paginate(20)
+                ->through(function ($user) {
                     return (object) [
                         'id' => $user->id,
                         'name' => $user->name,
@@ -75,6 +74,8 @@ class MemberController extends Controller
                         'bio' => $user->bio,
                         'avatar' => $user->photo ? asset($user->photo) : null,
                         'city' => trim(($user->city ?? '') . ($user->state ? ', ' . $user->state : '')),
+                        'occupation' => $user->occupation,
+                        'company' => $user->company,
                         'linkedin' => $user->linkedin,
                         'facebook' => $user->facebook,
                         'instagram' => $user->instagram,

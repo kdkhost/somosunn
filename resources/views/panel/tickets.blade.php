@@ -7,16 +7,22 @@
 @endsection
 
 @section('panel_content')
-    <div class="space-y-6">
-        <div>
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white transition-colors">Meus Ingressos</h2>
-            <p class="text-slate-500 dark:text-slate-400 text-sm transition-colors">Visualize e gerencie seus ingressos para
-                eventos.</p>
+<div class="space-y-6">
+    {{-- Header card --}}
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 md:p-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <p class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">EVENTOS</p>
+                <h1 class="mt-2 text-2xl md:text-3xl font-black text-slate-900 dark:text-white">Meus Ingressos</h1>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Visualize e gerencie seus ingressos para eventos.</p>
+            </div>
         </div>
+    </div>
 
+    {{-- Content card --}}
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 md:p-8">
         @if($registrations->isEmpty())
-            <div
-                class="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-100 dark:border-slate-800 shadow-sm">
+            <div class="text-center py-12">
                 <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-ticket-alt text-3xl text-slate-300 dark:text-slate-600"></i>
                 </div>
@@ -32,7 +38,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($registrations as $reg)
                     <div
-                        class="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow group">
+                        class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow group">
                         <div class="relative h-40 overflow-hidden">
                             @if($reg->event->image)
                                 <img src="{{ $reg->event->image_url }}" alt="{{ $reg->event->title }}"
@@ -103,62 +109,65 @@
                 @endforeach
             </div>
 
-            <div class="mt-8">
-                {{ $registrations->links() }}
-            </div>
+            @if($registrations->hasPages())
+                <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    {{ $registrations->links() }}
+                </div>
+            @endif
         @endif
     </div>
+</div>
 
-    <!-- Ticket Modal -->
-    <div id="ticketModal"
-        class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
-        aria-labelledby="ticketModalTitle" role="dialog" aria-modal="true">
-        <div class="bg-white dark:bg-slate-900 rounded-[3rem] p-4 max-w-sm w-full shadow-2xl overflow-hidden relative"
-            onclick="event.stopPropagation()">
+<!-- Ticket Modal -->
+<div id="ticketModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+    aria-labelledby="ticketModalTitle" role="dialog" aria-modal="true">
+    <div class="bg-white dark:bg-slate-900 rounded-[3rem] p-4 max-w-sm w-full shadow-2xl overflow-hidden relative"
+        onclick="event.stopPropagation()">
 
-            <button onclick="closeTicketModal()"
-                class="absolute top-6 right-6 w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-red-500 transition-colors">
-                <i class="fas fa-times"></i>
-            </button>
+        <button onclick="closeTicketModal()"
+            class="absolute top-6 right-6 w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-red-500 transition-colors">
+            <i class="fas fa-times"></i>
+        </button>
 
-            <div class="p-6 text-center">
-                <div
-                    class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/20">
-                    <i class="fas fa-ticket-alt text-2xl text-white"></i>
+        <div class="p-6 text-center">
+            <div
+                class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/20">
+                <i class="fas fa-ticket-alt text-2xl text-white"></i>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2 leading-tight" id="modalTicketTitle">Título
+                do Evento</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-8" id="modalTicketDate">00/00/0000 - 00:00</p>
+
+            <div id="ticketStateAlert"
+                class="hidden mb-5 rounded-2xl px-4 py-3 text-sm font-bold">
+            </div>
+
+            <div class="relative inline-flex mb-8">
+                <div class="bg-white p-6 rounded-3xl shadow-inner border-4 border-dashed border-slate-100 dark:border-slate-800 flex justify-center qrcode-wrapper"
+                    id="qrcode-container">
+                    <!-- QR Code vai aqui via JS -->
                 </div>
-
-                <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2 leading-tight" id="modalTicketTitle">Título
-                    do Evento</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-8" id="modalTicketDate">00/00/0000 - 00:00</p>
-
-                <div id="ticketStateAlert"
-                    class="hidden mb-5 rounded-2xl px-4 py-3 text-sm font-bold">
+                <div id="ticketStateOverlay"
+                    class="hidden absolute inset-0 rounded-3xl bg-white/90 dark:bg-slate-950/90 backdrop-blur-[1px] border-2 flex items-center justify-center">
+                    <span id="ticketStateOverlayLabel"
+                        class="rotate-[-10deg] rounded-xl border-2 px-4 py-2 text-center text-lg font-black uppercase tracking-[0.12em]">
+                        Expirado
+                    </span>
                 </div>
+            </div>
 
-                <div class="relative inline-flex mb-8">
-                    <div class="bg-white p-6 rounded-3xl shadow-inner border-4 border-dashed border-slate-100 dark:border-slate-800 flex justify-center qrcode-wrapper"
-                        id="qrcode-container">
-                        <!-- QR Code vai aqui via JS -->
-                    </div>
-                    <div id="ticketStateOverlay"
-                        class="hidden absolute inset-0 rounded-3xl bg-white/90 dark:bg-slate-950/90 backdrop-blur-[1px] border-2 flex items-center justify-center">
-                        <span id="ticketStateOverlayLabel"
-                            class="rotate-[-10deg] rounded-xl border-2 px-4 py-2 text-center text-lg font-black uppercase tracking-[0.12em]">
-                            Expirado
-                        </span>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <p class="font-mono text-sm text-slate-600 dark:text-slate-400 tracking-widest bg-slate-50 dark:bg-slate-950 py-3 px-6 rounded-2xl border border-slate-100 dark:border-slate-800 select-all"
-                        id="modalTicketCodeString">
-                        XXXX-XXXX-XXXX
-                    </p>
-                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em]">Apresente no check-in</p>
-                </div>
+            <div class="space-y-4">
+                <p class="font-mono text-sm text-slate-600 dark:text-slate-400 tracking-widest bg-slate-50 dark:bg-slate-950 py-3 px-6 rounded-2xl border border-slate-100 dark:border-slate-800 select-all"
+                    id="modalTicketCodeString">
+                    XXXX-XXXX-XXXX
+                </p>
+                <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em]">Apresente no check-in</p>
             </div>
         </div>
     </div>
+</div>
 
 @endsection
 
