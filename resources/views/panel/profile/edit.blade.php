@@ -8,54 +8,115 @@
     @endphp
 
     @if($isMarketingManager)
-        <div class="mb-6 rounded-3xl border border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-fuchsia-50 dark:from-purple-900/20 dark:to-fuchsia-900/20 p-5 shadow-sm">
-            <div class="flex items-center gap-4 flex-wrap">
-                <div class="w-12 h-12 rounded-2xl bg-purple-600 text-white flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-bullhorn text-xl"></i>
+        <div class="mb-6 rounded-2xl border border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-fuchsia-50 dark:from-purple-900/20 dark:to-fuchsia-900/20 p-4 shadow-sm">
+            <div class="flex items-center gap-3 flex-wrap">
+                <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-bullhorn"></i>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <h3 class="font-black text-purple-900 dark:text-purple-100">Voce e o Responsavel de Marketing da plataforma</h3>
-                    <p class="text-sm text-purple-700 dark:text-purple-300 mt-0.5">
-                        Acompanhe os valores destinados ao marketing na area exclusiva.
-                    </p>
+                    <h3 class="font-bold text-sm text-purple-900 dark:text-purple-100">Responsavel de Marketing</h3>
+                    <p class="text-xs text-purple-700 dark:text-purple-300">Acompanhe os valores na area exclusiva.</p>
                 </div>
                 <a href="{{ route('panel.marketing.index') }}"
-                    class="inline-flex items-center gap-2 rounded-full bg-purple-600 hover:bg-purple-700 px-4 py-2 text-sm font-bold text-white transition">
-                    <i class="fas fa-arrow-right"></i> Acessar painel
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 px-3 py-1.5 text-xs font-bold text-white transition">
+                    <i class="fas fa-arrow-right text-[10px]"></i> Acessar
                 </a>
             </div>
         </div>
     @endif
 
-    <div
-        class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">Meu perfil</h1>
-                <p class="text-slate-600 dark:text-slate-400 mt-1">Mantenha seus dados atualizados para melhor experiência
-                    na plataforma.</p>
-            </div>
-
-            @if(request()->routeIs('curriculum.register') || request()->has('ref_curriculum'))
-                <div
-                    class="flex-1 max-w-md bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 p-4 rounded-2xl flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
-                        <i class="fas fa-file-invoice"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-bold text-blue-900 dark:text-blue-100 italic">Banco de Talentos</h4>
-                        <p class="text-xs text-blue-700 dark:text-blue-300">Complete seu perfil abaixo para que empresas
-                            parceiras possam te encontrar!</p>
-                    </div>
+    {{-- HERO CARD: Capa + Avatar + Nome --}}
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors duration-300">
+        {{-- Capa --}}
+        <div id="cover-preview"
+            class="relative w-full h-32 md:h-40 bg-gradient-to-r from-blue-500 to-indigo-600 cursor-pointer group"
+            onclick="document.getElementById('cover-input').click()">
+            @if($user->cover_photo)
+                <img src="{{ asset($user->cover_photo) }}?t={{ time() }}" alt="Capa" class="w-full h-full object-cover" id="cover-img">
+            @else
+                <div class="w-full h-full flex items-center justify-center" id="cover-img">
+                    <span class="text-white/60 text-sm font-bold"><i class="fas fa-camera mr-2"></i>Clique para adicionar capa</span>
                 </div>
             @endif
-            <a href="{{ route('panel.dashboard') }}"
-                class="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                data-tooltip="Voltar para o painel principal" style="position:relative;">
-                <i class="fas fa-arrow-left mr-2"></i> Voltar
-            </a>
+            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span class="text-white text-sm font-bold flex items-center gap-2"><i class="fas fa-camera"></i> Alterar capa (1200x300)</span>
+            </div>
+            <input type="file" id="cover-input" class="hidden" accept="image/png,image/jpeg,image/gif,image/webp" data-crop-type="cover_photo" data-crop-ratio="{{ 1200/300 }}">
+            <div id="cover-status" class="hidden absolute bottom-2 right-2 text-xs font-bold text-white bg-emerald-500 px-2 py-1 rounded-lg">
+                <i class="fas fa-check-circle"></i> Capa atualizada!
+            </div>
+        </div>
+
+        {{-- Avatar + Info --}}
+        <div class="px-6 pb-5 -mt-10 relative z-10">
+            <div class="flex items-end gap-4">
+                <div id="avatar-preview"
+                    class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-lg cursor-pointer relative group flex-shrink-0"
+                    onclick="document.getElementById('avatar-input').click()">
+                    @if($user->photo)
+                        <img src="{{ asset($user->photo) }}?t={{ time() }}" alt="Avatar" class="w-full h-full object-cover" id="avatar-img">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-black text-2xl bg-slate-100 dark:bg-slate-800" id="avatar-img">
+                            {{ mb_substr((string) $user->name, 0, 1) }}
+                        </div>
+                    @endif
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl">
+                        <i class="fas fa-camera text-white"></i>
+                    </div>
+                </div>
+                <input type="file" id="avatar-input" class="hidden" accept="image/png,image/jpeg,image/gif,image/webp" data-crop-type="photo" data-crop-ratio="1">
+
+                <div class="flex-1 min-w-0 pb-1">
+                    <h1 class="text-xl md:text-2xl font-black text-slate-900 dark:text-white truncate">{{ $user->name }}</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">{{ $user->email }}</p>
+                    <div id="avatar-status" class="hidden mt-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        <i class="fas fa-check-circle"></i> Foto atualizada!
+                    </div>
+                </div>
+
+                <a href="{{ route('panel.dashboard') }}"
+                    class="hidden md:inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                    <i class="fas fa-arrow-left text-xs"></i> Voltar
+                </a>
+            </div>
         </div>
     </div>
+
+    {{-- Modal de Crop --}}
+    <div id="crop-modal" class="hidden fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                <h3 class="font-black text-slate-900 dark:text-white">Recortar imagem</h3>
+                <button type="button" onclick="closeCropModal()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-4">
+                <div id="crop-container" class="w-full" style="max-height: 400px;">
+                    <img id="crop-image" src="" alt="Crop" class="max-w-full">
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
+                <button type="button" onclick="closeCropModal()" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+                    Cancelar
+                </button>
+                <button type="button" onclick="applyCrop()" id="crop-apply-btn"
+                    class="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-black transition-colors flex items-center gap-2">
+                    <i class="fas fa-crop-alt"></i> Recortar e salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if(request()->routeIs('curriculum.register') || request()->has('ref_curriculum'))
+        <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 p-4 rounded-2xl flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-blue-900 dark:text-blue-100 italic">Banco de Talentos</h4>
+                <p class="text-xs text-blue-700 dark:text-blue-300">Complete seu perfil abaixo para que empresas parceiras possam te encontrar!</p>
+            </div>
+        </div>
+    @endif
 
     <form method="POST" action="{{ route('panel.profile.update') }}" enctype="multipart/form-data" class="mt-6 space-y-6">
         @csrf
@@ -240,100 +301,6 @@
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Confirmar senha</label>
                     <input type="password" name="password_confirmation" minlength="6"
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
-                </div>
-            </div>
-        </div>
-
-        {{-- FOTOS (Upload automatico com crop) --}}
-        <div
-            class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300">
-            <h2 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <i class="fas fa-image text-slate-500"></i> Fotos
-            </h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-5">
-                <!-- Foto de Perfil -->
-                <div>
-                    <label class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 block">Foto de perfil</label>
-                    <div class="flex items-center gap-4">
-                        <div id="avatar-preview"
-                            class="w-20 h-20 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0 border-2 border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 transition-colors relative group"
-                            onclick="document.getElementById('avatar-input').click()">
-                            @if($user->photo)
-                                <img src="{{ asset($user->photo) }}?t={{ time() }}" alt="Avatar" class="w-full h-full object-cover" id="avatar-img">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-bold text-xl" id="avatar-img">
-                                    {{ mb_substr((string) $user->name, 0, 1) }}
-                                </div>
-                            @endif
-                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                                <i class="fas fa-camera text-white text-lg"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1">
-                            <input type="file" id="avatar-input" class="hidden" accept="image/png,image/jpeg,image/gif,image/webp" data-crop-type="photo" data-crop-ratio="1">
-                            <button type="button" onclick="document.getElementById('avatar-input').click()"
-                                class="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                                <i class="fas fa-upload text-blue-500"></i> Alterar foto
-                            </button>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">500x500px (JPG/PNG). Sera recortada automaticamente.</p>
-                            <div id="avatar-status" class="hidden mt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                                <i class="fas fa-check-circle"></i> Foto atualizada!
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Capa -->
-                <div>
-                    <label class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 block">Capa do Perfil</label>
-                    <div id="cover-preview"
-                        class="w-full h-24 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 transition-colors relative group mb-3"
-                        onclick="document.getElementById('cover-input').click()">
-                        @if($user->cover_photo)
-                            <img src="{{ asset($user->cover_photo) }}?t={{ time() }}" alt="Capa" class="w-full h-full object-cover" id="cover-img">
-                        @else
-                            <div class="w-full h-full flex items-center justify-center text-slate-400" id="cover-img">
-                                <i class="fas fa-panorama text-2xl"></i>
-                            </div>
-                        @endif
-                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <i class="fas fa-camera text-white text-lg"></i>
-                        </div>
-                    </div>
-                    <input type="file" id="cover-input" class="hidden" accept="image/png,image/jpeg,image/gif,image/webp" data-crop-type="cover_photo" data-crop-ratio="{{ 1200/300 }}">
-                    <button type="button" onclick="document.getElementById('cover-input').click()"
-                        class="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                        <i class="fas fa-upload text-blue-500"></i> Alterar capa
-                    </button>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">1200x300px (JPG/PNG). Sera recortada automaticamente.</p>
-                    <div id="cover-status" class="hidden mt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                        <i class="fas fa-check-circle"></i> Capa atualizada!
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Modal de Crop --}}
-        <div id="crop-modal" class="hidden fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
-                <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                    <h3 class="font-black text-slate-900 dark:text-white">Recortar imagem</h3>
-                    <button type="button" onclick="closeCropModal()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="p-4">
-                    <div id="crop-container" class="w-full" style="max-height: 400px;">
-                        <img id="crop-image" src="" alt="Crop" class="max-w-full">
-                    </div>
-                </div>
-                <div class="p-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
-                    <button type="button" onclick="closeCropModal()" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
-                        Cancelar
-                    </button>
-                    <button type="button" onclick="applyCrop()" id="crop-apply-btn"
-                        class="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-black transition-colors flex items-center gap-2">
-                        <i class="fas fa-crop-alt"></i> Recortar e salvar
-                    </button>
                 </div>
             </div>
         </div>
