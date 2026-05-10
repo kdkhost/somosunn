@@ -161,13 +161,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 flex-1">
                 @php
                     $checkItems = [
-                        ['key' => 'plano_ativo', 'label' => 'Plano Premium Ativo', 'icon' => 'fa-gem'],
-                        ['key' => 'email_verificado', 'label' => 'E-mail Verificado', 'icon' => 'fa-envelope-circle-check'],
-                        ['key' => 'perfil_completo', 'label' => 'Dados do Perfil', 'icon' => 'fa-id-card'],
-                        ['key' => 'foto', 'label' => 'Headshot Profissional', 'icon' => 'fa-camera-retro'],
-                        ['key' => 'bio', 'label' => 'Pitch de Apresentação', 'icon' => 'fa-quote-left'],
-                        ['key' => 'telefone', 'label' => 'Canal de Contato', 'icon' => 'fa-mobile-screen'],
-                        ['key' => 'ocupacao', 'label' => 'Área de Atuação', 'icon' => 'fa-briefcase'],
+                        ['key' => 'plano_ativo', 'label' => 'Plano Premium Ativo', 'icon' => 'fa-gem', 'url' => route('planos')],
+                        ['key' => 'email_verificado', 'label' => 'E-mail Verificado', 'icon' => 'fa-envelope-circle-check', 'url' => route('panel.profile.edit')],
+                        ['key' => 'perfil_completo', 'label' => 'Dados do Perfil', 'icon' => 'fa-id-card', 'url' => route('panel.profile.edit')],
+                        ['key' => 'foto', 'label' => 'Headshot Profissional', 'icon' => 'fa-camera-retro', 'url' => route('panel.profile.edit')],
+                        ['key' => 'bio', 'label' => 'Pitch de Apresentação', 'icon' => 'fa-quote-left', 'url' => route('panel.profile.edit')],
+                        ['key' => 'telefone', 'label' => 'Canal de Contato', 'icon' => 'fa-mobile-screen', 'url' => route('panel.profile.edit')],
+                        ['key' => 'ocupacao', 'label' => 'Área de Atuação', 'icon' => 'fa-briefcase', 'url' => route('panel.profile.edit')],
                     ];
                     if (!empty($sellerHealthChecks ?? [])) {
                         $checkItems = array_merge($checkItems, $sellerHealthChecks);
@@ -175,18 +175,34 @@
                 @endphp
 
                 @foreach($checkItems as $item)
-                    @php $isDone = $myHealthDetails[$item['key']] ?? false; @endphp
-                    <div class="flex items-center gap-4 p-5 rounded-3xl {{ $isDone ? 'bg-emerald-500/5 dark:bg-emerald-500/10 border-emerald-500/20' : 'bg-slate-50 dark:bg-slate-800/20 border-slate-100 dark:border-slate-800' }} border-2 transition-all hover:scale-[1.02] duration-300 group/item">
-                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center {{ $isDone ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 shadow-sm' }}">
-                            <i class="fas {{ $isDone ? 'fa-check' : $item['icon'] }} group-hover/item:scale-110 transition-transform"></i>
+                    @php
+                        $isDone = $myHealthDetails[$item['key']] ?? false;
+                        $itemUrl = $item['url'] ?? route('panel.profile.edit');
+                    @endphp
+                    @if($isDone)
+                        <div class="flex items-center gap-4 p-5 rounded-3xl bg-emerald-500/5 dark:bg-emerald-500/10 border-2 border-emerald-500/20 transition-all duration-300">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-emerald-500 text-white shadow-lg shadow-emerald-500/30">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-black text-emerald-700 dark:text-emerald-400 tracking-tight">{{ $item['label'] }}</span>
+                                <span class="text-[10px] uppercase font-bold text-emerald-500/60">CONCLUÍDO</span>
+                            </div>
                         </div>
-                        <div class="flex flex-col">
-                            <span class="text-sm font-black {{ $isDone ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300' }} tracking-tight">{{ $item['label'] }}</span>
-                            <span class="text-[10px] uppercase font-bold {{ $isDone ? 'text-emerald-500/60' : 'text-slate-400' }}">
-                                {{ $isDone ? 'CONCLUÍDO' : 'PENDENTE' }}
-                            </span>
-                        </div>
-                    </div>
+                    @else
+                        <a href="{{ $itemUrl }}" class="flex items-center gap-4 p-5 rounded-3xl bg-slate-50 dark:bg-slate-800/20 border-2 border-slate-100 dark:border-slate-800 transition-all hover:scale-[1.02] hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 duration-300 group/item cursor-pointer">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 shadow-sm group-hover/item:bg-blue-600 group-hover/item:text-white group-hover/item:border-blue-600 transition-all">
+                                <i class="fas {{ $item['icon'] }} group-hover/item:scale-110 transition-transform"></i>
+                            </div>
+                            <div class="flex flex-col flex-1">
+                                <span class="text-sm font-black text-slate-700 dark:text-slate-300 tracking-tight group-hover/item:text-blue-700 dark:group-hover/item:text-blue-400 transition-colors">{{ $item['label'] }}</span>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 group-hover/item:text-blue-500 transition-colors">PENDENTE — clique para completar</span>
+                            </div>
+                            <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center group-hover/item:bg-blue-100 group-hover/item:text-blue-600 transition-all">
+                                <i class="fas fa-arrow-right text-xs"></i>
+                            </div>
+                        </a>
+                    @endif
                 @endforeach
             </div>
         </div>
@@ -419,7 +435,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 animate-fade-in-up" style="animation-delay: 400ms;">
         <!-- Chart Section -->
-        <div class="lg:col-span-8 bg-white dark:bg-slate-900 rounded-[3rem] shadow-sm border border-slate-100 dark:border-slate-800 p-10">
+        <div class="{{ (isset($suggestedUsers) && $suggestedUsers->count() > 0) ? 'lg:col-span-8' : 'lg:col-span-12' }} bg-white dark:bg-slate-900 rounded-[3rem] shadow-sm border border-slate-100 dark:border-slate-800 p-10">
             <div class="flex items-center justify-between mb-10">
                 <div>
                     <h3 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
