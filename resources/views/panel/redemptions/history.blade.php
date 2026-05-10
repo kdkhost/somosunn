@@ -24,24 +24,25 @@
 @section('panel_content')
 <div class="space-y-6">
 
-    {{-- Header --}}
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-                Meus Resgates
-            </h1>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Acompanhe aprovacao, envio, prazo e responsavel pela entrega dos seus resgates em {{ $coinName }}.
-            </p>
-        </div>
+    {{-- Card cabecalho --}}
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 md:p-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <p class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Historico</p>
+                <h1 class="mt-2 text-2xl md:text-3xl font-black text-slate-900 dark:text-white">Meus Resgates</h1>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-xl">
+                    Acompanhe aprovacao, envio, prazo e responsavel pela entrega dos seus resgates em {{ $coinName }}.
+                </p>
+            </div>
 
-        <a href="{{ route('panel.redemptions.shop') }}"
-            class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2.5 text-sm font-bold text-white transition-colors">
-            <i class="fas fa-store"></i> Voltar para a Loja
-        </a>
+            <a href="{{ route('panel.redemptions.shop') }}"
+                class="inline-flex items-center gap-2 rounded-2xl bg-blue-600 hover:bg-blue-700 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-colors">
+                <i class="fas fa-store"></i> Voltar para a Loja
+            </a>
+        </div>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div class="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[1180px] text-left">
                     <thead>
