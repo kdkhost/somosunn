@@ -45,18 +45,9 @@ class GatewayAccount extends Model
      */
     public static function resolveForSeller(int $sellerId): array
     {
-        // Respeita o toggle global do admin: se MP foi desativado em Settings,
-        // nenhuma credencial (do vendedor ou global) pode ativa-lo.
-        $mpToggle = (int) Setting::get('mercadopago_enabled', 0) === 1;
-        if (!$mpToggle) {
-            return [
-                'mpEnabled'           => false,
-                'mpPublicKey'         => '',
-                'useGlobalCredentials' => true,
-                'source'              => 'disabled',
-            ];
-        }
-
+        // 1. Primeiro tenta credenciais proprias do vendedor em gateway_accounts.
+        //    Mesmo que o admin desative o MP globalmente, o vendedor que configurou
+        //    sua propria conta pode continuar vendendo atraves dela.
         if ($sellerId > 0) {
             $account = self::query()
                 ->where('user_id', $sellerId)
@@ -78,6 +69,7 @@ class GatewayAccount extends Model
             }
         }
 
+        // 2. Fallback para credenciais globais da plataforma (apenas se habilitadas).
         return static::resolveGlobalSettings();
     }
 
@@ -86,17 +78,7 @@ class GatewayAccount extends Model
      */
     public static function resolveForSellerSumUp(int $sellerId): array
     {
-        // Respeita o toggle global do admin
-        $sumupToggle = (int) Setting::get('sumup_enabled', 0) === 1;
-        if (!$sumupToggle) {
-            return [
-                'sumupEnabled' => false,
-                'apiKey'       => '',
-                'merchantCode' => '',
-                'source'       => 'disabled',
-            ];
-        }
-
+        // 1. Credenciais proprias do vendedor sempre tem prioridade.
         if ($sellerId > 0) {
             $account = self::query()
                 ->where('user_id', $sellerId)
