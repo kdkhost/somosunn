@@ -957,7 +957,13 @@
 
             // Geocodificar endereco do usuario logado para calcular distancias
             (function() {
-                var geoQuery = [userCity, userState, 'Brasil'].filter(Boolean).join(', ');
+                // Prioridade: CEP > Cidade+Estado > nada
+                var geoQuery = '';
+                if (userCep) {
+                    geoQuery = userCep + ', Brasil';
+                } else {
+                    geoQuery = [userCity, userState, 'Brasil'].filter(Boolean).join(', ');
+                }
                 if (!geoQuery || geoQuery === 'Brasil') return;
                 if (locationIqKey) {
                     fetch('https://us1.locationiq.com/v1/search?key=' + locationIqKey + '&q=' + encodeURIComponent(geoQuery) + '&countrycodes=br&format=json&limit=1')
