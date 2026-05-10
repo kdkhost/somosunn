@@ -952,7 +952,7 @@
             var userCep = @json(auth()->user()->cep ?? '');
             var userNeighbourhood = @json(auth()->user()->neighborhood ?? '');
             var locationIqKey = @json(\App\Models\Setting::get('locationiq_api_key', ''));
-            var RADIUS_KM = 70;
+            var RADIUS_KM = 150;
             var userLat = null;
             var userLon = null;
 
