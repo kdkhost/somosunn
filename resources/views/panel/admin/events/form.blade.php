@@ -950,6 +950,7 @@
             var userState = @json(auth()->user()->state ?? '');
             var userCity = @json(auth()->user()->city ?? '');
             var userCep = @json(auth()->user()->cep ?? '');
+            var userNeighbourhood = @json(auth()->user()->neighborhood ?? '');
             var locationIqKey = @json(\App\Models\Setting::get('locationiq_api_key', ''));
             var RADIUS_KM = 70;
             var userLat = null;
@@ -957,10 +958,12 @@
 
             // Geocodificar endereco do usuario logado para calcular distancias
             (function() {
-                // Prioridade: CEP > Cidade+Estado > nada
+                // Prioridade: CEP > Bairro+Cidade+Estado > Cidade+Estado
                 var geoQuery = '';
                 if (userCep) {
                     geoQuery = userCep + ', Brasil';
+                } else if (userNeighbourhood && userCity) {
+                    geoQuery = [userNeighbourhood, userCity, userState, 'Brasil'].filter(Boolean).join(', ');
                 } else {
                     geoQuery = [userCity, userState, 'Brasil'].filter(Boolean).join(', ');
                 }
