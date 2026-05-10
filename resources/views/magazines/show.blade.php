@@ -469,12 +469,12 @@
     }
 
     // ========================================================
-    // Render PDF pages
+    // Render PDF pages — LAZY / PROGRESSIVE
     // ========================================================
     async function renderPage(pdf, pageNum, targetCssWidth) {
         const page = await pdf.getPage(pageNum);
         const vp1 = page.getViewport({ scale: 1 });
-        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const dpr = Math.min(1.5, window.devicePixelRatio || 1); // Cap DPR for performance
         const scale = (targetCssWidth * dpr) / vp1.width;
         const viewport = page.getViewport({ scale });
 
@@ -483,18 +483,16 @@
         canvas.height = viewport.height;
         const ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport }).promise;
-        return { dataUrl: canvas.toDataURL('image/jpeg', 0.88), aspect: vp1.height / vp1.width };
+        return canvas.toDataURL('image/jpeg', 0.75); // Lower quality = faster
     }
 
     function computeBookSize(pageAspect) {
-        // Available space in the canvas area
         const canvas = document.getElementById('mag-canvas');
         const rect = canvas.getBoundingClientRect();
         const availableW = rect.width - 40;
         const availableH = rect.height - 40;
         const isMobile = window.innerWidth < 900;
 
-        // Single page mode (mobile) vs spread mode (desktop)
         if (isMobile) {
             let w = Math.min(availableW, 620);
             let h = w * pageAspect;
@@ -502,16 +500,24 @@
             return { width: Math.floor(w), height: Math.floor(h), isMobile: true };
         }
 
-        // Desktop: show two pages side by side, book dimensions = 2 * page
         let bookW = Math.min(availableW, 1200);
         let pageW = bookW / 2;
         let pageH = pageW * pageAspect;
         if (pageH > availableH) {
             pageH = availableH;
             pageW = pageH / pageAspect;
-            bookW = pageW * 2;
         }
         return { width: Math.floor(pageW), height: Math.floor(pageH), isMobile: false };
+    }
+
+    // Placeholder SVG (grey page with spinner)
+    function placeholderSvg(w, h) {
+        return 'data:image/svg+xml,' + encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' +
+            '<rect fill="#f1f5f9" width="100%" height="100%"/>' +
+            '<text x="50%" y="50%" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">Carregando...</text>' +
+            '</svg>'
+        );
     }
 
     async function init() {
@@ -523,9 +529,9 @@
             });
             loadingTask.onProgress = (p) => {
                 if (p.total > 0) {
-                    const pct = Math.min(40, Math.round((p.loaded / p.total) * 40));
-                    barFill.style.width = pct + '%';
-                    progressEl.textContent = 'Carregando PDF... ' + Math.round((p.loaded / p.total) * 100) + '%';
+                    const pct = Math.round((p.loaded / p.total) * 100);
+                    barFill.style.width = Math.min(90, pct) + '%';
+                    progressEl.textContent = 'Baixando PDF... ' + pct + '%';
                 }
             };
             const pdf = await loadingTask.promise;
@@ -540,35 +546,39 @@
             // Compute target book size
             const { width: pageW, height: pageH, isMobile } = computeBookSize(aspect);
 
-            // Render all pages
-            const pageImages = [];
-            for (let i = 1; i <= numPages; i++) {
-                const pct = 40 + Math.round((i / numPages) * 55);
-                barFill.style.width = pct + '%';
-                progressEl.textContent = 'Renderizando pagina ' + i + ' de ' + numPages;
-                const r = await renderPage(pdf, i, pageW);
-                pageImages.push(r.dataUrl);
-            }
+            progressEl.textContent = 'Preparando paginas...';
+            barFill.style.width = '95%';
 
-            progressEl.textContent = 'Finalizando...';
-            barFill.style.width = '100%';
-
-            // Build DOM
+            // Create placeholder DOM for ALL pages immediately
             container.innerHTML = '';
             container.style.display = 'block';
             container.style.width = (isMobile ? pageW : pageW * 2) + 'px';
             container.style.height = pageH + 'px';
 
-            pageImages.forEach((src) => {
+            const placeholder = placeholderSvg(pageW, pageH);
+            const pageElements = [];
+
+            for (let i = 0; i < numPages; i++) {
                 const div = document.createElement('div');
                 div.className = 'mag-page';
                 const img = document.createElement('img');
-                img.src = src;
+                img.src = placeholder;
                 img.draggable = false;
+                img.dataset.pageIndex = i;
                 div.appendChild(img);
                 container.appendChild(div);
-            });
+                pageElements.push(img);
+            }
 
+            // Render first 4 pages immediately (cover + first spread)
+            const initialPages = Math.min(4, numPages);
+            for (let i = 0; i < initialPages; i++) {
+                const dataUrl = await renderPage(pdf, i + 1, pageW);
+                pageElements[i].src = dataUrl;
+            }
+            markInitialRendered(initialPages);
+
+            barFill.style.width = '100%';
             loadingEl.style.display = 'none';
             toolbar.style.display = 'flex';
 
@@ -599,15 +609,54 @@
                 currentEl.textContent = Math.max(1, idx + 1);
                 playPageSound();
                 updateButtons();
+                // Lazy-load nearby pages
+                lazyRenderNearby(pdf, idx, pageW, pageElements, numPages);
             });
 
             updateButtons();
+
+            // Start background rendering of remaining pages
+            lazyRenderAll(pdf, initialPages, pageW, pageElements, numPages);
+
         } catch (err) {
             console.error(err);
             loadingEl.style.display = 'none';
             errorEl.style.display = 'block';
             errorMsg.textContent = err.message || String(err);
         }
+    }
+
+    // Lazy render: load pages near the current view
+    const renderedPages = new Set();
+    async function lazyRenderNearby(pdf, currentIdx, pageW, pageElements, numPages) {
+        // Render 3 pages ahead and 1 behind
+        const targets = [currentIdx - 1, currentIdx, currentIdx + 1, currentIdx + 2, currentIdx + 3];
+        for (const idx of targets) {
+            if (idx < 0 || idx >= numPages || renderedPages.has(idx)) continue;
+            renderedPages.add(idx);
+            try {
+                const dataUrl = await renderPage(pdf, idx + 1, pageW);
+                pageElements[idx].src = dataUrl;
+            } catch (e) { /* skip */ }
+        }
+    }
+
+    // Background render all remaining pages (low priority)
+    async function lazyRenderAll(pdf, startFrom, pageW, pageElements, numPages) {
+        for (let i = startFrom; i < numPages; i++) {
+            if (renderedPages.has(i)) continue;
+            renderedPages.add(i);
+            try {
+                const dataUrl = await renderPage(pdf, i + 1, pageW);
+                pageElements[i].src = dataUrl;
+            } catch (e) { /* skip */ }
+            // Yield to main thread every 2 pages to keep UI responsive
+            if (i % 2 === 0) await new Promise(r => setTimeout(r, 50));
+        }
+    }
+    // Mark initial pages as rendered
+    function markInitialRendered(count) {
+        for (let i = 0; i < count; i++) renderedPages.add(i);
     }
 
     function updateButtons() {
