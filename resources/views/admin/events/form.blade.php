@@ -1161,73 +1161,91 @@ async function setAsCover(mediaId) {
                         return;
                     }
 
-                    var query = buildSearchQuery(text);
-                    var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&countrycodes=br&limit=8&addressdetails=1';
-
-                    venueResults.innerHTML = '<div class="list-group-item text-center py-3"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando...</div>';
+                    venueResults.innerHTML = '<div class="list-group-item text-center py-3"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando estabelecimentos...</div>';
                     venueResults.style.display = 'block';
 
-                    fetch(url, { headers: { 'Accept-Language': 'pt-BR' } })
-                        .then(function(r) { return r.json(); })
-                        .then(function(data) {
-                            if (!data || data.length === 0) {
-                                venueResults.innerHTML = '<div class="list-group-item text-muted text-center py-3"><i class="fas fa-search mr-1"></i>Nenhum resultado encontrado</div>';
-                                return;
-                            }
+                    var localQuery = text + (userState ? ', ' + userState + ', Brasil' : ', Brasil');
+                    var nationalQuery = text + ', Brasil';
+                    var localUrl = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(localQuery) + '&countrycodes=br&limit=20&addressdetails=1';
+                    var nationalUrl = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(nationalQuery) + '&countrycodes=br&limit=40&addressdetails=1';
+                    var headers = { 'Accept-Language': 'pt-BR' };
 
-                            var html = '';
-                            data.forEach(function(item) {
-                                var addr = item.address || {};
-                                var name = item.display_name || '';
-                                var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.building || addr.shop || '').trim();
-                                var city = addr.city || addr.town || addr.village || '';
-                                var state = addr.state || '';
-                                var road = addr.road || '';
-                                var number = addr.house_number || '';
-                                var neighbourhood = addr.suburb || addr.neighbourhood || '';
-
-                                var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
-                                var displayTitle = shortName || name.split(',')[0];
-                                var isUserState = userState && state.toLowerCase().indexOf(userState.toLowerCase()) !== -1;
-
-                                html += '<a href="#" class="list-group-item list-group-item-action venue-result py-2 px-3" '
-                                    + 'data-lat="' + item.lat + '" '
-                                    + 'data-lon="' + item.lon + '" '
-                                    + 'data-name="' + displayTitle.replace(/"/g, '&quot;') + '" '
-                                    + 'data-address="' + fullAddress.replace(/"/g, '&quot;') + '">'
-                                    + '<div class="d-flex align-items-start gap-2">'
-                                    + '<i class="fas fa-map-pin mt-1 ' + (isUserState ? 'text-success' : 'text-muted') + '"></i>'
-                                    + '<div class="flex-1">'
-                                    + '<strong class="d-block text-sm">' + displayTitle + '</strong>'
-                                    + '<small class="text-muted d-block">' + fullAddress + '</small>'
-                                    + (isUserState ? '<span class="badge badge-success badge-sm mt-1">Seu estado</span>' : '')
-                                    + '</div>'
-                                    + '</div></a>';
-                            });
-
-                            venueResults.innerHTML = html;
-
-                            // Bind click
-                            venueResults.querySelectorAll('.venue-result').forEach(function(el) {
-                                el.addEventListener('click', function(e) {
-                                    e.preventDefault();
-                                    var lat = parseFloat(this.dataset.lat);
-                                    var lon = parseFloat(this.dataset.lon);
-                                    var venueName = this.dataset.name;
-                                    var venueAddress = this.dataset.address;
-
-                                    locationInput.value = venueName;
-                                    document.getElementById('addressInput').value = venueAddress;
-                                    setMarker(lat, lon);
-                                    if (map) map.setView([lat, lon], 16);
-                                    venueResults.style.display = 'none';
-                                    toastr.success('Local selecionado: ' + venueName);
-                                });
-                            });
-                        })
-                        .catch(function() {
-                            venueResults.innerHTML = '<div class="list-group-item text-danger text-center py-3"><i class="fas fa-exclamation-triangle mr-1"></i>Erro na busca</div>';
+                    if (outOfStateCheck.checked) {
+                        fetch(nationalUrl, { headers: headers })
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) { renderVenueResults(data || []); })
+                            .catch(function() { venueResults.innerHTML = '<div class="list-group-item text-danger text-center py-3"><i class="fas fa-exclamation-triangle mr-1"></i>Erro na busca</div>'; });
+                    } else {
+                        Promise.all([
+                            fetch(localUrl, { headers: headers }).then(function(r) { return r.json(); }).catch(function() { return []; }),
+                            new Promise(function(resolve) {
+                                setTimeout(function() {
+                                    fetch(nationalUrl, { headers: headers }).then(function(r) { return r.json(); }).then(resolve).catch(function() { resolve([]); });
+                                }, 1100);
+                            })
+                        ]).then(function(results) {
+                            var local = results[0] || [];
+                            var national = results[1] || [];
+                            var seen = {};
+                            var combined = [];
+                            local.forEach(function(item) { var key = item.lat + ',' + item.lon; if (!seen[key]) { seen[key] = true; item._isLocal = true; combined.push(item); } });
+                            national.forEach(function(item) { var key = item.lat + ',' + item.lon; if (!seen[key]) { seen[key] = true; combined.push(item); } });
+                            renderVenueResults(combined);
                         });
+                    }
+                }
+
+                function renderVenueResults(data) {
+                    if (!data || data.length === 0) {
+                        venueResults.innerHTML = '<div class="list-group-item text-muted text-center py-3"><i class="fas fa-search mr-1"></i>Nenhum resultado encontrado</div>';
+                        return;
+                    }
+
+                    var items = data.slice(0, 20);
+                    var html = '<div class="list-group-item bg-light py-2 px-3 text-xs font-weight-bold text-muted"><i class="fas fa-list mr-1"></i>' + Math.min(data.length, 20) + ' de ' + data.length + ' resultados' + (data.length > 20 ? ' (refine sua busca)' : '') + '</div>';
+
+                    items.forEach(function(item, idx) {
+                        var addr = item.address || {};
+                        var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.building || addr.shop || '').trim();
+                        var city = addr.city || addr.town || addr.village || '';
+                        var state = addr.state || '';
+                        var road = addr.road || '';
+                        var number = addr.house_number || '';
+                        var neighbourhood = addr.suburb || addr.neighbourhood || '';
+                        var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
+                        var displayTitle = shortName || item.display_name.split(',')[0];
+                        var isLocal = item._isLocal || (userState && state.toLowerCase().indexOf(userState.toLowerCase()) !== -1);
+
+                        html += '<a href="#" class="list-group-item list-group-item-action venue-result py-2 px-3" '
+                            + 'data-lat="' + item.lat + '" '
+                            + 'data-lon="' + item.lon + '" '
+                            + 'data-name="' + displayTitle.replace(/"/g, '&quot;') + '" '
+                            + 'data-address="' + fullAddress.replace(/"/g, '&quot;') + '">'
+                            + '<div class="d-flex align-items-start gap-2">'
+                            + '<span class="font-weight-bold ' + (isLocal ? 'text-success' : 'text-muted') + '" style="min-width:20px">' + (idx + 1) + '.</span>'
+                            + '<div class="flex-1">'
+                            + '<strong class="d-block text-sm">' + displayTitle + '</strong>'
+                            + '<small class="text-muted d-block">' + fullAddress + '</small>'
+                            + (isLocal ? '<span class="badge badge-success badge-sm mt-1"><i class="fas fa-check mr-1"></i>Proximo</span>' : '')
+                            + '</div>'
+                            + '</div></a>';
+                    });
+
+                    venueResults.innerHTML = html;
+
+                    venueResults.querySelectorAll('.venue-result').forEach(function(el) {
+                        el.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var lat = parseFloat(this.dataset.lat);
+                            var lon = parseFloat(this.dataset.lon);
+                            locationInput.value = this.dataset.name;
+                            document.getElementById('addressInput').value = this.dataset.address;
+                            setMarker(lat, lon);
+                            if (map) map.setView([lat, lon], 16);
+                            venueResults.style.display = 'none';
+                            toastr.success('Local selecionado: ' + this.dataset.name);
+                        });
+                    });
                 }
 
                 // Buscar ao clicar no botao

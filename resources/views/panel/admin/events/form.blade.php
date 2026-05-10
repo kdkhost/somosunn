@@ -955,62 +955,108 @@
                 var text = locationInput.value.trim();
                 if (text.length < 3) { venueResults.classList.add('hidden'); return; }
 
-                var query = buildQuery(text);
-                var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&countrycodes=br&limit=8&addressdetails=1';
-
-                venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando...</div>';
+                venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando estabelecimentos...</div>';
                 venueResults.classList.remove('hidden');
 
-                fetch(url, { headers: { 'Accept-Language': 'pt-BR' } })
-                    .then(function(r) { return r.json(); })
-                    .then(function(data) {
-                        if (!data || data.length === 0) {
-                            venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-slate-500"><i class="fas fa-search mr-1"></i>Nenhum resultado</div>';
-                            return;
-                        }
+                // Fazer 2 buscas em paralelo: uma local (estado) e uma geral (Brasil)
+                var localQuery = text + (userState ? ', ' + userState + ', Brasil' : ', Brasil');
+                var nationalQuery = text + ', Brasil';
 
-                        var html = '';
-                        data.forEach(function(item) {
-                            var addr = item.address || {};
-                            var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.building || addr.shop || '').trim();
-                            var city = addr.city || addr.town || addr.village || '';
-                            var state = addr.state || '';
-                            var road = addr.road || '';
-                            var number = addr.house_number || '';
-                            var neighbourhood = addr.suburb || addr.neighbourhood || '';
-                            var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
-                            var displayTitle = shortName || item.display_name.split(',')[0];
-                            var isLocal = userState && state.toLowerCase().indexOf(userState.toLowerCase()) !== -1;
+                var localUrl = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(localQuery) + '&countrycodes=br&limit=20&addressdetails=1';
+                var nationalUrl = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(nationalQuery) + '&countrycodes=br&limit=40&addressdetails=1';
 
-                            html += '<button type="button" class="venue-item w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-slate-800 last:border-0 transition-colors" '
-                                + 'data-lat="' + item.lat + '" data-lon="' + item.lon + '" '
-                                + 'data-name="' + displayTitle.replace(/"/g, '&quot;') + '" '
-                                + 'data-address="' + fullAddress.replace(/"/g, '&quot;') + '">'
-                                + '<div class="flex items-start gap-2">'
-                                + '<i class="fas fa-map-pin mt-1 text-xs ' + (isLocal ? 'text-emerald-500' : 'text-slate-400') + '"></i>'
-                                + '<div class="flex-1 min-w-0">'
-                                + '<p class="text-sm font-bold text-slate-900 dark:text-white truncate">' + displayTitle + '</p>'
-                                + '<p class="text-xs text-slate-500 dark:text-slate-400 truncate">' + fullAddress + '</p>'
-                                + (isLocal ? '<span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">Seu estado</span>' : '')
-                                + '</div></div></button>';
+                var headers = { 'Accept-Language': 'pt-BR' };
+
+                // Se "fora do estado" marcado, busca so nacional
+                if (outOfStateCheck && outOfStateCheck.checked) {
+                    fetch(nationalUrl, { headers: headers })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) { renderResults(data || []); })
+                        .catch(function() { venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-red-500"><i class="fas fa-exclamation-triangle mr-1"></i>Erro na busca</div>'; });
+                } else {
+                    // Busca local + nacional em paralelo, combina e deduplica
+                    Promise.all([
+                        fetch(localUrl, { headers: headers }).then(function(r) { return r.json(); }).catch(function() { return []; }),
+                        new Promise(function(resolve) {
+                            // Delay de 1s para respeitar rate limit do Nominatim (1 req/s)
+                            setTimeout(function() {
+                                fetch(nationalUrl, { headers: headers }).then(function(r) { return r.json(); }).then(resolve).catch(function() { resolve([]); });
+                            }, 1100);
+                        })
+                    ]).then(function(results) {
+                        var local = results[0] || [];
+                        var national = results[1] || [];
+
+                        // Combinar: locais primeiro, depois nacionais (sem duplicatas)
+                        var seen = {};
+                        var combined = [];
+
+                        local.forEach(function(item) {
+                            var key = item.lat + ',' + item.lon;
+                            if (!seen[key]) { seen[key] = true; item._isLocal = true; combined.push(item); }
+                        });
+                        national.forEach(function(item) {
+                            var key = item.lat + ',' + item.lon;
+                            if (!seen[key]) { seen[key] = true; combined.push(item); }
                         });
 
-                        venueResults.innerHTML = html;
-
-                        venueResults.querySelectorAll('.venue-item').forEach(function(el) {
-                            el.addEventListener('click', function() {
-                                locationInput.value = this.dataset.name;
-                                if (addressInput) addressInput.value = this.dataset.address;
-                                if (latInput) latInput.value = this.dataset.lat;
-                                if (lngInput) lngInput.value = this.dataset.lon;
-                                venueResults.classList.add('hidden');
-                                if (typeof toastr !== 'undefined') toastr.success('Local selecionado: ' + this.dataset.name);
-                            });
-                        });
-                    })
-                    .catch(function() {
-                        venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-red-500"><i class="fas fa-exclamation-triangle mr-1"></i>Erro na busca</div>';
+                        renderResults(combined);
                     });
+                }
+            }
+
+            function renderResults(data) {
+                if (!data || data.length === 0) {
+                    venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-slate-500"><i class="fas fa-search mr-1"></i>Nenhum resultado encontrado. Tente outro nome.</div>';
+                    return;
+                }
+
+                // Limitar a 20 resultados
+                var items = data.slice(0, 20);
+                var totalFound = data.length;
+
+                var html = '<div class="px-4 py-2 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-500">'
+                    + '<i class="fas fa-list mr-1"></i> ' + Math.min(totalFound, 20) + ' de ' + totalFound + ' resultados'
+                    + (totalFound > 20 ? ' (refine sua busca para ver mais)' : '')
+                    + '</div>';
+
+                items.forEach(function(item, idx) {
+                    var addr = item.address || {};
+                    var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.building || addr.shop || '').trim();
+                    var city = addr.city || addr.town || addr.village || '';
+                    var state = addr.state || '';
+                    var road = addr.road || '';
+                    var number = addr.house_number || '';
+                    var neighbourhood = addr.suburb || addr.neighbourhood || '';
+                    var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
+                    var displayTitle = shortName || item.display_name.split(',')[0];
+                    var isLocal = item._isLocal || (userState && state.toLowerCase().indexOf(userState.toLowerCase()) !== -1);
+
+                    html += '<button type="button" class="venue-item w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-slate-800 last:border-0 transition-colors" '
+                        + 'data-lat="' + item.lat + '" data-lon="' + item.lon + '" '
+                        + 'data-name="' + displayTitle.replace(/"/g, '&quot;') + '" '
+                        + 'data-address="' + fullAddress.replace(/"/g, '&quot;') + '">'
+                        + '<div class="flex items-start gap-2">'
+                        + '<span class="mt-0.5 text-xs font-black ' + (isLocal ? 'text-emerald-500' : 'text-slate-400') + '">' + (idx + 1) + '.</span>'
+                        + '<div class="flex-1 min-w-0">'
+                        + '<p class="text-sm font-bold text-slate-900 dark:text-white truncate">' + displayTitle + '</p>'
+                        + '<p class="text-xs text-slate-500 dark:text-slate-400 truncate">' + fullAddress + '</p>'
+                        + (isLocal ? '<span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold"><i class="fas fa-check text-[8px]"></i>Proximo</span>' : '')
+                        + '</div></div></button>';
+                });
+
+                venueResults.innerHTML = html;
+
+                venueResults.querySelectorAll('.venue-item').forEach(function(el) {
+                    el.addEventListener('click', function() {
+                        locationInput.value = this.dataset.name;
+                        if (addressInput) addressInput.value = this.dataset.address;
+                        if (latInput) latInput.value = this.dataset.lat;
+                        if (lngInput) lngInput.value = this.dataset.lon;
+                        venueResults.classList.add('hidden');
+                        if (typeof toastr !== 'undefined') toastr.success('Local selecionado: ' + this.dataset.name);
+                    });
+                });
             }
 
             searchBtn.addEventListener('click', searchVenue);
