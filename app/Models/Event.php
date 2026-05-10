@@ -57,6 +57,8 @@ class Event extends Model
         'is_ticket_enabled',
         'scanner_restriction_mode',
         'scanner_radius_meters',
+        'scanner_early_minutes',
+        'scanner_late_minutes',
     ];
 
     protected $casts = [
@@ -267,25 +269,46 @@ class Event extends Model
             return null;
         }
 
-        return $this->start_at instanceof CarbonInterface
+        $start = $this->start_at instanceof CarbonInterface
             ? Carbon::instance($this->start_at)
             : Carbon::parse($this->start_at);
+
+        // Aplica tolerância antecipada configurada pelo admin
+        $earlyMinutes = (int) ($this->scanner_early_minutes ?? 0);
+        if ($earlyMinutes > 0) {
+            $start = $start->copy()->subMinutes($earlyMinutes);
+        }
+
+        return $start;
     }
 
     public function scannerDeadlineAt(): ?Carbon
     {
+        $deadline = null;
+
         if ($this->end_at) {
-            return $this->end_at instanceof CarbonInterface
+            $deadline = $this->end_at instanceof CarbonInterface
                 ? Carbon::instance($this->end_at)
                 : Carbon::parse($this->end_at);
+        } else {
+            $start = $this->start_at instanceof CarbonInterface
+                ? Carbon::instance($this->start_at)
+                : ($this->start_at ? Carbon::parse($this->start_at) : null);
+
+            if (!$start) {
+                return null;
+            }
+
+            $deadline = $start->copy()->endOfDay();
         }
 
-        $start = $this->scannerStartsAt();
-        if (!$start) {
-            return null;
+        // Aplica tolerância adicional após o fim do evento
+        $lateMinutes = (int) ($this->scanner_late_minutes ?? 0);
+        if ($lateMinutes > 0) {
+            $deadline = $deadline->copy()->addMinutes($lateMinutes);
         }
 
-        return $start->copy()->endOfDay();
+        return $deadline;
     }
 
     public function hasScannerLocationConstraint(): bool
@@ -462,8 +485,13 @@ class Event extends Model
             return 'Este evento ainda nao possui uma janela valida de check-in configurada.';
         }
 
+        $earlyMinutes = (int) ($this->scanner_early_minutes ?? 0);
+        $extraInfo = $earlyMinutes > 0
+            ? ' (abre ' . $this->formatMinutesToHuman($earlyMinutes) . ' antes)'
+            : '';
+
         if ($comparison->lt($startsAt)) {
-            return 'A validacao do QR Code abre em ' . $startsAt->format('d/m/Y H:i') . '.';
+            return 'A validacao do QR Code abre em ' . $startsAt->format('d/m/Y H:i') . $extraInfo . '.';
         }
 
         if ($comparison->gt($deadlineAt)) {
@@ -471,14 +499,30 @@ class Event extends Model
                 return 'QR Code expirado. A validacao encerrou em ' . $deadlineAt->format('d/m/Y H:i') . '.';
             }
 
-            return 'QR Code expirado. A validacao encerrou as 23:59 do dia ' . $startsAt->format('d/m/Y') . '.';
+            return 'QR Code expirado. A validacao encerrou em ' . $deadlineAt->format('d/m/Y H:i') . '.';
         }
 
         if ($this->end_at) {
             return 'Validacao disponivel ate ' . $deadlineAt->format('d/m/Y H:i') . '.';
         }
 
-        return 'Validacao disponivel ate 23:59 do dia ' . $startsAt->format('d/m/Y') . '.';
+        return 'Validacao disponivel ate ' . $deadlineAt->format('d/m/Y H:i') . '.';
+    }
+
+    private function formatMinutesToHuman(int $minutes): string
+    {
+        if ($minutes < 60) {
+            return $minutes . ' min';
+        }
+
+        $hours = intdiv($minutes, 60);
+        $mins = $minutes % 60;
+
+        if ($mins === 0) {
+            return $hours . 'h';
+        }
+
+        return $hours . 'h' . $mins . 'min';
     }
 
     public function scopePublicUpcoming(Builder $query): Builder

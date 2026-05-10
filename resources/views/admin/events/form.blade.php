@@ -230,7 +230,43 @@
                                         <div id="scannerExactHint" class="alert alert-warning mb-0 d-none">
                                             A localizacao exata exige leitura no ponto configurado para o evento, com tolerancia tecnica de ate 5 metros.
                                         </div>
+
+                                        <hr class="my-3">
+                                        <h6 class="font-weight-bold mb-2"><i class="fas fa-clock mr-1"></i> Janela de validação do ingresso</h6>
+                                        <p class="text-muted small mb-3">
+                                            Configure quanto tempo antes do início e depois do término do evento o scanner aceita ingressos. Útil para permitir entrada antecipada e atrasados.
+                                        </p>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="small font-weight-bold">
+                                                    <i class="fas fa-door-open text-success mr-1"></i> Abrir scanner antes (minutos)
+                                                </label>
+                                                <div class="input-group">
+                                                    <input type="number" min="0" max="1440" step="5" name="scanner_early_minutes" class="form-control"
+                                                        value="{{ old('scanner_early_minutes', $event->scanner_early_minutes ?? 0) }}" placeholder="0">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text bg-light">min</span>
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">Ex: 120 = scanner abre 2h antes do evento</small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="small font-weight-bold">
+                                                    <i class="fas fa-hourglass-end text-warning mr-1"></i> Aceitar após o fim (minutos)
+                                                </label>
+                                                <div class="input-group">
+                                                    <input type="number" min="0" max="1440" step="5" name="scanner_late_minutes" class="form-control"
+                                                        value="{{ old('scanner_late_minutes', $event->scanner_late_minutes ?? 0) }}" placeholder="0">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text bg-light">min</span>
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">Tolerância para atrasados após o término</small>
+                                            </div>
+                                        </div>
+
                                         <div class="alert alert-secondary mt-3 mb-0">
+                                            <i class="fas fa-info-circle mr-1"></i>
                                             Toda leitura, com sucesso ou erro, fica registrada no sistema para auditoria.
                                         </div>
                                     </div>

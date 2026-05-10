@@ -177,6 +177,8 @@ class EventController extends Controller
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
             'scanner_radius_value' => 'nullable|numeric|min:0.001',
             'scanner_radius_unit' => 'nullable|string|in:m,km',
+            'scanner_early_minutes' => 'nullable|integer|min:0|max:1440',
+            'scanner_late_minutes' => 'nullable|integer|min:0|max:1440',
             'type' => 'nullable|string|in:event,album',
             'slug' => 'nullable|string|max:255',
         ]);
@@ -319,6 +321,8 @@ class EventController extends Controller
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
             'scanner_radius_value' => 'nullable|numeric|min:0.001',
             'scanner_radius_unit' => 'nullable|string|in:m,km',
+            'scanner_early_minutes' => 'nullable|integer|min:0|max:1440',
+            'scanner_late_minutes' => 'nullable|integer|min:0|max:1440',
             'type' => 'nullable|string|in:event,album',
             'slug' => 'nullable|string|max:255',
         ]);

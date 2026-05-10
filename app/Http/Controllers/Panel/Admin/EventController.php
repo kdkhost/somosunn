@@ -386,6 +386,8 @@ class EventController extends Controller
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
             'scanner_radius_value' => 'nullable|numeric|min:0.001',
             'scanner_radius_unit' => 'nullable|string|in:m,km',
+            'scanner_early_minutes' => 'nullable|integer|min:0|max:1440',
+            'scanner_late_minutes' => 'nullable|integer|min:0|max:1440',
             'batch_1_price' => 'nullable|numeric|min:0',
             'batch_1_deadline' => 'nullable|date',
             'batch_2_price' => 'nullable|numeric|min:0',
