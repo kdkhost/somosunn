@@ -419,6 +419,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'supe
     Route::get('/marketing', [\App\Http\Controllers\Panel\MarketingController::class, 'index'])->name('marketing.index');
     Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/perfil/upload-photo', [\App\Http\Controllers\Panel\ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
     Route::get('/certificados', [\App\Http\Controllers\Panel\CertificateController::class, 'index'])->name('certificates.index');
     Route::post('/certificados/gerar', [\App\Http\Controllers\Panel\CertificateController::class, 'generate'])->name('certificates.generate');
     Route::get('/certificados/{certificate}', [\App\Http\Controllers\Panel\CertificateController::class, 'show'])->name('certificates.show');

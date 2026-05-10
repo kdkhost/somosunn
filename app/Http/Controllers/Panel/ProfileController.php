@@ -174,5 +174,80 @@ class ProfileController extends Controller
 
         return redirect()->route('panel.profile.edit')->with('success', 'Perfil atualizado com sucesso!');
     }
+
+    /**
+     * Upload de foto de perfil ou capa via AJAX (com crop no frontend).
+     * Recebe a imagem ja cortada como base64 ou file.
+     */
+    public function uploadPhoto(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:photo,cover_photo',
+            'image' => 'required',
+        ]);
+
+        $user = auth()->user();
+        $type = $request->input('type');
+
+        // Aceita base64 (do cropper) ou file upload
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+        } elseif (is_string($request->input('image')) && str_starts_with($request->input('image'), 'data:image')) {
+            // Decode base64
+            $base64 = $request->input('image');
+            $data = explode(',', $base64, 2);
+            $decoded = base64_decode($data[1] ?? '');
+            if (!$decoded) {
+                return response()->json(['success' => false, 'error' => 'Imagem invalida.'], 422);
+            }
+            // Detectar extensao
+            $mime = explode(';', explode(':', $data[0] ?? '')[1] ?? '')[0] ?? 'image/jpeg';
+            $ext = match ($mime) {
+                'image/png' => 'png',
+                'image/gif' => 'gif',
+                'image/webp' => 'webp',
+                default => 'jpg',
+            };
+            $tmpPath = tempnam(sys_get_temp_dir(), 'crop_') . '.' . $ext;
+            file_put_contents($tmpPath, $decoded);
+            $file = new \Illuminate\Http\UploadedFile($tmpPath, 'cropped.' . $ext, $mime, null, true);
+        } else {
+            return response()->json(['success' => false, 'error' => 'Nenhuma imagem recebida.'], 422);
+        }
+
+        if (!$file->isValid()) {
+            return response()->json(['success' => false, 'error' => 'Arquivo invalido.'], 422);
+        }
+
+        $isAvatar = $type === 'photo';
+        $folder = $isAvatar ? 'uploads/imagens/avatars' : 'uploads/imagens/covers';
+        $prefix = $isAvatar ? 'avatar' : 'cover';
+        $oldPath = $isAvatar ? $user->photo : $user->cover_photo;
+
+        // Remover arquivo antigo
+        if ($oldPath && file_exists(public_path($oldPath))) {
+            @unlink(public_path($oldPath));
+        }
+
+        $filename = $prefix . '_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $path = app(WatermarkService::class)->processPublicImage(
+            $file,
+            $folder,
+            $filename,
+            ['prefix' => $prefix . '-' . $user->id]
+        );
+
+        if (!file_exists(public_path($path))) {
+            return response()->json(['success' => false, 'error' => 'Falha ao salvar imagem.'], 500);
+        }
+
+        $user->update([$type => $path]);
+
+        return response()->json([
+            'success' => true,
+            'url' => asset($path) . '?t=' . time(),
+            'message' => ($isAvatar ? 'Foto de perfil' : 'Capa') . ' atualizada!',
+        ]);
+    }
 }
 

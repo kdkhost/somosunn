@@ -924,39 +924,29 @@
                                         remaining: 'quase pronto'
                                     });
 
-                                    if (contentType.includes('application/json') && xhr.responseText && window.UNNAjaxGlobal) {
+                                    if (contentType.includes('application/json') && xhr.responseText) {
                                         try {
                                             const json = JSON.parse(xhr.responseText);
                                             setUploadCardVisible(false);
-                                            if (window.UNNAjaxGlobal.handleJsonResponse) {
+                                            if (json.success || json.redirect) {
+                                                if (typeof toastr !== 'undefined' && json.message) toastr.success(json.message);
+                                                setTimeout(function() {
+                                                    window.location.href = json.redirect || responseUrl || currentUrl;
+                                                }, 500);
+                                                return;
+                                            }
+                                            if (window.UNNAjaxGlobal && window.UNNAjaxGlobal.handleJsonResponse) {
                                                 window.UNNAjaxGlobal.handleJsonResponse(form, json, { preferPjax: false });
                                                 return;
                                             }
                                         } catch (e) { }
                                     }
 
+                                    // Para respostas HTML apos upload de arquivo, SEMPRE fazer hard reload
+                                    // para evitar conflito de re-declaracao de variaveis no SPA router.
+                                    setUploadCardVisible(false);
                                     if (responseUrl && responseUrl !== currentUrl) {
-                                        if (window.UNNAjaxGlobal) {
-                                            window.UNNAjaxGlobal.navigate(responseUrl, { preferPjax: false, replaceHistory: true });
-                                        } else {
-                                            window.location.assign(responseUrl);
-                                        }
-                                        return;
-                                    }
-
-                                    if (contentType.includes('text/html') && xhr.responseText) {
-                                        if (window.UNNAjaxGlobal) {
-                                            window.UNNAjaxGlobal.replaceDocument(xhr.responseText, responseUrl || currentUrl, true);
-                                        } else {
-                                            document.open();
-                                            document.write(xhr.responseText);
-                                            document.close();
-                                        }
-                                        return;
-                                    }
-
-                                    if (window.UNNAjaxGlobal) {
-                                        window.UNNAjaxGlobal.navigate(window.location.href, { preferPjax: false, replaceHistory: true });
+                                        window.location.assign(responseUrl);
                                     } else {
                                         window.location.reload();
                                     }

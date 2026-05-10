@@ -244,7 +244,7 @@
             </div>
         </div>
 
-        {{-- FOTOS (FILEPOND) --}}
+        {{-- FOTOS (Upload automatico com crop) --}}
         <div
             class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300">
             <h2 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
@@ -255,22 +255,31 @@
                 <!-- Foto de Perfil -->
                 <div>
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 block">Foto de perfil</label>
-                    <div class="flex items-start gap-4">
-                        <div
-                            class="w-20 h-20 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0 border border-slate-200 dark:border-slate-700">
+                    <div class="flex items-center gap-4">
+                        <div id="avatar-preview"
+                            class="w-20 h-20 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0 border-2 border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 transition-colors relative group"
+                            onclick="document.getElementById('avatar-input').click()">
                             @if($user->photo)
-                                <img src="{{ asset($user->photo) }}" alt="Avatar" class="w-full h-full object-cover">
+                                <img src="{{ asset($user->photo) }}?t={{ time() }}" alt="Avatar" class="w-full h-full object-cover" id="avatar-img">
                             @else
-                                <div
-                                    class="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-bold text-xl">
+                                <div class="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-bold text-xl" id="avatar-img">
                                     {{ mb_substr((string) $user->name, 0, 1) }}
                                 </div>
                             @endif
+                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                                <i class="fas fa-camera text-white text-lg"></i>
+                            </div>
                         </div>
                         <div class="flex-1">
-                            <input type="file" class="filepond" name="photo" data-allow-reorder="true"
-                                data-max-file-size="5MB" data-max-files="1" accept="image/png, image/jpeg, image/gif">
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Recomendado: 500x500px (JPG/PNG)</p>
+                            <input type="file" id="avatar-input" class="hidden" accept="image/png,image/jpeg,image/gif,image/webp" data-crop-type="photo" data-crop-ratio="1">
+                            <button type="button" onclick="document.getElementById('avatar-input').click()"
+                                class="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                <i class="fas fa-upload text-blue-500"></i> Alterar foto
+                            </button>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">500x500px (JPG/PNG). Sera recortada automaticamente.</p>
+                            <div id="avatar-status" class="hidden mt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                <i class="fas fa-check-circle"></i> Foto atualizada!
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -278,15 +287,53 @@
                 <!-- Capa -->
                 <div>
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 block">Capa do Perfil</label>
-                    @if($user->cover_photo)
-                        <div
-                            class="w-full h-24 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 mb-3 border border-slate-200 dark:border-slate-700">
-                            <img src="{{ asset($user->cover_photo) }}" alt="Capa" class="w-full h-full object-cover">
+                    <div id="cover-preview"
+                        class="w-full h-24 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 transition-colors relative group mb-3"
+                        onclick="document.getElementById('cover-input').click()">
+                        @if($user->cover_photo)
+                            <img src="{{ asset($user->cover_photo) }}?t={{ time() }}" alt="Capa" class="w-full h-full object-cover" id="cover-img">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center text-slate-400" id="cover-img">
+                                <i class="fas fa-panorama text-2xl"></i>
+                            </div>
+                        @endif
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-camera text-white text-lg"></i>
                         </div>
-                    @endif
-                    <input type="file" class="filepond" name="cover_photo" data-allow-reorder="true"
-                        data-max-file-size="5MB" data-max-files="1" accept="image/png, image/jpeg, image/gif">
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Recomendado: 1200x300px (JPG/PNG)</p>
+                    </div>
+                    <input type="file" id="cover-input" class="hidden" accept="image/png,image/jpeg,image/gif,image/webp" data-crop-type="cover_photo" data-crop-ratio="{{ 1200/300 }}">
+                    <button type="button" onclick="document.getElementById('cover-input').click()"
+                        class="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                        <i class="fas fa-upload text-blue-500"></i> Alterar capa
+                    </button>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">1200x300px (JPG/PNG). Sera recortada automaticamente.</p>
+                    <div id="cover-status" class="hidden mt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        <i class="fas fa-check-circle"></i> Capa atualizada!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Modal de Crop --}}
+        <div id="crop-modal" class="hidden fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+                <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                    <h3 class="font-black text-slate-900 dark:text-white">Recortar imagem</h3>
+                    <button type="button" onclick="closeCropModal()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="p-4">
+                    <div id="crop-container" class="w-full" style="max-height: 400px;">
+                        <img id="crop-image" src="" alt="Crop" class="max-w-full">
+                    </div>
+                </div>
+                <div class="p-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
+                    <button type="button" onclick="closeCropModal()" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="applyCrop()" id="crop-apply-btn"
+                        class="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-black transition-colors flex items-center gap-2">
+                        <i class="fas fa-crop-alt"></i> Recortar e salvar
+                    </button>
                 </div>
             </div>
         </div>
@@ -509,10 +556,130 @@
         @endif
     </div>
 
+    @push('styles')
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+    @endpush
+
     @push('scripts')
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
         <script>
-        const referralProfileTrackUrl = @json(route('panel.referral.track'));
-        const referralProfileTrackToken = @json(csrf_token());
+        // ── Crop & Auto-Upload para fotos de perfil ──
+        (function() {
+            var cropper = null;
+            var currentType = '';
+            var currentRatio = 1;
+            var uploadUrl = @json(route('panel.profile.upload-photo'));
+            var csrfToken = @json(csrf_token());
+
+            // Abrir modal de crop ao selecionar arquivo
+            document.getElementById('avatar-input').addEventListener('change', function(e) {
+                openCropModal(e.target, 'photo', 1);
+            });
+            document.getElementById('cover-input').addEventListener('change', function(e) {
+                openCropModal(e.target, 'cover_photo', 1200/300);
+            });
+
+            window.openCropModal = function(input, type, ratio) {
+                if (!input.files || !input.files[0]) return;
+                currentType = type;
+                currentRatio = ratio;
+
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    var img = document.getElementById('crop-image');
+                    img.src = ev.target.result;
+                    document.getElementById('crop-modal').classList.remove('hidden');
+
+                    // Destruir cropper anterior
+                    if (cropper) { cropper.destroy(); cropper = null; }
+
+                    setTimeout(function() {
+                        cropper = new Cropper(img, {
+                            aspectRatio: ratio,
+                            viewMode: 1,
+                            dragMode: 'move',
+                            autoCropArea: 1,
+                            responsive: true,
+                            background: false,
+                        });
+                    }, 100);
+                };
+                reader.readAsDataURL(input.files[0]);
+            };
+
+            window.closeCropModal = function() {
+                document.getElementById('crop-modal').classList.add('hidden');
+                if (cropper) { cropper.destroy(); cropper = null; }
+                // Reset inputs
+                document.getElementById('avatar-input').value = '';
+                document.getElementById('cover-input').value = '';
+            };
+
+            window.applyCrop = function() {
+                if (!cropper) return;
+
+                var btn = document.getElementById('crop-apply-btn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+                var canvas = cropper.getCroppedCanvas({
+                    width: currentType === 'photo' ? 500 : 1200,
+                    height: currentType === 'photo' ? 500 : 300,
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
+                });
+
+                canvas.toBlob(function(blob) {
+                    var formData = new FormData();
+                    formData.append('_token', csrfToken);
+                    formData.append('type', currentType);
+                    formData.append('image', blob, 'cropped.jpg');
+
+                    fetch(uploadUrl, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'Accept': 'application/json' }
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-crop-alt"></i> Recortar e salvar';
+
+                        if (data.success) {
+                            closeCropModal();
+
+                            // Atualizar preview
+                            if (currentType === 'photo') {
+                                var preview = document.getElementById('avatar-preview');
+                                preview.innerHTML = '<img src="' + data.url + '" alt="Avatar" class="w-full h-full object-cover" id="avatar-img"><div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full"><i class="fas fa-camera text-white text-lg"></i></div>';
+                                document.getElementById('avatar-status').classList.remove('hidden');
+                                setTimeout(function() { document.getElementById('avatar-status').classList.add('hidden'); }, 4000);
+                            } else {
+                                var preview = document.getElementById('cover-preview');
+                                preview.innerHTML = '<img src="' + data.url + '" alt="Capa" class="w-full h-full object-cover" id="cover-img"><div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><i class="fas fa-camera text-white text-lg"></i></div>';
+                                document.getElementById('cover-status').classList.remove('hidden');
+                                setTimeout(function() { document.getElementById('cover-status').classList.add('hidden'); }, 4000);
+                            }
+
+                            if (typeof toastr !== 'undefined') toastr.success(data.message || 'Imagem atualizada!');
+                        } else {
+                            if (typeof toastr !== 'undefined') toastr.error(data.error || 'Erro ao salvar imagem.');
+                        }
+                    })
+                    .catch(function(err) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-crop-alt"></i> Recortar e salvar';
+                        if (typeof toastr !== 'undefined') toastr.error('Erro de conexao. Tente novamente.');
+                    });
+                }, 'image/jpeg', 0.9);
+            };
+        })();
+        </script>
+
+        <script>
+        if (typeof referralProfileTrackUrl === 'undefined') {
+        var referralProfileTrackUrl = @json(route('panel.referral.track'));
+        var referralProfileTrackToken = @json(csrf_token());
 
         function trackReferralProfileAction(action, channel, targetUrl) {
             const payload = new FormData();
@@ -567,6 +734,7 @@
                 });
             });
         }
+        } // end if typeof referralProfileTrackUrl
         </script>
         <style>
             /* Hide FilePond Credits */
