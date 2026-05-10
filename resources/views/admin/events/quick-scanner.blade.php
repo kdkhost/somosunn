@@ -14,23 +14,24 @@
         <div class="row mb-3">
             <div class="col-12">
                 <div class="card card-primary card-outline shadow-sm">
-                    <div class="card-body d-flex flex-column flex-lg-row align-items-lg-center justify-content-between">
-                        <div>
-                            <h3 class="mb-2 font-weight-bold">
-                                <i class="fas fa-qrcode mr-2 text-primary"></i>Leitura rapida para todos os eventos
-                            </h3>
-                            <p class="text-muted mb-0">
-                                Valide qualquer ingresso ativo. Se o evento usar geocerca, a regra do proprio evento sera aplicada automaticamente.
-                            </p>
-                        </div>
-                        <div class="mt-3 mt-lg-0 d-flex flex-wrap gap-2">
-                            <a href="{{ route('admin.events.list') }}" class="btn btn-outline-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-qrcode mr-2 text-primary"></i>Leitura rápida para todos os eventos
+                        </h3>
+                        <div class="card-tools">
+                            <a href="{{ route('admin.events.list') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                 <i class="fas fa-list mr-1"></i> Lista de eventos
                             </a>
-                            <a href="{{ route('admin.events.index') }}" class="btn btn-light border">
-                                <i class="fas fa-calendar-alt mr-1"></i> Calendario
+                            <a href="{{ route('admin.events.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                                <i class="fas fa-calendar-alt mr-1"></i> Calendário
                             </a>
                         </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <p class="text-muted mb-0 small">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Valide qualquer ingresso ativo. Se o evento usar geocerca, a regra do próprio evento será aplicada automaticamente.
+                        </p>
                     </div>
                 </div>
             </div>
