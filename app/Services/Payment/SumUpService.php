@@ -35,29 +35,30 @@ class SumUpService
             $description = $options['description'];
         }
 
-        // Calcula o valor a cobrar, aplicando a taxa de gateway ao cliente (pass_fee)
-        $charge = $this->resolveChargeAmount($order);
+        // Calcula o breakdown de cobranca com base no numero de parcelas solicitado.
+        // Por padrao, assume 1x (a vista) - sem taxa de gateway nem juros de parcelamento.
+        $installments = max(1, (int) ($options['installments'] ?? 1));
+        $breakdown    = $this->calculateBreakdown($order, $installments);
 
-        // Atualiza o pedido caso o valor efetivamente cobrado pela SumUp seja diferente do base.
-        // Mantemos "total_amount" = valor cobrado do cliente (inclui taxa repassada)
-        // e "fee_amount" = quanto desse total corresponde a taxa repassada.
-        if ($charge['charge_amount'] > $charge['base_amount']) {
-            $order->forceFill([
-                'total_amount' => $charge['charge_amount'],
-                'fee_amount'   => $charge['fee_amount'],
-                'metadata'     => array_merge($order->metadata ?? [], [
-                    'sumup_base_amount'    => $charge['base_amount'],
-                    'sumup_fee_percentage' => $charge['fee_percentage'],
-                    'sumup_fee_fixed'      => $charge['fee_fixed'],
-                    'sumup_fee_amount'     => $charge['fee_amount'],
-                    'sumup_pass_fee'       => true,
-                ]),
-            ])->save();
-        }
+        // Atualiza o pedido para refletir o valor que sera efetivamente cobrado.
+        $metaUpdates = [
+            'sumup_base_amount'   => $breakdown['base_amount'],
+            'sumup_fee_amount'    => $breakdown['total_extra'],
+            'sumup_gateway_fee'   => $breakdown['gateway_fee'],
+            'sumup_interest_fee'  => $breakdown['installment_interest'],
+            'sumup_installments'  => $installments,
+            'sumup_pass_fee'      => $breakdown['total_extra'] > 0,
+        ];
+
+        $order->forceFill([
+            'total_amount' => $breakdown['charge_amount'],
+            'fee_amount'   => $breakdown['total_extra'],
+            'metadata'     => array_merge($order->metadata ?? [], $metaUpdates),
+        ])->save();
 
         $payload = [
             'checkout_reference' => 'ORDER-' . $order->id . '-' . time(),
-            'amount'             => $charge['charge_amount'],
+            'amount'             => $breakdown['charge_amount'],
             'currency'           => $order->currency ?? 'BRL',
             'merchant_code'      => $config['merchant_code'],
             'description'        => mb_substr($description, 0, 255),
@@ -79,7 +80,7 @@ class SumUpService
             'checkout_id'   => $response['id'],
             'status'        => 'PENDING',
             'payment_type'  => strtoupper($options['payment_type'] ?? 'CARD'),
-            'amount'        => $charge['charge_amount'],
+            'amount'        => $breakdown['charge_amount'],
             'currency'      => $order->currency ?? 'BRL',
             'webhook_token' => $webhookToken,
             'webhook_url'   => $webhookUrl,
@@ -89,55 +90,89 @@ class SumUpService
         return [
             'checkout_id'   => $response['id'],
             'webhook_token' => $webhookToken,
-            'charge_amount' => $charge['charge_amount'],
-            'base_amount'   => $charge['base_amount'],
-            'fee_amount'    => $charge['fee_amount'],
+            'charge_amount' => $breakdown['charge_amount'],
+            'base_amount'   => $breakdown['base_amount'],
+            'fee_amount'    => $breakdown['total_extra'],
+            'installments'  => $installments,
             'raw'           => $response,
         ];
     }
 
     /**
-     * Calcula o valor a ser cobrado do cliente considerando o repasse de taxa (pass_fee).
+     * Calcula o breakdown de cobranca (base + taxa de gateway + juros de parcelamento).
      *
-     * Quando o admin marca "sumup_pass_fee=1", a taxa percentual + fixa do gateway
-     * e adicionada ao valor base do pedido, de forma que a plataforma receba
-     * aproximadamente o valor base apos o desconto do SumUp.
+     * Regra: taxa de gateway (pass_fee) e juros de parcelamento SO sao aplicados
+     * quando o numero de parcelas for MAIOR que "sumup_installments_no_interest".
+     * Para a vista (1x, dentro do limite sem juros), o cliente paga apenas o valor base.
+     */
+    public function calculateBreakdown(Order $order, int $installments = 1): array
+    {
+        // Prioriza o valor base gravado em metadata (se o pedido ja passou por este fluxo antes)
+        $baseAmount = (float) (data_get($order->metadata, 'sumup_base_amount') ?? $order->total_amount);
+        $installments = max(1, $installments);
+
+        $passFee        = (bool)(int) Setting::get('sumup_pass_fee', 0);
+        $feePercent     = (float) Setting::get('sumup_fee_percentage', 2.75);
+        $feeFixed       = (float) Setting::get('sumup_fee_fixed', 0);
+        $noInterestUpTo = max(1, (int) Setting::get('sumup_installments_no_interest', 1));
+        $installmentTax = (float) Setting::get('sumup_installment_tax', 0);
+        $interestType   = (string) Setting::get('sumup_interest_type', 'per_installment');
+
+        $chargeAmount       = $baseAmount;
+        $gatewayFee         = 0.0;
+        $installmentInterest = 0.0;
+
+        // Taxa de gateway e juros so se aplicam quando ha parcelamento acima do limite sem juros.
+        if ($installments > $noInterestUpTo) {
+            // 1) Taxa de gateway (pass_fee) - aplicada ao valor base
+            if ($passFee && ($feePercent > 0 || $feeFixed > 0)) {
+                $withGatewayFee = round($baseAmount * (1 + $feePercent / 100) + $feeFixed, 2);
+                $gatewayFee     = round($withGatewayFee - $baseAmount, 2);
+                $chargeAmount   = $withGatewayFee;
+            }
+
+            // 2) Juros de parcelamento - aplicado sobre o valor apos a taxa de gateway
+            if ($installmentTax > 0) {
+                $parcelsWithInterest = $installments - $noInterestUpTo;
+                $before = $chargeAmount;
+                if ($interestType === 'on_total') {
+                    $chargeAmount = round($chargeAmount * (1 + $installmentTax / 100), 2);
+                } else {
+                    $chargeAmount = round($chargeAmount * (1 + ($installmentTax / 100) * $parcelsWithInterest), 2);
+                }
+                $installmentInterest = round($chargeAmount - $before, 2);
+            }
+        }
+
+        return [
+            'base_amount'          => round($baseAmount, 2),
+            'charge_amount'        => round($chargeAmount, 2),
+            'gateway_fee'          => round($gatewayFee, 2),
+            'installment_interest' => round($installmentInterest, 2),
+            'total_extra'          => round($gatewayFee + $installmentInterest, 2),
+            'installments'         => $installments,
+            'no_interest_up_to'    => $noInterestUpTo,
+            'pass_fee'             => $passFee,
+            'fee_percentage'       => $feePercent,
+            'fee_fixed'            => $feeFixed,
+            'installment_tax'      => $installmentTax,
+            'interest_type'        => $interestType,
+        ];
+    }
+
+    /**
+     * @deprecated Use calculateBreakdown() em vez deste metodo.
      */
     public function resolveChargeAmount(Order $order): array
     {
-        $baseAmount = (float) $order->total_amount;
-
-        // Se a taxa ja foi aplicada previamente ao pedido, usamos o valor base preservado.
-        $storedBase = (float) data_get($order->metadata, 'sumup_base_amount', 0);
-        if ($storedBase > 0) {
-            $baseAmount = $storedBase;
-        }
-
-        $passFee    = (bool)(int) Setting::get('sumup_pass_fee', 0);
-        $feePercent = (float) Setting::get('sumup_fee_percentage', 2.75);
-        $feeFixed   = (float) Setting::get('sumup_fee_fixed', 0);
-
-        if (!$passFee || ($feePercent <= 0 && $feeFixed <= 0)) {
-            return [
-                'base_amount'    => round($baseAmount, 2),
-                'charge_amount'  => round($baseAmount, 2),
-                'fee_amount'     => 0.0,
-                'fee_percentage' => $feePercent,
-                'fee_fixed'      => $feeFixed,
-                'pass_fee'       => false,
-            ];
-        }
-
-        $chargeAmount = round($baseAmount * (1 + $feePercent / 100) + $feeFixed, 2);
-        $feeAmount    = round($chargeAmount - $baseAmount, 2);
-
+        $b = $this->calculateBreakdown($order, 1);
         return [
-            'base_amount'    => round($baseAmount, 2),
-            'charge_amount'  => $chargeAmount,
-            'fee_amount'     => $feeAmount,
-            'fee_percentage' => $feePercent,
-            'fee_fixed'      => $feeFixed,
-            'pass_fee'       => true,
+            'base_amount'    => $b['base_amount'],
+            'charge_amount'  => $b['charge_amount'],
+            'fee_amount'     => $b['total_extra'],
+            'fee_percentage' => $b['fee_percentage'],
+            'fee_fixed'      => $b['fee_fixed'],
+            'pass_fee'       => $b['pass_fee'] && $b['total_extra'] > 0,
         ];
     }
 

@@ -777,6 +777,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
 Route::post('/checkout/process-payment', [\App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('checkout.process_payment');
 Route::post('/checkout/sumup/pix', [\App\Http\Controllers\CheckoutController::class, 'sumupPix'])->name('checkout.sumup.pix');
 Route::get('/checkout/sumup/status', [\App\Http\Controllers\CheckoutController::class, 'sumupStatus'])->name('checkout.sumup.status');
+Route::post('/checkout/sumup/recreate', [\App\Http\Controllers\CheckoutController::class, 'sumupRecreateCheckout'])->name('checkout.sumup.recreate');
 Route::post('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
 Route::get('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
 Route::get('/checkout/sucesso/{order}', [\App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');

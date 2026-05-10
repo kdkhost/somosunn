@@ -626,4 +626,50 @@ class CheckoutController extends Controller
             return response()->json(['status' => 'PENDING']);
         }
     }
+
+    /**
+     * Recria o checkout SumUp com um novo numero de parcelas.
+     *
+     * Quando o cliente muda entre "a vista" e "parcelado" no formulario, o valor
+     * cobrado muda (taxa de gateway/juros so se aplicam quando parcelado acima do
+     * limite sem juros). Como o SumUp cria o checkout com valor fixo, precisamos
+     * gerar um novo checkout toda vez que o total muda.
+     */
+    public function sumupRecreateCheckout(Request $request, \App\Services\Payment\SumUpService $sumUpService)
+    {
+        $request->validate([
+            'order_id'     => 'required|integer',
+            'installments' => 'required|integer|min:1|max:12',
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+        abort_unless(Auth::check() && Auth::id() === $order->user_id, 403);
+
+        if ($order->status === 'paid') {
+            return response()->json(['success' => false, 'error' => 'Pedido ja esta pago.'], 422);
+        }
+
+        try {
+            $checkout = $sumUpService->createCheckout($order, [
+                'installments' => (int) $request->input('installments'),
+            ]);
+
+            $order->refresh();
+
+            return response()->json([
+                'success'       => true,
+                'checkout_id'   => $checkout['checkout_id'] ?? '',
+                'charge_amount' => (float) ($checkout['charge_amount'] ?? $order->total_amount),
+                'base_amount'   => (float) ($checkout['base_amount']   ?? $order->total_amount),
+                'fee_amount'    => (float) ($checkout['fee_amount']    ?? 0),
+                'installments'  => (int)   ($checkout['installments']  ?? 1),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('SumUp recreate checkout failed', [
+                'order_id' => $order->id,
+                'error'    => $e->getMessage(),
+            ]);
+            return response()->json(['success' => false, 'error' => 'Falha ao atualizar checkout: ' . $e->getMessage()], 500);
+        }
+    }
 }

@@ -4,71 +4,78 @@
     $apiKey              = $sumupApiKey          ?? '';
     $orderId             = $order->id            ?? 0;
 
-    // Valor base do pedido (antes da taxa de gateway) e valor efetivamente cobrado do cliente.
-    // Quando "Repassar taxa" esta ativado, o pedido e atualizado com total_amount = base + taxa.
+    // Valor base do pedido (antes de taxas/juros) = valor original do pedido.
     $baseAmount          = (float) (data_get($order->metadata, 'sumup_base_amount') ?? ($order->total_amount ?? 0));
-    $amount              = (float) ($order->total_amount ?? 0); // valor ja com taxa repassada, se houver
+    // Valor atualmente cobrado do SumUp (reflete o checkout atual - pode ter sido criado como a vista).
+    $amount              = (float) ($order->total_amount ?? 0);
     $amountFormatted     = number_format($amount, 2, '.', '');
     $successUrl          = route('events.payment.success', $orderId);
     $pendingUrl          = route('events.payment.pending', $orderId);
     $checkoutIdValue     = $checkoutId           ?? '';
     $maxInstallments     = (int) ($sumupMaxInstallments  ?? 12);
-    $noInterestUpTo      = (int) ($sumupNoInterestUpTo   ?? 1);
+    $noInterestUpTo      = (int) ($sumupNoInterestUpTo   ?? $sumupInstallmentsNoInterest ?? 1);
     $installmentTax      = (float) ($sumupInstallmentTax ?? 0);
     $passFeeToClient     = (bool) ($sumupPassFeeToClient ?? false);
     $interestType        = $sumupInterestType ?? \App\Models\Setting::get('sumup_interest_type', 'per_installment');
     $pixExpirationMinutes = (int) ($sumupPixExpirationMinutes ?? \App\Models\Setting::get('sumup_pix_expiration_minutes', 10) ?? 10);
 
-    // Taxa do gateway SumUp (percentual + fixa) - aplicada quando "Repassar taxa" esta ativo
+    // Taxa do gateway SumUp (percentual + fixa) - SO aplicada quando ha parcelamento acima do limite sem juros
     $sumupFeePercentage  = (float) \App\Models\Setting::get('sumup_fee_percentage', 2.75);
     $sumupFeeFixed       = (float) \App\Models\Setting::get('sumup_fee_fixed', 0);
-    $gatewayFeeAmount    = max(0, $amount - $baseAmount);
-    $hasGatewayFee       = $passFeeToClient && $gatewayFeeAmount > 0.009;
 
-    // Pré-calcular as opções de parcelas para exibição no debug e no JS
-    // O valor base ja inclui a taxa de gateway quando pass_fee=1 (calculado no service).
-    // Os juros de parcelamento (installmentTax) sao APLICADOS SOBRE o valor cobrado ($amount)
-    // apenas para as parcelas acima do noInterestUpTo.
+    // Calcular TODAS as opcoes de parcelas a partir do valor base.
+    // Regra: parcelas ate $noInterestUpTo => valor base (sem taxa nem juros).
+    //        parcelas acima => base + taxa gateway (se pass_fee=1) + juros (se installment_tax>0).
     $installmentOptions = [];
     for ($i = 1; $i <= $maxInstallments; $i++) {
-        if ($i <= $noInterestUpTo || $installmentTax <= 0 || !$passFeeToClient) {
-            // Sem juros de parcelamento (apenas a taxa de gateway, se aplicavel, ja esta em $amount)
-            $total = $amount;
-            $perInstallment = $amount / $i;
-            $hasInterest = false;
-        } else {
-            $hasInterest = true;
-            $parcelsWithInterest = $i - $noInterestUpTo;
+        $chargeAmount = $baseAmount;
+        $gatewayFee   = 0.0;
+        $interestFee  = 0.0;
+        $hasExtras    = false;
 
-            if ($interestType === 'on_total') {
-                // Juros sobre o total: aplica a taxa uma vez sobre o valor total
-                $total = $amount * (1 + $installmentTax / 100);
-            } else {
-                // Juros por parcela: aplica a taxa multiplicada pelo número de parcelas com juros
-                $total = $amount * (1 + ($installmentTax / 100) * $parcelsWithInterest);
+        if ($i > $noInterestUpTo) {
+            // Taxa de gateway
+            if ($passFeeToClient && ($sumupFeePercentage > 0 || $sumupFeeFixed > 0)) {
+                $withFee      = round($baseAmount * (1 + $sumupFeePercentage / 100) + $sumupFeeFixed, 2);
+                $gatewayFee   = round($withFee - $baseAmount, 2);
+                $chargeAmount = $withFee;
+                $hasExtras    = true;
             }
-
-            $perInstallment = $total / $i;
+            // Juros de parcelamento - sobre o valor apos gateway
+            if ($installmentTax > 0) {
+                $parcelsWithInterest = $i - $noInterestUpTo;
+                $before = $chargeAmount;
+                if ($interestType === 'on_total') {
+                    $chargeAmount = round($chargeAmount * (1 + $installmentTax / 100), 2);
+                } else {
+                    $chargeAmount = round($chargeAmount * (1 + ($installmentTax / 100) * $parcelsWithInterest), 2);
+                }
+                $interestFee = round($chargeAmount - $before, 2);
+                $hasExtras   = true;
+            }
         }
+
         $installmentOptions[] = [
             'n'               => $i,
-            'per_installment' => round($perInstallment, 2),
-            'total'           => round($total, 2),
-            'has_interest'    => $hasInterest,
+            'per_installment' => round($chargeAmount / $i, 2),
+            'total'           => round($chargeAmount, 2),
+            'gateway_fee'     => $gatewayFee,
+            'interest_fee'    => $interestFee,
+            'has_interest'    => $hasExtras,
         ];
     }
 @endphp
 
-{{-- Aviso de taxa repassada ao cliente --}}
-@if($hasGatewayFee)
+{{-- Aviso de taxa de parcelamento (apenas informativo - valor real exibido no seletor) --}}
+@if($passFeeToClient && $maxInstallments > $noInterestUpTo && ($sumupFeePercentage > 0 || $installmentTax > 0))
 <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-800 flex items-start gap-2">
     <i class="fas fa-info-circle mt-0.5"></i>
     <div>
-        <strong>Taxa de processamento inclusa:</strong>
-        R$ {{ number_format($baseAmount, 2, ',', '.') }}
-        + R$ {{ number_format($gatewayFeeAmount, 2, ',', '.') }}
-        ({{ number_format($sumupFeePercentage, 2, ',', '.') }}%@if($sumupFeeFixed > 0) + R$ {{ number_format($sumupFeeFixed, 2, ',', '.') }}@endif)
-        = <strong>R$ {{ number_format($amount, 2, ',', '.') }}</strong>
+        <strong>A vista:</strong> sem taxas adicionais.
+        <strong class="ml-2">Parcelado (acima de {{ $noInterestUpTo }}x):</strong>
+        @if($sumupFeePercentage > 0)taxa de processamento {{ number_format($sumupFeePercentage, 2, ',', '.') }}%@endif
+        @if($sumupFeePercentage > 0 && $installmentTax > 0) + @endif
+        @if($installmentTax > 0)juros de {{ number_format($installmentTax, 2, ',', '.') }}%@endif.
     </div>
 </div>
 @endif
@@ -141,7 +148,7 @@
             style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px;">
             @foreach($installmentOptions as $opt)
                 <option value="{{ $opt['n'] }}">
-                    {{ $opt['n'] }}x de R$ {{ number_format($opt['per_installment'], 2, ',', '.') }} = R$ {{ number_format($opt['total'], 2, ',', '.') }}@if($opt['has_interest']) (+{{ number_format($installmentTax, 2, ',', '.') }}% juros)@else{{ ' sem juros' }}@endif
+                    {{ $opt['n'] }}x de R$ {{ number_format($opt['per_installment'], 2, ',', '.') }} = R$ {{ number_format($opt['total'], 2, ',', '.') }}@if($opt['has_interest']) (com taxas)@else sem juros@endif
                 </option>
             @endforeach
         </select>
@@ -151,12 +158,18 @@
     {{-- Widget SumUp (seletor de parcelas nativo sempre oculto — usamos o nosso) --}}
     <div id="sumup-card"></div>
 
+    {{-- Feedback de recriacao de checkout quando o usuario muda parcelas --}}
+    <div id="sumup-recreating" class="hidden mt-3 py-2 px-3 bg-slate-100 rounded-lg text-xs text-slate-600 flex items-center justify-center gap-2">
+        <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-slate-500"></div>
+        <span>Atualizando valor...</span>
+    </div>
+
     {{-- Botão customizado de pagamento com valor atualizado --}}
-    @if($maxInstallments > 1 && $installmentTax > 0 && $passFeeToClient)
+    @if($maxInstallments > 1 && ($installmentTax > 0 || ($passFeeToClient && $sumupFeePercentage > 0)))
     <button type="button" id="sumup-custom-pay-btn" onclick="submitSumupCard()"
         class="w-full mt-4 py-4 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-base transition-all active:scale-[0.98] flex items-center justify-center gap-2">
         <i class="fas fa-lock text-sm"></i>
-        <span id="sumup-pay-btn-text">Pagar R$ {{ number_format($amount, 2, ',', '.') }}</span>
+        <span id="sumup-pay-btn-text">Pagar R$ {{ number_format($installmentOptions[0]['total'] ?? $amount, 2, ',', '.') }}</span>
     </button>
     @endif
 </div>
@@ -230,6 +243,97 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ── Seletor customizado de parcelas ──────────────────────────────────────
     var sumupCardInstance = null;
+    var currentCheckoutId = CHECKOUT_ID;
+    var recreatingCheckout = false;
+    var installmentDebounceTimer = null;
+
+    function remountSumupCard(newCheckoutId, installments) {
+        currentCheckoutId = newCheckoutId;
+        var cardContainer = document.getElementById('sumup-card');
+        if (!cardContainer || typeof SumUpCard === 'undefined') return;
+
+        // Destruir widget anterior
+        try {
+            if (sumupCardInstance && typeof sumupCardInstance.unmount === 'function') {
+                sumupCardInstance.unmount();
+            }
+        } catch (e) { /* ignore */ }
+        cardContainer.innerHTML = '';
+
+        try {
+            sumupCardInstance = SumUpCard.mount({
+                id: 'sumup-card',
+                checkoutId: newCheckoutId,
+                locale: 'pt-BR',
+                country: 'BR',
+                currency: 'BRL',
+                showInstallments: false,
+                installments: installments,
+                showSubmitButton: !(MAX_INSTALLMENTS > 1 && (INSTALLMENT_TAX > 0 || (PASS_FEE_TO_CLIENT))),
+                maxInstallments: MAX_INSTALLMENTS,
+                onResponse: function(type, body) {
+                    if (type === 'success') {
+                        if (typeof toastr !== 'undefined') toastr.success('Pagamento aprovado!');
+                        setTimeout(function(){ window.location.href = SUCCESS_URL; }, 1500);
+                    } else if (type === 'error') {
+                        if (typeof toastr !== 'undefined') toastr.error((body && body.message) || 'Erro ao processar pagamento.');
+                    } else if (type === 'pending') {
+                        if (typeof toastr !== 'undefined') toastr.info('Pagamento pendente de confirmacao.');
+                        setTimeout(function(){ window.location.href = PENDING_URL; }, 1500);
+                    }
+                }
+            });
+        } catch (e) {
+            console.error('Falha ao remontar widget SumUp:', e);
+        }
+    }
+
+    function recreateSumupCheckout(installments) {
+        var recreatingEl = document.getElementById('sumup-recreating');
+        var payBtn = document.getElementById('sumup-custom-pay-btn');
+        if (recreatingEl) recreatingEl.classList.remove('hidden');
+        if (payBtn) payBtn.setAttribute('disabled', 'disabled');
+        recreatingCheckout = true;
+
+        return fetch('{{ route("checkout.sumup.recreate") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ order_id: ORDER_ID, installments: installments })
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            if (recreatingEl) recreatingEl.classList.add('hidden');
+            if (payBtn) payBtn.removeAttribute('disabled');
+            recreatingCheckout = false;
+
+            if (!data.success) {
+                if (typeof toastr !== 'undefined') toastr.error(data.error || 'Falha ao atualizar valor.');
+                return;
+            }
+
+            // Atualizar botao
+            var btnText = document.getElementById('sumup-pay-btn-text');
+            if (btnText) {
+                btnText.textContent = 'Pagar R$ ' + Number(data.charge_amount).toFixed(2).replace('.', ',');
+            }
+
+            // Remontar o widget SumUp com o novo checkout_id (valor atualizado)
+            if (data.checkout_id && data.checkout_id !== currentCheckoutId) {
+                remountSumupCard(data.checkout_id, installments);
+            }
+        })
+        .catch(function(err){
+            if (recreatingEl) recreatingEl.classList.add('hidden');
+            if (payBtn) payBtn.removeAttribute('disabled');
+            recreatingCheckout = false;
+            console.error('Recreate checkout error:', err);
+            if (typeof toastr !== 'undefined') toastr.error('Erro ao atualizar valor.');
+        });
+    }
 
     window.onCustomInstallmentChange = function(value) {
         var n = parseInt(value, 10);
@@ -239,21 +343,25 @@ document.addEventListener('DOMContentLoaded', function() {
         var option = INSTALLMENT_OPTIONS.find(function(o) { return o.n === n; });
         var totalWithInterest = option ? option.total : AMOUNT;
 
-        // Atualizar o widget SumUp com o número de parcelas
-        if (sumupCardInstance && typeof sumupCardInstance.update === 'function') {
-            sumupCardInstance.update({ installments: n });
-        }
-
-        // Atualizar o texto do botão customizado
+        // Atualizar imediatamente o texto do botao
         var btnText = document.getElementById('sumup-pay-btn-text');
         if (btnText) {
-            var formatted = totalWithInterest.toFixed(2).replace('.', ',');
-            btnText.textContent = 'Pagar R$ ' + formatted;
+            btnText.textContent = 'Pagar R$ ' + totalWithInterest.toFixed(2).replace('.', ',');
         }
+
+        // Debounce para recriar o checkout no backend (so se o valor mudar)
+        if (installmentDebounceTimer) clearTimeout(installmentDebounceTimer);
+        installmentDebounceTimer = setTimeout(function(){
+            recreateSumupCheckout(n);
+        }, 400);
     };
 
     // Submeter o formulário SumUp via botão customizado
     window.submitSumupCard = function() {
+        if (recreatingCheckout) {
+            if (typeof toastr !== 'undefined') toastr.info('Aguarde - atualizando valor...');
+            return;
+        }
         if (sumupCardInstance && typeof sumupCardInstance.submit === 'function') {
             sumupCardInstance.submit();
         }
@@ -314,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     amount: AMOUNT.toFixed(2),
                     showInstallments: false,
                     installments: 1,
-                    showSubmitButton: !(INSTALLMENT_TAX > 0 && PASS_FEE_TO_CLIENT && MAX_INSTALLMENTS > 1),
+                    showSubmitButton: !(MAX_INSTALLMENTS > 1 && (INSTALLMENT_TAX > 0 || PASS_FEE_TO_CLIENT)),
                     maxInstallments: MAX_INSTALLMENTS,
                     onChangeInstallments: function(installments) {
                         console.log('SumUp native installment changed:', installments);
