@@ -175,11 +175,40 @@
                         </div>
                         <div class="row event-only-field">
                             <div class="col-md-6">
-                                <div class="form-group mb-2"><label>Local (Nome do Local)</label><input name="location"
-                                        class="form-control" value="{{ old('location', $event->location) }}"></div>
+                                <div class="form-group mb-2">
+                                    <label>Local (Nome do Estabelecimento)</label>
+                                    <div class="input-group">
+                                        <input name="location" id="locationInput" class="form-control"
+                                            value="{{ old('location', $event->location) }}"
+                                            placeholder="Digite o nome do local ou estabelecimento..."
+                                            autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-info" id="searchVenueBtn" title="Buscar estabelecimento">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="venueResults" class="list-group mt-1 shadow-sm" style="position:absolute;z-index:1050;width:calc(100% - 30px);max-height:250px;overflow-y:auto;display:none;"></div>
+                                    <small class="text-muted d-block mt-1">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Digite o nome do local e clique em <i class="fas fa-map-marker-alt text-info"></i> para buscar. Prioridade: seu estado.
+                                    </small>
+                                </div>
+
+                                {{-- Checkbox: evento fora do estado --}}
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" class="form-check-input" id="eventOutOfState" name="event_out_of_state" value="1"
+                                        {{ old('event_out_of_state', $event->event_out_of_state ?? false) ? 'checked' : '' }}>
+                                    <label class="form-check-label text-sm" for="eventOutOfState">
+                                        <i class="fas fa-plane-departure mr-1 text-muted"></i>
+                                        Evento fora do meu estado
+                                    </label>
+                                </div>
+
                                 <div class="form-group mb-2"><label>Endereço Completo</label>
                                     <div class="input-group"><input name="address" id="addressInput" class="form-control"
-                                            value="{{ old('address', $event->address) }}">
+                                            value="{{ old('address', $event->address) }}"
+                                            placeholder="Rua, numero, bairro, cidade - UF">
                                         <div class="input-group-append"><button type="button" class="btn btn-secondary"
                                                 id="searchBtn"><i class="fas fa-search"></i> Buscar</button></div>
                                     </div>
@@ -1089,7 +1118,7 @@ async function setAsCover(mediaId) {
                 var query = document.getElementById('addressInput').value;
                 if (!query) return;
                 toastr.info('Buscando endereço...');
-                fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query))
+                fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&countrycodes=br&limit=5')
                     .then(response => response.json())
                     .then(data => {
                         if (data && data.length > 0) {
@@ -1099,6 +1128,137 @@ async function setAsCover(mediaId) {
                         } else toastr.error('Endereço não encontrado.');
                     }).catch(err => toastr.error('Erro na busca.'));
             });
+
+            // ── Busca de estabelecimento por nome (Nominatim) ──
+            (function() {
+                var locationInput = document.getElementById('locationInput');
+                var venueResults = document.getElementById('venueResults');
+                var searchVenueBtn = document.getElementById('searchVenueBtn');
+                var outOfStateCheck = document.getElementById('eventOutOfState');
+                var debounceTimer = null;
+
+                // Estado do usuario registrante (prioridade na busca)
+                var userState = @json(auth()->user()->state ?? '');
+                var userCity = @json(auth()->user()->city ?? '');
+
+                function buildSearchQuery(text) {
+                    var query = text.trim();
+                    if (!query) return '';
+
+                    // Se "fora do estado" nao esta marcado, prioriza o estado do usuario
+                    if (!outOfStateCheck.checked && userState) {
+                        query += ', ' + userState + ', Brasil';
+                    } else {
+                        query += ', Brasil';
+                    }
+                    return query;
+                }
+
+                function searchVenue() {
+                    var text = locationInput.value.trim();
+                    if (text.length < 3) {
+                        venueResults.style.display = 'none';
+                        return;
+                    }
+
+                    var query = buildSearchQuery(text);
+                    var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&countrycodes=br&limit=8&addressdetails=1';
+
+                    venueResults.innerHTML = '<div class="list-group-item text-center py-3"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando...</div>';
+                    venueResults.style.display = 'block';
+
+                    fetch(url, { headers: { 'Accept-Language': 'pt-BR' } })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (!data || data.length === 0) {
+                                venueResults.innerHTML = '<div class="list-group-item text-muted text-center py-3"><i class="fas fa-search mr-1"></i>Nenhum resultado encontrado</div>';
+                                return;
+                            }
+
+                            var html = '';
+                            data.forEach(function(item) {
+                                var addr = item.address || {};
+                                var name = item.display_name || '';
+                                var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.building || addr.shop || '').trim();
+                                var city = addr.city || addr.town || addr.village || '';
+                                var state = addr.state || '';
+                                var road = addr.road || '';
+                                var number = addr.house_number || '';
+                                var neighbourhood = addr.suburb || addr.neighbourhood || '';
+
+                                var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
+                                var displayTitle = shortName || name.split(',')[0];
+                                var isUserState = userState && state.toLowerCase().indexOf(userState.toLowerCase()) !== -1;
+
+                                html += '<a href="#" class="list-group-item list-group-item-action venue-result py-2 px-3" '
+                                    + 'data-lat="' + item.lat + '" '
+                                    + 'data-lon="' + item.lon + '" '
+                                    + 'data-name="' + displayTitle.replace(/"/g, '&quot;') + '" '
+                                    + 'data-address="' + fullAddress.replace(/"/g, '&quot;') + '">'
+                                    + '<div class="d-flex align-items-start gap-2">'
+                                    + '<i class="fas fa-map-pin mt-1 ' + (isUserState ? 'text-success' : 'text-muted') + '"></i>'
+                                    + '<div class="flex-1">'
+                                    + '<strong class="d-block text-sm">' + displayTitle + '</strong>'
+                                    + '<small class="text-muted d-block">' + fullAddress + '</small>'
+                                    + (isUserState ? '<span class="badge badge-success badge-sm mt-1">Seu estado</span>' : '')
+                                    + '</div>'
+                                    + '</div></a>';
+                            });
+
+                            venueResults.innerHTML = html;
+
+                            // Bind click
+                            venueResults.querySelectorAll('.venue-result').forEach(function(el) {
+                                el.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    var lat = parseFloat(this.dataset.lat);
+                                    var lon = parseFloat(this.dataset.lon);
+                                    var venueName = this.dataset.name;
+                                    var venueAddress = this.dataset.address;
+
+                                    locationInput.value = venueName;
+                                    document.getElementById('addressInput').value = venueAddress;
+                                    setMarker(lat, lon);
+                                    if (map) map.setView([lat, lon], 16);
+                                    venueResults.style.display = 'none';
+                                    toastr.success('Local selecionado: ' + venueName);
+                                });
+                            });
+                        })
+                        .catch(function() {
+                            venueResults.innerHTML = '<div class="list-group-item text-danger text-center py-3"><i class="fas fa-exclamation-triangle mr-1"></i>Erro na busca</div>';
+                        });
+                }
+
+                // Buscar ao clicar no botao
+                if (searchVenueBtn) {
+                    searchVenueBtn.addEventListener('click', searchVenue);
+                }
+
+                // Buscar ao pressionar Enter no campo
+                if (locationInput) {
+                    locationInput.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            searchVenue();
+                        }
+                    });
+                }
+
+                // Fechar resultados ao clicar fora
+                document.addEventListener('click', function(e) {
+                    if (!venueResults.contains(e.target) && e.target !== locationInput && e.target !== searchVenueBtn) {
+                        venueResults.style.display = 'none';
+                    }
+                });
+
+                // Quando muda o checkbox "fora do estado", limpa resultados
+                if (outOfStateCheck) {
+                    outOfStateCheck.addEventListener('change', function() {
+                        venueResults.style.display = 'none';
+                    });
+                }
+            })();
 
             // Certificate Logic
             if ('{{ $event->exists }}' == '') return;
