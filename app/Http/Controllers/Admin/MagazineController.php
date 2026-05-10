@@ -165,10 +165,19 @@ class MagazineController extends Controller
     {
         $user = Auth::user();
         if (!$user) abort(403);
-        // Admins e quem tem feature magazines_create
-        if (!$user->isAdmin() && !$user->canAccessFeature('magazines_create')) {
-            abort(403, 'Voce nao tem permissao para cadastrar revistas.');
+
+        // Admin, Superadmin, ou usuario com feature "magazines.publish" (Editor de Revistas)
+        if ($user->isAdmin()) {
+            return;
         }
+        if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
+            return;
+        }
+        if ($user->canAccessFeature('magazines.publish') || $user->canAccessFeature('magazines_create')) {
+            return;
+        }
+
+        abort(403, 'Voce precisa ter a permissao "Publicar revistas (Editor)" ativa para publicar revistas.');
     }
 
     protected function ensureCanManage(Magazine $magazine): void
@@ -176,6 +185,7 @@ class MagazineController extends Controller
         $user = Auth::user();
         if (!$user) abort(403);
         if ($user->isAdmin()) return;
+        if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) return;
         if ($magazine->isOwnedBy($user->id)) return;
         abort(403);
     }

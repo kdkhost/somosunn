@@ -157,6 +157,8 @@ class Plan extends Model
         'support.priority' => 'Suporte prioritario',
         'early.access' => 'Acesso antecipado a novidades',
         'admin.panel' => 'Acesso ao painel admin',
+        'magazines.access' => 'Acessar revistas digitais',
+        'magazines.publish' => 'Publicar revistas (Editor)',
     ];
 
     public const FEATURE_GROUPS = [
@@ -199,6 +201,8 @@ class Plan extends Model
             'mentorships.create',
             'mentorships.edit',
             'mentorships.delete',
+            'magazines.access',
+            'magazines.publish',
             'benefits.club.partner',
         ],
         'Administracao' => [
