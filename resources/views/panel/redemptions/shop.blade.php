@@ -9,7 +9,7 @@
 @endphp
 
 @section('panel_content')
-<div class="max-w-7xl mx-auto space-y-6">
+<div class="space-y-6">
 
     {{-- Header limpo --}}
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -74,7 +74,7 @@
     @endif
 
     {{-- GRID --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-5">
         @forelse($items as $item)
             @php
                 $canAfford = $userPoints >= (int) $item->points_cost;
