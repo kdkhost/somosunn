@@ -27,26 +27,42 @@ class VenueSearchController extends Controller
         $userLat = $request->input('lat');
         $userLon = $request->input('lon');
 
-        // 1) TomTom (prioridade por cobertura de SMBs no Brasil)
+        // 1) TomTom com bias (melhor cobertura de SMBs no Brasil)
         if ($tomtomKey && in_array($provider, ['auto', 'tomtom'], true)) {
             $results = $this->searchTomTom($query, $tomtomKey, $limit, $userLat, $userLon, $radiusKm);
             if (!empty($results)) {
                 return response()->json(['results' => $results, 'provider' => 'tomtom']);
             }
+            // Relaxar bias: tenta sem lat/lon para achar o estabelecimento em outro estado
+            if ($userLat && $userLon) {
+                $results = $this->searchTomTom($query, $tomtomKey, $limit);
+                if (!empty($results)) {
+                    return response()->json(['results' => $results, 'provider' => 'tomtom', 'out_of_radius' => true]);
+                }
+            }
         }
 
-        // 2) Google Places
+        // 2) Google Places com bias
         if ($googleKey && in_array($provider, ['auto', 'google'], true)) {
             $results = $this->searchGoogle($query, $googleKey, $limit, $userLat, $userLon, $radiusKm);
             if (!empty($results)) {
                 return response()->json(['results' => $results, 'provider' => 'google']);
+            }
+            // Relaxar bias
+            if ($userLat && $userLon) {
+                $results = $this->searchGoogle($query, $googleKey, $limit);
+                if (!empty($results)) {
+                    return response()->json(['results' => $results, 'provider' => 'google', 'out_of_radius' => true]);
+                }
             }
         }
 
         // 3) LocationIQ (fallback)
         if ($locationIqKey && in_array($provider, ['auto', 'locationiq'], true)) {
             $results = $this->searchLocationIq($query, $locationIqKey, $limit);
-            return response()->json(['results' => $results, 'provider' => 'locationiq']);
+            if (!empty($results)) {
+                return response()->json(['results' => $results, 'provider' => 'locationiq']);
+            }
         }
 
         return response()->json(['results' => [], 'provider' => 'none']);
