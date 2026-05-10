@@ -948,17 +948,8 @@
             if (!locationInput || !venueResults || !searchBtn) return;
 
             var userState = @json(auth()->user()->state ?? '');
-
-            function buildQuery(text) {
-                var q = text.trim();
-                if (!q) return '';
-                if (!outOfStateCheck.checked && userState) {
-                    q += ', ' + userState + ', Brasil';
-                } else {
-                    q += ', Brasil';
-                }
-                return q;
-            }
+            var userCity = @json(auth()->user()->city ?? '');
+            var locationIqKey = @json(\App\Models\Setting::get('locationiq_api_key', ''));
 
             function searchVenue() {
                 var text = locationInput.value.trim();
@@ -967,90 +958,48 @@
                 venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando estabelecimentos...</div>';
                 venueResults.classList.remove('hidden');
 
-                var headers = { 'Accept-Language': 'pt-BR' };
+                var promises = [];
 
-                // 1. Busca Nominatim (texto livre)
-                var nominatimQuery = text + ', Brasil';
-                var nominatimUrl = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(nominatimQuery) + '&countrycodes=br&limit=30&addressdetails=1';
+                // 1. LocationIQ (melhor cobertura)
+                if (locationIqKey) {
+                    var liqUrl = 'https://us1.locationiq.com/v1/search?key=' + locationIqKey + '&q=' + encodeURIComponent(text) + '&countrycodes=br&format=json&limit=20&addressdetails=1&dedupe=1';
+                    promises.push(fetch(liqUrl).then(function(r) { return r.json(); }).then(function(data) {
+                        if (data.error) return [];
+                        return (data || []).map(function(item) {
+                            var addr = item.address || {};
+                            var city = addr.city || addr.town || addr.village || '';
+                            var state = addr.state || '';
+                            var road = addr.road || ''; var number = addr.house_number || '';
+                            var neighbourhood = addr.suburb || addr.neighbourhood || '';
+                            var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
+                            var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.shop || '').trim();
+                            var isLocal = userState && state.toLowerCase().indexOf(userState.toLowerCase()) !== -1;
+                            return { lat: item.lat, lon: item.lon, name: shortName || item.display_name.split(',')[0], address: fullAddress || item.display_name, isLocal: isLocal };
+                        });
+                    }).catch(function() { return []; }));
+                }
 
-                // 2. Busca Overpass (por name exato em amenities/shops/tourism)
-                var overpassQuery = '[out:json][timeout:10];('
-                    + 'node["name"~"' + text.replace(/"/g, '') + '",i]["amenity"](area:3600059470);'
-                    + 'node["name"~"' + text.replace(/"/g, '') + '",i]["shop"](area:3600059470);'
-                    + 'node["name"~"' + text.replace(/"/g, '') + '",i]["tourism"](area:3600059470);'
-                    + 'node["name"~"' + text.replace(/"/g, '') + '",i]["leisure"](area:3600059470);'
-                    + ');out body 30;';
-                var overpassUrl = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(overpassQuery);
-
-                Promise.all([
-                    fetch(nominatimUrl, { headers: headers }).then(function(r) { return r.json(); }).catch(function() { return []; }),
-                    fetch(overpassUrl).then(function(r) { return r.json(); }).then(function(data) { return data.elements || []; }).catch(function() { return []; })
-                ]).then(function(results) {
-                    var nominatimResults = results[0] || [];
-                    var overpassResults = results[1] || [];
-
-                    var seen = {};
-                    var combined = [];
-
-                    // Processar Overpass (mais preciso para nomes de estabelecimentos)
-                    overpassResults.forEach(function(el) {
-                        if (!el.lat || !el.lon) return;
-                        var key = parseFloat(el.lat).toFixed(5) + ',' + parseFloat(el.lon).toFixed(5);
-                        if (seen[key]) return;
-                        seen[key] = true;
-
+                // 2. Overpass (OSM direto)
+                var overpassQuery = '[out:json][timeout:10];(node["name"~"' + text.replace(/"/g, '') + '",i]["amenity"](area:3600059470);node["name"~"' + text.replace(/"/g, '') + '",i]["shop"](area:3600059470););out body 20;';
+                promises.push(fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(overpassQuery)).then(function(r) { return r.json(); }).then(function(data) {
+                    return (data.elements || []).filter(function(el) { return el.lat && el.lon; }).map(function(el) {
                         var tags = el.tags || {};
-                        var city = tags['addr:city'] || '';
-                        var state = tags['addr:state'] || '';
-                        var road = tags['addr:street'] || '';
-                        var number = tags['addr:housenumber'] || '';
-                        var neighbourhood = tags['addr:suburb'] || tags['addr:neighbourhood'] || '';
+                        var city = tags['addr:city'] || ''; var state = tags['addr:state'] || '';
+                        var road = tags['addr:street'] || ''; var number = tags['addr:housenumber'] || '';
+                        var neighbourhood = tags['addr:suburb'] || '';
                         var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
                         var isLocal = userState && (state.toLowerCase().indexOf(userState.toLowerCase()) !== -1 || city.toLowerCase().indexOf(userCity.toLowerCase()) !== -1);
-
-                        combined.push({
-                            lat: el.lat,
-                            lon: el.lon,
-                            name: tags.name || text,
-                            address: fullAddress || 'Endereco nao detalhado',
-                            isLocal: isLocal,
-                            source: 'overpass'
-                        });
+                        return { lat: el.lat, lon: el.lon, name: tags.name || text, address: fullAddress || 'Sem endereco detalhado', isLocal: isLocal };
                     });
+                }).catch(function() { return []; }));
 
-                    // Processar Nominatim
-                    nominatimResults.forEach(function(item) {
-                        var key = parseFloat(item.lat).toFixed(5) + ',' + parseFloat(item.lon).toFixed(5);
-                        if (seen[key]) return;
-                        seen[key] = true;
-
-                        var addr = item.address || {};
-                        var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.building || addr.shop || '').trim();
-                        var city = addr.city || addr.town || addr.village || '';
-                        var state = addr.state || '';
-                        var road = addr.road || '';
-                        var number = addr.house_number || '';
-                        var neighbourhood = addr.suburb || addr.neighbourhood || '';
-                        var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
-                        var isLocal = userState && state.toLowerCase().indexOf(userState.toLowerCase()) !== -1;
-
-                        combined.push({
-                            lat: item.lat,
-                            lon: item.lon,
-                            name: shortName || item.display_name.split(',')[0],
-                            address: fullAddress,
-                            isLocal: isLocal,
-                            source: 'nominatim'
-                        });
-                    });
-
-                    // Ordenar: locais primeiro
-                    combined.sort(function(a, b) {
-                        if (a.isLocal && !b.isLocal) return -1;
-                        if (!a.isLocal && b.isLocal) return 1;
-                        return 0;
-                    });
-
+                Promise.all(promises).then(function(results) {
+                    var seen = {}; var combined = [];
+                    results.forEach(function(items) { (items || []).forEach(function(item) {
+                        var key = parseFloat(item.lat).toFixed(4) + ',' + parseFloat(item.lon).toFixed(4);
+                        if (!seen[key]) { seen[key] = true; combined.push(item); }
+                    }); });
+                    combined.sort(function(a, b) { return (a.isLocal ? 0 : 1) - (b.isLocal ? 0 : 1); });
                     renderResults(combined);
                 });
             }
