@@ -994,7 +994,7 @@
 
                 var promises = [];
 
-                // 1. LocationIQ (melhor cobertura)
+                // LocationIQ (cobertura completa, rapido e estavel)
                 if (locationIqKey) {
                     var liqUrl = 'https://us1.locationiq.com/v1/search?key=' + locationIqKey + '&q=' + encodeURIComponent(text) + '&countrycodes=br&format=json&limit=30&addressdetails=1&dedupe=1';
                     promises.push(fetch(liqUrl).then(function(r) { return r.json(); }).then(function(data) {
@@ -1012,18 +1012,10 @@
                     }).catch(function() { return []; }));
                 }
 
-                // 2. Overpass (OSM direto)
-                var overpassQuery = '[out:json][timeout:10];(node["name"~"' + text.replace(/"/g, '') + '",i]["amenity"](area:3600059470);node["name"~"' + text.replace(/"/g, '') + '",i]["shop"](area:3600059470););out body 30;';
-                promises.push(fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(overpassQuery)).then(function(r) { return r.json(); }).then(function(data) {
-                    return (data.elements || []).filter(function(el) { return el.lat && el.lon; }).map(function(el) {
-                        var tags = el.tags || {};
-                        var city = tags['addr:city'] || ''; var state = tags['addr:state'] || '';
-                        var road = tags['addr:street'] || ''; var number = tags['addr:housenumber'] || '';
-                        var neighbourhood = tags['addr:suburb'] || '';
-                        var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
-                        return { lat: parseFloat(el.lat), lon: parseFloat(el.lon), name: tags.name || text, address: fullAddress || 'Sem endereco detalhado' };
-                    });
-                }).catch(function() { return []; }));
+                if (promises.length === 0) {
+                    venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-red-500">API de busca nao configurada.</div>';
+                    return;
+                }
 
                 Promise.all(promises).then(function(results) {
                     var seen = {}; var combined = [];
