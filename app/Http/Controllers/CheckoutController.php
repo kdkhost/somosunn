@@ -337,6 +337,9 @@ class CheckoutController extends Controller
                 ]),
             ]);
 
+            // Recarregar para pegar total_amount atualizado caso a taxa tenha sido repassada
+            $order = $order->fresh('items', 'user');
+
             // Merchant Code (usado como public key no frontend)
             $merchantCode = trim((string) (\App\Models\Setting::get('sumup_merchant_code')
                 ?: config('payments.sumup.merchant_code', '')));

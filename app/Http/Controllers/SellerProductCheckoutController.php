@@ -336,6 +336,9 @@ class SellerProductCheckoutController extends Controller
                 ]),
             ]);
 
+            // Recarregar para pegar total_amount atualizado caso a taxa tenha sido repassada
+            $order = $order->fresh('items', 'user');
+
             $merchantCode = trim((string) (\App\Models\Setting::get('sumup_merchant_code')
                 ?: config('payments.sumup.merchant_code', '')));
 
@@ -350,7 +353,7 @@ class SellerProductCheckoutController extends Controller
             $passFeeToClient = (bool)(int)(\App\Models\Setting::get('sumup_pass_fee', 0));
 
             return view('checkout.transparent', [
-                'order'                       => $order->fresh('items', 'user'),
+                'order'                       => $order,
                 'preferenceId'                => '',
                 'publicKey'                   => '',
                 'gateway'                     => 'sumup',

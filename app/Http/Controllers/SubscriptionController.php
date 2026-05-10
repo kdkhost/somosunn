@@ -492,11 +492,15 @@ class SubscriptionController extends Controller
                 ]),
             ]);
 
+            $order->refresh();
+
             return response()->json([
                 'success' => true,
                 'checkout_id' => $checkoutId,
                 'order_id' => $order->id,
-                'amount' => (float) $effectivePrice,
+                'amount' => (float) $order->total_amount,
+                'base_amount' => (float) (data_get($order->metadata, 'sumup_base_amount') ?? $effectivePrice),
+                'fee_amount'  => (float) (data_get($order->metadata, 'sumup_fee_amount') ?? 0),
                 'success_url' => route('subscription.success', $order->id),
             ]);
         } catch (\Throwable $e) {

@@ -84,6 +84,24 @@
                                     </div>
                                 @endif
 
+                                @php
+                                    $sumupBaseAmount = (float) data_get($order->metadata, 'sumup_base_amount', 0);
+                                    $sumupFeeAmount  = (float) data_get($order->metadata, 'sumup_fee_amount', 0);
+                                    $sumupPassFeeMeta = (bool) data_get($order->metadata, 'sumup_pass_fee', false);
+                                    $showSumupFeeLine = $sumupPassFeeMeta && $sumupBaseAmount > 0 && $sumupFeeAmount > 0.009;
+                                @endphp
+
+                                @if($showSumupFeeLine)
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-400">Subtotal</span>
+                                        <span class="text-slate-200">R$ {{ number_format($sumupBaseAmount, 2, ',', '.') }}</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-400">Taxa de processamento</span>
+                                        <span class="text-slate-200">+ R$ {{ number_format($sumupFeeAmount, 2, ',', '.') }}</span>
+                                    </div>
+                                @endif
+
                                 <div class="flex justify-between text-2xl font-extrabold pt-2">
                                     <span>Total</span>
                                     <span class="text-white">R$

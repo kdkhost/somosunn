@@ -35,9 +35,29 @@ class SumUpService
             $description = $options['description'];
         }
 
+        // Calcula o valor a cobrar, aplicando a taxa de gateway ao cliente (pass_fee)
+        $charge = $this->resolveChargeAmount($order);
+
+        // Atualiza o pedido caso o valor efetivamente cobrado pela SumUp seja diferente do base.
+        // Mantemos "total_amount" = valor cobrado do cliente (inclui taxa repassada)
+        // e "fee_amount" = quanto desse total corresponde a taxa repassada.
+        if ($charge['charge_amount'] > $charge['base_amount']) {
+            $order->forceFill([
+                'total_amount' => $charge['charge_amount'],
+                'fee_amount'   => $charge['fee_amount'],
+                'metadata'     => array_merge($order->metadata ?? [], [
+                    'sumup_base_amount'    => $charge['base_amount'],
+                    'sumup_fee_percentage' => $charge['fee_percentage'],
+                    'sumup_fee_fixed'      => $charge['fee_fixed'],
+                    'sumup_fee_amount'     => $charge['fee_amount'],
+                    'sumup_pass_fee'       => true,
+                ]),
+            ])->save();
+        }
+
         $payload = [
             'checkout_reference' => 'ORDER-' . $order->id . '-' . time(),
-            'amount'             => (float) $order->total_amount,
+            'amount'             => $charge['charge_amount'],
             'currency'           => $order->currency ?? 'BRL',
             'merchant_code'      => $config['merchant_code'],
             'description'        => mb_substr($description, 0, 255),
@@ -59,7 +79,7 @@ class SumUpService
             'checkout_id'   => $response['id'],
             'status'        => 'PENDING',
             'payment_type'  => strtoupper($options['payment_type'] ?? 'CARD'),
-            'amount'        => $order->total_amount,
+            'amount'        => $charge['charge_amount'],
             'currency'      => $order->currency ?? 'BRL',
             'webhook_token' => $webhookToken,
             'webhook_url'   => $webhookUrl,
@@ -69,7 +89,55 @@ class SumUpService
         return [
             'checkout_id'   => $response['id'],
             'webhook_token' => $webhookToken,
+            'charge_amount' => $charge['charge_amount'],
+            'base_amount'   => $charge['base_amount'],
+            'fee_amount'    => $charge['fee_amount'],
             'raw'           => $response,
+        ];
+    }
+
+    /**
+     * Calcula o valor a ser cobrado do cliente considerando o repasse de taxa (pass_fee).
+     *
+     * Quando o admin marca "sumup_pass_fee=1", a taxa percentual + fixa do gateway
+     * e adicionada ao valor base do pedido, de forma que a plataforma receba
+     * aproximadamente o valor base apos o desconto do SumUp.
+     */
+    public function resolveChargeAmount(Order $order): array
+    {
+        $baseAmount = (float) $order->total_amount;
+
+        // Se a taxa ja foi aplicada previamente ao pedido, usamos o valor base preservado.
+        $storedBase = (float) data_get($order->metadata, 'sumup_base_amount', 0);
+        if ($storedBase > 0) {
+            $baseAmount = $storedBase;
+        }
+
+        $passFee    = (bool)(int) Setting::get('sumup_pass_fee', 0);
+        $feePercent = (float) Setting::get('sumup_fee_percentage', 2.75);
+        $feeFixed   = (float) Setting::get('sumup_fee_fixed', 0);
+
+        if (!$passFee || ($feePercent <= 0 && $feeFixed <= 0)) {
+            return [
+                'base_amount'    => round($baseAmount, 2),
+                'charge_amount'  => round($baseAmount, 2),
+                'fee_amount'     => 0.0,
+                'fee_percentage' => $feePercent,
+                'fee_fixed'      => $feeFixed,
+                'pass_fee'       => false,
+            ];
+        }
+
+        $chargeAmount = round($baseAmount * (1 + $feePercent / 100) + $feeFixed, 2);
+        $feeAmount    = round($chargeAmount - $baseAmount, 2);
+
+        return [
+            'base_amount'    => round($baseAmount, 2),
+            'charge_amount'  => $chargeAmount,
+            'fee_amount'     => $feeAmount,
+            'fee_percentage' => $feePercent,
+            'fee_fixed'      => $feeFixed,
+            'pass_fee'       => true,
         ];
     }
 

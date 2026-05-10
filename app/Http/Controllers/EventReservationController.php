@@ -970,6 +970,9 @@ class EventReservationController extends Controller
                 ]),
             ]);
 
+            // Recarregar para pegar total_amount atualizado caso a taxa tenha sido repassada
+            $order = $order->fresh('items', 'user');
+
             // Resolver chave pública do SumUp
             $sumupPublicKey = $merchantCode;
 

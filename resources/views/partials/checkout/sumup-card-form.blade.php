@@ -3,7 +3,11 @@
     $methodPix           = $sumupMethodPix       ?? true;
     $apiKey              = $sumupApiKey          ?? '';
     $orderId             = $order->id            ?? 0;
-    $amount              = (float) ($order->total_amount ?? 0);
+
+    // Valor base do pedido (antes da taxa de gateway) e valor efetivamente cobrado do cliente.
+    // Quando "Repassar taxa" esta ativado, o pedido e atualizado com total_amount = base + taxa.
+    $baseAmount          = (float) (data_get($order->metadata, 'sumup_base_amount') ?? ($order->total_amount ?? 0));
+    $amount              = (float) ($order->total_amount ?? 0); // valor ja com taxa repassada, se houver
     $amountFormatted     = number_format($amount, 2, '.', '');
     $successUrl          = route('events.payment.success', $orderId);
     $pendingUrl          = route('events.payment.pending', $orderId);
@@ -15,16 +19,20 @@
     $interestType        = $sumupInterestType ?? \App\Models\Setting::get('sumup_interest_type', 'per_installment');
     $pixExpirationMinutes = (int) ($sumupPixExpirationMinutes ?? \App\Models\Setting::get('sumup_pix_expiration_minutes', 10) ?? 10);
 
+    // Taxa do gateway SumUp (percentual + fixa) - aplicada quando "Repassar taxa" esta ativo
+    $sumupFeePercentage  = (float) \App\Models\Setting::get('sumup_fee_percentage', 2.75);
+    $sumupFeeFixed       = (float) \App\Models\Setting::get('sumup_fee_fixed', 0);
+    $gatewayFeeAmount    = max(0, $amount - $baseAmount);
+    $hasGatewayFee       = $passFeeToClient && $gatewayFeeAmount > 0.009;
+
     // Pré-calcular as opções de parcelas para exibição no debug e no JS
-    // Dois tipos de cálculo:
-    //   'per_installment' = juros aplicados POR PARCELA (juros compostos simplificados)
-    //     total = amount * (1 + taxa/100 * n_parcelas_com_juros)
-    //   'on_total' = juros aplicados UMA VEZ sobre o total
-    //     total = amount * (1 + taxa/100)
+    // O valor base ja inclui a taxa de gateway quando pass_fee=1 (calculado no service).
+    // Os juros de parcelamento (installmentTax) sao APLICADOS SOBRE o valor cobrado ($amount)
+    // apenas para as parcelas acima do noInterestUpTo.
     $installmentOptions = [];
     for ($i = 1; $i <= $maxInstallments; $i++) {
         if ($i <= $noInterestUpTo || $installmentTax <= 0 || !$passFeeToClient) {
-            // Sem juros ou juros absorvidos pela plataforma
+            // Sem juros de parcelamento (apenas a taxa de gateway, se aplicavel, ja esta em $amount)
             $total = $amount;
             $perInstallment = $amount / $i;
             $hasInterest = false;
@@ -51,6 +59,20 @@
     }
 @endphp
 
+{{-- Aviso de taxa repassada ao cliente --}}
+@if($hasGatewayFee)
+<div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-800 flex items-start gap-2">
+    <i class="fas fa-info-circle mt-0.5"></i>
+    <div>
+        <strong>Taxa de processamento inclusa:</strong>
+        R$ {{ number_format($baseAmount, 2, ',', '.') }}
+        + R$ {{ number_format($gatewayFeeAmount, 2, ',', '.') }}
+        ({{ number_format($sumupFeePercentage, 2, ',', '.') }}%@if($sumupFeeFixed > 0) + R$ {{ number_format($sumupFeeFixed, 2, ',', '.') }}@endif)
+        = <strong>R$ {{ number_format($amount, 2, ',', '.') }}</strong>
+    </div>
+</div>
+@endif
+
 {{-- Debug: Verificar se variáveis estão sendo passadas --}}
 @if(config('app.debug'))
 <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
@@ -59,8 +81,8 @@
     API Key: {{ !empty($apiKey) ? 'Configurada' : 'NÃO configurada' }}<br>
     Method Card: {{ $methodCard ? 'Sim' : 'Não' }}<br>
     Method PIX: {{ $methodPix ? 'Sim' : 'Não' }}<br>
-    Order ID: {{ $orderId }} | Amount: R$ {{ $amountFormatted }}<br>
-    Parcelas: até {{ $maxInstallments }}x | Sem juros: até {{ $noInterestUpTo }}x | Juros: {{ $installmentTax }}% | Repasse: {{ $passFeeToClient ? 'Sim' : 'Não' }} | PIX expira: {{ $pixExpirationMinutes }}min
+    Order ID: {{ $orderId }} | Base: R$ {{ number_format($baseAmount, 2, ',', '.') }} | Cobrado: R$ {{ $amountFormatted }}<br>
+    Parcelas: até {{ $maxInstallments }}x | Sem juros: até {{ $noInterestUpTo }}x | Juros: {{ $installmentTax }}% | Repasse taxa gateway: {{ $passFeeToClient ? 'Sim (' . number_format($sumupFeePercentage, 2, ',', '.') . '%)' : 'Não' }} | PIX expira: {{ $pixExpirationMinutes }}min
 </div>
 @endif
 
