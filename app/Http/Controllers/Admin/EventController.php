@@ -228,7 +228,8 @@ class EventController extends Controller
         if ($data['type'] === 'album' && !isset($data['start_at'])) {
             $data['start_at'] = now();
         }
-        $data['slug'] = $request->input('slug') ?: ($data['type'] === 'album' ? Str::slug($data['title']) : null);
+        $data['slug'] = $request->input('slug')
+            ?: Str::slug($data['title']) . '-' . substr(uniqid(), -6);
         $data['user_id'] = Auth::id();
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
@@ -380,7 +381,8 @@ class EventController extends Controller
             $data['start_at'] = now();
         }
         if ($request->has('slug')) {
-            $data['slug'] = $request->input('slug') ?: ($data['type'] === 'album' ? Str::slug($data['title']) : null);
+            $data['slug'] = $request->input('slug')
+                ?: ($event->slug ?: Str::slug($data['title']) . '-' . substr(uniqid(), -6));
         }
         if ($request->has('is_certificate_enabled')) {
             $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');

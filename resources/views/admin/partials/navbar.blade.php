@@ -183,10 +183,10 @@
                 @csrf
                 <input type="hidden" name="site_theme" id="site_theme_input"
                     value="{{ $settings['site_theme'] ?? 'light' }}">
-                <button type="button" class="btn btn-sm nav-link p-1 d-flex align-items-center" id="themeToggleBtn"
-                    title="Alternar tema" style="border:none; background:none;">
+                <a class="nav-link" href="#" id="themeToggleBtn" role="button" title="Alternar tema"
+                    onclick="event.preventDefault(); document.getElementById('themeToggleForm').querySelector('[type=submit]')?.click() || (function(){var f=document.getElementById('themeToggleForm');var i=document.getElementById('site_theme_input');i.value=(i.value==='dark')?'light':'dark';f.submit();})();">
                     <i class="fas {{ ($settings['site_theme'] ?? 'light') === 'dark' ? 'fa-sun text-warning' : 'fa-moon' }}"></i>
-                </button>
+                </a>
             </form>
         </li>
         @auth

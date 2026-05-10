@@ -114,7 +114,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Preço Lote 1</label>
-                                            <input name="batch_1_price" class="form-control mask-money" value="{{ old('batch_1_price', $event->batch_1_price) }}">
+                                            <input name="batch_1_price" class="form-control mask-money" value="{{ old('batch_1_price', $event->batch_1_price ? number_format((float) $event->batch_1_price, 2, ',', '.') : '') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -129,7 +129,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Preço Lote 2</label>
-                                            <input name="batch_2_price" class="form-control mask-money" value="{{ old('batch_2_price', $event->batch_2_price) }}">
+                                            <input name="batch_2_price" class="form-control mask-money" value="{{ old('batch_2_price', $event->batch_2_price ? number_format((float) $event->batch_2_price, 2, ',', '.') : '') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -144,7 +144,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group mb-0">
                                             <label>Preço Lote 3</label>
-                                            <input name="batch_3_price" class="form-control mask-money" value="{{ old('batch_3_price', $event->batch_3_price) }}">
+                                            <input name="batch_3_price" class="form-control mask-money" value="{{ old('batch_3_price', $event->batch_3_price ? number_format((float) $event->batch_3_price, 2, ',', '.') : '') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -1052,12 +1052,34 @@ async function setAsCover(mediaId) {
             var initialLat = {{ $event->latitude ?? '-23.5505' }};
             var initialLng = {{ $event->longitude ?? '-46.6333' }};
             var zoom = {{ $event->latitude ? 15 : 10 }};
-            var map = L.map('map').setView([initialLat, initialLng], zoom);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
-            var marker;
-            if ({{ $event->latitude ? 'true' : 'false' }}) marker = L.marker([initialLat, initialLng]).addTo(map);
-            map.on('click', function (e) { setMarker(e.latlng.lat, e.latlng.lng); });
+            var mapEl = document.getElementById('map');
+            var map = null;
+            var marker = null;
+
+            function initMap() {
+                if (!mapEl || map) return;
+                try {
+                    map = L.map('map').setView([initialLat, initialLng], zoom);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+                    if ({{ $event->latitude ? 'true' : 'false' }}) marker = L.marker([initialLat, initialLng]).addTo(map);
+                    map.on('click', function (e) { setMarker(e.latlng.lat, e.latlng.lng); });
+                    // Força redesenho após render (corrige mapa cinza em tabs ou divs ocultos)
+                    setTimeout(function () { map.invalidateSize(); }, 250);
+                } catch (err) {
+                    console.error('Erro ao inicializar mapa:', err);
+                }
+            }
+
+            // Inicializa com delay para garantir que o div tenha dimensões
+            setTimeout(initMap, 100);
+
+            // Re-invalidar mapa quando tab é mostrada
+            $('a[data-toggle="tab"], a[data-toggle="pill"]').on('shown.bs.tab', function () {
+                if (map) setTimeout(function () { map.invalidateSize(); }, 50);
+            });
+
             function setMarker(lat, lng) {
+                if (!map) return;
                 if (marker) marker.setLatLng([lat, lng]);
                 else marker = L.marker([lat, lng]).addTo(map);
                 document.getElementById('latInput').value = lat;
