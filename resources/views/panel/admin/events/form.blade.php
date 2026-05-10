@@ -397,15 +397,26 @@
                                 <span><i class="fas fa-plane-departure mr-1"></i>Evento fora do meu estado</span>
                             </label>
                         </div>
+                        <p class="mt-2 text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
+                            <i class="fas fa-lightbulb text-amber-400 mr-1"></i>
+                            <strong>Dica:</strong> Se nao encontrar o local pelo nome, digite o nome no campo acima e o endereco completo no campo abaixo. Voce tambem pode clicar diretamente no mapa para marcar a localizacao exata.
+                        </p>
                     </div>
 
                     <div>
                         <label
                             class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Endereço
                             Completo</label>
-                        <input type="text" name="address" id="panelAddressInput" value="{{ old('address', $event->address) }}"
-                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
-                            placeholder="Preenchido automaticamente ao selecionar um local">
+                        <div class="flex gap-2">
+                            <input type="text" name="address" id="panelAddressInput" value="{{ old('address', $event->address) }}"
+                                class="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
+                                placeholder="Ex: Av. das Americas, 4666 - Barra da Tijuca, RJ">
+                            <button type="button" id="panelSearchAddressBtn"
+                                class="px-4 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-2xl font-bold text-sm transition-colors flex items-center gap-2 shrink-0">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-400">Digite o endereco e clique em <i class="fas fa-search"></i> para localizar no mapa.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -422,21 +433,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label
-                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Latitude
-                                exata</label>
+                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Latitude</label>
                             <input type="number" step="any" name="latitude" id="panelLatInput"
                                 value="{{ old('latitude', $event->latitude) }}"
                                 class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
-                                placeholder="-23.550520" readonly>
+                                placeholder="-23.550520">
                         </div>
                         <div>
                             <label
-                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Longitude
-                                exata</label>
+                                class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Longitude</label>
                             <input type="number" step="any" name="longitude" id="panelLngInput"
                                 value="{{ old('longitude', $event->longitude) }}"
                                 class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
-                                placeholder="-46.633308" readonly>
+                                placeholder="-46.633308">
                         </div>
                     </div>
 
@@ -1096,6 +1105,29 @@
                 }
             });
             if (outOfStateCheck) outOfStateCheck.addEventListener('change', function() { venueResults.classList.add('hidden'); });
+
+            // Busca de endereco por texto (geocoding via Nominatim)
+            var searchAddressBtn = document.getElementById('panelSearchAddressBtn');
+            if (searchAddressBtn && addressInput) {
+                searchAddressBtn.addEventListener('click', function() {
+                    var query = addressInput.value.trim();
+                    if (query.length < 5) { if (typeof toastr !== 'undefined') toastr.warning('Digite um endereco mais completo.'); return; }
+                    if (typeof toastr !== 'undefined') toastr.info('Buscando endereco...');
+                    fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query + ', Brasil') + '&countrycodes=br&limit=1&addressdetails=1', { headers: { 'Accept-Language': 'pt-BR' } })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (data && data.length > 0) {
+                                latInput.value = data[0].lat;
+                                lngInput.value = data[0].lon;
+                                if (typeof toastr !== 'undefined') toastr.success('Endereco localizado! Lat/Lng preenchidos.');
+                            } else {
+                                if (typeof toastr !== 'undefined') toastr.error('Endereco nao encontrado. Tente ser mais especifico.');
+                            }
+                        })
+                        .catch(function() { if (typeof toastr !== 'undefined') toastr.error('Erro na busca de endereco.'); });
+                });
+                addressInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); searchAddressBtn.click(); } });
+            }
         })();
         </script>
     @endpush
