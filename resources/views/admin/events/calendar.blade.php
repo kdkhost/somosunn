@@ -1143,24 +1143,24 @@
                     if (value === null || value === undefined) return '';
                     let str = String(value).trim();
                     if (!str) return '';
+                    // Remove R$ e espaços
                     str = str.replace(/^R\$\s?/, '').trim();
+                    // Se o valor é zero (em qualquer formato), retorna vazio
+                    const numericTest = parseFloat(str.replace(',', '.'));
+                    if (numericTest === 0) return '';
+                    // Se já está no formato brasileiro (99,90 ou 1.234,56), mantém
                     if (str.includes(',')) return str;
+                    // Se é formato decimal inglês (99.90), converte
                     if (/^\d+(\.\d{1,2})$/.test(str)) return str.replace('.', ',');
+                    // Se é inteiro puro, adiciona ,00
+                    if (/^\d+$/.test(str)) return str + ',00';
                     return str;
                 }
 
                 function setMoneyValue($input, value) {
                     const normalized = normalizeMoneyForMask(value);
-                    if (!normalized && normalized !== '0') {
-                        $input.val('');
-                        return;
-                    }
-
-                    if (typeof $input.inputmask === 'function') {
-                        $input.inputmask('setvalue', normalized);
-                    } else {
-                        $input.val(normalized);
-                    }
+                    $input.val(normalized);
+                    $input.trigger('input').trigger('change');
                 }
 
                 function setEventImageExisting(url) {
