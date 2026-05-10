@@ -374,19 +374,38 @@
                     <div>
                         <label
                             class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Nome
-                            do Local</label>
-                        <input type="text" name="location" value="{{ old('location', $event->location) }}"
-                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
-                            placeholder="Ex: Espaço Solarium / Online">
+                            do Local / Estabelecimento</label>
+                        <div class="relative">
+                            <div class="flex gap-2">
+                                <input type="text" name="location" id="panelLocationInput" value="{{ old('location', $event->location) }}"
+                                    class="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
+                                    placeholder="Digite o nome do local e clique em buscar..."
+                                    autocomplete="off">
+                                <button type="button" id="panelSearchVenueBtn"
+                                    class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-sm transition-colors flex items-center gap-2 shrink-0">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span class="hidden sm:inline">Buscar</span>
+                                </button>
+                            </div>
+                            <div id="panelVenueResults" class="absolute left-0 right-0 top-full mt-1 z-50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden max-h-[280px] overflow-y-auto hidden"></div>
+                        </div>
+                        <div class="flex items-center gap-4 mt-2">
+                            <label class="inline-flex items-center gap-2 cursor-pointer text-xs text-slate-500 dark:text-slate-400">
+                                <input type="checkbox" id="panelOutOfState" name="event_out_of_state" value="1"
+                                    {{ old('event_out_of_state', $event->event_out_of_state ?? false) ? 'checked' : '' }}
+                                    class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
+                                <span><i class="fas fa-plane-departure mr-1"></i>Evento fora do meu estado</span>
+                            </label>
+                        </div>
                     </div>
 
                     <div>
                         <label
                             class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Endereço
                             Completo</label>
-                        <input type="text" name="address" value="{{ old('address', $event->address) }}"
+                        <input type="text" name="address" id="panelAddressInput" value="{{ old('address', $event->address) }}"
                             class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
-                            placeholder="Ex: Av. Paulista, 1000 - São Paulo, SP">
+                            placeholder="Preenchido automaticamente ao selecionar um local">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -405,19 +424,19 @@
                             <label
                                 class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Latitude
                                 exata</label>
-                            <input type="number" step="any" name="latitude"
+                            <input type="number" step="any" name="latitude" id="panelLatInput"
                                 value="{{ old('latitude', $event->latitude) }}"
                                 class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
-                                placeholder="-23.550520">
+                                placeholder="-23.550520" readonly>
                         </div>
                         <div>
                             <label
                                 class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">Longitude
                                 exata</label>
-                            <input type="number" step="any" name="longitude"
+                            <input type="number" step="any" name="longitude" id="panelLngInput"
                                 value="{{ old('longitude', $event->longitude) }}"
                                 class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-900 dark:text-white font-medium"
-                                placeholder="-46.633308">
+                                placeholder="-46.633308" readonly>
                         </div>
                     </div>
 
@@ -904,6 +923,105 @@
                 });
             });
             @endif
+        </script>
+
+        {{-- Busca de estabelecimento por nome (Nominatim) --}}
+        <script>
+        (function() {
+            var locationInput = document.getElementById('panelLocationInput');
+            var venueResults = document.getElementById('panelVenueResults');
+            var searchBtn = document.getElementById('panelSearchVenueBtn');
+            var outOfStateCheck = document.getElementById('panelOutOfState');
+            var addressInput = document.getElementById('panelAddressInput');
+            var latInput = document.getElementById('panelLatInput');
+            var lngInput = document.getElementById('panelLngInput');
+
+            if (!locationInput || !venueResults || !searchBtn) return;
+
+            var userState = @json(auth()->user()->state ?? '');
+
+            function buildQuery(text) {
+                var q = text.trim();
+                if (!q) return '';
+                if (!outOfStateCheck.checked && userState) {
+                    q += ', ' + userState + ', Brasil';
+                } else {
+                    q += ', Brasil';
+                }
+                return q;
+            }
+
+            function searchVenue() {
+                var text = locationInput.value.trim();
+                if (text.length < 3) { venueResults.classList.add('hidden'); return; }
+
+                var query = buildQuery(text);
+                var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&countrycodes=br&limit=8&addressdetails=1';
+
+                venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando...</div>';
+                venueResults.classList.remove('hidden');
+
+                fetch(url, { headers: { 'Accept-Language': 'pt-BR' } })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (!data || data.length === 0) {
+                            venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-slate-500"><i class="fas fa-search mr-1"></i>Nenhum resultado</div>';
+                            return;
+                        }
+
+                        var html = '';
+                        data.forEach(function(item) {
+                            var addr = item.address || {};
+                            var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.building || addr.shop || '').trim();
+                            var city = addr.city || addr.town || addr.village || '';
+                            var state = addr.state || '';
+                            var road = addr.road || '';
+                            var number = addr.house_number || '';
+                            var neighbourhood = addr.suburb || addr.neighbourhood || '';
+                            var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
+                            var displayTitle = shortName || item.display_name.split(',')[0];
+                            var isLocal = userState && state.toLowerCase().indexOf(userState.toLowerCase()) !== -1;
+
+                            html += '<button type="button" class="venue-item w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-slate-800 last:border-0 transition-colors" '
+                                + 'data-lat="' + item.lat + '" data-lon="' + item.lon + '" '
+                                + 'data-name="' + displayTitle.replace(/"/g, '&quot;') + '" '
+                                + 'data-address="' + fullAddress.replace(/"/g, '&quot;') + '">'
+                                + '<div class="flex items-start gap-2">'
+                                + '<i class="fas fa-map-pin mt-1 text-xs ' + (isLocal ? 'text-emerald-500' : 'text-slate-400') + '"></i>'
+                                + '<div class="flex-1 min-w-0">'
+                                + '<p class="text-sm font-bold text-slate-900 dark:text-white truncate">' + displayTitle + '</p>'
+                                + '<p class="text-xs text-slate-500 dark:text-slate-400 truncate">' + fullAddress + '</p>'
+                                + (isLocal ? '<span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">Seu estado</span>' : '')
+                                + '</div></div></button>';
+                        });
+
+                        venueResults.innerHTML = html;
+
+                        venueResults.querySelectorAll('.venue-item').forEach(function(el) {
+                            el.addEventListener('click', function() {
+                                locationInput.value = this.dataset.name;
+                                if (addressInput) addressInput.value = this.dataset.address;
+                                if (latInput) latInput.value = this.dataset.lat;
+                                if (lngInput) lngInput.value = this.dataset.lon;
+                                venueResults.classList.add('hidden');
+                                if (typeof toastr !== 'undefined') toastr.success('Local selecionado: ' + this.dataset.name);
+                            });
+                        });
+                    })
+                    .catch(function() {
+                        venueResults.innerHTML = '<div class="px-4 py-4 text-center text-sm text-red-500"><i class="fas fa-exclamation-triangle mr-1"></i>Erro na busca</div>';
+                    });
+            }
+
+            searchBtn.addEventListener('click', searchVenue);
+            locationInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); searchVenue(); } });
+            document.addEventListener('click', function(e) {
+                if (!venueResults.contains(e.target) && e.target !== locationInput && e.target !== searchBtn && !searchBtn.contains(e.target)) {
+                    venueResults.classList.add('hidden');
+                }
+            });
+            if (outOfStateCheck) outOfStateCheck.addEventListener('change', function() { venueResults.classList.add('hidden'); });
+        })();
         </script>
     @endpush
 
