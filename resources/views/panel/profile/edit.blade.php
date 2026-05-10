@@ -3,6 +3,30 @@
 @section('title', 'Meu Perfil - UNN')
 
 @section('panel_content')
+    @php
+        $isMarketingManager = (int) \App\Models\Setting::get('platform_marketing_user_id', 0) === (int) $user->id;
+    @endphp
+
+    @if($isMarketingManager)
+        <div class="mb-6 rounded-3xl border border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-fuchsia-50 dark:from-purple-900/20 dark:to-fuchsia-900/20 p-5 shadow-sm">
+            <div class="flex items-center gap-4 flex-wrap">
+                <div class="w-12 h-12 rounded-2xl bg-purple-600 text-white flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-bullhorn text-xl"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-black text-purple-900 dark:text-purple-100">Voce e o Responsavel de Marketing da plataforma</h3>
+                    <p class="text-sm text-purple-700 dark:text-purple-300 mt-0.5">
+                        Acompanhe os valores destinados ao marketing na area exclusiva.
+                    </p>
+                </div>
+                <a href="{{ route('panel.marketing.index') }}"
+                    class="inline-flex items-center gap-2 rounded-full bg-purple-600 hover:bg-purple-700 px-4 py-2 text-sm font-bold text-white transition">
+                    <i class="fas fa-arrow-right"></i> Acessar painel
+                </a>
+            </div>
+        </div>
+    @endif
+
     <div
         class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

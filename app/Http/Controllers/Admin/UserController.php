@@ -144,4 +144,43 @@ class UserController extends Controller
 
         return response()->json(['ok' => true]);
     }
+
+    /**
+     * Define (ou remove) o usuario como Responsavel de Marketing da plataforma.
+     * Somente admins/superadmins podem alterar essa configuracao.
+     * O responsavel de marketing recebera 10% de cada venda concluida.
+     */
+    public function setMarketingManager(Request $request, User $user)
+    {
+        if (!auth()->user()?->isAdmin()) {
+            return response()->json(['message' => 'Acesso negado.'], 403);
+        }
+
+        $action = $request->input('action', 'set');
+        $currentId = (int) \App\Models\Setting::get('platform_marketing_user_id', 0);
+
+        if ($action === 'unset' || $currentId === $user->id) {
+            \App\Models\Setting::set('platform_marketing_user_id', '');
+            return response()->json([
+                'success' => true,
+                'assigned' => false,
+                'message' => 'Responsavel de Marketing removido.',
+            ]);
+        }
+
+        \App\Models\Setting::set('platform_marketing_user_id', (string) $user->id);
+
+        try {
+            $user->notify(new \App\Notifications\MarketingManagerAssigned());
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao enviar notificacao de Marketing Manager: ' . $e->getMessage());
+        }
+
+        return response()->json([
+            'success'  => true,
+            'assigned' => true,
+            'user_id'  => $user->id,
+            'message'  => 'Usuario definido como Responsavel de Marketing. Notificacao enviada.',
+        ]);
+    }
 }

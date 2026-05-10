@@ -8,6 +8,8 @@
         $totalUsers = $users->count();
         $totalAdmins = $users->whereIn('role', ['admin', 'superadmin'])->count();
         $totalMembers = $users->where('role', 'member')->count() + $users->whereNull('role')->count();
+        $marketingUserId = (int) \App\Models\Setting::get('platform_marketing_user_id', 0);
+        $marketingUser = $marketingUserId > 0 ? \App\Models\User::find($marketingUserId) : null;
     @endphp
 
     {{-- KPI Cards --}}
@@ -41,6 +43,34 @@
                     <span class="progress-description text-xs">Usuários regulares</span>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {{-- Responsavel de Marketing --}}
+    <div class="card card-outline card-info shadow-sm mb-4">
+        <div class="card-header border-0 py-2">
+            <h3 class="card-title font-weight-bold text-info" style="font-size: 0.95rem;">
+                <i class="fas fa-bullhorn mr-2"></i> Responsavel de Marketing da Plataforma
+            </h3>
+        </div>
+        <div class="card-body py-3">
+            @if($marketingUser)
+                <div class="d-flex align-items-center justify-content-between flex-wrap">
+                    <div>
+                        <span class="badge badge-success px-3 py-2 mr-2" style="font-size: 11px;">
+                            <i class="fas fa-check-circle mr-1"></i> Ativo
+                        </span>
+                        <strong>{{ $marketingUser->name }}</strong>
+                        <span class="text-muted ml-2">({{ $marketingUser->email }})</span>
+                    </div>
+                    <small class="text-muted">Recebe 10% de cada venda concluida (split "traffic")</small>
+                </div>
+            @else
+                <p class="text-muted mb-0 small">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Nenhum usuario designado. Clique no icone <i class="fas fa-bullhorn text-info"></i> ao lado de um usuario para definir o responsavel.
+                </p>
+            @endif
         </div>
     </div>
 
@@ -110,6 +140,16 @@
                                                 <a href="{{ route('admin.users.impersonate', $user) }}" class="btn btn-sm btn-outline-warning rounded-pill px-2"
                                                     title="Acessar como usuário" data-pjax="false"><i class="fas fa-user-secret"></i></a>
                                             @endif
+                                        @endif
+                                        @if(auth()->user()->isAdmin())
+                                            <button type="button"
+                                                class="btn btn-sm rounded-pill px-2 btn-toggle-marketing {{ $marketingUserId === $user->id ? 'btn-success' : 'btn-outline-info' }}"
+                                                title="{{ $marketingUserId === $user->id ? 'Remover como Responsavel de Marketing' : 'Definir como Responsavel de Marketing' }}"
+                                                data-url="{{ route('admin.users.marketing-manager', $user) }}"
+                                                data-user-name="{{ $user->name }}"
+                                                data-is-current="{{ $marketingUserId === $user->id ? '1' : '0' }}">
+                                                <i class="fas fa-bullhorn"></i>
+                                            </button>
                                         @endif
                                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary rounded-pill px-2" title="Editar"
                                             data-pjax="true"><i class="fas fa-edit"></i></a>
@@ -187,6 +227,56 @@
                 },
                 "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+            // Marketing Manager toggle
+            $(document).on('click', '.btn-toggle-marketing', function () {
+                var btn = $(this);
+                var url = btn.data('url');
+                var userName = btn.data('user-name');
+                var isCurrent = btn.data('is-current') === 1 || btn.data('is-current') === '1';
+                var action = isCurrent ? 'unset' : 'set';
+
+                var confirmText = isCurrent
+                    ? 'Remover ' + userName + ' como Responsavel de Marketing?'
+                    : 'Definir ' + userName + ' como Responsavel de Marketing? Um email e uma notificacao serao enviados.';
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: isCurrent ? 'Remover Responsavel?' : 'Definir Responsavel?',
+                        text: confirmText,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: isCurrent ? 'Sim, remover' : 'Sim, definir',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonColor: isCurrent ? '#dc3545' : '#17a2b8',
+                    }).then(function (result) {
+                        if (!result.isConfirmed) return;
+                        performToggle();
+                    });
+                } else if (confirm(confirmText)) {
+                    performToggle();
+                }
+
+                function performToggle() {
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            action: action,
+                        },
+                    }).done(function (resp) {
+                        if (typeof toastr !== 'undefined') {
+                            toastr.success(resp.message || 'Atualizado.');
+                        }
+                        setTimeout(function () { location.reload(); }, 800);
+                    }).fail(function (xhr) {
+                        var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Erro ao atualizar.';
+                        if (typeof toastr !== 'undefined') toastr.error(msg);
+                        else alert(msg);
+                    });
+                }
+            });
         });
     </script>
 @endpush

@@ -204,6 +204,13 @@
             'active' => request()->routeIs('panel.splits.index'),
             'visible' => method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace(),
         ],
+        [
+            'label' => 'Marketing da Plataforma',
+            'route' => route('panel.marketing.index'),
+            'icon' => 'fas fa-bullhorn',
+            'active' => request()->routeIs('panel.marketing.*'),
+            'visible' => (int) \App\Models\Setting::get('platform_marketing_user_id', 0) === (int) $user->id,
+        ],
     ], fn(array $item) => $item['visible']));
 
     $instructorItems = array_values(array_filter([

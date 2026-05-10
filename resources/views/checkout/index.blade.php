@@ -76,8 +76,6 @@
 
                             @if(!$isFreeCheckout)
                                 <div class="pt-4 border-t border-gray-100">
-                                <label class="block text-sm font-medium text-gray-700 mb-3">Forma de Pagamento</label>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     @php
                                         // Ler métodos MP e SumUp ativos do banco
                                         $mpMethodsActive = [];
@@ -89,54 +87,74 @@
                                         $sumupMethodsActive = [];
                                         if ((int) \App\Models\Setting::get('sumup_method_card', 1) === 1) $sumupMethodsActive[] = 'Cartão';
                                         if ((int) \App\Models\Setting::get('sumup_method_pix', 1) === 1) $sumupMethodsActive[] = 'Pix';
+
+                                        $mpActive    = ($mpEnabled ?? false) && !empty($mpMethodsActive);
+                                        $sumupActive = ($sumup['available'] ?? false) && !empty($sumupMethodsActive);
+                                        $activeCount = ($mpActive ? 1 : 0) + ($sumupActive ? 1 : 0);
+                                        $singleGateway = null;
+                                        if ($activeCount === 1) {
+                                            $singleGateway = $mpActive ? 'mercadopago' : 'sumup';
+                                        }
                                     @endphp
 
-                                    @if(($mpEnabled ?? true) && !empty($mpMethodsActive))
-                                        <label class="cursor-pointer block">
-                                            <input type="radio" name="gateway_provider" value="mercadopago" class="peer sr-only"
-                                                data-gateway-summary="Pagamento via Mercado Pago."
-                                                {{ $selectedGateway === 'mercadopago' ? 'checked' : '' }}>
-                                            <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:ring-2 peer-checked:ring-blue-100 transition-all">
-                                                <div class="flex items-start gap-3">
-                                                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
-                                                        <i class="fas fa-hand-holding-dollar"></i>
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="font-bold text-gray-900 text-sm">Mercado Pago</p>
-                                                        <div class="flex flex-wrap gap-1 mt-1">
-                                                            @foreach($mpMethodsActive as $method)
-                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-600">{{ $method }}</span>
-                                                            @endforeach
+                                    @if($activeCount >= 2)
+                                        <label class="block text-sm font-medium text-gray-700 mb-3">Forma de Pagamento</label>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            @if($mpActive)
+                                                <label class="cursor-pointer block">
+                                                    <input type="radio" name="gateway_provider" value="mercadopago" class="peer sr-only"
+                                                        data-gateway-summary="Pagamento via Mercado Pago."
+                                                        {{ $selectedGateway === 'mercadopago' ? 'checked' : '' }}>
+                                                    <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:ring-2 peer-checked:ring-blue-100 transition-all">
+                                                        <div class="flex items-start gap-3">
+                                                            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
+                                                                <i class="fas fa-hand-holding-dollar"></i>
+                                                            </div>
+                                                            <div class="flex-1 min-w-0">
+                                                                <p class="font-bold text-gray-900 text-sm">Mercado Pago</p>
+                                                                <div class="flex flex-wrap gap-1 mt-1">
+                                                                    @foreach($mpMethodsActive as $method)
+                                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-600">{{ $method }}</span>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    @endif
+                                                </label>
+                                            @endif
 
-                                    @if(($sumup['available'] ?? false) && !empty($sumupMethodsActive))
-                                        <label class="cursor-pointer block">
-                                            <input type="radio" name="gateway_provider" value="sumup" class="peer sr-only"
-                                                data-gateway-summary="Pagamento via SumUp."
-                                                {{ $selectedGateway === 'sumup' ? 'checked' : '' }}>
-                                            <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200 transition-all">
-                                                <div class="flex items-start gap-3">
-                                                    <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
-                                                        <i class="fas fa-credit-card"></i>
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="font-bold text-gray-900 text-sm">SumUp</p>
-                                                        <div class="flex flex-wrap gap-1 mt-1">
-                                                            @foreach($sumupMethodsActive as $method)
-                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-600">{{ $method }}</span>
-                                                            @endforeach
+                                            @if($sumupActive)
+                                                <label class="cursor-pointer block">
+                                                    <input type="radio" name="gateway_provider" value="sumup" class="peer sr-only"
+                                                        data-gateway-summary="Pagamento via SumUp."
+                                                        {{ $selectedGateway === 'sumup' ? 'checked' : '' }}>
+                                                    <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-200 transition-all">
+                                                        <div class="flex items-start gap-3">
+                                                            <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
+                                                                <i class="fas fa-credit-card"></i>
+                                                            </div>
+                                                            <div class="flex-1 min-w-0">
+                                                                <p class="font-bold text-gray-900 text-sm">SumUp</p>
+                                                                <div class="flex flex-wrap gap-1 mt-1">
+                                                                    @foreach($sumupMethodsActive as $method)
+                                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-600">{{ $method }}</span>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </label>
+                                                </label>
+                                            @endif
+                                        </div>
+                                    @elseif($activeCount === 1)
+                                        {{-- Apenas um gateway ativo: input hidden, sem seletor --}}
+                                        <input type="hidden" name="gateway_provider" value="{{ $singleGateway }}">
+                                    @else
+                                        <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                                            <i class="fas fa-triangle-exclamation mr-2"></i>
+                                            Nenhum gateway de pagamento disponivel.
+                                        </div>
                                     @endif
-                                </div>
                                 </div>
                             @endif
 

@@ -416,6 +416,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'supe
     Route::get('/dashboard/stats', [\App\Http\Controllers\Panel\DashboardController::class, 'stats'])->name('dashboard.stats');
     Route::get('/ingressos', [\App\Http\Controllers\Panel\TicketController::class, 'index'])->name('tickets.index');
     Route::get('/recebimentos', [\App\Http\Controllers\Panel\SplitController::class, 'index'])->name('splits.index');
+    Route::get('/marketing', [\App\Http\Controllers\Panel\MarketingController::class, 'index'])->name('marketing.index');
     Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'update'])->name('profile.update');
     Route::get('/certificados', [\App\Http\Controllers\Panel\CertificateController::class, 'index'])->name('certificates.index');
@@ -721,6 +722,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::put('referrals/sandbox/{sandboxRequest}', [\App\Http\Controllers\Admin\ReferralController::class, 'updateSandboxRequest'])->name('referrals.sandbox.update');
 
     // Traditional Admin Resources
+    Route::post('users/{user}/marketing-manager', [\App\Http\Controllers\Admin\UserController::class, 'setMarketingManager'])->name('users.marketing-manager');
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     Route::post('plans/{plan}/toggle-active', [\App\Http\Controllers\Admin\PlanController::class, 'toggleActive'])->name('plans.toggle-active');
     Route::post('plans/reorder', [\App\Http\Controllers\Admin\PlanController::class, 'reorder'])->name('plans.reorder');

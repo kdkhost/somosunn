@@ -253,6 +253,14 @@ class PaymentWebhookController extends Controller
             ->orWhere('level', 'superadmin')
             ->first();
 
+        // Responsavel de Marketing (configurado pelo admin na listagem de usuarios)
+        $marketingManagerId = (int) Setting::get('platform_marketing_user_id', 0);
+        $marketingManager = $marketingManagerId > 0 ? User::find($marketingManagerId) : null;
+
+        // Admin da plataforma (quem recebe o split "platform")
+        $platformAdminId = (int) Setting::get('platform_admin_user_id', 0);
+        $platformAdmin = $platformAdminId > 0 ? User::find($platformAdminId) : null;
+
         // Determinar gateway usado (informativo para o painel de splits)
         $gateway = (string) ($order->gateway ?? '');
 
@@ -265,12 +273,12 @@ class PaymentWebhookController extends Controller
             [
                 'type' => 'platform',
                 'percent' => $platformPercent,
-                'user_id' => null,
+                'user_id' => $platformAdmin?->id,
             ],
             [
                 'type' => 'traffic',
                 'percent' => $trafficPercent,
-                'user_id' => null,
+                'user_id' => $marketingManager?->id,
             ],
             [
                 'type' => 'superadmin',
@@ -293,9 +301,9 @@ class PaymentWebhookController extends Controller
             } elseif ($split['type'] === 'superadmin' && $superadmin) {
                 $pixKey = $superadmin->pix_key;
             } elseif ($split['type'] === 'platform') {
-                $pixKey = Setting::get('marketplace_split_platform_pix');
+                $pixKey = $platformAdmin?->pix_key ?? Setting::get('marketplace_split_platform_pix');
             } elseif ($split['type'] === 'traffic') {
-                $pixKey = Setting::get('marketplace_split_traffic_pix');
+                $pixKey = $marketingManager?->pix_key ?? Setting::get('marketplace_split_traffic_pix');
             }
 
             // Status: sempre "pending" até confirmação manual pelo admin/superadmin.

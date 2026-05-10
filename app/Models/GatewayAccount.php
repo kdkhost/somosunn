@@ -45,8 +45,15 @@ class GatewayAccount extends Model
      */
     public static function resolveForSeller(int $sellerId): array
     {
+        // Se o "vendedor" e admin/superadmin, ele e a propria plataforma.
+        // Nesse caso o toggle global (mercadopago_enabled) deve controlar o gateway,
+        // mesmo que haja uma gateway_account cadastrada em nome dele.
+        if ($sellerId > 0 && static::isPlatformOwner($sellerId)) {
+            return static::resolveGlobalSettings();
+        }
+
         // 1. Primeiro tenta credenciais proprias do vendedor em gateway_accounts.
-        //    Mesmo que o admin desative o MP globalmente, o vendedor que configurou
+        //    Mesmo que o admin desative o MP globalmente, o vendedor comum que configurou
         //    sua propria conta pode continuar vendendo atraves dela.
         if ($sellerId > 0) {
             $account = self::query()
@@ -74,10 +81,49 @@ class GatewayAccount extends Model
     }
 
     /**
+     * Verifica se o user_id corresponde ao dono da plataforma (admin/superadmin).
+     * Vendedor admin = plataforma -> toggle global decide seus gateways.
+     */
+    protected static function isPlatformOwner(int $userId): bool
+    {
+        static $cache = [];
+        if (isset($cache[$userId])) {
+            return $cache[$userId];
+        }
+        try {
+            $user = \App\Models\User::find($userId);
+            return $cache[$userId] = (bool) ($user && method_exists($user, 'isAdmin') && $user->isAdmin());
+        } catch (\Throwable $e) {
+            return $cache[$userId] = false;
+        }
+    }
+
+    /**
      * Resolve credenciais SumUp para um vendedor (compatibilidade retroativa).
      */
     public static function resolveForSellerSumUp(int $sellerId): array
     {
+        // Se o vendedor e admin, toggle global SumUp decide.
+        if ($sellerId > 0 && static::isPlatformOwner($sellerId)) {
+            $sumupToggle = (int) Setting::get('sumup_enabled', 0) === 1;
+            if (!$sumupToggle) {
+                return [
+                    'sumupEnabled' => false,
+                    'apiKey'       => '',
+                    'merchantCode' => '',
+                    'source'       => 'disabled',
+                ];
+            }
+            $apiKey       = trim((string) (Setting::get('sumup_api_key') ?: config('payments.sumup.api_key', '')));
+            $merchantCode = trim((string) (Setting::get('sumup_merchant_code') ?: config('payments.sumup.merchant_code', '')));
+            return [
+                'sumupEnabled' => $apiKey !== '' && $merchantCode !== '',
+                'apiKey'       => $apiKey,
+                'merchantCode' => $merchantCode,
+                'source'       => 'global',
+            ];
+        }
+
         // 1. Credenciais proprias do vendedor sempre tem prioridade.
         if ($sellerId > 0) {
             $account = self::query()
@@ -188,12 +234,24 @@ class GatewayAccount extends Model
      */
     private static function resolveMercadoPagoForSeller(int $sellerId): ?array
     {
-        // Só retorna se MP estiver habilitado nas settings
-        if (!(int) Setting::get('mercadopago_enabled', 0)) {
+        // Se o vendedor e admin, toggle global decide.
+        if ($sellerId > 0 && static::isPlatformOwner($sellerId)) {
+            if (!(int) Setting::get('mercadopago_enabled', 0)) {
+                return null;
+            }
+            $mpGlobal = static::resolveGlobalSettings();
+            if ($mpGlobal['mpEnabled']) {
+                return [
+                    'provider' => 'mercadopago',
+                    'enabled'  => true,
+                    'config'   => $mpGlobal,
+                    'source'   => 'global',
+                ];
+            }
             return null;
         }
 
-        // Tentar credenciais do vendedor
+        // Vendedor comum: primeiro tenta credenciais proprias (independente do toggle global).
         if ($sellerId > 0) {
             $account = self::query()
                 ->where('user_id', $sellerId)
@@ -220,7 +278,10 @@ class GatewayAccount extends Model
             }
         }
 
-        // Fallback para credenciais globais
+        // Sem credenciais proprias -> tenta globais (respeitando toggle)
+        if (!(int) Setting::get('mercadopago_enabled', 0)) {
+            return null;
+        }
         $mpGlobal = static::resolveGlobalSettings();
         if ($mpGlobal['mpEnabled']) {
             return [
@@ -240,12 +301,29 @@ class GatewayAccount extends Model
      */
     private static function resolveSumUpForSeller(int $sellerId): ?array
     {
-        // Só retorna se SumUp estiver habilitado nas settings
-        if (!(int) Setting::get('sumup_enabled', 0)) {
+        // Se o vendedor e admin, toggle global decide
+        if ($sellerId > 0 && static::isPlatformOwner($sellerId)) {
+            if (!(int) Setting::get('sumup_enabled', 0)) {
+                return null;
+            }
+            $apiKey       = trim((string) (Setting::get('sumup_api_key') ?: config('payments.sumup.api_key', '')));
+            $merchantCode = trim((string) (Setting::get('sumup_merchant_code') ?: config('payments.sumup.merchant_code', '')));
+            if ($apiKey !== '') {
+                return [
+                    'provider' => 'sumup',
+                    'enabled'  => true,
+                    'config'   => [
+                        'sumupEnabled' => true,
+                        'apiKey'       => $apiKey,
+                        'merchantCode' => $merchantCode,
+                    ],
+                    'source' => 'global',
+                ];
+            }
             return null;
         }
 
-        // Tentar credenciais do vendedor
+        // Vendedor comum: tenta credenciais proprias
         if ($sellerId > 0) {
             $account = self::query()
                 ->where('user_id', $sellerId)
@@ -276,7 +354,10 @@ class GatewayAccount extends Model
             }
         }
 
-        // Fallback para credenciais globais
+        // Sem credenciais proprias -> globais (respeitando toggle)
+        if (!(int) Setting::get('sumup_enabled', 0)) {
+            return null;
+        }
         $apiKey       = trim((string) (Setting::get('sumup_api_key') ?: config('payments.sumup.api_key', '')));
         $merchantCode = trim((string) (Setting::get('sumup_merchant_code') ?: config('payments.sumup.merchant_code', '')));
 
