@@ -26,6 +26,15 @@ class WatermarkService
         'uploads/imagens/geral',
         'uploads/imagens/seo',
         'uploads/imagens/marketplace',
+        'uploads/imagens/avatars',
+        'uploads/imagens/covers',
+        'uploads/imagens/profiles',
+        'uploads/imagens/stores',
+        'uploads/imagens/products',
+        'uploads/imagens/courses/covers',
+        'uploads/imagens/events/covers',
+        'uploads/imagens/mentorships/covers',
+        'uploads/imagens/plans',
     ];
 
     public function processEventImage(UploadedFile $file, Event $event): string
