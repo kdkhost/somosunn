@@ -14,7 +14,7 @@
     .mag-stage {
         position: fixed;
         inset: 0;
-        z-index: 40;
+        z-index: 9999;
         background:
             radial-gradient(ellipse at 20% 10%, rgba(139, 92, 246, 0.18), transparent 55%),
             radial-gradient(ellipse at 80% 90%, rgba(79, 70, 229, 0.22), transparent 60%),
@@ -267,8 +267,21 @@
     }
 
     /* ========== Hide site chrome while viewing ========== */
-    body.mag-viewer-active > *:not(.mag-stage):not(script):not(style) {
+    body.mag-viewer-active > header,
+    body.mag-viewer-active > footer,
+    body.mag-viewer-active > nav,
+    body.mag-viewer-active .site-header,
+    body.mag-viewer-active .site-footer,
+    body.mag-viewer-active .site-nav,
+    body.mag-viewer-active .navbar,
+    body.mag-viewer-active .site-back-to-top,
+    body.mag-viewer-active #pwa-install-modal {
         display: none !important;
+    }
+    body.mag-viewer-active main {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+        min-height: 100vh !important;
     }
     body.mag-viewer-active { overflow: hidden; }
 </style>
