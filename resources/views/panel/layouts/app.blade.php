@@ -401,7 +401,7 @@
 @section('content')
     <div
         class="panel-theme-shell bg-slate-50 dark:bg-slate-950 min-h-screen pb-10 transition-colors duration-300">
-        <div class="max-w-7xl mx-auto w-full px-4 md:px-6 xl:px-8">
+        <div class="unn-panel-container w-full mx-auto px-4 md:px-6 xl:px-8" style="max-width: 80rem;">
             <nav class="flex items-center justify-between gap-4 py-4 md:h-24 md:py-0" aria-label="breadcrumb">
                 <ol
                     class="list-none p-0 inline-flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400 font-medium">
