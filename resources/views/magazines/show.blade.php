@@ -259,44 +259,50 @@
     // Activate viewer mode
     document.body.classList.add('mag-viewer-active');
 
-    // Reposition arrows next to the book edges (not screen edges)
+    // Reposition arrows next to the book edges
     function fixArrows() {
         var container = document.querySelector('.mag-flipbook-wrap .df-container');
-        var nextBtn = container ? container.querySelector('.df-ui-next') : null;
-        var prevBtn = container ? container.querySelector('.df-ui-prev') : null;
-        // Find the book wrapper element
-        var bookWrapper = container ? container.querySelector('.df-book-wrapper') : null;
+        if (!container) return;
 
-        if (!nextBtn || !prevBtn || !container) return;
+        var nextBtn = container.querySelector('.df-ui-next');
+        var prevBtn = container.querySelector('.df-ui-prev');
+        if (!nextBtn && !prevBtn) return;
 
-        if (bookWrapper) {
+        // Try to find the book element (wrapper or stage)
+        var book = container.querySelector('.df-book-wrapper') || container.querySelector('.df-book-stage');
+
+        var baseStyle = 'position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);border-radius:50%;color:#fff;font-size:30px;opacity:0.9;border:none;z-index:5;margin:0;padding:0;cursor:pointer;transition:opacity 0.2s;';
+
+        if (book && book.offsetWidth > 100) {
             var containerRect = container.getBoundingClientRect();
-            var bookRect = bookWrapper.getBoundingClientRect();
+            var bookRect = book.getBoundingClientRect();
 
-            // Position prev arrow at left edge of book - arrow width - gap
-            var prevLeft = (bookRect.left - containerRect.left) - 52;
-            if (prevLeft < 4) prevLeft = 4;
+            // Seta esquerda: entre a borda esquerda da tela e a borda esquerda do livro
+            var gapLeft = bookRect.left - containerRect.left;
+            var prevPos = Math.max(4, (gapLeft / 2) - 22); // centraliza no gap
 
-            // Position next arrow at right edge of book + gap
-            var nextRight = (containerRect.right - bookRect.right) - 52;
-            if (nextRight < 4) nextRight = 4;
+            // Seta direita: entre a borda direita do livro e a borda direita da tela
+            var gapRight = containerRect.right - bookRect.right;
+            var nextPos = Math.max(4, (gapRight / 2) - 22); // centraliza no gap
 
-            prevBtn.style.cssText = 'position:absolute;top:50%;left:' + prevLeft + 'px;right:auto;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:50%;color:#fff;font-size:32px;opacity:0.85;border:none;z-index:5;margin:0;padding:0;cursor:pointer;';
-            nextBtn.style.cssText = 'position:absolute;top:50%;right:' + nextRight + 'px;left:auto;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:50%;color:#fff;font-size:32px;opacity:0.85;border:none;z-index:5;margin:0;padding:0;cursor:pointer;';
+            if (prevBtn) prevBtn.style.cssText = baseStyle + 'left:' + prevPos + 'px;right:auto;';
+            if (nextBtn) nextBtn.style.cssText = baseStyle + 'right:' + nextPos + 'px;left:auto;';
         } else {
-            // Fallback: if no book wrapper found, use percentage-based positioning
-            prevBtn.style.cssText = 'position:absolute;top:50%;left:15%;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:50%;color:#fff;font-size:32px;opacity:0.85;border:none;z-index:5;margin:0;padding:0;cursor:pointer;';
-            nextBtn.style.cssText = 'position:absolute;top:50%;right:15%;left:auto;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:50%;color:#fff;font-size:32px;opacity:0.85;border:none;z-index:5;margin:0;padding:0;cursor:pointer;';
+            // Fallback: posicionar a 20% das bordas
+            if (prevBtn) prevBtn.style.cssText = baseStyle + 'left:18%;right:auto;';
+            if (nextBtn) nextBtn.style.cssText = baseStyle + 'right:18%;left:auto;';
         }
     }
 
-    // Run multiple times to catch DearFlip's delayed rendering
-    setTimeout(fixArrows, 1500);
-    setTimeout(fixArrows, 3000);
-    setTimeout(fixArrows, 5000);
-    setTimeout(fixArrows, 10000);
-    // Also fix on window resize
-    window.addEventListener('resize', function() { setTimeout(fixArrows, 300); });
+    // Run after DearFlip renders (progressive attempts)
+    var arrowInterval = setInterval(function() {
+        fixArrows();
+    }, 1500);
+    // Stop after 20 seconds
+    setTimeout(function() { clearInterval(arrowInterval); }, 20000);
+
+    // Also fix on resize
+    window.addEventListener('resize', function() { setTimeout(fixArrows, 200); });
 
     // Cleanup on back navigation
     window.addEventListener('beforeunload', function() {
