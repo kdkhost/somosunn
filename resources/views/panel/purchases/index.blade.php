@@ -134,6 +134,16 @@
                                     <i class="fas fa-ban"></i> Prazo expirado
                                 </span>
                             @endif
+
+                            {{-- Botao cancelar (cliente ou admin) --}}
+                            <form action="{{ route('panel.purchases.cancel', $order) }}" method="POST" data-no-ajax="true"
+                                onsubmit="return confirm('Tem certeza que deseja cancelar este pedido? Esta acao nao pode ser desfeita.')">
+                                @csrf
+                                <button type="submit"
+                                    class="inline-flex items-center gap-2 rounded-2xl bg-red-50 hover:bg-red-100 border border-red-200 px-5 py-3 text-sm font-bold text-red-700 transition">
+                                    <i class="fas fa-times-circle"></i> Cancelar pedido
+                                </button>
+                            </form>
                         </div>
                     @endif
                 </article>

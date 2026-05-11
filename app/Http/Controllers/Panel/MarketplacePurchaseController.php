@@ -216,4 +216,36 @@ class MarketplacePurchaseController extends Controller
 
         abort(404);
     }
+
+    /**
+     * Cancelamento manual de pedido pendente (pelo cliente ou admin).
+     */
+    public function cancel(Order $order)
+    {
+        $user = auth()->user();
+
+        // Permitir: dono do pedido OU admin/superadmin
+        if ((int) $order->user_id !== (int) $user->id && !$user->isAdmin()) {
+            abort(403);
+        }
+
+        if ($order->status !== 'pending') {
+            return redirect()->back()
+                ->with('error', 'Somente pedidos pendentes podem ser cancelados.');
+        }
+
+        // Cancelar no gateway se possivel
+        $this->cancelExpiredOrder($order);
+
+        // Sobrescrever o motivo para indicar cancelamento manual
+        $order->update([
+            'metadata' => array_merge($order->metadata ?? [], [
+                'cancelled_reason' => 'Cancelado manualmente por ' . $user->name . ' (id=' . $user->id . ')',
+                'cancelled_at_manual' => now()->toIso8601String(),
+            ]),
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Pedido #' . $order->id . ' cancelado com sucesso.');
+    }
 }
