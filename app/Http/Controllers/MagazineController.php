@@ -78,7 +78,7 @@ class MagazineController extends Controller
 
         // Escolher engine de flipbook conforme configuracao do admin
         $engine = \App\Models\Setting::get('magazine_flipbook_engine', 'dearflip');
-        $viewName = $engine === '3dflipbook' ? 'magazines.show-3dflipbook' : 'magazines.show';
+        $viewName = $engine === 'stpageflip' ? 'magazines.show-stpageflip' : 'magazines.show';
 
         return view($viewName, compact('magazine', 'related'));
     }

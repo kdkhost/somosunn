@@ -183,7 +183,7 @@
     <div class="alert alert-light border mb-3">
         <small class="text-muted">
             <i class="fas fa-info-circle mr-1"></i>
-            Escolha o plugin de visualizacao das revistas digitais. <strong>DearFlip</strong> e mais leve e rapido. <strong>3D FlipBook</strong> tem efeito 3D mais realista com dobra de pagina e sombras avancadas.
+            Escolha o plugin de visualizacao das revistas digitais. <strong>DearFlip</strong> e mais leve e rapido com streaming progressivo do PDF. <strong>PDF.js + StPageFlip</strong> usa a biblioteca oficial da Mozilla com efeito de pagina 3D do StPageFlip.
         </small>
     </div>
     <div class="row">
@@ -192,7 +192,7 @@
                 <label class="text-uppercase text-muted small font-weight-bold">Plugin de visualizacao</label>
                 <select name="magazine_flipbook_engine" class="form-control">
                     <option value="dearflip" {{ ($settings['magazine_flipbook_engine'] ?? 'dearflip') === 'dearflip' ? 'selected' : '' }}>DearFlip (leve, rapido, controles nativos)</option>
-                    <option value="3dflipbook" {{ ($settings['magazine_flipbook_engine'] ?? '') === '3dflipbook' ? 'selected' : '' }}>3D FlipBook (efeito 3D realista, dobra de pagina)</option>
+                    <option value="stpageflip" {{ ($settings['magazine_flipbook_engine'] ?? '') === 'stpageflip' ? 'selected' : '' }}>PDF.js + StPageFlip (Mozilla PDF.js com efeito 3D)</option>
                 </select>
             </div>
         </div>
