@@ -1,804 +1,125 @@
-# Changelog
+# CHANGELOG - SOMOS UNN
 
-Todas as alterações relevantes deste projeto são documentadas neste arquivo.
-
-O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
+> **IMPORTANTE PARA AGENTES DE IA**: Leia este arquivo E o `AGENTS.md` ANTES de modificar qualquer coisa no projeto. Este changelog documenta todas as funcionalidades implementadas, decisoes tecnicas e padroes adotados.
 
 ---
 
-## [2026-05-09] - Cron Autônomo, Otimizações e System Health
+## [2026-05-11] - Modulo Revistas Digitais (Flipbook)
 
 ### Adicionado
-
-#### Widget de Saúde do Sistema (Dashboard)
-- **Widget "Saúde do Sistema"** na dashboard admin (legado e Tailwind) com dados em tempo real via AJAX
-- Exibe: uso de disco (%), banco de dados (MB), capacidade estimada de usuários simultâneos, status do cron
-- Exibe: usuários online agora, pedidos pendentes, jobs na fila
-- Alertas visuais automáticos quando disco > 90% ou cron inativo
-- Botão de refresh manual para atualizar dados sob demanda
-
-#### Crons Faltantes Criados/Corrigidos
-- **`abandoned-cart:send`**: comando criado com assinatura correta (antes era `orders:abandoned-cart`)
-- **`users:send-birthday-emails`**: agendado diariamente às 07:00
-- **`invoices:send-overdue-reminders`**: agendado diariamente às 08:00
-- **`events:update-batches`**: agendado a cada 15 minutos para virada automática de lotes
-- Todos os comandos agora usam `MailTemplate` personalizado (nunca enviam email sem template)
-
-#### Métricas de Dashboard
-- `revenueToday` (receita do dia) adicionada ao payload admin
-- `usersToday` (novos usuários do dia) adicionada ao payload admin
-- `getMpBalance()` endpoint criado para consulta de saldo MercadoPago via AJAX
+- **Modulo completo de Revistas Digitais** com visualizador flipbook
+- Migration `magazines` (titulo, slug, PDF, capa, categoria, edicao, status, visibility, views_count, soft deletes)
+- Model `Magazine` com scope `visibleTo($user)` baseado em interesse "Noticias"
+- Controller publico `MagazineController` (listagem + flipbook viewer)
+- Controller admin `Admin\MagazineController` (CRUD com upload drag-and-drop)
+- **Dois engines de flipbook** alternáveis pelo admin:
+  - **DearFlip** (padrao): leve, streaming progressivo, controles nativos
+  - **PDF.js + StPageFlip**: renderizacao Mozilla com efeito 3D page-flip
+- **Deteccao automatica de spreads**: paginas landscape (aspect > 1.15) sao divididas em 2
+- **Carregamento progressivo**: renderiza 4 paginas iniciais, lazy-load restante em background
+- **Som de page-flip realista** via Web Audio API (3 fases: woosh + crinkle + thwap)
+- **Loading branded**: circulo azul UNN com logo da plataforma no centro
+- **Setas laterais customizadas** posicionadas junto ao livro
+- **Toolbar inferior** pill-shape com navegacao, som, zoom, download, fullscreen
+- **Pagina /revistas** com:
+  - Hero section com identidade visual UNN (azul #1F5EDB)
+  - Cards com mascara fume semi-transparente configuravel
+  - Grid responsivo desktop + Swiper mobile (1 por vez, drag)
+  - Filtros (busca + categoria) + paginacao customizada
+- **Permissoes**:
+  - `magazines.access` - Acessar revistas digitais
+  - `magazines.publish` - Publicar revistas (Editor)
+  - Superadmin/Admin tem acesso irrestrito
+- **Configuracoes no admin** (Settings > Geral > Revistas):
+  - Plugin de visualizacao (DearFlip / StPageFlip)
+  - Revistas por pagina (padrao 10)
+  - Opacidade da mascara dos cards (slider 30-95%)
+- **Importacao automatica**: comando `php artisan magazines:import-manchete`
+- **14 edicoes da Revista Manchete** importadas e publicadas (patrocinadora)
+- **Componente `x-unn-dropzone`** reutilizavel para drag-and-drop em qualquer painel
+- Sidebars atualizadas (admin antigo + painel novo) com item "Revistas"
 
 ### Corrigido
-- **Assinatura do comando de carrinho abandonado**: `orders:abandoned-cart` → `abandoned-cart:send` (corrigido em Kernel, seeders, views de cron)
-- **`systemHealth` endpoint**: tratamento seguro do `cron_heartbeat` (aceita Carbon, timestamp ou string)
-- **`systemHealth` endpoint**: verifica existência da coluna `last_activity_at` antes de consultar
-- **`SubscriptionsCheckExpired`**: removida classe anônima problemática, agora usa `SendGenericTemplateEmail` (padrão do sistema)
-- **Regex de templates**: adicionado `preg_quote()` para evitar erros com caracteres especiais em chaves de substituição
+- Superadmin agora tem acesso irrestrito ao painel novo (`/painel/admin/*`)
+  - Removido redirect que bloqueava superadmin no `EnsureUserIsAdmin`
+- Upload de PDF: `getSize()` chamado ANTES do `storeUploadedFile` (arquivo tmp era movido)
+- Inversao de cores no flipbook: forcado `color-scheme: light` + fundo branco no canvas
+- Ultima pagina nao mais se sobrepoe (showCover: true + spread detection)
 
-### Otimizado
-- **`DashboardMetricsService` (customerHealth)**: substituído loop `cursor()` por 3 queries agregadas COUNT (reduz de N+1 para 3 queries fixas)
-- **`CancelUnpaidOrders`**: usa `chunkById(100)` ao invés de carregar todos os pedidos pendentes na memória
-- **`SubscriptionsCheckExpired`**: usa `chunkById(50)` para expirar planos em lotes
-- **`CleanupNotifications`**: deleta em lotes de 500 com `usleep(100ms)` entre lotes para não travar o banco
-- **`SendBirthdayEmails`**: query otimizada com `select()` limitado (id, name, email, birth_date)
-- **`SendAbandonedCartEmails`**: usa `with('user')` e `whereHas('user')` para evitar N+1
-- **`systemHealth` endpoint**: cache de 5min para tamanho do banco, cache de 60s para total de usuários
-- **Dashboard cache**: tamanho do banco de dados cacheado por 5 minutos (query pesada em `information_schema`)
+### Arquivos principais
+- `app/Models/Magazine.php`
+- `app/Http/Controllers/MagazineController.php`
+- `app/Http/Controllers/Admin/MagazineController.php`
+- `app/Console/Commands/ImportManchetePdfs.php`
+- `resources/views/magazines/index.blade.php` (listagem publica)
+- `resources/views/magazines/show.blade.php` (DearFlip viewer)
+- `resources/views/magazines/show-stpageflip.blade.php` (PDF.js + StPageFlip viewer)
+- `resources/views/admin/magazines/index.blade.php` (admin AdminLTE)
+- `resources/views/admin/magazines/form.blade.php` (admin AdminLTE)
+- `resources/views/panel/admin/magazines/index.blade.php` (painel novo)
+- `resources/views/panel/admin/magazines/form.blade.php` (painel novo)
+- `resources/views/components/unn-dropzone.blade.php`
+- `public/assets-dflip/` (DearFlip assets locais)
+- `database/migrations/2026_05_10_192542_create_magazines_table.php`
 
 ---
 
-## [2026-05-08] - Sessão Completa de Correções e Melhorias
+## [2026-05-10] - Busca de Estabelecimentos (TomTom)
 
 ### Adicionado
+- **TomTom** como provedor primario de busca de estabelecimentos
+- Cascata com fallback: TomTom > Google Places > LocationIQ
+- Se busca com bias (lat/lon + raio) retorna vazio, tenta sem bias
+- Flag `out_of_radius` na resposta para auto-marcar "fora do raio"
+- Campo TomTom API Key no admin (Settings > Geral > APIs de Localizacao)
+- Provider select atualizado: "Automatico (TomTom > Google > LocationIQ)"
 
-#### Multi-Gateway (MercadoPago + SumUp em paralelo)
-- **Checkout de assinatura com multi-gateway**: seletor de gateway (MP/SumUp) com formulário dinâmico inline
-- **Widget SumUp SDK inline**: carrega via AJAX sem redirect, com cartão + PIX na mesma página
-- **Checkout de marketplace com multi-gateway**: `/loja/checkout` mostra ambos gateways quando ativos
-- **Checkout de cursos com multi-gateway**: `/checkout/{course}` respeita gateway escolhido
-- **Checkout de mentorias com multi-gateway**: mesma lógica aplicada
-- **Permissões granulares para MercadoPago** (idênticas ao SumUp):
-  - Por tipo de usuário: Membros, Instrutores, Vendedores, Mentores
-  - Por tipo de produto: Cursos, Mentorias, Eventos, Marketplace, Assinaturas, Serviços
-- **Página de Pagamentos do Marketplace** (`/admin/marketplace/payments`): mostra ambos gateways lado a lado com status, métodos e webhooks
-- **Métodos de pagamento SumUp (Cartão/PIX)** adicionados ao painel legado AdminLTE
+### Arquivos
+- `app/Http/Controllers/Api/VenueSearchController.php`
+- `resources/views/admin/settings/partials/general.blade.php`
 
-#### Carrinho Persistente
-- **Tabela `seller_product_cart_items`**: carrinho salvo no banco (não mais em session)
-- **Expiração configurável**: `cart_expiration_hours` (padrão 24h)
-- **Migração automática**: session → banco quando usuário loga
-- **Comando `cart:cleanup-expired`**: limpa carrinhos expirados (agendado a cada hora)
-- **Carrinho não perde itens** ao navegar, recarregar ou fechar navegador
+---
 
-#### Retry de Pagamento
-- **Rota `panel.purchases.retry`**: retoma pagamento de pedidos pendentes
-- **Countdown em tempo real**: mostra tempo restante para pagar
-- **Suporte MP e SumUp**: recria preferência/checkout se necessário
-- **Cancelamento automático**: pedidos expirados são cancelados via cron
-
-#### Cancelamento Automático de Pedidos
-- **Comando `orders:cancel-unpaid`** melhorado com prazos por método:
-  - PIX: minutos configurados no painel
-  - Cartão: 24 horas
-  - Boleto: 3 dias
-  - Default: 48 horas
-- **Cancela via API do gateway** (MP ou SumUp) quando possível
-- **Agendado a cada 5 minutos** no scheduler
-
-#### Proteção Anti-Duplicidade
-- **Trait `PreventsDoubleSubmit`**: previne pedidos duplicados em todos os checkouts
-- **Cache lock (15s)**: impede double-click no botão de pagar
-- **Reutilização de pedido pending**: não cria novo se já existe um recente
-- **Aplicado em**: SubscriptionController, CheckoutController, SellerProductCheckoutController
-
-#### Marketplace
-- **Botões padronizados**: layout vertical, sem corte de texto, ícones em todos
-- **Ambos canais visíveis**: produtos com `store_and_points` mostram Comprar + Trocar
-- **Página do produto reestruturada** (`/loja/{store}/p/{product}`): design moderno com galeria, tabs, ações sticky
-- **Storefront**: botões de compra + troca em cards de produto
-
-#### Emails Personalizados
-- **`VerifyEmailNotification`**: usa MailTemplate do banco (editável no admin)
-- **Override em User model**: `sendEmailVerificationNotification()` usa template customizado
-- **Templates criados**: `email_verification`, `welcome`
-
-#### Planos Premium
-- **Filtro por período**: planos sem preço para o período selecionado ficam ocultos
-- **Toggle Semestral/Anual**: só mostra planos que têm aquele período configurado
+## [2026-05-10] - Correcoes de Permissoes
 
 ### Corrigido
-
-#### Gateway Settings
-- **Bug crítico `$request->has()` vs `$request->input()`**: checkboxes sempre salvavam como 1
-- **Validação SumUp removida**: não mais erro "Ao menos um método deve permanecer ativo"
-- **AJAX save sem reload**: painel novo salva sem piscar a tela
-- **Flash messages globais**: SweetAlert2 adicionado ao layout do painel novo
-- **Inputs legíveis em dark mode**: classes CSS customizadas `.gw-input`
-- **Métodos dinâmicos no checkout**: só mostra métodos ativos (sem Boleto hardcoded)
-- **`mercadopago_enabled` respeitado**: toggle desativa MP em todos os checkouts
-
-#### Middleware e Rotas
-- **`Target class [signed] does not exist`**: registrados middlewares faltantes (signed, guest, can, password.confirm, auth.basic)
-- **`admin.plans.toggle-active`**: rota registrada para painel legado
-- **`admin.plans.reorder`**: rota registrada
-
-#### Service Worker
-- **Cache agressivo corrigido**: HTML agora é network-first (não mais cache-first)
-- **Rotas dinâmicas ignoradas**: `/loja`, `/marketplace`, `/checkout`, `/painel`, `/admin`
-- **Cache antigo deletado**: versão v1 → v3 com cleanup automático
-
-#### Checkout
-- **SumUp selecionado ia para MercadoPago**: corrigido `gateway_provider` respeitado
-- **`checkout_id` extraído corretamente** do retorno do SumUpService
-- **Carrinho não limpa prematuramente**: só limpa após pagamento aprovado (não no submit)
-
-### Alterado
-- **`SellerProductCartService`**: refatorado para persistência em banco
-- **`OrderSettlementService`**: limpa carrinho do comprador após pagamento
-- **`CancelUnpaidOrders`**: prazos por método de pagamento
-- **`MarketplaceController`**: produtos ordenados por `is_featured`
-- **Checkout views**: ícones FontAwesome em vez de logos SVG nos seletores de gateway
+- Superadmin tem acesso irrestrito a TODOS os modulos sem excecao
+- Middleware `EnsureUserIsAdmin`: superadmin passa direto (sem redirect)
+- Middleware `RedirectSuperadminToLegacy`: ja era no-op (confirmado)
+- Editors com feature `magazines.publish` podem acessar `panel.admin.magazines.*`
 
 ---
 
-## [Unreleased]
-
-### Adicionado
-- **Integração completa do SumUp**: implementação completa do gateway SumUp com suporte a cartão de crédito e PIX
-- **Interface administrativa reorganizada**: painel de gateways reorganizado com abas principais (MercadoPago | SumUp) e sub-abas específicas para cada gateway
-- **Controles granulares de permissões SumUp**: 
-  - Por tipo de usuário (Membros, Instrutores, Vendedores, Mentores)
-  - Por tipo de produto (Cursos, Mentorias, Eventos, Marketplace, Assinaturas, Serviços)
-  - Por valor (limites mínimo e máximo configuráveis)
-- **SumUpService**: classe completa para integração com API do SumUp incluindo criação de checkout, consulta de status, cálculo de taxas e parcelamento
-- **SumUpController**: endpoints RESTful para checkout, webhook, consultas de status e cálculo de parcelamento
-- **Middleware CheckSumUpPermissions**: verificação automática de permissões baseada em configurações granulares
-- **Trait SumUpIntegration**: integração reutilizável para controllers existentes com métodos para verificar disponibilidade e processar pagamentos
-- **Frontend JavaScript moderno**: classe `SumUpIntegration` para integração completa no frontend com monitoramento de status
-- **Estilos CSS responsivos**: interface moderna com suporte a dark mode e animações
-- **30+ configurações específicas do SumUp**: credenciais, métodos, taxas, parcelamento, permissões e configurações avançadas
-- **Fallback automático**: para MercadoPago quando SumUp não está disponível
-- **Webhook seguro**: validação opcional com HMAC para receber notificações do SumUp
-- **APIs RESTful**: endpoints para criar checkout (`POST /api/v1/sumup/checkout`), consultar status (`GET /api/v1/sumup/checkout/{id}`), calcular parcelamento (`POST /api/v1/sumup/installments`) e verificar disponibilidade (`POST /api/v1/sumup/availability`)
-- **Integração nos controllers existentes**: `CheckoutController` e `MentorshipCheckoutController` agora suportam SumUp automaticamente
-- **Documentação completa**: arquivo `SUMUP_IMPLEMENTATION.md` com guia completo de implementação e uso
-- **Multi-gateway checkout**: suporte a Mercado Pago e SumUp ativos simultaneamente, sem restrição de exclusividade.
-- **Gateway Selector**: seletor visual no checkout de eventos quando dois gateways estão disponíveis para o vendedor, com cards clicáveis por gateway.
-- **`GatewayAccount::resolveAllActiveGatewaysForSeller()`**: novo método que retorna todos os gateways ativos para um vendedor (seller → global), mantendo `resolveActiveGatewayForSeller()` para compatibilidade retroativa.
-- **Campos de parcelamento MP independentes**: `mercadopago_max_installments`, `mercadopago_installments_no_interest`, `mercadopago_installment_tax` — configuráveis em ambos os painéis.
-- **Expiração do PIX por gateway**: `mercadopago_pix_expiration_minutes` e `sumup_pix_expiration_minutes` (1–1440 min, padrão 10) — configuráveis em ambos os painéis.
-- **Validação de método mínimo por gateway**: ao salvar configurações, o `SettingController` rejeita com HTTP 422 se um gateway ativo ficar sem nenhum método de pagamento habilitado.
-- **Testes de integração** em `tests/Feature/MultiGateway/GatewayResolutionTest.php` cobrindo resolução de 0, 1 e 2 gateways, fallback global e independência de estado.
-- Instruções detalhadas para configuração da SumUp nos painéis de gateway, com origem da API Key, Merchant Code, credenciais OAuth e Webhook Secret.
-- Atalho "Configurar Credenciais" e resumo operacional na tela administrativa de transações SumUp.
-- **Detecção dinâmica de gateway ativo** no checkout de eventos: sistema agora detecta automaticamente qual gateway (Mercado Pago ou SumUp) o vendedor configurou como ativo
-- **Interface com abas separadas** no painel administrativo para configurações de gateway (Mercado Pago / SumUp)
-- **Feedback visual** com badges de status (Ativo/Inativo) nas abas de configuração de gateway
-- **Método unificado** `GatewayAccount::resolveActiveGatewayForSeller()` para detecção de gateway ativo independente do provedor
-- **Roteamento condicional** no `EventReservationController` para processar pagamentos via SumUp ou Mercado Pago baseado no gateway ativo
-- **Formulário de cartão SumUp** (`sumup-card-form.blade.php`) para checkout transparente de eventos
-- **Métodos dedicados** `processSumUpPayment()` e `processMercadoPagoPayment()` para processamento isolado de cada gateway
-- **Seleção de método de pagamento PIX/Cartão** no checkout SumUp com interface de botões
-- **Geração de QR Code PIX inline** via `SumUpService::processPixCheckout()`
-- **Polling automático** de status de pagamento PIX a cada 5 segundos
-- **Botão "Copiar código PIX"** para facilitar pagamento
-- **Rotas dedicadas** `POST /checkout/sumup/pix` e `GET /checkout/sumup/status` para processamento PIX
-- **Métodos no CheckoutController**: `sumupPix()` e `sumupStatus()` para gerenciar pagamentos PIX
-- **Logs detalhados de debug** no formulário SumUp para diagnosticar problemas de renderização
-- **Bloco de debug visual** (apenas em modo debug) mostrando variáveis recebidas pelo formulário
-- **Logs de console** em cada etapa da inicialização do SumUp Card Widget
-
-### Alterado
-- **Multi-gateway checkout**: suporte a Mercado Pago e SumUp ativos simultaneamente, sem restrição de exclusividade.
-- **Gateway Selector**: seletor visual no checkout de eventos quando dois gateways estão disponíveis para o vendedor, com cards clicáveis por gateway.
-- **`GatewayAccount::resolveAllActiveGatewaysForSeller()`**: novo método que retorna todos os gateways ativos para um vendedor (seller → global), mantendo `resolveActiveGatewayForSeller()` para compatibilidade retroativa.
-- **Campos de parcelamento MP independentes**: `mercadopago_max_installments`, `mercadopago_installments_no_interest`, `mercadopago_installment_tax` — configuráveis em ambos os painéis.
-- **Expiração do PIX por gateway**: `mercadopago_pix_expiration_minutes` e `sumup_pix_expiration_minutes` (1–1440 min, padrão 10) — configuráveis em ambos os painéis.
-- **Validação de método mínimo por gateway**: ao salvar configurações, o `SettingController` rejeita com HTTP 422 se um gateway ativo ficar sem nenhum método de pagamento habilitado.
-- **Testes de integração** em `tests/Feature/MultiGateway/GatewayResolutionTest.php` cobrindo resolução de 0, 1 e 2 gateways, fallback global e independência de estado.
-- Instruções detalhadas para configuração da SumUp nos painéis de gateway, com origem da API Key, Merchant Code, credenciais OAuth e Webhook Secret.
-- Atalho "Configurar Credenciais" e resumo operacional na tela administrativa de transações SumUp.
-- **Detecção dinâmica de gateway ativo** no checkout de eventos: sistema agora detecta automaticamente qual gateway (Mercado Pago ou SumUp) o vendedor configurou como ativo
-- **Interface com abas separadas** no painel administrativo para configurações de gateway (Mercado Pago / SumUp)
-- **Feedback visual** com badges de status (Ativo/Inativo) nas abas de configuração de gateway
-- **Método unificado** `GatewayAccount::resolveActiveGatewayForSeller()` para detecção de gateway ativo independente do provedor
-- **Roteamento condicional** no `EventReservationController` para processar pagamentos via SumUp ou Mercado Pago baseado no gateway ativo
-- **Formulário de cartão SumUp** (`sumup-card-form.blade.php`) para checkout transparente de eventos
-- **Métodos dedicados** `processSumUpPayment()` e `processMercadoPagoPayment()` para processamento isolado de cada gateway
-- **Seleção de método de pagamento PIX/Cartão** no checkout SumUp com interface de botões
-- **Geração de QR Code PIX inline** via `SumUpService::processPixCheckout()`
-- **Polling automático** de status de pagamento PIX a cada 5 segundos
-- **Botão "Copiar código PIX"** para facilitar pagamento
-- **Rotas dedicadas** `POST /checkout/sumup/pix` e `GET /checkout/sumup/status` para processamento PIX
-- **Métodos no CheckoutController**: `sumupPix()` e `sumupStatus()` para gerenciar pagamentos PIX
-- **Logs detalhados de debug** no formulário SumUp para diagnosticar problemas de renderização
-- **Bloco de debug visual** (apenas em modo debug) mostrando variáveis recebidas pelo formulário
-- **Logs de console** em cada etapa da inicialização do SumUp Card Widget
-
-### Alterado
-- **`SettingController::toggle()`**: removida a lógica que desativava o outro gateway ao ativar um.
-- **`SettingController::update()`**: removida a validação de exclusividade entre gateways; adicionado clamping para `mercadopago_max_installments`, `mercadopago_installments_no_interest`, `mercadopago_installment_tax`, `mercadopago_pix_expiration_minutes` e `sumup_pix_expiration_minutes`.
-- **`EventReservationController::checkout()`**: substituída chamada a `resolveActiveGatewayForSeller()` por `resolveAllActiveGatewaysForSeller()`; passa `$activeGateways` (array) para a view.
-- **`EventReservationController::reserve()`**: roteamento pelo gateway selecionado pelo cliente; valida gateway contra lista de ativos; exige campo `gateway` quando há múltiplos gateways; registra logs com `order_id`, `event_id` e `gateway`.
-- **`CheckoutController::sumupPix()`**: expiração do PIX agora usa `sumup_pix_expiration_minutes` (padrão 10 min) em vez de 30 min hardcoded.
-- **`MercadoPagoService::createPixPayment()`**: expiração do PIX agora usa `mercadopago_pix_expiration_minutes` com fallback para `pix_expiration_minutes` e depois para 10 min.
-- **Painel moderno** (`panel/admin/settings/partials/gateway.blade.php`): removido aviso de exclusividade; adicionados campos de parcelamento MP e expiração PIX por gateway.
-- **Painel legado** (`admin/settings/partials/gateway.blade.php`): removido `alert-info` de exclusividade e JS de confirmação de troca; adicionados campos de parcelamento MP e expiração PIX por gateway.
-- **`sumup-card-form.blade.php`**: recebe `sumupPixExpirationMinutes` da view pai.
-- **`events/checkout.blade.php`**: exibe Gateway Selector quando `count($activeGateways) === 2`; envia campo `gateway` no POST.
-
-### Corrigido
-- Salvamento das credenciais SumUp do vendedor, incluindo API Key e Merchant Code em `gateway_accounts.extra`.
-- Validação de webhooks SumUp compatível com o cabeçalho oficial `x-payload-signature`.
-- Validação de credenciais SumUp compatível com o retorno atual `merchant_profile.merchant_code` da API.
-- **Gateway SumUp não carregava no checkout de eventos**: `EventReservationController` estava hardcoded para usar apenas Mercado Pago, impedindo vendedores com SumUp ativo de receberem pagamentos
-- **Detecção de gateway ativo** no método `checkout()` agora verifica ambos gateways (Mercado Pago e SumUp) em vez de apenas Mercado Pago
-- **Criação de pedidos** agora usa o gateway ativo detectado dinamicamente em vez de hardcoded `'mercadopago'`
-- **View de checkout transparente** (`checkout.transparent`) agora suporta renderização condicional para ambos gateways
-- **Sincronização automática** entre `settings` e `gateway_accounts` ao ativar/desativar gateways no painel admin
-- **Migração `add_sumup_subscription_id_to_subscriptions_table`**: corrigida referência à coluna inexistente `gateway` para usar `next_billing_at` (coluna que existe na tabela `subscriptions`)
-- **Models SumUp**: adicionada propriedade `$table` explícita nos Models `SumUpTransaction`, `SumUpWebhookLog` e `SumUpSavedCard` para usar nomes corretos das tabelas (`sumup_*` em vez da convenção padrão `sum_up_*` do Laravel)
-- **Inicialização do SumUp Card Widget**: corrigido container ID de `sumup-checkout-container` para `sumup-card` (requerido pelo SDK)
-- **Renderização automática**: removida chamada incorreta `sumupCard.render()` - `SumUpCard.mount()` já renderiza automaticamente
-- **Wrapper DOMContentLoaded**: adicionado para garantir que DOM esteja pronto antes da inicialização
-- **Referência a variável checkoutId**: corrigida para usar `checkoutIdValue` consistentemente
-- **Verificação de existência do container**: adicionada antes de tentar renderizar o widget
-- **Métodos PIX/Cartão desabilitados**: `Setting::get('sumup_method_card', 1)` retornava `null` quando a chave não existia no banco — cast `(bool)null` = `false` ignorava o default; corrigido com verificação explícita null-coalesce
-- **QR Code PIX não exibido**: `processPixCheckout` usava `payment_type='boleto'` (incorreto); corrigido para `payment_type='pix'`; extração do QR Code agora tenta múltiplos campos da resposta da API SumUp com fallback encadeado
-- **Tratamento de erros PIX**: `sumupPix()` agora loga a resposta raw completa, retorna erro 422 claro quando API não retorna código PIX, e o frontend exibe a mensagem real do erro
-
----
-
-## [2026-04-23]
-
-### Adicionado
-- Integração completa do gateway de pagamento **SumUp** como opção adicional ao Mercado Pago
-  - Migrations: `sumup_transactions`, `sumup_webhook_logs`, `sumup_saved_cards`, coluna `sumup_subscription_id` em `subscriptions`
-  - Models: `SumUpTransaction`, `SumUpWebhookLog`, `SumUpSavedCard`
-  - `SumUpService`: checkout, pagamento com cartão (tokenização), PIX com QR Code inline, reembolso total/parcial, assinaturas recorrentes, webhooks dinâmicos por transação, validação HMAC
-  - `SumUpWebhookProcessor`: dispatcher idempotente de eventos (`payment.succeeded`, `payment.failed`, `payment.refunded`, `subscription.renewed`, `subscription.cancelled`)
-  - `SumUpController` no painel admin: listagem de transações com filtros, detalhes, reembolso, relatório com gráfico Chart.js, exportação CSV, teste de conexão
-  - Rotas: webhook público `POST /webhook/sumup/{orderId}/{token}` e grupo `panel.admin.sumup.*`
-  - Item "SumUp" no sidebar do painel admin
-  - Seção SumUp nas configurações de gateway em ambos os painéis (`/admin` e `/painel/admin`) com campos padronizados, toggle ativo/inativo, taxas, métodos e botão de teste de conexão
-  - Sincronização automática das credenciais SumUp com `gateway_accounts` ao salvar configurações (mesmo padrão do Mercado Pago)
-
-### Corrigido
-- `OrderRefundService`: adicionado suporte ao gateway `sumup` no `match` de `refundOnGateway()`
-- `SettingController::testGateway()`: estendido para aceitar `gateway=sumup` com chamada real à API `GET /v0.1/me`
-- `GatewayAccount`: adicionado método `resolveForSellerSumUp()` seguindo o mesmo padrão de `resolveForSeller()`
-- Rotas `panel.admin.mailtemplates.*` corrigidas na view `panel/admin/mailtemplates/index.blade.php` — todas as referências atualizadas de `admin.mailtemplates.*` para `panel.admin.mailtemplates.*`
-
----
-
-## [2026-04-22]
-
-### Corrigido
-- Erro `Route [panel.admin.mailtemplates.index] not defined` no painel admin Tailwind
-- Adicionadas rotas `panel.admin.mailtemplates.*` com nomes únicos para o prefixo `/painel/admin`
-- View de listagem de mail templates detecta corretamente qual painel está ativo e usa as rotas correspondentes
-- Ambos os painéis (superadmin `/admin` e admin `/painel/admin`) funcionam de forma independente sem conflito de rotas
-
----
-
-## [2026-04-14]
-
-### Corrigido
-- Troca de abas quebrada na página de edição de eventos: `restoreActiveTab()` sobrescrevia o parâmetro `?tab=` da URL ao carregar a página
-- Adicionada guarda para pular restauração do localStorage quando `?tab=` está presente na URL
-- Script de inicialização de aba forçado corretamente no formulário de eventos
-
----
-
-## [2026-04-13]
-
-### Corrigido
-- Refinamento da visibilidade de campos e abas no painel administrativo legado (AdminLTE)
-
----
-
-## [2026-04-12]
-
-### Adicionado
-- **Módulo Acervo de Mídia**: desacoplamento completo da galeria de eventos — álbuns genéricos independentes de eventos
-- Rotas puras `/acervo/create` para isolamento do módulo Acervo
-- Botão "Definir como Capa" pela galeria de fotos do evento
-- Capa opcional para álbuns (sem obrigatoriedade)
-- Comando `events:update-batches` para tracking automático de virada de lotes de ingressos
-- Botão Salvar no modal de edição de eventos com exibição de duração
-- Link direto para galeria/acervo na home pública
-
-### Corrigido
-- Ativação da aba Galeria e submissão do formulário de Acervo no painel legado
-- `RouteNotFoundException` ao redirecionar após salvar/deletar um acervo
-- Importação ausente de `UploadStorage` que causava erro 500 no salvamento de capa
-- Erro `Cannot set properties of undefined` no DataTables na listagem do acervo
-- Erro `Incorrect column count` do DataTables
-- Summernote vazio ao abrir modal de edição de eventos
-- Notificação toastr duplicada no layout do painel
-- Popup SweetAlert2 duplicado nas notificações de flash session
-- Lógica VIP de lotes removida — todos os usuários veem o lote real baseado nas datas
-- Exclusão do CSRF header nas requisições Axios da galeria
-- Variáveis não definidas na inclusão do componente de galeria
-- Redirecionamento pós-save diferenciado entre Acervo e Evento
-- Validação nativa de data desativada em álbuns
-- Obrigatoriedade e visibilidade de datas removidas para registros do tipo álbum
-- Botão da galeria na home corrigido para rota correta do acervo
-
-### Alterado
-- Labels do formulário de eventos adaptados para o tipo Acervo
-- Campos de Mapa/Localização ocultados para registros do tipo álbum
-- Marca d'água removida globalmente de eventos e álbuns
-
----
-
-## [2026-03-26]
-
-### Adicionado
-- **Loja Virtual por Vendedor**: vitrine pública premium com produtos, canais de venda e pontos
-- Summernote ativado na bio da loja virtual
-- Separação da loja oficial da plataforma da elegibilidade comum de vendedores
-
-### Corrigido
-- Salvamento de produtos contra bloqueios 403 do ModSecurity com normalização de valores monetários
-- Camadas do dropdown de cores do Summernote
-- Paleta e preview de cores do Summernote
-- Contraste do Summernote entre tema claro e escuro
-- Alinhamento do Summernote ao tema ativo dos painéis
-- Seletor de cores do Summernote nos painéis
-- Espaço acima do cabeçalho da loja pública
-- Layout mobile da loja
-- Textos com acentuação corrompida
-- Método `normalizeMoneyInput` removido acidentalmente no `Admin\SellerProductController`
-
-### Alterado
-- Layout da vitrine da loja alinhado ao padrão de e-commerce
-- Faixa de filtros da loja pública reorganizada
-- Rodapé informativo da loja em três colunas
-- Cards de benefícios em quatro colunas
-- Seção institucional da loja em três colunas
-
----
-
-## [2026-03-25]
-
-### Adicionado
-- Implementação completa da loja virtual por vendedor no marketplace
-
----
-
-## [2026-03-24]
-
-### Adicionado
-- **Consentimento LGPD**: modal de consentimento com enforcement e páginas de documentos legais (Termos, Privacidade, LGPD)
-- Publicação de conteúdo legal via CMS com editor Summernote rico
-- Suporte a vídeos na galeria de eventos do painel
-- Centralização da publicação das páginas legais no CMS
-
-### Corrigido
-- Edição das páginas legais no admin
-- Desequilíbrio de divs em partials legados e restauração de visibilidade de abas
-- Lógica de abas AdminLTE e correção de visibilidade SEO
-- Syntax error no editor AdminLTE que causava erro 500
-- Rodapé público refatorado para layout full-width
-
-### Alterado
-- Editor de páginas admin convertido para sistema de abas
-- Rodapé público redesenhado com links refinados
-- Menu mobile expandido com links institucionais
-
----
-
-## [2026-03-23]
-
-### Adicionado
-- **Sistema de Verificação de E-mail** com interface premium e banner de alerta
-- **Bottom Navigation** para dispositivos móveis (PWA)
-- **Drag-and-Drop no FullCalendar** com AJAX e SweetAlert2
-- **Logomarca Dinâmica Somos Únicas** com sincronização de credenciais de checkout
-- **Gestão administrativa de split e chaves PIX** nos painéis admin e moderno
-- **Ranking público** redesenhado com pódio premium, coroa flutuante e medalhas
-- Toggle de layout dinâmico Full/Boxed controlado pelo painel administrativo
-- Paridade total entre painéis (Moderno/AdminLTE) no CMS com sistema de abas Zero Refresh
-- Repeaters visuais com Drag-and-Drop e Upload AJAX nos partials institucionais
-- Páginas institucionais (Termos, Privacidade, LGPD) com SEO e CMS completo
-- Preview de e-mail em tempo real sincronizado entre os painéis
-- Unificação de e-mails com design de cabeçalho padronizado
-
-### Corrigido
-- Erro 500 na página de ranking por tag `@endif` ausente
-- Responsividade mobile da seção journey
-- Layout boxed em todas as seções da home e navbar
-- Checkout unificado em cursos, eventos e mentorias
-- Visibilidade da carteira MP no checkout
-- Syntax Blade na indicação e credenciais MP no checkout
-- Rotas de checkout não definidas
-- Validação de CPF no Mercado Pago (exatamente 11 dígitos)
-- Redundância de taxa marketplace no gateway
-- Preview de e-mail ultra-responsivo e resiliente a modais lentos
-- Sincronização do preview em tempo real para editores em modais
-
-### Alterado
-- Painel SPA de alta velocidade com interceptador AJAX vanilla JS
-- Troca de tema claro/escuro sem `window.reload`
-- Dashboard admin refatorado com métricas de hoje e ações rápidas
-- Cartões de rastreio redesenhados para layout vertical flexível
-
----
-
-## [2026-03-22]
-
-### Adicionado
-- **Scanner de Ingressos Universal** com antifraude por GPS (10m), validação de horário e suporte para instrutores
-- **Checkout Transparente para Eventos** com temporizador PIX
-- Meta tags dinâmicas Open Graph e Twitter Card para eventos, cursos, mentorias, parceiros e vagas
-- Componente avançado de drag-and-drop para capa do evento
-- Campo de descrição com Summernote no formulário legado de eventos
-
-### Corrigido
-- Scanner universal que não abria a câmera — migrado para `Html5Qrcode` de baixo nível
-- Scanner do instrutor não redirecionava mais para admin — rota própria no painel
-- Sidebar: abre grupo Eventos e marca Scanner universal ativo
-- Sidebar: marca menu Extrato de Splits como ativo e abre grupo Marketplace
-- Sidebar: marca menu Galeria de Fotos como ativo em todas as rotas `admin.gallery.*`
-- Rotas `admin.fonts.*` ausentes no `web.php`
-- Rotas `admin.upload.chunk` e `admin.upload.assemble` ausentes
-- Rota `admin.events.calendar.settings` que causava erro 500
-- Erro `Undefined variable $course` em `admin/courses/create`
-- Editor Summernote via `x-init` Alpine e estrutura de scripts corrigida
-- Links de mapa com fallback e inicialização do Summernote via IIFE compatível com SPA
-- Erro 2067 Invalid user identification no PIX do MercadoPago
-
----
-
-## [2026-03-21]
-
-### Adicionado
-- **SPA de Alta Velocidade** no novo painel com interceptador AJAX vanilla JS customizado
-- **Migração de Lotes de Ingressos** com tracking automático
-- **Hub de Notificações** refatorado com cards individuais de notificação com lido/não-lido rastreável
-- Expansão da estética premium glassmorphism para todos os dashboards secundários
-- Refatoração estética premium da barra lateral com acordeão nativo e glassmorphism
-- Experiência imersiva nativa no lightbox da galeria
-- Melhoria na visualização de mídia no lightbox pelo celular
-
-### Corrigido
-- Quick Scanner abrindo no layout AdminLTE legado dentro do novo painel
-- `@endforeach` ausente que causava HTTP 500 na Homepage
-- Scroll horizontal, erro JS e métricas da dashboard
-
----
-
-## [2026-03-14]
-
-### Adicionado
-- Suporte a HEIC e otimização automática de imagens no upload da galeria
-- Controllers admin migrados para respostas JSON — sem refresh de página no CRUD
-
-### Corrigido
-- Rotas de checkout de mentorias ausentes
-- Rota `share.product` ausente
-- Suporte ao tema dark na página de FAQ do painel admin
-- Suporte ao tema dark na página de depoimentos admin
-- Scanner do instrutor não redirecionava mais para admin
-
----
-
-## [2026-03-13]
-
-### Corrigido
-- Upload XHR por arquivo, capa personalizada e rota destroy corrigida na galeria admin
-- Destaque automático removido da galeria — todos os álbuns na grade igual
-- Páginas públicas de galeria simplificadas removendo textos desnecessários
-
----
-
-## [2026-03-12]
-
-### Adicionado
-- Redesign completo da vitrine pública da galeria
-- Alinhamento das galerias admin e painel ao visual premium
-- Watermark obrigatório e upload rápido modernizado
-
-### Corrigido
-- Restauração de rotas faltantes: galeria, quick-scanner, marketplace, redemptions, fontes, mídia
-- Restauração de rotas admin legadas e aliases
-- Upload da galeria admin: fluxo, modal, limite e preview inline
-- Redirecionamento de feature bloqueada
-- Uploads S3 compatíveis com IDrive E2
-- Ajuste de uploads admin ao padrão AdminLTE
-- Namespace `MailTemplateController` corrigido
-- Rota `panel.admin.redemptions.index` para sidebar
-
----
-
-## [2026-03-11]
-
-### Adicionado
-- **Redesign Completo do Gateway Admin**: hero gradiente, tabs, segmented-control de ambiente, cards de métodos, reveal/hide de tokens
-- Componente global de upload (drag & drop, barra de progresso, preview) em todas as páginas do admin
-- Suporte completo a OAuth 2.0 na integração SumUp (posteriormente removido e reintegrado em 2026-04-23)
-
-### Corrigido
-- Painel admin e gateway legado
-- Modal de upload rápido no painel reescrito em Tailwind e JS puro
-- Upload chunked no admin: estabilização, limite e permissões
-- Editor legado e upload de páginas
-- Preloader do frontend restaurado
-- Recorrência nas regras de pontos legado
-- Layout da página de evento
-- Contraste do botão no scanner admin
-- Legibilidade do overlay do scanner
-- Galeria do painel redesenhada
-- Campos do portal no CMS persistidos e populados com defaults
-
----
-
-## [2026-03-10]
-
-### Adicionado
-- **SEO Dinâmico** com estatísticas e CTA editáveis na página de membros
-- **UNNBIT**: fluxo de valorização e resgate
-- **Controles de geofence configuráveis** para o scanner de ingressos
-- Padronização premium de uploads no painel do membro e galeria
-- Integração global do SweetAlert2
-- Migração completa do sistema de gerenciamento de páginas para Tailwind CSS
-- DataTables na listagem de eventos
-- Confirmações globais via SweetAlert2
-- Persistência de acknowledgements no hub de notificações
-- Unificação do editor de certificados no painel
-
-### Corrigido
-- Máscaras de telefone para fixo e celular
-- Binding Alpine nas notificações da navbar
-- Tratamento global de CRUD via AJAX
-- Sino de notificações com acknowledgement instantâneo
-
----
-
-## [2026-03-09]
-
-### Adicionado
-- **Scanner Universal de Ingressos** com antifraude por GPS (10m), validação de horário e suporte para instrutores
-- **Galeria de Eventos** com controles de marca d'água e otimizações de performance
-- **Múltiplos Ingressos Individuais** com QR Code por ingresso
-- Permissões obrigatórias (GPS, Câmera, Vibrate) e manifest PWA aprimorado para scanner
-- Agrupamento de múltiplos ingressos no mesmo e-mail
-- Exibição de ingressos e melhoria no feedback do scanner
-- Animações dinâmicas na página Premium
-- Dualidade de painéis para listagem de eventos
-
-### Corrigido
-- Restrição de duplicidade de ingressos por usuário removida
-- Disponibilidade do scanner de eventos
-- Tratamento de reservas duplicadas de eventos
-- Normalização de telefone brasileiro e máscaras
-- Layout mobile do quick scanner
-- Scroll horizontal, erro JS e métricas da dashboard
-- Preloader restaurado no painel administrativo
-
----
-
-## [2026-03-08]
-
-### Adicionado
-- **Galeria de Fotos e Vídeos** com marca d'água dinâmica em eventos
-- **Sistema de Validação de Ingressos QR Code** com pontuação no app
-- **Controle de Visibilidade de Conteúdo** por seção
-- **Página 'Sobre' da Comunidade Somos Únicas**
-- Suporte a variáveis flexíveis nos templates de e-mail
-- Bypass de firewall (403) usando Base64 para salvamento de HTML em templates
-- Tema roxo profundo para Somos Únicas com campo de imagem networking no CMS
-- Método `canMessageUser` no model User
-
-### Corrigido
-- Erro 500 no perfil — lógica de conexão movida para o model `Connection`
-- Caminhos de imagem de capa de cursos Somos Únicas
-- Datas e range do calendário de eventos Somos Únicas
-- Rota `panel.admin.courses.show`
-- Fallback do checkout MercadoPago para eventos
-- Flash de modal de ingresso ao recarregar
-- Toast de erro duplicado na página de evento
-- Disponibilidade de evento e fallback de preferência MP
-- Refunds de produtos no admin e descrição de produto no MercadoPago
-- Split desativado no Mercado Pago para vendas do próprio administrador
-- Ambiente MP alterado para produção com melhoria no tratamento de erro no saldo
-- Fallback para token da plataforma no saldo do Mercado Pago
-- Sincronização forçada do Summernote e consistência de resposta AJAX
-- Limpeza automática de boilerplate HTML nos templates de e-mail
-- Unificação de templates de e-mail com layout da UNN
-- Importação de serviço e validação de email no admin
-- Rota de quem somos no submenu Somos Únicas
-- Syntax error no controller de eventos que impedia finalização de compra
-- Placeholders de imagem na demo e autoria atribuída ao admin logado
-
----
-
-## [2026-03-07]
-
-### Adicionado
-- **Área Somos Únicas** na cor rosa com página oficial do Ranking da Comunidade
-- Componente global de upload (drag & drop, barra de progresso, preview) em todas as páginas do admin
-- Script para importar credenciais do `.env` para o banco de dados automaticamente
-- Modal de evento com background, layout, texto e botão atualizados
-- Exibição dinâmica da forma de pagamento selecionada no card de Resumo do checkout de eventos
-
-### Corrigido
-- Bug 500 no dashboard AdminLTE com diretiva `@json` multilinha corrompida pelo parser Blade
-- Bug 500 do `RouteNotFound` ao acessar log de atividades
-- Leitura de chaves do PagSeguro (Global) no `EventReservationController`
-- Lógica de gateway: permite compra se credenciais globais estiverem configuradas
-- Credenciais globais de pagamento buscadas exclusivamente no banco de dados (Setting::get)
-- Textos corrigidos para 'SOMOS UNN' nas views do frontend
-- Páginas do CMS restauradas e impedidas de sumir da listagem do admin
-
----
-
-## [2026-03-06]
-
-### Adicionado
-- **Rastreio Completo de Afiliados**: cliques, visitas e compras com log detalhado, CSV e visão global no admin
-- **Kit de Divulgação e API REST** para o afiliado montar páginas externas
-- **Gestão de Tokens da API** no painel do afiliado
-- **Dashboards com Visitas em Tempo Real** e métricas por responsável
-- Gráficos diários e por canal no painel de indicações
-- Organização das indicações em abas no admin legado e no painel novo
-- Itens de resgate destacados no menu admin
-- Reconciliação de pontos históricos de membros antigos sem duplicar saldo
-- Instrutor e vendedor incluídos nos planos pagos
-
-### Corrigido
-- Ícone do Pix nos checkouts e nas configurações
-- Sincronização do resumo do checkout com o gateway selecionado
-- Restrição de whitelist do Pix no PagSeguro sem expor erro bruto no checkout
-- Brechas de eventos, plano gratuito e pontuação recorrente
-- CSV de rastreio para abrir corretamente no Excel sem UTF-8 com BOM
-- Erro no painel quando as colunas novas de resgates ainda não existem
-- HTML bruto nos resumos públicos de mentorias, eventos e cursos
-- Botões de eventos e mentorias encerrados bloqueados nas vitrines públicas
-- Imagem do plano no resumo do checkout de assinatura
-
----
-
-## [2026-03-05]
-
-### Adicionado
-- Upload avançado, menu recolhível e paginação nas listas do painel
-- Summernote sem upload no detalhe dos itens de resgate
-- Regras de pontos em lista colorida por categoria
-
-### Corrigido
-- Listagem de regras de pontos no painel novo
-- Telas de fatura alinhadas ao padrão visual do painel
-- Calendário e fluxo de eventos no painel admin novo
-- Edição de mentorias alinhada ao layout novo do painel admin
-- Rodapé público usando o nome configurado no painel em vez de UNN fixo
-- Tamanho visual das imagens nas configurações do admin
-- JavaScript global do admin para reativar os uploads de imagens
-
----
-
-## [2026-03-02]
-
-### Adicionado
-- **Sistema de Gamificação Completo**:
-  - `PointsService` com guarda de não-repetição, limite diário e cálculo de streak
-  - Hooks de autenticação: login diário com detecção de streak 7/30 dias, bônus de indicação no cadastro, pontos por completar perfil
-  - Hooks de comunidade: publicar post, comentar, receber curtida, compartilhar nas redes sociais
-  - Hooks de conteúdo: aula concluída, primeiro/qualquer curso, certificado, evento, mentoria, avaliação e mentor ao criar mentoria
-  - Comandos agendados: bônus semanal para top 10 do ranking (domingo) e bônus de aniversário diário (01h)
-- **Página 'Meus Pontos'**: histórico paginado, posição no ranking, pontos do mês, top 10 motivacional
-- **Programa de Indicações**: link de referral, botão de copiar, compartilhamento WhatsApp/Telegram
-- **Share-with-Approval**: compartilhamento entre membros com aprovação do destinatário, inbox de solicitações, notificações e expiração automática em 7 dias
-- **Widget de Pontos UNN** no painel do membro com ranking e pontos do mês
-- **Página de Oportunidades** moderna com filtros empresa/tipo, badge parceiro e melhorias ARIA
-- **CMS de Páginas de App**: premium, eventos, membros, vagas, cursos, portal e feed integrados com título, hero e SEO configurável
-- Login social robusto com cadastro redirecionando para planos
-- Campo de data de aniversário no perfil
-
-### Corrigido
-- Relacionamento `conversations()` no model User
-- Variável `$splits` não passada para a view `splits/index`
-- Bloco `@empty` duplicado que causava ParseError na view de vagas
-
----
-
-## [2026-02-27] — [2026-03-01]
-
-### Adicionado
-- **Sistema de Split de Pagamentos**: modelo `OrderSplit`, cálculo automático de splits por pedido pago
-- **Chave PIX** no perfil do usuário
-- **Campos de período e preços** em planos (mensal, trimestral, semestral, anual)
-- **Plano gratuito** com flag `is_free`
-
-### Corrigido
-- Campo `paid_at` em pedidos
-- Satisfações e feedback
-
----
-
-## [2026-02-20] — [2026-02-26]
-
-### Adicionado
-- **Vagas de Emprego**: modelo `JobVacancy`, candidaturas, visibilidade e campos avançados
-- **Itens Resgatáveis (UNNBIT)**: modelo `RedeemableItem`, resgates e catálogo
-- **Parceiros**: módulo completo com cupons aninhados, slug e página pública
-- Aprovação manual de pedidos com campos de auditoria
-
-### Corrigido
-- Campos faltantes em lições
-- Aprovação manual financeira de pedidos
-
----
-
-## [2026-02-10] — [2026-02-19]
-
-### Adicionado
-- **Certificados para Mentorias e Eventos** com campos de carga horária
-- **Logs de Atividade** do sistema
-- **Galeria de Eventos** com tabela `event_media`
-- **Ingressos de Eventos**: campos de ticket, QR Code e scanner
-- **Wishlist** de cursos para membros
-- Campo de gênero e data de nascimento no perfil do usuário
-
-### Corrigido
-- Campos de certificado em cursos e mentorias
-- Metadados de certificados
-
----
-
-## [2026-02-05] — [2026-02-09]
-
-### Adicionado
-- **Conexões entre Membros**: aceitar, remover, bloquear, notificações
-- **Chat em Tempo Real**: conversas, mensagens, leitura
-- **Feed Social**: posts, comentários, reações, compartilhamentos, denúncias, ocultação
-- **Notificações**: hub de notificações, leitura, exclusão
-- **Avaliações de Itens**: cursos e mentorias
-- **Bookmarks de Aulas** com progresso de reprodução
-- **Índice de Performance** com índices de banco de dados
-
----
-
-## [2026-02-02] — [2026-02-04]
-
-### Adicionado
-- **Sistema de Pedidos (Orders)**: modelo `Order`, `OrderItem`, `OrderShipment`, status, gateway, transaction_id
-- **Assinaturas**: modelo `Subscription` com gateway e período
-- **Contas de Gateway**: modelo `GatewayAccount` com suporte a MercadoPago OAuth
-- **Webhooks MercadoPago**: processamento de pagamentos, fulfillment de pedidos, ativação de planos
-- **Checkout Transparente**: cursos, mentorias com MercadoPago
-- **Faturas (Invoices)**: geração, PDF, envio por e-mail
-- **Cupons de Desconto**: modelo `Coupon`, `CouponRedemption`, validação no checkout
-- **Fontes Personalizadas**: upload e gestão de fontes no admin
-- **Progresso de Aulas**: rastreamento de progresso e retomada de vídeo
-- **Vídeo Seguro**: streaming com chave de acesso por aula
-
----
-
-## [2026-01-28] — [2026-02-01]
-
-### Adicionado
-- **Estrutura Base do Projeto**:
-  - Migrations iniciais: usuários, cursos, aulas, eventos, mentorias, matrículas, pagamentos, certificados, configurações
-  - **Planos de Assinatura**: modelo `Plan` com permissões, slug, descrição, destaque, comparação, ciclo e pró-rata
-  - **Sistema de Permissões**: roles, permissions, plan_permission
-  - **Templates de E-mail**: modelo `MailTemplate` com slug, categoria, assunto, corpo e status
-  - **Regras de Pontos**: modelo `PointsRule` com categoria e recorrência
-  - **Logs de Pontos**: modelo `PointsLog`
-  - **Tabelas de Rede Social**: conexões, conversas, posts
-  - **Notificações**: tabela de notificações do sistema
-  - Campos sociais nos usuários (bio, avatar, redes sociais)
-  - Campos de plano nos usuários (plan_id, plan_expires_at)
-  - Campos de perfil profissional e conexões nos usuários
-  - Campos de vídeo avançado nas aulas (player, retomada, bookmarks)
-  - Campos de certificado em cursos (template, assinatura, carga horária)
-  - Campos de SEO e OG nas configurações
-  - Índices de performance no banco de dados
-  - Jobs: `ProcessEmailQueue`, `SendInvoiceEmailJob`, `SendMarketplaceOrderPaidEmailsJob`
-  - Middleware: `AdminMiddleware`, `CheckFeature`, `CheckPermission`, `EnsureUserIsAdmin`, `LogUserActivity`, `TrackReferralLink`, `TrackVisitor`
-
----
-
-*Changelog gerado em 23/04/2026.*
+## Decisoes Tecnicas Importantes
+
+### Stack do Projeto
+- **Backend**: Laravel 10.x, PHP 8.x, MySQL/MariaDB
+- **Frontend site + painel novo**: Tailwind CSS (CDN), jQuery 3.6, FilePond, Cropper.js
+- **Frontend admin antigo**: AdminLTE 3.2, Bootstrap 4, jQuery
+- **Sem framework reativo** (sem Vue, React, Alpine)
+- **Deploy**: git push + ssh `git fetch && git reset --hard origin/main`
+- **Storage**: local em `public/storage/` (sem S3)
+
+### Padroes a Seguir
+- UTF-8 sem BOM (rodar `php tools/check-no-bom.php` antes de commitar)
+- Views do admin antigo: `@extends('admin.layouts.app')` com AdminLTE
+- Views do painel novo: `@extends('panel.layouts.app')` com Tailwind
+- Views publicas: `@extends('layouts.app')` com Tailwind
+- Uploads: usar `UploadStorage::storeUploadedFile()` com `watermark => false` para PDFs
+- Features/permissoes: definidas em `Plan::FEATURE_LABELS` e `Plan::FEATURE_GROUPS`
+- Rotas admin antigo: prefixo `admin.` em `routes/web.php`
+- Rotas painel novo: prefixo `panel.admin.` em `routes/web.php`
+- Sidebar admin: `resources/views/admin/partials/sidebar.blade.php`
+- Sidebar painel: `resources/views/panel/partials/sidebar.blade.php`
+
+### Cores da Plataforma
+- Azul principal: `#1F5EDB` (--unn-azul-1)
+- Azul secundario: `#177FD6` (--unn-azul-2)
+- Azul escuro: `#1D3FC4` (--unn-azul-3)
+- Gradiente botoes: `linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-2), var(--unn-azul-3))`
+
+### Usuarios Importantes
+- Superadmin: Marcelo Brad (id=2, email: marcelobradrj@gmail.com)
+- Plataforma: Jorge Orlandi (id=1)
+- Marketing Manager: Monique (id=38)
+- Split: 70% vendedor / 10% plataforma / 10% marketing / 10% superadmin
