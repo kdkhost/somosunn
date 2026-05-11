@@ -1,85 +1,483 @@
 @extends('layouts.app')
 
-@section('title', 'Revistas digitais')
+@section('title', 'Banca de Revistas - SOMOS UNN')
+
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<style>
+    .mag-hero {
+        position: relative;
+        padding: 4rem 1rem 3rem;
+        text-align: center;
+        overflow: hidden;
+    }
+    .mag-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse at 20% 30%, rgba(31, 94, 219, 0.08), transparent 60%),
+            radial-gradient(ellipse at 80% 70%, rgba(23, 127, 214, 0.06), transparent 60%);
+        pointer-events: none;
+    }
+    .mag-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .4rem 1rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(31,94,219,0.1), rgba(23,127,214,0.1));
+        border: 1px solid rgba(31,94,219,0.2);
+        color: #1F5EDB;
+        font-size: .7rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 1rem;
+    }
+    .mag-hero h1 {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 900;
+        color: #0f172a;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        margin-bottom: 0.75rem;
+    }
+    .mag-hero h1 .accent {
+        background: linear-gradient(135deg, #1F5EDB, #177FD6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .mag-hero p {
+        font-size: 1rem;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .dark .mag-hero h1 { color: #f1f5f9; }
+    .dark .mag-hero p { color: #94a3b8; }
+
+    /* Filtros */
+    .mag-filters {
+        max-width: 900px;
+        margin: 0 auto 2.5rem;
+        padding: 0 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        align-items: center;
+        justify-content: center;
+    }
+    .mag-filter-input {
+        flex: 1;
+        min-width: 220px;
+        max-width: 400px;
+        position: relative;
+    }
+    .mag-filter-input input {
+        width: 100%;
+        padding: .85rem 1rem .85rem 2.75rem;
+        border-radius: 999px;
+        border: 1px solid rgba(0,0,0,0.08);
+        background: #fff;
+        font-size: .9rem;
+        transition: all .2s;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+    }
+    .mag-filter-input input:focus {
+        outline: none;
+        border-color: #1F5EDB;
+        box-shadow: 0 0 0 4px rgba(31,94,219,0.1);
+    }
+    .mag-filter-input i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+    .mag-category-select {
+        padding: .85rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(0,0,0,0.08);
+        background: #fff;
+        font-size: .9rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+    }
+    .dark .mag-filter-input input,
+    .dark .mag-category-select {
+        background: #0f172a;
+        color: #e2e8f0;
+        border-color: rgba(255,255,255,0.1);
+    }
+
+    /* Grid desktop */
+    .mag-grid {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.5rem;
+    }
+
+    /* Card */
+    .mag-card {
+        position: relative;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        transition: transform .3s ease, box-shadow .3s ease;
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+    .mag-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 40px rgba(31,94,219,0.18);
+    }
+    .dark .mag-card {
+        background: #1e293b;
+        border-color: rgba(255,255,255,0.06);
+    }
+
+    .mag-card-cover {
+        position: relative;
+        aspect-ratio: 3/4;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    }
+    .mag-card-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .5s ease;
+    }
+    .mag-card:hover .mag-card-cover img {
+        transform: scale(1.05);
+    }
+    .mag-card-cover-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 3rem;
+    }
+
+    /* Overlay gradient */
+    .mag-card-overlay {
+        position: absolute;
+        inset: auto 0 0 0;
+        height: 60%;
+        background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 1rem;
+        color: #fff;
+    }
+    .mag-card-category {
+        font-size: .65rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #60a5fa;
+        margin-bottom: .25rem;
+    }
+    .mag-card-title {
+        font-size: .95rem;
+        font-weight: 900;
+        line-height: 1.2;
+        margin-bottom: .25rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .mag-card-edition {
+        font-size: .7rem;
+        color: rgba(255,255,255,0.7);
+    }
+
+    /* Featured badge */
+    .mag-card-featured {
+        position: absolute;
+        top: .75rem;
+        right: .75rem;
+        padding: .25rem .75rem;
+        background: linear-gradient(135deg, #f59e0b, #ef4444);
+        color: #fff;
+        font-size: .65rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-radius: 999px;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        z-index: 2;
+    }
+
+    /* "Abrir revista" hover indicator */
+    .mag-card-action {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        padding: .75rem 1.5rem;
+        background: rgba(255,255,255,0.95);
+        color: #1F5EDB;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: .85rem;
+        opacity: 0;
+        transition: all .3s ease;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        white-space: nowrap;
+        pointer-events: none;
+    }
+    .mag-card:hover .mag-card-action {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* Empty state */
+    .mag-empty {
+        max-width: 500px;
+        margin: 3rem auto;
+        padding: 3rem 2rem;
+        text-align: center;
+        background: #fff;
+        border-radius: 1.5rem;
+        border: 1px solid rgba(0,0,0,0.04);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .dark .mag-empty {
+        background: #1e293b;
+        border-color: rgba(255,255,255,0.06);
+    }
+    .mag-empty i {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
+    }
+    .mag-empty h3 {
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: #1e293b;
+        margin-bottom: .5rem;
+    }
+    .mag-empty p {
+        color: #64748b;
+        font-size: .9rem;
+    }
+    .dark .mag-empty h3 { color: #f1f5f9; }
+    .dark .mag-empty p { color: #94a3b8; }
+
+    /* Mobile Swiper */
+    .mag-mobile-swiper { display: none; }
+    .mag-mobile-swiper .mag-card {
+        margin: 0 auto;
+        max-width: 320px;
+    }
+    .mag-mobile-swiper .swiper-pagination-bullet-active {
+        background: #1F5EDB;
+    }
+
+    @media (max-width: 640px) {
+        .mag-grid { display: none; }
+        .mag-mobile-swiper { display: block; }
+        .mag-hero { padding: 2.5rem 1rem 1.5rem; }
+        .mag-filters { margin-bottom: 1.5rem; }
+    }
+
+    /* Pagination */
+    .mag-pagination {
+        max-width: 1280px;
+        margin: 2.5rem auto 4rem;
+        padding: 0 1rem;
+        display: flex;
+        justify-content: center;
+    }
+    .mag-pagination nav { display: flex; gap: .25rem; }
+    .mag-pagination a, .mag-pagination span {
+        padding: .5rem .875rem;
+        border-radius: .5rem;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.08);
+        color: #475569;
+        font-weight: 700;
+        font-size: .85rem;
+        transition: all .2s;
+    }
+    .mag-pagination a:hover {
+        background: #1F5EDB;
+        color: #fff;
+        border-color: #1F5EDB;
+    }
+
+    /* Interest notice */
+    .mag-interest-notice {
+        max-width: 700px;
+        margin: 0 auto 2rem;
+        padding: 1rem 1.25rem;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, rgba(31,94,219,0.06), rgba(23,127,214,0.06));
+        border: 1px solid rgba(31,94,219,0.15);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: .875rem;
+        color: #334155;
+    }
+    .mag-interest-notice i {
+        font-size: 1.25rem;
+        color: #1F5EDB;
+    }
+    .mag-interest-notice a {
+        color: #1F5EDB;
+        font-weight: 800;
+        text-decoration: underline;
+    }
+    .dark .mag-interest-notice {
+        color: #e2e8f0;
+    }
+</style>
+@endpush
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-purple-950/30 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {{-- Hero --}}
-        <div class="text-center mb-10">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-black uppercase tracking-widest mb-4">
-                <i class="fas fa-newspaper"></i> Banca digital
-            </div>
-            <h1 class="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white">Revistas &amp; Manchetes</h1>
-            <p class="mt-3 text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Folheie edicoes com efeito de pagina real, som imersivo e leitura em tela cheia.</p>
-            @if(!$hasNewsInterest && auth()->check())
-                <div class="mt-5 inline-flex items-center gap-3 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200/70 dark:border-amber-500/30 px-4 py-3 text-sm text-amber-900 dark:text-amber-200">
-                    <i class="fas fa-info-circle text-amber-500"></i>
-                    <div>
-                        Para ver todas as edicoes, marque <strong>Noticias</strong> como interesse no seu perfil.
-                        <a href="{{ route('panel.profile.edit') }}" class="underline font-bold ml-1">Editar perfil</a>
-                    </div>
-                </div>
-            @endif
+<div class="mag-hero">
+    <div class="relative z-10">
+        <div class="mag-hero-badge">
+            <i class="fas fa-newspaper"></i> Banca Digital
         </div>
-
-        {{-- Filtros --}}
-        <form method="GET" class="mb-8 flex flex-wrap gap-3 items-center justify-center">
-            <div class="relative flex-1 min-w-[240px] max-w-md">
-                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" name="q" value="{{ $q }}" placeholder="Buscar edicao..."
-                    class="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-sm focus:border-purple-500 focus:ring-purple-500">
-            </div>
-            @if($categories->count())
-                <select name="category" onchange="this.form.submit()" class="px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-sm">
-                    <option value="">Todas as categorias</option>
-                    @foreach($categories as $cat)
-                        <option value="{{ $cat }}" @selected($category === $cat)>{{ $cat }}</option>
-                    @endforeach
-                </select>
-            @endif
-            <button class="px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold shadow-lg shadow-purple-500/30 transition">Filtrar</button>
-        </form>
-
-        {{-- Grid --}}
-        @if($magazines->count())
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                @foreach($magazines as $m)
-                    <a href="{{ route('magazines.show', $m->slug) }}" class="group relative rounded-2xl overflow-hidden bg-white dark:bg-slate-900 shadow-lg shadow-slate-200/40 dark:shadow-black/20 border border-slate-100 dark:border-slate-800 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
-                        <div class="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/40 dark:to-indigo-900/40">
-                            @if($m->thumbnail_url)
-                                <img src="{{ $m->thumbnail_url }}" alt="{{ $m->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-6xl text-purple-300 dark:text-purple-700"><i class="fas fa-book-open"></i></div>
-                            @endif
-                            @if($m->is_featured)
-                                <div class="absolute top-3 right-3 px-2 py-1 rounded-lg bg-amber-400 text-amber-900 text-[10px] font-black uppercase shadow"><i class="fas fa-star"></i> Destaque</div>
-                            @endif
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 text-purple-700 text-xs font-black shadow"><i class="fas fa-book-open"></i> Abrir revista</span>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <div class="text-[10px] uppercase tracking-widest font-black text-purple-600 dark:text-purple-400">{{ $m->category ?: 'Revista' }}</div>
-                            <h3 class="mt-1 font-black text-sm text-slate-900 dark:text-white line-clamp-2">{{ $m->title }}</h3>
-                            <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
-                                <span>{{ $m->edition }}</span>
-                                @if($m->published_at)<span>{{ $m->published_at->format('M/Y') }}</span>@endif
-                            </div>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-
-            <div class="mt-10">{{ $magazines->links() }}</div>
-        @else
-            <div class="text-center py-16 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
-                <i class="fas fa-book-open text-6xl text-slate-300 dark:text-slate-700 mb-4"></i>
-                <h3 class="text-xl font-black text-slate-700 dark:text-slate-300">Nenhuma revista disponivel ainda</h3>
-                <p class="text-sm text-slate-500 mt-2">Em breve novas edicoes serao publicadas aqui.</p>
-            </div>
-        @endif
+        <h1>Revistas &amp; <span class="accent">Manchetes</span></h1>
+        <p>Folheie edicoes completas com efeito de pagina real, som imersivo e leitura em tela cheia.</p>
     </div>
 </div>
+
+@if(auth()->check() && !$hasNewsInterest)
+    <div class="mag-interest-notice">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            Para receber notificacoes de novas edicoes, marque <strong>Noticias</strong> como interesse no seu perfil.
+            <a href="{{ route('panel.profile.edit') }}">Editar perfil</a>
+        </div>
+    </div>
+@endif
+
+<form method="GET" class="mag-filters">
+    <div class="mag-filter-input">
+        <i class="fas fa-search"></i>
+        <input type="text" name="q" value="{{ $q }}" placeholder="Buscar por titulo ou edicao...">
+    </div>
+    @if($categories->count())
+        <select name="category" onchange="this.form.submit()" class="mag-category-select">
+            <option value="">Todas as categorias</option>
+            @foreach($categories as $cat)
+                <option value="{{ $cat }}" @selected($category === $cat)>{{ $cat }}</option>
+            @endforeach
+        </select>
+    @endif
+    <button type="submit" style="padding: .85rem 1.5rem; border-radius: 999px; background: linear-gradient(135deg, #1F5EDB, #177FD6); color: #fff; font-weight: 800; font-size: .85rem; border: 0; cursor: pointer; box-shadow: 0 8px 20px rgba(31,94,219,0.3);">Filtrar</button>
+</form>
+
+@if($magazines->count())
+    {{-- Desktop Grid --}}
+    <div class="mag-grid">
+        @foreach($magazines as $m)
+            <a href="{{ route('magazines.show', $m->slug) }}" class="mag-card">
+                <div class="mag-card-cover">
+                    @if($m->is_featured)
+                        <div class="mag-card-featured"><i class="fas fa-star"></i> Destaque</div>
+                    @endif
+                    @if($m->thumbnail_url)
+                        <img src="{{ $m->thumbnail_url }}" alt="{{ $m->title }}" loading="lazy">
+                    @else
+                        <div class="mag-card-cover-placeholder"><i class="fas fa-book-open"></i></div>
+                    @endif
+                    <div class="mag-card-overlay">
+                        <div class="mag-card-category">{{ $m->category ?: 'Revista' }}</div>
+                        <div class="mag-card-title">{{ $m->title }}</div>
+                        <div class="mag-card-edition">
+                            {{ $m->edition }}
+                            @if($m->published_at) &middot; {{ $m->published_at->format('M/Y') }} @endif
+                        </div>
+                    </div>
+                    <div class="mag-card-action">
+                        <i class="fas fa-book-open mr-1"></i> Abrir revista
+                    </div>
+                </div>
+            </a>
+        @endforeach
+    </div>
+
+    {{-- Mobile Swiper --}}
+    <div class="mag-mobile-swiper">
+        <div class="swiper magSwiper">
+            <div class="swiper-wrapper">
+                @foreach($magazines as $m)
+                    <div class="swiper-slide" style="padding: 0 1rem 1rem;">
+                        <a href="{{ route('magazines.show', $m->slug) }}" class="mag-card">
+                            <div class="mag-card-cover">
+                                @if($m->is_featured)
+                                    <div class="mag-card-featured"><i class="fas fa-star"></i> Destaque</div>
+                                @endif
+                                @if($m->thumbnail_url)
+                                    <img src="{{ $m->thumbnail_url }}" alt="{{ $m->title }}" loading="lazy">
+                                @else
+                                    <div class="mag-card-cover-placeholder"><i class="fas fa-book-open"></i></div>
+                                @endif
+                                <div class="mag-card-overlay">
+                                    <div class="mag-card-category">{{ $m->category ?: 'Revista' }}</div>
+                                    <div class="mag-card-title">{{ $m->title }}</div>
+                                    <div class="mag-card-edition">
+                                        {{ $m->edition }}
+                                        @if($m->published_at) &middot; {{ $m->published_at->format('M/Y') }} @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+            <div class="swiper-pagination" style="margin-top: 1rem; position: static;"></div>
+        </div>
+    </div>
+
+    <div class="mag-pagination">{{ $magazines->links() }}</div>
+@else
+    <div class="mag-empty">
+        <i class="fas fa-book-open"></i>
+        <h3>Nenhuma revista disponivel ainda</h3>
+        <p>Em breve novas edicoes serao publicadas aqui.</p>
+    </div>
+@endif
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+(function() {
+    if (window.matchMedia('(max-width: 640px)').matches) {
+        new Swiper('.magSwiper', {
+            slidesPerView: 1,
+            spaceBetween: 12,
+            centeredSlides: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            grabCursor: true,
+        });
+    }
+})();
+</script>
+@endpush

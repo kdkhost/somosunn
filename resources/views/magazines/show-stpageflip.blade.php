@@ -572,14 +572,20 @@
     function computeBookSize(pageAspect) {
         var canvas = document.getElementById('mag-canvas');
         var rect = canvas.getBoundingClientRect();
-        var availableW = rect.width - 140; // space for side arrows
-        var availableH = rect.height - 60;
+        var availableW = rect.width - 140; // espaco para setas laterais
+        // Subtrair: toolbar (~70px) + espaco extra
+        var availableH = rect.height - 40;
+        var isMobile = window.innerWidth < 768;
 
-        // Modo single page (1 pagina por vez, nitida e legivel)
-        var w = Math.min(availableW, 720);
+        // Modo single page (1 pagina por vez)
+        var maxW = isMobile ? (window.innerWidth - 20) : 720;
+        var w = Math.min(availableW, maxW);
         var h = w * pageAspect;
-        if (h > availableH) { h = availableH; w = h / pageAspect; }
-        return { width: Math.floor(w), height: Math.floor(h), isMobile: true };
+        if (h > availableH) {
+            h = availableH;
+            w = h / pageAspect;
+        }
+        return { width: Math.floor(w), height: Math.floor(h), isMobile: isMobile };
     }
 
     function placeholderSvg(w, h) {
