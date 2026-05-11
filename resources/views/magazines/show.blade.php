@@ -78,27 +78,42 @@
     }
 
     /* === DearFlip Controls Enhancement === */
-    /* Setas laterais maiores */
+    /* Setas laterais coladas na borda da pagina */
     .df-container > .df-ui-next,
     .df-container > .df-ui-prev {
-        opacity: 0.7 !important;
-        font-size: 42px !important;
+        opacity: 0.8 !important;
+        font-size: 36px !important;
         color: #fff !important;
         text-shadow: 0 2px 8px rgba(0,0,0,0.5);
         transition: all 0.2s !important;
-        width: 50px !important;
-        height: 50px !important;
+        width: 44px !important;
+        height: 44px !important;
         display: flex !important;
         align-items: center;
         justify-content: center;
-        background: rgba(0,0,0,0.25) !important;
+        background: rgba(0,0,0,0.35) !important;
         border-radius: 50% !important;
         backdrop-filter: blur(4px);
+    }
+    .df-container > .df-ui-next {
+        right: auto !important;
+        margin-right: 0 !important;
+    }
+    .df-container > .df-ui-prev {
+        left: auto !important;
+        margin-left: 0 !important;
+    }
+    /* Posicionar as setas junto ao livro (nao no canto da tela) */
+    .df-container.df-floating > .df-ui-next {
+        right: 8px !important;
+    }
+    .df-container.df-floating > .df-ui-prev {
+        left: 8px !important;
     }
     .df-container > .df-ui-next:hover,
     .df-container > .df-ui-prev:hover {
         opacity: 1 !important;
-        background: rgba(0,0,0,0.5) !important;
+        background: rgba(0,0,0,0.6) !important;
         transform: translateY(-50%) scale(1.1) !important;
     }
 
@@ -210,8 +225,8 @@
         backgroundColor: '#3d3d3d',
         paddingTop: 50,
         paddingBottom: 5,
-        paddingLeft: 10,
-        paddingRight: 10,
+        paddingLeft: 60,
+        paddingRight: 60,
         controlsPosition: 'bottom',
         allControls: 'thumbnail,outline,share,download,fullScreen,pageMode,startPage,endPage,sound,zoomIn,zoomOut',
         hideControls: '{{ $magazine->allow_download ? "" : "download" }}',
