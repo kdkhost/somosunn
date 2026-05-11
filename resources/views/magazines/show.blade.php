@@ -259,22 +259,44 @@
     // Activate viewer mode
     document.body.classList.add('mag-viewer-active');
 
-    // Force arrow repositioning after DearFlip renders
+    // Reposition arrows next to the book edges (not screen edges)
     function fixArrows() {
-        var nextBtn = document.querySelector('.mag-flipbook-wrap .df-ui-next');
-        var prevBtn = document.querySelector('.mag-flipbook-wrap .df-ui-prev');
-        if (nextBtn) {
-            nextBtn.style.cssText = 'position:absolute!important;top:50%!important;right:12px!important;left:auto!important;transform:translateY(-50%)!important;width:44px!important;height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,0.4)!important;border-radius:50%!important;color:#fff!important;font-size:32px!important;opacity:0.85!important;border:none!important;z-index:5!important;margin:0!important;padding:0!important;';
-        }
-        if (prevBtn) {
-            prevBtn.style.cssText = 'position:absolute!important;top:50%!important;left:12px!important;right:auto!important;transform:translateY(-50%)!important;width:44px!important;height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,0.4)!important;border-radius:50%!important;color:#fff!important;font-size:32px!important;opacity:0.85!important;border:none!important;z-index:5!important;margin:0!important;padding:0!important;';
+        var container = document.querySelector('.mag-flipbook-wrap .df-container');
+        var nextBtn = container ? container.querySelector('.df-ui-next') : null;
+        var prevBtn = container ? container.querySelector('.df-ui-prev') : null;
+        // Find the book wrapper element
+        var bookWrapper = container ? container.querySelector('.df-book-wrapper') : null;
+
+        if (!nextBtn || !prevBtn || !container) return;
+
+        if (bookWrapper) {
+            var containerRect = container.getBoundingClientRect();
+            var bookRect = bookWrapper.getBoundingClientRect();
+
+            // Position prev arrow at left edge of book - arrow width - gap
+            var prevLeft = (bookRect.left - containerRect.left) - 52;
+            if (prevLeft < 4) prevLeft = 4;
+
+            // Position next arrow at right edge of book + gap
+            var nextRight = (containerRect.right - bookRect.right) - 52;
+            if (nextRight < 4) nextRight = 4;
+
+            prevBtn.style.cssText = 'position:absolute;top:50%;left:' + prevLeft + 'px;right:auto;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:50%;color:#fff;font-size:32px;opacity:0.85;border:none;z-index:5;margin:0;padding:0;cursor:pointer;';
+            nextBtn.style.cssText = 'position:absolute;top:50%;right:' + nextRight + 'px;left:auto;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:50%;color:#fff;font-size:32px;opacity:0.85;border:none;z-index:5;margin:0;padding:0;cursor:pointer;';
+        } else {
+            // Fallback: if no book wrapper found, use percentage-based positioning
+            prevBtn.style.cssText = 'position:absolute;top:50%;left:15%;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:50%;color:#fff;font-size:32px;opacity:0.85;border:none;z-index:5;margin:0;padding:0;cursor:pointer;';
+            nextBtn.style.cssText = 'position:absolute;top:50%;right:15%;left:auto;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:50%;color:#fff;font-size:32px;opacity:0.85;border:none;z-index:5;margin:0;padding:0;cursor:pointer;';
         }
     }
+
     // Run multiple times to catch DearFlip's delayed rendering
-    setTimeout(fixArrows, 1000);
-    setTimeout(fixArrows, 2000);
-    setTimeout(fixArrows, 4000);
-    setTimeout(fixArrows, 8000);
+    setTimeout(fixArrows, 1500);
+    setTimeout(fixArrows, 3000);
+    setTimeout(fixArrows, 5000);
+    setTimeout(fixArrows, 10000);
+    // Also fix on window resize
+    window.addEventListener('resize', function() { setTimeout(fixArrows, 300); });
 
     // Cleanup on back navigation
     window.addEventListener('beforeunload', function() {
