@@ -93,6 +93,45 @@
         perspective: 2000px;
         position: relative;
         min-height: 0;
+        gap: 1rem;
+    }
+
+    /* Lateral arrows */
+    .mag-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 48px;
+        height: 48px;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        z-index: 5;
+    }
+    .mag-arrow:hover {
+        background: rgba(168, 85, 247, 0.35);
+        color: #fff;
+        transform: translateY(-50%) scale(1.1);
+    }
+    .mag-arrow:disabled {
+        opacity: 0.2;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    .mag-arrow-left { left: 1.5rem; }
+    .mag-arrow-right { right: 1.5rem; }
+    @media (max-width: 768px) {
+        .mag-arrow { width: 40px; height: 40px; font-size: 0.9rem; }
+        .mag-arrow-left { left: 0.5rem; }
+        .mag-arrow-right { right: 0.5rem; }
     }
 
     /* Subtle floor shadow under the book */
@@ -313,7 +352,10 @@
             <div class="mag-loading-bar"><div class="mag-loading-bar-fill" id="mag-loading-bar-fill"></div></div>
             <div class="mag-loading-progress" id="mag-loading-progress">Preparando...</div>
         </div>
+        {{-- Setas laterais --}}
+        <button class="mag-arrow mag-arrow-left" id="mag-arrow-left" style="display:none;" title="Pagina anterior"><i class="fas fa-chevron-left"></i></button>
         <div id="mag-flipbook-container" style="display:none;"></div>
+        <button class="mag-arrow mag-arrow-right" id="mag-arrow-right" style="display:none;" title="Proxima pagina"><i class="fas fa-chevron-right"></i></button>
         <div class="mag-error" id="mag-error" style="display:none;">
             <i class="fas fa-exclamation-triangle"></i>
             <h3 style="color:#fff;margin-bottom:0.5rem;font-weight:900;">Nao foi possivel carregar</h3>
@@ -371,6 +413,8 @@
     const btnSoundIcn = document.getElementById('mag-sound-icon');
     const btnFull     = document.getElementById('mag-fullscreen');
     const btnZoom     = document.getElementById('mag-zoom');
+    const arrowLeft   = document.getElementById('mag-arrow-left');
+    const arrowRight  = document.getElementById('mag-arrow-right');
 
     // Hide site chrome
     document.body.classList.add('mag-viewer-active');
@@ -502,25 +546,14 @@
     function computeBookSize(pageAspect) {
         const canvas = document.getElementById('mag-canvas');
         const rect = canvas.getBoundingClientRect();
-        const availableW = rect.width - 40;
-        const availableH = rect.height - 40;
-        const isMobile = window.innerWidth < 900;
+        const availableW = rect.width - 80;
+        const availableH = rect.height - 60;
 
-        if (isMobile) {
-            let w = Math.min(availableW, 620);
-            let h = w * pageAspect;
-            if (h > availableH) { h = availableH; w = h / pageAspect; }
-            return { width: Math.floor(w), height: Math.floor(h), isMobile: true };
-        }
-
-        let bookW = Math.min(availableW, 1200);
-        let pageW = bookW / 2;
-        let pageH = pageW * pageAspect;
-        if (pageH > availableH) {
-            pageH = availableH;
-            pageW = pageH / pageAspect;
-        }
-        return { width: Math.floor(pageW), height: Math.floor(pageH), isMobile: false };
+        // Sempre modo single page (como revista real no digital)
+        let w = Math.min(availableW, 700);
+        let h = w * pageAspect;
+        if (h > availableH) { h = availableH; w = h / pageAspect; }
+        return { width: Math.floor(w), height: Math.floor(h), isMobile: true };
     }
 
     // Placeholder SVG (grey page with spinner)
@@ -565,7 +598,7 @@
             // Create placeholder DOM for ALL pages immediately
             container.innerHTML = '';
             container.style.display = 'block';
-            container.style.width = (isMobile ? pageW : pageW * 2) + 'px';
+            container.style.width = pageW + 'px';
             container.style.height = pageH + 'px';
 
             const placeholder = placeholderSvg(pageW, pageH);
@@ -594,8 +627,10 @@
             barFill.style.width = '100%';
             loadingEl.style.display = 'none';
             toolbar.style.display = 'flex';
+            arrowLeft.style.display = 'flex';
+            arrowRight.style.display = 'flex';
 
-            // Init StPageFlip
+            // Init StPageFlip — modo single page (portrait)
             pageFlip = new St.PageFlip(container, {
                 width: pageW,
                 height: pageH,
@@ -604,12 +639,12 @@
                 maxWidth: 1400,
                 minHeight: 380,
                 maxHeight: 2000,
-                maxShadowOpacity: 0.6,
+                maxShadowOpacity: 0.5,
                 showCover: true,
                 mobileScrollSupport: false,
-                usePortrait: isMobile,
+                usePortrait: true,
                 drawShadow: true,
-                flippingTime: 750,
+                flippingTime: 600,
                 useMouseEvents: true,
                 swipeDistance: 30,
                 disableFlipByClick: false,
@@ -680,12 +715,16 @@
         btnFirst.disabled = cur <= 0;
         btnNext.disabled = cur >= total - 1;
         btnLast.disabled = cur >= total - 1;
+        arrowLeft.disabled = cur <= 0;
+        arrowRight.disabled = cur >= total - 1;
     }
 
     btnPrev.addEventListener('click', () => pageFlip && pageFlip.flipPrev());
     btnNext.addEventListener('click', () => pageFlip && pageFlip.flipNext());
     btnFirst.addEventListener('click', () => pageFlip && pageFlip.flip(0));
     btnLast.addEventListener('click', () => pageFlip && pageFlip.flip(pageFlip.getPageCount() - 1));
+    arrowLeft.addEventListener('click', () => pageFlip && pageFlip.flipPrev());
+    arrowRight.addEventListener('click', () => pageFlip && pageFlip.flipNext());
 
     // Keyboard
     document.addEventListener('keydown', (e) => {
