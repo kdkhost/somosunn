@@ -9,9 +9,9 @@
         inset: 0;
         z-index: 9999;
         background:
-            radial-gradient(ellipse at 20% 10%, rgba(139, 92, 246, 0.15), transparent 55%),
-            radial-gradient(ellipse at 80% 90%, rgba(79, 70, 229, 0.2), transparent 60%),
-            linear-gradient(180deg, rgb(40, 40, 40) 0%, rgb(20, 20, 25) 100%);
+            radial-gradient(ellipse at 20% 10%, rgba(139, 92, 246, 0.04), transparent 55%),
+            radial-gradient(ellipse at 80% 90%, rgba(79, 70, 229, 0.05), transparent 60%),
+            linear-gradient(180deg, rgb(240, 240, 240) 0%, rgb(220, 220, 225) 100%);
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -28,7 +28,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+        background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, transparent 100%);
         pointer-events: none;
     }
     .mag-header > * { pointer-events: auto; }
@@ -36,29 +36,30 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        color: rgba(255,255,255,0.85);
+        color: rgba(15, 23, 42, 0.85);
         font-weight: 700;
         font-size: 0.85rem;
         padding: 0.5rem 1rem;
         border-radius: 999px;
-        background: rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.8);
         backdrop-filter: blur(8px);
         text-decoration: none;
         transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
-    .mag-back:hover { background: rgba(255,255,255,0.2); color: #fff; }
+    .mag-back:hover { background: #fff; color: #0f172a; }
     .mag-info { text-align: right; }
     .mag-info-cat {
         font-size: 0.65rem;
         text-transform: uppercase;
         letter-spacing: 2px;
         font-weight: 900;
-        color: rgba(168,85,247,0.9);
+        color: rgb(124, 58, 237);
     }
     .mag-info-title {
         font-size: 0.95rem;
         font-weight: 900;
-        color: #fff;
+        color: #0f172a;
         max-width: 350px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -84,18 +85,18 @@
         transform: translateX(-50%);
         width: 70%;
         height: 40px;
-        background: radial-gradient(ellipse, rgba(0, 0, 0, 0.7) 0%, transparent 70%);
+        background: radial-gradient(ellipse, rgba(0, 0, 0, 0.25) 0%, transparent 70%);
         filter: blur(20px);
         pointer-events: none;
         z-index: 1;
     }
     #mag-flipbook-container {
         box-shadow:
-            0 40px 80px -20px rgba(0, 0, 0, 0.8),
-            0 20px 40px -10px rgba(0, 0, 0, 0.5),
-            0 0 0 1px rgba(255, 255, 255, 0.04);
+            0 30px 60px -15px rgba(0, 0, 0, 0.35),
+            0 15px 30px -10px rgba(0, 0, 0, 0.2),
+            0 0 0 1px rgba(0, 0, 0, 0.04);
         border-radius: 4px;
-        background: #0f172a;
+        background: #fff;
         position: relative;
         z-index: 2;
     }
@@ -121,7 +122,7 @@
         flex-direction: column;
         align-items: center;
         gap: 1.25rem;
-        color: #e2e8f0;
+        color: #475569;
         z-index: 2;
     }
     .mag-loader {
@@ -138,10 +139,11 @@
         font-weight: 700;
         letter-spacing: 2px;
         text-transform: uppercase;
+        color: #1e293b;
     }
     .mag-loading-progress {
         font-size: 0.75rem;
-        color: rgba(203, 213, 225, 0.6);
+        color: rgba(100, 116, 139, 0.8);
         font-variant-numeric: tabular-nums;
     }
     .mag-loading-bar {
@@ -166,24 +168,28 @@
         width: 54px;
         height: 54px;
         border-radius: 50%;
-        background: rgba(0, 0, 0, 0.55);
-        color: #fff;
+        background: rgba(255, 255, 255, 0.95);
+        color: #475569;
         font-size: 26px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         z-index: 10000;
-        border: 0;
-        opacity: 0.9;
-        transition: opacity 0.2s, background 0.2s;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        opacity: 0.95;
+        transition: opacity 0.2s, background 0.2s, color 0.2s;
         backdrop-filter: blur(6px);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     }
     #mag-arrow-prev { left: 20px; }
     #mag-arrow-next { right: 20px; }
-    .mag-arrow:hover { opacity: 1; background: rgba(0,0,0,0.8); }
-    .mag-arrow:disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+    .mag-arrow:hover {
+        opacity: 1;
+        background: #fff;
+        color: #7c3aed;
+    }
+    .mag-arrow:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
 
     /* Toolbar bottom */
     .mag-toolbar {
@@ -195,11 +201,11 @@
         align-items: center;
         gap: 0.25rem;
         padding: 0.5rem;
-        background: rgba(15, 23, 42, 0.85);
+        background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(24px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.06);
         border-radius: 999px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         z-index: 10;
     }
     .mag-btn {
@@ -208,7 +214,7 @@
         border: 0;
         border-radius: 999px;
         background: transparent;
-        color: #cbd5e1;
+        color: #475569;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -218,18 +224,18 @@
         text-decoration: none;
     }
     .mag-btn:hover {
-        background: rgba(168, 85, 247, 0.25);
-        color: #fff;
+        background: rgba(168, 85, 247, 0.12);
+        color: #7c3aed;
     }
     .mag-btn:disabled {
         opacity: 0.3;
         cursor: not-allowed;
         pointer-events: none;
     }
-    .mag-btn.is-active { background: rgba(168, 85, 247, 0.35); color: #fff; }
+    .mag-btn.is-active { background: rgba(168, 85, 247, 0.15); color: #7c3aed; }
     .mag-pages {
         padding: 0 0.75rem;
-        color: #cbd5e1;
+        color: #475569;
         font-size: 0.8rem;
         font-weight: 900;
         font-variant-numeric: tabular-nums;
@@ -237,11 +243,11 @@
         min-width: 80px;
         text-align: center;
     }
-    .mag-pages strong { color: #fff; }
+    .mag-pages strong { color: #0f172a; }
     .mag-divider {
         width: 1px;
         height: 24px;
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.08);
         margin: 0 0.25rem;
     }
 
