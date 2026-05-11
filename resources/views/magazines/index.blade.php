@@ -44,10 +44,7 @@
         margin-bottom: 0.75rem;
     }
     .mag-hero h1 .accent {
-        background: linear-gradient(135deg, #1F5EDB, #177FD6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #1F5EDB;
     }
     .mag-hero p {
         font-size: 1rem;
@@ -56,6 +53,7 @@
         margin: 0 auto;
     }
     .dark .mag-hero h1 { color: #f1f5f9; }
+    .dark .mag-hero h1 .accent { color: #60a5fa; }
     .dark .mag-hero p { color: #94a3b8; }
 
     /* Filtros */
@@ -80,14 +78,14 @@
         padding: .85rem 1rem .85rem 2.75rem;
         border-radius: 999px;
         border: 1.5px solid #e2e8f0;
-        background: #fff;
+        background: #ffffff !important;
         font-size: .9rem;
-        color: #1e293b;
+        color: #1e293b !important;
         transition: all .2s;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .mag-filter-input input::placeholder {
-        color: #94a3b8;
+        color: #94a3b8 !important;
     }
     .mag-filter-input input:focus {
         outline: none;
@@ -105,32 +103,23 @@
         padding: .85rem 1.25rem;
         border-radius: 999px;
         border: 1.5px solid #e2e8f0;
-        background: #fff;
+        background: #ffffff !important;
         font-size: .9rem;
         font-weight: 600;
-        color: #1e293b;
+        color: #1e293b !important;
         cursor: pointer;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         appearance: none;
         -webkit-appearance: none;
         padding-right: 2.5rem;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 1rem center;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 1rem center !important;
     }
     .mag-category-select:focus {
         outline: none;
         border-color: #1F5EDB;
         box-shadow: 0 0 0 4px rgba(31,94,219,0.1);
-    }
-    .dark .mag-filter-input input,
-    .dark .mag-category-select {
-        background: #1e293b;
-        color: #e2e8f0;
-        border-color: #334155;
-    }
-    .dark .mag-filter-input input::placeholder {
-        color: #64748b;
     }
 
     /* Grid desktop */
@@ -509,7 +498,31 @@
         </div>
     </div>
 
-    <div class="mag-pagination">{{ $magazines->links() }}</div>
+    <div class="mag-pagination">
+        @if($magazines->hasPages())
+            <nav>
+                @if($magazines->onFirstPage())
+                    <span class="disabled">&laquo;</span>
+                @else
+                    <a href="{{ $magazines->previousPageUrl() }}">&laquo;</a>
+                @endif
+
+                @foreach($magazines->getUrlRange(1, $magazines->lastPage()) as $page => $url)
+                    @if($page == $magazines->currentPage())
+                        <span aria-current="page">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                @if($magazines->hasMorePages())
+                    <a href="{{ $magazines->nextPageUrl() }}">&raquo;</a>
+                @else
+                    <span class="disabled">&raquo;</span>
+                @endif
+            </nav>
+        @endif
+    </div>
 @else
     <div class="mag-empty">
         <i class="fas fa-book-open"></i>
