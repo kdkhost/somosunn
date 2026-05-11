@@ -65,7 +65,7 @@
         padding: 0 1rem;
         display: flex;
         flex-wrap: wrap;
-        gap: .5rem;
+        gap: .75rem;
         align-items: center;
         justify-content: center;
     }
@@ -79,11 +79,15 @@
         width: 100%;
         padding: .85rem 1rem .85rem 2.75rem;
         border-radius: 999px;
-        border: 1px solid rgba(0,0,0,0.08);
+        border: 1.5px solid #e2e8f0;
         background: #fff;
         font-size: .9rem;
+        color: #1e293b;
         transition: all .2s;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .mag-filter-input input::placeholder {
+        color: #94a3b8;
     }
     .mag-filter-input input:focus {
         outline: none;
@@ -98,20 +102,35 @@
         color: #94a3b8;
     }
     .mag-category-select {
-        padding: .85rem 1rem;
+        padding: .85rem 1.25rem;
         border-radius: 999px;
-        border: 1px solid rgba(0,0,0,0.08);
+        border: 1.5px solid #e2e8f0;
         background: #fff;
         font-size: .9rem;
         font-weight: 600;
+        color: #1e293b;
         cursor: pointer;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 2.5rem;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+    }
+    .mag-category-select:focus {
+        outline: none;
+        border-color: #1F5EDB;
+        box-shadow: 0 0 0 4px rgba(31,94,219,0.1);
     }
     .dark .mag-filter-input input,
     .dark .mag-category-select {
-        background: #0f172a;
+        background: #1e293b;
         color: #e2e8f0;
-        border-color: rgba(255,255,255,0.1);
+        border-color: #334155;
+    }
+    .dark .mag-filter-input input::placeholder {
+        color: #64748b;
     }
 
     /* Grid desktop */
@@ -172,12 +191,12 @@
         font-size: 3rem;
     }
 
-    /* Overlay gradient */
+    /* Overlay gradient — apenas metade inferior com degrade fume */
     .mag-card-overlay {
         position: absolute;
         inset: auto 0 0 0;
-        height: 60%;
-        background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
+        height: 50%;
+        background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%);
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
@@ -306,19 +325,57 @@
         display: flex;
         justify-content: center;
     }
-    .mag-pagination nav { display: flex; gap: .25rem; }
-    .mag-pagination a, .mag-pagination span {
-        padding: .5rem .875rem;
-        border-radius: .5rem;
+    .mag-pagination nav {
+        display: flex;
+        gap: .375rem;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .mag-pagination nav a,
+    .mag-pagination nav span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 .75rem;
+        border-radius: .75rem;
         background: #fff;
-        border: 1px solid rgba(0,0,0,0.08);
+        border: 1.5px solid #e2e8f0;
         color: #475569;
         font-weight: 700;
         font-size: .85rem;
+        text-decoration: none;
         transition: all .2s;
     }
-    .mag-pagination a:hover {
-        background: #1F5EDB;
+    .mag-pagination nav a:hover {
+        background: linear-gradient(135deg, #1F5EDB, #177FD6);
+        color: #fff;
+        border-color: #1F5EDB;
+        box-shadow: 0 4px 12px rgba(31,94,219,0.3);
+    }
+    .mag-pagination nav span[aria-current="page"],
+    .mag-pagination nav .active > span {
+        background: linear-gradient(135deg, #1F5EDB, #177FD6);
+        color: #fff;
+        border-color: #1F5EDB;
+        box-shadow: 0 4px 12px rgba(31,94,219,0.3);
+    }
+    .mag-pagination nav .disabled > span,
+    .mag-pagination nav span.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    .dark .mag-pagination nav a,
+    .dark .mag-pagination nav span {
+        background: #1e293b;
+        border-color: #334155;
+        color: #94a3b8;
+    }
+    .dark .mag-pagination nav a:hover {
+        background: linear-gradient(135deg, #1F5EDB, #177FD6);
         color: #fff;
         border-color: #1F5EDB;
     }
