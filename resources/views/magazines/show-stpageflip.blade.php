@@ -493,25 +493,14 @@
     function computeBookSize(pageAspect) {
         var canvas = document.getElementById('mag-canvas');
         var rect = canvas.getBoundingClientRect();
-        var availableW = rect.width - 120;
+        var availableW = rect.width - 140; // space for side arrows
         var availableH = rect.height - 60;
-        var isMobile = window.innerWidth < 900;
 
-        if (isMobile) {
-            var w = Math.min(availableW, 620);
-            var h = w * pageAspect;
-            if (h > availableH) { h = availableH; w = h / pageAspect; }
-            return { width: Math.floor(w), height: Math.floor(h), isMobile: true };
-        }
-
-        // Spread mode (2 pages)
-        var pageW = Math.floor(availableW / 2);
-        var pageH = Math.floor(pageW * pageAspect);
-        if (pageH > availableH) {
-            pageH = availableH;
-            pageW = Math.floor(pageH / pageAspect);
-        }
-        return { width: pageW, height: pageH, isMobile: false };
+        // Modo single page (1 pagina por vez, nitida e legivel)
+        var w = Math.min(availableW, 720);
+        var h = w * pageAspect;
+        if (h > availableH) { h = availableH; w = h / pageAspect; }
+        return { width: Math.floor(w), height: Math.floor(h), isMobile: true };
     }
 
     function placeholderSvg(w, h) {
@@ -556,7 +545,7 @@
             // Build placeholders for all pages
             container.innerHTML = '';
             container.style.display = 'block';
-            container.style.width = (isMobile ? pageW : pageW * 2) + 'px';
+            container.style.width = pageW + 'px';
             container.style.height = pageH + 'px';
 
             var placeholder = placeholderSvg(pageW, pageH);
@@ -587,7 +576,7 @@
             arrowPrev.style.display = 'flex';
             arrowNext.style.display = 'flex';
 
-            // Init StPageFlip
+            // Init StPageFlip (modo single page — 1 pagina por vez)
             pageFlip = new St.PageFlip(container, {
                 width: pageW,
                 height: pageH,
@@ -599,7 +588,7 @@
                 maxShadowOpacity: 0.5,
                 showCover: true,
                 mobileScrollSupport: false,
-                usePortrait: isMobile,
+                usePortrait: true,
                 drawShadow: true,
                 flippingTime: 700,
                 useMouseEvents: true,
