@@ -78,43 +78,49 @@
     }
 
     /* === DearFlip Controls Enhancement === */
-    /* Setas laterais coladas na borda da pagina */
-    .df-container > .df-ui-next,
-    .df-container > .df-ui-prev {
-        opacity: 0.8 !important;
-        font-size: 36px !important;
+    /* Setas laterais junto a borda da pagina do livro */
+    .mag-flipbook-wrap .df-container > .df-ui-next.df-ui-btn,
+    .mag-flipbook-wrap .df-container > .df-ui-prev.df-ui-btn,
+    .mag-flipbook-wrap .df-container.df-floating > .df-ui-next,
+    .mag-flipbook-wrap .df-container.df-floating > .df-ui-prev {
+        position: absolute !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        -webkit-transform: translateY(-50%) !important;
+        opacity: 0.85 !important;
+        font-size: 32px !important;
         color: #fff !important;
-        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-        transition: all 0.2s !important;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.6) !important;
         width: 44px !important;
         height: 44px !important;
         display: flex !important;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0,0,0,0.35) !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: rgba(0,0,0,0.4) !important;
         border-radius: 50% !important;
-        backdrop-filter: blur(4px);
+        border: none !important;
+        backdrop-filter: blur(4px) !important;
+        transition: all 0.2s ease !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 5 !important;
     }
-    .df-container > .df-ui-next {
-        right: auto !important;
-        margin-right: 0 !important;
-    }
-    .df-container > .df-ui-prev {
+    .mag-flipbook-wrap .df-container > .df-ui-next.df-ui-btn,
+    .mag-flipbook-wrap .df-container.df-floating > .df-ui-next {
+        right: 12px !important;
         left: auto !important;
-        margin-left: 0 !important;
     }
-    /* Posicionar as setas junto ao livro (nao no canto da tela) */
-    .df-container.df-floating > .df-ui-next {
-        right: 8px !important;
+    .mag-flipbook-wrap .df-container > .df-ui-prev.df-ui-btn,
+    .mag-flipbook-wrap .df-container.df-floating > .df-ui-prev {
+        left: 12px !important;
+        right: auto !important;
     }
-    .df-container.df-floating > .df-ui-prev {
-        left: 8px !important;
-    }
-    .df-container > .df-ui-next:hover,
-    .df-container > .df-ui-prev:hover {
+    .mag-flipbook-wrap .df-container > .df-ui-next:hover,
+    .mag-flipbook-wrap .df-container > .df-ui-prev:hover {
         opacity: 1 !important;
-        background: rgba(0,0,0,0.6) !important;
-        transform: translateY(-50%) scale(1.1) !important;
+        background: rgba(0,0,0,0.7) !important;
+        transform: translateY(-50%) scale(1.15) !important;
+        -webkit-transform: translateY(-50%) scale(1.15) !important;
     }
 
     /* Barra de controles inferior mais visivel */
@@ -252,6 +258,23 @@
 <script>
     // Activate viewer mode
     document.body.classList.add('mag-viewer-active');
+
+    // Force arrow repositioning after DearFlip renders
+    function fixArrows() {
+        var nextBtn = document.querySelector('.mag-flipbook-wrap .df-ui-next');
+        var prevBtn = document.querySelector('.mag-flipbook-wrap .df-ui-prev');
+        if (nextBtn) {
+            nextBtn.style.cssText = 'position:absolute!important;top:50%!important;right:12px!important;left:auto!important;transform:translateY(-50%)!important;width:44px!important;height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,0.4)!important;border-radius:50%!important;color:#fff!important;font-size:32px!important;opacity:0.85!important;border:none!important;z-index:5!important;margin:0!important;padding:0!important;';
+        }
+        if (prevBtn) {
+            prevBtn.style.cssText = 'position:absolute!important;top:50%!important;left:12px!important;right:auto!important;transform:translateY(-50%)!important;width:44px!important;height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,0.4)!important;border-radius:50%!important;color:#fff!important;font-size:32px!important;opacity:0.85!important;border:none!important;z-index:5!important;margin:0!important;padding:0!important;';
+        }
+    }
+    // Run multiple times to catch DearFlip's delayed rendering
+    setTimeout(fixArrows, 1000);
+    setTimeout(fixArrows, 2000);
+    setTimeout(fixArrows, 4000);
+    setTimeout(fixArrows, 8000);
 
     // Cleanup on back navigation
     window.addEventListener('beforeunload', function() {
