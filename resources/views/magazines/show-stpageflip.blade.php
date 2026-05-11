@@ -341,6 +341,7 @@
         <div class="mag-divider"></div>
 
         <button id="mag-sound" class="mag-btn is-active" title="Som de pagina virando"><i id="mag-sound-icon" class="fas fa-volume-high"></i></button>
+        <button id="mag-zoom" class="mag-btn" title="Ampliar pagina"><i id="mag-zoom-icon" class="fas fa-magnifying-glass-plus"></i></button>
         @if($magazine->allow_download)
             <a href="{{ $magazine->pdf_url }}" download class="mag-btn" title="Baixar PDF"><i class="fas fa-download"></i></a>
         @endif
@@ -375,6 +376,8 @@
     var btnSound    = document.getElementById('mag-sound');
     var btnSoundIcn = document.getElementById('mag-sound-icon');
     var btnFull     = document.getElementById('mag-fullscreen');
+    var btnZoom     = document.getElementById('mag-zoom');
+    var btnZoomIcn  = document.getElementById('mag-zoom-icon');
     var arrowPrev   = document.getElementById('mag-arrow-prev');
     var arrowNext   = document.getElementById('mag-arrow-next');
 
@@ -475,11 +478,11 @@
     }
 
     // Render a PDF page — returns 1 or 2 images depending if it's a spread
-    // Pages with aspect > 1.3 (landscape) are detected as spreads and split in half
+    // Pages with aspect > 1.15 (landscape) are detected as spreads and split in half
     async function renderPage(pdf, pdfPageNum, targetCssWidth, half) {
         var page = await pdf.getPage(pdfPageNum);
         var vp1 = page.getViewport({ scale: 1 });
-        var dpr = Math.min(1.5, window.devicePixelRatio || 1);
+        var dpr = Math.min(2, window.devicePixelRatio || 1); // Ate 2x para texto nitido no zoom
 
         var fullWidth = vp1.width;
         var fullHeight = vp1.height;
@@ -493,7 +496,7 @@
             canvas.height = viewport.height;
             var ctx = canvas.getContext('2d');
             await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-            return canvas.toDataURL('image/jpeg', 0.8);
+            return canvas.toDataURL('image/jpeg', 0.88);
         }
 
         // Split mode: render full page then crop half
@@ -511,10 +514,10 @@
             ctx2.translate(-viewport2.width / 2, 0);
         }
         await page.render({ canvasContext: ctx2, viewport: viewport2 }).promise;
-        return canvas2.toDataURL('image/jpeg', 0.8);
+        return canvas2.toDataURL('image/jpeg', 0.88);
     }
 
-    // Detect which PDF pages are spreads (landscape aspect > 1.3)
+    // Detect which PDF pages are spreads (landscape aspect > 1.15)
     async function analyzePdfPages(pdf) {
         var map = []; // each entry: { pdfPage: N, half: 'full'|'left'|'right' }
         for (var p = 1; p <= pdf.numPages; p++) {
@@ -522,7 +525,7 @@
             var vp = page.getViewport({ scale: 1 });
             var aspectRatio = vp.width / vp.height;
 
-            if (aspectRatio > 1.3) {
+            if (aspectRatio > 1.15) {
                 // Spread page — split in two
                 map.push({ pdfPage: p, half: 'left' });
                 map.push({ pdfPage: p, half: 'right' });
@@ -749,6 +752,21 @@
     });
     document.addEventListener('fullscreenchange', function() {
         btnFull.querySelector('i').className = document.fullscreenElement ? 'fas fa-compress' : 'fas fa-expand';
+    });
+
+    // Zoom: toggle entre 1x, 1.5x, 2x
+    var zoomLevels = [1, 1.5, 2];
+    var zoomIndex = 0;
+    btnZoom.addEventListener('click', function() {
+        zoomIndex = (zoomIndex + 1) % zoomLevels.length;
+        var z = zoomLevels[zoomIndex];
+        container.style.transition = 'transform 0.3s ease';
+        container.style.transformOrigin = 'center center';
+        container.style.transform = 'scale(' + z + ')';
+        btnZoomIcn.className = z === 1
+            ? 'fas fa-magnifying-glass-plus'
+            : 'fas fa-magnifying-glass-minus';
+        btnZoom.classList.toggle('is-active', z > 1);
     });
 
     // Reposition arrows on render + resize
