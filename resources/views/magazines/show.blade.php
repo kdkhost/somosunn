@@ -546,14 +546,21 @@
     function computeBookSize(pageAspect) {
         const canvas = document.getElementById('mag-canvas');
         const rect = canvas.getBoundingClientRect();
-        const availableW = rect.width - 80;
+        const availableW = rect.width - 120; // space for arrows
         const availableH = rect.height - 60;
 
-        // Sempre modo single page (como revista real no digital)
-        let w = Math.min(availableW, 700);
-        let h = w * pageAspect;
-        if (h > availableH) { h = availableH; w = h / pageAspect; }
-        return { width: Math.floor(w), height: Math.floor(h), isMobile: true };
+        // Spread mode: 2 pages side by side filling the available space
+        // Each page width = half of total book width
+        let pageW = Math.floor(availableW / 2);
+        let pageH = Math.floor(pageW * pageAspect);
+
+        // If too tall, constrain by height
+        if (pageH > availableH) {
+            pageH = availableH;
+            pageW = Math.floor(pageH / pageAspect);
+        }
+
+        return { width: pageW, height: pageH };
     }
 
     // Placeholder SVG (grey page with spinner)
@@ -598,7 +605,7 @@
             // Create placeholder DOM for ALL pages immediately
             container.innerHTML = '';
             container.style.display = 'block';
-            container.style.width = pageW + 'px';
+            container.style.width = (pageW * 2) + 'px';
             container.style.height = pageH + 'px';
 
             const placeholder = placeholderSvg(pageW, pageH);
@@ -630,19 +637,19 @@
             arrowLeft.style.display = 'flex';
             arrowRight.style.display = 'flex';
 
-            // Init StPageFlip — modo single page (portrait)
+            // Init StPageFlip — modo spread (2 paginas abertas como livro)
             pageFlip = new St.PageFlip(container, {
                 width: pageW,
                 height: pageH,
                 size: 'fixed',
-                minWidth: 260,
+                minWidth: 200,
                 maxWidth: 1400,
-                minHeight: 380,
+                minHeight: 300,
                 maxHeight: 2000,
                 maxShadowOpacity: 0.5,
                 showCover: true,
                 mobileScrollSupport: false,
-                usePortrait: true,
+                usePortrait: window.innerWidth < 768,
                 drawShadow: true,
                 flippingTime: 600,
                 useMouseEvents: true,
