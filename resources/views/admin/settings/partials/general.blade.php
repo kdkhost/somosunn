@@ -204,5 +204,15 @@
                 <small class="text-muted">Quantidade de revistas exibidas por pagina na banca</small>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="text-uppercase text-muted small font-weight-bold">Opacidade da mascara (texto)</label>
+                <input type="range" min="30" max="95" step="5" name="magazines_overlay_opacity" class="form-control-range"
+                    value="{{ $settings['magazines_overlay_opacity'] ?? '70' }}"
+                    oninput="this.nextElementSibling.textContent = this.value + '%'">
+                <small class="text-muted">{{ ($settings['magazines_overlay_opacity'] ?? '70') }}%</small>
+                <small class="d-block text-muted">Faixa escura atras do titulo/categoria nos cards (0=transparente, 100=opaco)</small>
+            </div>
+        </div>
     </div>
 </div>

@@ -3,6 +3,10 @@
 @section('title', 'Banca de Revistas - SOMOS UNN')
 
 @push('styles')
+@php
+    $overlayOpacity = (int) (\App\Models\Setting::get('magazines_overlay_opacity', 70));
+    $overlayAlpha = round($overlayOpacity / 100, 2);
+@endphp
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 <style>
     .mag-hero {
@@ -182,17 +186,18 @@
         font-size: 3rem;
     }
 
-    /* Overlay gradient — apenas metade inferior com degrade fume */
+    /* Overlay — faixa fume semi-transparente na base para texto legivel */
     .mag-card-overlay {
         position: absolute;
         inset: auto 0 0 0;
-        height: 50%;
-        background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%);
+        padding: .75rem 1rem;
+        color: #fff;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        padding: 1rem;
-        color: #fff;
+        background: rgba(0, 0, 0, {{ $overlayAlpha }});
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
     }
     .mag-card-category {
         font-size: .65rem;
