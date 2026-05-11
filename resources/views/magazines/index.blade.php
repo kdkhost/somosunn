@@ -38,13 +38,15 @@
     .mag-hero h1 {
         font-size: clamp(2rem, 5vw, 3.5rem);
         font-weight: 900;
-        color: #0f172a;
+        color: #0f172a !important;
         letter-spacing: -0.02em;
         line-height: 1.1;
         margin-bottom: 0.75rem;
+        -webkit-text-fill-color: #0f172a !important;
     }
     .mag-hero h1 .accent {
-        color: #1F5EDB;
+        color: #1F5EDB !important;
+        -webkit-text-fill-color: #1F5EDB !important;
     }
     .mag-hero p {
         font-size: 1rem;
@@ -330,43 +332,33 @@
         height: 40px;
         padding: 0 .75rem;
         border-radius: .75rem;
-        background: #fff;
-        border: 1.5px solid #e2e8f0;
-        color: #475569;
+        background: #ffffff !important;
+        border: 1.5px solid #e2e8f0 !important;
+        color: #475569 !important;
         font-weight: 700;
         font-size: .85rem;
         text-decoration: none;
         transition: all .2s;
     }
     .mag-pagination nav a:hover {
-        background: linear-gradient(135deg, #1F5EDB, #177FD6);
-        color: #fff;
-        border-color: #1F5EDB;
+        background: linear-gradient(135deg, #1F5EDB, #177FD6) !important;
+        color: #fff !important;
+        border-color: #1F5EDB !important;
         box-shadow: 0 4px 12px rgba(31,94,219,0.3);
     }
-    .mag-pagination nav span[aria-current="page"],
-    .mag-pagination nav .active > span {
-        background: linear-gradient(135deg, #1F5EDB, #177FD6);
-        color: #fff;
-        border-color: #1F5EDB;
+    .mag-pagination nav span[aria-current="page"] {
+        background: linear-gradient(135deg, #1F5EDB, #177FD6) !important;
+        color: #fff !important;
+        border-color: #1F5EDB !important;
         box-shadow: 0 4px 12px rgba(31,94,219,0.3);
     }
-    .mag-pagination nav .disabled > span,
     .mag-pagination nav span.disabled {
         opacity: 0.4;
         cursor: not-allowed;
         pointer-events: none;
-    }
-    .dark .mag-pagination nav a,
-    .dark .mag-pagination nav span {
-        background: #1e293b;
-        border-color: #334155;
-        color: #94a3b8;
-    }
-    .dark .mag-pagination nav a:hover {
-        background: linear-gradient(135deg, #1F5EDB, #177FD6);
-        color: #fff;
-        border-color: #1F5EDB;
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
+        border-color: #e2e8f0 !important;
     }
 
     /* Interest notice */

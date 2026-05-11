@@ -34,11 +34,13 @@ class MagazineController extends Controller
             $query->where('category', $category);
         }
 
+        $perPage = max(4, min(50, (int) \App\Models\Setting::get('magazines_per_page', 10)));
+
         $magazines = $query
             ->orderByDesc('is_featured')
             ->orderByDesc('published_at')
             ->orderByDesc('id')
-            ->paginate(12)
+            ->paginate($perPage)
             ->withQueryString();
 
         $categories = Magazine::query()

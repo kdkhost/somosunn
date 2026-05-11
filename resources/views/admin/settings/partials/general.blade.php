@@ -187,13 +187,21 @@
         </small>
     </div>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label class="text-uppercase text-muted small font-weight-bold">Plugin de visualizacao</label>
                 <select name="magazine_flipbook_engine" class="form-control">
                     <option value="dearflip" {{ ($settings['magazine_flipbook_engine'] ?? 'dearflip') === 'dearflip' ? 'selected' : '' }}>DearFlip (leve, rapido, controles nativos)</option>
                     <option value="stpageflip" {{ ($settings['magazine_flipbook_engine'] ?? '') === 'stpageflip' ? 'selected' : '' }}>PDF.js + StPageFlip (Mozilla PDF.js com efeito 3D)</option>
                 </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="text-uppercase text-muted small font-weight-bold">Revistas por pagina</label>
+                <input type="number" min="4" max="50" name="magazines_per_page" class="form-control"
+                    value="{{ $settings['magazines_per_page'] ?? '10' }}">
+                <small class="text-muted">Quantidade de revistas exibidas por pagina na banca</small>
             </div>
         </div>
     </div>
