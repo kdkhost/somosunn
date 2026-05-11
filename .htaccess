@@ -28,6 +28,7 @@ AddDefaultCharset UTF-8
     # expor arquivos do public sem /public na URL
     RewriteRule ^uploads/(.*)$ public/uploads/$1 [L,NC]
     RewriteRule ^img/(.*)$ public/img/$1 [L,NC]
+    RewriteRule ^assets-dflip/(.*)$ public/assets-dflip/$1 [L,NC]
 
     # /storage: evita depender de symlink e serve uploads tanto do public/storage
     # quanto do storage/app/public (Laravel padrão) quando existirem.

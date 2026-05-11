@@ -3,7 +3,7 @@
 @section('title', $magazine->title . ' - Revista')
 
 @push('styles')
-<link href="{{ asset('vendor/dflip/css/dflip.min.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ asset('assets-dflip/css/dflip.min.css') }}" rel="stylesheet" type="text/css">
 <style>
     .mag-viewer {
         position: fixed;
@@ -121,7 +121,7 @@
 @push('scripts')
 <script>
     // DearFlip location (local assets: images, sound, etc.)
-    var dFlipLocation = "{{ asset('vendor/dflip') }}/";
+    var dFlipLocation = "{{ asset('assets-dflip') }}/";
 
     // DearFlip options — must be defined BEFORE dflip.min.js loads
     var option_magazine_flipbook = {
@@ -157,7 +157,7 @@
         }
     };
 </script>
-<script src="{{ asset('vendor/dflip/js/dflip.min.js') }}"></script>
+<script src="{{ asset('assets-dflip/js/dflip.min.js') }}"></script>
 <script>
     // Activate viewer mode
     document.body.classList.add('mag-viewer-active');
