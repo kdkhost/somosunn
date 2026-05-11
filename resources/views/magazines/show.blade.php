@@ -4,6 +4,7 @@
 
 @push('styles')
 <link href="{{ asset('assets-dflip/css/dflip.min.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ asset('assets-dflip/css/themify-icons.min.css') }}" rel="stylesheet" type="text/css">
 <style>
     .mag-viewer {
         position: fixed;
