@@ -127,18 +127,20 @@
     // Activate viewer mode
     document.body.classList.add('mag-viewer-active');
 
-    // Set base path for templates/images/sounds
-    if (typeof defined !== 'undefined' || true) {
-        // 3D FlipBook auto-detects paths from the script location
-        // but we need to override for our custom structure
+    // Set PDF.js worker path explicitly
+    if (typeof PDFJS !== 'undefined') {
+        PDFJS.workerSrc = '{{ asset("assets-3dflipbook/js/pdf.worker.js") }}';
+    }
+    if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ asset("assets-3dflipbook/js/pdf.worker.js") }}';
     }
 
-    // Initialize via jQuery
+    // Initialize via jQuery when ready
     $(function() {
-        var container = $('#magazine-3dflipbook');
-        var pdfUrl = container.attr('src');
+        var $container = $('#magazine-3dflipbook');
+        var pdfUrl = '{{ $magazine->pdf_url }}';
 
-        container.FlipBook({
+        $container.FlipBook({
             pdf: pdfUrl,
             template: {
                 html: '{{ asset("assets-3dflipbook/templates/default-book-view.html") }}',
@@ -156,8 +158,8 @@
             },
             controlsProps: {
                 enableFullScreen: true,
-                enableDownload: @json((bool) $magazine->allow_download),
-                enableSound: @json((bool) $magazine->enable_sound),
+                enableDownload: {{ $magazine->allow_download ? 'true' : 'false' }},
+                enableSound: {{ $magazine->enable_sound ? 'true' : 'false' }},
                 enableThumbnails: true,
                 thumbnails: {
                     autoBuild: true
@@ -168,8 +170,7 @@
                     enabled: false
                 },
                 startPage: 1
-            },
-            pdfVersion: '2.3.200'
+            }
         });
     });
 
