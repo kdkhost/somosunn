@@ -104,38 +104,34 @@ class MarketplacePurchaseController extends Controller
 
     private function retrySumUp(Order $order)
     {
-        // Recuperar URL de checkout salvo
-        $checkoutUrl = data_get($order->metadata, 'sumup_checkout_url');
+        // Identificar o item original para redirecionar ao checkout correto
+        $order->load('items');
+        $firstItem = $order->items->first();
 
-        if (!$checkoutUrl) {
-            // Tentar recriar
-            try {
-                $sumUpService = app(SumUpService::class);
-                $checkout = $sumUpService->createCheckout($order, [
-                    'description' => 'Pedido #' . $order->id,
-                    'return_url'  => route('checkout.success', $order->id),
-                ]);
+        if ($firstItem) {
+            $itemType = $firstItem->item_type ?? '';
+            $itemId = $firstItem->item_id ?? null;
 
-                $checkoutUrl = $checkout['checkout_url'] ?? null;
-
-                $order->update([
-                    'metadata' => array_merge($order->metadata ?? [], [
-                        'sumup_checkout_id'  => $checkout['id'] ?? null,
-                        'sumup_checkout_url' => $checkoutUrl,
-                    ]),
-                ]);
-            } catch (\Throwable $e) {
-                return redirect()->route('panel.purchases.index')
-                    ->with('error', 'Erro ao retomar pagamento SumUp: ' . $e->getMessage());
+            // Redirecionar para o checkout do item original
+            if ($itemType === 'course' && $itemId) {
+                return redirect()->route('checkout.show', $itemId);
+            }
+            if ($itemType === 'event_registration' && $itemId) {
+                return redirect()->route('events.show', $itemId)
+                    ->with('info', 'Selecione o ingresso novamente para concluir o pagamento.');
+            }
+            if ($itemType === 'mentorship' && $itemId) {
+                return redirect()->route('mentorships.checkout.show', $itemId);
+            }
+            if ($itemType === 'seller_product') {
+                return redirect()->route('seller-products.checkout.show')
+                    ->with('info', 'Finalize o pagamento do seu pedido.');
             }
         }
 
-        if (!$checkoutUrl) {
-            return redirect()->route('panel.purchases.index')
-                ->with('error', 'Não foi possível gerar o link de pagamento SumUp.');
-        }
-
-        return redirect()->away($checkoutUrl);
+        // Fallback: redirecionar para compras com mensagem
+        return redirect()->route('panel.purchases.index')
+            ->with('info', 'Para retomar o pagamento, acesse o produto novamente e finalize a compra.');
     }
 
     /**

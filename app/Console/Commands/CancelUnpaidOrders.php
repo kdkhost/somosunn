@@ -22,8 +22,8 @@ class CancelUnpaidOrders extends Command
         // Deadlines configuráveis
         $mpPixMinutes = (int) (Setting::get('mercadopago_pix_expiration_minutes') ?? Setting::get('pix_expiration_minutes') ?? 10);
         $sumupPixMinutes = (int) (Setting::get('sumup_pix_expiration_minutes') ?? 10);
-        $cardHours = 24;   // cartão: 24h padrão
-        $defaultHours = 48; // sem método: 48h
+        $cardHours = 24;   // cartao: 24h padrao
+        $defaultHours = 24; // sem metodo definido: 24h (antes era 48h)
 
         // Otimização: só buscar pedidos pendentes criados há mais de X minutos (mínimo possível)
         $minDeadline = min($mpPixMinutes, $sumupPixMinutes);

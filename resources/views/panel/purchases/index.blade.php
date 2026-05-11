@@ -122,7 +122,7 @@
                     @if($order->status === 'pending')
                         <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-3">
                             @if($order->can_retry)
-                                <form action="{{ route('panel.purchases.retry', $order) }}" method="POST">
+                                <form action="{{ route('panel.purchases.retry', $order) }}" method="POST" data-no-ajax="true">
                                     @csrf
                                     <button type="submit"
                                         class="inline-flex items-center gap-2 rounded-2xl bg-blue-600 hover:bg-blue-700 px-5 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition">
