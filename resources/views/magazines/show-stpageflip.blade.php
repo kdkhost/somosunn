@@ -136,13 +136,30 @@
         color: #475569;
         z-index: 2;
     }
+    .mag-loader-wrap {
+        position: relative;
+        width: 80px;
+        height: 80px;
+    }
     .mag-loader {
-        width: 60px; height: 60px;
-        border: 4px solid rgba(168, 85, 247, 0.15);
-        border-top-color: #a855f7;
-        border-right-color: #a855f7;
+        width: 80px; height: 80px;
+        border: 4px solid rgba(31, 94, 219, 0.15);
+        border-top-color: #1F5EDB;
+        border-right-color: #177FD6;
         border-radius: 50%;
         animation: magspin 0.9s linear infinite;
+        position: absolute;
+        inset: 0;
+    }
+    .mag-loader-logo {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: contain;
     }
     @keyframes magspin { to { transform: rotate(360deg); } }
     .mag-loading-label {
@@ -160,13 +177,13 @@
     .mag-loading-bar {
         width: 200px;
         height: 3px;
-        background: rgba(168, 85, 247, 0.15);
+        background: rgba(31, 94, 219, 0.15);
         border-radius: 999px;
         overflow: hidden;
     }
     .mag-loading-bar-fill {
         height: 100%;
-        background: linear-gradient(90deg, #a855f7, #6366f1);
+        background: linear-gradient(90deg, #1F5EDB, #177FD6);
         width: 0%;
         transition: width 0.3s ease;
     }
@@ -324,7 +341,10 @@
     {{-- Canvas --}}
     <div class="mag-canvas" id="mag-canvas">
         <div class="mag-loading" id="mag-loading">
-            <div class="mag-loader"></div>
+            <div class="mag-loader-wrap">
+                <div class="mag-loader"></div>
+                <img src="{{ \App\Models\Setting::getUrl('favicon_image') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg') }}" alt="UNN" class="mag-loader-logo">
+            </div>
             <div class="mag-loading-label">Carregando revista</div>
             <div class="mag-loading-bar"><div class="mag-loading-bar-fill" id="mag-loading-bar-fill"></div></div>
             <div class="mag-loading-progress" id="mag-loading-progress">Preparando...</div>
