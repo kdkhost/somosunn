@@ -3,7 +3,7 @@
 @section('title', $magazine->title . ' - Revista')
 
 @push('styles')
-<link href="https://cdn.jsdelivr.net/npm/@dearhive/dearflip-jquery-flipbook@2/dflip/css/dflip.min.css" rel="stylesheet" type="text/css">
+<link href="{{ asset('vendor/dflip/css/dflip.min.css') }}" rel="stylesheet" type="text/css">
 <style>
     .mag-viewer {
         position: fixed;
@@ -120,8 +120,8 @@
 
 @push('scripts')
 <script>
-    // DearFlip location (CDN base path for assets: images, sound, etc.)
-    var dFlipLocation = "https://cdn.jsdelivr.net/npm/@dearhive/dearflip-jquery-flipbook@2/dflip/";
+    // DearFlip location (local assets: images, sound, etc.)
+    var dFlipLocation = "{{ asset('vendor/dflip') }}/";
 
     // DearFlip options — must be defined BEFORE dflip.min.js loads
     var option_magazine_flipbook = {
@@ -157,7 +157,7 @@
         }
     };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@dearhive/dearflip-jquery-flipbook@2/dflip/js/dflip.min.js"></script>
+<script src="{{ asset('vendor/dflip/js/dflip.min.js') }}"></script>
 <script>
     // Activate viewer mode
     document.body.classList.add('mag-viewer-active');
