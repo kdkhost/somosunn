@@ -4,6 +4,17 @@
 
 @push('styles')
 <style>
+    /* Forcar modo claro para o viewer (evita inversao de cores pelo browser) */
+    :root { color-scheme: light; }
+    .mag-viewer, .mag-viewer *, #mag-flipbook-container, .mag-page, .mag-page img {
+        color-scheme: light !important;
+        forced-color-adjust: none !important;
+    }
+    .mag-page img {
+        filter: none !important;
+        background: #fff !important;
+    }
+
     .mag-viewer {
         position: fixed;
         inset: 0;
@@ -501,7 +512,15 @@
             canvas.width = viewport.width;
             canvas.height = viewport.height;
             var ctx = canvas.getContext('2d');
-            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+            // Fundo branco explicito para evitar inversao de cores em dark mode
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            await page.render({
+                canvasContext: ctx,
+                viewport: viewport,
+                background: '#ffffff',
+                intent: 'display'
+            }).promise;
             return canvas.toDataURL('image/jpeg', 0.88);
         }
 
@@ -514,12 +533,20 @@
         canvas2.width = Math.floor(viewport2.width / 2);
         canvas2.height = viewport2.height;
         var ctx2 = canvas2.getContext('2d');
+        // Fundo branco explicito
+        ctx2.fillStyle = '#ffffff';
+        ctx2.fillRect(0, 0, canvas2.width, canvas2.height);
 
         // Translate context to show only left or right half
         if (half === 'right') {
             ctx2.translate(-viewport2.width / 2, 0);
         }
-        await page.render({ canvasContext: ctx2, viewport: viewport2 }).promise;
+        await page.render({
+            canvasContext: ctx2,
+            viewport: viewport2,
+            background: '#ffffff',
+            intent: 'display'
+        }).promise;
         return canvas2.toDataURL('image/jpeg', 0.88);
     }
 
