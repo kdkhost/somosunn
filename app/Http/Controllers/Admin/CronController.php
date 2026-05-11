@@ -115,4 +115,47 @@ class CronController extends Controller
 
         return back()->with($success ? 'success' : 'error', $success ? 'Executada com sucesso!' : 'Falha na execução.');
     }
+
+    /**
+     * Executa TODAS as tarefas ativas de uma vez.
+     */
+    public function runAll()
+    {
+        $tasks = ScheduledTask::where('active', true)->get();
+        $executed = 0;
+        $failed = 0;
+
+        foreach ($tasks as $task) {
+            $output = '';
+            $success = true;
+
+            try {
+                $exitCode = Artisan::call($task->command);
+                $output = Artisan::output();
+                $success = $exitCode === 0;
+            } catch (\Throwable $e) {
+                $output = $e->getMessage();
+                $success = false;
+            }
+
+            $task->last_run_at = now();
+            $task->save();
+
+            ScheduledTaskLog::create([
+                'scheduled_task_id' => $task->id,
+                'executed_at' => now(),
+                'output' => $output ?: 'Executado via "Executar Todas".',
+                'success' => $success,
+            ]);
+
+            $success ? $executed++ : $failed++;
+        }
+
+        $msg = "Executadas: {$executed} tarefas.";
+        if ($failed > 0) {
+            $msg .= " Falhas: {$failed}.";
+        }
+
+        return back()->with($failed > 0 ? 'warning' : 'success', $msg);
+    }
 }

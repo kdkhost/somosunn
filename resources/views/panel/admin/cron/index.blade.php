@@ -48,6 +48,14 @@
                     <i class="fas fa-plus text-xs"></i>
                     Nova tarefa
                 </a>
+                <form action="{{ route('panel.admin.cron.run-all') }}" method="POST" class="inline-flex" onsubmit="return confirm('Executar TODAS as tarefas ativas agora?')">
+                    @csrf
+                    <button type="submit"
+                        class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+                        <i class="fas fa-play text-xs"></i>
+                        Executar Todas
+                    </button>
+                </form>
             </div>
         </div>
 

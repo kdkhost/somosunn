@@ -191,7 +191,21 @@ class Kernel extends ConsoleKernel
                     $schedule->command($task->command)
                         ->cron($task->frequency)
                         ->withoutOverlapping()
-                        ->onOneServer();
+                        ->after(function () use ($task) {
+                            try {
+                                $task->last_run_at = now();
+                                $task->save();
+
+                                \App\Models\ScheduledTaskLog::create([
+                                    'scheduled_task_id' => $task->id,
+                                    'executed_at' => now(),
+                                    'output' => 'Executado automaticamente pelo scheduler.',
+                                    'success' => true,
+                                ]);
+                            } catch (\Throwable $e) {
+                                \Log::warning('Falha ao registrar log de tarefa agendada: ' . $e->getMessage());
+                            }
+                        });
                 }
             }
         } catch (\Exception $e) {

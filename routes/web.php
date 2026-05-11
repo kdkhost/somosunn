@@ -9,6 +9,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin/cron')->name('admin.cron.')-
     Route::delete('/{task}', [\App\Http\Controllers\Admin\CronController::class, 'destroy'])->name('destroy');
     Route::get('/{task}/logs', [\App\Http\Controllers\Admin\CronController::class, 'logs'])->name('logs');
     Route::post('/{task}/run', [\App\Http\Controllers\Admin\CronController::class, 'run'])->name('run');
+    Route::post('/run-all', [\App\Http\Controllers\Admin\CronController::class, 'runAll'])->name('run-all');
 });
 
 // Rotas de upload chunked (admin)
@@ -525,6 +526,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'supe
             Route::put('/{task}', [\App\Http\Controllers\Panel\Admin\CronController::class, 'update'])->name('update');
             Route::delete('/{task}', [\App\Http\Controllers\Panel\Admin\CronController::class, 'destroy'])->name('destroy');
             Route::post('/{task}/run', [\App\Http\Controllers\Panel\Admin\CronController::class, 'run'])->name('run');
+            Route::post('/run-all', [\App\Http\Controllers\Panel\Admin\CronController::class, 'runAll'])->name('run-all');
         });
 
         Route::resource('users', \App\Http\Controllers\Panel\Admin\UserController::class);
