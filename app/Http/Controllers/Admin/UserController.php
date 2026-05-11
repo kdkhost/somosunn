@@ -206,6 +206,7 @@ class UserController extends Controller
 
         try {
             $user->notify(new \App\Notifications\MarketingManagerAssigned());
+            \App\Notifications\MarketingManagerAssigned::sendMail($user);
         } catch (\Throwable $e) {
             \Log::warning('Falha ao enviar notificacao de Marketing Manager: ' . $e->getMessage());
         }

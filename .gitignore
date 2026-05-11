@@ -18,6 +18,10 @@
 /public/build/
 /public/mix-manifest.json
 /public/js/*.map
+
+# Instrucoes locais (nao enviar para o servidor)
+AGENTS.md
+.kiro/
 /public/css/*.map
 npm-debug.log
 composer.lock
