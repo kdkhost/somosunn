@@ -78,49 +78,46 @@
     }
 
     /* === DearFlip Controls Enhancement === */
-    /* Setas laterais junto a borda da pagina do livro */
-    .mag-flipbook-wrap .df-container > .df-ui-next.df-ui-btn,
-    .mag-flipbook-wrap .df-container > .df-ui-prev.df-ui-btn,
-    .mag-flipbook-wrap .df-container.df-floating > .df-ui-next,
-    .mag-flipbook-wrap .df-container.df-floating > .df-ui-prev {
-        position: absolute !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        -webkit-transform: translateY(-50%) !important;
-        opacity: 0.85 !important;
-        font-size: 32px !important;
-        color: #fff !important;
-        text-shadow: 0 2px 6px rgba(0,0,0,0.6) !important;
-        width: 44px !important;
-        height: 44px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        background: rgba(0,0,0,0.4) !important;
-        border-radius: 50% !important;
-        border: none !important;
-        backdrop-filter: blur(4px) !important;
-        transition: all 0.2s ease !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        z-index: 5 !important;
+    /* Esconder setas nativas do DearFlip (vamos usar as nossas) */
+    .mag-flipbook-wrap .df-container > .df-ui-next,
+    .mag-flipbook-wrap .df-container > .df-ui-prev {
+        display: none !important;
     }
-    .mag-flipbook-wrap .df-container > .df-ui-next.df-ui-btn,
-    .mag-flipbook-wrap .df-container.df-floating > .df-ui-next {
-        right: 12px !important;
-        left: auto !important;
+
+    /* Nossas setas customizadas, posicionadas junto ao livro */
+    .mag-custom-arrow {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        font-size: 26px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10000;
+        border: 0;
+        opacity: 0.85;
+        transition: all 0.2s ease;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
     }
-    .mag-flipbook-wrap .df-container > .df-ui-prev.df-ui-btn,
-    .mag-flipbook-wrap .df-container.df-floating > .df-ui-prev {
-        left: 12px !important;
-        right: auto !important;
+    .mag-custom-arrow.is-visible {
+        display: flex;
     }
-    .mag-flipbook-wrap .df-container > .df-ui-next:hover,
-    .mag-flipbook-wrap .df-container > .df-ui-prev:hover {
-        opacity: 1 !important;
-        background: rgba(0,0,0,0.7) !important;
-        transform: translateY(-50%) scale(1.15) !important;
-        -webkit-transform: translateY(-50%) scale(1.15) !important;
+    .mag-custom-arrow:hover {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.8);
+        transform: translateY(-50%) scale(1.1);
+    }
+    .mag-custom-arrow:disabled {
+        opacity: 0.25;
+        cursor: not-allowed;
+        pointer-events: none;
     }
 
     /* Barra de controles inferior mais visivel */
@@ -209,6 +206,14 @@
             source="{{ $magazine->pdf_url }}">
         </div>
     </div>
+
+    {{-- Setas customizadas (posicionadas via JS junto ao livro) --}}
+    <button type="button" class="mag-custom-arrow" id="mag-arrow-prev" aria-label="Pagina anterior">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    <button type="button" class="mag-custom-arrow" id="mag-arrow-next" aria-label="Proxima pagina">
+        <i class="fas fa-chevron-right"></i>
+    </button>
 </div>
 @endsection
 
@@ -259,50 +264,68 @@
     // Activate viewer mode
     document.body.classList.add('mag-viewer-active');
 
-    // Reposition arrows next to the book edges
-    function fixArrows() {
+    var customPrev = document.getElementById('mag-arrow-prev');
+    var customNext = document.getElementById('mag-arrow-next');
+
+    // Posicionar as setas customizadas junto ao livro renderizado
+    function positionArrows() {
         var container = document.querySelector('.mag-flipbook-wrap .df-container');
-        if (!container) return;
+        if (!container) return false;
 
-        var nextBtn = container.querySelector('.df-ui-next');
-        var prevBtn = container.querySelector('.df-ui-prev');
-        if (!nextBtn && !prevBtn) return;
-
-        // Try to find the book element (wrapper or stage)
         var book = container.querySelector('.df-book-wrapper') || container.querySelector('.df-book-stage');
+        if (!book || book.offsetWidth < 100) return false;
 
-        var baseStyle = 'position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);border-radius:50%;color:#fff;font-size:30px;opacity:0.9;border:none;z-index:5;margin:0;padding:0;cursor:pointer;transition:opacity 0.2s;';
+        var bookRect = book.getBoundingClientRect();
 
-        if (book && book.offsetWidth > 100) {
-            var containerRect = container.getBoundingClientRect();
-            var bookRect = book.getBoundingClientRect();
+        // Posicionar no meio do gap entre o livro e a borda da tela
+        var gapLeft = bookRect.left;
+        var gapRight = window.innerWidth - bookRect.right;
+        var leftPos = Math.max(8, (gapLeft / 2) - 27);
+        var rightPos = Math.max(8, (gapRight / 2) - 27);
 
-            // Seta esquerda: entre a borda esquerda da tela e a borda esquerda do livro
-            var gapLeft = bookRect.left - containerRect.left;
-            var prevPos = Math.max(4, (gapLeft / 2) - 22); // centraliza no gap
+        customPrev.style.left = leftPos + 'px';
+        customPrev.style.right = 'auto';
+        customNext.style.right = rightPos + 'px';
+        customNext.style.left = 'auto';
 
-            // Seta direita: entre a borda direita do livro e a borda direita da tela
-            var gapRight = containerRect.right - bookRect.right;
-            var nextPos = Math.max(4, (gapRight / 2) - 22); // centraliza no gap
-
-            if (prevBtn) prevBtn.style.cssText = baseStyle + 'left:' + prevPos + 'px;right:auto;';
-            if (nextBtn) nextBtn.style.cssText = baseStyle + 'right:' + nextPos + 'px;left:auto;';
-        } else {
-            // Fallback: posicionar a 20% das bordas
-            if (prevBtn) prevBtn.style.cssText = baseStyle + 'left:18%;right:auto;';
-            if (nextBtn) nextBtn.style.cssText = baseStyle + 'right:18%;left:auto;';
-        }
+        customPrev.classList.add('is-visible');
+        customNext.classList.add('is-visible');
+        return true;
     }
 
-    // Run after DearFlip renders (progressive attempts)
-    var arrowInterval = setInterval(function() {
-        fixArrows();
-    }, 1500);
-    // Stop after 20 seconds
-    setTimeout(function() { clearInterval(arrowInterval); }, 20000);
+    // Disparar proxima/anterior pagina clicando nas setas nativas (hidden)
+    function triggerDflip(direction) {
+        var container = document.querySelector('.mag-flipbook-wrap .df-container');
+        if (!container) return;
+        var btn = container.querySelector(direction === 'next' ? '.df-ui-next' : '.df-ui-prev');
+        if (btn) btn.click();
+    }
 
-    // Also fix on resize
-    window.addEventListener('resize', function() { setTimeout(fixArrows, 200); });
+    customPrev.addEventListener('click', function() { triggerDflip('prev'); });
+    customNext.addEventListener('click', function() { triggerDflip('next'); });
+
+    // Navegacao por teclado
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') { triggerDflip('prev'); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { triggerDflip('next'); e.preventDefault(); }
+    });
+
+    // Tentar posicionar repetidamente ate o livro renderizar
+    var posInterval = setInterval(function() {
+        if (positionArrows()) {
+            // Posicionou com sucesso, continua monitorando mas com frequencia menor
+        }
+    }, 800);
+    // Apos 15s, reduz frequencia
+    setTimeout(function() {
+        clearInterval(posInterval);
+        posInterval = setInterval(positionArrows, 3000);
+    }, 15000);
+
+    // Reposicionar no resize
+    window.addEventListener('resize', function() {
+        setTimeout(positionArrows, 150);
+    });
 
     // Cleanup on back navigation
     window.addEventListener('beforeunload', function() {
