@@ -95,24 +95,23 @@
         background: rgba(0, 0, 0, 0.55);
         color: #fff;
         font-size: 26px;
-        display: none;
+        display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         z-index: 10000;
         border: 0;
         opacity: 0.85;
-        transition: all 0.2s ease;
+        transition: opacity 0.2s ease, background 0.2s ease;
         backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
         box-shadow: 0 4px 16px rgba(0,0,0,0.3);
     }
-    .mag-custom-arrow.is-visible {
-        display: flex;
-    }
+    #mag-arrow-prev { left: 20px; }
+    #mag-arrow-next { right: 20px; }
     .mag-custom-arrow:hover {
         opacity: 1;
         background: rgba(0, 0, 0, 0.8);
-        transform: translateY(-50%) scale(1.1);
     }
     .mag-custom-arrow:disabled {
         opacity: 0.25;
@@ -280,16 +279,14 @@
         // Posicionar no meio do gap entre o livro e a borda da tela
         var gapLeft = bookRect.left;
         var gapRight = window.innerWidth - bookRect.right;
-        var leftPos = Math.max(8, (gapLeft / 2) - 27);
-        var rightPos = Math.max(8, (gapRight / 2) - 27);
+        var leftPos = Math.max(20, (gapLeft / 2) - 27);
+        var rightPos = Math.max(20, (gapRight / 2) - 27);
 
         customPrev.style.left = leftPos + 'px';
         customPrev.style.right = 'auto';
         customNext.style.right = rightPos + 'px';
         customNext.style.left = 'auto';
 
-        customPrev.classList.add('is-visible');
-        customNext.classList.add('is-visible');
         return true;
     }
 
