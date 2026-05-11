@@ -474,20 +474,63 @@
         } catch (e) { /* silent */ }
     }
 
-    // Render a single PDF page to data URL
-    async function renderPage(pdf, pageNum, targetCssWidth) {
-        var page = await pdf.getPage(pageNum);
+    // Render a PDF page — returns 1 or 2 images depending if it's a spread
+    // Pages with aspect > 1.3 (landscape) are detected as spreads and split in half
+    async function renderPage(pdf, pdfPageNum, targetCssWidth, half) {
+        var page = await pdf.getPage(pdfPageNum);
         var vp1 = page.getViewport({ scale: 1 });
         var dpr = Math.min(1.5, window.devicePixelRatio || 1);
-        var scale = (targetCssWidth * dpr) / vp1.width;
-        var viewport = page.getViewport({ scale: scale });
 
-        var canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        var ctx = canvas.getContext('2d');
-        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-        return canvas.toDataURL('image/jpeg', 0.8);
+        var fullWidth = vp1.width;
+        var fullHeight = vp1.height;
+
+        // If no half specified, render the full page
+        if (!half || half === 'full') {
+            var scale = (targetCssWidth * dpr) / fullWidth;
+            var viewport = page.getViewport({ scale: scale });
+            var canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            var ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+            return canvas.toDataURL('image/jpeg', 0.8);
+        }
+
+        // Split mode: render full page then crop half
+        var halfWidth = fullWidth / 2;
+        var scale2 = (targetCssWidth * dpr) / halfWidth;
+        var viewport2 = page.getViewport({ scale: scale2 });
+
+        var canvas2 = document.createElement('canvas');
+        canvas2.width = Math.floor(viewport2.width / 2);
+        canvas2.height = viewport2.height;
+        var ctx2 = canvas2.getContext('2d');
+
+        // Translate context to show only left or right half
+        if (half === 'right') {
+            ctx2.translate(-viewport2.width / 2, 0);
+        }
+        await page.render({ canvasContext: ctx2, viewport: viewport2 }).promise;
+        return canvas2.toDataURL('image/jpeg', 0.8);
+    }
+
+    // Detect which PDF pages are spreads (landscape aspect > 1.3)
+    async function analyzePdfPages(pdf) {
+        var map = []; // each entry: { pdfPage: N, half: 'full'|'left'|'right' }
+        for (var p = 1; p <= pdf.numPages; p++) {
+            var page = await pdf.getPage(p);
+            var vp = page.getViewport({ scale: 1 });
+            var aspectRatio = vp.width / vp.height;
+
+            if (aspectRatio > 1.3) {
+                // Spread page — split in two
+                map.push({ pdfPage: p, half: 'left' });
+                map.push({ pdfPage: p, half: 'right' });
+            } else {
+                map.push({ pdfPage: p, half: 'full' });
+            }
+        }
+        return map;
     }
 
     function computeBookSize(pageAspect) {
@@ -522,27 +565,38 @@
             loadingTask.onProgress = function(p) {
                 if (p.total > 0) {
                     var pct = Math.round((p.loaded / p.total) * 100);
-                    barFill.style.width = Math.min(90, pct) + '%';
+                    barFill.style.width = Math.min(85, pct) + '%';
                     progressEl.textContent = 'Baixando PDF... ' + pct + '%';
                 }
             };
             var pdf = await loadingTask.promise;
-            var numPages = pdf.numPages;
-            totalEl.textContent = numPages;
 
-            var firstPage = await pdf.getPage(1);
+            // Analyze all pages to detect spreads
+            progressEl.textContent = 'Analisando paginas...';
+            barFill.style.width = '90%';
+            var pageMap = await analyzePdfPages(pdf);
+            var totalPages = pageMap.length; // may differ from pdf.numPages if there are spreads
+            totalEl.textContent = totalPages;
+
+            // Use first entry aspect (assume most pages share same aspect)
+            var firstPage = await pdf.getPage(pageMap[0].pdfPage);
             var fvp = firstPage.getViewport({ scale: 1 });
-            var aspect = fvp.height / fvp.width;
+            var pageAspect;
+            if (pageMap[0].half === 'full') {
+                pageAspect = fvp.height / fvp.width;
+            } else {
+                // Half of a spread
+                pageAspect = fvp.height / (fvp.width / 2);
+            }
 
-            var sizes = computeBookSize(aspect);
+            var sizes = computeBookSize(pageAspect);
             var pageW = sizes.width;
             var pageH = sizes.height;
-            var isMobile = sizes.isMobile;
 
             progressEl.textContent = 'Preparando paginas...';
             barFill.style.width = '95%';
 
-            // Build placeholders for all pages
+            // Build placeholders for all (flipbook) pages
             container.innerHTML = '';
             container.style.display = 'block';
             container.style.width = pageW + 'px';
@@ -550,7 +604,7 @@
 
             var placeholder = placeholderSvg(pageW, pageH);
             var pageElements = [];
-            for (var i = 0; i < numPages; i++) {
+            for (var i = 0; i < totalPages; i++) {
                 var div = document.createElement('div');
                 div.className = 'mag-page';
                 var img = document.createElement('img');
@@ -562,10 +616,11 @@
                 pageElements.push(img);
             }
 
-            // Render first 4 pages immediately
-            var initialPages = Math.min(4, numPages);
+            // Render first 4 flipbook pages immediately
+            var initialPages = Math.min(4, totalPages);
             for (var k = 0; k < initialPages; k++) {
-                var dataUrl = await renderPage(pdf, k + 1, pageW);
+                var entry = pageMap[k];
+                var dataUrl = await renderPage(pdf, entry.pdfPage, pageW, entry.half);
                 pageElements[k].src = dataUrl;
                 renderedPages.add(k);
             }
@@ -602,13 +657,13 @@
                 currentEl.textContent = Math.max(1, idx + 1);
                 playPageSound();
                 updateButtons();
-                lazyRenderNearby(pdf, idx, pageW, pageElements, numPages);
+                lazyRenderNearby(pdf, pageMap, idx, pageW, pageElements, totalPages);
             });
 
             updateButtons();
 
             // Background render remaining pages
-            lazyRenderAll(pdf, initialPages, pageW, pageElements, numPages);
+            lazyRenderAll(pdf, pageMap, initialPages, pageW, pageElements, totalPages);
 
         } catch (err) {
             console.error(err);
@@ -618,25 +673,27 @@
         }
     }
 
-    async function lazyRenderNearby(pdf, currentIdx, pageW, pageElements, numPages) {
+    async function lazyRenderNearby(pdf, pageMap, currentIdx, pageW, pageElements, numPages) {
         var targets = [currentIdx - 1, currentIdx, currentIdx + 1, currentIdx + 2, currentIdx + 3];
         for (var t = 0; t < targets.length; t++) {
             var idx = targets[t];
             if (idx < 0 || idx >= numPages || renderedPages.has(idx)) continue;
             renderedPages.add(idx);
             try {
-                var dataUrl = await renderPage(pdf, idx + 1, pageW);
+                var entry = pageMap[idx];
+                var dataUrl = await renderPage(pdf, entry.pdfPage, pageW, entry.half);
                 pageElements[idx].src = dataUrl;
             } catch (e) { /* skip */ }
         }
     }
 
-    async function lazyRenderAll(pdf, startFrom, pageW, pageElements, numPages) {
+    async function lazyRenderAll(pdf, pageMap, startFrom, pageW, pageElements, numPages) {
         for (var i = startFrom; i < numPages; i++) {
             if (renderedPages.has(i)) continue;
             renderedPages.add(i);
             try {
-                var dataUrl = await renderPage(pdf, i + 1, pageW);
+                var entry = pageMap[i];
+                var dataUrl = await renderPage(pdf, entry.pdfPage, pageW, entry.half);
                 pageElements[i].src = dataUrl;
             } catch (e) { /* skip */ }
             if (i % 2 === 0) await new Promise(function(r) { setTimeout(r, 40); });
