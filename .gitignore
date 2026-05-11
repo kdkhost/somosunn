@@ -8,8 +8,6 @@
 /storage/*.key
 /storage/app/public/
 /storage/logs/
-.idea/
-*.log
 .DS_Store
 .env.*.local
 .phpunit.result.cache
@@ -22,9 +20,12 @@
 # Instrucoes locais (nao enviar para o servidor)
 AGENTS.md
 .kiro/
+.vscode/
+.windsurf/
+.cursor/
+.idea/
 /public/css/*.map
 npm-debug.log
 composer.lock
 
-# Configurações locais de editor (contêm tokens sensíveis)
-.cursor/
+# Configurações locais de editor

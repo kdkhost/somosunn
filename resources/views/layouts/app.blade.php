@@ -1903,6 +1903,10 @@
         @if(session('info'))
             toastr.info(@json(session('info')));
         @endif
+
+        // Funcoes globais de notificacao (usadas pelo sistema AJAX)
+        window.showSuccess = function(msg) { toastr.success(msg || 'Sucesso'); };
+        window.showError = function(msg) { toastr.error(msg || 'Erro na operacao'); };
     </script>
 
     @if ($pwaEnabled)

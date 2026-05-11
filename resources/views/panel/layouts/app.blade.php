@@ -6,6 +6,7 @@
     <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.css') }}?v=3" rel="stylesheet">
     <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-type.css') }}?v=3" rel="stylesheet">
 
+    <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
     <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
 
@@ -463,23 +464,17 @@
 
     @prepend('scripts')
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
         <script>
-            // Handler global de flash messages
+            // Handler global de flash messages (usa Toastr, nao SweetAlert2)
             document.addEventListener('DOMContentLoaded', function () {
                 const flash = document.getElementById('flash-messages');
-                if (!flash || typeof Swal === 'undefined') return;
+                if (!flash) return;
 
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 4000,
-                    timerProgressBar: true,
-                    didOpen: (t) => {
-                        t.addEventListener('mouseenter', Swal.stopTimer);
-                        t.addEventListener('mouseleave', Swal.resumeTimer);
-                    }
-                });
+                // Garantir que toastr esta disponivel
+                if (typeof toastr === 'undefined') return;
+
+                toastr.options = { positionClass: 'toast-top-right', timeOut: 4000, progressBar: true };
 
                 const messages = [
                     { type: 'success', msg: flash.dataset.success },
@@ -491,12 +486,16 @@
                     { type: 'info',    msg: flash.dataset.toastrInfo },
                 ];
 
-                messages.forEach(m => {
+                messages.forEach(function(m) {
                     if (m.msg && m.msg.trim() !== '') {
-                        Toast.fire({ icon: m.type, title: m.msg });
+                        toastr[m.type](m.msg);
                     }
                 });
             });
+
+            // Funcoes globais de notificacao (usadas pelo sistema AJAX)
+            window.showSuccess = function(msg) { if (typeof toastr !== 'undefined') toastr.success(msg || 'Sucesso'); };
+            window.showError = function(msg) { if (typeof toastr !== 'undefined') toastr.error(msg || 'Erro na operacao'); };
         </script>
     @endprepend
 
