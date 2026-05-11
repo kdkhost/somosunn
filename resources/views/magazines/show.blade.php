@@ -10,7 +10,7 @@
         position: fixed;
         inset: 0;
         z-index: 9999;
-        background: #111;
+        background: rgb(61, 61, 61);
         display: flex;
         flex-direction: column;
     }
@@ -77,6 +77,78 @@
         height: 100% !important;
     }
 
+    /* === DearFlip Controls Enhancement === */
+    /* Setas laterais maiores */
+    .df-container > .df-ui-next,
+    .df-container > .df-ui-prev {
+        opacity: 0.7 !important;
+        font-size: 42px !important;
+        color: #fff !important;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        transition: all 0.2s !important;
+        width: 50px !important;
+        height: 50px !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.25) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(4px);
+    }
+    .df-container > .df-ui-next:hover,
+    .df-container > .df-ui-prev:hover {
+        opacity: 1 !important;
+        background: rgba(0,0,0,0.5) !important;
+        transform: translateY(-50%) scale(1.1) !important;
+    }
+
+    /* Barra de controles inferior mais visivel */
+    .df-container .df-ui-controls {
+        background-color: rgba(40, 40, 40, 0.95) !important;
+        backdrop-filter: blur(10px) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.4) !important;
+        padding: 4px 8px !important;
+        margin-bottom: 8px !important;
+    }
+    .df-floating .df-ui-controls {
+        border-radius: 12px !important;
+    }
+
+    /* Botoes da barra com mais destaque */
+    .df-container .df-ui-btn {
+        color: #ccc !important;
+        font-size: 16px !important;
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 8px !important;
+        transition: all 0.15s !important;
+    }
+    .df-container .df-ui-btn:hover {
+        color: #fff !important;
+        background-color: rgba(168, 85, 247, 0.3) !important;
+    }
+    .df-container .df-ui-btn.df-active {
+        color: #a855f7 !important;
+        background-color: rgba(168, 85, 247, 0.15) !important;
+    }
+
+    /* Indicador de pagina */
+    .df-container .df-ui-page {
+        background-color: rgba(255,255,255,0.08) !important;
+        border-radius: 8px !important;
+        color: #fff !important;
+    }
+    .df-container .df-ui-page label {
+        color: #ddd !important;
+        font-weight: 700 !important;
+    }
+
+    /* Background do flipbook */
+    .df-container {
+        background-color: rgb(61, 61, 61) !important;
+    }
+
     /* Hide site chrome */
     body.mag-viewer-active > header,
     body.mag-viewer-active > footer,
@@ -135,17 +207,19 @@
         duration: 800,
         hard: 'none',
         soundEnable: @json((bool) $magazine->enable_sound),
-        backgroundColor: '#111111',
-        paddingTop: 60,
-        paddingBottom: 10,
-        paddingLeft: 20,
-        paddingRight: 20,
+        backgroundColor: '#3d3d3d',
+        paddingTop: 50,
+        paddingBottom: 5,
+        paddingLeft: 10,
+        paddingRight: 10,
         controlsPosition: 'bottom',
-        allControls: 'thumbnail,outline,share,download,fullScreen,pageMode,startPage,endPage,sound',
+        allControls: 'thumbnail,outline,share,download,fullScreen,pageMode,startPage,endPage,sound,zoomIn,zoomOut',
         hideControls: '{{ $magazine->allow_download ? "" : "download" }}',
         pageMode: 2,
         singlePageMode: 2,
         direction: 1,
+        scrollWheel: false,
+        backgroundColor: 'rgb(61, 61, 61)',
         text: {
             toggleSound: 'Som',
             toggleThumbnails: 'Miniaturas',
@@ -155,6 +229,7 @@
             toggleFullscreen: 'Tela cheia',
             zoomIn: 'Ampliar',
             zoomOut: 'Reduzir',
+            share: 'Compartilhar',
         }
     };
 </script>
