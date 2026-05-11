@@ -230,7 +230,7 @@
         overwritePDFOutline: false,
         enableDownload: @json((bool) $magazine->allow_download),
         duration: 800,
-        hard: 'none',
+        hard: 'cover',
         soundEnable: @json((bool) $magazine->enable_sound),
         backgroundColor: '#3d3d3d',
         paddingTop: 50,
