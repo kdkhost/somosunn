@@ -113,6 +113,16 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar cancelamento automático de pedidos: ' . $e->getMessage());
         }
 
+        // Cancela resgates nao entregues no prazo e aplica punicao ao vendedor
+        try {
+            $schedule->command('redemptions:check-expired')
+                ->hourly()
+                ->withoutOverlapping()
+                ->name('redemptions-check-expired');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar verificacao de resgates expirados: ' . $e->getMessage());
+        }
+
         // Limpa itens de carrinho expirados (24h padrão, configurável)
         try {
             $schedule->command('cart:cleanup-expired')

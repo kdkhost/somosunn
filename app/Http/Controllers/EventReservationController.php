@@ -76,6 +76,22 @@ class EventReservationController extends Controller
     {
         $this->abortIfDisabledOrUnpublished($event);
 
+        // Verificar suspensao de eventos (punicao por nao-entrega de resgate)
+        $user = auth()->user();
+        if ($user && !$user->isAdmin() && (int) ($user->events_suspension_remaining ?? 0) > 0) {
+            $remaining = (int) $user->events_suspension_remaining;
+            // Decrementar a suspensao (cada tentativa bloqueada consome 1)
+            $user->decrement('events_suspension_remaining');
+            $remaining--;
+            $msg = "Voce esta suspenso de comprar ingressos por nao ter entregue um produto no prazo.";
+            if ($remaining > 0) {
+                $msg .= " Suspensao restante: {$remaining} evento(s).";
+            } else {
+                $msg .= " Esta foi sua ultima suspensao. Na proxima vez voce podera comprar normalmente.";
+            }
+            return redirect()->route('events.show', $event)->with('error', $msg);
+        }
+
         if ($this->isEventClosed($event)) {
             return redirect()->route('events.show', $event)->with('error', 'Este evento já encerrou.');
         }

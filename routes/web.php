@@ -421,7 +421,7 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
 });
 
 // Painel do Membro (Tailwind)
-Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'superadmin.legacy'])->group(function () {
+Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'check.blocked', 'superadmin.legacy'])->group(function () {
     Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/stats', [\App\Http\Controllers\Panel\DashboardController::class, 'stats'])->name('dashboard.stats');
     Route::get('/ingressos', [\App\Http\Controllers\Panel\TicketController::class, 'index'])->name('tickets.index');
