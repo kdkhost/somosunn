@@ -76,7 +76,11 @@ class MagazineController extends Controller
             ->limit(4)
             ->get();
 
-        return view('magazines.show', compact('magazine', 'related'));
+        // Escolher engine de flipbook conforme configuracao do admin
+        $engine = \App\Models\Setting::get('magazine_flipbook_engine', 'dearflip');
+        $viewName = $engine === '3dflipbook' ? 'magazines.show-3dflipbook' : 'magazines.show';
+
+        return view($viewName, compact('magazine', 'related'));
     }
 
     protected function canView(Magazine $magazine, $user): bool

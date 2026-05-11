@@ -175,4 +175,26 @@
             </div>
         </div>
     </div>
+
+    <hr class="my-4">
+
+    {{-- Revistas / Flipbook --}}
+    <h5 class="text-primary mb-3"><i class="fas fa-book-open mr-2"></i> Revistas (Flipbook)</h5>
+    <div class="alert alert-light border mb-3">
+        <small class="text-muted">
+            <i class="fas fa-info-circle mr-1"></i>
+            Escolha o plugin de visualizacao das revistas digitais. <strong>DearFlip</strong> e mais leve e rapido. <strong>3D FlipBook</strong> tem efeito 3D mais realista com dobra de pagina e sombras avancadas.
+        </small>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="text-uppercase text-muted small font-weight-bold">Plugin de visualizacao</label>
+                <select name="magazine_flipbook_engine" class="form-control">
+                    <option value="dearflip" {{ ($settings['magazine_flipbook_engine'] ?? 'dearflip') === 'dearflip' ? 'selected' : '' }}>DearFlip (leve, rapido, controles nativos)</option>
+                    <option value="3dflipbook" {{ ($settings['magazine_flipbook_engine'] ?? '') === '3dflipbook' ? 'selected' : '' }}>3D FlipBook (efeito 3D realista, dobra de pagina)</option>
+                </select>
+            </div>
+        </div>
+    </div>
 </div>
