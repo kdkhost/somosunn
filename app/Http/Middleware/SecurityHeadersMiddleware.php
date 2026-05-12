@@ -31,10 +31,10 @@ class SecurityHeadersMiddleware
         // Referrer-Policy
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-        // Permissions-Policy
+        // Permissions-Policy (sem restringir payment para não quebrar gateways)
         $response->headers->set(
             'Permissions-Policy',
-            'camera=(), microphone=(), geolocation=(), payment=(self)'
+            'camera=(), microphone=(), geolocation=()'
         );
 
         // HSTS (apenas em HTTPS)
