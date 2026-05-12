@@ -307,6 +307,14 @@
                                                 </p>
                                             @endif
                                         @endif
+
+                                        {{-- Botão para comprar ingressos adicionais --}}
+                                        @if(!$isClosed && $remainingSeats !== 0)
+                                            <a href="{{ route('events.checkout', $event) }}"
+                                                class="w-full mt-3 border-2 border-blue-600 text-blue-700 bg-blue-50 hover:bg-blue-100 py-3 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                                                <i class="fas fa-plus-circle"></i> Comprar mais ingressos
+                                            </a>
+                                        @endif
                                     </div>
                                 @elseif($isClosed)
                                     <a href="{{ route('events.index') }}"
