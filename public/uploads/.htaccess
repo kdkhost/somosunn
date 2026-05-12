@@ -1,0 +1,31 @@
+# Hardening de uploads - bloqueia execução de scripts
+# Prompt de segurança item 2: Hardening de Uploads
+# Spec: .kiro/specs/waf-e-auditoria-seguranca Requisito 6.4
+
+<FilesMatch "\.(php|phtml|phar|pl|py|jsp|asp|aspx|sh|cgi|exe|bat|cmd|htaccess)$">
+    Require all denied
+</FilesMatch>
+
+Options -Indexes -ExecCGI
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+# Bloqueia acesso direto a arquivos com double extension
+<FilesMatch "\.php\.\w+$">
+    Require all denied
+</FilesMatch>
+
+# Bloqueia arquivos ocultos
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

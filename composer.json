@@ -33,7 +33,8 @@
   "prefer-stable": true,
   "require-dev": {
     "mockery/mockery": "^1.6",
-    "phpunit/phpunit": "10.5"
+    "phpunit/phpunit": "10.5",
+    "giorgiosironi/eris": "^0.14"
   },
   "config": {
     "audit": {

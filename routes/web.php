@@ -275,14 +275,14 @@ Route::get('/post/{post}', [\App\Http\Controllers\SocialController::class, 'publ
 
 // Auth
 Route::get('/login', fn() => view('auth.login'))->name('login');
-Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'authenticate']);
+Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'authenticate'])->middleware('throttle:10,1');
 Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 Route::get('/register', fn() => view('auth.register'))->name('register');
-Route::post('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'store']);
+Route::post('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'store'])->middleware('throttle:5,1');
 Route::get('/password/forgot', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('/password/email', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::post('/password/email', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:5,1');
 Route::get('/password/reset/{token}', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('/password/reset', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
+Route::post('/password/reset', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update')->middleware('throttle:5,1');
 
 // Social Auth
 Route::get('/auth/redirect/{provider}', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])->name('social.redirect');
@@ -817,3 +817,50 @@ Route::get('/email/verify/{id}/{hash}', [App\Http\Controllers\Auth\EmailVerifica
 Route::post('/email/verification-notification', [App\Http\Controllers\Auth\EmailVerificationController::class, 'store'])
     ->middleware(['auth', 'throttle:6,1'])
     ->name('verification.send');
+
+/*
+|--------------------------------------------------------------------------
+| WAF Panel Routes (Superadmin only - AdminLTE)
+|--------------------------------------------------------------------------
+| Spec: .kiro/specs/waf-e-auditoria-seguranca
+| Requisitos: 13.1, 13.2
+*/
+Route::prefix('admin/waf')->name('admin.waf.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(function () {
+    // Dashboard
+    Route::get('/', [\App\Http\Controllers\Admin\Waf\WafDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/data', [\App\Http\Controllers\Admin\Waf\WafDashboardController::class, 'data'])->name('data');
+    Route::post('/mode', [\App\Http\Controllers\Admin\Waf\WafDashboardController::class, 'toggleMode'])->name('mode');
+
+    // Events
+    Route::get('/events', [\App\Http\Controllers\Admin\Waf\WafEventsController::class, 'index'])->name('events.index');
+    Route::get('/events/export', [\App\Http\Controllers\Admin\Waf\WafEventsController::class, 'export'])->name('events.export');
+    Route::get('/events/{id}', [\App\Http\Controllers\Admin\Waf\WafEventsController::class, 'show'])->name('events.show');
+    Route::post('/events/{id}/false-positive', [\App\Http\Controllers\Admin\Waf\WafEventsController::class, 'markFalsePositive'])->name('events.false-positive');
+    Route::post('/events/{id}/block-ip', [\App\Http\Controllers\Admin\Waf\WafEventsController::class, 'blockIp'])->name('events.block-ip');
+    Route::post('/events/{id}/allow-ip', [\App\Http\Controllers\Admin\Waf\WafEventsController::class, 'allowIp'])->name('events.allow-ip');
+
+    // Rules
+    Route::resource('/rules', \App\Http\Controllers\Admin\Waf\WafRulesController::class)->names('rules');
+    Route::post('/rules/{id}/toggle', [\App\Http\Controllers\Admin\Waf\WafRulesController::class, 'toggle'])->name('rules.toggle');
+    Route::post('/rules/test', [\App\Http\Controllers\Admin\Waf\WafRulesController::class, 'test'])->name('rules.test');
+    Route::get('/rules-export', [\App\Http\Controllers\Admin\Waf\WafRulesController::class, 'exportAll'])->name('rules.export');
+    Route::post('/rules-import', [\App\Http\Controllers\Admin\Waf\WafRulesController::class, 'import'])->name('rules.import');
+
+    // IP Lists
+    Route::get('/blocklist', [\App\Http\Controllers\Admin\Waf\WafIpListController::class, 'blocklist'])->name('blocklist.index');
+    Route::post('/blocklist', [\App\Http\Controllers\Admin\Waf\WafIpListController::class, 'storeBlock'])->name('blocklist.store');
+    Route::delete('/blocklist/{id}', [\App\Http\Controllers\Admin\Waf\WafIpListController::class, 'destroyBlock'])->name('blocklist.destroy');
+    Route::get('/allowlist', [\App\Http\Controllers\Admin\Waf\WafIpListController::class, 'allowlist'])->name('allowlist.index');
+    Route::post('/allowlist', [\App\Http\Controllers\Admin\Waf\WafIpListController::class, 'storeAllow'])->name('allowlist.store');
+    Route::delete('/allowlist/{id}', [\App\Http\Controllers\Admin\Waf\WafIpListController::class, 'destroyAllow'])->name('allowlist.destroy');
+
+    // Settings
+    Route::get('/settings', [\App\Http\Controllers\Admin\Waf\WafSettingsController::class, 'index'])->name('settings');
+    Route::put('/settings', [\App\Http\Controllers\Admin\Waf\WafSettingsController::class, 'update'])->name('settings.update');
+
+    // Alerts
+    Route::get('/alerts', [\App\Http\Controllers\Admin\Waf\WafAlertsController::class, 'index'])->name('alerts.index');
+    Route::post('/alerts', [\App\Http\Controllers\Admin\Waf\WafAlertsController::class, 'store'])->name('alerts.store');
+    Route::put('/alerts/{id}', [\App\Http\Controllers\Admin\Waf\WafAlertsController::class, 'update'])->name('alerts.update');
+    Route::delete('/alerts/{id}', [\App\Http\Controllers\Admin\Waf\WafAlertsController::class, 'destroy'])->name('alerts.destroy');
+});

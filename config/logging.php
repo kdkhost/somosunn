@@ -67,6 +67,24 @@ return [
             'handler' => NullHandler::class,
         ],
 
+        // Canal dedicado do WAF (Web Application Firewall da Unn)
+        // Requisitos: 21.1, 21.2 da spec waf-e-auditoria-seguranca
+        'waf' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/waf.log'),
+            'level' => env('WAF_LOG_LEVEL', 'warning'),
+            'days' => env('WAF_LOG_DAYS', 30),
+        ],
+
+        // Canal de segurança geral (brute force, uploads suspeitos, acessos proibidos)
+        // Prompt de segurança item 10
+        'security' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/security.log'),
+            'level' => env('SECURITY_LOG_LEVEL', 'info'),
+            'days' => env('SECURITY_LOG_DAYS', 90),
+        ],
+
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],

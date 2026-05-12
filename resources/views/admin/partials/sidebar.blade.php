@@ -587,6 +587,60 @@
 
                 <li class="nav-header">PERSONALIZAÇÃO</li>
 
+                {{-- WAF - Segurança (apenas superadmin) --}}
+                @if(auth()->user()->isSuperAdmin())
+                    <li class="nav-item has-treeview {{ request()->routeIs('admin.waf.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('admin.waf.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-shield-alt" style="color: #1F5EDB;"></i>
+                            <p>Segurança (WAF)<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview pl-4">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.waf.dashboard') }}" class="nav-link {{ request()->routeIs('admin.waf.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.waf.events.index') }}" class="nav-link {{ request()->routeIs('admin.waf.events.*') ? 'active' : '' }}">
+                                    <i class="fas fa-list-alt nav-icon"></i>
+                                    <p>Eventos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.waf.rules.index') }}" class="nav-link {{ request()->routeIs('admin.waf.rules.*') ? 'active' : '' }}">
+                                    <i class="fas fa-gavel nav-icon"></i>
+                                    <p>Regras</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.waf.blocklist.index') }}" class="nav-link {{ request()->routeIs('admin.waf.blocklist.*') ? 'active' : '' }}">
+                                    <i class="fas fa-ban nav-icon text-danger"></i>
+                                    <p>IP Blocklist</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.waf.allowlist.index') }}" class="nav-link {{ request()->routeIs('admin.waf.allowlist.*') ? 'active' : '' }}">
+                                    <i class="fas fa-check-circle nav-icon text-success"></i>
+                                    <p>IP Allowlist</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.waf.settings') }}" class="nav-link {{ request()->routeIs('admin.waf.settings*') ? 'active' : '' }}">
+                                    <i class="fas fa-cog nav-icon"></i>
+                                    <p>Configuracoes</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.waf.alerts.index') }}" class="nav-link {{ request()->routeIs('admin.waf.alerts.*') ? 'active' : '' }}">
+                                    <i class="fas fa-bell nav-icon"></i>
+                                    <p>Alertas</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+
                 <li class="nav-item">
                     <a href="{{ route('admin.profile.edit') }}" class="nav-link {{ $is('admin.profile.*') }}">
                         <i class="nav-icon fas fa-id-card"></i>

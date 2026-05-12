@@ -15,8 +15,19 @@ class LoginController extends Controller
     public function authenticate(Request $request)
     {
         $credentials = $request->validate(['email'=>'required|email','password'=>'required']);
+
         if(Auth::attempt($credentials, $request->filled('remember'))){
             $request->session()->regenerate();
+
+            // Log de segurança: login bem-sucedido
+            try {
+                \Illuminate\Support\Facades\Log::channel('security')->info('Login bem-sucedido', [
+                    'user_id'    => Auth::id(),
+                    'email'      => $credentials['email'],
+                    'ip'         => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
+            } catch (\Throwable $e) {}
 
             // Gamificação: login diário + streaks
             try {
@@ -60,6 +71,16 @@ class LoginController extends Controller
 
             return $this->redirectToSafeIntended($request, $defaultRoute);
         }
+
+        // Log de segurança: login falhado
+        try {
+            \Illuminate\Support\Facades\Log::channel('security')->warning('Login falhado', [
+                'email'      => $credentials['email'],
+                'ip'         => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        } catch (\Throwable $e) {}
+
         return back()->withErrors(['email' => 'Credenciais inválidas']);
     }
 

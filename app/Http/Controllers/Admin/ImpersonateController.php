@@ -33,10 +33,26 @@ class ImpersonateController extends Controller
             }
         }
 
+        // Log de auditoria: início de impersonação (Requisito 19.2)
+        try {
+            \Illuminate\Support\Facades\Log::channel('security')->info('Impersonação iniciada', [
+                'impersonator_id'   => $currentUser->id,
+                'impersonator_name' => $currentUser->name,
+                'impersonator_role' => $currentUser->role,
+                'target_id'         => $userToImpersonate->id,
+                'target_name'       => $userToImpersonate->name,
+                'target_role'       => $userToImpersonate->role,
+                'ip'                => request()->ip(),
+                'user_agent'        => request()->userAgent(),
+                'timestamp'         => now()->toIso8601String(),
+            ]);
+        } catch (\Throwable $e) {}
+
         // Guarda o ID original na sessão
         session()->put('impersonator_id', $currentUser->id);
         session()->put('impersonator_is_admin', true);
         session()->put('impersonator_name', (string) ($currentUser->name ?? ''));
+        session()->put('impersonation_started_at', now()->toIso8601String());
 
         // Loga como o novo usuário
         Auth::login($userToImpersonate);
@@ -52,9 +68,22 @@ class ImpersonateController extends Controller
         }
 
         $originalId = session()->pull('impersonator_id');
-        $impersonatedName = auth()->user()?->name ?? 'usuário';
-        session()->forget(['impersonator_is_admin', 'impersonator_name']);
+        $impersonatedUser = auth()->user();
+        $impersonatedName = $impersonatedUser?->name ?? 'usuário';
+        session()->forget(['impersonator_is_admin', 'impersonator_name', 'impersonation_started_at']);
         $originalUser = User::find($originalId);
+
+        // Log de auditoria: fim de impersonação (Requisito 19.2)
+        try {
+            \Illuminate\Support\Facades\Log::channel('security')->info('Impersonação encerrada', [
+                'impersonator_id'   => $originalId,
+                'target_id'         => $impersonatedUser?->id,
+                'target_name'       => $impersonatedName,
+                'ip'                => request()->ip(),
+                'user_agent'        => request()->userAgent(),
+                'timestamp'         => now()->toIso8601String(),
+            ]);
+        } catch (\Throwable $e) {}
 
         if ($originalUser) {
             Auth::login($originalUser);

@@ -29,3 +29,15 @@ npm-debug.log
 composer.lock
 
 # Configurações locais de editor
+
+# Segurança: nunca versionar
+.env.*
+*.bak
+*.old
+*.zip
+*.sql
+*.tar.gz
+*.dump
+.ftpquota
+storage/logs/*.log
+bootstrap/cache/*.php
