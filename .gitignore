@@ -41,3 +41,8 @@ composer.lock
 .ftpquota
 storage/logs/*.log
 bootstrap/cache/*.php
+
+# Documentação de segurança (somente local, não vai para o git)
+SECURITY_FIXES.md
+AUDITORIA_SEGURANCA_KIRO.md
+AGENTS.md
