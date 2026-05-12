@@ -31,10 +31,10 @@ class SecurityHeadersMiddleware
         // Referrer-Policy
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-        // Permissions-Policy (sem restringir payment para não quebrar gateways)
+        // Permissions-Policy (permite camera para scanner de QR code)
         $response->headers->set(
             'Permissions-Policy',
-            'camera=(), microphone=(), geolocation=()'
+            'microphone=(), geolocation=()'
         );
 
         // HSTS (apenas em HTTPS)
