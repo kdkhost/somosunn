@@ -68,7 +68,7 @@
                                 </span>
                                 <p class="text-sm text-gray-500">Valor por pessoa</p>
                                 <div class="flex items-end gap-3">
-                                    <p class="text-3xl font-black text-gray-900">
+                                    <p class="text-3xl font-black text-gray-900" id="checkout-total" data-checkout-total>
                                         {{ 'R$ ' . number_format($effectiveUnitPrice, 2, ',', '.') }}
                                     </p>
                                     @if($flashActive && $regularUnitPrice > 0 && $effectiveUnitPrice < $regularUnitPrice)

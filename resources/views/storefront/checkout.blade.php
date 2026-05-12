@@ -347,7 +347,7 @@
                         </div>
                         <div class="flex justify-between pt-3 border-t border-slate-100">
                             <span class="font-black text-slate-900">Total</span>
-                            <span class="text-xl font-black text-slate-900">R$ {{ number_format((float) $totals['subtotal'], 2, ',', '.') }}</span>
+                            <span class="text-xl font-black text-slate-900" id="checkout-total" data-checkout-total>R$ {{ number_format((float) $totals['subtotal'], 2, ',', '.') }}</span>
                         </div>
                     </div>
 

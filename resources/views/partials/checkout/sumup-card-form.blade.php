@@ -349,6 +349,22 @@ document.addEventListener('DOMContentLoaded', function() {
             btnText.textContent = 'Pagar R$ ' + totalWithInterest.toFixed(2).replace('.', ',');
         }
 
+        // Atualizar o resumo lateral (coluna ao lado) com o valor atualizado
+        var formattedTotal = 'R$ ' + totalWithInterest.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        var sidebarTotal = document.getElementById('checkout-total') || document.querySelector('[data-checkout-total]') || document.querySelector('.checkout-total-value');
+        if (sidebarTotal) {
+            sidebarTotal.textContent = formattedTotal;
+        }
+        // Tambem tenta atualizar qualquer elemento com classe ou data-attribute de total
+        document.querySelectorAll('[data-dynamic-total], .dynamic-total, .order-total-value').forEach(function(el) {
+            el.textContent = formattedTotal;
+        });
+        // Atualiza subtotal se existir
+        var subtotalEl = document.getElementById('checkout-subtotal');
+        if (subtotalEl && n > 1 && option && option.has_interest) {
+            subtotalEl.textContent = formattedTotal;
+        }
+
         // Debounce para recriar o checkout no backend (so se o valor mudar)
         if (installmentDebounceTimer) clearTimeout(installmentDebounceTimer);
         installmentDebounceTimer = setTimeout(function(){
