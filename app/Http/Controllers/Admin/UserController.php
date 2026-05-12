@@ -241,4 +241,72 @@ class UserController extends Controller
 
         $user->update(['extra_features' => $extra]);
     }
+
+    /**
+     * Suspender/bloquear um usuario (punição configurável).
+     * POST /admin/users/{user}/suspend (AJAX)
+     */
+    public function suspend(Request $request, User $user)
+    {
+        if (!$this->isSuperadmin() && $user->role === 'superadmin') {
+            return response()->json(['message' => 'Nao e possivel suspender um Super Admin.'], 403);
+        }
+
+        $request->validate([
+            'duration_hours' => 'required|integer|min:1|max:8760', // max 1 ano
+            'reason'         => 'required|string|max:500',
+            'events_suspension' => 'nullable|integer|min:0|max:100',
+        ]);
+
+        $blockedUntil = now()->addHours((int) $request->input('duration_hours'));
+
+        $user->update([
+            'blocked_until'                => $blockedUntil,
+            'block_reason'                 => $request->input('reason'),
+            'events_suspension_remaining'  => (int) $request->input('events_suspension', 0),
+        ]);
+
+        try {
+            \Illuminate\Support\Facades\Log::channel('security')->info('Usuario suspenso pelo admin', [
+                'user_id'       => $user->id,
+                'user_name'     => $user->name,
+                'blocked_until' => $blockedUntil->toIso8601String(),
+                'reason'        => $request->input('reason'),
+                'actor_id'      => auth()->id(),
+                'ip'            => $request->ip(),
+            ]);
+        } catch (\Throwable $e) {}
+
+        return response()->json([
+            'ok'      => true,
+            'message' => "Usuario {$user->name} suspenso ate " . $blockedUntil->format('d/m/Y H:i') . '.',
+        ]);
+    }
+
+    /**
+     * Remover suspensão de um usuario.
+     * POST /admin/users/{user}/unsuspend (AJAX)
+     */
+    public function unsuspend(Request $request, User $user)
+    {
+        $user->update([
+            'blocked_until'                => null,
+            'block_reason'                 => null,
+            'events_suspension_remaining'  => 0,
+        ]);
+
+        try {
+            \Illuminate\Support\Facades\Log::channel('security')->info('Suspensao removida pelo admin', [
+                'user_id'   => $user->id,
+                'user_name' => $user->name,
+                'actor_id'  => auth()->id(),
+                'ip'        => $request->ip(),
+            ]);
+        } catch (\Throwable $e) {}
+
+        return response()->json([
+            'ok'      => true,
+            'message' => "Suspensao de {$user->name} removida.",
+        ]);
+    }
 }
