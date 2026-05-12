@@ -334,6 +334,7 @@
                             'admin.points-rules.*',
                             'admin.mailtemplates.*',
                             'admin.cron.*',
+                            'admin.punishments.*',
                         ];
 
                         $settingsPatterns = [
@@ -486,6 +487,26 @@
                                     <i class="fas fa-clock nav-icon"></i>
                                     <p>Cron Jobs</p>
                                 </a>
+                            </li>
+                            <li class="nav-item has-treeview {{ $open('admin.punishments.*') }}">
+                                <a href="#" class="nav-link {{ $is('admin.punishments.*') }}">
+                                    <i class="fas fa-gavel nav-icon text-danger"></i>
+                                    <p>Punicoes<i class="right fas fa-angle-left"></i></p>
+                                </a>
+                                <ul class="nav nav-treeview pl-3">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.punishments.index') }}" class="nav-link {{ $is('admin.punishments.index') }}">
+                                            <i class="fas fa-list nav-icon"></i>
+                                            <p>Lista de Punicoes</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.punishments.settings') }}" class="nav-link {{ $is('admin.punishments.settings') }}">
+                                            <i class="fas fa-cog nav-icon"></i>
+                                            <p>Configuracoes</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </li>

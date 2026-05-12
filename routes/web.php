@@ -793,6 +793,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Admin\EventMediaController::class, 'destroy'])->name('events.media.destroy');
     Route::post('mentorships/{mentorship}/media', [\App\Http\Controllers\Panel\MentorshipMediaController::class, 'store'])->name('mentorships.media.store');
     Route::delete('mentorships/{mentorship}/media/{media}', [\App\Http\Controllers\Panel\MentorshipMediaController::class, 'destroy'])->name('mentorships.media.destroy');
+
+    // Punishments (Gestao de Punicoes)
+    Route::get('punishments', [\App\Http\Controllers\Admin\PunishmentController::class, 'index'])->name('punishments.index');
+    Route::get('punishments/settings', [\App\Http\Controllers\Admin\PunishmentController::class, 'settings'])->name('punishments.settings');
+    Route::put('punishments/settings', [\App\Http\Controllers\Admin\PunishmentController::class, 'updateSettings'])->name('punishments.settings.update');
+    Route::get('punishments/{user}', [\App\Http\Controllers\Admin\PunishmentController::class, 'show'])->name('punishments.show');
+    Route::post('punishments/apply', [\App\Http\Controllers\Admin\PunishmentController::class, 'apply'])->name('punishments.apply');
+    Route::post('punishments/{user}/remove', [\App\Http\Controllers\Admin\PunishmentController::class, 'remove'])->name('punishments.remove');
+    Route::put('punishments/{user}/edit', [\App\Http\Controllers\Admin\PunishmentController::class, 'edit'])->name('punishments.edit');
 });
 
 // Checkout process
