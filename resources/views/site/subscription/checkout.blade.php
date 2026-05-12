@@ -625,6 +625,15 @@
 
                         sumupCheckoutData = data;
 
+                        // Atualizar resumo lateral com o valor que será cobrado pelo SumUp
+                        if (data.amount) {
+                            var totalEl = document.getElementById('checkout-total');
+                            var subtotalEl = document.getElementById('checkout-subtotal');
+                            var formatted = 'R$ ' + Number(data.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            if (totalEl) totalEl.textContent = formatted;
+                            if (subtotalEl) subtotalEl.textContent = formatted;
+                        }
+
                         // Mostrar seletor de método
                         if (methodSelector) methodSelector.classList.remove('hidden');
                         submitBtn.classList.add('hidden');
