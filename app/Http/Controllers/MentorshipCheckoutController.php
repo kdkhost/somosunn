@@ -60,13 +60,26 @@ class MentorshipCheckoutController extends Controller
         $mpEnabled = $sellerMpAccount['mpEnabled'] ?? false;
         $preferredGateway = 'mercadopago';
 
-        if (!$mpEnabled) {
+        // Verificar tambem se SumUp esta disponivel como alternativa
+        $sumupAvailable = false;
+        if ($isPlatformOwner) {
+            $sumupApiKey = \App\Models\Setting::get('sumup_api_key');
+            $sumupEnabled = (string) \App\Models\Setting::get('sumup_enabled', '0') === '1'
+                || (string) \App\Models\Setting::get('gateway_sumup_enabled', '0') === '1';
+            $sumupAvailable = !empty($sumupApiKey) && $sumupEnabled;
+        }
+
+        if (!$mpEnabled && !$sumupAvailable) {
             return redirect()
                 ->route('mentorships.show', $mentorship)
                 ->with('error', 'Esta mentoria nao esta disponivel para compra: o mentor ainda nao configurou um metodo de pagamento.');
         }
 
-        return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'preferredGateway'));
+        if (!$mpEnabled && $sumupAvailable) {
+            $preferredGateway = 'sumup';
+        }
+
+        return view('checkout.mentorship', compact('mentorship', 'mpEnabled', 'preferredGateway', 'sumupAvailable'));
     }
 
     public function process(
