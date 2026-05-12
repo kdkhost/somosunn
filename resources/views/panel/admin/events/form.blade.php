@@ -1001,9 +1001,16 @@
                 }
 
                 fetch('/api/venue-search?' + params, {
-                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin'
                 })
-                .then(function(r) { return r.json(); })
+                .then(function(r) {
+                    if (!r.ok) {
+                        console.error('Venue search HTTP error:', r.status, r.statusText);
+                        throw new Error('HTTP ' + r.status);
+                    }
+                    return r.json();
+                })
                 .then(function(data) {
                     var items = (data.results || []).map(function(place) {
                         return {
