@@ -20,11 +20,11 @@ class WafDashboardController extends Controller
 {
     public function index()
     {
-        $settings = WafSettings::load();
+        $wafSettings = WafSettings::load();
 
         return view('admin.waf.dashboard', [
-            'settings' => $settings,
-            'hasTable' => Schema::hasTable('waf_events'),
+            'wafSettings' => $wafSettings,
+            'hasTable'    => Schema::hasTable('waf_events'),
         ]);
     }
 

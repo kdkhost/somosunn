@@ -10,11 +10,11 @@
                 <h1 class="m-0"><i class="fas fa-shield-alt text-primary"></i> WAF - Dashboard</h1>
             </div>
             <div class="col-sm-6 text-right">
-                <span class="badge badge-{{ $settings->isEnforce() ? 'danger' : 'warning' }} p-2" id="waf-mode-badge">
-                    Modo: {{ $settings->isEnforce() ? 'ENFORCE' : 'DETECTION-ONLY' }}
+                <span class="badge badge-{{ $wafSettings->isEnforce() ? 'danger' : 'warning' }} p-2" id="waf-mode-badge">
+                    Modo: {{ $wafSettings->isEnforce() ? 'ENFORCE' : 'DETECTION-ONLY' }}
                 </span>
                 <button class="btn btn-sm btn-outline-primary ml-2" id="btn-toggle-mode"
-                    data-current="{{ $settings->mode }}">
+                    data-current="{{ $wafSettings->mode }}">
                     <i class="fas fa-exchange-alt"></i> Alternar Modo
                 </button>
             </div>
