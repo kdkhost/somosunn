@@ -359,6 +359,11 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('[data-dynamic-total], .dynamic-total, .order-total-value').forEach(function(el) {
             el.textContent = formattedTotal;
         });
+        // Atualiza o preco do item no resumo (card escuro)
+        var itemPriceEl = document.getElementById('checkout-item-price');
+        if (itemPriceEl) {
+            itemPriceEl.textContent = formattedTotal;
+        }
         // Atualiza subtotal se existir
         var subtotalEl = document.getElementById('checkout-subtotal');
         if (subtotalEl && n > 1 && option && option.has_interest) {

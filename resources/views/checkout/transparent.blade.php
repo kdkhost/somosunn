@@ -70,7 +70,7 @@
                                         <p class="font-medium text-slate-100">{{ $item->title }}</p>
                                         <p class="text-sm text-slate-400">Quantidade: {{ $item->quantity }}</p>
                                     </div>
-                                    <span class="font-semibold">R$ {{ number_format($item->price, 2, ',', '.') }}</span>
+                                    <span class="font-semibold" id="checkout-item-price">R$ {{ number_format($item->price, 2, ',', '.') }}</span>
                                 </div>
                             @endforeach
 
@@ -104,7 +104,7 @@
 
                                 <div class="flex justify-between text-2xl font-extrabold pt-2">
                                     <span>Total</span>
-                                    <span class="text-white">R$
+                                    <span class="text-white" id="checkout-total" data-checkout-total>R$
                                         {{ number_format($order->total_amount, 2, ',', '.') }}</span>
                                 </div>
                             </div>
