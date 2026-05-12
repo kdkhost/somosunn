@@ -146,7 +146,7 @@
                                                 <form method="POST" action="{{ route('admin.waf.alerts.destroy', $alert->id) }}" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-xs btn-danger" onclick="return confirm('Remover este alerta?')">
+                                                    <button type="submit" class="btn btn-xs btn-danger btn-swal-confirm" data-swal-title="Remover alerta?" data-swal-text="Esta acao nao pode ser desfeita.">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -172,3 +172,7 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+@include('admin.waf.partials.swal-confirm')
+@endpush

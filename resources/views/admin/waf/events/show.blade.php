@@ -100,7 +100,7 @@
                                         <div class="input-group">
                                             <input type="text" name="note" class="form-control form-control-sm" placeholder="Nota (opcional)">
                                             <div class="input-group-append">
-                                                <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Marcar como falso positivo?')">
+                                                <button type="submit" class="btn btn-sm btn-warning btn-swal-confirm" data-swal-title="Marcar como falso positivo?" data-swal-text="Este evento sera marcado e a regra revisada.">
                                                     <i class="fas fa-flag"></i> Falso Positivo
                                                 </button>
                                             </div>
@@ -111,7 +111,7 @@
                             <div class="col-md-6">
                                 <form method="POST" action="{{ route('admin.waf.events.block-ip', $event->id) }}">
                                     @csrf
-                                    <button type="submit" class="btn btn-danger btn-block btn-sm" onclick="return confirm('Bloquear IP {{ $event->ip }}?')">
+                                    <button type="submit" class="btn btn-danger btn-block btn-sm btn-swal-confirm" data-swal-title="Bloquear IP?" data-swal-text="{{ $event->ip }}">
                                         <i class="fas fa-ban"></i> Bloquear IP
                                     </button>
                                 </form>
@@ -119,7 +119,7 @@
                             <div class="col-md-6">
                                 <form method="POST" action="{{ route('admin.waf.events.allow-ip', $event->id) }}">
                                     @csrf
-                                    <button type="submit" class="btn btn-success btn-block btn-sm" onclick="return confirm('Permitir IP {{ $event->ip }}?')">
+                                    <button type="submit" class="btn btn-success btn-block btn-sm btn-swal-confirm" data-swal-title="Permitir IP?" data-swal-text="{{ $event->ip }}">
                                         <i class="fas fa-check"></i> Permitir IP
                                     </button>
                                 </form>
@@ -178,3 +178,7 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+@include('admin.waf.partials.swal-confirm')
+@endpush

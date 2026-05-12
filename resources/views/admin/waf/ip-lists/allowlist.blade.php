@@ -111,7 +111,7 @@
                                                 <form method="POST" action="{{ route('admin.waf.allowlist.destroy', $entry->id) }}" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-xs btn-outline-danger" onclick="return confirm('Remover {{ $entry->cidr }} da allowlist?')">
+                                                    <button type="submit" class="btn btn-xs btn-outline-danger btn-swal-confirm" data-swal-title="Remover IP?" data-swal-text="{{ $entry->cidr }}">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </form>
@@ -137,3 +137,7 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+@include('admin.waf.partials.swal-confirm')
+@endpush

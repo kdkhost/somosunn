@@ -212,12 +212,25 @@
         var current = $(this).data('current');
         var newMode = current === 'detection-only' ? 'enforce' : 'detection-only';
 
-        if (!confirm('Alterar modo do WAF para "' + newMode + '"?')) return;
+        Swal.fire({
+            title: 'Alterar modo do WAF?',
+            html: 'Mudar para <strong>' + newMode.toUpperCase() + '</strong>?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1F5EDB',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, alterar',
+            cancelButtonText: 'Cancelar'
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
 
-        $.post('{{ route("admin.waf.mode") }}', { _token: '{{ csrf_token() }}', mode: newMode }, function(res) {
-            if (res.success) {
-                location.reload();
-            }
+            $.post('{{ route("admin.waf.mode") }}', { _token: '{{ csrf_token() }}', mode: newMode }, function(res) {
+                if (res.success) {
+                    Swal.fire({ icon: 'success', title: 'Modo alterado!', text: 'WAF agora em ' + newMode.toUpperCase(), timer: 2000, showConfirmButton: false }).then(function() { location.reload(); });
+                }
+            }).fail(function() {
+                Swal.fire({ icon: 'error', title: 'Erro', text: 'Falha ao alterar modo.' });
+            });
         });
     });
 

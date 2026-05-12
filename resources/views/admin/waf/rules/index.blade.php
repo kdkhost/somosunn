@@ -151,7 +151,7 @@
                                         <form method="POST" action="{{ route('admin.waf.rules.destroy', $rule->id) }}" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-xs btn-danger" title="Remover" onclick="return confirm('Remover regra {{ $rule->name }}?')">
+                                            <button type="submit" class="btn btn-xs btn-danger btn-swal-confirm" title="Remover" data-swal-title="Remover regra?" data-swal-text="Regra: {{ $rule->name }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -219,4 +219,8 @@ $(function() {
     });
 });
 </script>
+@endpush
+
+@push('scripts')
+@include('admin.waf.partials.swal-confirm')
 @endpush
