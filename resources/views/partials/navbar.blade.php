@@ -31,6 +31,7 @@
                 ['label' => 'Cursos', 'href' => route('courses.index'), 'setting_key' => 'feature_courses'],
                 ['label' => 'Eventos', 'href' => route('events.index'), 'setting_key' => 'feature_events'],
                 ['label' => 'Marketplace', 'href' => route('marketplace.index')],
+                ['label' => 'Revistas', 'href' => route('magazines.index'), 'requires_auth' => true],
                 ['label' => 'Membros', 'href' => route('membros')],
                 ['label' => 'Ranking', 'href' => route('ranking.public')],
                 ['label' => 'Vagas Abertas', 'href' => route('jobs.public.index')],
