@@ -41,8 +41,14 @@ class BlockSensitiveRoutesInProduction
 
     public function handle(Request $request, Closure $next): Response
     {
-        // Só bloqueia em produção
-        if (app()->environment('local', 'testing', 'staging')) {
+        // Bloqueia em qualquer ambiente que não seja localhost real
+        // (APP_ENV=local em servidor remoto ainda é produção de fato)
+        $isRealLocal = in_array($request->ip(), ['127.0.0.1', '::1'])
+            || str_starts_with($request->ip(), '192.168.')
+            || app()->runningInConsole()
+            || app()->runningUnitTests();
+
+        if ($isRealLocal && app()->environment('local', 'testing')) {
             return $next($request);
         }
 
