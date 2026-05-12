@@ -161,6 +161,59 @@ class ConnectionController extends Controller
     }
 
     /**
+     * Lista de usuarios bloqueados pelo usuario autenticado.
+     */
+    public function blockedUsers()
+    {
+        $userId = Auth::id();
+
+        $blockedConnections = Connection::where('status', 'blocked')
+            ->where(function ($q) use ($userId) {
+                $q->where('requester_id', $userId)->orWhere('requested_id', $userId);
+            })
+            ->get();
+
+        $blockedUsers = $blockedConnections->map(function ($conn) use ($userId) {
+            $blockedId = $conn->requester_id === $userId ? $conn->requested_id : $conn->requester_id;
+            $user = User::find($blockedId);
+            if (!$user) return null;
+
+            return (object) [
+                'connection_id' => $conn->id,
+                'user'          => $user,
+                'blocked_at'    => $conn->responded_at ?? $conn->updated_at,
+            ];
+        })->filter()->values();
+
+        return view('panel.connections.blocked', compact('blockedUsers'));
+    }
+
+    /**
+     * Desbloquear um usuario.
+     */
+    public function unblock(User $user)
+    {
+        $requesterId = Auth::id();
+        $requestedId = $user->id;
+
+        $connection = Connection::where('status', 'blocked')
+            ->where(function ($q) use ($requesterId, $requestedId) {
+                $q->where('requester_id', $requesterId)->where('requested_id', $requestedId);
+            })->orWhere(function ($q) use ($requesterId, $requestedId) {
+                $q->where('requester_id', $requestedId)->where('requested_id', $requesterId);
+            })->first();
+
+        if (!$connection) {
+            return response()->json(['success' => false, 'message' => 'Conexão bloqueada não encontrada.']);
+        }
+
+        // Remove a conexão completamente (volta ao estado "sem conexão")
+        $connection->delete();
+
+        return response()->json(['success' => true, 'message' => 'Usuário desbloqueado com sucesso.']);
+    }
+
+    /**
      * Get pending notifications count.
      */
     public function notifications()

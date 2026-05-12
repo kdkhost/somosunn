@@ -379,6 +379,8 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
         Route::post('/connection/accept/{user}', [\App\Http\Controllers\ConnectionController::class, 'accept'])->name('connection.accept');
         Route::post('/connection/remove/{user}', [\App\Http\Controllers\ConnectionController::class, 'remove'])->name('connection.remove');
         Route::post('/connection/block/{user}', [\App\Http\Controllers\ConnectionController::class, 'block'])->name('connection.block');
+        Route::get('/connection/blocked', [\App\Http\Controllers\ConnectionController::class, 'blockedUsers'])->name('connection.blocked');
+        Route::post('/connection/unblock/{user}', [\App\Http\Controllers\ConnectionController::class, 'unblock'])->name('connection.unblock');
         Route::get('/connection/notifications', [\App\Http\Controllers\ConnectionController::class, 'notifications'])->name('connection.notifications');
         Route::post('/post', [\App\Http\Controllers\SocialController::class, 'storePost'])->name('social.post.store');
         Route::post('/post/{post}/react', [\App\Http\Controllers\SocialController::class, 'toggleReaction'])->name('social.post.react');
