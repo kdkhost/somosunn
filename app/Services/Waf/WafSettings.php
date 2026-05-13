@@ -137,6 +137,6 @@ final class WafSettings
 
     public function isFailOpen(): bool
     {
-        return $this->failPolicy === self::FAIL_OPEN;
+        return in_array($this->failPolicy, [self::FAIL_OPEN, 'allow', 'open'], true);
     }
 }
