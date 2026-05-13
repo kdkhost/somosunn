@@ -546,7 +546,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::get('invoices-editor/preview', [\App\Http\Controllers\Admin\InvoiceEditorController::class, 'preview'])->name('invoices.editor.preview');
         Route::post('invoices-editor/reset', [\App\Http\Controllers\Admin\InvoiceEditorController::class, 'resetDefaults'])->name('invoices.editor.reset');
         Route::resource('coupons', \App\Http\Controllers\Panel\Admin\CouponController::class);
-        Route::post('courses/{course}/certificate/preview', [\App\Http\Controllers\Panel\Admin\CourseController::class, 'certificatePreview'])->name('courses.certificate.preview');
+        Route::match(['get', 'post'], 'courses/{course}/certificate/preview', [\App\Http\Controllers\Panel\Admin\CourseController::class, 'certificatePreview'])->name('courses.certificate.preview');
         Route::post('courses/{course}/lessons', [\App\Http\Controllers\LessonController::class, 'store'])->name('courses.lessons.store');
         Route::post('courses/{course}/lessons/content-image', [\App\Http\Controllers\LessonController::class, 'uploadContentImage'])->name('courses.lessons.content-image');
         Route::resource('courses', \App\Http\Controllers\Panel\Admin\CourseController::class);

@@ -440,7 +440,33 @@ class CourseController extends Controller
         $this->ensurePermission('courses.view');
         $this->ensureCanManage($course);
 
-        // We use the same validation but relaxed for preview
+        // Se for GET, usar dados salvos do curso (preview do que ja esta salvo)
+        if ($request->isMethod('get')) {
+            $settings = $course->certificate_settings;
+            if (is_string($settings)) {
+                $settings = json_decode($settings, true) ?: [];
+            }
+
+            $user = Auth::user();
+            $certHash = 'PREVIEW-' . strtoupper(Str::random(8));
+            $workload = $course->total_hours ?? 0;
+
+            $fontCss = app(\App\Services\Certificate\CertificateFontCssGenerator::class)
+                ->buildFontCss($settings ?: [], true);
+
+            return view('admin.certificates.template', [
+                'user' => $user,
+                'course' => $course,
+                'certHash' => $certHash,
+                'authorName' => $course->author_name ?: 'Instrutor',
+                'workload' => $workload,
+                'type' => 'course',
+                'fontCss' => $fontCss,
+                'isPreview' => true
+            ]);
+        }
+
+        // POST: preview com dados do formulario (sem salvar)
         $request->validate([
             'certificate_settings' => 'nullable|json',
             'author_name' => 'nullable|string|max:255',
