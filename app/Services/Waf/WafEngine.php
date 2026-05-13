@@ -81,6 +81,14 @@ final class WafEngine
                 }
             }
 
+            // 1c. Rotas admin isentas para superadmin autenticado
+            if (str_starts_with($path, '/admin/') || str_starts_with($path, '/painel/admin/')) {
+                $user = $request->user();
+                if ($user && method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
+                    return WafDecision::allowed('admin_superadmin_exempt');
+                }
+            }
+
             $ctx = WafContext::fromRequest($request);
 
             // Enriquecimento opcional
@@ -369,19 +377,22 @@ final class WafEngine
 
     private function blockedHtml(WafDecision $decision): string
     {
-        $ref = e($decision->eventId ?? 'n/a');
+        $ref = $decision->eventId ?? 'N/A';
 
-        return <<<HTML
+        try {
+            return view('errors.waf-blocked', ['ref' => $ref])->render();
+        } catch (\Throwable $e) {
+            // Fallback se a view não renderizar
+            return <<<HTML
 <!doctype html>
 <html lang="pt-BR"><head>
-<meta charset="utf-8"><title>Requisicao bloqueada</title>
+<meta charset="utf-8"><title>Acesso Bloqueado</title>
 <meta name="robots" content="noindex">
+<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#e2e8f0;text-align:center;}</style>
 </head><body>
-<h1>Requisicao bloqueada</h1>
-<p>A sua requisicao foi bloqueada pelo sistema de seguranca.</p>
-<p>Se voce acredita que isso e um engano, informe o codigo de referencia ao suporte:</p>
-<p><code>{$ref}</code></p>
+<div><h1>Acesso Bloqueado</h1><p>Sua requisição foi bloqueada pelo sistema de segurança.</p><p>Código: <code>{$ref}</code></p><a href="/" style="color:#93c5fd;">Voltar ao início</a></div>
 </body></html>
 HTML;
+        }
     }
 }
