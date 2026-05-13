@@ -106,9 +106,9 @@
          CONTROLES — Organizados em grid abaixo do canvas
          ═══════════════════════════════════════════════════════════════ --}}
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            <div class="rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
-                <div class="mb-3 flex items-center gap-3">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
                         <i class="fas fa-image"></i>
                     </div>
                     <div>
@@ -164,9 +164,9 @@
                 </div>
             </div>
 
-            <div class="rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
-                <div class="mb-3 flex items-center gap-3">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400">
                         <i class="fas fa-pen-fancy"></i>
                     </div>
                     <div>
@@ -198,9 +198,9 @@
                 </div>
             </div>
 
-            <div class="rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
-                <div class="mb-3 flex items-center gap-3">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400">
                         <i class="fas fa-ruler-combined"></i>
                     </div>
                     <div>
@@ -258,9 +258,9 @@
                 </div>
             </div>
 
-            <div class="rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
-                <div class="mb-3 flex items-center gap-3">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400">
                         <i class="fas fa-layer-group"></i>
                     </div>
                     <div>
@@ -306,9 +306,9 @@
                 </div>
             </div>
 
-            <div class="rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
-                <div class="mb-3 flex items-center gap-3">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                         <i class="fas fa-stream"></i>
                     </div>
                     <div>
@@ -321,9 +321,9 @@
             </div>
 
             <div id="cert-style-controls" style="display:none;"
-                class="rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
-                <div class="mb-3 flex items-center gap-3">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-900/20 dark:text-fuchsia-400">
+                class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-900/20 dark:text-fuchsia-400">
                         <i class="fas fa-sliders-h"></i>
                     </div>
                     <div>
