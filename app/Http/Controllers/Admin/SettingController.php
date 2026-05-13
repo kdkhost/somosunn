@@ -732,8 +732,9 @@ class SettingController extends Controller
                 $data[$checkbox] = ((int) $value === 1) ? 1 : 0;
             }
 
-            // VALIDAÇÃO: MercadoPago ativo deve ter ao menos um método
+            // VALIDAÇÃO: cada gateway ativo deve ter ao menos um método de pagamento ativo
             $mpEnabled = (int) ($data['mercadopago_enabled'] ?? 0) === 1;
+            $sumupEnabled = (int) ($data['sumup_enabled'] ?? 0) === 1;
 
             if ($mpEnabled) {
                 $mpMethodsActive = (int) ($data['mercadopago_method_credit_card'] ?? 0)
@@ -744,23 +745,25 @@ class SettingController extends Controller
 
                 if ($mpMethodsActive === 0) {
                     if ($request->expectsJson() || $request->ajax()) {
-                        return response()->json(['message' => 'Ao menos um método de pagamento deve permanecer ativo para o MercadoPago.'], 422);
+                        return response()->json(['message' => 'Ao menos um método de pagamento deve permanecer ativo para este gateway.'], 422);
                     }
                     return redirect()->back()
-                        ->with('error', 'Ao menos um método de pagamento deve permanecer ativo para o MercadoPago.')
+                        ->with('error', 'Ao menos um método de pagamento deve permanecer ativo para este gateway.')
                         ->withInput();
                 }
             }
 
-            // SumUp: se ativo, garantir que pelo menos um método esteja ativo
-            $sumupEnabled = (int) ($data['sumup_enabled'] ?? 0) === 1;
             if ($sumupEnabled) {
                 $sumupMethodsActive = (int) ($data['sumup_method_card'] ?? 0)
                     + (int) ($data['sumup_method_pix'] ?? 0);
 
-                // Se nenhum método SumUp está marcado, ativar card por padrão
                 if ($sumupMethodsActive === 0) {
-                    $data['sumup_method_card'] = 1;
+                    if ($request->expectsJson() || $request->ajax()) {
+                        return response()->json(['message' => 'Ao menos um método de pagamento deve permanecer ativo para este gateway.'], 422);
+                    }
+                    return redirect()->back()
+                        ->with('error', 'Ao menos um método de pagamento deve permanecer ativo para este gateway.')
+                        ->withInput();
                 }
             }
 

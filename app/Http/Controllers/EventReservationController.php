@@ -128,34 +128,43 @@ class EventReservationController extends Controller
             }
 
             if (count($activeGateways) > 1) {
-                // Múltiplos gateways: verificar se o gateway foi informado
+                // Múltiplos gateways: exigir campo gateway no request
                 $selectedGateway = $request->input('gateway');
                 if (!$selectedGateway) {
-                    // Não informado: será redirecionado para seleção após criar o pedido
-                    $gatewayProvider = null;
-                    $paymentsConfigured = true; // Permitir continuar para criar o pedido
-                } elseif (!in_array($selectedGateway, $activeProviders, true)) {
+                    return response()->json([
+                        'error' => 'O campo gateway é obrigatório quando há múltiplos gateways disponíveis.',
+                    ], 422);
+                }
+
+                if (!in_array($selectedGateway, $activeProviders, true)) {
                     \Log::warning('EventReservation: gateway inválido informado pelo cliente', [
+                        'order_id' => null,
                         'event_id' => $event->id,
                         'gateway_informado' => $selectedGateway,
                         'gateways_ativos' => $activeProviders,
                     ]);
-                    return back()->with('error', 'Gateway de pagamento inválido ou não disponível para este evento.')->withInput();
-                } else {
-                    $gatewayProvider = $selectedGateway;
+                    return response()->json([
+                        'error' => 'Gateway de pagamento inválido ou não disponível para este evento.',
+                    ], 422);
                 }
+
+                $gatewayProvider = $selectedGateway;
             } else {
-                // Apenas 1 gateway: usar diretamente
+                // Apenas 1 gateway ativo: usar diretamente sem exigir o campo no request
                 $gatewayProvider = $activeGateways[0]['provider'];
-                // Se o cliente informou um gateway diferente, rejeitar
+
+                // Se o cliente informou um gateway, validar que é o ativo
                 $selectedGateway = $request->input('gateway');
                 if ($selectedGateway && !in_array($selectedGateway, $activeProviders, true)) {
                     \Log::warning('EventReservation: gateway inválido informado pelo cliente', [
+                        'order_id' => null,
                         'event_id' => $event->id,
                         'gateway_informado' => $selectedGateway,
                         'gateways_ativos' => $activeProviders,
                     ]);
-                    return response()->json(['error' => 'Gateway de pagamento inválido ou não disponível para este evento.'], 422);
+                    return response()->json([
+                        'error' => 'Gateway de pagamento inválido ou não disponível para este evento.',
+                    ], 422);
                 }
             }
 
@@ -599,28 +608,25 @@ class EventReservationController extends Controller
         }
 
         // Roteamento para o gateway correto
-        if ($gatewayProvider === null && count($activeGateways) > 1) {
-            // Múltiplos gateways e nenhum selecionado: redirecionar para página de seleção
-            return redirect()->route('events.payment.select-gateway', $order->id);
-        } elseif ($gatewayProvider === 'sumup') {
+        if ($gatewayProvider === 'sumup') {
             \Log::info('EventReservation: processando pagamento via SumUp', [
-                'order_id' => $order?->id,
+                'order_id' => $order->id,
                 'event_id' => $event->id,
                 'gateway' => 'sumup',
             ]);
             return $this->processSumUpPayment($order, $event, $gatewayConfig, $sumUpService);
         } elseif ($gatewayProvider === 'mercadopago') {
             \Log::info('EventReservation: processando pagamento via MercadoPago', [
-                'order_id' => $order?->id,
+                'order_id' => $order->id,
                 'event_id' => $event->id,
                 'gateway' => 'mercadopago',
             ]);
             return $this->processMercadoPagoPayment($order, $event, $gatewayConfig, $mpService);
         } else {
             \Log::error('Gateway desconhecido ou não configurado', [
+                'order_id' => $order->id,
                 'event_id' => $event->id,
-                'order_id' => $order?->id,
-                'gateway_provider' => $gatewayProvider,
+                'gateway' => $gatewayProvider,
             ]);
 
             return back()->with('error', 'Método de pagamento não configurado. Entre em contato com o organizador.');
@@ -629,6 +635,7 @@ class EventReservationController extends Controller
 
     /**
      * Exibe a página de seleção de gateway quando há múltiplos gateways ativos.
+     * Renderiza checkout.transparent com Gateway Selector inline.
      */
     public function selectGateway(Order $order, Request $request)
     {
@@ -661,43 +668,117 @@ class EventReservationController extends Controller
                 ->with('error', 'Nenhum gateway de pagamento disponível.');
         }
 
-        // Preparar dados dos gateways para a view
-        $gatewayOptions = [];
+        // Preparar dados para o checkout.transparent com Gateway Selector
+        $order->load('items', 'user');
+
+        // Resolver public key do Mercado Pago
+        $mpPublicKey = '';
+        $preferenceId = '';
+        $mpGatewayConfig = null;
+        $sumupGatewayConfig = null;
+
         foreach ($activeGateways as $gw) {
             if ($gw['provider'] === 'mercadopago') {
-                $methods = [];
-                if ((int) (\App\Models\Setting::get('mercadopago_method_credit_card', 1))) $methods[] = 'Cartão de Crédito';
-                if ((int) (\App\Models\Setting::get('mercadopago_method_pix', 1))) $methods[] = 'PIX';
-                if ((int) (\App\Models\Setting::get('mercadopago_method_debit_card', 0))) $methods[] = 'Débito';
-                if ((int) (\App\Models\Setting::get('mercadopago_method_ticket', 0))) $methods[] = 'Boleto';
-
-                $gatewayOptions[] = [
-                    'provider'    => 'mercadopago',
-                    'name'        => 'Mercado Pago',
-                    'icon'        => 'fas fa-handshake',
-                    'color'       => 'blue',
-                    'description' => 'Pague com ' . implode(', ', $methods),
-                    'methods'     => $methods,
-                ];
+                $mpGatewayConfig = $gw;
             } elseif ($gw['provider'] === 'sumup') {
-                $methods = [];
-                $methodCardRaw = \App\Models\Setting::get('sumup_method_card');
-                $methodPixRaw  = \App\Models\Setting::get('sumup_method_pix');
-                if ($methodCardRaw !== null ? (bool)(int)$methodCardRaw : true) $methods[] = 'Cartão de Crédito';
-                if ($methodPixRaw !== null ? (bool)(int)$methodPixRaw : true) $methods[] = 'PIX';
-
-                $gatewayOptions[] = [
-                    'provider'    => 'sumup',
-                    'name'        => 'SumUp',
-                    'icon'        => 'fas fa-credit-card',
-                    'color'       => 'slate',
-                    'description' => 'Pague com ' . implode(', ', $methods),
-                    'methods'     => $methods,
-                ];
+                $sumupGatewayConfig = $gw;
             }
         }
 
-        return view('events.payment.select-gateway', compact('order', 'event', 'gatewayOptions'));
+        // Resolver MP public key
+        if ($mpGatewayConfig) {
+            if (!empty($mpGatewayConfig['config']['mpPublicKey'])) {
+                $mpPublicKey = $mpGatewayConfig['config']['mpPublicKey'];
+            }
+            if (empty($mpPublicKey)) {
+                $platformOwnerId = \App\Models\Setting::get('platform_owner_id', 2);
+                $isPlatformOwner = $sellerId === (int) $platformOwnerId;
+                if (!$isPlatformOwner) {
+                    $sellerMpAccount = \App\Models\GatewayAccount::resolveForSeller($sellerId);
+                    $mpPublicKey = $sellerMpAccount['mpPublicKey'] ?? '';
+                }
+            }
+            if (empty($mpPublicKey)) {
+                $mpEnv = (string) \App\Models\Setting::get('mercadopago_env', 'sandbox');
+                $prefix = $mpEnv === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
+                $mpPublicKey = \App\Models\Setting::get($prefix . 'public_key')
+                    ?: config('payments.mercadopago.public_key')
+                    ?: \App\Models\Setting::get('mp_public_key', '');
+            }
+
+            // Criar preference do MP
+            try {
+                $mpService = app(\App\Services\Payment\MercadoPagoService::class);
+                $preference = $mpService->createPreference($order, [
+                    'statement_descriptor' => 'UNN EVENTOS',
+                    'back_urls' => [
+                        'success' => route('events.payment.success', $order->id),
+                        'failure' => route('events.payment.failure', $order->id),
+                        'pending' => route('events.payment.pending', $order->id),
+                    ],
+                ]);
+                $preferenceId = $preference['id'] ?? '';
+
+                $order->update([
+                    'metadata' => array_merge($order->metadata ?? [], [
+                        'mercadopago_preference_id' => $preference['id'] ?? null,
+                        'mercadopago_init_point' => $preference['init_point'] ?? null,
+                    ]),
+                ]);
+            } catch (\Throwable $e) {
+                \Log::warning('selectGateway: falha ao criar preference MP', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // Resolver dados do SumUp
+        $sumupViewData = [];
+        if ($sumupGatewayConfig) {
+            try {
+                $sumUpService = app(\App\Services\Payment\SumUpService::class);
+                $apiKey = $sumupGatewayConfig['config']['apiKey'] ?? '';
+                $merchantCode = $sumupGatewayConfig['config']['merchantCode'] ?? '';
+
+                $checkout = $sumUpService->createCheckout($order, $merchantCode);
+
+                $order->update([
+                    'metadata' => array_merge($order->metadata ?? [], [
+                        'sumup_checkout_id' => $checkout['id'] ?? null,
+                    ]),
+                ]);
+
+                $methodCardRaw = \App\Models\Setting::get('sumup_method_card');
+                $methodPixRaw  = \App\Models\Setting::get('sumup_method_pix');
+
+                $sumupViewData = [
+                    'sumupMethodCard'          => $methodCardRaw !== null ? (bool)(int)$methodCardRaw : true,
+                    'sumupMethodPix'           => $methodPixRaw !== null ? (bool)(int)$methodPixRaw : true,
+                    'sumupApiKey'              => $apiKey,
+                    'sumupMaxInstallments'     => max(1, min(12, (int) (\App\Models\Setting::get('sumup_max_installments', 12)))),
+                    'sumupNoInterestUpTo'      => max(1, min(12, (int) (\App\Models\Setting::get('sumup_installments_no_interest', 1)))),
+                    'sumupInstallmentTax'      => max(0.0, (float) (\App\Models\Setting::get('sumup_installment_tax', 0))),
+                    'sumupPassFeeToClient'     => (bool)(int)(\App\Models\Setting::get('sumup_pass_fee', 0)),
+                    'sumupInterestType'        => \App\Models\Setting::get('sumup_interest_type', 'per_installment'),
+                    'sumupPixExpirationMinutes' => (int) (\App\Models\Setting::get('sumup_pix_expiration_minutes', 10) ?: 10),
+                    'checkoutId'               => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
+                ];
+            } catch (\Throwable $e) {
+                \Log::warning('selectGateway: falha ao criar checkout SumUp', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return view('checkout.transparent', array_merge([
+            'order'          => $order->fresh('items', 'user'),
+            'preferenceId'   => $preferenceId,
+            'publicKey'      => $mpPublicKey,
+            'gateway'        => null,
+            'activeGateways' => $activeGateways,
+        ], $sumupViewData));
     }
 
     /**
@@ -1017,6 +1098,7 @@ class EventReservationController extends Controller
                 'sumupInstallmentTax'      => $installmentTax,
                 'sumupPassFeeToClient'     => $passFeeToClient,
                 'sumupInterestType'        => \App\Models\Setting::get('sumup_interest_type', 'per_installment'),
+                'sumupPixExpirationMinutes' => (int) (\App\Models\Setting::get('sumup_pix_expiration_minutes', 10) ?: 10),
             ]);
         } catch (\Throwable $e) {
             \Log::error('Falha ao iniciar pagamento SumUp de evento', [

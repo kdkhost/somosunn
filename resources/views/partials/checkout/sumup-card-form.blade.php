@@ -227,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const NO_INTEREST_UP_TO  = {{ $noInterestUpTo }};
     const INSTALLMENT_TAX    = {{ $installmentTax }};
     const PASS_FEE_TO_CLIENT = {{ $passFeeToClient ? 'true' : 'false' }};
+    const PIX_EXPIRATION_MINUTES = {{ $pixExpirationMinutes }};
 
     // Opções de parcelas pré-calculadas pelo PHP
     const INSTALLMENT_OPTIONS = @json($installmentOptions);
@@ -540,6 +541,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Timer
             if (data.expires_at) {
                 startPixTimer(data.expires_at);
+            } else {
+                // Fallback: usar o valor configurado de expiração em minutos
+                var fallbackExpiry = new Date(Date.now() + PIX_EXPIRATION_MINUTES * 60 * 1000).toISOString();
+                startPixTimer(fallbackExpiry);
             }
 
             content && content.classList.remove('hidden');
@@ -597,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function startPixPolling(checkoutId) {
         var attempts    = 0;
-        var maxAttempts = 60; // 5 minutos
+        var maxAttempts = Math.ceil(PIX_EXPIRATION_MINUTES * 60 / 5); // poll every 5s until expiration
 
         var poll = setInterval(function() {
             attempts++;

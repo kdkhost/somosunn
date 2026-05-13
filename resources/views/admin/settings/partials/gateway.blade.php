@@ -237,29 +237,29 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Juros (% a.m.) — MP</label>
+                        <label class="text-uppercase text-muted small font-weight-bold">Taxa de Juros por Parcela (%)</label>
                         <div class="input-group">
-                            <input type="number" step="0.01" name="mercadopago_installment_tax" class="form-control" value="{{ $settings['mercadopago_installment_tax'] ?? $settings['gateway_installment_tax'] ?? '0.00' }}">
+                            <input type="number" step="0.01" min="0" max="99.99" name="mercadopago_installment_tax" class="form-control" value="{{ $settings['mercadopago_installment_tax'] ?? $settings['gateway_installment_tax'] ?? '0.00' }}">
                             <div class="input-group-append"><span class="input-group-text">%</span></div>
                         </div>
                     </div>
                     <div class="col-md-4 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Máx. Parcelas — MP</label>
+                        <label class="text-uppercase text-muted small font-weight-bold">Máximo de Parcelas</label>
                         <input type="number" min="1" max="12" name="mercadopago_max_installments" class="form-control" value="{{ $settings['mercadopago_max_installments'] ?? '12' }}">
                     </div>
                     <div class="col-md-4 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Parcelas sem Juros — MP</label>
+                        <label class="text-uppercase text-muted small font-weight-bold">Parcelas sem Juros</label>
                         <input type="number" min="1" max="12" name="mercadopago_installments_no_interest" class="form-control" value="{{ $settings['mercadopago_installments_no_interest'] ?? '1' }}">
                     </div>
                     <div class="col-md-3 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Repassar taxa — MP</label>
+                        <label class="text-uppercase text-muted small font-weight-bold">Repassar taxa ao cliente</label>
                         <select name="gateway_pass_tax_to_client" class="form-control">
-                            <option value="0" {{ (int) ($settings['gateway_pass_tax_to_client'] ?? 0) === 0 ? 'selected' : '' }}>Nao - empresa absorve</option>
-                            <option value="1" {{ (int) ($settings['gateway_pass_tax_to_client'] ?? 1) === 1 ? 'selected' : '' }}>Sim - cliente paga</option>
+                            <option value="0" {{ (int) ($settings['gateway_pass_tax_to_client'] ?? 0) === 0 ? 'selected' : '' }}>Não - empresa absorve</option>
+                            <option value="1" {{ (int) ($settings['gateway_pass_tax_to_client'] ?? 0) === 1 ? 'selected' : '' }}>Sim - cliente paga</option>
                         </select>
                     </div>
                     <div class="col-md-3 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Expiração do Pix MP (min)</label>
+                        <label class="text-uppercase text-muted small font-weight-bold">Expiração do PIX (minutos)</label>
                         <div class="input-group">
                             <input type="number" name="mercadopago_pix_expiration_minutes" class="form-control" value="{{ $settings['mercadopago_pix_expiration_minutes'] ?? $settings['pix_expiration_minutes'] ?? '10' }}" min="1" max="1440">
                             <div class="input-group-append"><span class="input-group-text">min</span></div>
@@ -605,7 +605,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Expiração PIX SumUp (minutos)</label>
+                    <label class="text-uppercase text-muted small font-weight-bold">Expiração do PIX (minutos)</label>
                     <input type="number" min="1" max="1440" name="sumup_pix_expiration_minutes" class="form-control"
                         value="{{ $settings['sumup_pix_expiration_minutes'] ?? '10' }}">
                 </div>

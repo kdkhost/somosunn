@@ -2,6 +2,44 @@
 
 ---
 
+## [2026-05-13] - Multi-Gateway Checkout (spec multi-gateway-checkout)
+
+### Adicionado
+- Suporte a multiplos gateways simultaneos (Mercado Pago + SumUp) no checkout
+- Metodo `resolveAllActiveGatewaysForSeller()` em `GatewayAccount` que resolve todos os gateways ativos independentemente
+- Seletor visual de gateway no checkout quando ambos estao ativos (cards clicaveis com icones)
+- Configuracoes independentes de parcelamento por gateway (mercadopago_max_installments, mercadopago_installments_no_interest, mercadopago_installment_tax)
+- Configuracao de expiracao do PIX por gateway (mercadopago_pix_expiration_minutes, sumup_pix_expiration_minutes)
+- Validacao de metodo minimo por gateway (HTTP 422 se gateway ativo sem metodo de pagamento)
+- Clamping de valores para novas settings de parcelamento e expiracao PIX
+- Paridade de configuracoes entre painel moderno (Tailwind) e painel legado (AdminLTE)
+- Testes de integracao em `tests/Feature/MultiGateway/GatewayResolutionTest.php`
+
+### Removido
+- Logica de exclusividade entre gateways no `SettingController` (toggle e update)
+- Aviso de exclusividade de gateway nas views de configuracao (ambos os paineis)
+
+### Alterado
+- `EventReservationController`: checkout e reserve agora suportam multiplos gateways ativos
+- `CheckoutController`: PIX SumUp usa `sumup_pix_expiration_minutes` (antes hardcoded 30min)
+- `CheckoutController`: PIX Mercado Pago usa `mercadopago_pix_expiration_minutes` com fallback
+- View `checkout/transparent.blade.php`: renderiza seletor de gateway quando 2 ativos
+- View `partials/checkout/sumup-card-form.blade.php`: timer PIX usa valor configuravel
+- `resolveActiveGatewayForSeller()` marcado como `@deprecated` (usa internamente o novo metodo)
+
+### Arquivos principais afetados
+- `app/Models/GatewayAccount.php`
+- `app/Http/Controllers/Admin/SettingController.php`
+- `app/Http/Controllers/EventReservationController.php`
+- `app/Http/Controllers/CheckoutController.php`
+- `resources/views/checkout/transparent.blade.php`
+- `resources/views/partials/checkout/sumup-card-form.blade.php`
+- `resources/views/admin/settings/partials/gateway.blade.php`
+- `resources/views/panel/admin/settings/partials/gateway.blade.php`
+- `tests/Feature/MultiGateway/GatewayResolutionTest.php`
+
+---
+
 ## [2026-05-11] - Fase 1 WAF - Auditoria de Seguranca (spec waf-e-auditoria-seguranca)
 
 ### Adicionado

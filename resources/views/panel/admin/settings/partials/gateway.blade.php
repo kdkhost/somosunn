@@ -343,19 +343,19 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             <div class="gw-card">
-                <label class="gw-label">Juros Parcelas (%)</label>
-                <input type="number" step="0.01" name="mercadopago_installment_tax"
+                <label class="gw-label">Taxa de Juros por Parcela (%)</label>
+                <input type="number" min="0" max="99.99" step="0.01" name="mercadopago_installment_tax"
                     value="{{ $settings['mercadopago_installment_tax'] ?? '0.00' }}"
                     class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm">
             </div>
             <div class="gw-card">
-                <label class="gw-label">Máx. Parcelas</label>
+                <label class="gw-label">Máximo de Parcelas</label>
                 <input type="number" min="1" max="12" name="mercadopago_max_installments"
                     value="{{ $settings['mercadopago_max_installments'] ?? '12' }}"
                     class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm">
             </div>
             <div class="gw-card">
-                <label class="gw-label">Sem Juros (até)</label>
+                <label class="gw-label">Parcelas sem Juros</label>
                 <input type="number" min="1" max="12" name="mercadopago_installments_no_interest"
                     value="{{ $settings['mercadopago_installments_no_interest'] ?? '1' }}"
                     class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm">
@@ -370,7 +370,7 @@
         </div>
 
         <div class="gw-card">
-            <label class="gw-label">Expiração PIX MP (minutos)</label>
+            <label class="gw-label">Expiração do PIX (minutos)</label>
             <input type="number" min="1" max="1440" name="mercadopago_pix_expiration_minutes"
                 value="{{ $settings['mercadopago_pix_expiration_minutes'] ?? '10' }}"
                 class="gw-input max-w-xs px-4 py-3 rounded-xl font-bold text-sm">
@@ -724,7 +724,7 @@
         </div>
 
         <div class="gw-card">
-            <label class="gw-label">Expiração PIX SumUp (minutos)</label>
+            <label class="gw-label">Expiração do PIX (minutos)</label>
             <input type="number" min="1" max="1440" name="sumup_pix_expiration_minutes"
                 value="{{ $settings['sumup_pix_expiration_minutes'] ?? '10' }}"
                 class="gw-input max-w-xs px-4 py-3 rounded-xl font-bold text-sm">
