@@ -54,29 +54,50 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="description">Descricao</label>
+                                <label for="description">Descrição</label>
                                 <textarea name="description" id="description" class="form-control" rows="2" maxlength="1000">{{ old('description', $rule->description ?? '') }}</textarea>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="attack_pattern">Attack Pattern <span class="text-danger">*</span></label>
+                                        <label for="attack_pattern">Padrão de Ataque <span class="text-danger">*</span></label>
                                         <select name="attack_pattern" id="attack_pattern" class="form-control" required>
                                             <option value="">Selecione...</option>
-                                            @foreach(['sqli','xss','rfi','lfi','path_traversal','command_injection','ssrf','csrf','brute_force','rate_limit','bot_detection','custom'] as $p)
-                                                <option value="{{ $p }}" {{ old('attack_pattern', $rule->attack_pattern ?? '') === $p ? 'selected' : '' }}>{{ $p }}</option>
+                                            @php
+                                                $patterns = [
+                                                    'SQLi' => 'SQLi (Injeção SQL)',
+                                                    'XSS' => 'XSS (Cross-Site Scripting)',
+                                                    'Path_Traversal' => 'Path Traversal',
+                                                    'LFI' => 'LFI (Inclusão de Arquivo Local)',
+                                                    'RFI' => 'RFI (Inclusão de Arquivo Remoto)',
+                                                    'SSRF' => 'SSRF (Server-Side Request Forgery)',
+                                                    'XXE' => 'XXE (Entidades XML Externas)',
+                                                    'RCE' => 'RCE (Execução Remota de Código)',
+                                                    'Malicious_Upload' => 'Upload Malicioso',
+                                                    'Brute_Force' => 'Força Bruta',
+                                                    'Credential_Stuffing' => 'Credential Stuffing',
+                                                    'User_Enumeration' => 'Enumeração de Usuários',
+                                                    'Scraping' => 'Scraping',
+                                                    'Bot' => 'Bot / User-Agent Suspeito',
+                                                    'CSRF_Missing' => 'CSRF Ausente',
+                                                    'Webhook_Invalid_Signature' => 'Webhook - Assinatura Inválida',
+                                                    'Custom' => 'Personalizado',
+                                                ];
+                                            @endphp
+                                            @foreach($patterns as $value => $label)
+                                                <option value="{{ $value }}" {{ old('attack_pattern', $rule->attack_pattern ?? '') === $value ? 'selected' : '' }}>{{ $label }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="matcher_type">Matcher Type <span class="text-danger">*</span></label>
+                                        <label for="matcher_type">Tipo de Matcher <span class="text-danger">*</span></label>
                                         <select name="matcher_type" id="matcher_type" class="form-control" required>
                                             <option value="">Selecione...</option>
-                                            @foreach(['regex','list','numeric','function'] as $mt)
-                                                <option value="{{ $mt }}" {{ old('matcher_type', $rule->matcher_type ?? '') === $mt ? 'selected' : '' }}>{{ $mt }}</option>
+                                            @foreach(['regex' => 'Regex (Expressão Regular)', 'list' => 'Lista de Strings', 'numeric' => 'Numérico (Comparação)', 'function' => 'Função Pré-definida'] as $val => $label)
+                                                <option value="{{ $val }}" {{ old('matcher_type', $rule->matcher_type ?? '') === $val ? 'selected' : '' }}>{{ $label }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -84,10 +105,10 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="matcher_payload">Matcher Payload (JSON) <span class="text-danger">*</span></label>
+                                <label for="matcher_payload">Payload do Matcher (JSON) <span class="text-danger">*</span></label>
                                 <textarea name="matcher_payload" id="matcher_payload" class="form-control" rows="5" required
-                                          placeholder='{"pattern": "(?i)(union\\s+select|insert\\s+into)", "flags": "i"}'>{{ old('matcher_payload', $rule ? json_encode($rule->matcher_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : '') }}</textarea>
-                                <small class="text-muted">Objeto JSON com a configuracao do matcher.</small>
+                                          placeholder='{"pattern": "union\\s+(all\\s+)?select", "flags": "i", "target": "all"}'>{{ old('matcher_payload', $rule ? json_encode($rule->matcher_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : '') }}</textarea>
+                                <small class="text-muted">Objeto JSON com a configuração do matcher.</small>
                             </div>
 
                             <div class="row">
@@ -101,9 +122,9 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="action">Acao <span class="text-danger">*</span></label>
+                                        <label for="action">Ação <span class="text-danger">*</span></label>
                                         <select name="action" id="action" class="form-control" required>
-                                            @foreach(['monitor' => 'Monitor', 'challenge' => 'Challenge', 'block' => 'Block'] as $val => $label)
+                                            @foreach(['monitor' => 'Monitorar', 'challenge' => 'Desafiar', 'block' => 'Bloquear'] as $val => $label)
                                                 <option value="{{ $val }}" {{ old('action', $rule->action ?? '') === $val ? 'selected' : '' }}>{{ $label }}</option>
                                             @endforeach
                                         </select>
@@ -113,7 +134,7 @@
                                     <div class="form-group">
                                         <label for="severity">Severidade <span class="text-danger">*</span></label>
                                         <select name="severity" id="severity" class="form-control" required>
-                                            @foreach(['info' => 'Info', 'low' => 'Low', 'medium' => 'Medium', 'high' => 'High', 'critical' => 'Critical'] as $val => $label)
+                                            @foreach(['info' => 'Informativa', 'low' => 'Baixa', 'medium' => 'Média', 'high' => 'Alta', 'critical' => 'Crítica'] as $val => $label)
                                                 <option value="{{ $val }}" {{ old('severity', $rule->severity ?? '') === $val ? 'selected' : '' }}>{{ $label }}</option>
                                             @endforeach
                                         </select>
@@ -132,7 +153,7 @@
                         </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> {{ $rule ? 'Atualizar' : 'Criar' }} Regra
+                                <i class="fas fa-save"></i> {{ $rule ? 'Atualizar Regra' : 'Criar Regra' }}
                             </button>
                         </div>
                     </div>
@@ -147,7 +168,7 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Payload de Teste</label>
-                                <textarea id="test-sample" class="form-control" rows="3" placeholder="Insira um payload para testar..."></textarea>
+                                <textarea id="test-sample" class="form-control" rows="3" placeholder="Digite um payload para testar..."></textarea>
                             </div>
                             <button type="button" id="btn-test-rule" class="btn btn-sm btn-outline-primary btn-block">
                                 <i class="fas fa-play"></i> Testar
@@ -173,7 +194,12 @@ $(function() {
         var sample = $('#test-sample').val();
 
         if (!matcherType || !matcherPayload || !sample) {
-            alert('Preencha matcher_type, matcher_payload e o payload de teste.');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos obrigatórios',
+                text: 'Preencha o tipo de matcher, o payload JSON e o texto de teste.',
+                confirmButtonColor: '#1F5EDB'
+            });
             return;
         }
 
@@ -192,8 +218,7 @@ $(function() {
             }
         }).fail(function(xhr) {
             var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Erro ao testar.';
-            $('#test-result').show();
-            $('#test-alert').attr('class', 'alert alert-warning').text(msg);
+            Swal.fire({ icon: 'error', title: 'Erro', text: msg, confirmButtonColor: '#1F5EDB' });
         });
     });
 });
