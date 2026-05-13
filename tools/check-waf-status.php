@@ -46,6 +46,9 @@ try {
             echo "waf.enabled no banco: " . ($row ? json_encode($row->value) : 'NAO ENCONTRADO') . PHP_EOL;
         }
     } else {
+        echo "Fail policy: " . $settings->failPolicy . PHP_EOL;
+        echo "isFailOpen: " . ($settings->isFailOpen() ? 'SIM' : 'NAO') . PHP_EOL;
+
         $engine = App\Services\Waf\WafEngine::make($settings);
         $decision = $engine->inspect($request);
         echo "Decisao: {$decision->decision}" . PHP_EOL;
@@ -61,4 +64,5 @@ try {
 } catch (\Throwable $e) {
     echo "ERRO: " . $e->getMessage() . PHP_EOL;
     echo "Arquivo: " . $e->getFile() . ":" . $e->getLine() . PHP_EOL;
+    echo "Trace: " . $e->getTraceAsString() . PHP_EOL;
 }
