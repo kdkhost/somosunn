@@ -173,6 +173,35 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar atualização de lotes de eventos: ' . $e->getMessage());
         }
 
+        // WAF: verifica picos de bloqueios e dispara alertas
+        try {
+            $schedule->command('waf:check-spike')
+                ->everyFiveMinutes()
+                ->withoutOverlapping()
+                ->name('waf-check-spike');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar verificacao de picos WAF: ' . $e->getMessage());
+        }
+
+        // WAF: limpa eventos expirados e IPs expirados (diario)
+        try {
+            $schedule->command('waf:purge-events')
+                ->dailyAt('04:00')
+                ->withoutOverlapping()
+                ->name('waf-purge-events');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar purge de eventos WAF: ' . $e->getMessage());
+        }
+
+        try {
+            $schedule->command('waf:purge-ips')
+                ->dailyAt('04:15')
+                ->withoutOverlapping()
+                ->name('waf-purge-ips');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar purge de IPs WAF: ' . $e->getMessage());
+        }
+
         // Envia emails de carrinho abandonado (marketplace)
         try {
             $schedule->command('abandoned-cart:send')

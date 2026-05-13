@@ -163,6 +163,42 @@ final class WafEngine
                 }
             }
 
+            // Disparar alertas para eventos criticos
+            if ($decision->isBlocked() && $score >= 80) {
+                $this->fireAlert('critical_finding', [
+                    'attack_pattern' => $this->describeReasons($matches),
+                    'ip'             => $ctx->ip,
+                    'route'          => $ctx->routeName ?? $ctx->path,
+                    'risk_score'     => $score,
+                    'timestamp'      => now()->format('d/m/Y H:i:s'),
+                    'country'        => $ctx->country ?? 'Desconhecido',
+                ]);
+            }
+
+            // Auto-bloqueio de IP por acumulo
+            if ($decision->isBlocked() || $decision->isChallenged()) {
+                $autoBlockCfg = $this->settings->autoBlock;
+                if (! empty($autoBlockCfg['enabled'])) {
+                    $entry = $this->ipLists->autoBlock(
+                        $ctx->ip,
+                        (int) ($autoBlockCfg['window_minutes'] ?? 15),
+                        (int) ($autoBlockCfg['threshold'] ?? 100),
+                        (int) ($autoBlockCfg['duration_hours'] ?? 24)
+                    );
+
+                    if ($entry) {
+                        $this->fireAlert('auto_block', [
+                            'ip'          => $ctx->ip,
+                            'event_count' => $autoBlockCfg['threshold'] ?? 100,
+                            'window'      => $autoBlockCfg['window_minutes'] ?? 15,
+                            'duration'    => $autoBlockCfg['duration_hours'] ?? 24,
+                            'country'     => $ctx->country ?? 'Desconhecido',
+                            'timestamp'   => now()->format('d/m/Y H:i:s'),
+                        ]);
+                    }
+                }
+            }
+
             return $decision;
         } catch (\Throwable $e) {
             return $this->handleFailure($e, $request);
@@ -296,6 +332,20 @@ final class WafEngine
         }
 
         return implode(',', array_unique($patterns));
+    }
+
+    /**
+     * Dispara alerta do WAF de forma assíncrona (não bloqueia a requisição).
+     */
+    private function fireAlert(string $trigger, array $data): void
+    {
+        try {
+            $alertService = new WafAlertService();
+            $alertService->fire($trigger, $data);
+        } catch (\Throwable $e) {
+            // Nunca bloqueia a requisição por falha no alerta
+            Log::channel('waf')->warning('Falha ao disparar alerta WAF: ' . $e->getMessage());
+        }
     }
 
     private function handleFailure(\Throwable $e, Request $request): WafDecision
