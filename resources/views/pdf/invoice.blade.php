@@ -1,11 +1,41 @@
 @php
     $company = $company ?? [];
-    $primaryColor = $company['primary_color'] ?? '#1F5EDB';
-    $invoice->loadMissing(['items', 'user', 'order']);
+    $primaryColor = $company['invoice_primary_color'] ?? ($company['primary_color'] ?? '#1F5EDB');
+    $secondaryColor = $company['invoice_secondary_color'] ?? '#177FD6';
+    $textColor = $company['invoice_text_color'] ?? '#1f2937';
+    $bgColor = $company['invoice_bg_color'] ?? '#f9fafb';
+    $logoPosition = $company['invoice_logo_position'] ?? 'left';
+    $logoMaxHeight = $company['invoice_logo_max_height'] ?? 60;
+    $fontFamily = $company['invoice_font_family'] ?? 'DejaVu Sans';
+    $showAddress = $company['invoice_show_company_address'] ?? true;
+    $showPhone = $company['invoice_show_company_phone'] ?? true;
+    $showEmail = $company['invoice_show_company_email'] ?? true;
+    $showDueDate = $company['invoice_show_due_date'] ?? true;
+    $showStatusBadge = $company['invoice_show_status_badge'] ?? true;
+    $showNotes = $company['invoice_show_notes'] ?? true;
+    $showFooter = $company['invoice_show_footer'] ?? true;
+    $footerText = $company['invoice_footer_text'] ?? 'Obrigado pela sua preferência!';
+    $headerText = $company['invoice_header_text'] ?? 'FATURA';
+    $customCss = $company['invoice_custom_css'] ?? '';
 
-    $number = $invoice->number ?: ('#' . $invoice->id);
-    $issuedAt = $invoice->issued_at ? $invoice->issued_at->format('d/m/Y') : now()->format('d/m/Y');
-    $dueAt = $invoice->due_at ? $invoice->due_at->format('d/m/Y') : null;
+    // Suporte a objeto fake (preview) e Model real
+    if (is_object($invoice) && !($invoice instanceof \App\Models\Invoice)) {
+        $invoice = (object) (array) $invoice;
+        $items = $invoice->items ?? collect();
+        $user = $invoice->user ?? null;
+    } else {
+        $invoice->loadMissing(['items', 'user', 'order']);
+        $items = $invoice->items;
+        $user = $invoice->user;
+    }
+
+    $number = $invoice->number ?? ('#' . ($invoice->id ?? '0'));
+    $issuedAt = isset($invoice->issued_at) && $invoice->issued_at
+        ? (is_string($invoice->issued_at) ? $invoice->issued_at : $invoice->issued_at->format('d/m/Y'))
+        : now()->format('d/m/Y');
+    $dueAt = isset($invoice->due_at) && $invoice->due_at
+        ? (is_string($invoice->due_at) ? $invoice->due_at : $invoice->due_at->format('d/m/Y'))
+        : null;
     $status = (string) ($invoice->status ?? 'issued');
 
     $fmtMoney = function ($v) {
@@ -20,20 +50,20 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Fatura {{ $number }}</title>
+    <title>{{ $headerText }} {{ $number }}</title>
     <style>
         @page {
             margin: 0;
         }
 
         * {
-            font-family: DejaVu Sans, Arial, Helvetica, sans-serif;
+            font-family: {{ $fontFamily }}, Arial, Helvetica, sans-serif;
             box-sizing: border-box;
         }
 
         body {
             font-size: 13px;
-            color: #1f2937;
+            color: {{ $textColor }};
             margin: 0;
             padding: 0;
             line-height: 1.5;
@@ -41,11 +71,9 @@
         }
 
         .header {
-            background: #f9fafb;
+            background: {{ $bgColor }};
             padding: 40px 50px;
-            border-bottom: 2px solid
-                {{ $primaryColor }}
-            ;
+            border-bottom: 2px solid {{ $primaryColor }};
         }
 
         .header-content {
@@ -56,25 +84,41 @@
         .header-left {
             display: table-cell;
             vertical-align: middle;
+            @if($logoPosition === 'center')
+                text-align: center;
+                width: 100%;
+            @elseif($logoPosition === 'right')
+                text-align: right;
+            @else
+                text-align: left;
+            @endif
         }
 
         .header-right {
             display: table-cell;
             vertical-align: middle;
             text-align: right;
+            @if($logoPosition === 'center')
+                display: none;
+            @endif
         }
 
+        @if($logoPosition === 'center')
+        .header-title-center {
+            text-align: center;
+            margin-top: 15px;
+        }
+        @endif
+
         .logo {
-            max-height: 60px;
+            max-height: {{ $logoMaxHeight }}px;
             max-width: 200px;
         }
 
         .invoice-title {
             font-size: 28px;
             font-weight: 800;
-            color:
-                {{ $primaryColor }}
-            ;
+            color: {{ $primaryColor }};
             margin: 0;
             letter-spacing: -1px;
         }
@@ -159,7 +203,7 @@
         }
 
         th {
-            background: #f9fafb;
+            background: {{ $bgColor }};
             padding: 12px 15px;
             text-align: left;
             font-size: 11px;
@@ -246,9 +290,7 @@
         }
 
         .grand-total .total-value {
-            color:
-                {{ $primaryColor }}
-            ;
+            color: {{ $primaryColor }};
             font-weight: 800;
             font-size: 20px;
             vertical-align: middle;
@@ -257,7 +299,7 @@
 
         .notes-content {
             padding: 15px;
-            background: #f9fafb;
+            background: {{ $bgColor }};
             border-radius: 8px;
             font-size: 12px;
             color: #4b5563;
@@ -275,6 +317,11 @@
             font-size: 11px;
             text-align: center;
         }
+
+        @if(!empty($customCss))
+        /* CSS Customizado */
+        {!! $customCss !!}
+        @endif
     </style>
 </head>
 
@@ -290,11 +337,19 @@
                     </div>
                 @endif
             </div>
+            @if($logoPosition !== 'center')
             <div class="header-right">
-                <h1 class="invoice-title">FATURA</h1>
+                <h1 class="invoice-title">{{ $headerText }}</h1>
                 <div class="invoice-number">{{ $number }}</div>
             </div>
+            @endif
         </div>
+        @if($logoPosition === 'center')
+        <div class="header-title-center">
+            <h1 class="invoice-title">{{ $headerText }}</h1>
+            <div class="invoice-number">{{ $number }}</div>
+        </div>
+        @endif
     </div>
 
     <div class="content">
@@ -302,26 +357,30 @@
             <div class="info-col">
                 <div class="info-label">Emitente</div>
                 <div class="info-value" style="font-weight: 700;">{{ $company['name'] }}</div>
-                @if(!empty($company['address']))
+                @if($showAddress && !empty($company['address']))
                     <div class="info-sub">{{ $company['address'] }}</div>
                 @endif
-                @if(!empty($company['phone']))
+                @if($showPhone && !empty($company['phone']))
                     <div class="info-sub">{{ $company['phone'] }}</div>
+                @endif
+                @if($showEmail && !empty($company['email']))
+                    <div class="info-sub">{{ $company['email'] }}</div>
                 @endif
             </div>
             <div class="info-col">
                 <div class="info-label">Cliente</div>
-                <div class="info-value" style="font-weight: 700;">{{ $invoice->user->name ?? 'N/A' }}</div>
-                @if(!empty($invoice->user->email))
-                    <div class="info-sub">{{ $invoice->user->email }}</div>
+                <div class="info-value" style="font-weight: 700;">{{ $user->name ?? 'N/A' }}</div>
+                @if(!empty($user->email))
+                    <div class="info-sub">{{ $user->email }}</div>
                 @endif
             </div>
             <div class="info-col" style="text-align: right;">
                 <div class="info-label">Detalhes</div>
                 <div class="info-value"><span style="color: #9ca3af;">Data:</span> {{ $issuedAt }}</div>
-                @if($dueAt)
+                @if($showDueDate && $dueAt)
                     <div class="info-value"><span style="color: #9ca3af;">Vencimento:</span> {{ $dueAt }}</div>
                 @endif
+                @if($showStatusBadge)
                 <div style="margin-top: 12px;">
                     @php
                         $statusClass = $status === 'paid' ? 'status-paid' : ($status === 'cancelled' ? 'status-cancelled' : 'status-issued');
@@ -329,6 +388,7 @@
                     @endphp
                     <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -343,7 +403,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($invoice->items->sortBy('sort_order') as $item)
+                    @foreach($items->sortBy('sort_order') as $item)
                         <tr>
                             <td>
                                 <div class="item-desc">{{ $item->description }}</div>
@@ -363,7 +423,7 @@
 
         <div class="summary-container">
             <div class="summary-notes">
-                @if(!empty($invoice->notes))
+                @if($showNotes && !empty($invoice->notes))
                     <div class="info-label" style="margin-bottom: 10px;">Observações</div>
                     <div class="notes-content">
                         {!! nl2br(e($invoice->notes)) !!}
@@ -389,10 +449,12 @@
         </div>
     </div>
 
+    @if($showFooter)
     <div class="footer">
-        Obrigado pela sua preferência!<br>
-        {{ $company['site'] }} • {{ $company['email'] }}
+        {{ $footerText }}<br>
+        {{ $company['site'] }} &bull; {{ $company['email'] }}
     </div>
+    @endif
 </body>
 
 </html>

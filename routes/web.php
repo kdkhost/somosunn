@@ -754,6 +754,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
     Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
     Route::resource('magazines', \App\Http\Controllers\Admin\MagazineController::class)->except(['show']);
+    Route::get('invoices/editor', [\App\Http\Controllers\Admin\InvoiceEditorController::class, 'index'])->name('invoices.editor');
+    Route::post('invoices/editor/save', [\App\Http\Controllers\Admin\InvoiceEditorController::class, 'save'])->name('invoices.editor.save');
+    Route::get('invoices/editor/preview', [\App\Http\Controllers\Admin\InvoiceEditorController::class, 'preview'])->name('invoices.editor.preview');
+    Route::post('invoices/editor/reset', [\App\Http\Controllers\Admin\InvoiceEditorController::class, 'resetDefaults'])->name('invoices.editor.reset');
     Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'pdf'])->name('invoices.pdf');
     Route::post('invoices/{invoice}/send', [\App\Http\Controllers\Admin\InvoiceController::class, 'send'])->name('invoices.send');
     Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class);

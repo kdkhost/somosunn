@@ -194,15 +194,17 @@ class InvoiceService
     {
         $invoice->loadMissing(['user', 'items', 'order']);
 
+        $company = $this->companyInfo();
+
         $html = view('pdf.invoice', [
             'invoice' => $invoice,
-            'company' => $this->companyInfo(),
+            'company' => $company,
         ])->render();
 
         $options = new Options();
         $options->set('isRemoteEnabled', true);
         $options->set('isHtml5ParserEnabled', true);
-        $options->set('defaultFont', 'DejaVu Sans');
+        $options->set('defaultFont', $company['invoice_font_family'] ?? 'DejaVu Sans');
 
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html, 'UTF-8');
@@ -229,7 +231,25 @@ class InvoiceService
             'site' => url('/'),
             'logo' => $this->resolveLogoBase64(),
             'logo_url' => $this->resolveLogoUrl(),
-            'primary_color' => (string) (Setting::get('site_color_primary') ?: '#1F5EDB'),
+            'primary_color' => (string) (Setting::get('invoice_primary_color') ?: Setting::get('site_color_primary') ?: '#1F5EDB'),
+            // Configurações do editor de faturas
+            'invoice_primary_color' => (string) (Setting::get('invoice_primary_color') ?: '#1F5EDB'),
+            'invoice_secondary_color' => (string) (Setting::get('invoice_secondary_color') ?: '#177FD6'),
+            'invoice_text_color' => (string) (Setting::get('invoice_text_color') ?: '#1f2937'),
+            'invoice_bg_color' => (string) (Setting::get('invoice_bg_color') ?: '#f9fafb'),
+            'invoice_logo_position' => (string) (Setting::get('invoice_logo_position') ?: 'left'),
+            'invoice_logo_max_height' => (int) (Setting::get('invoice_logo_max_height') ?: 60),
+            'invoice_font_family' => (string) (Setting::get('invoice_font_family') ?: 'DejaVu Sans'),
+            'invoice_show_company_address' => (bool) (int) (Setting::get('invoice_show_company_address') ?? '1'),
+            'invoice_show_company_phone' => (bool) (int) (Setting::get('invoice_show_company_phone') ?? '1'),
+            'invoice_show_company_email' => (bool) (int) (Setting::get('invoice_show_company_email') ?? '1'),
+            'invoice_show_due_date' => (bool) (int) (Setting::get('invoice_show_due_date') ?? '1'),
+            'invoice_show_status_badge' => (bool) (int) (Setting::get('invoice_show_status_badge') ?? '1'),
+            'invoice_show_notes' => (bool) (int) (Setting::get('invoice_show_notes') ?? '1'),
+            'invoice_show_footer' => (bool) (int) (Setting::get('invoice_show_footer') ?? '1'),
+            'invoice_footer_text' => (string) (Setting::get('invoice_footer_text') ?: 'Obrigado pela sua preferência!'),
+            'invoice_header_text' => (string) (Setting::get('invoice_header_text') ?: 'FATURA'),
+            'invoice_custom_css' => (string) (Setting::get('invoice_custom_css') ?: ''),
         ];
     }
 

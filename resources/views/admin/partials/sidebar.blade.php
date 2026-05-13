@@ -314,6 +314,7 @@
                             'admin.plans.*',
                             'admin.orders.*',
                             'admin.invoices.*',
+                            'admin.invoices.editor*',
                             'admin.coupons.*',
                             'admin.redemptions.*',
                             'admin.referrals.*',
@@ -368,6 +369,13 @@
                                     class="nav-link {{ $is('admin.invoices.*') }}">
                                     <i class="fas fa-file-invoice nav-icon"></i>
                                     <p>Faturas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.invoices.editor') }}"
+                                    class="nav-link {{ $is('admin.invoices.editor*') }}">
+                                    <i class="fas fa-paint-brush nav-icon"></i>
+                                    <p>Editor de Faturas</p>
                                 </a>
                             </li>
                             <li class="nav-item">
