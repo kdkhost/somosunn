@@ -75,7 +75,7 @@ final class WafContext
             body:      $body,
             cookies:   array_map(fn ($v) => is_array($v) ? implode(',', $v) : (string) $v, $request->cookies->all()),
             userId:    $user?->id,
-            userRole:  method_exists($user, 'role_name') ? null : (string) ($user->role ?? null),
+            userRole:  $user ? (string) ($user->role ?? null) : null,
             userAgent: (string) $request->userAgent(),
             referrer:  $request->headers->get('referer'),
             country:   null,
