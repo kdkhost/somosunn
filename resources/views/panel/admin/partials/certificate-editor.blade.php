@@ -105,9 +105,9 @@
     {{-- ═══════════════════════════════════════════════════════════════
          CONTROLES — Organizados em grid abaixo do canvas
          ═══════════════════════════════════════════════════════════════ --}}
-    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
-                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-5 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-700/50">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
                         <i class="fas fa-image"></i>
                     </div>
@@ -117,7 +117,7 @@
                     </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-4">
                     <div>
                         <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">{{ $backgroundLabel }}</label>
                         <label class="group flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-4 text-xs font-bold text-slate-500 transition-all hover:border-blue-300 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 dark:hover:border-blue-900 dark:hover:text-blue-400">
@@ -164,8 +164,8 @@
                 </div>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
-                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-5 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-700/50">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400">
                         <i class="fas fa-pen-fancy"></i>
                     </div>
@@ -175,7 +175,7 @@
                     </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-4">
                     <div>
                         <label for="certificate_title" class="mb-2 block text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Titulo do certificado</label>
                         <input type="text" name="certificate_title" id="certificate_title" value="{{ $titleInput }}"
@@ -198,8 +198,8 @@
                 </div>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
-                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-5 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-700/50">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400">
                         <i class="fas fa-ruler-combined"></i>
                     </div>
@@ -209,7 +209,7 @@
                     </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-4">
                     <label class="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 dark:border-slate-800 dark:bg-slate-950">
                         <span class="text-sm font-bold text-slate-700 dark:text-slate-200">Mostrar grade</span>
                         <input type="checkbox" id="cert-grid-enabled" class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900">
@@ -258,8 +258,8 @@
                 </div>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
-                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-5 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-700/50">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400">
                         <i class="fas fa-layer-group"></i>
                     </div>
@@ -269,7 +269,7 @@
                     </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-4">
                     @foreach($tagLabels as $tag => $label)
                         @php $toggleId = 'toggle-' . str_replace('_', '-', $tag); @endphp
                         <label
@@ -306,8 +306,8 @@
                 </div>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
-                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-5 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-700/50">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                         <i class="fas fa-stream"></i>
                     </div>
@@ -321,8 +321,8 @@
             </div>
 
             <div id="cert-style-controls" style="display:none;"
-                class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
-                <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-700/50">
+                class="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/50 transition-all hover:shadow-xl dark:border-slate-700/50 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 dark:shadow-none">
+                <div class="mb-5 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-700/50">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-900/20 dark:text-fuchsia-400">
                         <i class="fas fa-sliders-h"></i>
                     </div>
@@ -335,7 +335,7 @@
                     </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label for="style-x" class="mb-2 block text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">X (%)</label>
