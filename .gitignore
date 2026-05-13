@@ -51,3 +51,6 @@ IMPLEMENTATION_PLAN.md
 INSTRUCOES-CORRECAO-MIGRACAO.md
 SUMUP_IMPLEMENTATION.md
 .github/copilot-instructions.md
+
+# Graphify knowledge graph (local, muito grande para git)
+graphify-out/
