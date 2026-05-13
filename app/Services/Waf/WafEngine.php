@@ -81,12 +81,18 @@ final class WafEngine
                 }
             }
 
-            // 1c. Rotas admin isentas para superadmin autenticado
-            if (str_starts_with($path, '/admin/') || str_starts_with($path, '/painel/admin/')) {
+            // 1c. Rotas admin isentas para superadmin/admin autenticado
+            if (str_starts_with($path, '/admin/') || str_starts_with($path, '/painel/admin/') || str_starts_with($path, '/admin')) {
                 $user = $request->user();
-                if ($user && method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
-                    return WafDecision::allowed('admin_superadmin_exempt');
+                if ($user && method_exists($user, 'isAdmin') && $user->isAdmin()) {
+                    return WafDecision::allowed('admin_exempt');
                 }
+            }
+
+            // 1d. Qualquer requisição de superadmin ou admin nunca é bloqueada pelo WAF
+            $authUser = $request->user();
+            if ($authUser && method_exists($authUser, 'isAdmin') && $authUser->isAdmin()) {
+                return WafDecision::allowed('authenticated_admin_exempt');
             }
 
             $ctx = WafContext::fromRequest($request);
