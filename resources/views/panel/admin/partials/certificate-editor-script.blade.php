@@ -10,7 +10,6 @@
     $signatureUrl = $entity && $entity->instructor_signature ? \App\Support\UploadStorage::url($entity->instructor_signature) : '';
 @endphp
 
-<script>
     $(document).ready(function () {
         const formId = @json($formId);
         const $form = $('#' + formId);
@@ -707,4 +706,3 @@
             };
         }
     });
-</script>
