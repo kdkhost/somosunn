@@ -46,7 +46,6 @@ class InvoiceEditorController extends Controller
             if ($value === null || $value === '') {
                 $settings[$key] = $default;
             } else {
-                // Converter booleans armazenados como string
                 if (is_string($value) && in_array($value, ['0', '1'], true)) {
                     $settings[$key] = (bool) (int) $value;
                 } else {
@@ -55,7 +54,6 @@ class InvoiceEditorController extends Controller
             }
         }
 
-        // Dados da empresa para a aba "Dados"
         $companyData = [
             'company_name' => (string) (Setting::get('company_name') ?: ''),
             'company_cnpj' => (string) (Setting::get('company_cnpj') ?: ''),
@@ -69,7 +67,13 @@ class InvoiceEditorController extends Controller
             'company_email' => (string) (Setting::get('company_email') ?: ''),
         ];
 
-        return view('admin.invoices.editor', compact('settings', 'companyData'));
+        // Detectar qual painel está sendo usado (novo Tailwind ou antigo AdminLTE)
+        $routePrefix = request()->route()?->getPrefix() ?? '';
+        $view = str_contains($routePrefix, 'painel')
+            ? 'panel.admin.invoices.editor'
+            : 'admin.invoices.editor';
+
+        return view($view, compact('settings', 'companyData'));
     }
 
     /**
