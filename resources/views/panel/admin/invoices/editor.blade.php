@@ -2,25 +2,32 @@
 
 @section('title', 'Editor de Faturas')
 
-@section('content')
-<div class="max-w-7xl mx-auto px-4 py-8">
+@section('panel_breadcrumb')
+    <a href="{{ route('panel.admin.invoices.index') }}" class="hover:underline">Faturas</a>
+    <span class="mx-1">/</span>
+    <span>Editor Visual</span>
+@endsection
+
+@section('panel_content')
+<div class="space-y-6">
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                <i class="fas fa-paint-brush text-blue-600 mr-2"></i>Editor Visual de Faturas
-            </h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <h2 class="text-2xl font-black text-slate-800 dark:text-white transition-colors">
+                Editor Visual de Faturas
+            </h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm transition-colors">
                 Personalize cores, logo, layout e dados impressos nas faturas dos clientes.
             </p>
         </div>
         <div class="flex gap-3">
             <button type="button" id="btn-refresh-preview"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-xl transition-all">
+                class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-2xl transition-all">
                 <i class="fas fa-sync-alt"></i> Atualizar Preview
             </button>
             <button type="button" id="btn-save"
-                class="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-blue-600/20">
+                class="inline-flex items-center gap-2 px-5 py-2.5 text-white text-sm font-bold rounded-2xl transition-all shadow-lg"
+                style="background: linear-gradient(135deg, #1F5EDB 0%, #177FD6 100%); box-shadow: 0 8px 20px rgba(31,94,219,0.3);">
                 <i class="fas fa-save"></i> Salvar Configurações
             </button>
         </div>
@@ -29,7 +36,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {{-- Painel de Configurações --}}
         <div class="lg:col-span-1">
-            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden">
                 {{-- Abas --}}
                 <div class="flex border-b border-slate-100 dark:border-slate-800 overflow-x-auto">
                     <button class="editor-tab active flex-1 px-3 py-3 text-xs font-bold text-center transition-all" data-tab="cores">
@@ -79,7 +86,7 @@
                                 <label class="relative cursor-pointer">
                                     <input type="radio" name="invoice_logo_position" value="{{ $val }}" class="invoice-setting sr-only peer"
                                         {{ $settings['invoice_logo_position'] === $val ? 'checked' : '' }}>
-                                    <div class="p-3 text-center rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/20 transition-all">
+                                    <div class="p-3 text-center rounded-2xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/20 transition-all">
                                         <i class="fas fa-align-{{ $val === 'center' ? 'center' : ($val === 'right' ? 'right' : 'left') }} text-lg mb-1"></i>
                                         <p class="text-xs font-bold">{{ $label }}</p>
                                     </div>
@@ -100,7 +107,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 text-xs text-blue-700 dark:text-blue-300">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-3 text-xs text-blue-700 dark:text-blue-300">
                             <i class="fas fa-info-circle mr-1"></i>O logo utilizado é o configurado nas Configurações Globais.
                         </div>
                     </div>
@@ -134,21 +141,21 @@
 
                         <div class="mb-4">
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Cabeçalho</label>
-                            <input type="text" class="invoice-setting w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
+                            <input type="text" class="invoice-setting w-full px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
                                 id="invoice_header_text" name="invoice_header_text" value="{{ $settings['invoice_header_text'] }}"
                                 placeholder="FATURA, NOTA FISCAL, RECIBO...">
                         </div>
 
                         <div class="mb-4">
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Rodapé</label>
-                            <textarea class="invoice-setting w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm" rows="2"
+                            <textarea class="invoice-setting w-full px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm" rows="2"
                                 id="invoice_footer_text" name="invoice_footer_text"
                                 placeholder="Obrigado pela sua preferência!">{{ $settings['invoice_footer_text'] }}</textarea>
                         </div>
 
                         <div class="mb-4">
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Fonte</label>
-                            <select class="invoice-setting w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
+                            <select class="invoice-setting w-full px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
                                 id="invoice_font_family" name="invoice_font_family">
                                 <option value="DejaVu Sans" {{ $settings['invoice_font_family'] === 'DejaVu Sans' ? 'selected' : '' }}>DejaVu Sans</option>
                                 <option value="Helvetica" {{ $settings['invoice_font_family'] === 'Helvetica' ? 'selected' : '' }}>Helvetica</option>
@@ -159,7 +166,7 @@
 
                     {{-- Aba Dados --}}
                     <div class="editor-panel hidden" id="panel-dados">
-                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-xs text-amber-700 dark:text-amber-300 mb-4">
+                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-3 text-xs text-amber-700 dark:text-amber-300 mb-4">
                             <i class="fas fa-exclamation-triangle mr-1"></i>Alterações aqui afetam todo o sistema.
                         </div>
 
@@ -172,13 +179,13 @@
                         ] as [$key, $label])
                         <div class="mb-3">
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">{{ $label }}</label>
-                            <input type="text" class="company-field w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
+                            <input type="text" class="company-field w-full px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
                                 id="{{ $key }}" value="{{ $companyData[$key] ?? '' }}">
                         </div>
                         @endforeach
 
                         <button type="button" id="btn-save-company"
-                            class="w-full mt-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all">
+                            class="w-full mt-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-2xl transition-all">
                             <i class="fas fa-save mr-1"></i> Salvar Dados da Empresa
                         </button>
                     </div>
@@ -187,13 +194,13 @@
                     <div class="editor-panel hidden" id="panel-avancado">
                         <div class="mb-4">
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">CSS Customizado</label>
-                            <textarea class="invoice-setting w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-mono" rows="10"
+                            <textarea class="invoice-setting w-full px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-mono" rows="10"
                                 id="invoice_custom_css" name="invoice_custom_css"
                                 placeholder="/* CSS personalizado */">{{ $settings['invoice_custom_css'] }}</textarea>
                         </div>
 
                         <button type="button" id="btn-reset-defaults"
-                            class="w-full py-2 border-2 border-red-300 text-red-600 hover:bg-red-50 text-sm font-bold rounded-xl transition-all">
+                            class="w-full py-2 border-2 border-red-300 text-red-600 hover:bg-red-50 text-sm font-bold rounded-2xl transition-all">
                             <i class="fas fa-undo mr-1"></i> Restaurar Padrões
                         </button>
                     </div>
@@ -203,7 +210,7 @@
 
         {{-- Preview --}}
         <div class="lg:col-span-2">
-            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden">
                 <div class="flex items-center justify-between px-5 py-3 border-b border-slate-100 dark:border-slate-800">
                     <span class="text-sm font-bold text-slate-700 dark:text-slate-300">
                         <i class="fas fa-eye mr-1"></i> Preview da Fatura
