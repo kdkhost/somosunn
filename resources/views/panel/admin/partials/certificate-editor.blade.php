@@ -16,52 +16,68 @@
     $signatureUrl = $entity && $entity->instructor_signature ? \App\Support\UploadStorage::url($entity->instructor_signature) : null;
 @endphp
 
-<div id="certificate-editor-root" class="space-y-6">
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+<div id="certificate-editor-root" class="space-y-8">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-            <h3 class="text-xl font-black text-slate-800 dark:text-white transition-colors">Editor de Certificado</h3>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
-                Arraste os elementos para posicionar no certificado. Use a grade e o snap para alinhar.
+            <h3 class="text-2xl font-black text-slate-800 dark:text-white transition-colors">Editor de Certificado</h3>
+            <p class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400 transition-colors">
+                O mesmo fluxo completo do painel legado, agora no painel novo: posicione elementos, ajuste grade,
+                controle camadas e salve sem cortar a area de edicao.
             </p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap items-center gap-3">
             @if($previewUrl)
                 <button type="button" onclick="return previewCertificate();"
-                    class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-600 shadow-sm transition-all hover:border-blue-200 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                    class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.24em] text-slate-600 shadow-sm transition-all hover:border-blue-200 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-900 dark:hover:text-blue-400">
                     <i class="fas fa-eye"></i>
                     <span>Preview PDF</span>
                 </button>
             @endif
 
             <button type="submit" form="{{ $formId }}"
-                class="inline-flex items-center gap-2 rounded-2xl px-5 py-2.5 text-xs font-bold text-white shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
-                style="background: linear-gradient(135deg, #1F5EDB 0%, #177FD6 100%);">
+                class="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-6 py-3 text-xs font-black uppercase tracking-[0.24em] text-white shadow-xl shadow-blue-500/20 transition-all hover:bg-blue-700 hover:shadow-blue-500/30">
                 <i class="fas fa-save"></i>
                 <span>{{ $saveLabel }}</span>
             </button>
         </div>
     </div>
 
-    {{-- Dica rápida --}}
-    <div class="flex items-center gap-3 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 px-5 py-3">
-        <i class="fas fa-info-circle text-blue-500"></i>
-        <p class="text-sm text-blue-700 dark:text-blue-300">
-            <strong>Dica:</strong> Arraste os elementos no canvas para posicionar. Use Ctrl+setas para ajuste fino.
-        </p>
+    <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 p-8 shadow-2xl shadow-blue-500/20">
+        <div class="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
+        <div class="absolute -bottom-10 -right-10 h-48 w-48 rounded-full bg-cyan-300/10 blur-3xl"></div>
+        <div class="relative grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
+            <div class="flex h-16 w-16 items-center justify-center rounded-3xl border border-white/20 bg-white/15 text-3xl text-white backdrop-blur">
+                <i class="fas fa-drafting-compass"></i>
+            </div>
+            <div>
+                <h4 class="text-xl font-black text-white">Designer visual completo</h4>
+                <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-blue-100/90">
+                    Arraste, redimensione, bloqueie e ordene cada elemento do certificado. A grade, o snap,
+                    o zoom, o texto de apresentacao e a assinatura funcionam aqui do mesmo jeito que no admin legado.
+                </p>
+            </div>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 gap-8 2xl:grid-cols-[minmax(0,1.35fr)_420px]">
         <div class="space-y-6">
-            <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                    <h4 class="text-sm font-black text-slate-800 dark:text-white"><i class="fas fa-vector-square mr-2 text-slate-400"></i>Canvas (A4 Paisagem)</h4>
+            <div class="rounded-[2.5rem] border border-slate-200 bg-white p-6 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
+                <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Canvas</p>
+                        <h4 class="mt-2 text-lg font-black text-slate-800 dark:text-white">A4 paisagem sem cortes</h4>
+                        <p class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+                            O editor agora usa area ampla, com overflow controlado e ajuste automatico para nao travar
+                            nem cortar o certificado no painel novo.
+                        </p>
+                    </div>
 
-                    <div class="flex flex-wrap items-center gap-2">
-                        <div class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 dark:border-slate-800 dark:bg-slate-950">
-                            <label for="cert-zoom" class="text-[10px] font-bold text-slate-400">Zoom</label>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 shadow-inner dark:border-slate-800 dark:bg-slate-950">
+                            <label for="cert-zoom" class="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Zoom</label>
                             <select id="cert-zoom"
-                                class="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-bold text-slate-700 outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-white">
+                                class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-900 dark:text-white">
                                 <option value="0.5">50%</option>
                                 <option value="0.75">75%</option>
                                 <option value="1" selected>100%</option>
@@ -74,12 +90,13 @@
                         </div>
 
                         <button type="button" id="cert-fit"
-                            class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 transition-all hover:border-blue-200 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                            class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-slate-600 shadow-sm transition-all hover:border-blue-200 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-900 dark:hover:text-blue-400">
                             <i class="fas fa-expand-arrows-alt"></i>
                             <span>Fit</span>
                         </button>
                     </div>
                 </div>
+            </div>
 
             <div class="rounded-[2.75rem] border border-slate-800 bg-slate-950 p-5 shadow-[0_40px_120px_-40px_rgba(15,23,42,0.85)]">
                 <div id="cert-canvas-stage"
