@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 p-8 shadow-2xl shadow-blue-500/20">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 p-8 shadow-2xl shadow-blue-500/20">
         <div class="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
         <div class="absolute -bottom-10 -right-10 h-48 w-48 rounded-full bg-cyan-300/10 blur-3xl"></div>
         <div class="relative grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
@@ -60,9 +60,9 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-8 2xl:grid-cols-[minmax(0,1.35fr)_420px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div class="space-y-6">
-            <div class="rounded-[2.5rem] border border-slate-200 bg-white p-6 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                 <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                     <div>
                         <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Canvas</p>
@@ -98,9 +98,9 @@
                 </div>
             </div>
 
-            <div class="rounded-[2.75rem] border border-slate-800 bg-slate-950 p-5 shadow-[0_40px_120px_-40px_rgba(15,23,42,0.85)]">
+            <div class="rounded-[2rem] border border-slate-800 bg-slate-950 p-4 shadow-xl">
                 <div id="cert-canvas-stage"
-                    class="flex min-h-[640px] items-center justify-center overflow-auto rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_42%),linear-gradient(180deg,rgba(15,23,42,0.98),rgba(2,6,23,0.98))] p-4 lg:p-8">
+                    class="flex min-h-[480px] items-center justify-center overflow-auto rounded-2xl border border-white/10 bg-slate-900 p-4">
                     <div id="cert-canvas" class="relative shrink-0 overflow-hidden bg-white shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)]"
                         style="width: 842px; height: 595px; border-radius: 6px;">
                         <img id="cert-bg-img" src="{{ $certificateBgUrl ?: '' }}"
@@ -131,7 +131,7 @@
         </div>
 
         <div class="space-y-6">
-            <div class="rounded-[2.25rem] border border-slate-200 bg-white p-7 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                 <div class="mb-5 flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
                         <i class="fas fa-image"></i>
@@ -189,7 +189,7 @@
                 </div>
             </div>
 
-            <div class="rounded-[2.25rem] border border-slate-200 bg-white p-7 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                 <div class="mb-5 flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400">
                         <i class="fas fa-pen-fancy"></i>
@@ -223,7 +223,7 @@
                 </div>
             </div>
 
-            <div class="rounded-[2.25rem] border border-slate-200 bg-white p-7 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                 <div class="mb-5 flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400">
                         <i class="fas fa-ruler-combined"></i>
@@ -283,7 +283,7 @@
                 </div>
             </div>
 
-            <div class="rounded-[2.25rem] border border-slate-200 bg-white p-7 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                 <div class="mb-5 flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400">
                         <i class="fas fa-layer-group"></i>
@@ -331,7 +331,7 @@
                 </div>
             </div>
 
-            <div class="rounded-[2.25rem] border border-slate-200 bg-white p-7 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                 <div class="mb-5 flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                         <i class="fas fa-stream"></i>
@@ -346,7 +346,7 @@
             </div>
 
             <div id="cert-style-controls" style="display:none;"
-                class="rounded-[2.25rem] border border-slate-200 bg-white p-7 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
+                class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                 <div class="mb-5 flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-900/20 dark:text-fuchsia-400">
                         <i class="fas fa-sliders-h"></i>
