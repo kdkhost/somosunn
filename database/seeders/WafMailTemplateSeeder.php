@@ -1,52 +1,24 @@
 <?php
 
-namespace App\Mail;
+namespace Database\Seeders;
 
-use App\Mail\Concerns\UsesMailTemplate;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
+use App\Models\MailTemplate;
+use Illuminate\Database\Seeder;
 
 /**
- * Email de alerta do WAF - usa o sistema de templates editaveis (MailTemplate).
- *
- * Os templates aparecem no painel admin em "Templates de Email" e podem ser
- * editados, ativados/desativados e personalizados pelo superadmin.
- *
- * Slugs:
- *   - waf_alert_critical_finding
- *   - waf_alert_block_spike
- *   - waf_alert_auto_block
+ * Registra os templates de email do WAF na tabela mail_templates
+ * para que aparecam no painel de edicao de emails do admin.
  */
-class WafAlertMail extends Mailable
+class WafMailTemplateSeeder extends Seeder
 {
-    use Queueable, SerializesModels, UsesMailTemplate;
-
-    public string $alertType;
-    public array $alertData;
-
-    public function __construct(string $alertType, array $alertData = [])
+    public function run(): void
     {
-        $this->alertType = $alertType;
-        $this->alertData = $alertData;
-    }
-
-    public function build(): self
-    {
-        $slug     = 'waf_alert_' . $this->alertType;
-        $defaults = $this->getDefaults();
-
-        return $this->buildFromTemplate($slug, [
-            'alert' => $this->alertData,
-        ], $defaults);
-    }
-
-    private function getDefaults(): array
-    {
-        return match ($this->alertType) {
-            'critical_finding' => [
+        $templates = [
+            [
+                'slug'     => 'waf_alert_critical_finding',
                 'name'     => 'WAF - Ataque Critico Detectado',
                 'category' => 'seguranca',
+                'locale'   => 'pt-BR',
                 'subject'  => '🚨 [{{site.name}}] WAF: Ataque critico detectado!',
                 'body'     => '<h2 style="color:#dc3545;">Ataque Critico Detectado</h2>'
                     . '<p>O Firewall (WAF) detectou uma tentativa de ataque de <strong>alta severidade</strong> contra o seu site.</p>'
@@ -59,10 +31,13 @@ class WafAlertMail extends Mailable
                     . '</table>'
                     . '<p><a href="{{site.url}}/admin/waf/events" style="display:inline-block;padding:12px 24px;background:#dc3545;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">Investigar Evento</a></p>'
                     . '<p style="color:#888;font-size:12px;">Este alerta foi gerado automaticamente pelo Firewall (WAF).</p>',
+                'is_active' => true,
             ],
-            'block_spike' => [
+            [
+                'slug'     => 'waf_alert_block_spike',
                 'name'     => 'WAF - Pico de Bloqueios',
                 'category' => 'seguranca',
+                'locale'   => 'pt-BR',
                 'subject'  => '⚠️ [{{site.name}}] WAF: Pico de requisicoes bloqueadas',
                 'body'     => '<h2 style="color:#856404;">Pico de Requisicoes Bloqueadas</h2>'
                     . '<p>O Firewall (WAF) detectou um volume anormal de requisicoes bloqueadas no seu site.</p>'
@@ -74,10 +49,13 @@ class WafAlertMail extends Mailable
                     . '</table>'
                     . '<p><a href="{{site.url}}/admin/waf" style="display:inline-block;padding:12px 24px;background:#1F5EDB;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">Acessar Painel WAF</a></p>'
                     . '<p style="color:#888;font-size:12px;">Este alerta foi gerado automaticamente pelo sistema de seguranca.</p>',
+                'is_active' => true,
             ],
-            'auto_block' => [
+            [
+                'slug'     => 'waf_alert_auto_block',
                 'name'     => 'WAF - IP Bloqueado Automaticamente',
                 'category' => 'seguranca',
+                'locale'   => 'pt-BR',
                 'subject'  => '🛡️ [{{site.name}}] WAF: IP bloqueado automaticamente',
                 'body'     => '<h2 style="color:#155724;">IP Bloqueado Automaticamente</h2>'
                     . '<p>O Firewall (WAF) bloqueou automaticamente um endereco IP por acumulo de atividade suspeita.</p>'
@@ -90,13 +68,15 @@ class WafAlertMail extends Mailable
                     . '</table>'
                     . '<p><a href="{{site.url}}/admin/waf/blocklist" style="display:inline-block;padding:12px 24px;background:#1F5EDB;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">Gerenciar IP Blocklist</a></p>'
                     . '<p style="color:#888;font-size:12px;">Voce pode desbloquear este IP manualmente pelo painel se for um falso positivo.</p>',
+                'is_active' => true,
             ],
-            default => [
-                'name'     => 'WAF - Alerta de Seguranca',
-                'category' => 'seguranca',
-                'subject'  => '[{{site.name}}] WAF: Alerta de seguranca',
-                'body'     => '<h2>Alerta de Seguranca - WAF</h2><p>{{alert.message}}</p>',
-            ],
-        };
+        ];
+
+        foreach ($templates as $data) {
+            MailTemplate::firstOrCreate(
+                ['slug' => $data['slug']],
+                $data
+            );
+        }
     }
 }
