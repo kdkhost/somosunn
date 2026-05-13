@@ -43,94 +43,69 @@
         </div>
     </div>
 
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 p-8 shadow-2xl shadow-blue-500/20">
-        <div class="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
-        <div class="absolute -bottom-10 -right-10 h-48 w-48 rounded-full bg-cyan-300/10 blur-3xl"></div>
-        <div class="relative grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
-            <div class="flex h-16 w-16 items-center justify-center rounded-3xl border border-white/20 bg-white/15 text-3xl text-white backdrop-blur">
-                <i class="fas fa-drafting-compass"></i>
+    {{-- ═══════════════════════════════════════════════════════════════
+         CANVAS — Certificado inteiro visível (layout vertical)
+         ═══════════════════════════════════════════════════════════════ --}}
+    <div class="rounded-[2rem] border border-slate-800 bg-slate-950 p-4 shadow-xl">
+        <div class="flex items-center justify-between gap-4 px-2 pb-3">
+            <div class="flex items-center gap-3">
+                <div class="inline-flex items-center gap-3 rounded-2xl border border-slate-700 bg-slate-900 px-3 py-2">
+                    <label for="cert-zoom" class="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Zoom</label>
+                    <select id="cert-zoom"
+                        class="rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-black text-white outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
+                        <option value="0.5">50%</option>
+                        <option value="0.75">75%</option>
+                        <option value="1" selected>100%</option>
+                        <option value="1.25">125%</option>
+                        <option value="1.5">150%</option>
+                        <option value="2">200%</option>
+                        <option value="2.5">250%</option>
+                        <option value="3">300%</option>
+                    </select>
+                </div>
+
+                <button type="button" id="cert-fit"
+                    class="inline-flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-xs font-black uppercase tracking-[0.2em] text-slate-300 transition-all hover:border-blue-500 hover:text-blue-400">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <span>Fit</span>
+                </button>
             </div>
-            <div>
-                <h4 class="text-xl font-black text-white">Designer visual completo</h4>
-                <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-blue-100/90">
-                    Arraste, redimensione, bloqueie e ordene cada elemento do certificado. A grade, o snap,
-                    o zoom, o texto de apresentacao e a assinatura funcionam aqui do mesmo jeito que no admin legado.
-                </p>
+        </div>
+
+        <div id="cert-canvas-stage"
+            class="flex min-h-[420px] items-center justify-center overflow-auto rounded-2xl border border-white/10 bg-slate-900 p-4">
+            <div id="cert-canvas" class="relative shrink-0 overflow-hidden bg-white shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)]"
+                style="width: 842px; height: 595px; border-radius: 6px;">
+                <img id="cert-bg-img" src="{{ $certificateBgUrl ?: '' }}"
+                    class="absolute inset-0 h-full w-full object-cover {{ $certificateBgUrl ? '' : 'hidden' }}" style="z-index: 1;">
+
+                <div id="cert-bg-placeholder"
+                    class="absolute inset-0 flex items-center justify-center bg-slate-100 text-center text-slate-400 {{ $certificateBgUrl ? 'hidden' : '' }}"
+                    style="z-index: 1;">
+                    <div class="space-y-3 px-8">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-2xl shadow">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Sem fundo ainda</p>
+                            <p class="mt-2 text-xs font-medium text-slate-400">Envie a arte do certificado nos controles abaixo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cert-grid-overlay"
+                    class="pointer-events-none absolute inset-0 hidden"
+                    style="z-index: 5;"></div>
+
+                <div id="cert-elements-layer" class="absolute inset-0" style="z-index: 10;"></div>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div class="space-y-6">
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
-                <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-                    <div>
-                        <p class="text-xs font-black uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Canvas</p>
-                        <h4 class="mt-2 text-lg font-black text-slate-800 dark:text-white">A4 paisagem sem cortes</h4>
-                        <p class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
-                            O editor agora usa area ampla, com overflow controlado e ajuste automatico para nao travar
-                            nem cortar o certificado no painel novo.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 shadow-inner dark:border-slate-800 dark:bg-slate-950">
-                            <label for="cert-zoom" class="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Zoom</label>
-                            <select id="cert-zoom"
-                                class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-900 dark:text-white">
-                                <option value="0.5">50%</option>
-                                <option value="0.75">75%</option>
-                                <option value="1" selected>100%</option>
-                                <option value="1.25">125%</option>
-                                <option value="1.5">150%</option>
-                                <option value="2">200%</option>
-                                <option value="2.5">250%</option>
-                                <option value="3">300%</option>
-                            </select>
-                        </div>
-
-                        <button type="button" id="cert-fit"
-                            class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-slate-600 shadow-sm transition-all hover:border-blue-200 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-900 dark:hover:text-blue-400">
-                            <i class="fas fa-expand-arrows-alt"></i>
-                            <span>Fit</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="rounded-[2rem] border border-slate-800 bg-slate-950 p-4 shadow-xl">
-                <div id="cert-canvas-stage"
-                    class="flex min-h-[480px] items-center justify-center overflow-auto rounded-2xl border border-white/10 bg-slate-900 p-4">
-                    <div id="cert-canvas" class="relative shrink-0 overflow-hidden bg-white shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)]"
-                        style="width: 842px; height: 595px; border-radius: 6px;">
-                        <img id="cert-bg-img" src="{{ $certificateBgUrl ?: '' }}"
-                            class="absolute inset-0 h-full w-full object-cover {{ $certificateBgUrl ? '' : 'hidden' }}" style="z-index: 1;">
-
-                        <div id="cert-bg-placeholder"
-                            class="absolute inset-0 flex items-center justify-center bg-slate-100 text-center text-slate-400 {{ $certificateBgUrl ? 'hidden' : '' }}"
-                            style="z-index: 1;">
-                            <div class="space-y-3 px-8">
-                                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-2xl shadow">
-                                    <i class="fas fa-image"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Sem fundo ainda</p>
-                                    <p class="mt-2 text-xs font-medium text-slate-400">Envie a arte do certificado no painel lateral.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="cert-grid-overlay"
-                            class="pointer-events-none absolute inset-0 hidden"
-                            style="z-index: 5;"></div>
-
-                        <div id="cert-elements-layer" class="absolute inset-0" style="z-index: 10;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="space-y-6">
+    {{-- ═══════════════════════════════════════════════════════════════
+         CONTROLES — Organizados em grid abaixo do canvas
+         ═══════════════════════════════════════════════════════════════ --}}
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
             <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                 <div class="mb-5 flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
@@ -421,6 +396,5 @@
             </div>
 
             <input type="hidden" name="certificate_settings" id="certificate_settings_input">
-        </div>
     </div>
 </div>
