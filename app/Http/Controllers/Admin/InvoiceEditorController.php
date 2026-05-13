@@ -134,14 +134,13 @@ class InvoiceEditorController extends Controller
     }
 
     /**
-     * Gera preview do PDF com as configurações atuais.
+     * Gera preview HTML da fatura (sem PDF, para preview instantâneo).
      */
     public function preview(Request $request)
     {
         $invoiceService = app(InvoiceService::class);
         $company = $invoiceService->companyInfo();
 
-        // Criar fatura fictícia para preview
         $fakeInvoice = $this->buildFakeInvoice();
 
         $html = view('pdf.invoice', [
@@ -149,19 +148,9 @@ class InvoiceEditorController extends Controller
             'company' => $company,
         ])->render();
 
-        $options = new Options();
-        $options->set('isRemoteEnabled', true);
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('defaultFont', $company['invoice_font_family'] ?? 'DejaVu Sans');
-
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html, 'UTF-8');
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
-
-        return response($dompdf->output(), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="preview-fatura.pdf"',
+        // Retorna HTML direto (não PDF) para preview instantâneo
+        return response($html, 200, [
+            'Content-Type' => 'text/html; charset=UTF-8',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
     }

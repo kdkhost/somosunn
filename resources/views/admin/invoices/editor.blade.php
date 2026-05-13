@@ -396,7 +396,7 @@ $(function() {
         $('#preview-loading').css('display', 'flex');
         $('#preview-status').text('Carregando...').removeClass('badge-warning badge-info').addClass('badge-secondary');
 
-        // Primeiro salvar temporariamente, depois recarregar iframe
+        // Primeiro salvar, depois carregar HTML direto no iframe (sem reload)
         var data = collectSettings();
         $.ajax({
             url: saveUrl,
@@ -404,12 +404,12 @@ $(function() {
             data: data,
             headers: { 'X-CSRF-TOKEN': csrfToken },
             success: function() {
-                var iframe = document.getElementById('preview-iframe');
-                iframe.src = previewUrl + '?t=' + Date.now();
-                iframe.onload = function() {
+                $.get(previewUrl + '?t=' + Date.now(), function(html) {
+                    var iframe = document.getElementById('preview-iframe');
+                    iframe.srcdoc = html;
                     $('#preview-loading').hide();
                     $('#preview-status').text('Atualizado').removeClass('badge-warning badge-secondary').addClass('badge-info');
-                };
+                });
             },
             error: function() {
                 $('#preview-loading').hide();
