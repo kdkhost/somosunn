@@ -49,6 +49,48 @@ try {
         echo "Fail policy: " . $settings->failPolicy . PHP_EOL;
         echo "isFailOpen: " . ($settings->isFailOpen() ? 'SIM' : 'NAO') . PHP_EOL;
 
+        // Testar diretamente sem try/catch do engine para ver o erro real
+        try {
+            $engine = App\Services\Waf\WafEngine::make($settings);
+
+            // Testar manualmente cada etapa
+            $ruleRepo = new App\Services\Waf\WafRuleRepository();
+            $rules = $ruleRepo->allActive();
+            echo "Regras carregadas do repo: " . $rules->count() . PHP_EOL;
+
+            $ctx = App\Services\Waf\WafContext::fromRequest($request);
+            echo "Contexto criado: IP={$ctx->ip}, path={$ctx->path}, scope={$ctx->scope}" . PHP_EOL;
+
+            // Testar matching manual
+            $matchers = [
+                'regex' => new App\Services\Waf\Matchers\RegexRuleMatcher(),
+                'list' => new App\Services\Waf\Matchers\ListRuleMatcher(),
+                'numeric' => new App\Services\Waf\Matchers\NumericRuleMatcher(),
+                'function' => new App\Services\Waf\Matchers\FunctionRuleMatcher(),
+            ];
+
+            $matchCount = 0;
+            foreach ($rules as $rule) {
+                $matcher = $matchers[$rule->matcher_type] ?? null;
+                if (!$matcher) continue;
+                try {
+                    $match = $matcher->evaluate($rule, $ctx);
+                    if ($match) {
+                        echo "  MATCH: {$rule->name} (score: {$match->score})" . PHP_EOL;
+                        $matchCount++;
+                    }
+                } catch (\Throwable $re) {
+                    echo "  ERRO na regra {$rule->name}: {$re->getMessage()}" . PHP_EOL;
+                }
+            }
+            echo "Total matches: {$matchCount}" . PHP_EOL;
+
+        } catch (\Throwable $e2) {
+            echo "ERRO DIRETO: " . $e2->getMessage() . PHP_EOL;
+            echo "Arquivo: " . $e2->getFile() . ":" . $e2->getLine() . PHP_EOL;
+        }
+
+        // Agora testar via engine completo
         $engine = App\Services\Waf\WafEngine::make($settings);
         $decision = $engine->inspect($request);
         echo "Decisao: {$decision->decision}" . PHP_EOL;
