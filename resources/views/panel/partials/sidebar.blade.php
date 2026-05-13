@@ -300,6 +300,7 @@
         ['label' => 'Planos e pacotes', 'route' => route('panel.admin.plans.index'), 'icon' => 'fas fa-gem', 'active' => request()->routeIs('panel.admin.plans.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Vendas', 'route' => route('panel.admin.orders.index'), 'icon' => 'fas fa-shopping-cart', 'active' => request()->routeIs('panel.admin.orders.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Faturas', 'route' => route('panel.admin.invoices.index'), 'icon' => 'fas fa-file-invoice', 'active' => request()->routeIs('panel.admin.invoices.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Editor de Faturas', 'route' => route('panel.admin.invoices.editor'), 'icon' => 'fas fa-paint-brush', 'active' => request()->routeIs('panel.admin.invoices.editor*'), 'visible' => $user->isAdmin()],
         ['label' => 'Cupons', 'route' => route('panel.admin.coupons.index'), 'icon' => 'fas fa-ticket-alt', 'active' => request()->routeIs('panel.admin.coupons.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Afiliados', 'route' => route('panel.admin.referrals.index'), 'icon' => 'fas fa-bullhorn', 'active' => request()->routeIs('panel.admin.referrals.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Lojas marketplace', 'route' => route('panel.admin.marketplace.stores.index'), 'icon' => 'fas fa-store-alt', 'active' => request()->routeIs('panel.admin.marketplace.stores.*'), 'visible' => $user->isAdmin()],
