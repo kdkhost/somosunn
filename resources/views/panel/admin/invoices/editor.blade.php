@@ -135,6 +135,43 @@
 
                     <hr class="border-slate-100 dark:border-slate-800">
 
+                    {{-- Seção: Dados da Empresa --}}
+                    <div>
+                        <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">Dados da Empresa</h4>
+                        <div class="space-y-2">
+                            @foreach([
+                                ['company_name', 'Nome'],
+                                ['company_cnpj', 'CNPJ'],
+                                ['company_address', 'Endereço'],
+                                ['company_number', 'Número'],
+                                ['company_district', 'Bairro'],
+                                ['company_city', 'Cidade'],
+                                ['company_state', 'UF'],
+                                ['company_zip', 'CEP'],
+                                ['company_phone', 'Telefone'],
+                                ['company_email', 'E-mail'],
+                            ] as [$key, $label])
+                            <div>
+                                <label class="block text-[11px] text-slate-500 mb-0.5">{{ $label }}</label>
+                                <input type="text" class="company-field w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800" id="{{ $key }}" value="{{ $companyData[$key] ?? '' }}">
+                            </div>
+                            @endforeach
+                        </div>
+                        <button type="button" id="btn-save-company" class="w-full py-2 mt-3 bg-slate-800 dark:bg-slate-700 text-white text-xs font-bold rounded-xl hover:bg-slate-700 transition-all">
+                            <i class="fas fa-save mr-1"></i> Salvar Dados da Empresa
+                        </button>
+                    </div>
+
+                    <hr class="border-slate-100 dark:border-slate-800">
+
+                    {{-- Seção: CSS Customizado --}}
+                    <div>
+                        <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">CSS Customizado</h4>
+                        <textarea class="invoice-setting w-full px-3 py-2 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800" name="invoice_custom_css" rows="6" placeholder="/* Estilos adicionais */">{{ $settings['invoice_custom_css'] ?? '' }}</textarea>
+                    </div>
+
+                    <hr class="border-slate-100 dark:border-slate-800">
+
                     {{-- Restaurar --}}
                     <button type="button" id="btn-reset" class="w-full py-2 text-xs font-bold text-red-500 hover:text-red-700 transition-colors">
                         <i class="fas fa-undo mr-1"></i> Restaurar padrões
@@ -206,6 +243,25 @@ $(function() {
     $('#btn-reset').on('click', function() {
         Swal.fire({ title: 'Restaurar padrões?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: 'Sim', cancelButtonText: 'Cancelar' }).then(function(r) {
             if (r.isConfirmed) $.ajax({ url: resetUrl, method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken }, success: function() { location.reload(); } });
+        });
+    });
+
+    // Salvar dados da empresa
+    $('#btn-save-company').on('click', function() {
+        var $b = $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Salvando...');
+        var data = {};
+        $('.company-field').each(function() { data[$(this).attr('id')] = $(this).val(); });
+        $.ajax({
+            url: saveUrl, method: 'POST', data: data, headers: { 'X-CSRF-TOKEN': csrfToken },
+            success: function() {
+                $b.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Salvar Dados da Empresa');
+                Swal.fire({ icon: 'success', title: 'Dados salvos!', timer: 1500, showConfirmButton: false });
+                loadPreview();
+            },
+            error: function() {
+                $b.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Salvar Dados da Empresa');
+                Swal.fire({ icon: 'error', title: 'Erro ao salvar' });
+            }
         });
     });
 
