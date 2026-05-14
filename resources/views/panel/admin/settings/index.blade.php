@@ -52,7 +52,7 @@
         </div>
 
         {{-- Settings Form (AJAX submit - no page reload) --}}
-        <form id="settings-form" action="{{ route('panel.admin.settings.update') }}" method="POST" enctype="multipart/form-data" novalidate>
+        <form id="settings-form" action="{{ route('panel.admin.settings.update') }}" method="POST" enctype="multipart/form-data" novalidate autocomplete="off">
             @csrf
             <input type="hidden" name="current_group" value="{{ $group }}">
 

@@ -118,12 +118,20 @@
 
 {{-- S3 FIELDS --}}
 <div id="s3-fields" class="{{ $storageDriver !== 's3' ? 'opacity-50 pointer-events-none' : '' }} transition-all duration-300">
+    {{-- Iscas anti-autofill: o Chrome se distrai com estes campos invisiveis e nao bagunca os reais --}}
+    <div style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden;" aria-hidden="true">
+        <input type="text" name="fake_user_for_chrome" autocomplete="username" tabindex="-1">
+        <input type="password" name="fake_pass_for_chrome" autocomplete="current-password" tabindex="-1">
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div class="stg-card">
             <label class="stg-label">Bucket</label>
             <input type="text" name="storage_bucket"
                 value="{{ $settings['storage_bucket'] ?? '' }}"
                 placeholder="meu-bucket"
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                data-lpignore="true" data-1p-ignore="true" data-form-type="other"
                 class="stg-input w-full px-4 py-3 rounded-xl text-sm">
         </div>
         <div class="stg-card">
@@ -131,6 +139,8 @@
             <input type="text" name="storage_region"
                 value="{{ $settings['storage_region'] ?? 'us-east-1' }}"
                 placeholder="us-east-1"
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                data-lpignore="true" data-1p-ignore="true" data-form-type="other"
                 class="stg-input w-full px-4 py-3 rounded-xl text-sm">
         </div>
     </div>
@@ -140,6 +150,8 @@
         <input type="text" name="storage_endpoint"
             value="{{ $settings['storage_endpoint'] ?? '' }}"
             placeholder="https://xxxx.e2.cloud.idrive.com"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+            data-lpignore="true" data-1p-ignore="true" data-form-type="other"
             class="stg-input w-full px-4 py-3 rounded-xl text-sm font-mono">
         <p class="text-xs text-slate-400 mt-1">
             Para IDrive e2, use o endpoint fornecido no painel. Para AWS S3, deixe em branco.
@@ -152,6 +164,8 @@
             <input type="text" name="storage_access_key"
                 value="{{ $settings['storage_access_key'] ?? '' }}"
                 placeholder="AKIAIOSFODNN7EXAMPLE"
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                data-lpignore="true" data-1p-ignore="true" data-form-type="other"
                 class="stg-input w-full px-4 py-3 rounded-xl text-sm font-mono">
         </div>
         <div class="stg-card">
@@ -160,6 +174,8 @@
                 <input type="password" name="storage_secret_key" id="storage_secret_key_input"
                     value="{{ $secretKey }}"
                     placeholder="{{ $maskedSecret !== '' ? $maskedSecret : '••••••••••••••••' }}"
+                    autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false"
+                    data-lpignore="true" data-1p-ignore="true" data-form-type="other"
                     class="stg-input w-full px-4 py-3 pr-11 rounded-xl text-sm font-mono">
                 <button type="button" onclick="stgRevealSecret()" id="stg-reveal-btn"
                     class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
@@ -179,6 +195,8 @@
         <input type="text" name="storage_url"
             value="{{ $settings['storage_url'] ?? '' }}"
             placeholder="https://meu-bucket.s3.us-east-1.amazonaws.com"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+            data-lpignore="true" data-1p-ignore="true" data-form-type="other"
             class="stg-input w-full px-4 py-3 rounded-xl text-sm font-mono">
         <p class="text-xs text-slate-400 mt-1">
             URL base para acesso publico aos arquivos. Deixe em branco para usar o padrao do provider.
@@ -244,6 +262,49 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+(function() {
+    // Reforco anti-autofill: o Chrome as vezes limpa values de inputs apos o carregamento.
+    // Garantimos que os valores reais (vindos do banco) sejam restaurados se isso ocorrer.
+    var stgDefaults = @json([
+        'storage_bucket' => $settings['storage_bucket'] ?? '',
+        'storage_region' => $settings['storage_region'] ?? 'us-east-1',
+        'storage_endpoint' => $settings['storage_endpoint'] ?? '',
+        'storage_access_key' => $settings['storage_access_key'] ?? '',
+        'storage_secret_key' => $secretKey,
+        'storage_url' => $settings['storage_url'] ?? '',
+    ]);
+
+    function restoreStgDefaults() {
+        Object.keys(stgDefaults).forEach(function(name) {
+            var el = document.querySelector('[name="' + name + '"]');
+            if (!el) return;
+            // So restaura se foi limpo pelo autofill (valor diferente do esperado E nao foi editado pelo usuario)
+            if (!el.dataset.userEdited && el.value !== stgDefaults[name]) {
+                el.value = stgDefaults[name];
+            }
+        });
+    }
+
+    // Marca campos como editados pelo usuario para nao sobrescrever
+    Object.keys(stgDefaults).forEach(function(name) {
+        var el = document.querySelector('[name="' + name + '"]');
+        if (el) {
+            el.addEventListener('input', function() {
+                el.dataset.userEdited = '1';
+            });
+        }
+    });
+
+    // Restaura logo apos load + 200ms (autofill costuma rodar tarde)
+    setTimeout(restoreStgDefaults, 100);
+    setTimeout(restoreStgDefaults, 600);
+    setTimeout(restoreStgDefaults, 1500);
+})();
+</script>
+@endpush
 
 @push('scripts')
 <script>

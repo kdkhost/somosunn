@@ -604,6 +604,13 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('admin.settings', ['group' => 'storage']) }}"
+                                    class="nav-link {{ request()->route('group') == 'storage' ? 'active' : '' }}">
+                                    <i class="fas fa-cloud nav-icon"></i>
+                                    <p>Armazenamento</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('admin.settings', ['group' => 'system']) }}"
                                     class="nav-link {{ request()->route('group') == 'system' ? 'active' : '' }}">
                                     <i class="fas fa-server nav-icon"></i>

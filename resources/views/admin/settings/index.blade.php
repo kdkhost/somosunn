@@ -13,6 +13,7 @@
         'smtp' => 'SMTP',
         'social' => 'Social Login',
         'seo' => 'SEO',
+        'storage' => 'Armazenamento',
         'system' => 'Sistema',
     ];
     $currentLabel = $groupLabels[$group] ?? 'Configurações';
@@ -52,7 +53,7 @@
 
     <div class="content">
         <div class="container-fluid">
-            <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" novalidate>
+            <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" novalidate autocomplete="off">
                 @csrf
                 <input type="hidden" name="current_group" value="{{ $group }}">
 

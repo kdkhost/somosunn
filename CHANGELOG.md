@@ -2,6 +2,38 @@
 
 ---
 
+## [2026-07-22] - Correcao de Autofill no Painel S3 + Configuracao no /admin Legado
+
+### Corrigido
+- **Bug do Chrome autofill**: campos S3 (Bucket, Endpoint, Access Key, URL) eram limpos ou substituidos por sugestoes do navegador (e-mail/senha) ao carregar a tela /painel/admin/settings/storage
+- Adicionado `autocomplete="off"` no formulario de settings (painel novo e /admin)
+- Adicionados atributos `autocomplete="off"`, `data-lpignore="true"`, `data-1p-ignore="true"`, `data-form-type="other"` em cada input S3
+- Iscas anti-autofill (`fake_username` e `fake_password` invisiveis) que distraem o Chrome para nao mexer nos campos reais
+- Script de reforco que restaura os valores do banco em 100ms, 600ms e 1500ms se o autofill os tiver limpado, sem sobrescrever edicoes do proprio usuario
+
+### Adicionado
+- **Aba "Armazenamento" no /admin legado** (AdminLTE) com paridade total com o painel novo
+- Novo partial `resources/views/admin/settings/partials/storage.blade.php` em estilo Bootstrap 4
+- Item "Armazenamento" no sidebar do admin legado (entre SEO e Sistema)
+- Chave `'storage' => 'Armazenamento'` adicionada a `$groupLabels` no admin legado
+- Botao "Testar Conexao S3" funcional no admin legado
+- Modulo de migracao de pastas no admin legado (listar, copiar, mover, migrar tudo)
+- Suporte a SweetAlert2 com fallback para `confirm()` nativo no admin legado
+
+### Resultado
+- Os dois paineis (`/admin` e `/painel/admin`) agora tem a configuracao S3 completa
+- Os campos pre-preenchidos com os dados salvos no banco resistem ao autofill do navegador
+- Mesma logica de teste e migracao em ambos paineis usando as rotas existentes
+
+### Arquivos afetados
+- `resources/views/admin/settings/partials/storage.blade.php` (novo)
+- `resources/views/admin/settings/index.blade.php` (groupLabels + autocomplete)
+- `resources/views/admin/partials/sidebar.blade.php` (item Armazenamento)
+- `resources/views/panel/admin/settings/partials/storage.blade.php` (anti-autofill + restauracao)
+- `resources/views/panel/admin/settings/index.blade.php` (autocomplete)
+
+---
+
 ## [2026-07-22] - Atalhos do Superadmin no Dashboard /painel/admin
 
 ### Adicionado
