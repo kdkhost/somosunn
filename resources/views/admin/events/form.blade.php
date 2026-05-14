@@ -1194,11 +1194,14 @@ async function setAsCover(mediaId) {
                     venueResults.innerHTML = '<div class="list-group-item text-center py-3"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando estabelecimentos...</div>';
                     venueResults.style.display = 'block';
 
+                    var outOfState = outOfStateCheck && outOfStateCheck.checked;
                     var params = 'q=' + encodeURIComponent(text);
-                    if (userLat && userLon) {
+
+                    // Quando "fora do estado" NAO esta marcado, envia coordenadas para priorizar proximidade
+                    // Quando marcado, NAO envia coordenadas para buscar em todo o Brasil
+                    if (!outOfState && userLat && userLon) {
                         params += '&lat=' + userLat + '&lon=' + userLon;
                     }
-                    var outOfState = outOfStateCheck && outOfStateCheck.checked;
                     if (outOfState) {
                         params += '&out_of_state=1';
                     }
