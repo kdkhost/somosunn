@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'default' => 'public',
+    'default' => env('FILESYSTEM_DISK', 'public'),
 
-    'cloud' => 'public',
+    'cloud' => 's3',
 
     'disks' => [
         'local' => [
@@ -44,13 +44,14 @@ return [
 
         's3' => [
             'driver' => 's3',
-            'key' => '',
-            'secret' => '',
-            'region' => '',
-            'bucket' => '',
-            'url' => null,
-            'endpoint' => null,
-            'use_path_style_endpoint' => false,
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'bucket' => env('AWS_BUCKET'),
+            'url' => env('AWS_URL'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+            'visibility' => 'public',
             'throw' => false,
         ],
     ],
