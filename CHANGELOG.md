@@ -2,6 +2,22 @@
 
 ---
 
+## [2026-05-14] - Padronizacao do Layout: /connection/blocked
+
+### Alterado
+- Pagina `/connection/blocked` corrigida para usar `@section('panel_content')` (estava usando `@section('content')` que nao envolvia no layout do painel)
+- Adicionado `@section('panel_breadcrumb')`
+- Hero card vermelho/slate consistente com o tom da feature (bloqueio)
+- Card da lista com header padronizado (icone + titulo + contador)
+- Avatares com ring rosa sutil
+- Botao "Desbloquear" estilizado em rosa com border
+- Suporte completo a dark mode
+
+### Arquivos afetados
+- `resources/views/panel/connections/blocked.blade.php`
+
+---
+
 ## [2026-05-14] - Padronizacao do Layout: /meu-parceiro
 
 ### Alterado
