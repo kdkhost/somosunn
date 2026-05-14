@@ -33,6 +33,7 @@
                         'smtp' => ['label' => 'SMTP', 'icon' => 'fa-envelope'],
                         'social' => ['label' => 'Social', 'icon' => 'fa-share-alt'],
                         'seo' => ['label' => 'SEO', 'icon' => 'fa-search'],
+                        'storage' => ['label' => 'Armazenamento', 'icon' => 'fa-cloud'],
                         'system' => ['label' => 'Sistema', 'icon' => 'fa-server'],
                     ];
                 @endphp

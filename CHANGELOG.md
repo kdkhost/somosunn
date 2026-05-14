@@ -6,17 +6,29 @@
 
 ### Adicionado
 - Pacote `league/flysystem-aws-s3-v3` instalado no servidor (suporte S3)
-- Disco S3 em `config/filesystems.php` lendo variáveis de ambiente (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION, AWS_BUCKET, AWS_ENDPOINT, AWS_URL, AWS_USE_PATH_STYLE_ENDPOINT)
+- Painel administrativo de configuração de armazenamento em Configurações > Armazenamento
+- Campos configuráveis pelo painel: Driver, Bucket, Endpoint, Region, Access Key, Secret Key, URL, Path Style
+- Botão "Testar Conexão S3" com resultado inline (upload, exists, url, read, delete)
+- Comando artisan `php artisan storage:test-s3` para teste via CLI
+- Disco S3 em `config/filesystems.php` lendo do banco (Setting) com fallback para .env
 - `FILESYSTEM_DISK` controla disco ativo (default: public/local)
 - `.env.example` atualizado com todas as variáveis S3/IDrive e2
 - Compatível com: IDrive e2, AWS S3, Cloudflare R2, Wasabi, MinIO, Backblaze B2
+- Indicador visual de status (Local/S3 ativo) no header da página
 
 ### Alterado
-- `config/filesystems.php`: `default` agora usa `env('FILESYSTEM_DISK', 'public')`
-- Disco S3 com `use_path_style_endpoint => true` (obrigatório para IDrive e2)
+- `config/filesystems.php`: lê configurações do banco de dados com fallback seguro para env()
+- `SettingController`: grupo 'storage' adicionado com testS3() endpoint
+- Sidebar do painel: link "Armazenamento" com ícone cloud
 
 ### Arquivos afetados
 - `config/filesystems.php`
+- `app/Http/Controllers/Admin/SettingController.php`
+- `app/Console/Commands/TestS3Connection.php` (novo)
+- `resources/views/panel/admin/settings/partials/storage.blade.php` (novo)
+- `resources/views/panel/admin/settings/index.blade.php`
+- `resources/views/panel/partials/sidebar.blade.php`
+- `routes/web.php`
 - `.env.example`
 - `composer.json` / `composer.lock`
 

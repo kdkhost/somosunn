@@ -31,6 +31,7 @@ class SettingController extends Controller
             'smtp',
             'social',
             'seo',
+            'storage',
             'system'
         ];
 
@@ -352,6 +353,9 @@ class SettingController extends Controller
             ],
             'smtp' => [
                 'email_queue_schedule_enabled',
+            ],
+            'storage' => [
+                'storage_path_style',
             ],
             'system' => [
                 'maintenance_enabled',
@@ -1428,6 +1432,88 @@ class SettingController extends Controller
                 'success' => false,
                 'message' => 'Erro ao processar upload: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Testa a conexao S3 usando as configuracoes salvas no banco.
+     */
+    public function testS3(Request $request)
+    {
+        $results = [];
+
+        try {
+            $key = Setting::get('storage_access_key', '');
+            $secret = Setting::get('storage_secret_key', '');
+            $region = Setting::get('storage_region', 'us-east-1') ?: 'us-east-1';
+            $bucket = Setting::get('storage_bucket', '');
+            $endpoint = Setting::get('storage_endpoint', '');
+            $url = Setting::get('storage_url', '');
+            $pathStyle = (bool) Setting::get('storage_path_style', 1);
+
+            if (empty($key) || empty($secret) || empty($bucket)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Preencha ao menos Access Key, Secret Key e Bucket antes de testar.',
+                    'results' => [],
+                ]);
+            }
+
+            // Configurar disco S3 em runtime
+            config([
+                'filesystems.disks.s3_test' => [
+                    'driver' => 's3',
+                    'key' => $key,
+                    'secret' => $secret,
+                    'region' => $region,
+                    'bucket' => $bucket,
+                    'url' => $url ?: null,
+                    'endpoint' => $endpoint ?: null,
+                    'use_path_style_endpoint' => $pathStyle,
+                    'visibility' => 'public',
+                    'throw' => true,
+                ],
+            ]);
+
+            $disk = Storage::disk('s3_test');
+            $testFile = '_somos_unn_test_' . time() . '.txt';
+            $testContent = 'SOMOS UNN S3 Test - ' . now()->toDateTimeString();
+
+            // 1. Upload
+            $disk->put($testFile, $testContent);
+            $results[] = ['step' => 'Upload', 'status' => 'ok', 'detail' => $testFile];
+
+            // 2. Exists
+            $exists = $disk->exists($testFile);
+            $results[] = ['step' => 'Verificar existencia', 'status' => $exists ? 'ok' : 'falha', 'detail' => $exists ? 'Arquivo encontrado' : 'Arquivo nao encontrado'];
+
+            // 3. URL
+            $fileUrl = $disk->url($testFile);
+            $results[] = ['step' => 'Gerar URL', 'status' => 'ok', 'detail' => $fileUrl];
+
+            // 4. Read
+            $readContent = $disk->get($testFile);
+            $match = $readContent === $testContent;
+            $results[] = ['step' => 'Leitura', 'status' => $match ? 'ok' : 'falha', 'detail' => $match ? 'Conteudo confere' : 'Conteudo divergente'];
+
+            // 5. Delete
+            $disk->delete($testFile);
+            $deleted = !$disk->exists($testFile);
+            $results[] = ['step' => 'Exclusao', 'status' => $deleted ? 'ok' : 'aviso', 'detail' => $deleted ? 'Arquivo removido' : 'Arquivo pode ainda existir (cache)'];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Conexao S3 testada com sucesso!',
+                'results' => $results,
+            ]);
+        } catch (\Throwable $e) {
+            $results[] = ['step' => 'Erro', 'status' => 'falha', 'detail' => $e->getMessage()];
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Falha na conexao S3: ' . Str::limit($e->getMessage(), 200),
+                'results' => $results,
+            ]);
         }
     }
 }
