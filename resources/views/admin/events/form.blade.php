@@ -1171,7 +1171,7 @@ async function setAsCover(mediaId) {
                     venueResults.innerHTML = '<div class="list-group-item text-center py-3"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando estabelecimentos...</div>';
                     venueResults.style.display = 'block';
 
-                    var params = 'query=' + encodeURIComponent(text);
+                    var params = 'q=' + encodeURIComponent(text);
                     if (userLat && userLon) {
                         params += '&lat=' + userLat + '&lon=' + userLon;
                     }
@@ -1185,7 +1185,7 @@ async function setAsCover(mediaId) {
                         credentials: 'same-origin'
                     })
                     .then(function(data) {
-                        renderVenueResults(data || []);
+                        renderVenueResults(data.results || data || []);
                     })
                     .catch(function(err) {
                         console.error('Venue search error:', err);
@@ -1200,15 +1200,15 @@ async function setAsCover(mediaId) {
                     var items = data.slice(0, 20);
                     var html = '<div class="list-group-item bg-light py-2 px-3 text-xs font-weight-bold text-muted"><i class="fas fa-list mr-1"></i>' + Math.min(data.length, 20) + ' de ' + data.length + ' resultados' + (data.length > 20 ? ' (refine sua busca)' : '') + '</div>';
                     items.forEach(function(item, idx) {
+                        var itemLon = item.lon || item.lng || '';
                         html += '<a href="#" class="list-group-item list-group-item-action venue-result py-2 px-3" '
-                            + 'data-lat="' + item.lat + '" data-lon="' + item.lon + '" '
-                            + 'data-name="' + item.name.replace(/"/g, '&quot;') + '" '
-                            + 'data-address="' + item.address.replace(/"/g, '&quot;') + '">'
+                            + 'data-lat="' + (item.lat || '') + '" data-lon="' + itemLon + '" '
+                            + 'data-name="' + (item.name || '').replace(/"/g, '&quot;') + '" '
+                            + 'data-address="' + (item.address || '').replace(/"/g, '&quot;') + '">'
                             + '<div class="d-flex align-items-start gap-2">'
-                            + '<span class="font-weight-bold ' + (item.isLocal ? 'text-success' : 'text-muted') + '" style="min-width:20px">' + (idx + 1) + '.</span>'
-                            + '<div class="flex-1"><strong class="d-block text-sm">' + item.name + '</strong>'
-                            + '<small class="text-muted d-block">' + item.address + '</small>'
-                            + (item.isLocal ? '<span class="badge badge-success badge-sm mt-1"><i class="fas fa-check mr-1"></i>Proximo</span>' : '')
+                            + '<span class="font-weight-bold text-primary" style="min-width:20px">' + (idx + 1) + '.</span>'
+                            + '<div class="flex-1"><strong class="d-block text-sm">' + (item.name || '') + '</strong>'
+                            + '<small class="text-muted d-block">' + (item.address || 'Endereco nao disponivel') + '</small>'
                             + '</div></div></a>';
                     });
                     venueResults.innerHTML = html;
