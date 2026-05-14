@@ -219,6 +219,14 @@
                                         class="form-control" value="{{ old('longitude', $event->longitude) }}" readonly>
                                 </div>
                                 <input type="hidden" name="published" value="0">
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" name="published" value="1" class="form-check-input" id="publishedCheck"
+                                        {{ old('published', $event->published) ? 'checked' : '' }}>
+                                    <label class="form-check-label font-weight-bold" for="publishedCheck">
+                                        <i class="fas fa-eye mr-1 text-success"></i> Evento Publicado
+                                    </label>
+                                    <small class="d-block text-muted">Desmarque para ocultar o evento do site. Eventos sem imagem de capa ficam automaticamente como rascunho.</small>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label>Mapa (Clique para marcar)</label>
@@ -1140,6 +1148,8 @@ async function setAsCover(mediaId) {
                 // Estado do usuario registrante (prioridade na busca)
                 var userState = @json(auth()->user()->state ?? '');
                 var userCity = @json(auth()->user()->city ?? '');
+                var userLat = null;
+                var userLon = null;
 
                 function buildSearchQuery(text) {
                     var query = text.trim();
@@ -1161,56 +1171,27 @@ async function setAsCover(mediaId) {
                     venueResults.innerHTML = '<div class="list-group-item text-center py-3"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando estabelecimentos...</div>';
                     venueResults.style.display = 'block';
 
-                    var headers = { 'Accept-Language': 'pt-BR' };
-                    var nominatimUrl = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(text + ', Brasil') + '&countrycodes=br&limit=30&addressdetails=1';
-                    var overpassQuery = '[out:json][timeout:10];('
-                        + 'node["name"~"' + text.replace(/"/g, '') + '",i]["amenity"](area:3600059470);'
-                        + 'node["name"~"' + text.replace(/"/g, '') + '",i]["shop"](area:3600059470);'
-                        + 'node["name"~"' + text.replace(/"/g, '') + '",i]["tourism"](area:3600059470);'
-                        + 'node["name"~"' + text.replace(/"/g, '') + '",i]["leisure"](area:3600059470);'
-                        + ');out body 30;';
-                    var overpassUrl = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(overpassQuery);
+                    var params = 'query=' + encodeURIComponent(text);
+                    if (userLat && userLon) {
+                        params += '&lat=' + userLat + '&lon=' + userLon;
+                    }
+                    var outOfState = outOfStateCheck && outOfStateCheck.checked;
+                    if (outOfState) {
+                        params += '&out_of_state=1';
+                    }
 
-                    Promise.all([
-                        fetch(nominatimUrl, { headers: headers }).then(function(r) { return r.json(); }).catch(function() { return []; }),
-                        fetch(overpassUrl).then(function(r) { return r.json(); }).then(function(d) { return d.elements || []; }).catch(function() { return []; })
-                    ]).then(function(results) {
-                        var nominatimData = results[0] || [];
-                        var overpassData = results[1] || [];
-                        var seen = {};
-                        var combined = [];
-
-                        overpassData.forEach(function(el) {
-                            if (!el.lat || !el.lon) return;
-                            var key = parseFloat(el.lat).toFixed(5) + ',' + parseFloat(el.lon).toFixed(5);
-                            if (seen[key]) return; seen[key] = true;
-                            var tags = el.tags || {};
-                            var city = tags['addr:city'] || ''; var state = tags['addr:state'] || '';
-                            var road = tags['addr:street'] || ''; var number = tags['addr:housenumber'] || '';
-                            var neighbourhood = tags['addr:suburb'] || tags['addr:neighbourhood'] || '';
-                            var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
-                            var isLocal = userState && (state.toLowerCase().indexOf(userState.toLowerCase()) !== -1 || city.toLowerCase().indexOf(userCity.toLowerCase()) !== -1);
-                            combined.push({ lat: el.lat, lon: el.lon, name: tags.name || text, address: fullAddress || 'Endereco nao detalhado', isLocal: isLocal });
-                        });
-
-                        nominatimData.forEach(function(item) {
-                            var key = parseFloat(item.lat).toFixed(5) + ',' + parseFloat(item.lon).toFixed(5);
-                            if (seen[key]) return; seen[key] = true;
-                            var addr = item.address || {};
-                            var shortName = (addr.amenity || addr.tourism || addr.leisure || addr.building || addr.shop || '').trim();
-                            var city = addr.city || addr.town || addr.village || ''; var state = addr.state || '';
-                            var road = addr.road || ''; var number = addr.house_number || '';
-                            var neighbourhood = addr.suburb || addr.neighbourhood || '';
-                            var fullAddress = [road, number, neighbourhood, city, state].filter(Boolean).join(', ');
-                            var isLocal = userState && state.toLowerCase().indexOf(userState.toLowerCase()) !== -1;
-                            combined.push({ lat: item.lat, lon: item.lon, name: shortName || item.display_name.split(',')[0], address: fullAddress, isLocal: isLocal });
-                        });
-
-                        combined.sort(function(a, b) { return (a.isLocal ? 0 : 1) - (b.isLocal ? 0 : 1); });
-                        renderVenueResults(combined);
+                    fetch('/api/venue-search?' + params, {
+                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                        credentials: 'same-origin'
+                    })
+                    .then(function(data) {
+                        renderVenueResults(data || []);
+                    })
+                    .catch(function(err) {
+                        console.error('Venue search error:', err);
+                        venueResults.innerHTML = '<div class="list-group-item text-danger text-center py-3"><i class="fas fa-exclamation-triangle mr-1"></i>Erro na busca. Tente novamente.</div>';
                     });
                 }
-
                 function renderVenueResults(data) {
                     if (!data || data.length === 0) {
                         venueResults.innerHTML = '<div class="list-group-item text-muted text-center py-3"><i class="fas fa-search mr-1"></i>Nenhum resultado. Tente outro nome ou digite o endereco.</div>';

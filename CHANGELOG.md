@@ -2,6 +2,20 @@
 
 ---
 
+## [2026-05-14] - Correcoes de Eventos: Publicacao e Busca de Local
+
+### Corrigido
+- Bug de publicacao no /admin: evento ficava oculto ao salvar porque o campo `published` era forcado para `false` quando nao havia nova imagem no request (agora preserva o valor atual se o campo nao for enviado)
+- Checkbox "Evento Publicado" adicionado ao formulario legado (antes so tinha hidden input com valor 0)
+- Busca de estabelecimento no /admin migrada de Nominatim/Overpass (APIs publicas lentas/instáveis) para `/api/venue-search` (mesma API interna usada pelo /painel)
+- Variáveis `userLat`/`userLon` adicionadas ao JS legado para suportar busca por proximidade
+
+### Arquivos afetados
+- `app/Http/Controllers/Admin/EventController.php` (logica de published no update)
+- `resources/views/admin/events/form.blade.php` (checkbox published + busca via API interna)
+
+---
+
 ## [2026-05-14] - Paridade de Eventos: /admin e /painel
 
 ### Adicionado ao painel legado /admin

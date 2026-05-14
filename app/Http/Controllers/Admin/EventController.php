@@ -330,6 +330,10 @@ class EventController extends Controller
 
         if ($request->has('published')) {
             $validated['published'] = $request->boolean('published');
+        } else {
+            // Se o campo nao foi enviado (checkbox desmarcada sem hidden input),
+            // manter o valor atual do evento para nao forcar despublicacao
+            $validated['published'] = $event->published;
         }
 
         // Eventos sem imagem (nem atual nem nova) ficam como rascunho
