@@ -1150,6 +1150,29 @@ async function setAsCover(mediaId) {
                 var userCity = @json(auth()->user()->city ?? '');
                 var userLat = null;
                 var userLon = null;
+                var userCep = @json(auth()->user()->cep ?? '');
+                var userNeighbourhood = @json(auth()->user()->neighborhood ?? '');
+                var locationIqKey = @json(\App\Models\Setting::get('locationiq_api_key', ''));
+
+                // Geocodificar endereco do usuario para priorizar resultados proximos
+                (function() {
+                    var geoQuery = '';
+                    if (userCep) {
+                        geoQuery = userCep + ', Brasil';
+                    } else if (userNeighbourhood && userCity) {
+                        geoQuery = [userNeighbourhood, userCity, userState, 'Brasil'].filter(Boolean).join(', ');
+                    } else {
+                        geoQuery = [userCity, userState, 'Brasil'].filter(Boolean).join(', ');
+                    }
+                    if (!geoQuery || geoQuery === 'Brasil') return;
+                    if (locationIqKey) {
+                        fetch('https://us1.locationiq.com/v1/search?key=' + locationIqKey + '&q=' + encodeURIComponent(geoQuery) + '&countrycodes=br&format=json&limit=1')
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) {
+                                if (data && data[0]) { userLat = parseFloat(data[0].lat); userLon = parseFloat(data[0].lon); }
+                            }).catch(function() {});
+                    }
+                })();
 
                 function buildSearchQuery(text) {
                     var query = text.trim();
