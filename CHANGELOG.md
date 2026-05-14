@@ -2,6 +2,30 @@
 
 ---
 
+## [2026-07-22] - Atalhos do Superadmin no Dashboard /painel/admin
+
+### Adicionado
+- Novo bloco "Atalhos do Superadmin" no dashboard administrativo, visivel apenas para `isSuperAdmin()`
+- 4 cards de acesso direto: Armazenamento (S3/IDrive e2), Pagamentos, SMTP/E-mails e Sistema
+- Cada card abre direto na aba correspondente de `panel.admin.settings` sem navegacao adicional
+- Visual com cores diferentes por modulo, hover translate-up, indicador de seta animada
+
+### Motivo
+- Usuario relatou nao localizar a configuracao S3 no painel do superadmin
+- O link existia em "Painel admin > Ajustes > Armazenamento" mas ficava 3 niveis profundo
+- Atalhos no dashboard tornam configuracoes criticas imediatamente visiveis
+
+### Diagnostico realizado (sem alteracao de codigo)
+- Confirmado via script: 8 settings storage_* salvas corretamente no banco do servidor
+- Confirmado: `UploadStorage::effectiveDisk()` retorna `s3` apos boot
+- Confirmado: partial `storage.blade.php` renderiza com todos os campos pre-preenchidos
+- Cache de view, config, route e application limpos no servidor
+
+### Arquivos afetados
+- `resources/views/panel/admin/dashboard.blade.php` (novo bloco de atalhos)
+
+---
+
 ## [2026-05-14] - Correcoes de Eventos: Publicacao e Busca de Local
 
 ### Corrigido

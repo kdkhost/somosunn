@@ -61,6 +61,65 @@
             <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-72 h-72 bg-blue-400/20 dark:bg-purple-500/10 rounded-full blur-[80px] group-hover:bg-blue-400/30 transition-all duration-1000 pointer-events-none"></div>
         </div>
 
+        {{-- Atalhos rápidos do superadmin (configurações críticas) --}}
+        @if(auth()->user() && auth()->user()->isSuperAdmin())
+            @php
+                $quickAdminShortcuts = [
+                    [
+                        'label' => 'Armazenamento (S3)',
+                        'desc' => 'Configurar IDrive e2 e migrar arquivos',
+                        'url' => route('panel.admin.settings', ['group' => 'storage']),
+                        'icon' => 'fa-cloud',
+                        'color' => 'sky',
+                    ],
+                    [
+                        'label' => 'Pagamentos',
+                        'desc' => 'Mercado Pago, SumUp e taxas',
+                        'url' => route('panel.admin.settings', ['group' => 'gateway']),
+                        'icon' => 'fa-credit-card',
+                        'color' => 'emerald',
+                    ],
+                    [
+                        'label' => 'SMTP / E-mails',
+                        'desc' => 'Servidor de envio e templates',
+                        'url' => route('panel.admin.settings', ['group' => 'smtp']),
+                        'icon' => 'fa-envelope',
+                        'color' => 'violet',
+                    ],
+                    [
+                        'label' => 'Sistema',
+                        'desc' => 'Manutenção, debug, limites',
+                        'url' => route('panel.admin.settings', ['group' => 'system']),
+                        'icon' => 'fa-server',
+                        'color' => 'amber',
+                    ],
+                ];
+            @endphp
+            <div class="space-y-4">
+                <div class="px-2">
+                    <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Atalhos do Superadmin</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Acesso direto às configurações críticas da plataforma.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                    @foreach($quickAdminShortcuts as $shortcut)
+                        <a href="{{ $shortcut['url'] }}"
+                            class="group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-{{ $shortcut['color'] }}-300 dark:hover:border-{{ $shortcut['color'] }}-700">
+                            <div class="flex items-start gap-4">
+                                <div class="shrink-0 w-12 h-12 rounded-xl bg-{{ $shortcut['color'] }}-50 dark:bg-{{ $shortcut['color'] }}-900/30 text-{{ $shortcut['color'] }}-600 dark:text-{{ $shortcut['color'] }}-300 flex items-center justify-center">
+                                    <i class="fas {{ $shortcut['icon'] }} text-lg"></i>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-black text-sm text-slate-800 dark:text-white truncate">{{ $shortcut['label'] }}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-snug">{{ $shortcut['desc'] }}</p>
+                                </div>
+                                <i class="fas fa-arrow-right text-slate-300 dark:text-slate-600 group-hover:text-{{ $shortcut['color'] }}-500 group-hover:translate-x-1 transition-all"></i>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         <div class="space-y-6" id="panel-admin-service-visits">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 px-2">
                 <div>
