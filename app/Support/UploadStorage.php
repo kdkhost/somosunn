@@ -289,6 +289,19 @@ class UploadStorage
             return $default;
         }
 
+        // Se o disco efetivo e S3, verificar se o arquivo existe la
+        if (self::effectiveDisk() === 's3') {
+            try {
+                $s3Disk = Storage::disk('s3');
+                if ($s3Disk->exists($normalized)) {
+                    return $s3Disk->url($normalized);
+                }
+            } catch (\Throwable $e) {
+                // Fallback para local se S3 falhar
+            }
+        }
+
+        // Fallback: URL local
         $distinctPublicBaseUrl = self::distinctPublicBaseUrl();
         if ($distinctPublicBaseUrl !== null) {
             return self::joinUrl($distinctPublicBaseUrl, $normalized);
