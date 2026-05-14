@@ -2,6 +2,23 @@
 
 ---
 
+## [2026-05-14] - Padronizacao do Layout: /meu-parceiro
+
+### Alterado
+- Pagina `/meu-parceiro` migrada de `layouts.app` (publico) para `panel.layouts.app` (painel)
+- Substituidos estilos inline por classes Tailwind padrao do painel
+- Hero card com gradient padrao do sistema (azul/slate)
+- Cards de stats redesenhados (ícone + label + valor) seguindo padrao do painel
+- Lista de cupons com badges e botões padronizados
+- Modal de cupom com estilo consistente (border-radius, sombras, focus rings)
+- Suporte a dark mode
+- Sem alteracao de funcionalidade — apenas visual
+
+### Arquivos afetados
+- `resources/views/member/partner/index.blade.php`
+
+---
+
 ## [2026-05-14] - Correcao Critica: S3 Funcional via Painel
 
 ### Corrigido — UploadStorage agora aplica configuracao S3 do banco
