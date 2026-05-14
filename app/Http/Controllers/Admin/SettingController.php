@@ -1516,4 +1516,101 @@ class SettingController extends Controller
             ]);
         }
     }
+
+    public function migrateStorage(Request $request)
+    {
+        // Only superadmin can migrate
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return response()->json(['success' => false, 'message' => 'Apenas o superadmin pode executar migracoes.'], 403);
+        }
+
+        $path = $request->input('path', '');
+        $deleteLocal = $request->boolean('delete_local', false);
+
+        try {
+            $localDisk = Storage::disk('public');
+            $s3Disk = Storage::disk('s3');
+
+            $files = $path ? $localDisk->allFiles($path) : $localDisk->allFiles('');
+
+            if (empty($files)) {
+                return response()->json(['success' => true, 'message' => 'Nenhum arquivo encontrado.', 'migrated' => 0]);
+            }
+
+            $migrated = 0;
+            $failed = 0;
+            $skipped = 0;
+
+            foreach ($files as $file) {
+                if ($s3Disk->exists($file)) {
+                    $skipped++;
+                    continue;
+                }
+
+                try {
+                    $content = $localDisk->get($file);
+                    $s3Disk->put($file, $content, 'public');
+
+                    if ($s3Disk->exists($file)) {
+                        $migrated++;
+                        if ($deleteLocal) {
+                            $localDisk->delete($file);
+                        }
+                    } else {
+                        $failed++;
+                    }
+                } catch (\Throwable $e) {
+                    $failed++;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Migracao concluida: {$migrated} migrados, {$skipped} ja existiam, {$failed} falharam.",
+                'migrated' => $migrated,
+                'skipped' => $skipped,
+                'failed' => $failed,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Erro: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function storageFolders()
+    {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return response()->json(['success' => false], 403);
+        }
+
+        $localDisk = Storage::disk('public');
+        $directories = $localDisk->directories('');
+        $folders = [];
+
+        foreach ($directories as $dir) {
+            $files = $localDisk->allFiles($dir);
+            $size = 0;
+            foreach ($files as $f) {
+                $size += $localDisk->size($f);
+            }
+            $folders[] = [
+                'name' => $dir,
+                'files' => count($files),
+                'size' => $size,
+                'size_formatted' => $this->formatStorageBytes($size),
+            ];
+        }
+
+        // Sort by size descending
+        usort($folders, fn($a, $b) => $b['size'] - $a['size']);
+
+        return response()->json(['success' => true, 'folders' => $folders]);
+    }
+
+    private function formatStorageBytes(int $bytes): string
+    {
+        if ($bytes >= 1073741824) return number_format($bytes / 1073741824, 2) . ' GB';
+        if ($bytes >= 1048576) return number_format($bytes / 1048576, 2) . ' MB';
+        if ($bytes >= 1024) return number_format($bytes / 1024, 2) . ' KB';
+        return $bytes . ' B';
+    }
 }

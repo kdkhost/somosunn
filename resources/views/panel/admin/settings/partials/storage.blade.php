@@ -215,6 +215,36 @@
     </div>
 </div>
 
+{{-- MIGRACAO DE ARQUIVOS --}}
+<div class="stg-card mt-6" id="migration-section">
+    <div class="flex items-center gap-3 mb-4 border-b border-slate-100 dark:border-slate-700 pb-3">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400">
+            <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <div>
+            <h3 class="font-black text-slate-800 dark:text-white text-sm">Migracao de Arquivos</h3>
+            <p class="text-xs text-slate-400">Envie arquivos locais para o S3 sem sair do painel</p>
+        </div>
+    </div>
+
+    <div class="space-y-3">
+        <button type="button" onclick="stgLoadFolders()" id="btn-load-folders"
+            class="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-bold text-sm transition-all bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30">
+            <i class="fas fa-folder-open"></i> Listar Pastas Disponiveis
+        </button>
+
+        <div id="stg-folders-list" class="hidden space-y-2"></div>
+
+        <div id="stg-migration-progress" class="hidden mt-4 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <i class="fas fa-spinner fa-spin text-indigo-500" id="stg-mig-spinner"></i>
+                <span class="text-sm font-bold text-slate-700 dark:text-slate-200" id="stg-mig-status">Migrando...</span>
+            </div>
+            <div id="stg-mig-result" class="text-xs text-slate-500 dark:text-slate-400"></div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 (function() {
@@ -310,6 +340,167 @@
         .finally(function() {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-plug"></i> Testar Conexao S3';
+        });
+    };
+
+    // Folder labels mapping (Portuguese friendly names)
+    var folderLabels = {
+        'event-images': 'Imagens de Eventos',
+        'course-thumbs': 'Capas de Cursos',
+        'course-materials': 'Materiais de Cursos',
+        'course-videos': 'Videos de Cursos',
+        'uploads': 'Uploads Gerais',
+        'magazines': 'Revistas',
+        'events': 'Galeria de Eventos',
+        'pages': 'Paginas',
+        'branding': 'Identidade Visual',
+        'certificates': 'Certificados',
+        'partners': 'Parceiros',
+        'plan-images': 'Imagens de Planos',
+        'pwa-icons': 'Icones PWA',
+        'resumes': 'Curriculos',
+        'jobs': 'Vagas',
+        'redemptions': 'Resgates',
+    };
+
+    function getFolderLabel(name) {
+        return folderLabels[name] || name;
+    }
+
+    // Load folders for migration
+    window.stgLoadFolders = function() {
+        var btn = document.getElementById('btn-load-folders');
+        var list = document.getElementById('stg-folders-list');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+
+        fetch('{{ route("panel.admin.settings.storage.folders") }}', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-folder-open"></i> Atualizar Lista';
+
+            if (!data.success || !data.folders || data.folders.length === 0) {
+                list.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma pasta encontrada.</p>';
+                list.classList.remove('hidden');
+                return;
+            }
+
+            var html = '<div class="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">';
+            html += '<div class="px-4 py-2 bg-slate-50 dark:bg-slate-800 text-xs font-black uppercase tracking-wider text-slate-400 flex items-center justify-between"><span>Pasta</span><span>Acoes</span></div>';
+
+            data.folders.forEach(function(folder) {
+                var label = getFolderLabel(folder.name);
+                html += '<div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40">';
+                html += '<div class="flex-1 min-w-0">';
+                html += '<p class="font-bold text-sm text-slate-800 dark:text-white truncate">' + label + '</p>';
+                html += '<p class="text-xs text-slate-400">' + folder.name + ' &bull; ' + folder.files + ' arquivos &bull; ' + folder.size_formatted + '</p>';
+                html += '</div>';
+                html += '<div class="flex gap-2 shrink-0">';
+                html += '<button type="button" onclick="stgMigrateFolder(\'' + folder.name + '\', false)" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition" title="Copiar para S3 (manter local)"><i class="fas fa-copy"></i></button>';
+                html += '<button type="button" onclick="stgMigrateFolder(\'' + folder.name + '\', true)" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-red-500 hover:bg-red-600 transition" title="Mover para S3 (apagar local)"><i class="fas fa-cloud-upload-alt"></i></button>';
+                html += '</div>';
+                html += '</div>';
+            });
+
+            // Botao migrar tudo
+            html += '<div class="px-4 py-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">';
+            html += '<button type="button" onclick="stgMigrateAll()" class="w-full py-2.5 rounded-xl text-xs font-black text-white bg-red-600 hover:bg-red-700 transition flex items-center justify-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Migrar TUDO para S3 (apagar local)</button>';
+            html += '</div>';
+
+            html += '</div>';
+            list.innerHTML = html;
+            list.classList.remove('hidden');
+        })
+        .catch(function(err) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-folder-open"></i> Listar Pastas Disponiveis';
+            if (typeof toastr !== 'undefined') toastr.error('Erro ao carregar pastas.');
+        });
+    };
+
+    // Migrate a specific folder
+    window.stgMigrateFolder = function(path, deleteLocal) {
+        var action = deleteLocal ? 'MOVER (apagar local)' : 'COPIAR (manter local)';
+        Swal.fire({
+            title: action + ' pasta "' + path + '"?',
+            text: deleteLocal ? 'Os arquivos locais serao apagados apos confirmacao no S3.' : 'Os arquivos serao copiados para o S3. O local sera mantido.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: deleteLocal ? '#ef4444' : '#4f46e5',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: '<i class="fas fa-cloud-upload-alt mr-1"></i> ' + (deleteLocal ? 'Mover' : 'Copiar'),
+            cancelButtonText: 'Cancelar'
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+            stgRunMigration(path, deleteLocal);
+        });
+    };
+
+    // Migrate all
+    window.stgMigrateAll = function() {
+        Swal.fire({
+            title: 'Migrar TODOS os arquivos?',
+            html: 'Todos os arquivos locais serao enviados para o S3 e <strong>apagados do servidor</strong>. Esta acao nao pode ser desfeita.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: '<i class="fas fa-cloud-upload-alt mr-1"></i> Sim, migrar tudo',
+            cancelButtonText: 'Cancelar'
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+            stgRunMigration('', true);
+        });
+    };
+
+    // Execute migration
+    window.stgRunMigration = function(path, deleteLocal) {
+        var progress = document.getElementById('stg-migration-progress');
+        var spinner = document.getElementById('stg-mig-spinner');
+        var status = document.getElementById('stg-mig-status');
+        var resultDiv = document.getElementById('stg-mig-result');
+
+        progress.classList.remove('hidden');
+        spinner.className = 'fas fa-spinner fa-spin text-indigo-500';
+        status.textContent = 'Migrando ' + (path || 'todos os arquivos') + '...';
+        resultDiv.textContent = '';
+
+        fetch('{{ route("panel.admin.settings.storage.migrate") }}', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ path: path, delete_local: deleteLocal })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                spinner.className = 'fas fa-check-circle text-emerald-500';
+                status.textContent = 'Concluido!';
+                resultDiv.textContent = data.message;
+                if (typeof toastr !== 'undefined') toastr.success(data.message);
+                // Recarregar lista de pastas
+                setTimeout(stgLoadFolders, 1500);
+            } else {
+                spinner.className = 'fas fa-times-circle text-red-500';
+                status.textContent = 'Falha';
+                resultDiv.textContent = data.message;
+                if (typeof toastr !== 'undefined') toastr.error(data.message);
+            }
+        })
+        .catch(function(err) {
+            spinner.className = 'fas fa-times-circle text-red-500';
+            status.textContent = 'Erro de conexao';
+            resultDiv.textContent = err.message;
+            if (typeof toastr !== 'undefined') toastr.error('Erro de conexao.');
         });
     };
 })();
