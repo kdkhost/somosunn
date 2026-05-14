@@ -2,6 +2,47 @@
 
 ---
 
+## [2026-05-14] - Correcao Critica: S3 Funcional via Painel
+
+### Corrigido — UploadStorage agora aplica configuracao S3 do banco
+- `applyRuntimeConfig()` agora le credenciais S3 do banco (Setting) com fallback para .env
+- `selectedDisk()`, `effectiveDisk()`, `disk()` e `isLocal()` agora respeitam a configuracao salva
+- Sobrescreve dinamicamente `filesystems.disks.s3.*` em runtime sem usar closures (mantem `config:cache` funcional)
+- Fallback automatico para disco `public` se credenciais S3 estiverem incompletas
+- Sem isso, o painel de Armazenamento era apenas cosmetico — agora salva e aplica de verdade
+
+### Arquivos afetados
+- `app/Support/UploadStorage.php`
+
+---
+
+## [2026-05-14] - Polimento Final: IDrive e2 + Pagina de Reputacao
+
+### Adicionado — Guia de credenciais IDrive e2
+- Card informativo no painel de Armazenamento explicando como obter credenciais IDrive e2
+- Link direto para `idrive.com/s3-storage-e2` e passo a passo (Bucket, Access Keys, Endpoint)
+- Aviso de seguranca sobre armazenamento de credenciais
+
+### Adicionado — Pagina de detalhes da Reputacao do membro
+- Nova rota `panel.reputation` (`/painel/reputacao`)
+- `ReputationController@show` com dados de score + historico dos ultimos 6 meses
+- Hero card com badge grande, score numerico, label e barra de progresso
+- 4 barras de progresso (uma por dimensao: Entrega, Relacionamento, Interacao, Engajamento)
+- Secao de dicas de melhoria (exibida apenas para dimensoes com score < 50)
+- Grafico historico HTML/CSS dos ultimos 6 meses com cores por faixa de score
+- Item "Minha Reputacao" no menu principal da sidebar do painel
+
+### Arquivos criados
+- `app/Http/Controllers/Panel/ReputationController.php`
+- `resources/views/panel/reputation/show.blade.php`
+
+### Arquivos alterados
+- `routes/web.php` (rota `panel.reputation`)
+- `resources/views/panel/admin/settings/partials/storage.blade.php` (guia IDrive e2)
+- `resources/views/panel/partials/sidebar.blade.php` (item "Minha Reputacao")
+
+---
+
 ## [2026-05-14] - Sistema de Reputação do Membro
 
 ### Adicionado

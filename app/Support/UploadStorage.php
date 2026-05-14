@@ -14,38 +14,104 @@ class UploadStorage
     public static function applyRuntimeConfig(array $settings = []): void
     {
         $localConfig = self::localPublicDiskConfig();
-        $selectedDisk = 'public';
-        $effectiveDisk = 'public';
 
+        // Configurar discos locais sempre (compatibilidade legacy)
         config([
-            'uploads.disk' => 'public',
-            'filesystems.cloud' => 'public',
             'filesystems.disks.public' => $localConfig,
             'filesystems.disks.uploads' => $localConfig,
             'filesystems.disks.local_public' => $localConfig,
         ]);
 
+        // Tentar ler configuracoes do banco com fallback seguro
+        $dbSettings = self::readStorageSettingsFromDb();
+        $merged = array_merge($dbSettings, $settings);
+
+        // Resolver disco selecionado: db -> env -> public
+        $selectedDisk = $merged['storage_driver'] ?? env('FILESYSTEM_DISK', 'public');
+        $selectedDisk = in_array($selectedDisk, ['s3', 'public'], true) ? $selectedDisk : 'public';
+
+        // Se S3 selecionado, aplicar credenciais (db -> env)
+        $effectiveDisk = $selectedDisk;
+        if ($selectedDisk === 's3') {
+            $s3Key = $merged['storage_access_key'] ?? env('AWS_ACCESS_KEY_ID');
+            $s3Secret = $merged['storage_secret_key'] ?? env('AWS_SECRET_ACCESS_KEY');
+            $s3Bucket = $merged['storage_bucket'] ?? env('AWS_BUCKET');
+
+            // Sobrescrever config do disco s3 com valores do banco
+            config([
+                'filesystems.disks.s3.key' => $s3Key,
+                'filesystems.disks.s3.secret' => $s3Secret,
+                'filesystems.disks.s3.region' => $merged['storage_region'] ?? env('AWS_DEFAULT_REGION', 'us-east-1'),
+                'filesystems.disks.s3.bucket' => $s3Bucket,
+                'filesystems.disks.s3.url' => $merged['storage_url'] ?? env('AWS_URL'),
+                'filesystems.disks.s3.endpoint' => $merged['storage_endpoint'] ?? env('AWS_ENDPOINT'),
+                'filesystems.disks.s3.use_path_style_endpoint' => (bool) ($merged['storage_path_style'] ?? env('AWS_USE_PATH_STYLE_ENDPOINT', true)),
+            ]);
+
+            // Fallback: se credenciais incompletas, voltar ao public
+            if (empty($s3Key) || empty($s3Secret) || empty($s3Bucket)) {
+                $effectiveDisk = 'public';
+            }
+        }
+
         config([
+            'uploads.disk' => $effectiveDisk,
             'uploads.selected_disk' => $selectedDisk,
             'uploads.effective_disk' => $effectiveDisk,
+            'filesystems.cloud' => $effectiveDisk,
         ]);
 
         self::forgetDisks();
     }
 
+    /**
+     * Le configuracoes de armazenamento do banco com fallback seguro.
+     * Retorna array vazio se a tabela nao existe ou ocorre erro.
+     */
+    private static function readStorageSettingsFromDb(): array
+    {
+        try {
+            if (!class_exists(\App\Models\Setting::class)) {
+                return [];
+            }
+
+            $keys = [
+                'storage_driver',
+                'storage_bucket',
+                'storage_endpoint',
+                'storage_region',
+                'storage_access_key',
+                'storage_secret_key',
+                'storage_url',
+                'storage_path_style',
+            ];
+
+            $result = [];
+            foreach ($keys as $key) {
+                $value = \App\Models\Setting::get($key, null);
+                if ($value !== null && $value !== '') {
+                    $result[$key] = $value;
+                }
+            }
+            return $result;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
     public static function selectedDisk(array $settings = []): string
     {
-        return 'public';
+        return (string) (config('uploads.selected_disk', 'public') ?: 'public');
     }
 
     public static function effectiveDisk(): string
     {
-        return 'public';
+        return (string) (config('uploads.effective_disk', 'public') ?: 'public');
     }
 
     public static function disk()
     {
-        return Storage::disk('public');
+        return Storage::disk(self::effectiveDisk());
     }
 
     public static function storeUploadedFile(
@@ -104,7 +170,7 @@ class UploadStorage
 
     public static function isLocal(): bool
     {
-        return true;
+        return self::effectiveDisk() === 'public';
     }
 
     public static function effectiveUploadLimitBytes(?int $applicationMaxBytes = null, ?string $uploadMax = null, ?string $postMax = null): ?int

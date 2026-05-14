@@ -467,6 +467,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
     Route::post('my-jobs/applications/{application}/status', [\App\Http\Controllers\Panel\MyJobController::class, 'updateApplicationStatus'])->name('my-jobs.application.status');
 
     Route::get('/meus-pontos', [\App\Http\Controllers\Panel\PointsController::class, 'index'])->name('points.index');
+    Route::get('/reputacao', [\App\Http\Controllers\Panel\ReputationController::class, 'show'])->name('reputation');
     Route::get('/indicacoes', [\App\Http\Controllers\Panel\ReferralController::class, 'index'])->name('referral.index');
     Route::get('/indicacoes/exportar', [\App\Http\Controllers\Panel\ReferralController::class, 'export'])->name('referral.export');
     Route::get('/indicacoes/dados', [\App\Http\Controllers\Panel\ReferralController::class, 'stats'])->name('referral.stats');

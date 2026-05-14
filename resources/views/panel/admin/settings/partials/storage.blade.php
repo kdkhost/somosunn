@@ -96,6 +96,26 @@
     </p>
 </div>
 
+{{-- IDrive e2 SETUP GUIDE --}}
+<div class="rounded-2xl bg-blue-50 border border-blue-200 p-4 mb-4 dark:bg-blue-900/20 dark:border-blue-700">
+    <div class="flex items-start gap-3">
+        <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-1"></i>
+        <div class="flex-1 text-sm">
+            <p class="font-bold text-blue-800 dark:text-blue-200 mb-2">Como obter credenciais IDrive e2:</p>
+            <ol class="list-decimal ml-5 space-y-1 text-blue-700 dark:text-blue-300">
+                <li>Acesse <a href="https://www.idrive.com/s3-storage-e2/" target="_blank" class="underline font-semibold">idrive.com/s3-storage-e2</a> e crie uma conta</li>
+                <li>Crie um Bucket no painel IDrive e2</li>
+                <li>Em "Access Keys", gere um par de chaves (Access Key + Secret Key)</li>
+                <li>Copie o Endpoint URL fornecido (formato: https://xxxx.e2.cloud.idrive.com)</li>
+                <li>Cole as credenciais nos campos abaixo e clique em "Testar Conexao"</li>
+            </ol>
+            <p class="mt-2 text-xs text-blue-600 dark:text-blue-400">
+                <i class="fas fa-shield-alt"></i> Suas credenciais sao armazenadas com seguranca no banco de dados.
+            </p>
+        </div>
+    </div>
+</div>
+
 {{-- S3 FIELDS --}}
 <div id="s3-fields" class="{{ $storageDriver !== 's3' ? 'opacity-50 pointer-events-none' : '' }} transition-all duration-300">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

@@ -157,6 +157,13 @@
             'visible' => true,
         ],
         [
+            'label' => 'Minha Reputacao',
+            'route' => route('panel.reputation'),
+            'icon' => 'fas fa-medal',
+            'active' => request()->routeIs('panel.reputation'),
+            'visible' => true,
+        ],
+        [
             'label' => 'Indicações',
             'route' => route('panel.referral.index'),
             'icon' => 'fas fa-user-plus',
