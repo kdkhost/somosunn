@@ -19,33 +19,59 @@ class PublicStorageProxyController extends Controller
     private function servePath(string $path, bool $uploadsRoute)
     {
         // Proteção contra path traversal e acesso a arquivos sensíveis
-        $decodedPath = urldecode($path);
-        if (str_contains($decodedPath, '..') ||
-            str_contains($decodedPath, '.env') ||
-            str_contains($decodedPath, 'config/') ||
-            str_contains($decodedPath, 'database/') ||
-            str_contains($decodedPath, 'vendor/') ||
-            str_contains($decodedPath, 'storage/logs') ||
-            str_contains($decodedPath, 'app/') ||
-            str_contains($decodedPath, 'bootstrap/')) {
-            \Illuminate\Support\Facades\Log::warning('Tentativa de path traversal bloqueada', [
-                'ip'   => request()->ip(),
-                'path' => $decodedPath,
-                'url'  => request()->fullUrl(),
+        // Double-decode para prevenir bypass com %252e%252e etc.
+        $decodedPath = urldecode(urldecode($path));
+
+        // Bloquear padrões perigosos
+        $blockedPatterns = [
+            '..',
+            '.env',
+            'vendor/',
+            'storage/logs',
+            'config/',
+            'database/',
+            'app/',
+            'bootstrap/',
+        ];
+
+        foreach ($blockedPatterns as $pattern) {
+            if (str_contains($decodedPath, $pattern)) {
+                \Illuminate\Support\Facades\Log::channel('security')->warning('Path traversal bloqueado em storage proxy', [
+                    'ip'      => request()->ip(),
+                    'path'    => $decodedPath,
+                    'pattern' => $pattern,
+                    'url'     => request()->fullUrl(),
+                ]);
+                abort(403);
+            }
+        }
+
+        // Bloquear extensões perigosas (executáveis/scripts)
+        $blockedExtensions = [
+            'php', 'phtml', 'phar', 'cgi', 'exe', 'sh', 'bat', 'cmd', 'js',
+        ];
+
+        $extension = strtolower(pathinfo($decodedPath, PATHINFO_EXTENSION));
+
+        if ($extension !== '' && in_array($extension, $blockedExtensions, true)) {
+            \Illuminate\Support\Facades\Log::channel('security')->warning('Extensao perigosa bloqueada em storage proxy', [
+                'ip'        => request()->ip(),
+                'path'      => $decodedPath,
+                'extension' => $extension,
             ]);
             abort(403);
         }
 
-        // Validar extensão permitida
+        // Validar extensão permitida (whitelist)
         $allowedExtensions = [
-            'jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'ico',
+            'jpg', 'jpeg', 'png', 'webp', 'gif', 'svg',
             'pdf',
-            'mp4', 'webm', 'mp3', 'ogg', 'wav',
+            'mp4', 'webm', 'mp3', 'wav', 'ogg',
             'ttf', 'otf', 'woff', 'woff2', 'eot',
         ];
-        $extension = strtolower(pathinfo($decodedPath, PATHINFO_EXTENSION));
+
         if ($extension !== '' && !in_array($extension, $allowedExtensions, true)) {
-            \Illuminate\Support\Facades\Log::warning('Extensão de arquivo bloqueada em storage/uploads', [
+            \Illuminate\Support\Facades\Log::channel('security')->warning('Extensao nao permitida em storage proxy', [
                 'ip'        => request()->ip(),
                 'path'      => $decodedPath,
                 'extension' => $extension,

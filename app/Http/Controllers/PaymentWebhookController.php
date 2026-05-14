@@ -13,6 +13,7 @@ use App\Models\Plan;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\OrderSplit;
+use App\Models\PaymentWebhookLog;
 use App\Models\SumUpWebhookLog;
 use App\Services\CouponService;
 use App\Services\AffiliateTrackingService;
@@ -107,6 +108,22 @@ class PaymentWebhookController extends Controller
         }
 
         $type = $request->input('type') ?? $request->input('topic');
+
+        // Registrar webhook no banco para auditoria
+        $paymentIdForLog = $request->input('data.id') ?? $request->input('id');
+        try {
+            PaymentWebhookLog::create([
+                'provider'    => 'mercadopago',
+                'external_id' => (string) ($paymentIdForLog ?? ''),
+                'request_id'  => $requestId,
+                'signature'   => $signature,
+                'status'      => $type,
+                'payload'     => $request->all(),
+                'ip'          => $request->ip(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Falha ao registrar webhook log MP: ' . $e->getMessage());
+        }
 
         // Se for preapproval (assinatura iniciada/autorizada)
         if ($type === 'subscription_preapproval' || $type === 'preapproval') {

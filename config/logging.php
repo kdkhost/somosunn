@@ -81,7 +81,7 @@ return [
         'security' => [
             'driver' => 'daily',
             'path' => storage_path('logs/security.log'),
-            'level' => env('SECURITY_LOG_LEVEL', 'info'),
+            'level' => env('SECURITY_LOG_LEVEL', 'warning'),
             'days' => env('SECURITY_LOG_DAYS', 90),
         ],
 

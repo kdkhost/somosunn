@@ -7,6 +7,37 @@ AddDefaultCharset UTF-8
 
     RewriteEngine On
 
+    # === SECURITY: Block access to sensitive files and directories ===
+    # Block .env files
+    RewriteRule ^\.env - [F,L]
+    RewriteRule \.env$ - [F,L]
+
+    # Block .git directory
+    RewriteRule ^\.git - [F,L]
+
+    # Block .htaccess and .htpasswd
+    RewriteRule ^\.ht - [F,L]
+
+    # Block composer files
+    RewriteRule ^composer\.(json|lock)$ - [F,L]
+
+    # Block package files
+    RewriteRule ^package(-lock)?\.json$ - [F,L]
+
+    # Block storage/logs access
+    RewriteRule ^storage/ - [F,L]
+
+    # Block vendor directory direct access
+    RewriteRule ^vendor/ - [F,L]
+
+    # Block config directory
+    RewriteRule ^config/ - [F,L]
+
+    # Block database directory
+    RewriteRule ^database/ - [F,L]
+
+    # === END SECURITY ===
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -21,6 +52,16 @@ AddDefaultCharset UTF-8
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Block access to hidden files (dotfiles)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Block access to sensitive file types
+<FilesMatch "\.(env|git|gitignore|gitmodules|bak|sql|log|ini|conf|dist|yml|yaml|lock)$">
+    Require all denied
+</FilesMatch>
 
 <IfModule mod_headers.c>
     # CORS headers for external resources (prevent CORB blocking)

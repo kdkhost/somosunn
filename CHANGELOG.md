@@ -2,6 +2,40 @@
 
 ---
 
+## [2026-05-14] - Segurança: Finalização Completa
+
+### Adicionado
+- Tabela `payment_webhook_logs` para auditoria de webhooks (provider, external_id, request_id, signature, status, payload, ip)
+- Model `PaymentWebhookLog` para registrar cada chamada de webhook
+- Logging de webhooks MP no banco de dados (cada chamada registrada para auditoria)
+- Regras de bloqueio no `public/.htaccess`: .env, .git, composer.*, package*.json, storage/, vendor/, config/, database/
+- Bloqueio de dotfiles e extensões sensíveis (.sql, .log, .ini, .conf, .bak, .yml, .yaml, .lock) via FilesMatch
+
+### Alterado
+- `PublicStorageProxyController`: double-decode (urldecode×2), extensões perigosas bloqueadas (php, phtml, phar, cgi, exe, sh, bat, cmd, js), logging no canal security
+- `PaymentWebhookController`: cada webhook MP agora é registrado na tabela payment_webhook_logs
+- `config/logging.php`: canal security com nível warning (era info)
+
+### Verificação de segurança completa
+- ✅ BlockSensitiveRoutesInProduction (global, 11 padrões)
+- ✅ SecurityHeadersMiddleware (X-Frame, nosniff, Referrer-Policy, HSTS, sem camera=())
+- ✅ Path traversal protection (double-decode, blacklist + whitelist)
+- ✅ Webhook MP (anti-replay, header check, DB logging, consulta API)
+- ✅ Login throttle (10/min login, 5/min register, 5/min reset)
+- ✅ Security log channel (daily, 90 dias)
+- ✅ .htaccess hardening (public + uploads)
+- ✅ WAF com 18 regras ativas
+
+### Arquivos afetados
+- `app/Http/Controllers/PaymentWebhookController.php`
+- `app/Http/Controllers/PublicStorageProxyController.php`
+- `app/Models/PaymentWebhookLog.php` (novo)
+- `database/migrations/2026_07_21_000001_create_payment_webhook_logs_table.php` (novo)
+- `config/logging.php`
+- `public/.htaccess`
+
+---
+
 ## [2026-05-14] - Preparação S3 Cloud Storage (IDrive e2)
 
 ### Adicionado
