@@ -1185,7 +1185,8 @@ async function setAsCover(mediaId) {
                         credentials: 'same-origin'
                     })
                     .then(function(data) {
-                        renderVenueResults(data.results || data || []);
+                        var results = Array.isArray(data) ? data : (data.results || []);
+                        renderVenueResults(results);
                     })
                     .catch(function(err) {
                         console.error('Venue search error:', err);
