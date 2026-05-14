@@ -281,6 +281,31 @@ class SumUpService
         return $this->get("/v0.1/checkouts/{$checkoutId}", $apiKey);
     }
 
+    /**
+     * Cancela um checkout SumUp pendente.
+     */
+    public function cancelCheckout(string $checkoutId): array
+    {
+        try {
+            $apiKey   = $this->apiKey();
+            $response = $this->delete("/v0.1/checkouts/{$checkoutId}", $apiKey);
+
+            Log::info('SumUp checkout cancelled', [
+                'checkout_id' => $checkoutId,
+                'response'    => $response,
+            ]);
+
+            return ['success' => true, 'response' => $response];
+        } catch (\Throwable $e) {
+            Log::warning('SumUp cancelCheckout failed', [
+                'checkout_id' => $checkoutId,
+                'error'       => $e->getMessage(),
+            ]);
+
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Reembolso
     // -------------------------------------------------------------------------

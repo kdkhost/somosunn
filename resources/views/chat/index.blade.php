@@ -52,9 +52,26 @@
             <!-- Sidebar Conversations -->
             <div :class="activeConversationId ? 'hidden md:flex' : 'flex'"
                 class="w-full md:w-1/3 border-r border-gray-200 dark:border-slate-800 flex-col transition-all">
+                @php
+                    $blockedCount = \App\Models\Connection::where('status', 'blocked')
+                        ->where(function ($q) {
+                            $q->where('requester_id', Auth::id())
+                              ->orWhere('requested_id', Auth::id());
+                        })->count();
+                @endphp
                 <div
-                    class="p-3 sm:p-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 transition-colors">
+                    class="p-3 sm:p-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 transition-colors flex items-center justify-between">
                     <h2 class="font-bold text-lg sm:text-xl text-gray-800 dark:text-white">Mensagens</h2>
+                    <a href="{{ route('connection.blocked') }}"
+                       class="text-gray-500 hover:text-red-500 transition text-sm flex items-center gap-1"
+                       title="Usuarios bloqueados">
+                        <i class="fas fa-user-slash"></i>
+                        @if($blockedCount > 0)
+                            <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                                {{ $blockedCount }}
+                            </span>
+                        @endif
+                    </a>
                 </div>
 
                 <div class="flex-1 overflow-y-auto no-scrollbar" id="conversations-list">

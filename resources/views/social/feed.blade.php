@@ -106,6 +106,13 @@
                                         <p class="text-xs text-gray-500">Membro</p>
                                     </div>
                                 </div>
+                                @php
+                                    $blockedCount = \App\Models\Connection::where('status', 'blocked')
+                                        ->where(function ($q) {
+                                            $q->where('requester_id', Auth::id())
+                                              ->orWhere('requested_id', Auth::id());
+                                        })->count();
+                                @endphp
                                 <nav class="space-y-2 mb-4">
                                     <button type="button" data-panel="feed"
                                         class="w-full flex items-center gap-2 text-blue-600 font-medium p-2 bg-blue-50 rounded transition">
@@ -117,6 +124,16 @@
                                         <i class="fas fa-comments w-6"></i>
                                         <span>Mensagens</span>
                                     </button>
+                                    <a href="{{ route('connection.blocked') }}"
+                                        class="w-full flex items-center gap-2 text-gray-600 hover:text-blue-600 p-2 rounded transition">
+                                        <i class="fas fa-user-slash w-6"></i>
+                                        <span>Bloqueados</span>
+                                        @if($blockedCount > 0)
+                                            <span class="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                                                {{ $blockedCount }}
+                                            </span>
+                                        @endif
+                                    </a>
                                 </nav>
                                 <div class="border-t border-gray-100 pt-4">
                                     <div class="flex items-center justify-between mb-3">

@@ -9,6 +9,13 @@
     // Interesse em Noticias (exibe modulo Revistas)
     $hasNewsInterest = \App\Models\Magazine::userHasNewsInterest($user);
 
+    // Contagem de usuarios bloqueados
+    $blockedCount = \App\Models\Connection::where('status', 'blocked')
+        ->where(function ($q) use ($user) {
+            $q->where('requester_id', $user->id)
+              ->orWhere('requested_id', $user->id);
+        })->count();
+
     if ($canAccessInstructorArea) {
         try {
             $hasPartnerProfile = \App\Models\Partner::where('user_id', $user->id)->exists();
@@ -105,6 +112,14 @@
             'icon' => 'fas fa-comments',
             'active' => request()->routeIs('chat.*'),
             'visible' => $user->canAccessFeature('chat'),
+        ],
+        [
+            'label' => 'Bloqueados',
+            'route' => route('connection.blocked'),
+            'icon' => 'fas fa-user-slash',
+            'active' => request()->routeIs('connection.blocked'),
+            'visible' => $user->canAccessFeature('community'),
+            'badge' => $blockedCount,
         ],
         [
             'label' => 'Marketplace',
@@ -415,6 +430,11 @@
                         <a href="{{ $item['route'] }}" class="{{ $submenuItemClass($item['active']) }}">
                             <i class="{{ $item['icon'] }} w-4 opacity-80"></i>
                             <span>{{ $item['label'] }}</span>
+                            @if(!empty($item['badge']))
+                                <span class="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                                    {{ $item['badge'] }}
+                                </span>
+                            @endif
                         </a>
                     @endforeach
                 </div>

@@ -232,13 +232,17 @@ class SubscriptionController extends Controller
                 }
             }
 
+            $sellerId = $plan->seller_id;
+            $platformFeePercent = \App\Support\MarketplaceFee::percent();
+            $platformFeeAmount = $sellerId ? \App\Support\MarketplaceFee::amount($effectivePrice) : 0.0;
+
             $order = Order::create([
                 'user_id' => $user->id,
-                'seller_id' => null,
+                'seller_id' => $sellerId,
                 'status' => 'pending',
                 'total_amount' => $effectivePrice,
                 'fee_amount' => 0,
-                'platform_fee_amount' => 0,
+                'platform_fee_amount' => $platformFeeAmount,
                 'currency' => 'BRL',
                 'gateway' => $chosenGateway,
                 'gateway_account_id' => null,
@@ -247,6 +251,7 @@ class SubscriptionController extends Controller
                     'sale_type' => 'subscription',
                     'period' => $period,
                     'prorata' => $prorataAmount > 0 ? $prorataAmount : null,
+                    'platform_fee_percent' => $sellerId ? $platformFeePercent : null,
                     'public_token' => Str::random(40),
                 ],
             ]);
@@ -482,13 +487,17 @@ class SubscriptionController extends Controller
         }
 
         // Criar pedido
+        $sellerId = $plan->seller_id;
+        $platformFeePercent = \App\Support\MarketplaceFee::percent();
+        $platformFeeAmount = $sellerId ? \App\Support\MarketplaceFee::amount($effectivePrice) : 0.0;
+
         $order = Order::create([
             'user_id' => $user->id,
-            'seller_id' => null,
+            'seller_id' => $sellerId,
             'status' => 'pending',
             'total_amount' => $effectivePrice,
             'fee_amount' => 0,
-            'platform_fee_amount' => 0,
+            'platform_fee_amount' => $platformFeeAmount,
             'currency' => 'BRL',
             'gateway' => 'sumup',
             'gateway_account_id' => null,
@@ -497,6 +506,7 @@ class SubscriptionController extends Controller
                 'sale_type' => 'subscription',
                 'period' => $period,
                 'prorata' => $prorataAmount > 0 ? $prorataAmount : null,
+                'platform_fee_percent' => $sellerId ? $platformFeePercent : null,
                 'public_token' => Str::random(40),
             ],
         ]);

@@ -2,6 +2,39 @@
 
 ---
 
+## [2026-05-14] - Implementação de 3 Features Pendentes
+
+### Adicionado — Lista de Bloqueados Visível
+- Link "Bloqueados" com badge na sidebar do feed social
+- Link "Bloqueados" com badge no cabeçalho do chat
+- Link "Bloqueados" com badge no sidebar do painel (condicionado a feature community)
+- Contagem de usuários bloqueados exibida em tempo real
+
+### Adicionado — Cancelamento Automático de Pedidos (PIX 24h / Cartão 48h)
+- Método `cancelCheckout()` no SumUpService para cancelar checkouts via API
+- Deadlines configuráveis: `pix_cancel_hours` (default 24h), `card_cancel_hours` (default 48h)
+- Liberação automática de cupons reservados ao cancelar pedido
+- Metadados detalhados: "Auto-cancel: payment window expired (pix, 24h)"
+- Liberação de vagas de eventos ao cancelar pedido
+
+### Adicionado — Taxa da Plataforma em Assinaturas
+- Migration `add_seller_id_to_plans_table` (FK nullable para users)
+- Relacionamento `seller()` no model Plan
+- SubscriptionController aplica `MarketplaceFee::amount()` quando plano tem seller_id
+- Registra `platform_fee_percent` nos metadados do pedido
+
+### Arquivos afetados
+- `resources/views/social/feed.blade.php`
+- `resources/views/chat/index.blade.php`
+- `resources/views/panel/partials/sidebar.blade.php`
+- `app/Console/Commands/CancelUnpaidOrders.php`
+- `app/Services/Payment/SumUpService.php`
+- `app/Models/Plan.php`
+- `app/Http/Controllers/SubscriptionController.php`
+- `database/migrations/2026_07_21_000002_add_seller_id_to_plans_table.php` (novo)
+
+---
+
 ## [2026-05-14] - Segurança: Finalização Completa
 
 ### Adicionado

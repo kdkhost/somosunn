@@ -290,6 +290,7 @@ class Plan extends Model
     protected $fillable = [
         'name',
         'slug',
+        'seller_id',
         'price',
         'period',
         'billing_cycle',
@@ -329,6 +330,11 @@ class Plan extends Model
         'period_settings' => 'array',
         'sort_order' => 'integer',
     ];
+
+    public function seller(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'seller_id');
+    }
 
     public function getImageUrlAttribute(): ?string
     {

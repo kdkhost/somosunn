@@ -13,33 +13,33 @@ use Illuminate\Support\Facades\Log;
 class CancelUnpaidOrders extends Command
 {
     protected $signature = 'orders:cancel-unpaid';
-    protected $description = 'Cancels unpaid orders based on payment method deadlines (PIX = configured minutes, card = 24h, default = 48h)';
+    protected $description = 'Cancels unpaid orders based on payment method deadlines (PIX = 24h, card = 48h)';
 
     public function handle()
     {
         $this->info('Starting checks for unpaid orders...');
 
-        // Deadlines configuráveis
-        $mpPixMinutes = (int) (Setting::get('mercadopago_pix_expiration_minutes') ?? Setting::get('pix_expiration_minutes') ?? 10);
-        $sumupPixMinutes = (int) (Setting::get('sumup_pix_expiration_minutes') ?? 10);
-        $cardHours = 24;   // cartao: 24h padrao
-        $defaultHours = 24; // sem metodo definido: 24h (antes era 48h)
+        // Deadlines configuraveis via Settings (em horas)
+        $pixCancelHours  = (int) (Setting::get('pix_cancel_hours', 24));
+        $cardCancelHours = (int) (Setting::get('card_cancel_hours', 48));
+        $defaultHours    = 48;
 
-        // Otimização: só buscar pedidos pendentes criados há mais de X minutos (mínimo possível)
-        $minDeadline = min($mpPixMinutes, $sumupPixMinutes);
-        $maxAge = Carbon::now()->subMinutes($minDeadline);
+        // Otimizacao: so buscar pedidos pendentes criados ha mais de X horas (minimo possivel)
+        $minHours = min($pixCancelHours, $cardCancelHours);
+        $maxAge   = Carbon::now()->subHours($minHours);
 
         $count = 0;
 
         Order::where('status', 'pending')
             ->where('created_at', '<', $maxAge)
             ->with('items')
-            ->chunkById(100, function ($orders) use ($mpPixMinutes, $sumupPixMinutes, $cardHours, $defaultHours, &$count) {
+            ->chunkById(100, function ($orders) use ($pixCancelHours, $cardCancelHours, $defaultHours, &$count) {
                 foreach ($orders as $order) {
-                    $deadline = $this->computeDeadline($order, $mpPixMinutes, $sumupPixMinutes, $cardHours, $defaultHours);
+                    $deadline = $this->computeDeadline($order, $pixCancelHours, $cardCancelHours, $defaultHours);
 
                     if ($order->created_at->lt($deadline)) {
-                        $this->cancelOrder($order);
+                        $hours = $this->getHoursForMethod($order, $pixCancelHours, $cardCancelHours, $defaultHours);
+                        $this->cancelOrder($order, $hours);
                         $count++;
                     }
                 }
@@ -51,39 +51,50 @@ class CancelUnpaidOrders extends Command
     }
 
     /**
-     * Calcula o deadline para o pedido considerando método de pagamento.
+     * Calcula o deadline para o pedido considerando metodo de pagamento.
+     * Retorna o timestamp limite: se created_at < deadline, o pedido expirou.
      */
-    private function computeDeadline(Order $order, int $mpPixMin, int $sumupPixMin, int $cardHours, int $defaultHours): Carbon
+    private function computeDeadline(Order $order, int $pixHours, int $cardHours, int $defaultHours): Carbon
+    {
+        $hours = $this->getHoursForMethod($order, $pixHours, $cardHours, $defaultHours);
+        return Carbon::now()->subHours($hours);
+    }
+
+    /**
+     * Retorna a quantidade de horas de tolerancia para o metodo de pagamento.
+     */
+    private function getHoursForMethod(Order $order, int $pixHours, int $cardHours, int $defaultHours): int
     {
         $paymentMethod = (string) ($order->payment_method ?? '');
-        $gateway = (string) ($order->gateway ?? '');
 
-        // PIX: usa expiração configurada no gateway
+        // PIX: usa pix_cancel_hours
         if (stripos($paymentMethod, 'pix') !== false) {
-            $minutes = $gateway === 'sumup' ? $sumupPixMin : $mpPixMin;
-            return Carbon::now()->subMinutes(max(1, $minutes));
+            return $pixHours;
         }
 
-        // Cartão: 24h
+        // Cartao: usa card_cancel_hours
         if (stripos($paymentMethod, 'card') !== false
             || stripos($paymentMethod, 'credit') !== false
             || stripos($paymentMethod, 'debit') !== false) {
-            return Carbon::now()->subHours($cardHours);
+            return $cardHours;
         }
 
-        // Boleto (ticket): 3 dias
+        // Boleto (ticket): 72h (3 dias)
         if (stripos($paymentMethod, 'ticket') !== false || stripos($paymentMethod, 'boleto') !== false) {
-            return Carbon::now()->subDays(3);
+            return 72;
         }
 
         // Default: 48h
-        return Carbon::now()->subHours($defaultHours);
+        return $defaultHours;
     }
 
-    private function cancelOrder(Order $order): void
+    private function cancelOrder(Order $order, int $hours): void
     {
-        $this->info("Cancelling Order #{$order->id} (gateway={$order->gateway}, method={$order->payment_method})");
+        $paymentMethod = (string) ($order->payment_method ?? 'unknown');
 
+        $this->info("Cancelling Order #{$order->id} (gateway={$order->gateway}, method={$paymentMethod})");
+
+        // 1. Cancelar no gateway
         try {
             if ($order->gateway === 'mercadopago' && $order->transaction_id) {
                 $service = app(MercadoPagoService::class);
@@ -106,24 +117,65 @@ class CancelUnpaidOrders extends Command
             // Continua cancelando localmente mesmo se gateway falhar
         }
 
-        // Cancelar inscrições de evento associadas
+        // 2. Liberar cupons reservados
+        $this->releaseCoupons($order);
+
+        // 3. Cancelar inscricoes de evento associadas
+        $this->releaseEventRegistrations($order);
+
+        // 4. Atualizar pedido com metadados detalhados
+        $cancelReason = $this->buildCancelReason($paymentMethod, $hours);
+
+        $order->update([
+            'status'       => 'cancelled',
+            'cancelled_at' => now(),
+            'metadata'     => array_merge($order->metadata ?? [], [
+                'cancelled_reason'  => $cancelReason,
+                'cancelled_at_auto' => now()->toIso8601String(),
+            ]),
+        ]);
+
+        Log::info("Order #{$order->id} auto-cancelled", [
+            'gateway'        => $order->gateway,
+            'payment_method' => $paymentMethod,
+            'reason'         => $cancelReason,
+        ]);
+    }
+
+    /**
+     * Libera cupons reservados associados ao pedido.
+     */
+    private function releaseCoupons(Order $order): void
+    {
+        \App\Models\CouponRedemption::where('order_id', $order->id)
+            ->where('status', 'reserved')
+            ->update([
+                'status'         => 'cancelled',
+                'reserved_until' => null,
+            ]);
+    }
+
+    /**
+     * Cancela inscricoes de evento associadas ao pedido.
+     */
+    private function releaseEventRegistrations(Order $order): void
+    {
         foreach ($order->items as $item) {
             if ($item->item_type === 'event_registration') {
                 \App\Models\EventRegistration::where('order_id', $order->id)
                     ->where('status', '!=', 'cancelled')
                     ->update(['status' => 'cancelled']);
+                break; // Ja atualizou todos de uma vez
             }
         }
+    }
 
-        $order->update([
-            'status' => 'cancelled',
-            'cancelled_at' => now(),
-            'metadata' => array_merge($order->metadata ?? [], [
-                'cancelled_reason' => 'Auto-cancel: payment window expired',
-                'cancelled_at_auto' => now()->toIso8601String(),
-            ])
-        ]);
-
-        Log::info("Order #{$order->id} auto-cancelled due to expired payment window.");
+    /**
+     * Monta a razao de cancelamento com metodo e horas.
+     */
+    private function buildCancelReason(string $paymentMethod, int $hours): string
+    {
+        $method = strtolower(trim($paymentMethod)) ?: 'unknown';
+        return "Auto-cancel: payment window expired ({$method}, {$hours}h)";
     }
 }
