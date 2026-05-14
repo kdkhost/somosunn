@@ -266,16 +266,19 @@
 @push('scripts')
 <script>
 (function() {
+    @php
+        $stgDefaults = [
+            'storage_bucket' => (string) ($settings['storage_bucket'] ?? ''),
+            'storage_region' => (string) ($settings['storage_region'] ?? 'us-east-1'),
+            'storage_endpoint' => (string) ($settings['storage_endpoint'] ?? ''),
+            'storage_access_key' => (string) ($settings['storage_access_key'] ?? ''),
+            'storage_secret_key' => (string) $secretKey,
+            'storage_url' => (string) ($settings['storage_url'] ?? ''),
+        ];
+    @endphp
     // Reforco anti-autofill: o Chrome as vezes limpa values de inputs apos o carregamento.
     // Garantimos que os valores reais (vindos do banco) sejam restaurados se isso ocorrer.
-    var stgDefaults = @json([
-        'storage_bucket' => $settings['storage_bucket'] ?? '',
-        'storage_region' => $settings['storage_region'] ?? 'us-east-1',
-        'storage_endpoint' => $settings['storage_endpoint'] ?? '',
-        'storage_access_key' => $settings['storage_access_key'] ?? '',
-        'storage_secret_key' => $secretKey,
-        'storage_url' => $settings['storage_url'] ?? '',
-    ]);
+    var stgDefaults = {!! json_encode($stgDefaults, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!};
 
     function restoreStgDefaults() {
         Object.keys(stgDefaults).forEach(function(name) {

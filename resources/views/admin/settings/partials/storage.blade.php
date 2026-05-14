@@ -206,14 +206,17 @@
 @push('scripts')
 <script>
 (function() {
-    var stgDefaults = @json([
-        'storage_bucket' => $settings['storage_bucket'] ?? '',
-        'storage_region' => $settings['storage_region'] ?? 'us-east-1',
-        'storage_endpoint' => $settings['storage_endpoint'] ?? '',
-        'storage_access_key' => $accessKey,
-        'storage_secret_key' => $secretKey,
-        'storage_url' => $settings['storage_url'] ?? '',
-    ]);
+    @php
+        $stgDefaults = [
+            'storage_bucket' => (string) ($settings['storage_bucket'] ?? ''),
+            'storage_region' => (string) ($settings['storage_region'] ?? 'us-east-1'),
+            'storage_endpoint' => (string) ($settings['storage_endpoint'] ?? ''),
+            'storage_access_key' => (string) $accessKey,
+            'storage_secret_key' => (string) $secretKey,
+            'storage_url' => (string) ($settings['storage_url'] ?? ''),
+        ];
+    @endphp
+    var stgDefaults = {!! json_encode($stgDefaults, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!};
 
     function restoreStgDefaults() {
         Object.keys(stgDefaults).forEach(function(name) {
