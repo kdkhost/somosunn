@@ -18,6 +18,42 @@ class PublicStorageProxyController extends Controller
 
     private function servePath(string $path, bool $uploadsRoute)
     {
+        // Proteção contra path traversal e acesso a arquivos sensíveis
+        $decodedPath = urldecode($path);
+        if (str_contains($decodedPath, '..') ||
+            str_contains($decodedPath, '.env') ||
+            str_contains($decodedPath, 'config/') ||
+            str_contains($decodedPath, 'database/') ||
+            str_contains($decodedPath, 'vendor/') ||
+            str_contains($decodedPath, 'storage/logs') ||
+            str_contains($decodedPath, 'app/') ||
+            str_contains($decodedPath, 'bootstrap/')) {
+            \Illuminate\Support\Facades\Log::warning('Tentativa de path traversal bloqueada', [
+                'ip'   => request()->ip(),
+                'path' => $decodedPath,
+                'url'  => request()->fullUrl(),
+            ]);
+            abort(403);
+        }
+
+        // Validar extensão permitida
+        $allowedExtensions = [
+            'jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'ico',
+            'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+            'mp4', 'webm', 'mp3', 'ogg', 'wav',
+            'zip', 'rar', 'csv', 'txt', 'json',
+            'ttf', 'otf', 'woff', 'woff2', 'eot',
+        ];
+        $extension = strtolower(pathinfo($decodedPath, PATHINFO_EXTENSION));
+        if ($extension !== '' && !in_array($extension, $allowedExtensions, true)) {
+            \Illuminate\Support\Facades\Log::warning('Extensão de arquivo bloqueada em storage/uploads', [
+                'ip'        => request()->ip(),
+                'path'      => $decodedPath,
+                'extension' => $extension,
+            ]);
+            abort(403);
+        }
+
         foreach ($this->candidatePaths($path, $uploadsRoute) as $candidate) {
             if (UploadStorage::exists($candidate)) {
                 return UploadStorage::response($candidate);

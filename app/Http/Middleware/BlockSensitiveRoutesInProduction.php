@@ -32,6 +32,7 @@ class BlockSensitiveRoutesInProduction
         '#^/?backend/install(/|$)#i',
         '#^/?run$#i',
         '#^/?test-connection$#i',
+        '#^/?demo-somos-unicas#i',
         '#^/?telescope(/|$)#i',
         '#^/?horizon(/|$)#i',
         '#^/?_debugbar(/|$)#i',
