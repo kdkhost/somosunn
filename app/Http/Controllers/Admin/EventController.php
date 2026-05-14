@@ -447,6 +447,69 @@ class EventController extends Controller
         return response()->json(['status' => 'success', 'message' => $successMsg]);
     }
 
+    /**
+     * Alterna o estado de publicacao do evento (publicar/despublicar).
+     * Bloqueia publicacao sem imagem de capa.
+     */
+    public function togglePublished(Event $event)
+    {
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
+
+        $newPublished = !$event->published;
+
+        // Bloqueia publicacao sem imagem de capa
+        if ($newPublished && empty($event->image)) {
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Adicione uma imagem de capa antes de publicar este evento.',
+                ], 422);
+            }
+            return back()->with('error', 'Adicione uma imagem de capa antes de publicar este evento.');
+        }
+
+        $event->forceFill(['published' => $newPublished])->save();
+
+        $message = $event->published ? 'Evento ativado com sucesso' : 'Evento desativado com sucesso';
+
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'published' => (bool) $event->published,
+                'message' => $message,
+            ]);
+        }
+
+        return back()->with('success', $message);
+    }
+
+    /**
+     * Move o evento no calendario (drag & drop).
+     */
+    public function move(Request $request, Event $event)
+    {
+        $this->ensurePermission('events.edit');
+        $this->ensureCanManage($event);
+
+        $request->validate([
+            'start' => 'required|date',
+            'end' => 'nullable|date|after_or_equal:start',
+            'allDay' => 'nullable|boolean',
+        ]);
+
+        $event->update([
+            'start_at' => $request->input('start'),
+            'end_at' => $request->input('end'),
+            'all_day' => $request->boolean('allDay'),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Evento movido com sucesso',
+        ]);
+    }
+
     public function updateCalendarSettings(Request $request)
     {
         $payload = $request->validate([

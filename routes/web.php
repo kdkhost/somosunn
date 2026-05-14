@@ -577,6 +577,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::post('events/{event}/toggle-published', [\App\Http\Controllers\Panel\Admin\EventController::class, 'togglePublished'])->name('events.toggle-published');
         Route::post('events/{event}/toggle-field', [\App\Http\Controllers\Panel\Admin\EventController::class, 'toggleField'])->name('events.toggle-field');
         Route::post('events/{event}/set-cover', [\App\Http\Controllers\Panel\Admin\EventController::class, 'setCover'])->name('events.set-cover');
+        Route::post('events/calendar/settings', [\App\Http\Controllers\Panel\Admin\EventController::class, 'updateCalendarSettings'])->name('events.calendar.settings');
         Route::resource('events', \App\Http\Controllers\Panel\Admin\EventController::class);
         Route::post('events/{event}/media', [\App\Http\Controllers\Panel\EventMediaController::class, 'store'])->name('events.media.store');
         Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Panel\EventMediaController::class, 'destroy'])->name('events.media.destroy');
@@ -682,6 +683,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::get('events/{event}/scanner', [\App\Http\Controllers\Admin\EventScannerController::class, 'index'])->name('events.scanner');
     Route::post('events/{event}/scanner/validate', [\App\Http\Controllers\Admin\EventScannerController::class, 'validateTicket'])->name('events.scanner.validate');
     Route::post('events/{event}/toggle-field', [\App\Http\Controllers\Admin\EventController::class, 'toggleField'])->name('events.toggle-field');
+    Route::post('events/{event}/toggle-published', [\App\Http\Controllers\Admin\EventController::class, 'togglePublished'])->name('events.toggle-published');
+    Route::post('events/{event}/move', [\App\Http\Controllers\Admin\EventController::class, 'move'])->name('events.move');
     Route::post('events/{event}/set-cover', [\App\Http\Controllers\Admin\EventController::class, 'setCover'])->name('events.set-cover');
     Route::post('events/{event}/media', [\App\Http\Controllers\Admin\EventMediaController::class, 'store'])->name('events.media.store');
     Route::delete('events/{event}/media/{media}', [\App\Http\Controllers\Admin\EventMediaController::class, 'destroy'])->name('events.media.destroy');

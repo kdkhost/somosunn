@@ -2,6 +2,31 @@
 
 ---
 
+## [2026-05-14] - Paridade de Eventos: /admin e /painel
+
+### Adicionado ao painel legado /admin
+- Método `togglePublished()` em `Admin\EventController` (publicar/despublicar com bloqueio se sem capa)
+- Método `move()` em `Admin\EventController` (drag & drop no calendário)
+- Rota `POST admin/events/{event}/toggle-published` → `admin.events.toggle-published`
+- Rota `POST admin/events/{event}/move` → `admin.events.move`
+
+### Adicionado ao painel moderno /painel/admin
+- Método `updateCalendarSettings()` em `Panel\Admin\EventController` (cores, templates, view inicial)
+- Método `defaultCalendarSettings()` (configurações padrão do calendário)
+- `loadCalendarSettings()` expandido para ler/validar JSON do Setting com fallback robusto
+- Rota `POST painel/admin/events/calendar/settings` → `panel.admin.events.calendar.settings`
+
+### Resultado
+- Ambos os painéis agora têm: `index`, `show`, `create`, `store`, `edit`, `update`, `destroy`, `feed`, `list`, `toggleField`, `setCover`, `togglePublished`, `move`, `updateCalendarSettings`
+- Operações idênticas, apenas com prefixos diferentes (`/admin/events/*` e `/painel/admin/events/*`)
+
+### Arquivos afetados
+- `app/Http/Controllers/Admin/EventController.php`
+- `app/Http/Controllers/Panel/Admin/EventController.php`
+- `routes/web.php`
+
+---
+
 ## [2026-05-14] - Padronizacao do Layout: /connection/blocked
 
 ### Alterado

@@ -422,11 +422,155 @@ class EventController extends Controller
 
     private function loadCalendarSettings(): array
     {
+        $defaults = $this->defaultCalendarSettings();
+
+        try {
+            $raw = (string) (\App\Models\Setting::get('calendar_settings_json', '') ?? '');
+            $raw = trim($raw);
+            if ($raw === '') {
+                return $defaults;
+            }
+
+            $decoded = json_decode($raw, true);
+            if (!is_array($decoded)) {
+                return $defaults;
+            }
+
+            $settings = array_merge($defaults, array_intersect_key($decoded, $defaults));
+
+            $settings['first_day'] = (int) ($settings['first_day'] ?? 0);
+            $settings['weekends'] = (bool) ($settings['weekends'] ?? true);
+            $settings['week_numbers'] = (bool) ($settings['week_numbers'] ?? false);
+            $settings['recent_limit'] = (int) ($settings['recent_limit'] ?? 6);
+            $settings['default_remove_after_drop'] = (bool) ($settings['default_remove_after_drop'] ?? false);
+
+            foreach (['button_color', 'event_text_color'] as $key) {
+                $value = strtoupper(trim((string) ($settings[$key] ?? '')));
+                if (!preg_match('/^#[0-9A-F]{6}$/', $value)) {
+                    $settings[$key] = $defaults[$key];
+                } else {
+                    $settings[$key] = $value;
+                }
+            }
+
+            $allowedViews = ['dayGridMonth', 'timeGridWeek', 'timeGridDay'];
+            if (!in_array((string) ($settings['initial_view'] ?? ''), $allowedViews, true)) {
+                $settings['initial_view'] = $defaults['initial_view'];
+            }
+
+            $settings['templates'] = is_array($settings['templates'] ?? null) ? $settings['templates'] : $defaults['templates'];
+            $settings['quick_colors'] = is_array($settings['quick_colors'] ?? null) ? $settings['quick_colors'] : $defaults['quick_colors'];
+
+            $settings['templates'] = collect($settings['templates'])
+                ->map(fn($t) => [
+                    'title' => trim((string) ($t['title'] ?? '')),
+                    'color' => strtoupper(trim((string) ($t['color'] ?? ''))),
+                ])
+                ->filter(fn($t) => $t['title'] !== '' && preg_match('/^#[0-9A-F]{6}$/', $t['color']))
+                ->values()
+                ->all();
+            if (empty($settings['templates'])) {
+                $settings['templates'] = $defaults['templates'];
+            }
+
+            $settings['quick_colors'] = collect($settings['quick_colors'])
+                ->map(fn($c) => strtoupper(trim((string) $c)))
+                ->filter(fn($c) => preg_match('/^#[0-9A-F]{6}$/', $c))
+                ->unique()
+                ->values()
+                ->all();
+            if (empty($settings['quick_colors'])) {
+                $settings['quick_colors'] = $defaults['quick_colors'];
+            }
+
+            return $settings;
+        } catch (\Throwable $e) {
+            return $defaults;
+        }
+    }
+
+    protected function defaultCalendarSettings(): array
+    {
         return [
             'initial_view' => 'dayGridMonth',
-            'event_text_color' => '#FFFFFF',
+            'first_day' => 0,
+            'weekends' => true,
+            'week_numbers' => false,
             'button_color' => '#1F5EDB',
+            'event_text_color' => '#FFFFFF',
+            'recent_limit' => 6,
+            'default_remove_after_drop' => false,
+            'templates' => [
+                ['title' => 'Almoço de Negócios', 'color' => '#28A745'],
+                ['title' => 'Reunião com Parceiros', 'color' => '#FFC107'],
+                ['title' => 'Mentoria VIP', 'color' => '#17A2B8'],
+                ['title' => 'Workshop', 'color' => '#007BFF'],
+                ['title' => 'Networking', 'color' => '#DC3545'],
+            ],
+            'quick_colors' => ['#007BFF', '#28A745', '#17A2B8', '#FFC107', '#DC3545', '#6F42C1'],
         ];
+    }
+
+    /**
+     * Atualiza configuracoes do calendario (cores, templates, view inicial, etc).
+     */
+    public function updateCalendarSettings(Request $request)
+    {
+        $this->ensurePermission('events.edit');
+
+        $payload = $request->validate([
+            'initial_view' => 'required|in:dayGridMonth,timeGridWeek,timeGridDay',
+            'first_day' => 'required|integer|min:0|max:6',
+            'weekends' => 'required|in:0,1',
+            'week_numbers' => 'required|in:0,1',
+            'button_color' => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'event_text_color' => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'recent_limit' => 'required|integer|min:1|max:20',
+            'default_remove_after_drop' => 'required|in:0,1',
+            'templates' => 'array',
+            'templates.*.title' => 'required|string|max:80',
+            'templates.*.color' => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'quick_colors' => 'array',
+            'quick_colors.*' => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
+        ]);
+
+        $defaults = $this->defaultCalendarSettings();
+
+        $templates = collect($payload['templates'] ?? [])
+            ->map(fn($t) => [
+                'title' => trim((string) ($t['title'] ?? '')),
+                'color' => strtoupper(trim((string) ($t['color'] ?? ''))),
+            ])
+            ->filter(fn($t) => $t['title'] !== '' && preg_match('/^#[0-9A-F]{6}$/', $t['color']))
+            ->values()
+            ->all();
+
+        $quickColors = collect($payload['quick_colors'] ?? [])
+            ->map(fn($c) => strtoupper(trim((string) $c)))
+            ->filter(fn($c) => preg_match('/^#[0-9A-F]{6}$/', $c))
+            ->unique()
+            ->values()
+            ->all();
+
+        $settings = [
+            'initial_view' => (string) $payload['initial_view'],
+            'first_day' => (int) $payload['first_day'],
+            'weekends' => (bool) ((int) $payload['weekends']),
+            'week_numbers' => (bool) ((int) $payload['week_numbers']),
+            'button_color' => strtoupper((string) $payload['button_color']),
+            'event_text_color' => strtoupper((string) $payload['event_text_color']),
+            'recent_limit' => (int) $payload['recent_limit'],
+            'default_remove_after_drop' => (bool) ((int) $payload['default_remove_after_drop']),
+            'templates' => $templates ?: ($defaults['templates'] ?? []),
+            'quick_colors' => $quickColors ?: ($defaults['quick_colors'] ?? []),
+        ];
+
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'calendar_settings_json'],
+            ['value' => json_encode($settings, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'group' => 'calendar']
+        );
+
+        return response()->json(['status' => 'success', 'message' => 'Configurações do calendário atualizadas.']);
     }
 
     private function normalizeHexColor(string $color, string $fallback = '#3B82F6'): string
