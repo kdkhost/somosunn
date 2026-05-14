@@ -4,6 +4,11 @@
 
 ## [2026-07-22] - Correcao de Autofill no Painel S3 + Configuracao no /admin Legado
 
+### Corrigido (HOTFIX 16:45)
+- **Erro 500 em /admin/settings/storage**: a versao compilada do Blade falhava ao parsear `@json([...])` com array contendo operador `??` em algumas combinacoes
+- Substituido `@json()` por bloco `@php` que monta o array + `{!! json_encode(...) !!}` (mais robusto e compativel com qualquer versao do Blade)
+- Caches de view antigos removidos manualmente no servidor
+
 ### Corrigido
 - **Bug do Chrome autofill**: campos S3 (Bucket, Endpoint, Access Key, URL) eram limpos ou substituidos por sugestoes do navegador (e-mail/senha) ao carregar a tela /painel/admin/settings/storage
 - Adicionado `autocomplete="off"` no formulario de settings (painel novo e /admin)
