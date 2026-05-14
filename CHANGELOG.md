@@ -2,6 +2,51 @@
 
 ---
 
+## [2026-05-13] - Segurança: Travas de Rotas Sensíveis e Hardening
+
+### Adicionado
+- Rota `/demo-somos-unicas` adicionada à lista de padrões bloqueados em produção
+- Alias `sensitive.production` registrado no Kernel.php para uso explícito em rotas
+- Proteção contra path traversal no `PublicStorageProxyController` (bloqueia `..`, `.env`, `config/`, `vendor/`, etc.)
+- Validação de extensões permitidas em `/storage/{path}` e `/uploads/{path}`
+- Proteção anti-replay no webhook Mercado Pago (cache de `x-request-id` por 24h)
+- Verificação de headers `x-signature` e `x-request-id` no webhook MP (log warning se ausentes)
+
+### Alterado
+- Extensões permitidas em storage/uploads reduzidas para: imagens, PDF, vídeo, áudio e fontes
+- Removidas extensões perigosas: zip, rar, json, txt, doc, docx, xls, xlsx, ppt, pptx
+
+### Arquivos afetados
+- `app/Http/Middleware/BlockSensitiveRoutesInProduction.php`
+- `app/Http/Kernel.php`
+- `app/Http/Controllers/PublicStorageProxyController.php`
+- `app/Http/Controllers/PaymentWebhookController.php`
+
+---
+
+## [2026-05-13] - Editor de Certificado: Redesign Layout Vertical
+
+### Adicionado
+- Layout vertical: certificado inteiro visível em cima, controles organizados abaixo em grid
+- Zoom e botão Fit integrados na barra do canvas
+- Preview de certificado aceita GET (dados salvos) além de POST (dados do formulário)
+
+### Removido
+- Card hero azul decorativo que ocupava espaço sem funcionalidade
+- Scroll do canvas (agora overflow-hidden)
+- Layout side-by-side que cortava o certificado
+
+### Alterado
+- Cards de controle: 2 colunas (lg), gradiente no dark mode, sombras, separadores nos headers
+- Rota `courses/{course}/certificate/preview` aceita GET e POST (corrige erro 405)
+
+### Arquivos afetados
+- `resources/views/panel/admin/partials/certificate-editor.blade.php`
+- `app/Http/Controllers/Panel/Admin/CourseController.php`
+- `routes/web.php`
+
+---
+
 ## [2026-05-13] - Multi-Gateway Checkout (spec multi-gateway-checkout)
 
 ### Adicionado
