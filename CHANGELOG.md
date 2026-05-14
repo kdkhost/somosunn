@@ -2,6 +2,26 @@
 
 ---
 
+## [2026-05-14] - Preparação S3 Cloud Storage (IDrive e2)
+
+### Adicionado
+- Pacote `league/flysystem-aws-s3-v3` instalado no servidor (suporte S3)
+- Disco S3 em `config/filesystems.php` lendo variáveis de ambiente (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION, AWS_BUCKET, AWS_ENDPOINT, AWS_URL, AWS_USE_PATH_STYLE_ENDPOINT)
+- `FILESYSTEM_DISK` controla disco ativo (default: public/local)
+- `.env.example` atualizado com todas as variáveis S3/IDrive e2
+- Compatível com: IDrive e2, AWS S3, Cloudflare R2, Wasabi, MinIO, Backblaze B2
+
+### Alterado
+- `config/filesystems.php`: `default` agora usa `env('FILESYSTEM_DISK', 'public')`
+- Disco S3 com `use_path_style_endpoint => true` (obrigatório para IDrive e2)
+
+### Arquivos afetados
+- `config/filesystems.php`
+- `.env.example`
+- `composer.json` / `composer.lock`
+
+---
+
 ## [2026-05-13] - Segurança: Travas de Rotas Sensíveis e Hardening
 
 ### Adicionado
