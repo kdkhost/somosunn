@@ -4,6 +4,16 @@
 
 ## [2026-07-22] - Correcao de Autofill no Painel S3 + Configuracao no /admin Legado
 
+### Corrigido (HOTFIX 17:15)
+- **Erro "Class League\Flysystem\AwsS3V3\PortableVisibilityConverter not found" ao testar S3**: pasta `vendor/league/flysystem-aws-s3-v3/` ausente no servidor (provavelmente um `composer install` anterior nao baixou o pacote de fato)
+- Executado `composer install --no-dev --optimize-autoloader` no servidor para regenerar `vendor/`
+- Confirmado via script de diagnostico que todas as classes S3 estao acessiveis: `Aws\S3\S3Client`, `League\Flysystem\AwsS3V3\AwsS3V3Adapter`, `League\Flysystem\AwsS3V3\PortableVisibilityConverter`
+- Caches limpos apos reinstalacao
+
+### Decisoes Tecnicas Importantes
+- **APOS QUALQUER `git reset --hard origin/main` no servidor que toque `composer.lock`, sempre rodar `composer install --no-dev --optimize-autoloader`** para garantir que todos os pacotes vendor existam
+- O erro do S3 nao se resolve com `composer dump-autoload` se a pasta do pacote estiver faltando — precisa de `composer install`
+
 ### Corrigido (HOTFIX 16:45)
 - **Erro 500 em /admin/settings/storage**: a versao compilada do Blade falhava ao parsear `@json([...])` com array contendo operador `??` em algumas combinacoes
 - Substituido `@json()` por bloco `@php` que monta o array + `{!! json_encode(...) !!}` (mais robusto e compativel com qualquer versao do Blade)
