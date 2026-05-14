@@ -290,6 +290,7 @@
                                                                 class="font-bold text-gray-900 hover:text-blue-600 transition">
                                                                 {{ $post->user->name }}
                                                             </a>
+                                                            <x-reputation-badge :score="$post->user->reputation_score ?? 50" size="sm" />
                                                             <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                                                         </div>
                                                     </div>

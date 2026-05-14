@@ -222,6 +222,16 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar limpeza de notificações: ' . $e->getMessage());
         }
 
+        // Recalcula scores de reputacao dos membros diariamente
+        try {
+            $schedule->command('reputation:recalculate')
+                ->daily()
+                ->withoutOverlapping()
+                ->name('reputation-recalculate');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar recalculo de reputacao: ' . $e->getMessage());
+        }
+
         // Carregar tarefas dinamicas do banco
         try {
             if (\Schema::hasTable('scheduled_tasks')) {

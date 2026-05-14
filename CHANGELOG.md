@@ -2,6 +2,40 @@
 
 ---
 
+## [2026-05-14] - Sistema de Reputação do Membro
+
+### Adicionado
+- Tabela `member_reputation_scores` (score geral + 4 dimensões por membro)
+- Tabela `member_reputation_history` (histórico diário para gráfico de evolução)
+- `ReputationService` com cálculo completo: Entrega (40%), Relacionamento (25%), Interação (20%), Engajamento (15%)
+- Comando `php artisan reputation:recalculate` (diário, com --user para recálculo individual)
+- Job `RecalculateReputationJob` para recálculo assíncrono via eventos
+- Blade Component `<x-reputation-badge>` com 3 tamanhos (sm/md/lg) e tooltip com breakdown
+- Badge integrado no perfil do membro e nos posts do feed social
+- Accessor `$user->reputation_score` no model User (cacheado, sem recálculo no request)
+- 5 níveis: Excelente (90-100), Confiável (70-89), Regular (50-69), Atenção (30-49), Baixa Reputação (0-29)
+- Decay por inatividade: -2pts/semana após 30 dias sem login (mínimo 20)
+- Cache de 24h por membro para performance
+
+### Arquivos criados
+- `app/Services/ReputationService.php`
+- `app/Models/MemberReputationScore.php`
+- `app/Models/MemberReputationHistory.php`
+- `app/Console/Commands/RecalculateReputationScores.php`
+- `app/Jobs/RecalculateReputationJob.php`
+- `app/View/Components/ReputationBadge.php`
+- `resources/views/components/reputation-badge.blade.php`
+- `database/migrations/2026_07_21_000003_create_member_reputation_scores_table.php`
+- `database/migrations/2026_07_21_000004_create_member_reputation_history_table.php`
+
+### Arquivos alterados
+- `app/Console/Kernel.php` (schedule diário)
+- `app/Models/User.php` (accessor reputation_score)
+- `resources/views/social/feed.blade.php` (badge nos posts)
+- `resources/views/social/profile.blade.php` (badge no perfil)
+
+---
+
 ## [2026-05-14] - Implementação de 3 Features Pendentes
 
 ### Adicionado — Lista de Bloqueados Visível

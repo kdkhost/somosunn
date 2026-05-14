@@ -455,4 +455,13 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notify(new \App\Notifications\ResetPasswordNotification($token));
     }
+
+    /**
+     * Accessor para o score de reputacao do membro.
+     * Retorna o score cacheado/banco sem disparar recalculo.
+     */
+    public function getReputationScoreAttribute(): int
+    {
+        return app(\App\Services\ReputationService::class)->getScore($this->id)['score'];
+    }
 }

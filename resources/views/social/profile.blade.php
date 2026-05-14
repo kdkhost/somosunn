@@ -102,7 +102,10 @@
 
                     <!-- Detalhes -->
                     <div class="flex-1 pb-2 w-full text-center md:text-left pt-16 md:pt-0">
-                        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-1">{{ $user->name }}</h1>
+                        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-1">
+                            {{ $user->name }}
+                            <x-reputation-badge :score="$user->reputation_score" size="md" />
+                        </h1>
 
                         <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-gray-600 mb-4">
                             <span class="flex items-center gap-1">
@@ -477,6 +480,7 @@
                                                 class="font-bold text-gray-900 hover:text-blue-600 transition">
                                                 {{ $post->user->name }}
                                             </a>
+                                            <x-reputation-badge :score="$post->user->reputation_score ?? 50" size="sm" />
                                             <p class="text-xs text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                                         </div>
                                     </div>
