@@ -59,5 +59,6 @@ class Kernel extends HttpKernel
         'check.marketplace.seller' => \App\Http\Middleware\CheckMarketplaceSeller::class,
         'check.sumup.permissions' => \App\Http\Middleware\CheckSumUpPermissions::class,
         'superadmin.legacy' => \App\Http\Middleware\RedirectSuperadminToLegacy::class,
+        'sensitive.production' => \App\Http\Middleware\BlockSensitiveRoutesInProduction::class,
     ];
 }

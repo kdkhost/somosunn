@@ -39,9 +39,8 @@ class PublicStorageProxyController extends Controller
         // Validar extensão permitida
         $allowedExtensions = [
             'jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'ico',
-            'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+            'pdf',
             'mp4', 'webm', 'mp3', 'ogg', 'wav',
-            'zip', 'rar', 'csv', 'txt', 'json',
             'ttf', 'otf', 'woff', 'woff2', 'eot',
         ];
         $extension = strtolower(pathinfo($decodedPath, PATHINFO_EXTENSION));

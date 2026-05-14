@@ -81,6 +81,31 @@ class PaymentWebhookController extends Controller
             return response('OK', 200);
         }
 
+        // Validação de segurança: verificar headers obrigatórios do MercadoPago
+        $requestId = $request->header('x-request-id');
+        $signature = $request->header('x-signature');
+
+        if ($request->isMethod('POST') && !$requestId && !$signature) {
+            Log::channel('security')->warning('Webhook MP: requisição sem headers de autenticação', [
+                'ip'         => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'payload'    => array_slice($request->all(), 0, 5),
+            ]);
+            // Não abortar — MercadoPago pode enviar sem headers em alguns cenários legados
+            // Mas registrar para monitoramento
+        }
+
+        // Proteção contra replay attack: verificar se já processamos este request-id
+        if ($requestId) {
+            $cacheKey = 'mp_webhook_' . md5($requestId);
+            if (\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+                Log::info('Webhook MP: request-id duplicado ignorado', ['request_id' => $requestId]);
+                return response('OK', 200);
+            }
+            // Marcar como processado por 24h
+            \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addHours(24));
+        }
+
         $type = $request->input('type') ?? $request->input('topic');
 
         // Se for preapproval (assinatura iniciada/autorizada)
