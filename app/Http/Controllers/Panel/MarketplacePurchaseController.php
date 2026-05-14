@@ -226,10 +226,16 @@ class MarketplacePurchaseController extends Controller
 
         // Permitir: dono do pedido OU admin/superadmin
         if ((int) $order->user_id !== (int) $user->id && !$user->isAdmin()) {
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Sem permissao.'], 403);
+            }
             abort(403);
         }
 
         if ($order->status !== 'pending') {
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Somente pedidos pendentes podem ser cancelados.'], 422);
+            }
             return redirect()->back()
                 ->with('error', 'Somente pedidos pendentes podem ser cancelados.');
         }
@@ -244,6 +250,13 @@ class MarketplacePurchaseController extends Controller
                 'cancelled_at_manual' => now()->toIso8601String(),
             ]),
         ]);
+
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pedido #' . $order->id . ' cancelado com sucesso.',
+            ]);
+        }
 
         return redirect()->back()
             ->with('success', 'Pedido #' . $order->id . ' cancelado com sucesso.');

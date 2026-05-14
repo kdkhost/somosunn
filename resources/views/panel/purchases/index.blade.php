@@ -136,14 +136,12 @@
                             @endif
 
                             {{-- Botao cancelar (cliente ou admin) --}}
-                            <form action="{{ route('panel.purchases.cancel', $order) }}" method="POST" data-no-ajax="true"
-                                onsubmit="return confirm('Tem certeza que deseja cancelar este pedido? Esta acao nao pode ser desfeita.')">
-                                @csrf
-                                <button type="submit"
-                                    class="inline-flex items-center gap-2 rounded-2xl bg-red-50 hover:bg-red-100 border border-red-200 px-5 py-3 text-sm font-bold text-red-700 transition">
-                                    <i class="fas fa-times-circle"></i> Cancelar pedido
-                                </button>
-                            </form>
+                            <button type="button"
+                                class="btn-cancel-order inline-flex items-center gap-2 rounded-2xl bg-red-50 hover:bg-red-100 border border-red-200 px-5 py-3 text-sm font-bold text-red-700 transition"
+                                data-order-id="{{ $order->id }}"
+                                data-cancel-url="{{ route('panel.purchases.cancel', $order) }}">
+                                <i class="fas fa-times-circle"></i> Cancelar pedido
+                            </button>
                         </div>
                     @endif
                 </article>
@@ -199,6 +197,76 @@
 
         countdowns.forEach(el => updateCountdown(el));
         setInterval(() => countdowns.forEach(el => updateCountdown(el)), 1000);
+    });
+
+    // Cancelar pedido via AJAX + SweetAlert2
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('.btn-cancel-order');
+        if (!btn) return;
+
+        var orderId = btn.dataset.orderId;
+        var cancelUrl = btn.dataset.cancelUrl;
+
+        Swal.fire({
+            title: 'Cancelar pedido #' + orderId + '?',
+            text: 'Esta acao nao pode ser desfeita. O pedido sera cancelado permanentemente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: '<i class="fas fa-times-circle mr-1"></i> Sim, cancelar',
+            cancelButtonText: 'Voltar'
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Cancelando...';
+
+            fetch(cancelUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success || data.status === 'success') {
+                    // Atualizar o card do pedido sem reload
+                    var article = btn.closest('article');
+                    if (article) {
+                        // Trocar badge de status
+                        var badge = article.querySelector('.rounded-full.border');
+                        if (badge) {
+                            badge.className = 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-black bg-slate-50 text-slate-500 border-slate-200';
+                            badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-current"></span> Cancelado';
+                        }
+                        // Remover area de acoes
+                        var actionsDiv = btn.closest('.mt-5.pt-5');
+                        if (actionsDiv) actionsDiv.remove();
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pedido cancelado!',
+                        text: data.message || 'Pedido #' + orderId + ' cancelado com sucesso.',
+                        timer: 2500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-times-circle"></i> Cancelar pedido';
+                    Swal.fire({ icon: 'error', title: 'Erro', text: data.message || 'Nao foi possivel cancelar.' });
+                }
+            })
+            .catch(function(err) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-times-circle"></i> Cancelar pedido';
+                Swal.fire({ icon: 'error', title: 'Erro', text: 'Falha na comunicacao. Tente novamente.' });
+            });
+        });
     });
     </script>
     @endpush
