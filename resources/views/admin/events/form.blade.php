@@ -1184,6 +1184,10 @@ async function setAsCover(mediaId) {
                         headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                         credentials: 'same-origin'
                     })
+                    .then(function(r) {
+                        if (!r.ok) throw new Error('HTTP ' + r.status);
+                        return r.json();
+                    })
                     .then(function(data) {
                         var results = Array.isArray(data) ? data : (data.results || []);
                         renderVenueResults(results);
