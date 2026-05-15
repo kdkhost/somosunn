@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Services\WatermarkService;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -11,6 +12,9 @@ use Throwable;
 
 class UploadStorage
 {
+    /** TTL do cache de localizacao S3 (em segundos = 7 dias) */
+    private const S3_LOCATION_CACHE_TTL = 604800;
+
     public static function applyRuntimeConfig(array $settings = []): void
     {
         $localConfig = self::localPublicDiskConfig();
@@ -289,15 +293,15 @@ class UploadStorage
             return $default;
         }
 
-        // Se o disco efetivo e S3, verificar se o arquivo existe la
+        // Se o disco efetivo e S3, verificar (com cache) se o arquivo esta la.
+        // Apos migracao, o cache e populado proativamente para evitar HEAD em cada request.
         if (self::effectiveDisk() === 's3') {
-            try {
-                $s3Disk = Storage::disk('s3');
-                if ($s3Disk->exists($normalized)) {
-                    return $s3Disk->url($normalized);
+            if (self::isOnS3Cached($normalized)) {
+                try {
+                    return Storage::disk('s3')->url($normalized);
+                } catch (\Throwable $e) {
+                    // Fallback para local se S3 falhar na geracao da URL
                 }
-            } catch (\Throwable $e) {
-                // Fallback para local se S3 falhar
             }
         }
 
@@ -312,6 +316,89 @@ class UploadStorage
         }
 
         return asset('storage/' . ltrim($normalized, '/'));
+    }
+
+    /**
+     * Verifica se o arquivo existe no S3, usando cache de longa duracao.
+     * Apos uma migracao, o cache e populado proativamente para evitar HEAD repetitivos.
+     */
+    public static function isOnS3Cached(string $normalized): bool
+    {
+        $cacheKey = self::s3LocationCacheKey($normalized);
+
+        try {
+            $cached = Cache::get($cacheKey);
+
+            // 'yes' = arquivo confirmado no S3 (positivo persistente)
+            if ($cached === 'yes') {
+                return true;
+            }
+
+            // 'no' = arquivo confirmado nao existe no S3 (negativo curto, evita repetir HEAD)
+            if ($cached === 'no') {
+                return false;
+            }
+
+            // Sem cache: faz HEAD no S3 e cacheia o resultado
+            $exists = Storage::disk('s3')->exists($normalized);
+            // Positivo: cache longo. Negativo: cache curto (5 min) para nao impedir migracao tardia
+            Cache::put($cacheKey, $exists ? 'yes' : 'no', $exists ? self::S3_LOCATION_CACHE_TTL : 300);
+            return $exists;
+        } catch (\Throwable $e) {
+            // Falha de conexao S3 nao deve bloquear o site — cai pro fallback local
+            return false;
+        }
+    }
+
+    /**
+     * Marca um caminho como confirmado no S3. Usado pela migracao para popular cache proativamente.
+     */
+    public static function markAsOnS3(string $path): void
+    {
+        $normalized = self::normalizePath($path);
+        if ($normalized === null) {
+            return;
+        }
+        try {
+            Cache::put(self::s3LocationCacheKey($normalized), 'yes', self::S3_LOCATION_CACHE_TTL);
+        } catch (\Throwable $e) {
+            // noop
+        }
+    }
+
+    /**
+     * Remove o cache de localizacao S3 para um caminho (util ao deletar do S3).
+     */
+    public static function forgetS3Location(string $path): void
+    {
+        $normalized = self::normalizePath($path);
+        if ($normalized === null) {
+            return;
+        }
+        try {
+            Cache::forget(self::s3LocationCacheKey($normalized));
+        } catch (\Throwable $e) {
+            // noop
+        }
+    }
+
+    /**
+     * Limpa todo o cache de localizacao S3 (util apos trocar bucket).
+     */
+    public static function flushS3LocationCache(): void
+    {
+        try {
+            // Como nao temos cache tags com driver file, usamos um marker version.
+            Cache::put('s3_location_cache_version', (string) time(), self::S3_LOCATION_CACHE_TTL);
+        } catch (\Throwable $e) {
+            // noop
+        }
+    }
+
+    private static function s3LocationCacheKey(string $normalized): string
+    {
+        $version = Cache::get('s3_location_cache_version', '1');
+        return 'unn:s3loc:v' . $version . ':' . md5($normalized);
     }
 
     public static function exists(?string $path): bool

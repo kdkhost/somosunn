@@ -2,6 +2,38 @@
 
 ---
 
+## [2026-07-22] - S3 como Fonte de Verdade: Cache de Localizacao + Verificacao Publica
+
+### Adicionado — Cache de localizacao S3 (UploadStorage)
+- Cache persistente de 7 dias por arquivo: `unn:s3loc:vN:<md5(path)>` armazena `yes` (no S3) ou `no` (nao esta)
+- Nova logica em `UploadStorage::url()`: consulta o cache antes de fazer HEAD no S3 — performance imensa em pageviews com muitas imagens
+- `markAsOnS3($path)`: popula o cache proativamente quando um arquivo e migrado com sucesso
+- `forgetS3Location($path)`: limpa cache de um caminho (util ao deletar)
+- `flushS3LocationCache()`: invalida todo o cache via versionamento (sem precisar enumerar chaves)
+- Cache positivo = 7 dias (arquivo confirmado), cache negativo = 5 minutos (permite migracao tardia)
+
+### Alterado — Migracao popula cache automaticamente
+- `SettingController::migrateStorage()` agora chama `UploadStorage::markAsOnS3($file)` apos cada upload bem-sucedido
+- Apos migrar, o site usa imediatamente o S3 como fonte: zero requisicoes HEAD, zero risco de "imagem sumiu" temporariamente
+- Mesma logica para arquivos ja existentes no S3 (skipped) — cache populado pra refletir o estado real
+
+### Adicionado — Verificacao de acesso publico no teste S3
+- Apos o "Gerar URL", o teste agora faz um HTTP HEAD na URL gerada
+- Se HTTP 200-399: confirma que o bucket esta com leitura publica habilitada
+- Se HTTP 403/401: aviso de bucket privado, com instrucao para habilitar "public read" no IDrive e2
+- Detecta o problema "configuracao S3 OK no painel mas imagens nao aparecem" antes que ocorra
+
+### Resultado
+- **Os arquivos migrados sao agora a fonte de verdade do site**: o cache popula no momento da migracao, evitando race-conditions
+- **Performance**: paginas com muitas imagens ja nao fazem HEAD para cada uma — uma consulta de cache em vez disso
+- **Robustez**: se o S3 cair temporariamente, o url() ja sabe que o arquivo "esta no S3" e tenta gerar a URL; em caso de falha de geracao, cai pro local automaticamente
+
+### Arquivos afetados
+- `app/Support/UploadStorage.php`
+- `app/Http/Controllers/Admin/SettingController.php`
+
+---
+
 ## [2026-07-22] - Correcao de Autofill no Painel S3 + Configuracao no /admin Legado
 
 ### Corrigido (HOTFIX 17:15)

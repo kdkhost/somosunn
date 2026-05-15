@@ -1491,6 +1491,21 @@ class SettingController extends Controller
             $fileUrl = $disk->url($testFile);
             $results[] = ['step' => 'Gerar URL', 'status' => 'ok', 'detail' => $fileUrl];
 
+            // 3b. URL Publicamente acessivel (HEAD na URL pra detectar bucket privado)
+            try {
+                $headResp = \Illuminate\Support\Facades\Http::timeout(8)
+                    ->withHeaders(['User-Agent' => 'SomosUNN-S3-Test/1.0'])
+                    ->head($fileUrl);
+                $statusCode = $headResp->status();
+                if ($statusCode >= 200 && $statusCode < 400) {
+                    $results[] = ['step' => 'Acesso publico (HTTP)', 'status' => 'ok', 'detail' => 'HTTP ' . $statusCode . ' — arquivo acessivel publicamente'];
+                } else {
+                    $results[] = ['step' => 'Acesso publico (HTTP)', 'status' => 'aviso', 'detail' => 'HTTP ' . $statusCode . ' — bucket pode estar PRIVADO. Habilite "public read" no IDrive e2 ou imagens nao aparecerao.'];
+                }
+            } catch (\Throwable $httpEx) {
+                $results[] = ['step' => 'Acesso publico (HTTP)', 'status' => 'aviso', 'detail' => 'Nao foi possivel verificar a URL: ' . Str::limit($httpEx->getMessage(), 100)];
+            }
+
             // 4. Read
             $readContent = $disk->get($testFile);
             $match = $readContent === $testContent;
@@ -1543,6 +1558,8 @@ class SettingController extends Controller
 
             foreach ($files as $file) {
                 if ($s3Disk->exists($file)) {
+                    // Marca no cache para que url() resolva pro S3 sem novo HEAD
+                    UploadStorage::markAsOnS3($file);
                     $skipped++;
                     continue;
                 }
@@ -1553,6 +1570,8 @@ class SettingController extends Controller
 
                     if ($s3Disk->exists($file)) {
                         $migrated++;
+                        // Marca proativamente no cache: url() vai usar S3 imediatamente
+                        UploadStorage::markAsOnS3($file);
                         if ($deleteLocal) {
                             $localDisk->delete($file);
                         }
