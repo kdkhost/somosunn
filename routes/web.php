@@ -119,84 +119,86 @@ Route::get('/ranking', [\App\Http\Controllers\RankingPublicController::class, 'i
 Route::get('/somos-unicas', [\App\Http\Controllers\SomosUnicasController::class, 'index'])->name('somos-unicas');
 Route::get('/somos-unicas/sobre', [\App\Http\Controllers\SomosUnicasAboutController::class, 'index'])->name('site.somos-unicas.sobre');
 
-// Migrations & Demo
-Route::get('/run-migrations', function () {
-    try {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        return "<h1>Migrações concluídas com sucesso!</h1>";
-    } catch (\Exception $e) {
-        return "<h1>Erro ao rodar migrações:</h1> <pre>" . $e->getMessage() . "</pre>";
-    }
-});
+// Migrations & Demo (protegidas por middleware global + explicito)
+Route::middleware(['sensitive.production'])->group(function () {
+    Route::get('/run-migrations', function () {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            return "<h1>Migrações concluídas com sucesso!</h1>";
+        } catch (\Exception $e) {
+            return "<h1>Erro ao rodar migrações:</h1> <pre>" . $e->getMessage() . "</pre>";
+        }
+    });
 
-Route::get('/demo-somos-unicas', function () {
-    try {
-        $ownerId = auth()->check() ? auth()->id() : (\App\Models\User::where('role', 'superadmin')->first()->id ?? 1);
+    Route::get('/demo-somos-unicas', function () {
+        try {
+            $ownerId = auth()->check() ? auth()->id() : (\App\Models\User::where('role', 'superadmin')->first()->id ?? 1);
 
-        // Palestra 1
-        \App\Models\Event::create([
-            'user_id' => $ownerId,
-            'title' => 'Palestra: Protagonismo Feminino nos Negócios',
-            'speaker' => 'Dra. Luiza Helena',
-            'description' => '<p>Descubra como mulheres estão transformando o mercado corporativo e assumindo a linha de frente nos grandes negócios.</p>',
-            'start_at' => now()->addDays(5)->format('Y-m-d H:i:s'),
-            'end_at' => now()->addDays(5)->addHours(2)->format('Y-m-d H:i:s'),
-            'location' => 'Auditório UNN - São Paulo',
-            'price' => 0,
-            'capacity' => 150,
-            'published' => true,
-            'is_somos_unicas' => true,
-            'color' => '#ec4899',
-            'image' => 'https://placehold.co/800x600/fdf2f8/ec4899?text=Protagonismo+Feminino',
-        ]);
+            // Palestra 1
+            \App\Models\Event::create([
+                'user_id' => $ownerId,
+                'title' => 'Palestra: Protagonismo Feminino nos Negócios',
+                'speaker' => 'Dra. Luiza Helena',
+                'description' => '<p>Descubra como mulheres estão transformando o mercado corporativo e assumindo a linha de frente nos grandes negócios.</p>',
+                'start_at' => now()->addDays(5)->format('Y-m-d H:i:s'),
+                'end_at' => now()->addDays(5)->addHours(2)->format('Y-m-d H:i:s'),
+                'location' => 'Auditório UNN - São Paulo',
+                'price' => 0,
+                'capacity' => 150,
+                'published' => true,
+                'is_somos_unicas' => true,
+                'color' => '#ec4899',
+                'image' => 'https://placehold.co/800x600/fdf2f8/ec4899?text=Protagonismo+Feminino',
+            ]);
 
-        // Palestra 2
-        \App\Models\Event::create([
-            'user_id' => $ownerId,
-            'title' => 'Workshop: Liderança Feminina Na Prática',
-            'speaker' => 'Camila Farani',
-            'description' => '<p>Um workshop 100% focado em técnicas de negociação, networking e empoderamento feminino.</p>',
-            'start_at' => now()->addDays(10)->format('Y-m-d H:i:s'),
-            'end_at' => now()->addDays(10)->addHours(4)->format('Y-m-d H:i:s'),
-            'location' => 'Online (Zoom)',
-            'price' => 97.00,
-            'capacity' => 500,
-            'published' => true,
-            'is_somos_unicas' => true,
-            'color' => '#db2777',
-            'image' => 'https://placehold.co/800x600/fdf2f8/db2777?text=Lideranca+na+Pratica',
-        ]);
+            // Palestra 2
+            \App\Models\Event::create([
+                'user_id' => $ownerId,
+                'title' => 'Workshop: Liderança Feminina Na Prática',
+                'speaker' => 'Camila Farani',
+                'description' => '<p>Um workshop 100% focado em técnicas de negociação, networking e empoderamento feminino.</p>',
+                'start_at' => now()->addDays(10)->format('Y-m-d H:i:s'),
+                'end_at' => now()->addDays(10)->addHours(4)->format('Y-m-d H:i:s'),
+                'location' => 'Online (Zoom)',
+                'price' => 97.00,
+                'capacity' => 500,
+                'published' => true,
+                'is_somos_unicas' => true,
+                'color' => '#db2777',
+                'image' => 'https://placehold.co/800x600/fdf2f8/db2777?text=Lideranca+na+Pratica',
+            ]);
 
-        // Curso
-        \App\Models\Course::create([
-            'user_id' => $ownerId,
-            'title' => 'Empreendedorismo Feminino de A a Z',
-            'short_description' => 'Aprenda do zero como tirar sua ideia do papel e criar um negócio rentável.',
-            'full_description' => '<p>Este curso abrange todos os passos para mulheres criarem negócios prósperos desde a ideação até as vendas avançadas.</p>',
-            'price' => 297.00,
-            'author_name' => 'Equipe Somos Únicas',
-            'status' => 'published',
-            'is_somos_unicas' => true,
-            'thumbnail' => 'https://placehold.co/800x600/fce7f3/be185d?text=Empreendedorismo+A-Z',
-        ]);
+            // Curso
+            \App\Models\Course::create([
+                'user_id' => $ownerId,
+                'title' => 'Empreendedorismo Feminino de A a Z',
+                'short_description' => 'Aprenda do zero como tirar sua ideia do papel e criar um negócio rentável.',
+                'full_description' => '<p>Este curso abrange todos os passos para mulheres criarem negócios prósperos desde a ideação até as vendas avançadas.</p>',
+                'price' => 297.00,
+                'author_name' => 'Equipe Somos Únicas',
+                'status' => 'published',
+                'is_somos_unicas' => true,
+                'thumbnail' => 'https://placehold.co/800x600/fce7f3/be185d?text=Empreendedorismo+A-Z',
+            ]);
 
-        // Mentoria
-        \App\Models\Mentorship::create([
-            'title' => 'Mentoria VIP: Decolando sua Carreira',
-            'mentor_id' => $ownerId,
-            'description' => '<p>Sessões individuais de mentoria exclusivas para mulheres buscando o próximo nível profissional.</p>',
-            'price' => 997.00,
-            'slots' => 10,
-            'type' => 'online',
-            'video_platform' => 'Zoom',
-            'is_somos_unicas' => true,
-            'image' => 'https://placehold.co/800x600/fecdd3/e11d48?text=Mentoria+VIP',
-        ]);
+            // Mentoria
+            \App\Models\Mentorship::create([
+                'title' => 'Mentoria VIP: Decolando sua Carreira',
+                'mentor_id' => $ownerId,
+                'description' => '<p>Sessões individuais de mentoria exclusivas para mulheres buscando o próximo nível profissional.</p>',
+                'price' => 997.00,
+                'slots' => 10,
+                'type' => 'online',
+                'video_platform' => 'Zoom',
+                'is_somos_unicas' => true,
+                'image' => 'https://placehold.co/800x600/fecdd3/e11d48?text=Mentoria+VIP',
+            ]);
 
-        return "<h1>Conteúdo Demo criado com sucesso!</h1><p><a href='/somos-unicas'>Clique aqui para ver a página Somos Únicas</a></p>";
-    } catch (\Exception $e) {
-        return "<h1>Erro:</h1> <pre>" . $e->getMessage() . "</pre><br><pre>" . $e->getTraceAsString() . "</pre>";
-    }
+            return "<h1>Conteúdo Demo criado com sucesso!</h1><p><a href='/somos-unicas'>Clique aqui para ver a página Somos Únicas</a></p>";
+        } catch (\Exception $e) {
+            return "<h1>Erro:</h1> <pre>" . $e->getMessage() . "</pre><br><pre>" . $e->getTraceAsString() . "</pre>";
+        }
+    });
 });
 
 // Vagas Públicas (Externas)
@@ -295,14 +297,14 @@ Route::post('/upload', [\App\Http\Controllers\UploadController::class, 'upload']
 Route::post('/webhook/mercadopago', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])->defaults('seller_id', 'platform');
 Route::post('/webhook/sumup/{orderId}/{token}', [\App\Http\Controllers\PaymentWebhookController::class, 'sumup'])->name('webhook.sumup');
 
-// Installer
-Route::prefix('install')->group(function () {
+// Installer (protegido por middleware global + explicito)
+Route::middleware(['sensitive.production'])->prefix('install')->group(function () {
     Route::get('/', [\App\Http\Controllers\InstallController::class, 'index'])->name('install.index');
     Route::post('/run', [\App\Http\Controllers\InstallController::class, 'run'])->name('install.run');
     Route::post('/test-connection', [\App\Http\Controllers\InstallController::class, 'testConnection'])->name('install.test-connection');
 });
 // Legacy installer routes (backward compat)
-Route::prefix('backend/install')->group(function () {
+Route::middleware(['sensitive.production'])->prefix('backend/install')->group(function () {
     Route::post('/run', [\App\Http\Controllers\InstallController::class, 'run'])->name('install.run.legacy');
     Route::post('/test-connection', [\App\Http\Controllers\InstallController::class, 'testConnection'])->name('install.test-connection.legacy');
 });
