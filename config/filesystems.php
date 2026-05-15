@@ -1,6 +1,22 @@
 <?php
 
 /**
+ * ============================================================
+ * PROPRIEDADE INTELECTUAL E DIREITOS AUTORAIS
+ * ============================================================
+ *
+ * @autor marcelo-brad rj
+ * @contato
+ * Tel: 21 981325441
+ * WhatsApp: 21 98132-5441
+ * Email: contato@kdkhost.com.br
+ * Telegram: @MARCELO_BRAD
+ * Instagram: @marcelobradrj
+ *
+ * ============================================================
+ */
+
+/**
  * Filesystem Disks Configuration.
  *
  * IMPORTANTE: Este arquivo NAO deve conter closures nem leituras ao banco de dados.

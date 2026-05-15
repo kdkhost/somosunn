@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * ============================================================
+ * PROPRIEDADE INTELECTUAL E DIREITOS AUTORAIS
+ * ============================================================
+ *
+ * @autor marcelo-brad rj
+ * @contato
+ * Tel: 21 981325441
+ * WhatsApp: 21 98132-5441
+ * Email: contato@kdkhost.com.br
+ * Telegram: @MARCELO_BRAD
+ * Instagram: @marcelobradrj
+ *
+ * ============================================================
+ */
+
 namespace App\Http\Controllers;
 
 use App\Jobs\SendMarketplaceOrderPaidEmailsJob;
