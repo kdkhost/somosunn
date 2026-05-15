@@ -370,7 +370,16 @@
             credentials: 'same-origin',
             body: JSON.stringify({})
         })
-        .then(function(response) { return response.json(); })
+        .then(function(response) {
+            if (!response.ok && response.status === 419) {
+                throw new Error('Sessao expirada. Recarregue a pagina (Ctrl+Shift+R).');
+            }
+            var ct = response.headers.get('content-type') || '';
+            if (ct.indexOf('application/json') === -1) {
+                throw new Error('Resposta inesperada (HTTP ' + response.status + '). Recarregue a pagina.');
+            }
+            return response.json();
+        })
         .then(function(data) {
             if (data.success) {
                 resultsDiv.style.borderColor = '#10b981';
@@ -442,7 +451,12 @@
             headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
             credentials: 'same-origin'
         })
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+            if (!r.ok && r.status === 419) throw new Error('Sessao expirada. Recarregue a pagina.');
+            var ct = r.headers.get('content-type') || '';
+            if (ct.indexOf('application/json') === -1) throw new Error('Resposta inesperada (HTTP ' + r.status + '). Recarregue.');
+            return r.json();
+        })
         .then(function(data) {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-folder-open"></i> Atualizar Lista';
@@ -544,7 +558,12 @@
             credentials: 'same-origin',
             body: JSON.stringify({ path: path, delete_local: deleteLocal })
         })
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+            if (!r.ok && r.status === 419) throw new Error('Sessao expirada. Recarregue a pagina.');
+            var ct = r.headers.get('content-type') || '';
+            if (ct.indexOf('application/json') === -1) throw new Error('Resposta inesperada (HTTP ' + r.status + '). Recarregue.');
+            return r.json();
+        })
         .then(function(data) {
             if (data.success) {
                 spinner.className = 'fas fa-check-circle text-emerald-500';
