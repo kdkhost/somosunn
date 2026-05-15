@@ -293,29 +293,55 @@ class UploadStorage
             return $default;
         }
 
-        // Se o disco efetivo e S3, verificar (com cache) se o arquivo esta la.
-        // Apos migracao, o cache e populado proativamente para evitar HEAD em cada request.
+        // PRIORIDADE 1: Se o arquivo existe localmente, SEMPRE usar URL local.
+        // Isso garante que imagens/PDFs nunca "sumam" do site mesmo com S3 ativo.
+        $localUrl = self::resolveLocalUrl($raw, $normalized);
+        if ($localUrl !== null) {
+            return $localUrl;
+        }
+
+        // PRIORIDADE 2: Se o disco efetivo e S3, tentar gerar URL S3 (com cache).
         if (self::effectiveDisk() === 's3') {
             if (self::isOnS3Cached($normalized)) {
                 try {
-                    return Storage::disk('s3')->url($normalized);
+                    // Usar URL assinada temporaria (1h) para garantir acesso mesmo com bucket privado
+                    return Storage::disk('s3')->temporaryUrl($normalized, now()->addHour());
                 } catch (\Throwable $e) {
-                    // Fallback para local se S3 falhar na geracao da URL
+                    // Se temporaryUrl nao for suportado, tentar url() normal
+                    try {
+                        return Storage::disk('s3')->url($normalized);
+                    } catch (\Throwable $e2) {
+                        // Fallback final
+                    }
                 }
             }
         }
 
-        // Fallback: URL local
-        $distinctPublicBaseUrl = self::distinctPublicBaseUrl();
-        if ($distinctPublicBaseUrl !== null) {
-            return self::joinUrl($distinctPublicBaseUrl, $normalized);
-        }
-
+        // PRIORIDADE 3: Fallback — gerar URL local mesmo que arquivo nao exista
+        // (pode ser que o arquivo apareca depois, ou que o path esteja em cache do navegador)
         if (self::shouldUseUploadsRoute($raw, $normalized)) {
             return asset($normalized);
         }
 
         return asset('storage/' . ltrim($normalized, '/'));
+    }
+
+    /**
+     * Tenta resolver URL local se o arquivo existir fisicamente no servidor.
+     */
+    private static function resolveLocalUrl(string $raw, string $normalized): ?string
+    {
+        // Verificar se existe em algum dos caminhos locais conhecidos
+        foreach (self::publicCandidates($normalized) as $candidate) {
+            if (is_file($candidate)) {
+                // Arquivo existe localmente — gerar URL local
+                if (self::shouldUseUploadsRoute($raw, $normalized)) {
+                    return asset($normalized);
+                }
+                return asset('storage/' . ltrim($normalized, '/'));
+            }
+        }
+        return null;
     }
 
     /**
