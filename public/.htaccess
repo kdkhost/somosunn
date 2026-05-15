@@ -24,9 +24,6 @@ AddDefaultCharset UTF-8
     # Block package files
     RewriteRule ^package(-lock)?\.json$ - [F,L]
 
-    # Block storage/logs access
-    RewriteRule ^storage/ - [F,L]
-
     # Block vendor directory direct access
     RewriteRule ^vendor/ - [F,L]
 
