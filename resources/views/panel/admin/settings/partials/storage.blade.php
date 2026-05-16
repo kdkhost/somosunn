@@ -3,11 +3,43 @@
      ============================================================ --}}
 
 @php
+    use App\Support\StorageProviderRegistry;
+
+    // Resolve provedor ativo (idrive/wasabi/aws/public).
+    $activeProvider = 'public';
+    try {
+        $stored = (string) ($settings['storage_active_provider'] ?? '');
+        $driver = (string) ($settings['storage_driver'] ?? 'public');
+        if ($driver === 's3') {
+            $activeProvider = in_array($stored, ['idrive', 'wasabi', 'aws'], true)
+                ? $stored
+                : 'idrive';
+        }
+    } catch (\Throwable $e) {
+        $activeProvider = 'public';
+    }
+
     $storageDriver = $settings['storage_driver'] ?? 'public';
     $isS3Active = $storageDriver === 's3';
-    $secretKey = $settings['storage_secret_key'] ?? '';
+
+    // Resolve credenciais do provedor ativo (com fallback p/ schema legado storage_*).
+    $providerKey = $activeProvider !== 'public' ? $activeProvider : 'idrive';
+    $accessKey = (string) ($settings[$providerKey . '_access_key'] ?? $settings['storage_access_key'] ?? '');
+    $secretKey = (string) ($settings[$providerKey . '_secret_key'] ?? $settings['storage_secret_key'] ?? '');
+    $bucket    = (string) ($settings[$providerKey . '_bucket']     ?? $settings['storage_bucket']     ?? '');
+    $region    = (string) ($settings[$providerKey . '_region']     ?? $settings['storage_region']    ?? 'us-east-1');
+    $endpoint  = (string) ($settings[$providerKey . '_endpoint']   ?? $settings['storage_endpoint']  ?? '');
+    $url       = (string) ($settings[$providerKey . '_url']        ?? $settings['storage_url']       ?? '');
+    $pathStyle = (int) ($settings[$providerKey . '_path_style'] ?? $settings['storage_path_style'] ?? ($providerKey === 'aws' ? 0 : 1)) === 1;
+
     $maskedSecret = $secretKey !== '' ? str_repeat('*', max(0, strlen($secretKey) - 4)) . substr($secretKey, -4) : '';
-    $pathStyle = (int) ($settings['storage_path_style'] ?? 1) === 1;
+
+    $providerOptions = [
+        'public' => 'Local (disco publico)',
+        'idrive' => 'IDrive e2',
+        'wasabi' => 'Wasabi',
+        'aws'    => 'AWS S3',
+    ];
 @endphp
 
 <style>
@@ -83,16 +115,22 @@
     </div>
 </div>
 
-{{-- DRIVER --}}
+{{-- DRIVER + PROVEDOR num unico select --}}
 <div class="stg-card mb-4">
     <label class="stg-label">Driver de Armazenamento</label>
-    <select name="storage_driver" id="storage_driver" class="stg-select w-full px-4 py-3 rounded-xl text-sm font-semibold">
-        <option value="public" {{ $storageDriver !== 's3' ? 'selected' : '' }}>Local (disco publico)</option>
-        <option value="s3" {{ $storageDriver === 's3' ? 'selected' : '' }}>S3 / IDrive e2</option>
+    <select name="storage_active_choice" id="storage_active_choice" class="stg-select w-full px-4 py-3 rounded-xl text-sm font-semibold">
+        @foreach ($providerOptions as $key => $label)
+            <option value="{{ $key }}" {{ ($isS3Active ? $activeProvider : 'public') === $key ? 'selected' : '' }}>{{ $label }}</option>
+        @endforeach
     </select>
+
+    {{-- Hidden fields que o backend persiste (compat fluxo existente) --}}
+    <input type="hidden" name="storage_driver" id="storage_driver_hidden_panel" value="{{ $isS3Active ? 's3' : 'public' }}">
+    <input type="hidden" name="storage_active_provider" id="storage_active_provider_hidden_panel" value="{{ $isS3Active ? $activeProvider : 'idrive' }}">
+
     <p class="text-xs text-slate-400 mt-2">
         <i class="fas fa-info-circle"></i>
-        Ao selecionar S3, os uploads passarao a usar o bucket configurado abaixo.
+        Cada provedor S3 tem seu proprio conjunto de credenciais. Apenas o selecionado e usado em runtime.
     </p>
 </div>
 
@@ -312,16 +350,60 @@
 @push('scripts')
 <script>
 (function() {
-    // Toggle S3 fields visibility
-    var driverSelect = document.getElementById('storage_driver');
+    // Toggle S3 fields visibility - reage ao select de provedor (idrive/wasabi/aws/public)
+    var choiceSelect = document.getElementById('storage_active_choice');
+    var driverHidden = document.getElementById('storage_driver_hidden_panel');
+    var providerHidden = document.getElementById('storage_active_provider_hidden_panel');
     var s3Fields = document.getElementById('s3-fields');
 
-    if (driverSelect && s3Fields) {
-        driverSelect.addEventListener('change', function() {
-            if (this.value === 's3') {
+    function syncProviderUI(value) {
+        var isS3 = value && value !== 'public';
+        if (driverHidden) driverHidden.value = isS3 ? 's3' : 'public';
+        if (isS3 && providerHidden) providerHidden.value = value;
+        if (s3Fields) {
+            if (isS3) {
                 s3Fields.classList.remove('opacity-50', 'pointer-events-none');
             } else {
                 s3Fields.classList.add('opacity-50', 'pointer-events-none');
+            }
+        }
+    }
+
+    if (choiceSelect) {
+        choiceSelect.addEventListener('change', function() {
+            syncProviderUI(this.value);
+            // Recarrega para popular os campos com as creds do provedor escolhido.
+            // Simples e robusto: o backend renderiza com $providerKey correto.
+            // Nota: salve as alteracoes ANTES de trocar o provedor.
+            if (this.value !== '@php echo $isS3Active ? $activeProvider : "public"; @endphp') {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Trocar de provedor?',
+                        html: 'Voce vai trocar para <strong>' + this.options[this.selectedIndex].text + '</strong>.<br>'
+                            + '<small class="text-warning">Salve as alteracoes do provedor atual antes de continuar.</small>',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Trocar (descartar mudancas nao salvas)',
+                        cancelButtonText: 'Cancelar',
+                    }).then(function(result) {
+                        if (result.isConfirmed) {
+                            // Salva o novo provedor e recarrega
+                            var form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = '{{ route("panel.admin.settings.update") }}';
+                            form.innerHTML = '<input name="_token" value="{{ csrf_token() }}">'
+                                + '<input name="current_group" value="storage">'
+                                + '<input name="storage_active_provider" value="' + value + '">'
+                                + '<input name="storage_driver" value="' + (value === 'public' ? 'public' : 's3') + '">';
+                            document.body.appendChild(form);
+                            form.submit();
+                        } else {
+                            // Reverte select
+                            choiceSelect.value = '@php echo $isS3Active ? $activeProvider : "public"; @endphp';
+                            syncProviderUI(choiceSelect.value);
+                        }
+                    });
+                }
             }
         });
     }

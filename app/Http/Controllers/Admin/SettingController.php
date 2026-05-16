@@ -787,6 +787,42 @@ class SettingController extends Controller
             Setting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
         }
 
+        // Spec: multi-provider-s3-storage
+        // Se o request veio do form de Armazenamento (Tailwind/AdminLTE)
+        // com chaves storage_* sem prefixo, copia para o namespace do
+        // provedor ativo (idrive_*/wasabi_*/aws_*) para manter compatibilidade
+        // com a leitura via StorageProviderRegistry.
+        if (
+            $currentGroup === 'storage'
+            && isset($data['storage_active_provider'])
+            && in_array($data['storage_active_provider'], ['idrive', 'wasabi', 'aws'], true)
+        ) {
+            $providerKey = $data['storage_active_provider'];
+            $legacyToPrefixed = [
+                'storage_access_key' => $providerKey . '_access_key',
+                'storage_secret_key' => $providerKey . '_secret_key',
+                'storage_bucket'     => $providerKey . '_bucket',
+                'storage_region'     => $providerKey . '_region',
+                'storage_endpoint'   => $providerKey . '_endpoint',
+                'storage_url'        => $providerKey . '_url',
+                'storage_path_style' => $providerKey . '_path_style',
+            ];
+            foreach ($legacyToPrefixed as $legacyKey => $prefixedKey) {
+                if (array_key_exists($legacyKey, $data)) {
+                    $val = (string) ($data[$legacyKey] ?? '');
+                    // Apenas atualiza se o valor for diferente de vazio OU se a
+                    // chave prefixada ainda nao existe (preserva config antiga).
+                    Setting::updateOrCreate(
+                        ['key' => $prefixedKey],
+                        ['value' => $val]
+                    );
+                }
+            }
+            // Garante o flush do cache estatico do Setting para que a proxima
+            // chamada a UploadStorage::applyRuntimeConfig veja os valores novos.
+            Setting::flushRuntimeCache();
+        }
+
         // DEBUG: Confirmar o que foi salvo
         if ($currentGroup === 'gateway') {
             $savedTheme = Setting::where('key', 'gateway_checkout_theme')->value('value');
@@ -1646,223 +1682,52 @@ class SettingController extends Controller
     }
 
     /* =========================================================================
-     * Multi-Provider S3 Storage
+     * Multi-Provider S3 Storage - integracao com a tela "Armazenamento" existente
      * Spec: .kiro/specs/multi-provider-s3-storage
      *
-     * Endpoints:
-     *   GET  /admin/settings/storage-providers          -> showStorageProviders
-     *   POST /admin/settings/storage-providers/{prov}   -> updateStorageProvider
-     *   POST /admin/settings/storage-providers/active   -> switchActiveProvider
-     *   POST /admin/settings/storage-providers/{prov}/test -> testStorageProvider
+     * O select "Driver de Armazenamento" lista 4 opcoes:
+     *   - public           (Local)
+     *   - idrive           (IDrive e2)
+     *   - wasabi           (Wasabi)
+     *   - aws              (AWS S3)
      *
-     * Acesso: apenas superadmin (verificado em cada metodo - Req 8.1).
+     * Quando a opcao S3 e escolhida, o form mostra os campos {provider}_*
+     * (ex: idrive_access_key, wasabi_bucket, aws_region) - cada provedor
+     * tem seu proprio conjunto de creds. Apenas o ativo e usado em runtime.
      * ========================================================================= */
 
     /**
-     * Tela com 3 abas (IDrive e2, Wasabi, AWS S3) + estado do provedor ativo.
-     * Requirements: 3.1, 3.2, 3.3, 4.1, 4.2, 4.3
+     * Testa a conexao do provedor S3 informado SEM ativa-lo.
+     * Endpoint AJAX usado pelo botao "Testar Conexao" da tela Armazenamento.
+     *
+     * Aceita parametro `provider` (idrive|wasabi|aws). Quando ausente,
+     * usa o provedor ativo atual.
+     *
+     * Retorna JSON com lista detalhada de steps.
      */
-    public function showStorageProviders(Request $request)
+    public function testStorageProvider(Request $request)
     {
         if (! $this->isSuperadmin()) {
-            abort(403);
+            return response()->json(['error' => 'forbidden'], 403);
         }
 
-        /** @var \App\Support\StorageProviderRegistry $registry */
-        $registry = app(\App\Support\StorageProviderRegistry::class);
-
-        $providers = [];
-        foreach (\App\Support\StorageProviderRegistry::PROVIDERS as $providerKey) {
-            $config = $registry->configFor($providerKey);
-            $providers[$providerKey] = [
-                'key' => $providerKey,
-                'name' => $registry->displayName($providerKey),
-                'access_key' => $config->accessKey,
-                'secret_masked' => $config->maskedSecret(),
-                'bucket' => $config->bucket,
-                'region' => $config->region,
-                'endpoint' => $config->endpoint,
-                'url' => $config->url,
-                'path_style' => $config->pathStyle,
-                'configured' => $config->isValid(),
-            ];
-        }
-
-        $activeProvider = $registry->activeProvider();
-
-        // Detecta qual layout usar conforme rota (admin = AdminLTE, panel = Tailwind).
-        $isPanelRoute = str_starts_with($request->path(), 'painel/');
-        $view = $isPanelRoute
-            ? 'panel.admin.settings.storage-providers'
-            : 'admin.settings.storage-providers';
-
-        return view($view, [
-            'providers' => $providers,
-            'activeProvider' => $activeProvider,
-            'providerOptions' => array_merge(
-                \App\Support\StorageProviderRegistry::PROVIDERS,
-                [\App\Support\StorageProviderRegistry::PROVIDER_LOCAL]
-            ),
-            'displayNames' => \App\Support\StorageProviderRegistry::DISPLAY_NAMES,
-        ]);
-    }
-
-    /**
-     * Persiste a configuracao de UM provedor sem afetar os demais (Req 1.2 + 1.5).
-     * Requirements: 1.2, 1.3, 1.5, 8.4
-     */
-    public function updateStorageProvider(\App\Http\Requests\StorageProviderUpdateRequest $request, string $provider)
-    {
-        if (! $this->isSuperadmin()) {
-            abort(403);
-        }
-
-        // O FormRequest ja validou os campos. Validamos consistencia
-        // entre o {provider} da rota e o campo `provider` do formulario.
-        if ($request->provider() !== strtolower($provider)) {
-            return back()->withErrors(['provider' => 'Provedor da rota nao corresponde ao do formulario.']);
-        }
-
-        try {
-            /** @var \App\Support\StorageProviderRegistry $registry */
-            $registry = app(\App\Support\StorageProviderRegistry::class);
-            $config = $request->toConfig();
-
-            $registry->persistConfig($provider, $config);
-
-            $this->logAuditAction('settings.storage.provider_updated', [
-                'provider' => $provider,
-                'bucket' => $config->bucket,
-                'region' => $config->region,
-            ]);
-
-            return back()->with(
-                'success',
-                'Configuracoes do provedor "' . $registry->displayName($provider) . '" salvas com sucesso.'
-            );
-        } catch (\InvalidArgumentException $e) {
-            return back()->withErrors(['provider' => $e->getMessage()]);
-        } catch (\Throwable $e) {
-            \Log::channel('security')->error('storage.provider.update_failed', [
-                'provider' => $provider,
-                'message' => $e->getMessage(),
-            ]);
-            return back()->withErrors(['general' => 'Erro ao salvar configuracoes: ' . $e->getMessage()]);
-        }
-    }
-
-    /**
-     * Troca o provedor ativo, validando conexao antes de persistir
-     * (Req 2.6 + 2.7).
-     * Requirements: 2.1, 2.2, 2.3, 2.4, 2.6, 2.7, 8.4
-     */
-    public function switchActiveProvider(Request $request)
-    {
-        if (! $this->isSuperadmin()) {
-            abort(403);
-        }
-
-        $request->validate([
-            'provider' => [
-                'required',
-                'string',
-                \Illuminate\Validation\Rule::in(array_merge(
-                    \App\Support\StorageProviderRegistry::PROVIDERS,
-                    [\App\Support\StorageProviderRegistry::PROVIDER_LOCAL]
-                )),
-            ],
-            'skip_test' => ['nullable', 'boolean'],
-        ]);
-
-        $newProvider = strtolower(trim((string) $request->input('provider')));
-        $skipTest = (bool) $request->boolean('skip_test', false);
-
-        /** @var \App\Support\StorageProviderRegistry $registry */
-        $registry = app(\App\Support\StorageProviderRegistry::class);
-        $previousProvider = $registry->activeProvider();
-
-        // Switch para Local (Req 2.3): nao precisa de teste de conexao.
-        if ($newProvider === \App\Support\StorageProviderRegistry::PROVIDER_LOCAL) {
+        $provider = strtolower(trim((string) $request->input('provider', '')));
+        if ($provider === '' || $provider === 'public') {
+            // Sem provedor explicito: usa o ativo atual.
             try {
-                $registry->setActiveProvider($newProvider);
-                Setting::set('storage_driver', 'public');
-                Setting::flushRuntimeCache();
-
-                $this->logAuditAction('settings.storage.active_changed', [
-                    'previous' => $previousProvider,
-                    'current' => $newProvider,
-                ]);
-
-                return back()->with('success', 'Armazenamento alternado para Local com sucesso.');
+                /** @var \App\Support\StorageProviderRegistry $registry */
+                $registry = app(\App\Support\StorageProviderRegistry::class);
+                $provider = $registry->activeProvider();
             } catch (\Throwable $e) {
-                return back()->withErrors(['provider' => 'Erro ao alternar para local: ' . $e->getMessage()]);
+                return response()->json(['error' => 'unable to resolve active provider: ' . $e->getMessage()], 500);
             }
         }
 
-        // Req 2.5: creds incompletas -> rejeita switch.
-        if (! $registry->isConfigured($newProvider)) {
-            return back()->withErrors([
-                'provider' => 'O provedor "' . $registry->displayName($newProvider) . '" nao tem '
-                    . 'credenciais validas (Access Key, Secret Key, Bucket e Region sao obrigatorios). '
-                    . 'Configure os campos antes de ativar.',
-            ]);
-        }
-
-        // Req 2.6: validar conexao antes de persistir.
-        if (! $skipTest) {
-            $testResult = $registry->testConnection($newProvider);
-            if (! $testResult->isSuccess()) {
-                // Req 2.7: manter provedor anterior, exibir erro com motivo.
-                return back()->withErrors([
-                    'provider' => 'Falha ao validar conexao com "' . $registry->displayName($newProvider) . '": '
-                        . ($testResult->errorMessage ?? 'erro desconhecido'),
-                ])->withInput([
-                    'provider' => $newProvider,
-                    'test_result' => $testResult->toArray(),
-                ]);
-            }
-        }
-
-        try {
-            $registry->setActiveProvider($newProvider);
-            Setting::set('storage_driver', 's3');
-            Setting::flushRuntimeCache();
-
-            $this->logAuditAction('settings.storage.active_changed', [
-                'previous' => $previousProvider,
-                'current' => $newProvider,
-            ]);
-
-            return back()->with(
-                'success',
-                'Provedor "' . $registry->displayName($newProvider) . '" ativado com sucesso.'
-            );
-        } catch (\Throwable $e) {
-            \Log::channel('security')->error('storage.active_provider.switch_failed', [
-                'previous' => $previousProvider,
-                'attempted' => $newProvider,
-                'message' => $e->getMessage(),
-            ]);
-            return back()->withErrors([
-                'provider' => 'Erro ao ativar provedor: ' . $e->getMessage(),
-            ]);
-        }
-    }
-
-    /**
-     * Testa a conexao de um provedor SEM ativa-lo (Req 5.5).
-     * Retorna JSON com a lista detalhada de steps (Req 5.3).
-     * Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7
-     */
-    public function testStorageProvider(Request $request, string $provider)
-    {
-        if (! $this->isSuperadmin()) {
-            abort(403);
-        }
-
-        $provider = strtolower(trim($provider));
         if (! in_array($provider, \App\Support\StorageProviderRegistry::PROVIDERS, true)) {
-            return response()->json(['error' => 'Provedor desconhecido.'], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'Provedor invalido. Selecione idrive, wasabi ou aws.',
+            ], 422);
         }
 
         try {
@@ -1876,18 +1741,34 @@ class SettingController extends Controller
                 'total_latency_ms' => $result->totalLatencyMs,
             ]);
 
-            return response()->json($result->toArray());
+            // Adapta para o formato esperado pela view legada (results array)
+            return response()->json([
+                'success' => $result->isSuccess(),
+                'message' => $result->isSuccess()
+                    ? 'Conexao validada com sucesso ('
+                        . $registry->displayName($provider) . ')'
+                    : ($result->errorMessage ?? 'Falha na conexao'),
+                'provider' => $provider,
+                'status' => $result->status,
+                'total_latency_ms' => $result->totalLatencyMs,
+                'results' => array_map(static function (array $step): array {
+                    return [
+                        'step' => $step['name'],
+                        'status' => $step['status'] === 'success' ? 'ok' : 'erro',
+                        'detail' => $step['detail'] . ' (' . $step['latency_ms'] . ' ms)',
+                    ];
+                }, $result->steps),
+            ]);
         } catch (\Throwable $e) {
             \Log::channel('security')->error('storage.provider.test_failed', [
                 'provider' => $provider,
                 'message' => $e->getMessage(),
             ]);
             return response()->json([
+                'success' => false,
+                'message' => 'Erro inesperado: ' . $e->getMessage(),
                 'provider' => $provider,
-                'status' => \App\Support\StorageTestResult::STATUS_FAILED,
-                'error_message' => 'Erro inesperado durante teste: ' . $e->getMessage(),
-                'steps' => [],
-                'total_latency_ms' => 0,
+                'results' => [],
             ], 500);
         }
     }

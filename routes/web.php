@@ -525,18 +525,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
         Route::post('/settings/test-gateway', [\App\Http\Controllers\Admin\SettingController::class, 'testGateway'])->name('settings.test_gateway');
         Route::post('/settings/test-s3', [\App\Http\Controllers\Admin\SettingController::class, 'testS3'])->name('settings.test-s3');
+        Route::post('/settings/test-s3-provider', [\App\Http\Controllers\Admin\SettingController::class, 'testStorageProvider'])->name('settings.test-s3-provider');
         Route::post('/settings/storage/migrate', [\App\Http\Controllers\Admin\SettingController::class, 'migrateStorage'])->name('settings.storage.migrate');
         Route::get('/settings/storage/folders', [\App\Http\Controllers\Admin\SettingController::class, 'storageFolders'])->name('settings.storage.folders');
-
-        // Multi-Provider S3 Storage (.kiro/specs/multi-provider-s3-storage)
-        Route::get('/settings/storage-providers', [\App\Http\Controllers\Admin\SettingController::class, 'showStorageProviders'])->name('settings.storage-providers.show');
-        Route::post('/settings/storage-providers/active', [\App\Http\Controllers\Admin\SettingController::class, 'switchActiveProvider'])->name('settings.storage-providers.switch');
-        Route::post('/settings/storage-providers/{provider}', [\App\Http\Controllers\Admin\SettingController::class, 'updateStorageProvider'])
-            ->where('provider', 'idrive|wasabi|aws')
-            ->name('settings.storage-providers.update');
-        Route::post('/settings/storage-providers/{provider}/test', [\App\Http\Controllers\Admin\SettingController::class, 'testStorageProvider'])
-            ->where('provider', 'idrive|wasabi|aws')
-            ->name('settings.storage-providers.test');
 
         // Cron
         Route::prefix('cron')->name('cron.')->group(function () {
@@ -672,18 +663,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('/settings/test-smtp', [\App\Http\Controllers\Admin\SettingController::class, 'testSmtp'])->name('settings.test-smtp');
     Route::post('/settings/test-gateway', [\App\Http\Controllers\Admin\SettingController::class, 'testGateway'])->name('settings.test_gateway');
     Route::post('/settings/test-s3', [\App\Http\Controllers\Admin\SettingController::class, 'testS3'])->name('settings.test-s3');
+    Route::post('/settings/test-s3-provider', [\App\Http\Controllers\Admin\SettingController::class, 'testStorageProvider'])->name('settings.test-s3-provider');
     Route::post('/settings/upload', [\App\Http\Controllers\Admin\SettingController::class, 'uploadFile'])->name('settings.upload');
     Route::post('/settings/storage/migrate', [\App\Http\Controllers\Admin\SettingController::class, 'migrateStorage'])->name('settings.storage.migrate');
     Route::get('/settings/storage/folders', [\App\Http\Controllers\Admin\SettingController::class, 'storageFolders'])->name('settings.storage.folders');
-    // Multi-Provider S3 Storage (.kiro/specs/multi-provider-s3-storage) - AdminLTE
-    Route::get('/settings/storage-providers', [\App\Http\Controllers\Admin\SettingController::class, 'showStorageProviders'])->name('settings.storage-providers.show');
-    Route::post('/settings/storage-providers/active', [\App\Http\Controllers\Admin\SettingController::class, 'switchActiveProvider'])->name('settings.storage-providers.switch');
-    Route::post('/settings/storage-providers/{provider}', [\App\Http\Controllers\Admin\SettingController::class, 'updateStorageProvider'])
-        ->where('provider', 'idrive|wasabi|aws')
-        ->name('settings.storage-providers.update');
-    Route::post('/settings/storage-providers/{provider}/test', [\App\Http\Controllers\Admin\SettingController::class, 'testStorageProvider'])
-        ->where('provider', 'idrive|wasabi|aws')
-        ->name('settings.storage-providers.test');
     Route::get('/balance', [\App\Http\Controllers\Admin\DashboardController::class, 'getMpBalance'])->name('dashboard.balance');
     Route::get('/system-health', [\App\Http\Controllers\Admin\DashboardController::class, 'systemHealth'])->name('dashboard.system-health');
     Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');

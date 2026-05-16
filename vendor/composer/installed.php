@@ -3,13 +3,31 @@
         'name' => 'unn/community-platform',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '82ec16cfb6eeb48b7f374f85b892edde834680e6',
+        'reference' => '694320f6ccb4d846dc755ce778ffaf7274e56dfa',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
+        'aws/aws-crt-php' => array(
+            'pretty_version' => 'v1.2.7',
+            'version' => '1.2.7.0',
+            'reference' => 'd71d9906c7bb63a28295447ba12e74723bd3730e',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../aws/aws-crt-php',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'aws/aws-sdk-php' => array(
+            'pretty_version' => '3.381.0',
+            'version' => '3.381.0.0',
+            'reference' => 'c1d3326c6b3d13b9209ae8f1399be0973095b20b',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../aws/aws-sdk-php',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'brick/math' => array(
             'pretty_version' => '0.12.3',
             'version' => '0.12.3.0',
@@ -27,6 +45,18 @@
             'install_path' => __DIR__ . '/../carbonphp/carbon-doctrine-types',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'cordoval/hamcrest-php' => array(
+            'dev_requirement' => true,
+            'replaced' => array(
+                0 => '*',
+            ),
+        ),
+        'davedevelopment/hamcrest-php' => array(
+            'dev_requirement' => true,
+            'replaced' => array(
+                0 => '*',
+            ),
         ),
         'dflydev/dot-access-data' => array(
             'pretty_version' => 'v3.0.3',
@@ -154,6 +184,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'giorgiosironi/eris' => array(
+            'pretty_version' => '0.14.1',
+            'version' => '0.14.1.0',
+            'reference' => 'fe4302d938c6cca1b661032da4cfe9b7a11d1009',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../giorgiosironi/eris',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'graham-campbell/result-type' => array(
             'pretty_version' => 'v1.1.4',
             'version' => '1.1.4.0',
@@ -198,6 +237,15 @@
             'install_path' => __DIR__ . '/../guzzlehttp/uri-template',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'hamcrest/hamcrest-php' => array(
+            'pretty_version' => 'v2.1.1',
+            'version' => '2.1.1.0',
+            'reference' => 'f8b1c0173b22fa6ec77a81fe63e5b01eba7e6487',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../hamcrest/hamcrest-php',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'illuminate/auth' => array(
             'dev_requirement' => false,
@@ -397,6 +445,12 @@
                 0 => 'v10.50.0',
             ),
         ),
+        'kodova/hamcrest-php' => array(
+            'dev_requirement' => true,
+            'replaced' => array(
+                0 => '*',
+            ),
+        ),
         'laravel/framework' => array(
             'pretty_version' => 'v10.50.0',
             'version' => '10.50.0.0',
@@ -469,6 +523,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'league/flysystem-aws-s3-v3' => array(
+            'pretty_version' => '3.34.0',
+            'version' => '3.34.0.0',
+            'reference' => '0c62fdac907791d8649ad3c61cb7a77628344fb8',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../league/flysystem-aws-s3-v3',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'league/flysystem-local' => array(
             'pretty_version' => '3.31.0',
             'version' => '3.31.0.0',
@@ -514,6 +577,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'mockery/mockery' => array(
+            'pretty_version' => '1.6.12',
+            'version' => '1.6.12.0',
+            'reference' => '1f4efdd7d3beafe9807b08156dfcb176d18f1699',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../mockery/mockery',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'monolog/monolog' => array(
             'pretty_version' => '3.10.0',
             'version' => '3.10.0.0',
@@ -528,6 +600,15 @@
             'replaced' => array(
                 0 => '^1.0',
             ),
+        ),
+        'mtdowling/jmespath.php' => array(
+            'pretty_version' => '2.8.0',
+            'version' => '2.8.0.0',
+            'reference' => 'a2a865e05d5f420b50cc2f85bb78d565db12a6bc',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../mtdowling/jmespath.php',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'myclabs/deep-copy' => array(
             'pretty_version' => '1.13.4',
@@ -1085,6 +1166,15 @@
                 0 => '2.0|3.0',
             ),
         ),
+        'symfony/filesystem' => array(
+            'pretty_version' => 'v8.0.11',
+            'version' => '8.0.11.0',
+            'reference' => '224db910898ce1317b892a9a1338f1f8f17eb7c7',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/filesystem',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'symfony/finder' => array(
             'pretty_version' => 'v6.4.33',
             'version' => '6.4.33.0',
@@ -1301,7 +1391,7 @@
         'unn/community-platform' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '82ec16cfb6eeb48b7f374f85b892edde834680e6',
+            'reference' => '694320f6ccb4d846dc755ce778ffaf7274e56dfa',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

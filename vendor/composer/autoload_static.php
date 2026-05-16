@@ -11,27 +11,32 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
-        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
         '662a729f963d39afe703c9d9b7ab4a8c' => __DIR__ . '/..' . '/symfony/polyfill-php83/bootstrap.php',
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
-        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
+        'b067bc7112e384b61c701452d53a14a8' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/JmesPath.php',
         '09f6b20656683369174dd6fa83b7e5fb' => __DIR__ . '/..' . '/symfony/polyfill-uuid/bootstrap.php',
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
+        '8a9dc1de0ca7e01f3e08231539562f61' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/functions.php',
         '47e1160838b5e5a10346ac4084b58c23' => __DIR__ . '/..' . '/laravel/prompts/src/helpers.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         '35a6ad97d21e794e7e22a17d806652e4' => __DIR__ . '/..' . '/nunomaduro/termwind/src/Functions.php',
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
+        'a84de8315bd92c71bcb39ff2ace7383d' => __DIR__ . '/..' . '/giorgiosironi/eris/src/Generator/functions.php',
         '476ca15b8d69b04665cd879be9cb4c68' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Collections/functions.php',
         '265b4faa2b3a9766332744949e83bf97' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Collections/helpers.php',
         'c7a3c339e7e14b60e06a2d7fcce9476b' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Events/functions.php',
         'f57d353b41eb2e234b26064d63d8c5dd' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Filesystem/functions.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
+        'c72349b1fe8d0deeedd3a52e8aa814d8' => __DIR__ . '/..' . '/mockery/mockery/library/helpers.php',
+        'ce9671a430e4846b44e1c68c7611f9f5' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
     );
 
@@ -74,6 +79,7 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
             'Symfony\\Component\\HttpKernel\\' => 29,
             'Symfony\\Component\\HttpFoundation\\' => 33,
             'Symfony\\Component\\Finder\\' => 25,
+            'Symfony\\Component\\Filesystem\\' => 29,
             'Symfony\\Component\\EventDispatcher\\' => 34,
             'Symfony\\Component\\ErrorHandler\\' => 31,
             'Symfony\\Component\\CssSelector\\' => 30,
@@ -108,6 +114,7 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         'M' => 
         array (
             'Monolog\\' => 8,
+            'Mockery\\' => 8,
             'MercadoPago\\' => 12,
             'Masterminds\\' => 12,
         ),
@@ -116,6 +123,7 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
             'League\\OAuth1\\Client\\' => 21,
             'League\\MimeTypeDetection\\' => 25,
             'League\\Flysystem\\Local\\' => 23,
+            'League\\Flysystem\\AwsS3V3\\' => 25,
             'League\\Flysystem\\' => 17,
             'League\\Config\\' => 14,
             'League\\CommonMark\\' => 18,
@@ -123,6 +131,10 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
             'Laravel\\SerializableClosure\\' => 28,
             'Laravel\\Sanctum\\' => 16,
             'Laravel\\Prompts\\' => 16,
+        ),
+        'J' => 
+        array (
+            'JmesPath\\' => 9,
         ),
         'I' => 
         array (
@@ -145,6 +157,7 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         ),
         'E' => 
         array (
+            'Eris\\' => 5,
             'Egulias\\EmailValidator\\' => 23,
         ),
         'D' => 
@@ -175,6 +188,7 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         ),
         'A' => 
         array (
+            'Aws\\' => 4,
             'App\\' => 4,
         ),
     );
@@ -288,6 +302,10 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         array (
             0 => __DIR__ . '/..' . '/symfony/finder',
         ),
+        'Symfony\\Component\\Filesystem\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/filesystem',
+        ),
         'Symfony\\Component\\EventDispatcher\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
@@ -378,6 +396,10 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
+        'Mockery\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mockery/mockery/library/Mockery',
+        ),
         'MercadoPago\\' => 
         array (
             0 => __DIR__ . '/..' . '/mercadopago/dx-php/src/MercadoPago',
@@ -401,6 +423,10 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         'League\\Flysystem\\Local\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/flysystem-local',
+        ),
+        'League\\Flysystem\\AwsS3V3\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/flysystem-aws-s3-v3',
         ),
         'League\\Flysystem\\' => 
         array (
@@ -429,6 +455,10 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         'Laravel\\Prompts\\' => 
         array (
             0 => __DIR__ . '/..' . '/laravel/prompts/src',
+        ),
+        'JmesPath\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mtdowling/jmespath.php/src',
         ),
         'Illuminate\\Support\\' => 
         array (
@@ -471,6 +501,10 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         'Firebase\\JWT\\' => 
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
+        ),
+        'Eris\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/giorgiosironi/eris/src',
         ),
         'Egulias\\EmailValidator\\' => 
         array (
@@ -545,6 +579,10 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
         ),
+        'Aws\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aws/aws-sdk-php/src',
+        ),
         'App\\' => 
         array (
             0 => __DIR__ . '/../..' . '/app',
@@ -552,6 +590,29 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
     );
 
     public static $classMap = array (
+        'AWS\\CRT\\Auth\\AwsCredentials' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Auth/AwsCredentials.php',
+        'AWS\\CRT\\Auth\\CredentialsProvider' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Auth/CredentialsProvider.php',
+        'AWS\\CRT\\Auth\\Signable' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Auth/Signable.php',
+        'AWS\\CRT\\Auth\\SignatureType' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Auth/SignatureType.php',
+        'AWS\\CRT\\Auth\\SignedBodyHeaderType' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Auth/SignedBodyHeaderType.php',
+        'AWS\\CRT\\Auth\\Signing' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Auth/Signing.php',
+        'AWS\\CRT\\Auth\\SigningAlgorithm' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Auth/SigningAlgorithm.php',
+        'AWS\\CRT\\Auth\\SigningConfigAWS' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Auth/SigningConfigAWS.php',
+        'AWS\\CRT\\Auth\\SigningResult' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Auth/SigningResult.php',
+        'AWS\\CRT\\Auth\\StaticCredentialsProvider' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Auth/StaticCredentialsProvider.php',
+        'AWS\\CRT\\CRT' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/CRT.php',
+        'AWS\\CRT\\HTTP\\Headers' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/HTTP/Headers.php',
+        'AWS\\CRT\\HTTP\\Message' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/HTTP/Message.php',
+        'AWS\\CRT\\HTTP\\Request' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/HTTP/Request.php',
+        'AWS\\CRT\\HTTP\\Response' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/HTTP/Response.php',
+        'AWS\\CRT\\IO\\EventLoopGroup' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/IO/EventLoopGroup.php',
+        'AWS\\CRT\\IO\\InputStream' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/IO/InputStream.php',
+        'AWS\\CRT\\Internal\\Encoding' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Internal/Encoding.php',
+        'AWS\\CRT\\Internal\\Extension' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Internal/Extension.php',
+        'AWS\\CRT\\Log' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Log.php',
+        'AWS\\CRT\\NativeResource' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/NativeResource.php',
+        'AWS\\CRT\\OptionValue' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Options.php',
+        'AWS\\CRT\\Options' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Options.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'DateError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateError.php',
@@ -564,6 +625,74 @@ class ComposerStaticInitfa4ecf457268b02d2dd56fd7e482619c
         'DateObjectError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateObjectError.php',
         'DateRangeError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateRangeError.php',
         'Dompdf\\Cpdf' => __DIR__ . '/..' . '/dompdf/dompdf/lib/Cpdf.php',
+        'Hamcrest\\Arrays\\IsArray' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Arrays/IsArray.php',
+        'Hamcrest\\Arrays\\IsArrayContaining' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Arrays/IsArrayContaining.php',
+        'Hamcrest\\Arrays\\IsArrayContainingInAnyOrder' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Arrays/IsArrayContainingInAnyOrder.php',
+        'Hamcrest\\Arrays\\IsArrayContainingInOrder' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Arrays/IsArrayContainingInOrder.php',
+        'Hamcrest\\Arrays\\IsArrayContainingKey' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Arrays/IsArrayContainingKey.php',
+        'Hamcrest\\Arrays\\IsArrayContainingKeyValuePair' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Arrays/IsArrayContainingKeyValuePair.php',
+        'Hamcrest\\Arrays\\IsArrayWithSize' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Arrays/IsArrayWithSize.php',
+        'Hamcrest\\Arrays\\MatchingOnce' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Arrays/MatchingOnce.php',
+        'Hamcrest\\Arrays\\SeriesMatchingOnce' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Arrays/SeriesMatchingOnce.php',
+        'Hamcrest\\AssertionError' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/AssertionError.php',
+        'Hamcrest\\BaseDescription' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/BaseDescription.php',
+        'Hamcrest\\BaseMatcher' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/BaseMatcher.php',
+        'Hamcrest\\Collection\\IsEmptyTraversable' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Collection/IsEmptyTraversable.php',
+        'Hamcrest\\Collection\\IsTraversableWithSize' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Collection/IsTraversableWithSize.php',
+        'Hamcrest\\Core\\AllOf' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/AllOf.php',
+        'Hamcrest\\Core\\AnyOf' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/AnyOf.php',
+        'Hamcrest\\Core\\CombinableMatcher' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/CombinableMatcher.php',
+        'Hamcrest\\Core\\DescribedAs' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/DescribedAs.php',
+        'Hamcrest\\Core\\Every' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/Every.php',
+        'Hamcrest\\Core\\HasToString' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/HasToString.php',
+        'Hamcrest\\Core\\Is' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/Is.php',
+        'Hamcrest\\Core\\IsAnything' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/IsAnything.php',
+        'Hamcrest\\Core\\IsCollectionContaining' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/IsCollectionContaining.php',
+        'Hamcrest\\Core\\IsEqual' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/IsEqual.php',
+        'Hamcrest\\Core\\IsIdentical' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/IsIdentical.php',
+        'Hamcrest\\Core\\IsInstanceOf' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/IsInstanceOf.php',
+        'Hamcrest\\Core\\IsNot' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/IsNot.php',
+        'Hamcrest\\Core\\IsNull' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/IsNull.php',
+        'Hamcrest\\Core\\IsSame' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/IsSame.php',
+        'Hamcrest\\Core\\IsTypeOf' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/IsTypeOf.php',
+        'Hamcrest\\Core\\Set' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/Set.php',
+        'Hamcrest\\Core\\ShortcutCombination' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Core/ShortcutCombination.php',
+        'Hamcrest\\Description' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Description.php',
+        'Hamcrest\\DiagnosingMatcher' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/DiagnosingMatcher.php',
+        'Hamcrest\\FeatureMatcher' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/FeatureMatcher.php',
+        'Hamcrest\\Internal\\SelfDescribingValue' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Internal/SelfDescribingValue.php',
+        'Hamcrest\\Matcher' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Matcher.php',
+        'Hamcrest\\MatcherAssert' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/MatcherAssert.php',
+        'Hamcrest\\Matchers' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Matchers.php',
+        'Hamcrest\\NullDescription' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/NullDescription.php',
+        'Hamcrest\\Number\\IsCloseTo' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Number/IsCloseTo.php',
+        'Hamcrest\\Number\\OrderingComparison' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Number/OrderingComparison.php',
+        'Hamcrest\\SelfDescribing' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/SelfDescribing.php',
+        'Hamcrest\\StringDescription' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/StringDescription.php',
+        'Hamcrest\\Text\\IsEmptyString' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Text/IsEmptyString.php',
+        'Hamcrest\\Text\\IsEqualIgnoringCase' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Text/IsEqualIgnoringCase.php',
+        'Hamcrest\\Text\\IsEqualIgnoringWhiteSpace' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Text/IsEqualIgnoringWhiteSpace.php',
+        'Hamcrest\\Text\\MatchesPattern' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Text/MatchesPattern.php',
+        'Hamcrest\\Text\\StringContains' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Text/StringContains.php',
+        'Hamcrest\\Text\\StringContainsIgnoringCase' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Text/StringContainsIgnoringCase.php',
+        'Hamcrest\\Text\\StringContainsInOrder' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Text/StringContainsInOrder.php',
+        'Hamcrest\\Text\\StringEndsWith' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Text/StringEndsWith.php',
+        'Hamcrest\\Text\\StringStartsWith' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Text/StringStartsWith.php',
+        'Hamcrest\\Text\\SubstringMatcher' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Text/SubstringMatcher.php',
+        'Hamcrest\\TypeSafeDiagnosingMatcher' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/TypeSafeDiagnosingMatcher.php',
+        'Hamcrest\\TypeSafeMatcher' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/TypeSafeMatcher.php',
+        'Hamcrest\\Type\\IsArray' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Type/IsArray.php',
+        'Hamcrest\\Type\\IsBoolean' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Type/IsBoolean.php',
+        'Hamcrest\\Type\\IsCallable' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Type/IsCallable.php',
+        'Hamcrest\\Type\\IsDouble' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Type/IsDouble.php',
+        'Hamcrest\\Type\\IsInteger' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Type/IsInteger.php',
+        'Hamcrest\\Type\\IsNumeric' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Type/IsNumeric.php',
+        'Hamcrest\\Type\\IsObject' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Type/IsObject.php',
+        'Hamcrest\\Type\\IsResource' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Type/IsResource.php',
+        'Hamcrest\\Type\\IsScalar' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Type/IsScalar.php',
+        'Hamcrest\\Type\\IsString' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Type/IsString.php',
+        'Hamcrest\\Util' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Util.php',
+        'Hamcrest\\Xml\\HasXPath' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest/Xml/HasXPath.php',
         'Nette\\ArgumentOutOfRangeException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
         'Nette\\DeprecatedException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
         'Nette\\DirectoryNotFoundException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
