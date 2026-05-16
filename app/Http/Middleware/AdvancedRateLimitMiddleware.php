@@ -39,6 +39,7 @@ use App\Models\Setting;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,7 +48,12 @@ class AdvancedRateLimitMiddleware implements RateLimiterInterface
 {
     public const STORAGE_DIR = 'framework/rate-limits';
     public const WINDOW_SECONDS = 60;
-    private const DEFAULT_THRESHOLD = 100;
+    // Threshold default elevado para 300 req/min: cobre uso normal de admins
+    // navegando rapidamente entre paginas (DataTables, ajax, assets locais)
+    // sem disparar bloqueio. Scanners de scripted brute-force continuam
+    // facilmente identificados. O valor pode ser ajustado via setting
+    // `rate_limit_threshold` sem deploy.
+    private const DEFAULT_THRESHOLD = 300;
     private const DEFAULT_BLOCK_DURATION = 15;
     private const DEFAULT_BLOCK_INCREMENT = 5;
 
@@ -78,6 +84,18 @@ class AdvancedRateLimitMiddleware implements RateLimiterInterface
         $userAgent = (string) $request->header('User-Agent', '');
 
         try {
+            // Bypass para administradores autenticados.
+            // Admins/superadmins navegam intensamente entre paginas
+            // do painel (DataTables, exports, abas multiplas) e nao
+            // devem ser tratados como trafego anonimo. O log de auditoria
+            // de acoes administrativas continua sendo feito pelo
+            // AuditLogService e LogUserActivity. Esta verificacao e
+            // tolerante a falhas: qualquer erro ao consultar o usuario
+            // nao bloqueia a requisicao.
+            if ($this->isAuthenticatedAdmin()) {
+                return $next($request);
+            }
+
             if ($ip !== '' && $this->isWhitelisted($ip)) {
                 return $next($request);
             }
@@ -317,6 +335,41 @@ class AdvancedRateLimitMiddleware implements RateLimiterInterface
     /* -------------------------------------------------------------- */
     /* Helpers internos                                                */
     /* -------------------------------------------------------------- */
+
+    /**
+     * Verifica se a requisicao e' de um admin/superadmin autenticado.
+     * Usuarios administrativos sao isentos de rate limit para nao
+     * sofrerem bloqueio durante uso normal do painel (DataTables,
+     * navegacao multi-aba, exports). Falhas na resolucao de auth
+     * retornam false silenciosamente — o fluxo segue para as demais
+     * camadas de protecao (whitelist, UA, threshold).
+     */
+    private function isAuthenticatedAdmin(): bool
+    {
+        try {
+            if (! Auth::check()) {
+                return false;
+            }
+
+            $user = Auth::user();
+            if ($user === null) {
+                return false;
+            }
+
+            if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
+                return true;
+            }
+
+            if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
+                return true;
+            }
+        } catch (\Throwable $e) {
+            // Falha em consultar auth nao deve quebrar a request.
+            return false;
+        }
+
+        return false;
+    }
 
     private function storagePath(string $ip): string
     {

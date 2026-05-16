@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * ============================================================
+ * PROPRIEDADE INTELECTUAL E DIREITOS AUTORAIS
+ * ============================================================
+ *
+ * @autor marcelo-brad rj
+ * @contato
+ * Tel: 21 981325441
+ * WhatsApp: 21 98132-5441
+ * Email: contato@kdkhost.com.br
+ * Telegram: @MARCELO_BRAD
+ * Instagram: @marcelobradrj
+ *
+ * ============================================================
+ */
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -9,25 +25,44 @@ use App\Models\ActivityLog;
 
 class LogUserActivity
 {
+    /**
+     * Paths que NAO devem ser registrados em activity_logs apos
+     * processados — evita ruido de housekeeping/heartbeat e impede
+     * que o registro do "clear" suje a tabela imediatamente apos
+     * o usuario solicitar a limpeza.
+     */
+    private const SKIP_PATHS = [
+        'admin/activity-logs/clear',
+        'painel/admin/logs/clear',
+    ];
+
     public function handle(Request $request, Closure $next)
     {
         $response = $next($request);
 
-        // Only log for authenticated users and non-GET requests (usually actions)
-        // Or specific GET requests if critical. For now, let's log modifying actions.
-        if (Auth::check() && !in_array($request->method(), ['GET', 'HEAD', 'OPTIONS'])) {
-            try {
-                ActivityLog::create([
-                    'user_id' => Auth::id(),
-                    'action' => $this->getTranslatedAction($request->method(), $request->path()),
-                    'description' => $this->getTranslatedDescription($request),
-                    'ip_address' => $request->ip(),
-                    'user_agent' => $request->userAgent(),
-                    'properties' => $request->except(['password', 'password_confirmation', '_token']),
-                ]);
-            } catch (\Exception $e) {
-                // Fail silently to not impact user experience
+        // Apenas para usuarios autenticados e em metodos modificadores
+        if (! Auth::check() || in_array($request->method(), ['GET', 'HEAD', 'OPTIONS'], true)) {
+            return $response;
+        }
+
+        $path = ltrim($request->path(), '/');
+        foreach (self::SKIP_PATHS as $skip) {
+            if ($path === $skip || str_starts_with($path, $skip)) {
+                return $response;
             }
+        }
+
+        try {
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action' => $this->getTranslatedAction($request->method(), $request->path()),
+                'description' => $this->getTranslatedDescription($request),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'properties' => $request->except(['password', 'password_confirmation', '_token']),
+            ]);
+        } catch (\Throwable $e) {
+            // Fail-safe: nunca quebrar a request original por falha no logger
         }
 
         return $response;

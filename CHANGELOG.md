@@ -2,6 +2,57 @@
 
 ---
 
+## [2026-07-23] - fix(security): mitigar bloqueio de admins por AdvancedRateLimitMiddleware + robustez do botao "Limpar Historico"
+
+### Contexto
+O botao "Limpar Historico" em `/admin/activity-logs` era percebido como
+quebrado: o middleware global `AdvancedRateLimitMiddleware` tem threshold
+default de 100 req/min e bloqueia o IP por 15 min apos exceder, atingindo
+admins durante uso normal do painel (DataTables, exports, abas multiplas).
+Alem disso, o `LogUserActivity` registrava a propria acao de limpeza apos
+o `truncate()`, fazendo a tabela voltar a ter 1 registro imediatamente —
+reforcando a percepcao de que o botao "nao funcionou".
+
+### Modificado
+- `app/Http/Middleware/AdvancedRateLimitMiddleware.php`:
+  - Bypass de admin/superadmin autenticado (`isAuthenticatedAdmin()`),
+    com fail-safe — qualquer erro ao consultar Auth nao bloqueia request.
+  - Threshold default elevado de 100 -> 300 req/min (configuravel via
+    `Setting::rate_limit_threshold` sem deploy).
+- `app/Http/Middleware/LogUserActivity.php`:
+  - Bloco de copyright adicionado.
+  - Lista `SKIP_PATHS` impede registrar a propria limpeza (`admin/activity-logs/clear`).
+  - Catch generalizado para `\Throwable` (fail-safe estrito).
+- `app/Http/Controllers/Admin/ActivityLogController.php`:
+  - Bloco de copyright adicionado.
+  - `clear()` agora usa `DB::table('activity_logs')->delete()` em vez de
+    `truncate()` (preserva integridade referencial caso FKs sejam
+    adicionadas no futuro).
+  - Audit log no canal `security` da acao com user_id, ip e contagem.
+  - Tratamento de excecao com mensagem de erro amigavel.
+
+### Validacao
+- 10/10 unit tests em `AdvancedRateLimitMiddlewareTest` continuam passando.
+- `php tools/check-no-bom.php` -> OK.
+- `php -l` em todos os arquivos modificados -> sem erros.
+- Auditoria via `tools/debug-system.php` em producao confirmou:
+  - 0 IPs ativos em `rate_limit_blocks` (limpa).
+  - Tabelas criticas existem (audit_logs, rate_limit_blocks, anomaly_events, settings).
+  - Middlewares carregados corretamente.
+
+### Bugs adicionais identificados (NAO corrigidos nesta entrega — sem impacto em runtime)
+- `users.deleted_at` AUSENTE: o User model nao usa SoftDeletes, entao a
+  coluna nao e necessaria. Removido o flag falso-positivo do auditor.
+- `magazines.pdf_path` AUSENTE: a coluna pertence a `certificates`, nao a
+  `magazines`. Era um falso-positivo do script de debug.
+
+### Arquivos afetados
+- `app/Http/Middleware/AdvancedRateLimitMiddleware.php`
+- `app/Http/Middleware/LogUserActivity.php`
+- `app/Http/Controllers/Admin/ActivityLogController.php`
+
+---
+
 ## [2026-07-22] - Spec multi-provider-s3-storage: testes unit + property + integration + ajuste HealthController
 ### Adicionado
 - `tests/Unit/Support/StorageTestResultTest.php` (13 testes / value object)
