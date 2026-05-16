@@ -192,9 +192,49 @@ class HealthController extends Controller implements HealthCheckInterface
 
     /**
      * Verifica conectividade com o disco S3 listando arquivos no diretorio raiz.
+     *
+     * Integra com StorageProviderRegistry (multi-provider): se o provedor
+     * ativo e' 'local', o check passa como OK informando que S3 nao esta
+     * em uso; se e' um provedor S3 sem creds validas, retorna WARNING
+     * sem chamar o disco (evita o erro generico "missing region").
      */
     private function checkS3(float $start): ComponentStatus
     {
+        // Tenta consultar o Registry (multi-provider). Em caso de erro
+        // (boot inicial, classe ausente), cai no comportamento legado.
+        try {
+            if (class_exists(\App\Support\StorageProviderRegistry::class)) {
+                /** @var \App\Support\StorageProviderRegistry $registry */
+                $registry = app(\App\Support\StorageProviderRegistry::class);
+                $active = $registry->activeProvider();
+
+                // Provedor 'local': S3 nao esta em uso, considera OK.
+                if ($active === \App\Support\StorageProviderRegistry::PROVIDER_LOCAL) {
+                    return new ComponentStatus(
+                        's3',
+                        ComponentStatus::STATUS_OK,
+                        'storage local ativo (S3 nao em uso)',
+                        $this->elapsedMs($start),
+                    );
+                }
+
+                // Provedor S3 ativo mas sem creds validas: warning explicito.
+                if (!$registry->isConfigured($active)) {
+                    return new ComponentStatus(
+                        's3',
+                        ComponentStatus::STATUS_WARNING,
+                        sprintf(
+                            'provedor "%s" sem credenciais validas',
+                            $registry->displayName($active)
+                        ),
+                        $this->elapsedMs($start),
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            // Boot resiliente: ignora erro do Registry e tenta o caminho normal.
+        }
+
         // Storage::disk('s3')->files lanca em caso de credenciais invalidas
         // ou de bucket inacessivel; o try/catch externo captura.
         $disk = Storage::disk('s3');

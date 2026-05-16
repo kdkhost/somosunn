@@ -2,6 +2,30 @@
 
 ---
 
+## [2026-07-22] - Spec multi-provider-s3-storage: testes unit + property + integration + ajuste HealthController
+### Adicionado
+- `tests/Unit/Support/StorageTestResultTest.php` (13 testes / value object)
+- `tests/Unit/Support/StorageProviderConfigTest.php` (31 testes / value object + dataProvider para path_style)
+- `tests/Unit/Support/StorageProviderRegistryTest.php` (26 testes / 68 asserts - SQLite isolado)
+- `tests/Property/StorageProviderConfigIsolationTest.php` (Property: salvar P_i nunca toca P_j - 200 iteracoes Eris / 2500 asserts)
+- `tests/Feature/MultiProviderS3IntegrationTest.php` (4 testes / fluxo completo: salvar 3 + alternar + verificar disco)
+
+### Modificado
+- `app/Http/Controllers/HealthController.php`: `checkS3()` agora consulta o `StorageProviderRegistry` antes de tentar listar objetos no disco.
+  - Provedor ativo == 'local' -> retorna OK ("S3 nao em uso")
+  - Provedor ativo S3 sem creds validas -> retorna WARNING ("provedor X sem credenciais validas")
+  - Demais casos: comportamento legado preservado (lista objetos do disco)
+  - Resolve o problema observado em producao onde checkS3 retornava o erro generico "missing region"
+
+### Resultado dos testes
+- 76 testes / ~2710 asserts / 0 falhas / 0 errors
+- Todos os testes que dependem de banco usam SQLite isolado por arquivo (zero rede, zero MySQL externo)
+- Property test executa 200 iteracoes (100 por property method) com 12+ asserts cada
+
+### Validates: Requirements 1.1-1.5, 2.1, 2.4, 8.4, 9.1, 9.4
+
+---
+
 ## [2026-07-22] - Spec multi-provider-s3-storage: Multi-Provider S3 Storage (IDrive e2 + Wasabi + AWS S3)
 ### Adicionado
 - `app/Support/StorageProviderConfig.php` (value object - 7 campos por provedor + isValid + maskedSecret)
