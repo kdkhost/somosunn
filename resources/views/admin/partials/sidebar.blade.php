@@ -610,6 +610,18 @@
                                     <p>Armazenamento</p>
                                 </a>
                             </li>
+                            @if(auth()->user()->isSuperAdmin())
+                            <li class="nav-item">
+                                <a href="{{ route('admin.settings.storage-providers.show') }}"
+                                    class="nav-link {{ request()->routeIs('admin.settings.storage-providers.*') ? 'active' : '' }}">
+                                    <i class="fas fa-server nav-icon"></i>
+                                    <p>
+                                        Provedores S3
+                                        <span class="right badge badge-info" style="font-size: 0.65rem;">multi</span>
+                                    </p>
+                                </a>
+                            </li>
+                            @endif
                             <li class="nav-item">
                                 <a href="{{ route('admin.settings', ['group' => 'system']) }}"
                                     class="nav-link {{ request()->route('group') == 'system' ? 'active' : '' }}">
