@@ -48,25 +48,46 @@ class UploadStorage
         $selectedDisk = $merged['storage_driver'] ?? env('FILESYSTEM_DISK', 'public');
         $selectedDisk = in_array($selectedDisk, ['s3', 'public'], true) ? $selectedDisk : 'public';
 
-        // Se S3 selecionado, aplicar credenciais (db -> env)
+        // Se S3 selecionado, aplicar credenciais (multi-provider -> legacy -> env)
+        // Spec: multi-provider-s3-storage (Req 1.4, 7.4, 7.6)
         $effectiveDisk = $selectedDisk;
         if ($selectedDisk === 's3') {
-            $s3Key = $merged['storage_access_key'] ?? env('AWS_ACCESS_KEY_ID');
-            $s3Secret = $merged['storage_secret_key'] ?? env('AWS_SECRET_ACCESS_KEY');
-            $s3Bucket = $merged['storage_bucket'] ?? env('AWS_BUCKET');
+            // 1) Tentar resolver via StorageProviderRegistry (multi-provider).
+            //    Se o provedor ativo possui credenciais validas, prevalece.
+            $providerConfig = self::resolveActiveProviderConfig();
 
-            // Sobrescrever config do disco s3 com valores do banco
-            config([
-                'filesystems.disks.s3.key' => $s3Key,
-                'filesystems.disks.s3.secret' => $s3Secret,
-                'filesystems.disks.s3.region' => $merged['storage_region'] ?? env('AWS_DEFAULT_REGION', 'us-east-1'),
-                'filesystems.disks.s3.bucket' => $s3Bucket,
-                'filesystems.disks.s3.url' => $merged['storage_url'] ?? env('AWS_URL'),
-                'filesystems.disks.s3.endpoint' => $merged['storage_endpoint'] ?? env('AWS_ENDPOINT'),
-                'filesystems.disks.s3.use_path_style_endpoint' => (bool) ($merged['storage_path_style'] ?? env('AWS_USE_PATH_STYLE_ENDPOINT', true)),
-            ]);
+            if ($providerConfig !== null) {
+                config([
+                    'filesystems.disks.s3.key' => $providerConfig['key'],
+                    'filesystems.disks.s3.secret' => $providerConfig['secret'],
+                    'filesystems.disks.s3.region' => $providerConfig['region'],
+                    'filesystems.disks.s3.bucket' => $providerConfig['bucket'],
+                    'filesystems.disks.s3.url' => $providerConfig['url'],
+                    'filesystems.disks.s3.endpoint' => $providerConfig['endpoint'],
+                    'filesystems.disks.s3.use_path_style_endpoint' => $providerConfig['use_path_style_endpoint'],
+                ]);
 
-            // Fallback: se credenciais incompletas, voltar ao public
+                $s3Key = $providerConfig['key'];
+                $s3Secret = $providerConfig['secret'];
+                $s3Bucket = $providerConfig['bucket'];
+            } else {
+                // 2) Fallback: schema legado `storage_*` (compat retroativa - Req 7.6).
+                $s3Key = $merged['storage_access_key'] ?? env('AWS_ACCESS_KEY_ID');
+                $s3Secret = $merged['storage_secret_key'] ?? env('AWS_SECRET_ACCESS_KEY');
+                $s3Bucket = $merged['storage_bucket'] ?? env('AWS_BUCKET');
+
+                config([
+                    'filesystems.disks.s3.key' => $s3Key,
+                    'filesystems.disks.s3.secret' => $s3Secret,
+                    'filesystems.disks.s3.region' => $merged['storage_region'] ?? env('AWS_DEFAULT_REGION', 'us-east-1'),
+                    'filesystems.disks.s3.bucket' => $s3Bucket,
+                    'filesystems.disks.s3.url' => $merged['storage_url'] ?? env('AWS_URL'),
+                    'filesystems.disks.s3.endpoint' => $merged['storage_endpoint'] ?? env('AWS_ENDPOINT'),
+                    'filesystems.disks.s3.use_path_style_endpoint' => (bool) ($merged['storage_path_style'] ?? env('AWS_USE_PATH_STYLE_ENDPOINT', true)),
+                ]);
+            }
+
+            // Fallback final: se credenciais incompletas, voltar ao public
             if (empty($s3Key) || empty($s3Secret) || empty($s3Bucket)) {
                 $effectiveDisk = 'public';
             }
@@ -80,6 +101,65 @@ class UploadStorage
         ]);
 
         self::forgetDisks();
+    }
+
+    /**
+     * Resolve o disco do provedor ativo via StorageProviderRegistry.
+     *
+     * Retorna null nos seguintes casos (e o caller cai no schema legado):
+     *   - Registry indisponivel (boot inicial sem DB)
+     *   - Provedor ativo == 'local'
+     *   - Provedor ativo sem credenciais validas (Req 1.4)
+     *
+     * Em caso de qualquer excecao (DB indisponivel, classe inexistente),
+     * retorna null silenciosamente para preservar o comportamento legado.
+     *
+     * @return array{
+     *     key: string,
+     *     secret: string,
+     *     region: string,
+     *     bucket: string,
+     *     url: ?string,
+     *     endpoint: ?string,
+     *     use_path_style_endpoint: bool
+     * }|null
+     */
+    private static function resolveActiveProviderConfig(): ?array
+    {
+        try {
+            if (!class_exists(\App\Support\StorageProviderRegistry::class)) {
+                return null;
+            }
+
+            /** @var \App\Support\StorageProviderRegistry $registry */
+            $registry = app(\App\Support\StorageProviderRegistry::class);
+            $active = $registry->activeProvider();
+
+            // Provedor ativo == local: nao usa S3 (Req 2.3 - tratado no caller).
+            if ($active === \App\Support\StorageProviderRegistry::PROVIDER_LOCAL) {
+                return null;
+            }
+
+            // Req 1.4: creds incompletas -> fallback (caller decide qual).
+            if (!$registry->isConfigured($active)) {
+                return null;
+            }
+
+            $disk = $registry->diskConfigArray($active);
+
+            return [
+                'key' => (string) $disk['key'],
+                'secret' => (string) $disk['secret'],
+                'region' => (string) $disk['region'],
+                'bucket' => (string) $disk['bucket'],
+                'url' => $disk['url'] ?? null,
+                'endpoint' => $disk['endpoint'] ?? null,
+                'use_path_style_endpoint' => (bool) ($disk['use_path_style_endpoint'] ?? true),
+            ];
+        } catch (\Throwable $e) {
+            // Boot resiliente: nunca falhar por causa do registry.
+            return null;
+        }
     }
 
     /**

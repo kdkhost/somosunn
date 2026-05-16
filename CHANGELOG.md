@@ -2,6 +2,44 @@
 
 ---
 
+## [2026-07-22] - Spec multi-provider-s3-storage: Multi-Provider S3 Storage (IDrive e2 + Wasabi + AWS S3)
+### Adicionado
+- `app/Support/StorageProviderConfig.php` (value object - 7 campos por provedor + isValid + maskedSecret)
+- `app/Support/StorageTestResult.php` (value object - steps + status + total latency)
+- `app/Support/StorageProviderRegistry.php` (~600 linhas - core do feature)
+- `app/Http/Requests/StorageProviderUpdateRequest.php` (validacao do form)
+- `database/migrations/2026_07_22_000006_seed_multi_provider_s3.php` (22 chaves novas + migracao do legado)
+- `resources/views/admin/settings/storage-providers.blade.php` (UI AdminLTE com tabs)
+- `resources/views/admin/settings/partials/storage-provider-form.blade.php` (parcial AdminLTE)
+- `resources/views/panel/admin/settings/storage-providers.blade.php` (UI Tailwind com tabs)
+- `resources/views/panel/admin/settings/partials/storage-provider-form.blade.php` (parcial Tailwind)
+- 4 endpoints novos no `Admin\SettingController`:
+  - GET  `/admin/settings/storage-providers` -> showStorageProviders
+  - POST `/admin/settings/storage-providers/active` -> switchActiveProvider (com validacao de conexao)
+  - POST `/admin/settings/storage-providers/{provider}` -> updateStorageProvider
+  - POST `/admin/settings/storage-providers/{provider}/test` -> testStorageProvider (JSON)
+- Item "Provedores S3" no menu lateral do painel Tailwind (visivel apenas para superadmin)
+
+### Modificado
+- `app/Support/UploadStorage.php`: applyRuntimeConfig() agora consulta primeiro o StorageProviderRegistry (multi-provider) e cai no schema legado `storage_*` apenas como fallback. Mantem 100% das assinaturas publicas.
+- `routes/web.php`: 4 rotas novas em ambos os grupos admin (AdminLTE e Tailwind), sob middleware admin
+
+### Resumo do design
+- Schema: prefixos `idrive_`, `wasabi_`, `aws_` na tabela settings (zero quebra de schema)
+- Provedor ativo: chave `storage_active_provider` (idrive | wasabi | aws | local)
+- Switch valida conexao antes de aplicar (Req 2.6); falha mantem provedor anterior (Req 2.7)
+- Teste de conexao isolado: 6 steps (upload, exists, url, http_get, compare, delete) com timeout 30s e cleanup garantido
+- Compatibilidade total com legado `storage_*`: migration copia automaticamente para `idrive_*` no primeiro deploy
+- Audit log via canal security em todas as operacoes (criar/alterar/ativar provedor)
+- Apenas superadmin tem acesso aos endpoints
+
+### Migration: rodar `php artisan migrate` apos o deploy
+A migration `2026_07_22_000006_seed_multi_provider_s3` cria 22 chaves vazias na tabela settings (com defaults sensatos por provedor) e copia o legado IDrive automaticamente. Idempotente.
+
+### Validates: Requirements 1.1-1.5, 2.1-2.7, 3.1-3.5, 4.1-4.5, 5.1-5.7, 7.1-7.6, 8.1-8.4, 9.1-9.4
+
+---
+
 ## [2026-07-22] - Spec advanced-security-performance: TASK 18.4 (Integration tests) + 15.4 + suite Property/Unit completa - **SPEC 100% CONCLUIDA**
 ### Adicionado
 - `tests/Feature/AdvancedSecurityIntegrationTest.php` - 3 fluxos de integracao end-to-end:
