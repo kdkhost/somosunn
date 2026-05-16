@@ -40,6 +40,9 @@ use App\Http\Controllers\MailTestController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\SatisfactionController;
 
+// Health check (advanced-security-performance, Requirement 9)
+Route::get('/health', [\App\Http\Controllers\HealthController::class, 'index'])->name('health');
+
 Route::get('/storage/{path}', [\App\Http\Controllers\PublicStorageProxyController::class, 'storage'])
     ->where('path', '.*')
     ->name('public.storage');

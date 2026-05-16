@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\AuditLogService;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
@@ -862,6 +863,17 @@ class SettingController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Erro ao limpar cache nas configurações: ' . $e->getMessage());
         }
+
+        // Audit log: alteração de configurações
+        try {
+            app(AuditLogService::class)->log(
+                AuditLogService::ACTION_CONFIG_CHANGE,
+                null,
+                [],
+                [],
+                ['group' => $currentGroup]
+            );
+        } catch (\Throwable $e) { /* silent: audit nunca quebra o save */ }
 
         // Auto-save: Retornar JSON se for requisição AJAX
         if ($request->wantsJson() || $request->ajax()) {

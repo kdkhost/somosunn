@@ -20,6 +20,13 @@ class RecalculateReputationJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * Queue dedicada para este job (alinhada com QueueManagerService).
+     * Job leve, nao se enquadra em uploads/emails/webhooks.
+     * Spec: advanced-security-performance, Requirements 1.2-1.5
+     */
+    public string $queue = 'default';
+
+    /**
      * Numero maximo de tentativas.
      */
     public int $tries = 3;
@@ -28,6 +35,13 @@ class RecalculateReputationJob implements ShouldQueue
      * Timeout em segundos.
      */
     public int $timeout = 60;
+
+    /**
+     * Backoff em segundos entre tentativas.
+     *
+     * @var array<int, int>
+     */
+    public array $backoff = [10, 30, 60];
 
     /**
      * Criar nova instancia do job.

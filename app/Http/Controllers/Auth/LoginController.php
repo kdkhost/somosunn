@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Auth\Concerns\SanitizesIntendedRedirect;
 use App\Http\Controllers\Controller;
+use App\Services\AuditLogService;
 use App\Services\PointsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +17,24 @@ class LoginController extends Controller
     {
         $credentials = $request->validate(['email'=>'required|email','password'=>'required']);
 
-        if(Auth::attempt($credentials, $request->filled('remember'))){
+        $loginSuccessful = Auth::attempt($credentials, $request->filled('remember'));
+
+        // Anomaly detection: registra a tentativa de login (sucesso/falha) por IP.
+        // Spec: advanced-security-performance, Requirement 11.1
+        try {
+            app(\App\Services\AnomalyDetectorService::class)->recordLoginAttempt(
+                (string) $request->ip(),
+                (bool) $loginSuccessful
+            );
+        } catch (\Throwable $e) { /* swallow - nao bloqueia o fluxo */ }
+
+        if ($loginSuccessful) {
             $request->session()->regenerate();
+
+            // Audit log: login bem-sucedido
+            try {
+                app(AuditLogService::class)->log(AuditLogService::ACTION_LOGIN);
+            } catch (\Throwable $e) { /* silent: audit nunca quebra login */ }
 
             // Log de segurança: login bem-sucedido
             try {
@@ -86,6 +103,11 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
+        // Audit log: logout (antes de invalidar a sessão para preservar user_id)
+        try {
+            app(AuditLogService::class)->log(AuditLogService::ACTION_LOGOUT);
+        } catch (\Throwable $e) { /* silent: audit nunca quebra logout */ }
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

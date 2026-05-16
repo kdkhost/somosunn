@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Jobs\ProcessImageUploadJob;
+use App\Services\ImageProcessorService;
 use App\Services\WatermarkService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
@@ -14,6 +16,18 @@ class UploadStorage
 {
     /** TTL do cache de localizacao S3 (em segundos = 7 dias) */
     private const S3_LOCATION_CACHE_TTL = 604800;
+
+    /**
+     * Limiar (bytes) acima do qual o pos-processamento de imagem e
+     * delegado a um job assincrono na queue 'uploads'. Abaixo disso, o
+     * processamento e sincrono dentro do request.
+     *
+     * Spec: advanced-security-performance, Requirements 2.1, 2.7
+     */
+    private const ASYNC_PROCESS_THRESHOLD_BYTES = 2097152; // 2 MiB
+
+    /** Extensoes raster consideradas "imagens processaveis" */
+    private const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
     public static function applyRuntimeConfig(array $settings = []): void
     {
@@ -138,14 +152,164 @@ class UploadStorage
             );
 
         if ($shouldWatermark) {
-            return app(WatermarkService::class)->processStorageImage(
+            $storedPath = app(WatermarkService::class)->processStorageImage(
                 $file,
                 $directory,
                 $filename,
                 ['prefix' => (string) ($options['prefix'] ?? 'image')]
             );
+            self::recordUploadAnomaly();
+            return $storedPath;
         }
 
+        // Image processing pipeline: para imagens raster, delega ao
+        // ImageProcessorService (sync se < 2MB, async via queue 'uploads' se >= 2MB).
+        // Em caso de falha, cai no armazenamento padrao preservando o original.
+        if (self::shouldProcessAsImage($file, $options)) {
+            try {
+                $storedPath = self::processImageInline($file, $directory, $filename, $options);
+                self::recordUploadAnomaly();
+                return $storedPath;
+            } catch (Throwable $imageException) {
+                Log::warning('UploadStorage: image processing falhou, armazenando original sem modificacao.', [
+                    'exception' => $imageException->getMessage(),
+                    'directory' => $directory,
+                ]);
+                // Continua para o caminho padrao abaixo (fail-safe).
+            }
+        }
+
+        if (self::isLocal()) {
+            $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
+            $name = ($filename !== null && $filename !== '') ? $filename : uniqid('', true) . '.' . $extension;
+            $targetDirectory = self::localTargetDirectory($directory);
+
+            if (!is_dir($targetDirectory) && !@mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
+                throw new RuntimeException('Nao foi possivel preparar o diretorio de upload: ' . $directory);
+            }
+
+            try {
+                $file->move($targetDirectory, $name);
+            } catch (Throwable $exception) {
+                throw new RuntimeException('Nao foi possivel salvar o arquivo enviado.', 0, $exception);
+            }
+
+            $storedPath = ltrim(($directory !== '' ? $directory . '/' : '') . $name, '/');
+            self::recordUploadAnomaly();
+            return $storedPath;
+        }
+
+        $options = ['visibility' => 'public'];
+        if ($filename !== null && $filename !== '') {
+            $storedPath = (string) self::disk()->putFileAs($directory, $file, $filename, $options);
+            self::recordUploadAnomaly();
+            return $storedPath;
+        }
+
+        $storedPath = (string) self::disk()->putFile($directory, $file, $options);
+        self::recordUploadAnomaly();
+        return $storedPath;
+    }
+
+    /**
+     * Registra o upload no AnomalyDetectorService para deteccao de
+     * upload flood por usuario autenticado. Falhas sao silenciadas
+     * para nao interromper o fluxo do upload (Requirement 11.7).
+     *
+     * Spec: advanced-security-performance, Requirement 11.2
+     */
+    private static function recordUploadAnomaly(): void
+    {
+        try {
+            if (function_exists('auth') && auth()->check()) {
+                app(\App\Services\AnomalyDetectorService::class)->recordUpload((int) auth()->id());
+            }
+        } catch (\Throwable $e) { /* swallow - nao bloqueia o fluxo de upload */ }
+    }
+
+    /**
+     * Decide se o arquivo deve ser processado pelo ImageProcessorService.
+     *
+     * Critérios:
+     *   - opção `process_image` desligada explicitamente => false (recursion guard)
+     *   - extensão raster suportada (jpg, jpeg, png, gif, webp)
+     *   - quando `process_image` nao informado, defaultamos para true se for imagem raster
+     *
+     * Spec: advanced-security-performance, Requirements 2.1, 2.7
+     */
+    private static function shouldProcessAsImage(UploadedFile $file, array $options): bool
+    {
+        // Recursion guard: se a opcao foi desligada explicitamente, nao processa.
+        if (array_key_exists('process_image', $options) && $options['process_image'] === false) {
+            return false;
+        }
+
+        $extension = strtolower((string) ($file->getClientOriginalExtension() ?: $file->extension() ?: ''));
+        $isImage = in_array($extension, self::IMAGE_EXTENSIONS, true);
+
+        if (!$isImage) {
+            return false;
+        }
+
+        // Quando explicitamente true, processa. Quando ausente, default = true para imagens.
+        return array_key_exists('process_image', $options)
+            ? (bool) $options['process_image']
+            : true;
+    }
+
+    /**
+     * Roteia o processamento de imagem entre sincrono e assincrono baseado no tamanho.
+     *
+     * - Arquivos < 2MB: ImageProcessorService::process() inline, retorna originalPath
+     * - Arquivos >= 2MB: armazena original imediatamente e despacha ProcessImageUploadJob
+     *   na queue 'uploads' para gerar variantes em background
+     *
+     * Em caso de falha, propaga a excecao para o caller (storeUploadedFile),
+     * que tem fallback para armazenamento sem processamento.
+     */
+    private static function processImageInline(
+        UploadedFile $file,
+        string $directory,
+        ?string $filename,
+        array $options
+    ): string {
+        $size = (int) ($file->getSize() ?: 0);
+
+        if ($size > 0 && $size < self::ASYNC_PROCESS_THRESHOLD_BYTES) {
+            // SINCRONO: processa imediatamente e retorna o originalPath.
+            $processorOptions = $options;
+            unset($processorOptions['process_image'], $processorOptions['watermark']);
+            if ($filename !== null && $filename !== '') {
+                $processorOptions['filename'] = $filename;
+            }
+
+            $result = app(ImageProcessorService::class)->process($file, $directory, $processorOptions);
+
+            // process() ja faz fallback fail-safe interno. Se result.originalPath estiver
+            // vazio, significa que ate o fallback falhou - propaga excecao para o caller.
+            if ($result->originalPath === '') {
+                throw new RuntimeException('ImageProcessorService nao conseguiu armazenar a imagem.');
+            }
+
+            return $result->originalPath;
+        }
+
+        // ASSINCRONO: armazena o original imediatamente e enfileira o pos-processamento.
+        $storedPath = self::storeOriginalWithoutProcessing($file, $directory, $filename);
+        self::dispatchImageProcessing($storedPath, $directory, $options);
+
+        return $storedPath;
+    }
+
+    /**
+     * Armazena o arquivo original sem qualquer processamento de imagem.
+     * Usado pela rota assincrona e em casos onde o pos-processamento e adiado.
+     */
+    private static function storeOriginalWithoutProcessing(
+        UploadedFile $file,
+        string $directory,
+        ?string $filename
+    ): string {
         if (self::isLocal()) {
             $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
             $name = ($filename !== null && $filename !== '') ? $filename : uniqid('', true) . '.' . $extension;
@@ -164,12 +328,38 @@ class UploadStorage
             return ltrim(($directory !== '' ? $directory . '/' : '') . $name, '/');
         }
 
-        $options = ['visibility' => 'public'];
+        $putOptions = ['visibility' => 'public'];
         if ($filename !== null && $filename !== '') {
-            return (string) self::disk()->putFileAs($directory, $file, $filename, $options);
+            return (string) self::disk()->putFileAs($directory, $file, $filename, $putOptions);
         }
 
-        return (string) self::disk()->putFile($directory, $file, $options);
+        return (string) self::disk()->putFile($directory, $file, $putOptions);
+    }
+
+    /**
+     * Despacha o job de pos-processamento na queue 'uploads'.
+     *
+     * Em caso de falha do dispatch (queue indisponivel, banco fora do ar),
+     * apenas loga - o original ja foi armazenado e permanece intacto.
+     */
+    private static function dispatchImageProcessing(
+        string $storedPath,
+        string $directory,
+        array $options
+    ): void {
+        try {
+            $jobOptions = $options;
+            // Remove flags de controle que nao se aplicam ao job.
+            unset($jobOptions['process_image'], $jobOptions['watermark'], $jobOptions['prefix']);
+
+            ProcessImageUploadJob::dispatch($storedPath, $directory, $jobOptions);
+        } catch (Throwable $exception) {
+            Log::warning('UploadStorage: falha ao enfileirar ProcessImageUploadJob, original preservado.', [
+                'exception' => $exception->getMessage(),
+                'stored_path' => $storedPath,
+                'directory' => $directory,
+            ]);
+        }
     }
 
     public static function isLocal(): bool

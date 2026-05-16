@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\AuditLogService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -54,6 +55,17 @@ class ResetPasswordController extends Controller
         );
 
         if ($status === Password::PASSWORD_RESET) {
+            // Audit log: alteração de senha bem-sucedida
+            try {
+                app(AuditLogService::class)->log(
+                    AuditLogService::ACTION_PASSWORD_CHANGE,
+                    null,
+                    [],
+                    [],
+                    ['email' => $request->email]
+                );
+            } catch (\Throwable $e) { /* silent: audit nunca quebra reset */ }
+
             return redirect()->route('login')->with('status', 'Senha redefinida com sucesso! Faça login com sua nova senha.');
         }
 

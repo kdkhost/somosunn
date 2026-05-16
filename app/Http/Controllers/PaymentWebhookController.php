@@ -73,11 +73,40 @@ class PaymentWebhookController extends Controller
         $sumUpSvc = app(SumUpService::class);
 
         if ($secret && !$sumUpSvc->validateWebhookSignature($rawPayload, $signature, $secret)) {
+            // Anomaly detection: webhook invalido (assinatura nao bate)
+            // Spec: advanced-security-performance, Requirement 11.3
+            try {
+                app(\App\Services\AnomalyDetectorService::class)->recordWebhook(
+                    'sumup_' . (string) $request->ip(),
+                    false
+                );
+            } catch (\Throwable $e) { /* swallow */ }
+
             Log::warning('SumUp webhook: assinatura invalida', ['order_id' => $orderId, 'token' => $token]);
             return response('Unauthorized', 401);
         }
 
+        // Anomaly detection: webhook valido (passou pela validacao de assinatura)
+        // Spec: advanced-security-performance, Requirement 11.3
+        try {
+            app(\App\Services\AnomalyDetectorService::class)->recordWebhook(
+                'sumup_' . (string) $request->ip(),
+                true
+            );
+        } catch (\Throwable $e) { /* swallow */ }
+
         $log->update(['is_valid' => true]);
+
+        // Audit log: webhook SumUp processado (pós-validação)
+        try {
+            app(\App\Services\AuditLogService::class)->log(
+                \App\Services\AuditLogService::ACTION_WEBHOOK,
+                null,
+                [],
+                [],
+                ['provider' => 'sumup', 'order_id' => $orderId, 'event_type' => $eventType]
+            );
+        } catch (\Throwable $e) { /* swallow - never let audit break webhook */ }
 
         try {
             app(SumUpWebhookProcessor::class)->process($payload, $token);
@@ -101,6 +130,17 @@ class PaymentWebhookController extends Controller
         // Validação de segurança: verificar headers obrigatórios do MercadoPago
         $requestId = $request->header('x-request-id');
         $signature = $request->header('x-signature');
+
+        // Anomaly detection: registra o webhook MP. Considera valido apenas
+        // quando os headers de autenticacao do MercadoPago estao presentes.
+        // Spec: advanced-security-performance, Requirement 11.3
+        try {
+            $isValid = !empty($requestId) && !empty($signature);
+            app(\App\Services\AnomalyDetectorService::class)->recordWebhook(
+                'mercadopago_' . (string) $request->ip(),
+                $isValid
+            );
+        } catch (\Throwable $e) { /* swallow */ }
 
         if ($request->isMethod('POST') && !$requestId && !$signature) {
             Log::channel('security')->warning('Webhook MP: requisição sem headers de autenticação', [
@@ -140,6 +180,17 @@ class PaymentWebhookController extends Controller
         } catch (\Throwable $e) {
             Log::warning('Falha ao registrar webhook log MP: ' . $e->getMessage());
         }
+
+        // Audit log: webhook MercadoPago recebido (pós-validação básica)
+        try {
+            app(\App\Services\AuditLogService::class)->log(
+                \App\Services\AuditLogService::ACTION_WEBHOOK,
+                null,
+                [],
+                [],
+                ['provider' => 'mercadopago', 'request_id' => $requestId ?? null, 'type' => $type]
+            );
+        } catch (\Throwable $e) { /* swallow - never let audit break webhook */ }
 
         // Se for preapproval (assinatura iniciada/autorizada)
         if ($type === 'subscription_preapproval' || $type === 'preapproval') {

@@ -1,5 +1,31 @@
 <?php
 
+/**
+ * ============================================================
+ * PROPRIEDADE INTELECTUAL E DIREITOS AUTORAIS
+ * ============================================================
+ *
+ * @autor marcelo-brad rj
+ * @contato
+ * Tel: 21 981325441
+ * WhatsApp: 21 98132-5441
+ * Email: contato@kdkhost.com.br
+ * Telegram: @MARCELO_BRAD
+ * Instagram: @marcelobradrj
+ *
+ * ============================================================
+ *
+ * Sistema UNN - Console Kernel
+ *
+ * Registra os scheduled commands da plataforma. Inclui agendamentos
+ * de backup (database/config), rotacao de logs, processamento de
+ * fila padrao, recalculo de reputacao, expiracao de carrinhos e
+ * demais rotinas operacionais.
+ *
+ * Spec: .kiro/specs/advanced-security-performance
+ * Requirements: 1.6, 7.5, 10.4
+ */
+
 namespace App\Console;
 
 use App\Support\EmailQueueSettings;
@@ -222,6 +248,16 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar limpeza de notificações: ' . $e->getMessage());
         }
 
+        // Log rotation (advanced-security-performance, Requirement 10.4)
+        try {
+            $schedule->command('logs:cleanup')
+                ->dailyAt('02:00')
+                ->withoutOverlapping()
+                ->name('logs-cleanup');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar rotacao de logs: ' . $e->getMessage());
+        }
+
         // Recalcula scores de reputacao dos membros diariamente
         try {
             $schedule->command('reputation:recalculate')
@@ -230,6 +266,46 @@ class Kernel extends ConsoleKernel
                 ->name('reputation-recalculate');
         } catch (\Throwable $e) {
             \Log::warning('Falha ao configurar recalculo de reputacao: ' . $e->getMessage());
+        }
+
+        // Backup automatico (advanced-security-performance, Requirement 7.5)
+        try {
+            $schedule->command('backup:database')
+                ->dailyAt('03:00')
+                ->withoutOverlapping()
+                ->onOneServer()
+                ->runInBackground()
+                ->onFailure(function () {
+                    \Illuminate\Support\Facades\Log::channel('security')->error(
+                        'Scheduled backup:database falhou durante execucao.',
+                        ['command' => 'backup:database', 'scheduled_at' => '03:00']
+                    );
+                });
+
+            $schedule->command('backup:config')
+                ->weeklyOn(0, '04:00')  // Sunday at 4am
+                ->withoutOverlapping()
+                ->onOneServer()
+                ->runInBackground();
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar agendamento de backups: ' . $e->getMessage());
+        }
+
+        // Worker generico de fila (advanced-security-performance, Requirement 1.6)
+        // Processa filas default/uploads/webhooks/notifications. A fila `emails`
+        // possui worker dedicado configurado acima via EmailQueueSettings.
+        try {
+            $schedule->command('queue:work', [
+                '--stop-when-empty',
+                '--tries=3',
+                '--timeout=120',
+            ])
+                ->everyMinute()
+                ->withoutOverlapping()
+                ->runInBackground()
+                ->name('queue-work-default');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar worker generico de fila: ' . $e->getMessage());
         }
 
         // Carregar tarefas dinamicas do banco

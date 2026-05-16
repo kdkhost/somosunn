@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * ============================================================
+ * PROPRIEDADE INTELECTUAL E DIREITOS AUTORAIS
+ * ============================================================
+ *
+ * @autor marcelo-brad rj
+ * @contato
+ * Tel: 21 981325441
+ * WhatsApp: 21 98132-5441
+ * Email: contato@kdkhost.com.br
+ * Telegram: @MARCELO_BRAD
+ * Instagram: @marcelobradrj
+ *
+ * ============================================================
+ */
+
 namespace App\Providers;
 
 use App\Support\UploadStorage;
@@ -15,7 +31,67 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        // register bindings if necessary
+        // ========================================================
+        // Bindings de interfaces para os services do modulo
+        // advanced-security-performance.
+        //
+        // Services stateless sao registrados como singleton para
+        // economizar instanciacao por request. RateLimiterInterface,
+        // HealthCheckInterface, LogRotatorInterface e CspConfigInterface
+        // nao recebem bind aqui porque suas implementacoes concretas
+        // sao, respectivamente, um Middleware (resolvido pelo router),
+        // um Controller (resolvido pelo router) e um Command
+        // (resolvido pelo console kernel) - bind direto causaria
+        // dependencia circular ou resolucao incorreta.
+        // ========================================================
+
+        $this->app->singleton(
+            \App\Contracts\QueueManagerInterface::class,
+            \App\Services\QueueManagerService::class
+        );
+
+        $this->app->singleton(
+            \App\Contracts\ImageProcessorInterface::class,
+            \App\Services\ImageProcessorService::class
+        );
+
+        $this->app->singleton(
+            \App\Contracts\PresignedUrlInterface::class,
+            \App\Services\PresignedUrlService::class
+        );
+
+        $this->app->singleton(
+            \App\Contracts\AdvancedCacheInterface::class,
+            \App\Services\AdvancedCacheManager::class
+        );
+
+        $this->app->singleton(
+            \App\Contracts\AuditLogInterface::class,
+            \App\Services\AuditLogService::class
+        );
+
+        $this->app->singleton(
+            \App\Contracts\BackupInterface::class,
+            \App\Services\BackupService::class
+        );
+
+        $this->app->singleton(
+            \App\Contracts\AnomalyDetectorInterface::class,
+            \App\Services\AnomalyDetectorService::class
+        );
+
+        // Sem bind: RateLimiterInterface (implementacao em
+        // App\Http\Middleware\AdvancedRateLimitMiddleware - resolvida
+        // pelo router HTTP).
+        //
+        // Sem bind: HealthCheckInterface (implementacao em
+        // App\Http\Controllers\HealthController - resolvido pelo router).
+        //
+        // Sem bind: LogRotatorInterface (implementacao em
+        // App\Console\Commands\LogsCleanup - resolvido pelo console kernel).
+        //
+        // Sem bind: CspConfigInterface (sem implementacao concreta dedicada
+        // ainda; sera registrada quando criada).
     }
 
     public function boot()

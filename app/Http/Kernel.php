@@ -29,6 +29,10 @@ class Kernel extends HttpKernel
         // Primeiro gate de segurança — ver spec waf-e-auditoria-seguranca.
         // Curto-circuita quando WAF_ENABLED=false (padrão em Fase 0).
         \App\Http\Middleware\WafMiddleware::class,
+        // Rate limiting avançado por IP/UA — spec advanced-security-performance.
+        // Posicionado após o WAF e antes do bloqueio de rotas sensíveis para
+        // permitir bloqueio precoce de scanners e flood antes do roteamento.
+        \App\Http\Middleware\AdvancedRateLimitMiddleware::class,
         // Bloqueia rotas sensíveis (install, migrations, debug) em produção
         \App\Http\Middleware\BlockSensitiveRoutesInProduction::class,
         \App\Http\Middleware\TrackServiceVisit::class,
@@ -48,6 +52,8 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\RunInternalCron::class,
             \App\Http\Middleware\LogUserActivity::class,
             \App\Http\Middleware\EnsureLgpdConsent::class,
+            // Pass-through observador para o AnomalyDetectorService.
+            \App\Http\Middleware\AnomalyDetectorMiddleware::class,
         ],
         'api' => [
             'throttle:api',
@@ -76,5 +82,7 @@ class Kernel extends HttpKernel
         'check.sumup.permissions' => \App\Http\Middleware\CheckSumUpPermissions::class,
         'superadmin.legacy' => \App\Http\Middleware\RedirectSuperadminToLegacy::class,
         'sensitive.production' => \App\Http\Middleware\BlockSensitiveRoutesInProduction::class,
+        'rate.limit.advanced' => \App\Http\Middleware\AdvancedRateLimitMiddleware::class,
+        'security.headers' => \App\Http\Middleware\SecurityHeadersMiddleware::class,
     ];
 }
