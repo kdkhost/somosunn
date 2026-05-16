@@ -43,19 +43,18 @@ class WriteAuditLogJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * Queue dedicada (alinhada com QueueManagerService::QUEUE_DEFAULT).
-     */
-    public string $queue = 'default';
-
-    /**
      * Numero maximo de tentativas.
+     *
+     * @var int
      */
-    public int $tries = 3;
+    public $tries = 3;
 
     /**
      * Timeout em segundos.
+     *
+     * @var int
      */
-    public int $timeout = 30;
+    public $timeout = 30;
 
     /**
      * Em caso de exhaustao das tentativas, NAO falhamos a operacao
@@ -76,6 +75,9 @@ class WriteAuditLogJob implements ShouldQueue
     public function __construct(array $payload)
     {
         $this->payload = $payload;
+        // Atribuicao via metodo do trait Queueable evita FatalError
+        // de redeclaracao de propriedade com default diferente em PHP 8.4+.
+        $this->onQueue('default');
     }
 
     /**

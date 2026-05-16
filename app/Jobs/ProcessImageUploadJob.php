@@ -50,19 +50,18 @@ class ProcessImageUploadJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * Queue dedicada (alinhada com QueueManagerService::QUEUE_UPLOADS).
-     */
-    public string $queue = 'uploads';
-
-    /**
      * Numero maximo de tentativas em caso de falha de infraestrutura.
+     *
+     * @var int
      */
-    public int $tries = 3;
+    public $tries = 3;
 
     /**
      * Timeout em segundos.
+     *
+     * @var int
      */
-    public int $timeout = 120;
+    public $timeout = 120;
 
     /**
      * Backoff progressivo entre tentativas (segundos).
@@ -81,6 +80,9 @@ class ProcessImageUploadJob implements ShouldQueue
         public string $directory = '',
         public array $options = []
     ) {
+        // Atribuicao via metodo do trait Queueable evita FatalError
+        // de redeclaracao de propriedade com default diferente em PHP 8.4+.
+        $this->onQueue('uploads');
     }
 
     /**

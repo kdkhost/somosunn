@@ -14,19 +14,19 @@ class ProcessEmailQueue implements ShouldQueue
 
     /**
      * Queue dedicada para este job (alinhada com QueueManagerService).
-     * Spec: advanced-security-performance, Requirements 1.2-1.5
-     */
-    public string $queue = 'emails';
-
     /**
      * Tentativas em caso de falha.
+     *
+     * @var int
      */
-    public int $tries = 3;
+    public $tries = 3;
 
     /**
      * Timeout em segundos.
+     *
+     * @var int
      */
-    public int $timeout = 60;
+    public $timeout = 60;
 
     /**
      * Backoff em segundos entre tentativas.
@@ -40,7 +40,9 @@ class ProcessEmailQueue implements ShouldQueue
      */
     public function __construct()
     {
-        //
+        // Atribuicao via metodo do trait Queueable evita FatalError
+        // de redeclaracao de propriedade em PHP 8.4+.
+        $this->onQueue('emails');
     }
 
     /**

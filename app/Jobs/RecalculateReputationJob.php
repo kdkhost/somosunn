@@ -22,19 +22,19 @@ class RecalculateReputationJob implements ShouldQueue
     /**
      * Queue dedicada para este job (alinhada com QueueManagerService).
      * Job leve, nao se enquadra em uploads/emails/webhooks.
-     * Spec: advanced-security-performance, Requirements 1.2-1.5
-     */
-    public string $queue = 'default';
-
     /**
      * Numero maximo de tentativas.
+     *
+     * @var int
      */
-    public int $tries = 3;
+    public $tries = 3;
 
     /**
      * Timeout em segundos.
+     *
+     * @var int
      */
-    public int $timeout = 60;
+    public $timeout = 60;
 
     /**
      * Backoff em segundos entre tentativas.
@@ -48,7 +48,9 @@ class RecalculateReputationJob implements ShouldQueue
      */
     public function __construct(public int $userId)
     {
-        //
+        // Atribuicao via metodo do trait Queueable evita FatalError
+        // de redeclaracao de propriedade em PHP 8.4+.
+        $this->onQueue('default');
     }
 
     /**
