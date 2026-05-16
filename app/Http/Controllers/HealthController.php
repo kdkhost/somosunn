@@ -203,6 +203,20 @@ class HealthController extends Controller implements HealthCheckInterface
         // Tenta consultar o Registry (multi-provider). Em caso de erro
         // (boot inicial, classe ausente), cai no comportamento legado.
         try {
+            // Curto-circuito: se o storage_driver atual nao e 's3', S3
+            // nao esta em uso pelo sistema. Acontece quando o Superadmin
+            // selecionou disco local como driver primario.
+            $effectiveDisk = (string) config('uploads.effective_disk', '');
+            $selectedDisk = (string) config('uploads.selected_disk', '');
+            if ($selectedDisk !== 's3' && $effectiveDisk !== 's3') {
+                return new ComponentStatus(
+                    's3',
+                    ComponentStatus::STATUS_OK,
+                    'storage local ativo (S3 nao em uso)',
+                    $this->elapsedMs($start),
+                );
+            }
+
             if (class_exists(\App\Support\StorageProviderRegistry::class)) {
                 /** @var \App\Support\StorageProviderRegistry $registry */
                 $registry = app(\App\Support\StorageProviderRegistry::class);
