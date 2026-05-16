@@ -91,6 +91,8 @@ class SecurityHeadersMiddleware
             'data:',
             'https://fonts.gstatic.com',
             'https://cdnjs.cloudflare.com',
+            'https://cdn.jsdelivr.net',
+            'https://use.fontawesome.com',
         ],
         'connect-src' => [
             'https:',
