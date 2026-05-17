@@ -72,6 +72,7 @@ class SecurityHeadersMiddleware
             'https://cdnjs.cloudflare.com',
             'https://cdn.tailwindcss.com',
             'https://cdn.datatables.net',
+            'https://js.pusher.com',
             'https://code.jquery.com',
             'https://www.googletagmanager.com',
             'https://www.google-analytics.com',
