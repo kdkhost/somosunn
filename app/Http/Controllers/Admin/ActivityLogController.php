@@ -48,14 +48,10 @@ class ActivityLogController extends Controller
     /**
      * Limpa o historico de logs de atividade.
      *
-     * Usa DELETE em vez de TRUNCATE para preservar a integridade
-     * referencial caso existam (ou venham a existir) FKs apontando
-     * para activity_logs. TRUNCATE no MySQL ignora as constraints
-     * e pode causar inconsistencias silenciosas.
-     *
-     * Em caso de falha, exibe mensagem de erro e mantem os logs.
+     * Retorna JSON quando chamado via AJAX (X-Requested-With: XMLHttpRequest)
+     * ou redireciona com flash message quando chamado via form submit normal.
      */
-    public function clear()
+    public function clear(Request $request)
     {
         try {
             $userId = Auth::id();
@@ -65,20 +61,35 @@ class ActivityLogController extends Controller
                 ->warning('ActivityLog limpo manualmente', [
                     'user_id' => $userId,
                     'deleted_count' => $deleted,
-                    'ip' => request()->ip(),
+                    'ip' => $request->ip(),
                 ]);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Histórico limpo com sucesso. ' . $deleted . ' registros removidos.',
+                    'deleted' => $deleted,
+                ]);
+            }
 
             return redirect()
                 ->back()
-                ->with('success', 'Historico de logs limpo com sucesso. ' . $deleted . ' registros removidos.');
+                ->with('success', 'Histórico de logs limpo com sucesso. ' . $deleted . ' registros removidos.');
         } catch (\Throwable $e) {
             Log::channel('stack')->error('Falha ao limpar activity_logs', [
                 'exception' => $e->getMessage(),
             ]);
 
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Não foi possível limpar o histórico. Verifique os logs do servidor.',
+                ], 500);
+            }
+
             return redirect()
                 ->back()
-                ->with('error', 'Nao foi possivel limpar o historico. Verifique os logs do servidor.');
+                ->with('error', 'Não foi possível limpar o histórico. Verifique os logs do servidor.');
         }
     }
 }

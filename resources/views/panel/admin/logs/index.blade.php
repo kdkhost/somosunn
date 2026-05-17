@@ -156,7 +156,37 @@
                         cancelButtonText: 'Cancelar'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            $('#form-clear-logs').submit();
+                            $.ajax({
+                                url: '{{ route("panel.admin.logs.clear") }}',
+                                type: 'POST',
+                                data: { _token: '{{ csrf_token() }}' },
+                                dataType: 'json',
+                                beforeSend: function() {
+                                    Swal.fire({
+                                        title: 'Limpando...',
+                                        allowOutsideClick: false,
+                                        didOpen: function() { Swal.showLoading(); }
+                                    });
+                                },
+                                success: function(res) {
+                                    Swal.close();
+                                    // Limpar tabela no DOM
+                                    $('table tbody').html(
+                                        '<tr><td colspan="4" class="px-6 py-12 text-center text-slate-500 dark:text-slate-600 italic transition-colors">' +
+                                        'Nenhum log registrado.</td></tr>'
+                                    );
+                                    // Notificação única via toastr
+                                    toastr.success(res.message || 'Histórico limpo com sucesso.');
+                                },
+                                error: function(xhr) {
+                                    Swal.close();
+                                    var msg = 'Erro ao limpar histórico.';
+                                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                                        msg = xhr.responseJSON.message;
+                                    }
+                                    toastr.error(msg);
+                                }
+                            });
                         }
                     });
                 });

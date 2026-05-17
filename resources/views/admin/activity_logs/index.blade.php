@@ -202,7 +202,42 @@
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $('#form-clear-logs').submit();
+                        $.ajax({
+                            url: '{{ route("admin.activity_logs.clear") }}',
+                            type: 'POST',
+                            data: { _token: '{{ csrf_token() }}' },
+                            dataType: 'json',
+                            beforeSend: function() {
+                                Swal.fire({
+                                    title: 'Limpando...',
+                                    allowOutsideClick: false,
+                                    didOpen: function() { Swal.showLoading(); }
+                                });
+                            },
+                            success: function(res) {
+                                Swal.close();
+                                // Limpar tabela no DOM
+                                $('table tbody').html(
+                                    '<tr><td colspan="5" class="text-center py-5">' +
+                                    '<div class="mb-3"><i class="fas fa-history fa-3x text-muted"></i></div>' +
+                                    '<h5 class="text-muted font-weight-bold">Nenhum registro de atividade</h5>' +
+                                    '<p class="text-muted">As ações dos usuários serão registradas automaticamente aqui.</p>' +
+                                    '</td></tr>'
+                                );
+                                // Atualizar KPIs
+                                $('.info-box-number').text('0');
+                                // Notificação única via toastr
+                                toastr.success(res.message || 'Histórico limpo com sucesso.');
+                            },
+                            error: function(xhr) {
+                                Swal.close();
+                                var msg = 'Erro ao limpar histórico.';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    msg = xhr.responseJSON.message;
+                                }
+                                toastr.error(msg);
+                            }
+                        });
                     }
                 });
             });
