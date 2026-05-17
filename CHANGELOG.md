@@ -2,7 +2,144 @@
 
 ---
 
+## [2026-07-24] - audit(security): auditoria sistemica pos-deploy v9 — bug paralelo do "limpar historico" + CSP estendida para previews
+
+### Contexto
+Apos a serie de implantacoes de seguranca (WAF, AdvancedRateLimit,
+SecurityHeaders, AuditLog, AnomalyDetector, Multi-Provider S3) o usuario
+reportou que varias paginas/botoes do painel pararam de funcionar. O
+botao "Limpar Historico" em `/admin/activity-logs` ja havia sido
+corrigido em `244cb5e`. Esta entrega faz a auditoria sistemica e
+identifica/corrige bugs equivalentes em outras superficies do sistema.
+
+### Auditoria realizada
+- `tools/system-audit.php` (script descartavel) enumerou:
+  - 799 rotas totais, 497 admin, 262 admin mutating, 3 admin destrutivas
+  - Rotas destrutivas:
+    1. `POST admin/activity-logs/clear` (ja corrigida)
+    2. `DELETE admin/gallery/events/{event}/cover` (clearCover, escopo
+       de evento — sem bug equivalente)
+    3. `POST painel/admin/logs/clear` **(BUG PARALELO IDENTIFICADO)**
+- Smoke test em producao via curl + HEALTH_TOKEN: `/health=200`,
+  `/=200`, `/login=200`, healthcheck reportando todos os
+  componentes "ok" (database, s3, disk_write, queue_health,
+  storage_permissions).
+
+### Bug fix critico (bug paralelo do "Limpar Historico")
+- `app/Http/Controllers/Panel/Admin/ActivityLogController.php`:
+  `clear()` usava `ActivityLog::truncate()` sem fail-safe e sem audit
+  log, replicando exatamente o problema do legacy controller corrigido
+  em `244cb5e`. Reescrito para:
+  1. Usar `DB::table('activity_logs')->delete()` (preserva integridade
+     referencial caso FKs sejam adicionadas no futuro);
+  2. `try/catch` com mensagem de erro amigavel — nunca propaga excecao;
+  3. Audit log no canal `security` (com fallback para `stack`) com
+     `user_id`, `deleted_count` e `ip`;
+  4. Bloco de copyright adicionado.
+- `LogUserActivity::SKIP_PATHS` ja contem `painel/admin/logs/clear`
+  evitando o mesmo loop de "rebloqueio em truncate" no painel novo.
+
+### CSP estendida para suportar previews de upload e workers
+- `app/Http/Middleware/SecurityHeadersMiddleware.php`:
+  - Adicionada directive `media-src 'self' blob: data: https:` —
+    necessaria para previews de upload via `URL.createObjectURL(file)`
+    em `<video src="blob:...">` (admin/courses/form, admin/marketplace,
+    quick-upload-modal, etc.). Sem isso, browsers caem para `default-src
+    'self'` e bloqueiam o blob, fazendo o preview do video sumir;
+  - Adicionada directive `worker-src 'self' blob:` — necessaria para
+    Web Workers gerados dinamicamente por bibliotecas como TinyMCE
+    e processamento de imagem em browser. Worker-src nao tem fallback
+    confiavel para default-src em Chromium;
+  - Adicionada directive `child-src 'self' blob:` — alias legado
+    aceito por browsers mais antigos;
+  - Adicionada directive `object-src 'self' data:` — restringe Flash
+    e plugins legados, mas permite PDFs servidos pelo proprio dominio
+    (ex.: `/admin/invoices/{id}/pdf`) e via data: URLs.
+  - Adicionados `https://www.openstreetmap.org` e
+    `https://maps.google.com` em `frame-src` — usados em
+    `events/show.blade.php` e `site/institucional/contato.blade.php`
+    para mapas embed sem precisar configurar CSP por allowlist
+    em `Setting.csp_extra_allowlist`.
+
+### Auditoria de middlewares globais (Kernel `$middleware`)
+Confirmado que TODOS tem fail-safe estrito:
+- `WafMiddleware`: try/catch fail-open com log no canal `waf`.
+- `AdvancedRateLimitMiddleware`: bypass admin/superadmin + try/catch
+  fail-open + log no canal `security` (corrigido em `244cb5e`).
+- `BlockSensitiveRoutesInProduction`: lista PCRE de rotas (`run-migrations`,
+  `install`, `telescope`, `horizon`, `_debugbar`, `phpinfo`, `adminer`)
+  com bypass via `MAINTENANCE_SECRET` token; nao bloqueia rotas
+  legitimas. Roda no pipeline global (antes do StartSession), entao
+  `$request->user()` aqui sempre retorna null — o bypass de superadmin
+  e' **dead code** mas nao prejudica nada (rotas sensiveis sao apenas
+  install/migration que ja exigem token).
+- `TrackServiceVisit`: `try/catch` com log de erro; ignora rotas
+  admin/painel/api.
+- `LogUserActivity`: `try/catch` + `SKIP_PATHS` impede registro do
+  proprio "clear" (corrigido em parte em `244cb5e`).
+- `AnomalyDetectorMiddleware`: pass-through observador, nunca bloqueia.
+- `TrackVisitor::terminate`: `try/catch` + dedupe via session.
+- `RunInternalCron::terminate`: `try/catch` + lock + intervalo minimo.
+
+### Auditoria de jobs (`app/Jobs/`)
+Todos os 7 jobs (`ProcessEmailQueue`, `ProcessImageUploadJob`,
+`RecalculateReputationJob`, `SendGenericTemplateEmail`,
+`SendInvoiceEmailJob`, `SendMarketplaceOrderPaidEmailsJob`,
+`WriteAuditLogJob`) usam `$this->onQueue(...)` no construtor (padrao
+PHP 8.4+ requerido apos a regressao de `public string $queue`).
+Nenhuma classe inexistente referenciada.
+
+### Auditoria do `AuditLogService`
+Confirmado fail-safe estrito:
+- `log()` despacha via queue; em caso de falha cai para fallback
+  sincrono via `DB::table::insert`; em caso de falha do sincrono,
+  apenas grava log no canal `stack` — NUNCA propaga excecao;
+- `purgeOld()` envolto em `try/catch` retornando 0 em erro.
+
+### Adicionado
+- `tests/Feature/Admin/ActivityLogClearTest.php` (3 testes / 7 asserts):
+  - `test_legacy_admin_clear_uses_delete_and_emits_audit_log`
+  - `test_panel_admin_clear_also_uses_delete_and_does_not_throw`
+  - `test_panel_admin_clear_handles_exception_gracefully` (forca
+    falha removendo a tabela antes do clear e valida que o controller
+    nao propaga excecao).
+
+### Smoke test final no servidor
+- `https://somosunn.com.br/health` -> 200
+- `https://somosunn.com.br/` -> 200
+- `https://somosunn.com.br/login` -> 200
+- Healthcheck JSON: todos componentes ok, response_time 0.9ms
+
+### Arquivos afetados
+- `app/Http/Controllers/Panel/Admin/ActivityLogController.php` (fix)
+- `app/Http/Middleware/SecurityHeadersMiddleware.php` (CSP estendida)
+- `tests/Feature/Admin/ActivityLogClearTest.php` (novo)
+
+### Itens para teste manual (priorizado)
+1. **ALTO**: `/painel/admin/logs` -> botao "Limpar Historico" deve
+   esvaziar a tabela e mostrar success message.
+2. **ALTO**: previews de upload de video em
+   `/admin/courses/{id}/edit` (campo de upload de aula) -> o `<video>`
+   gerado de `blob:` deve aparecer (testar antes/depois da CSP).
+3. **MEDIO**: editor TinyMCE em `/painel/admin/mailtemplates` ->
+   abrir editor e verificar se nao ha `Refused to load script` no
+   console relacionado a worker.
+4. **MEDIO**: `/admin/invoices/{id}/pdf` -> iframe do invoice editor
+   deve renderizar sem bloqueio CSP.
+5. **MEDIO**: mapa em `/eventos/{slug}` -> iframe OSM/Google Maps
+   deve carregar.
+
+### Validacao
+- `php tools/check-no-bom.php` -> OK em todos os arquivos.
+- `php -l` em todos os arquivos modificados -> sem erros.
+- 17 testes existentes de SecurityHeaders -> verde.
+- 3 testes novos de ActivityLogClear -> verde.
+- Property test `CspHeaderGenerationTest` (2144 asserts) -> verde.
+
+---
+
 ## [2026-07-23] - feat(storage): finalizar spec multi-provider-s3-storage (auditoria + bug fix de regressao)
+
 
 ### Contexto
 Auditoria final da spec `multi-provider-s3-storage` apos a reversao do

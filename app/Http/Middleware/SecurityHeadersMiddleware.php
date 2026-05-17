@@ -105,6 +105,32 @@ class SecurityHeadersMiddleware
             'https://api.mercadopago.com',
             'https://www.sumup.com',
             'https://gateway.sumup.com',
+            'https://www.openstreetmap.org',
+            'https://maps.google.com',
+        ],
+        // media-src cobre <video src="blob:...">/<audio src="blob:...">
+        // criados via URL.createObjectURL() em previews de upload, alem de
+        // CDNs/HTTPS para arquivos servidos via S3 publico.
+        'media-src' => [
+            'blob:',
+            'data:',
+            'https:',
+        ],
+        // worker-src nao tem fallback para default-src em alguns browsers;
+        // mantemos blob: liberado para Web Workers gerados dinamicamente
+        // (TinyMCE, processamento de imagem em browser, etc.).
+        'worker-src' => [
+            'blob:',
+        ],
+        // child-src cobre Web Workers e nested browsing contexts em
+        // browsers mais antigos que ainda usam o nome legado.
+        'child-src' => [
+            'blob:',
+        ],
+        // object-src bloqueado por padrao — protege contra Flash e
+        // plugins legados; exceto data: para PDF embeds.
+        'object-src' => [
+            'data:',
         ],
     ];
 
@@ -270,6 +296,26 @@ class SecurityHeadersMiddleware
             'frame-src'   => array_merge(
                 ["'self'"],
                 self::BASE_ALLOWLIST['frame-src']
+            ),
+            'media-src'   => array_merge(
+                ["'self'"],
+                self::BASE_ALLOWLIST['media-src']
+            ),
+            'worker-src'  => array_merge(
+                ["'self'"],
+                self::BASE_ALLOWLIST['worker-src']
+            ),
+            'child-src'   => array_merge(
+                ["'self'"],
+                self::BASE_ALLOWLIST['child-src']
+            ),
+            // object-src restrito a 'self' + data: — sem 'self' apenas
+            // se nao usarmos <object>/<embed> em nenhum fluxo. Mantemos
+            // 'self' para nao quebrar PDFs que sao servidos pelo proprio
+            // dominio (ex.: /admin/invoices/{id}/pdf).
+            'object-src'  => array_merge(
+                ["'self'"],
+                self::BASE_ALLOWLIST['object-src']
             ),
         ];
 
