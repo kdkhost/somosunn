@@ -290,10 +290,6 @@ class SocialController extends Controller
     {
         $user = User::findOrFail($username);
 
-        if ($user->role === 'superadmin') {
-            abort(404);
-        }
-
         // Privacy check: Hide profile from non-connected users if configured
         // (Assuming user might have a setting 'hide_profile_public' or similar)
         // Or based on the Connection's hide_profile if we want that specifically per-connection?
