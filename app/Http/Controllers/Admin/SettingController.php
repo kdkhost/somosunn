@@ -792,6 +792,12 @@ class SettingController extends Controller
         // com chaves storage_* sem prefixo, copia para o namespace do
         // provedor ativo (idrive_*/wasabi_*/aws_*) para manter compatibilidade
         // com a leitura via StorageProviderRegistry.
+        //
+        // Importante: usamos $request->has() em vez de array_key_exists($data)
+        // porque o bloco $groupBools acima sintetiza valores 0 para checkboxes
+        // ausentes no payload. Sem este cuidado, um form prefixado puro
+        // (que submete apenas {provider}_path_style) seria sobrescrito por um
+        // storage_path_style=0 sintetizado, perdendo o valor real do usuario.
         if (
             $currentGroup === 'storage'
             && isset($data['storage_active_provider'])
@@ -808,10 +814,14 @@ class SettingController extends Controller
                 'storage_path_style' => $providerKey . '_path_style',
             ];
             foreach ($legacyToPrefixed as $legacyKey => $prefixedKey) {
-                if (array_key_exists($legacyKey, $data)) {
-                    $val = (string) ($data[$legacyKey] ?? '');
-                    // Apenas atualiza se o valor for diferente de vazio OU se a
-                    // chave prefixada ainda nao existe (preserva config antiga).
+                // Auto-copia apenas se a chave legada veio NO REQUEST (nao
+                // do bloco de groupBools sintetizado) E a prefixada NAO veio
+                // (o usuario nao quer sobrescrever a propria entrada).
+                $legacyInRequest = $request->has($legacyKey);
+                $prefixedInRequest = $request->has($prefixedKey);
+
+                if ($legacyInRequest && !$prefixedInRequest) {
+                    $val = (string) $request->input($legacyKey, '');
                     Setting::updateOrCreate(
                         ['key' => $prefixedKey],
                         ['value' => $val]

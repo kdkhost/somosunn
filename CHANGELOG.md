@@ -2,6 +2,68 @@
 
 ---
 
+## [2026-07-23] - feat(storage): finalizar spec multi-provider-s3-storage (auditoria + bug fix de regressao)
+
+### Contexto
+Auditoria final da spec `multi-provider-s3-storage` apos a reversao do
+commit `23e54f69` (que abandonou paginas/rotas separadas e integrou os 3
+provedores S3 ao select existente "Driver de Armazenamento"). Tarefa:
+verificar estado real do codigo, marcar/reescrever/cancelar as 23 tasks
+do plano, garantir que ambas as views (AdminLTE + Tailwind) tenham os
+fieldsets prefixados, fechar lacunas de teste e refazer deploy.
+
+### Bug fix critico (regressao identificada na auditoria)
+- `app/Http/Controllers/Admin/SettingController.php::update()`:
+  A auto-copia de `storage_*` para `{provider}_*` usava
+  `array_key_exists($legacyKey, $data)`. Como o bloco `$groupBools['storage']`
+  acima sintetiza `storage_path_style=0` quando o checkbox vem ausente,
+  qualquer save que enviasse apenas o campo prefixado correto
+  (`{provider}_path_style=1`) era sobrescrito por `0` apos a auto-copia.
+  Corrigido para usar `$request->has($legacyKey)` + `$request->has($prefixedKey)`,
+  fazendo a copia apenas quando o legacy esta no request E o prefixado nao.
+
+### Adicionado / Modificado
+- `resources/views/panel/admin/settings/partials/storage.blade.php`:
+  Reescrito para espelhar a estrutura da AdminLTE — agora possui os 3
+  fieldsets prefixados (idrive_*/wasabi_*/aws_*) com os 7 campos cada
+  e toggle JS por provedor selecionado, em vez de manter apenas os
+  campos `storage_*` legados sem prefixo.
+- `tests/Feature/Admin/StorageProviderSwitchTest.php` (novo):
+  7 testes feature exercitando o fluxo HTTP real do save de configuracoes
+  + endpoint de teste de conexao, usando `Storage::fake('s3')` para
+  evitar rede. Cobre: persistir provedor ativo + campos prefixados,
+  auto-copia legacy, isolamento entre provedores em troca, ciclo
+  IDrive -> Wasabi -> AWS, fallback para local, JSON do test endpoint.
+- `app/Http/Controllers/Admin/SettingController.php`:
+  Auto-copia de `storage_*` para `{provider}_*` corrigida (vide bug fix
+  acima).
+- `.kiro/specs/multi-provider-s3-storage/tasks.md`:
+  Atualizado com estado final das 23 tasks (18 concluidas, 3 reescritas,
+  2 canceladas por mudanca de escopo, com referencia explicita ao commit
+  `23e54f69` que reverteu as paginas separadas).
+
+### Status final da spec
+- 18/23 tasks concluidas
+- 3 reescritas (4.1, 5.1, 5.2): adaptadas para integrar com as views
+  e o controller existentes em vez de criar paginas/rotas dedicadas
+- 2 canceladas (4.2 parcial e 4.3): paginas/rotas separadas removidas
+  por requisicao explicita do usuario
+
+### Testes
+- 70 testes verdes:
+  - `tests/Unit/Support/StorageProviderConfigTest.php` -> 24 testes
+  - `tests/Unit/Support/StorageProviderRegistryTest.php` -> 33 testes
+  - `tests/Property/StorageProviderConfigIsolationTest.php` -> 2 propriedades, 2500 assertions (Eris)
+  - `tests/Feature/MultiProviderS3IntegrationTest.php` -> 4 testes
+  - `tests/Feature/Admin/StorageProviderSwitchTest.php` -> 7 testes (NOVO)
+
+### Validacao
+- `php tools/check-no-bom.php` -> OK em todos os arquivos
+- `php -l` em arquivos modificados -> sem erros
+- Migration ja aplicada em producao no commit anterior
+
+---
+
 ## [2026-07-23] - fix(security): mitigar bloqueio de admins por AdvancedRateLimitMiddleware + robustez do botao "Limpar Historico"
 
 ### Contexto
