@@ -2,6 +2,26 @@
 
 ---
 
+## [2026-05-17] - fix(csp): adicionar cdn.datatables.net na CSP + remover report-uri 404
+
+### Problema
+A Content-Security-Policy bloqueava `https://cdn.datatables.net` em `script-src`
+e `style-src`. Isso impedia o carregamento do DataTables em TODAS as paginas admin
+que usam tabelas (activity-logs, users, orders, courses, certificates, events,
+referrals). Como o JS do botao "Limpar Historico" estava no mesmo bloco jQuery que
+inicializava o DataTable, o erro `$(...).DataTable is not a function` impedia
+tambem o registro do listener do botao — fazendo parecer que o botao "nao funciona".
+
+### Correcoes
+- Adicionado `https://cdn.datatables.net` em `script-src` e `style-src` da CSP
+- Removido `report-uri /csp-report` que gerava 404 (rota nunca implementada)
+- Afeta: activity-logs, users, orders, courses, certificates, events, referrals
+
+### Arquivos afetados
+- `app/Http/Middleware/SecurityHeadersMiddleware.php`
+
+---
+
 ## [2026-07-24] - audit(security): auditoria sistemica pos-deploy v9 — bug paralelo do "limpar historico" + CSP estendida para previews
 
 ### Contexto

@@ -54,9 +54,10 @@ class SecurityHeadersMiddleware
     ];
 
     /**
-     * Endpoint usado em report-uri da CSP (a rota e' criada na task 12.2).
+     * Endpoint de report-uri da CSP (desativado — rota nao implementada).
+     * Mantido como referencia para futura implementacao.
      */
-    private const CSP_REPORT_URI = '/csp-report';
+    // private const CSP_REPORT_URI = '/csp-report';
 
     /**
      * Fontes base (CDNs reais utilizados pela plataforma) por directive.
@@ -70,6 +71,7 @@ class SecurityHeadersMiddleware
             'https://cdn.jsdelivr.net',
             'https://cdnjs.cloudflare.com',
             'https://cdn.tailwindcss.com',
+            'https://cdn.datatables.net',
             'https://code.jquery.com',
             'https://www.googletagmanager.com',
             'https://www.google-analytics.com',
@@ -78,6 +80,7 @@ class SecurityHeadersMiddleware
         'style-src' => [
             'https://cdn.jsdelivr.net',
             'https://cdnjs.cloudflare.com',
+            'https://cdn.datatables.net',
             'https://fonts.googleapis.com',
             'https://unpkg.com',
         ],
@@ -412,8 +415,7 @@ class SecurityHeadersMiddleware
     }
 
     /**
-     * Serializa o array de directives no formato textual do header,
-     * adicionando `report-uri` ao final.
+     * Serializa o array de directives no formato textual do header.
      *
      * @param array<string, array<int, string>> $directives
      */
@@ -425,8 +427,6 @@ class SecurityHeadersMiddleware
             $sources = array_values(array_unique($sources));
             $parts[] = $directive . ' ' . implode(' ', $sources);
         }
-
-        $parts[] = 'report-uri ' . self::CSP_REPORT_URI;
 
         return implode('; ', $parts);
     }
