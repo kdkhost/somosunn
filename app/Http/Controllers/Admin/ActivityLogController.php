@@ -27,10 +27,22 @@ use Illuminate\Support\Facades\Log;
 
 class ActivityLogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $logs = ActivityLog::with('user')->latest()->take(1000)->get();
-        return view('admin.activity_logs.index', compact('logs'));
+        $q = trim((string) $request->query('q', ''));
+
+        $logs = ActivityLog::with('user')
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where('description', 'like', '%' . $q . '%')
+                    ->orWhere('ip_address', 'like', '%' . $q . '%')
+                    ->orWhere('action', 'like', '%' . $q . '%');
+            })
+            ->latest()
+            ->paginate(30);
+
+        $logs->appends($request->all());
+
+        return view('admin.activity_logs.index', compact('logs', 'q'));
     }
 
     /**

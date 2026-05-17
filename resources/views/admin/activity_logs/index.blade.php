@@ -7,7 +7,7 @@
 
 @section('content')
     @php
-        $totalLogs = $logs->count();
+        $totalLogs = $logs->total();
         $uniqueUsers = $logs->pluck('user_id')->filter()->unique()->count();
         $uniqueActions = $logs->pluck('action')->unique()->count();
     @endphp
@@ -46,13 +46,23 @@
         </div>
     </div>
 
-    {{-- Tabela principal --}}
+    {{-- Filtro + Botao Limpar --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header border-0">
             <h3 class="card-title font-weight-bold">
                 <i class="fas fa-stream mr-2 text-primary"></i>Histórico de Ações
             </h3>
-            <div class="card-tools">
+            <div class="card-tools d-flex align-items-center">
+                <form action="{{ route('admin.activity_logs.index') }}" method="GET" class="mr-3">
+                    <div class="input-group input-group-sm" style="width: 250px;">
+                        <input type="text" name="q" class="form-control" placeholder="Buscar..." value="{{ $q ?? '' }}">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
                 <form action="{{ route('admin.activity_logs.clear') }}" method="POST" id="form-clear-logs" class="d-inline">
                     @csrf
                     <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 elevation-1 btn-clear-logs">
@@ -64,7 +74,7 @@
 
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table id="table_logs" class="table table-hover align-middle mb-0">
+                <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr class="bg-light">
                             <th class="border-0 pl-4" style="width:15%;">Data/Hora</th>
@@ -77,7 +87,7 @@
                     <tbody>
                         @forelse($logs as $log)
                             <tr>
-                                <td class="pl-4" data-sort="{{ $log->created_at->format('YmdHis') }}">
+                                <td class="pl-4">
                                     <div class="text-sm font-weight-bold">{{ $log->created_at->format('d/m/Y') }}</div>
                                     <small class="text-muted">{{ $log->created_at->format('H:i:s') }}</small>
                                 </td>
@@ -131,6 +141,12 @@
                 </table>
             </div>
         </div>
+
+        @if($logs->hasPages())
+            <div class="card-footer clearfix">
+                {{ $logs->links() }}
+            </div>
+        @endif
     </div>
 
     {{-- Info card --}}
@@ -166,54 +182,14 @@
 @endsection
 
 @push('styles')
-    <!-- DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css">
     <style>
         .align-middle td { vertical-align: middle !important; }
-        #table_logs_wrapper .dataTables_paginate {
-            display: flex;
-            justify-content: center;
-            padding: 0.75rem;
-        }
-        #table_logs_wrapper .dataTables_info {
-            margin: 0.95rem 0 0 0.75rem;
-            color: #6c757d;
-            font-size: 0.875rem;
-        }
     </style>
 @endpush
 
 @push('scripts')
-    <!-- DataTables & Plugins -->
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
-
     <script>
         $(function () {
-            $("#table_logs").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "pageLength": 20,
-                "order": [[0, "desc"]],
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
-                },
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#table_logs_wrapper .col-md-6:eq(0)');
-
             $('.btn-clear-logs').on('click', function() {
                 Swal.fire({
                     title: 'Limpar Histórico?',
