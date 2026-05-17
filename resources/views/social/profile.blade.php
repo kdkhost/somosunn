@@ -469,14 +469,14 @@
                                 @endphp
                                 <div class="flex justify-between items-start mb-3">
                                     <div class="flex items-center gap-3">
-                                        <a href="{{ route('social.profile', $post->user->email) }}"
+                                        <a href="{{ route('social.profile', $post->user->id) }}"
                                             class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0 block">
                                             <img src="{{ $postAvatar }}" alt="Avatar"
                                                 class="w-10 h-10 object-cover hover:opacity-80 transition"
                                                 onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                                         </a>
                                         <div>
-                                            <a href="{{ route('social.profile', $post->user->email) }}"
+                                            <a href="{{ route('social.profile', $post->user->id) }}"
                                                 class="font-bold text-gray-900 hover:text-blue-600 transition">
                                                 {{ $post->user->name }}
                                             </a>
