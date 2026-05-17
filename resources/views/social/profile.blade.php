@@ -18,22 +18,8 @@
  *
  * -----------------------------------------------------------------------------
  * DIREITOS AUTORAIS:
-                            <button type="button" class="flex items-center gap-2 hover:text-blue-600 transition"
-                                onclick="togglePanel('share-{{ $post->id }}')">
-                                <i class="fas fa-share"></i> Compartilhar
-                            </button>
-
-                            @if(Auth::check() && (Auth::id() === $post->user_id || Auth::user()->isAdmin()))
-                                <form action="{{ route('social.post.destroy', $post) }}" method="POST"
-                                        class="js-confirm-delete" data-confirm-title="Remover publicacao?"
-                                        data-confirm-text="Esta acao nao pode ser desfeita.">
-                                    @csrf
-                                    @method('DELETE')
-                                        <button type="submit" class="flex items-center gap-2 text-red-500 hover:text-red-700" title="Remover">
-                                            <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            @endif
+ * Este software e' propriedade intelectual de marcelo-brad rj.
+ * Todos os direitos reservados conforme legislacao vigente.
  *
  * -----------------------------------------------------------------------------
  * LICENÇA DE USO:
