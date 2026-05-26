@@ -22,6 +22,8 @@ API da SumUp.
   pago ou se a conciliacao detectar pagamento antes da nova cobranca.
 - Adicionado comando `sumup:reconcile-pending`, agendado a cada 5 minutos antes
   do cancelamento automatico de pedidos pendentes.
+- Pedidos SumUp ja pagos localmente tambem passam a preencher `payment_method`
+  e `transaction_id` ausentes durante a conciliacao.
 - Webhook SumUp passou a atualizar somente a transacao do token recebido, sem
   marcar todas as tentativas do pedido como pagas/falhas.
 - Ajustada a tela `painel/ingressos` para eventos sem QR: reservas pagas agora

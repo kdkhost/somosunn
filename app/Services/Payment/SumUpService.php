@@ -313,12 +313,27 @@ class SumUpService
             ->first();
 
         if ($localPaid && (string) $order->status === 'paid') {
+            $paymentMethod = $this->paymentMethodFromTransaction($localPaid, []);
+            $updates = [];
+
+            if (empty($order->payment_method)) {
+                $updates['payment_method'] = $paymentMethod;
+            }
+
+            if (empty($order->transaction_id) && !empty($localPaid->transaction_id)) {
+                $updates['transaction_id'] = $localPaid->transaction_id;
+            }
+
+            if ($updates) {
+                $order->forceFill($updates)->save();
+            }
+
             return array_merge($summary, [
                 'paid'           => true,
                 'status'         => 'PAID',
                 'checkout_id'    => $localPaid->checkout_id,
                 'transaction_id' => $localPaid->transaction_id,
-                'payment_method' => $this->paymentMethodFromTransaction($localPaid, []),
+                'payment_method' => $paymentMethod,
             ]);
         }
 
