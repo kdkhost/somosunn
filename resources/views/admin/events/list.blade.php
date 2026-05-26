@@ -159,6 +159,12 @@
                                                     title="Gerenciar Mídia">
                                                     <i class="fas fa-photo-video"></i>
                                                 </a>
+                                                @if($event->type !== 'album')
+                                                    <a href="{{ route('admin.events.exhibitors.index', $event) }}" class="btn btn-outline-primary elevation-1"
+                                                        title="Áreas para Expositores">
+                                                        <i class="fas fa-store"></i>
+                                                    </a>
+                                                @endif
                                                 @if($event->is_ticket_enabled)
                                                     <a href="{{ route('admin.events.scanner', $event) }}" class="btn btn-outline-success elevation-1"
                                                         title="Escanear Ingressos">

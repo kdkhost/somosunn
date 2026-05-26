@@ -6,6 +6,7 @@ use App\Http\Controllers\PaymentWebhookController;
 use App\Models\Order;
 use App\Models\SumUpTransaction;
 use App\Models\SumUpWebhookLog;
+use App\Services\EventExhibitorService;
 use Illuminate\Support\Facades\Log;
 
 class SumUpWebhookProcessor
@@ -82,6 +83,7 @@ class SumUpWebhookProcessor
         ]);
 
         $order->update(['status' => 'failed']);
+        app(EventExhibitorService::class)->releaseOrder($order, 'failed');
 
         // Notifica comprador
         if ($order->user) {
@@ -107,6 +109,8 @@ class SumUpWebhookProcessor
             'status'       => 'REFUNDED',
             'raw_response' => $payload,
         ]);
+
+        app(EventExhibitorService::class)->markOrderRefunded($order, true);
 
         Log::info('SumUp payment.refunded', ['order_id' => $order->id]);
     }

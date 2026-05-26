@@ -394,7 +394,7 @@ class CheckoutController extends Controller
         }
 
         if ($order->status === 'paid') {
-            return response()->json(['success' => true, 'redirect' => route('checkout.success', $order)]);
+            return response()->json(['success' => true, 'redirect' => $this->paymentRedirectUrl($order, 'success')]);
         }
 
         $formData = $request->formData;
@@ -426,7 +426,7 @@ class CheckoutController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'redirect' => route('checkout.success', $order)
+                    'redirect' => $this->paymentRedirectUrl($order, 'success')
                 ]);
             }
 
@@ -439,7 +439,7 @@ class CheckoutController extends Controller
                     'qr_code' => $paymentResult['qr_code'] ?? null,
                     'qr_code_base64' => $paymentResult['qr_code_base64'] ?? null,
                     'expires_at' => $paymentResult['expires_at'] ?? null,
-                    'redirect' => $paymentMethod === 'pix' ? null : route('checkout.pending', $order)
+                    'redirect' => $paymentMethod === 'pix' ? null : $this->paymentRedirectUrl($order, 'pending')
                 ]);
             }
 
@@ -483,6 +483,32 @@ class CheckoutController extends Controller
                 'pix_disabled' => false,
             ], 500);
         }
+    }
+
+    private function paymentRedirectUrl(Order $order, string $status): string
+    {
+        $context = (string) data_get($order->metadata, 'context', '');
+        $token = (string) data_get($order->metadata, 'public_token', '');
+
+        if ($context === 'event') {
+            return route('events.payment.' . $status, [
+                'order' => $order,
+                'token' => $token,
+            ]);
+        }
+
+        if ($context === 'event_exhibitor') {
+            $eventId = (int) data_get($order->metadata, 'event_id', 0);
+            if ($eventId > 0) {
+                return route('events.exhibitor.' . $status, [
+                    'event' => $eventId,
+                    'order' => $order,
+                    'token' => $token,
+                ]);
+            }
+        }
+
+        return route('checkout.' . $status, $order);
     }
 
     public function success(Order $order, Request $request)

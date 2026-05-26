@@ -9,8 +9,19 @@
     // Valor atualmente cobrado do SumUp (reflete o checkout atual - pode ter sido criado como a vista).
     $amount              = (float) ($order->total_amount ?? 0);
     $amountFormatted     = number_format($amount, 2, '.', '');
-    $successUrl          = route('events.payment.success', $orderId);
-    $pendingUrl          = route('events.payment.pending', $orderId);
+    $context             = (string) data_get($order->metadata, 'context', '');
+    $publicToken         = (string) data_get($order->metadata, 'public_token', '');
+    $eventId             = (int) data_get($order->metadata, 'event_id', 0);
+    if ($context === 'event_exhibitor' && $eventId > 0) {
+        $successUrl      = route('events.exhibitor.success', ['event' => $eventId, 'order' => $orderId, 'token' => $publicToken]);
+        $pendingUrl      = route('events.exhibitor.pending', ['event' => $eventId, 'order' => $orderId, 'token' => $publicToken]);
+    } elseif ($context === 'event') {
+        $successUrl      = route('events.payment.success', ['order' => $orderId, 'token' => $publicToken]);
+        $pendingUrl      = route('events.payment.pending', ['order' => $orderId, 'token' => $publicToken]);
+    } else {
+        $successUrl      = route('checkout.success', $orderId);
+        $pendingUrl      = route('checkout.pending', $orderId);
+    }
     $checkoutIdValue     = $checkoutId           ?? '';
     $maxInstallments     = (int) ($sumupMaxInstallments  ?? 12);
     $noInterestUpTo      = (int) ($sumupNoInterestUpTo   ?? $sumupInstallmentsNoInterest ?? 1);

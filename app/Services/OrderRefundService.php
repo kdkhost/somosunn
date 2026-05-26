@@ -72,6 +72,8 @@ class OrderRefundService
             $order->refunded_at = $isFullyRefunded ? $now : null;
             $order->save();
 
+            app(EventExhibitorService::class)->markOrderRefunded($order, $isFullyRefunded);
+
             return $order->fresh(['user', 'items', 'invoice', 'manualApprover']);
         });
     }

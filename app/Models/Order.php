@@ -67,6 +67,11 @@ class Order extends Model
     {
         return $this->hasOne(Invoice::class);
     }
+
+    public function exhibitorRegistrations()
+    {
+        return $this->hasMany(EventExhibitorRegistration::class);
+    }
     
     public function gatewayAccount()
     {

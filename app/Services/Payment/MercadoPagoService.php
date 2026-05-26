@@ -161,7 +161,7 @@ class MercadoPagoService
             'description'        => $this->orderDescription($order),
             'payment_method_id'  => 'pix',
             'payer'              => $payer,
-            'external_reference' => (string) $order->id,
+            'external_reference' => $this->externalReference($order),
             'notification_url'   => $this->notificationUrl(),
             'date_of_expiration' => $dateOfExpiration,
         ];
@@ -226,7 +226,7 @@ class MercadoPagoService
             'installments' => (int) $data['installments'],
             'payment_method_id' => $data['payment_method_id'],
             'payer' => $payer,
-            'external_reference' => (string) $order->id,
+            'external_reference' => $this->externalReference($order),
             'notification_url' => $this->notificationUrl(),
         ];
 
@@ -418,6 +418,8 @@ class MercadoPagoService
             $enabledMethods[] = 'debit_card';
         if (Setting::get('mercadopago_method_pix', 1))
             $enabledMethods[] = 'pix';
+        if (Setting::get('mercadopago_method_ticket', 0))
+            $enabledMethods[] = 'ticket';
 
         if (empty($enabledMethods)) {
             $enabledMethods = ['credit_card', 'debit_card', 'pix'];
@@ -473,6 +475,23 @@ class MercadoPagoService
                 'failure' => route('events.payment.failure', ['order' => $order->id, 'token' => $token]),
                 'pending' => route('events.payment.pending', ['order' => $order->id, 'token' => $token]),
             ],
+            'event_exhibitor' => [
+                'success' => route('events.exhibitor.success', [
+                    'event' => (int) data_get($order->metadata, 'event_id'),
+                    'order' => $order->id,
+                    'token' => $token,
+                ]),
+                'failure' => route('events.exhibitor.failure', [
+                    'event' => (int) data_get($order->metadata, 'event_id'),
+                    'order' => $order->id,
+                    'token' => $token,
+                ]),
+                'pending' => route('events.exhibitor.pending', [
+                    'event' => (int) data_get($order->metadata, 'event_id'),
+                    'order' => $order->id,
+                    'token' => $token,
+                ]),
+            ],
             'subscription' => [
                 'success' => route('subscription.success', ['order' => $order->id]),
                 'failure' => $subscriptionCheckoutUrl,
@@ -502,11 +521,6 @@ class MercadoPagoService
         if (!in_array('debit_card', $enabledMethods))
             $excludedMethods[] = ['id' => 'debit_card'];
 
-        // Always exclude ticket unless somehow forced, but effectively we want to ban it as per user requirement.
-        // Even if it was in enabledMethods (old config), we might want to force exclude or just respect config?
-        // User said "No Boleto". So let's force exclude it or just not check for it.
-        // If we don't check for it in enabledMethods, it won't be in allowed list.
-        // But we must add it to excluded list if we want to block it.
         if (!in_array('ticket', $enabledMethods))
             $excludedMethods[] = ['id' => 'ticket'];
 
@@ -522,11 +536,18 @@ class MercadoPagoService
             ],
             'back_urls' => $options['back_urls'] ?? $backUrls,
             'auto_return' => 'approved',
-            'external_reference' => (string) $order->id,
+            'external_reference' => $this->externalReference($order),
             'statement_descriptor' => $statementDescriptor,
             'notification_url' => $this->notificationUrl(),
             'payment_methods' => $paymentMethods,
         ];
+    }
+
+    private function externalReference(Order $order): string
+    {
+        $reference = trim((string) data_get($order->metadata, 'gateway_reference', ''));
+
+        return $reference !== '' ? $reference : (string) $order->id;
     }
 
     public function refundPayment(Order $order, ?float $amount = null): array

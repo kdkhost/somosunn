@@ -92,6 +92,15 @@
         } elseif ($startDate) {
             $isClosed = $startDate->lt($now->copy()->startOfDay());
         }
+        $exhibitorStatus = $event->exhibitorSalesStatus();
+        $showExhibitorOption = (bool) ($event->exhibitor_sales_enabled ?? false)
+            && (bool) ($event->exhibitor_show_publicly ?? true)
+            && $event->isEvent()
+            && !in_array((string) ($exhibitorStatus['key'] ?? ''), ['inativo', 'sem_configuracao'], true);
+        $canSellExhibitor = $showExhibitorOption && $event->canSellExhibitorArea();
+        $exhibitorPrice = $event->currentExhibitorPriceFor();
+        $exhibitorBatch = $event->currentExhibitorBatchLabelFor();
+        $exhibitorRemaining = $event->remaining_exhibitor_slots;
     @endphp
 
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -339,6 +348,37 @@
                                         <i class="fas fa-ticket-alt"></i>
                                         {{ $event->current_price > 0 ? 'Comprar Ingresso' : 'Garantir Minha Vaga' }}
                                     </a>
+                                @endif
+
+                                @if($showExhibitorOption)
+                                    <div class="mt-4 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-left">
+                                        <div class="flex items-start gap-3">
+                                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-blue-700 shadow-sm">
+                                                <i class="fas fa-store"></i>
+                                            </div>
+                                            <div class="min-w-0 flex-1">
+                                                <p class="font-black text-blue-950">Comprar área para expositor</p>
+                                                @if($canSellExhibitor)
+                                                    <p class="mt-1 text-sm text-blue-800">
+                                                        {{ $exhibitorBatch }} · {{ 'R$ ' . number_format((float) $exhibitorPrice, 2, ',', '.') }} · {{ (int) $exhibitorRemaining }} restante(s)
+                                                    </p>
+                                                    @if($event->exhibitor_includes_ticket)
+                                                        <p class="mt-1 text-xs font-bold text-emerald-700">
+                                                            <i class="fas fa-ticket-alt mr-1"></i> Ingresso incluso no pacote
+                                                        </p>
+                                                    @endif
+                                                    <a href="{{ route('events.exhibitor.show', $event) }}"
+                                                        class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-black text-blue-800 shadow-sm transition hover:bg-blue-100">
+                                                        <i class="fas fa-arrow-right"></i> Quero expor neste evento
+                                                    </a>
+                                                @elseif(($exhibitorStatus['key'] ?? '') === 'esgotado')
+                                                    <p class="mt-1 text-sm font-bold text-red-700">Áreas para expositores esgotadas</p>
+                                                @elseif(($exhibitorStatus['key'] ?? '') === 'encerrado_por_data')
+                                                    <p class="mt-1 text-sm font-bold text-slate-700">Venda de áreas encerrada por data.</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
                                 @endif
 
                                 <div class="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500">

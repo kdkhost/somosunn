@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\UploadStorage;
+use App\Models\EventExhibitorRegistration;
+use App\Services\EventExhibitorService;
 
 class Event extends Model
 {
@@ -59,26 +61,55 @@ class Event extends Model
         'scanner_radius_meters',
         'scanner_early_minutes',
         'scanner_late_minutes',
+        'exhibitor_sales_enabled',
+        'exhibitor_total_slots',
+        'exhibitor_description',
+        'exhibitor_internal_notes',
+        'exhibitor_area_image',
+        'exhibitor_includes_ticket',
+        'exhibitor_batch_1_price',
+        'exhibitor_batch_1_deadline',
+        'exhibitor_batch_1_slots',
+        'exhibitor_batch_2_price',
+        'exhibitor_batch_2_deadline',
+        'exhibitor_batch_2_slots',
+        'exhibitor_batch_3_price',
+        'exhibitor_batch_3_deadline',
+        'exhibitor_batch_3_slots',
+        'exhibitor_show_publicly',
     ];
 
     protected $casts = [
         'is_ticket_enabled' => 'boolean',
+        'exhibitor_sales_enabled' => 'boolean',
+        'exhibitor_includes_ticket' => 'boolean',
+        'exhibitor_show_publicly' => 'boolean',
+        'exhibitor_total_slots' => 'integer',
+        'exhibitor_batch_1_slots' => 'integer',
+        'exhibitor_batch_2_slots' => 'integer',
+        'exhibitor_batch_3_slots' => 'integer',
         'start_at' => 'datetime',
         'end_at' => 'datetime',
         'batch_1_deadline' => 'datetime',
         'batch_2_deadline' => 'datetime',
         'batch_3_deadline' => 'datetime',
+        'exhibitor_batch_1_deadline' => 'datetime',
+        'exhibitor_batch_2_deadline' => 'datetime',
+        'exhibitor_batch_3_deadline' => 'datetime',
         'all_day' => 'boolean',
         'published' => 'boolean',
         'is_certificate_enabled' => 'boolean',
         'certificate_settings' => 'array',
         'price' => 'decimal:2',
         'flash_sale_price' => 'decimal:2',
+        'exhibitor_batch_1_price' => 'decimal:2',
+        'exhibitor_batch_2_price' => 'decimal:2',
+        'exhibitor_batch_3_price' => 'decimal:2',
         'flash_sale_ends_at' => 'datetime',
         'scanner_radius_meters' => 'integer',
     ];
 
-    protected $appends = ['start', 'end', 'image_url', 'thumbnail_url', 'gallery_cover_url', 'is_ready_to_publish'];
+    protected $appends = ['start', 'end', 'image_url', 'thumbnail_url', 'gallery_cover_url', 'exhibitor_area_image_url', 'is_ready_to_publish'];
 
     public function getImageUrlAttribute(): ?string
     {
@@ -125,6 +156,11 @@ class Event extends Model
         }
 
         return $this->image_url;
+    }
+
+    public function getExhibitorAreaImageUrlAttribute(): ?string
+    {
+        return UploadStorage::url($this->exhibitor_area_image);
     }
 
     public function getStartAttribute()
@@ -582,6 +618,11 @@ class Event extends Model
         return $this->hasMany(EventRegistration::class);
     }
 
+    public function exhibitorRegistrations()
+    {
+        return $this->hasMany(EventExhibitorRegistration::class);
+    }
+
     public function media()
     {
         return $this->hasMany(EventMedia::class);
@@ -607,6 +648,15 @@ class Event extends Model
         return $this->registrations()->whereIn('status', EventRegistration::COUNTED_STATUSES);
     }
 
+    public function paidOrConfirmedExhibitorRegistrations()
+    {
+        return $this->exhibitorRegistrations()
+            ->whereIn('status', [
+                EventExhibitorRegistration::STATUS_PAID,
+                EventExhibitorRegistration::STATUS_CONFIRMED,
+            ]);
+    }
+
     public function getConfirmedSeatsAttribute()
     {
         return (int) $this->paidOrConfirmedRegistrations()->sum('quantity');
@@ -621,6 +671,16 @@ class Event extends Model
         return max(0, (int) $this->capacity - (int) $this->confirmed_seats);
     }
 
+    public function getConfirmedExhibitorSlotsAttribute(): int
+    {
+        return app(EventExhibitorService::class)->countedSlots($this);
+    }
+
+    public function getRemainingExhibitorSlotsAttribute(): int
+    {
+        return app(EventExhibitorService::class)->remainingSlots($this);
+    }
+
     public function hasCapacityFor(int $quantity): bool
     {
         if (!$this->capacity) {
@@ -628,6 +688,40 @@ class Event extends Model
         }
 
         return ((int) $this->confirmed_seats + $quantity) <= (int) $this->capacity;
+    }
+
+    public function hasExhibitorSlotsFor(int $quantity): bool
+    {
+        return app(EventExhibitorService::class)->hasSlotsFor($this, $quantity);
+    }
+
+    public function isExhibitorSalesActive(): bool
+    {
+        return app(EventExhibitorService::class)->isSalesActive($this);
+    }
+
+    public function currentExhibitorPriceFor(?User $user = null): ?float
+    {
+        $batch = app(EventExhibitorService::class)->currentBatch($this);
+
+        return $batch ? (float) $batch['price'] : null;
+    }
+
+    public function currentExhibitorBatchLabelFor(?User $user = null): ?string
+    {
+        $batch = app(EventExhibitorService::class)->currentBatch($this);
+
+        return $batch ? (string) $batch['label'] : null;
+    }
+
+    public function exhibitorSalesStatus(): array
+    {
+        return app(EventExhibitorService::class)->status($this);
+    }
+
+    public function canSellExhibitorArea(?int $quantity = 1): bool
+    {
+        return $this->isExhibitorSalesActive() && $this->hasExhibitorSlotsFor(max(1, (int) $quantity));
     }
 
     public function certificates()

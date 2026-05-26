@@ -33,6 +33,7 @@ use App\Models\PaymentWebhookLog;
 use App\Models\SumUpWebhookLog;
 use App\Services\CouponService;
 use App\Services\AffiliateTrackingService;
+use App\Services\EventExhibitorService;
 use App\Services\InvoiceService;
 use App\Services\Marketplace\SellerProductFulfillmentService;
 use App\Services\Payment\SumUpService;
@@ -236,16 +237,31 @@ class PaymentWebhookController extends Controller
             $orderId = $data['external_reference'] ?? null;
             $status = (string) ($data['status'] ?? '');
 
-            if (!$orderId || $status !== 'approved') {
+            if (!$orderId) {
                 return response('OK', 200);
             }
 
-            $order = Order::find($orderId);
+            $order = app(EventExhibitorService::class)->resolveOrderFromReference((string) $orderId);
             if (!$order) {
                 return response('OK', 200);
             }
 
-            $this->processPaidOrder($order, $paymentId, $data);
+            if ($status === 'approved') {
+                $this->processPaidOrder($order, $paymentId, $data);
+            } elseif (in_array($status, ['rejected', 'cancelled', 'cancelled_by_collector', 'cancelled_by_user'], true)) {
+                $order->update([
+                    'status' => 'failed',
+                    'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
+                ]);
+                app(EventExhibitorService::class)->releaseOrder($order, 'failed');
+            } elseif (in_array($status, ['refunded', 'charged_back'], true)) {
+                $order->update([
+                    'status' => 'refunded',
+                    'refunded_at' => now(),
+                    'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
+                ]);
+                app(EventExhibitorService::class)->markOrderRefunded($order, true);
+            }
 
         } catch (\Throwable $e) {
             Log::error('MP Webhook Error: ' . $e->getMessage(), ['seller_id' => $seller_id]);
@@ -308,6 +324,7 @@ class PaymentWebhookController extends Controller
 
         app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
         $this->confirmEventRegistrationsForOrder($order);
+        app(EventExhibitorService::class)->confirmPaidOrder($order);
         $this->activatePlanForOrder($order);
         app(AffiliateTrackingService::class)->recordPaidOrder($order);
         $this->fulfillDigitalItemsForOrder($order);

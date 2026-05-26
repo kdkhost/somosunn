@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Order;
 use App\Models\Setting;
+use App\Services\EventExhibitorService;
 use App\Services\Payment\MercadoPagoService;
 use App\Services\Payment\SumUpService;
 use Carbon\Carbon;
@@ -122,6 +123,7 @@ class CancelUnpaidOrders extends Command
 
         // 3. Cancelar inscricoes de evento associadas
         $this->releaseEventRegistrations($order);
+        app(EventExhibitorService::class)->releaseOrder($order, 'expired');
 
         // 4. Atualizar pedido com metadados detalhados
         $cancelReason = $this->buildCancelReason($paymentMethod, $hours);
@@ -161,7 +163,7 @@ class CancelUnpaidOrders extends Command
     private function releaseEventRegistrations(Order $order): void
     {
         foreach ($order->items as $item) {
-            if ($item->item_type === 'event_registration') {
+            if (in_array((string) $item->item_type, ['event_registration', 'event'], true)) {
                 \App\Models\EventRegistration::where('order_id', $order->id)
                     ->where('status', '!=', 'cancelled')
                     ->update(['status' => 'cancelled']);

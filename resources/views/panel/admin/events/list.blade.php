@@ -123,6 +123,14 @@
                                             <i class="fas fa-photo-video"></i>
                                         </a>
 
+                                        @if($event->type !== 'album')
+                                            <a href="{{ route('panel.admin.events.exhibitors.index', $event) }}"
+                                                class="w-10 h-10 flex items-center justify-center bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-[0.9rem] transition-all duration-300 border border-indigo-100 dark:border-indigo-800/50 hover:scale-110 active:scale-95 shadow-sm"
+                                                title="Áreas para Expositores">
+                                                <i class="fas fa-store"></i>
+                                            </a>
+                                        @endif
+
                                         @if($event->is_ticket_enabled && $event->type !== 'album')
                                             <a href="{{ route('panel.admin.events.scanner', $event) }}"
                                                 class="w-10 h-10 flex items-center justify-center bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-[0.9rem] transition-all duration-300 border border-emerald-100 dark:border-emerald-800/50 hover:scale-110 active:scale-95 shadow-sm"

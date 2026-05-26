@@ -2,6 +2,35 @@
 
 ---
 
+## [2026-05-26] - Implementação de Venda de Áreas para Expositores em Eventos
+
+### Adicionado
+- Gestão completa de áreas para expositores por evento em `/admin` e `/painel/admin`, com ativar/desativar via AJAX, resumo de áreas, filtros, exportação CSV, confirmação manual, cancelamento e reembolso.
+- Campos `exhibitor_*` na tabela `events`, incluindo descrição pública, observações internas, imagem/planta, ingresso incluso, exibição pública e três lotes independentes.
+- Nova tabela `event_exhibitor_registrations` com status, pagamento, reserva temporária em `metadata.reserve_expires_at`, soft deletes e índices operacionais.
+- Checkout público em `/eventos/{event}/expositor`, com cadastro de visitante, campos de responsável/empresa/marca, aceite dos termos, máscaras BR e seleção de gateway.
+- Tipo de venda `event_exhibitor_area` em `Order`, `OrderItem` e metadata de pedido, usando referência `EXHIBITOR-{event_id}-{registration_id}-{order_id}`.
+
+### Integrações
+- Mercado Pago passa a usar referência externa customizada quando existir e o webhook resolve IDs numéricos antigos ou `EXHIBITOR-*`.
+- SumUp passa a usar a referência do expositor no checkout e a liquidação existente confirma inscrições de expositor de forma idempotente.
+- `PaymentWebhookController`, `OrderSettlementService`, `SumUpWebhookProcessor`, `CancelUnpaidOrders` e `OrderRefundService` atualizam inscrições de expositor em aprovação, falha, expiração, cancelamento e reembolso.
+- A capacidade de ingressos normais permanece separada das áreas de expositor, mesmo quando `exhibitor_includes_ticket` estiver ativo.
+
+### Arquivos principais
+- `database/migrations/2026_05_26_000001_create_event_exhibitor_sales_tables.php`
+- `app/Models/EventExhibitorRegistration.php`
+- `app/Services/EventExhibitorService.php`
+- `app/Http/Controllers/Admin/EventExhibitorController.php`
+- `app/Http/Controllers/Panel/Admin/EventExhibitorController.php`
+- `app/Http/Controllers/EventExhibitorCheckoutController.php`
+- `resources/views/events/exhibitor/*`
+- `resources/views/admin/events/exhibitors/index.blade.php`
+- `resources/views/panel/admin/events/exhibitors/index.blade.php`
+- `tests/Feature/EventExhibitorSalesTest.php`
+
+---
+
 ## [2026-05-26] - fix(sumup): conciliacao automatica de pedidos pagos e liberacao de ingressos
 
 ### Problema

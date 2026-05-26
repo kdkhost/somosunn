@@ -58,7 +58,7 @@ class SumUpService
         ])->save();
 
         $payload = [
-            'checkout_reference' => 'ORDER-' . $order->id . '-' . time(),
+            'checkout_reference' => $this->checkoutReference($order),
             'amount'             => $breakdown['charge_amount'],
             'currency'           => $order->currency ?? 'BRL',
             'merchant_code'      => $config['merchant_code'],
@@ -720,6 +720,13 @@ class SumUpService
         $order->forceFill($updates)->save();
 
         return $order->fresh();
+    }
+
+    private function checkoutReference(Order $order): string
+    {
+        $reference = trim((string) data_get($order->metadata, 'gateway_reference', ''));
+
+        return $reference !== '' ? $reference : 'ORDER-' . $order->id . '-' . time();
     }
 
     private function buildWebhookUrl(int $orderId, string $token): string

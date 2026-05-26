@@ -71,6 +71,7 @@ class OrderSettlementService
 
         app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
         $this->confirmEventRegistrationsForOrder($order);
+        app(EventExhibitorService::class)->confirmPaidOrder($order);
         $this->activatePlanForOrder($order);
         $this->fulfillDigitalItemsForOrder($order);
         app(SellerProductFulfillmentService::class)->fulfillPaidOrder($order);

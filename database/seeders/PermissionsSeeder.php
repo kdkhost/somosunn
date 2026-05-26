@@ -47,6 +47,7 @@ class PermissionsSeeder extends Seeder
                 'events.delete' => 'Excluir evento',
                 'events.publish' => 'Publicar/encerrar evento',
                 'events.ticket.manage' => 'Gerenciar ingressos',
+                'events.exhibitors.manage' => 'Gerenciar áreas de expositores',
                 'events.checkin' => 'Fazer check-in de participantes',
             ],
             'planos' => [
@@ -234,7 +235,7 @@ class PermissionsSeeder extends Seeder
                 // Mentorias
                 'mentorships.view', 'mentorships.create', 'mentorships.edit', 'mentorships.delete', 'mentorships.schedule', 'mentorships.sessions',
                 // Eventos
-                'events.view', 'events.create', 'events.edit', 'events.delete', 'events.publish', 'events.ticket.manage', 'events.checkin',
+                'events.view', 'events.create', 'events.edit', 'events.delete', 'events.publish', 'events.ticket.manage', 'events.exhibitors.manage', 'events.checkin',
                 // Planos (apenas visualizar)
                 'plans.view', 'plans.edit', 'plans.feature.toggle', 'plans.discount.manage',
                 // Cupons

@@ -1,5 +1,6 @@
 # UNN — Plataforma de Networking
 
+- **Venda de Áreas para Expositores em Eventos (26/05):** Eventos podem vender áreas independentes para expositores com lotes próprios, planta/mapa, reservas temporárias, checkout Mercado Pago/SumUp, confirmações por webhook e gestão completa nos painéis `/admin` e `/painel/admin`, sem consumir a capacidade de ingressos normais.
 - **Gestão de Álbuns Genéricos e Fim da Marca d'água (12/04):** Implementada a funcionalidade de "Tipo de Registro" em ambos os painéis (Legado e Novo), permitindo criar álbuns de galeria (como o "Onde o network me levou") com a mesma facilidade de eventos, porém ocultando campos irrelevantes (preços, ingressos). Além disso, a aplicação automática de marca d'água foi desativada globalmente para capas de eventos e mídias da galeria, preservando a fidelidade original das imagens enviadas.
 - **Marketplace AdminLTE com Loja Própria e Moderação (26/03):** Implementado no painel legado um fluxo dedicado de marketplace com **dashboard**, **pagamentos**, **minha loja**, **produtos próprios**, **pedidos da loja**, **minhas vendas** e telas de **moderação de lojas/produtos**. O menu lateral e o painel rápido agora respeitam melhor o perfil do usuário (admin, superadmin e vendedor), enquanto o dashboard exibe alertas contextuais quando o módulo da loja virtual ainda não foi instalado.
 - **Refatoração da Lógica de Abas AdminLTE (24/03):** Resolvido o bug de persistência visual onde a aba de SEO sobrepunha as novas seções de Heros e Conteúdo. A estrutura do DOM foi saneada (remoção de wrappers Row) e o JavaScript foi reconstruído para garantir a sincronização determinística entre a URL e o conteúdo exibido, proporcionando uma experiência de edição "Zero Refresh" robusta.
@@ -101,6 +102,7 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 - **Cursos:** Aulas em vídeo, anexos, controle de progresso e certificação.
 - **Mentorias:** Agendamento, controle de vagas e venda de sessões.
 - **Eventos:** Calendário interativo, venda de ingressos e check-in.
+- **Expositores em eventos:** Venda de áreas com estoque separado, lotes independentes, reserva temporária e checkout online.
 
 ### 2. Networking e Comunidade
 - **Feed Social:** Publicações, curtidas e comentários (estilo rede social).
@@ -129,6 +131,38 @@ O UNN é uma plataforma completa de networking, cursos e mentorias, desenvolvida
 - **Dashboard Dinâmica:** Widgets e métricas em tempo real, segmentados por perfil.
 - **Cron Interno:** Gerencie tarefas agendadas direto pelo painel admin (menu "Cron").
 - **Logs de Execução:** Visualize histórico de execuções e falhas de cada tarefa agendada.
+
+## Venda de Áreas para Expositores em Eventos
+
+A funcionalidade permite que um evento venda ingressos normais e áreas para expositores em estoques separados.
+
+### Configuração administrativa
+- Acesse `/admin/events/{event}/exhibitors` ou `/painel/admin/events/{event}/exhibitors`.
+- Defina a quantidade total de áreas, descrição pública, observações internas, exibição pública, ingresso incluso e imagem/planta/mapa.
+- Configure até 3 lotes de expositor com preço, data limite e limite opcional de quantidade.
+- Use o botão AJAX de ativar/desativar para publicar ou suspender a venda sem recarregar a página.
+- A listagem permite filtrar inscrições, exportar CSV, confirmar manualmente, cancelar e reembolsar quando o gateway suportar.
+
+### Checkout público
+- A página pública do evento exibe “Comprar ingresso” e “Comprar área para expositor” quando houver lote ativo e vagas disponíveis.
+- A rota pública `/eventos/{event}/expositor` coleta dados do responsável, empresa, marca, CPF/CNPJ, telefone, quantidade e aceite dos termos.
+- Visitantes criam conta com senha no checkout; usuários logados reutilizam o perfil.
+- A reserva usa `metadata.reserve_expires_at` e conta como vaga apenas enquanto o pedido pendente ainda estiver dentro do prazo.
+
+### Pagamentos e webhooks
+- O pedido de expositor usa `metadata.context = event_exhibitor`, `sale_type = event_exhibitor_area` e item `event_exhibitor_area`.
+- Mercado Pago recebe `external_reference` no formato `EXHIBITOR-{event_id}-{registration_id}-{order_id}`.
+- O webhook Mercado Pago resolve tanto IDs numéricos antigos quanto referências `EXHIBITOR-*`.
+- SumUp usa a mesma referência no checkout e confirma via webhook/conciliador existente.
+- Pagamentos aprovados confirmam a inscrição; falhas, expiração e cancelamento liberam a vaga; reembolsos marcam a inscrição como reembolsada.
+- Boleto do Mercado Pago respeita a configuração do gateway: só aparece quando estiver habilitado no painel.
+
+### Deploy, migrations e cPanel
+- Rode `php artisan migrate` para criar `event_exhibitor_registrations` e adicionar os campos `exhibitor_*` em `events`.
+- Rode `php artisan db:seed --class=PermissionsSeeder` se precisar sincronizar a permissão `events.exhibitors.manage` em ambientes existentes.
+- Em hospedagem compartilhada/cPanel, mantenha o cron do Laravel executando `php artisan schedule:run` para expirar pedidos pendentes e reservas antigas.
+- Configure os webhooks públicos: `/api/v1/webhooks/mercadopago` e `/webhook/sumup/{order}/{token}` conforme o gateway usado.
+- Antes de publicar, execute `php tools/check-no-bom.php` para garantir UTF-8 sem BOM.
 
 
 ## Instalação e Deploy
