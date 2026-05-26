@@ -15,7 +15,7 @@
             ticketEnabled: {{ old('is_ticket_enabled', $event->is_ticket_enabled) ? 'true' : 'false' }},
             scannerMode: '{{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) }}'
         }"
-        x-effect="if (!certificateEnabled && tab === 'certificate') { tab = 'general'; }"
+        x-effect="if (type !== 'event' && ['location', 'pricing', 'exhibitors', 'certificate'].includes(tab)) { tab = 'general'; } if (!certificateEnabled && tab === 'certificate') { tab = 'general'; }"
         class="space-y-6">
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -44,7 +44,7 @@
                     <a href="{{ route('panel.admin.events.exhibitors.index', $event) }}"
                         class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2">
                         <i class="fas fa-store"></i>
-                        <span>Areas para expositores</span>
+                        <span>Inscricoes de expositores</span>
                     </a>
                 @endif
                 <a href="{{ route('panel.admin.events.index') }}"
@@ -99,6 +99,14 @@
                 class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
                 <i class="fas fa-tag"></i>
                 <span>Preço & Ingressos</span>
+            </button>
+            <button type="button" @click="tab = 'exhibitors'" x-show="type === 'event'"
+                :class="tab === 'exhibitors'
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 font-bold border border-blue-500/50 ring-2 ring-blue-500/20'
+                            : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-200 font-bold bg-white dark:bg-slate-800 shadow-sm'"
+                class="px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2">
+                <i class="fas fa-store"></i>
+                <span>Expositores</span>
             </button>
             @if($event->exists)
                 <button type="button" @click="tab = 'gallery'"
@@ -537,6 +545,8 @@
                     </div>
                 </div>
             </div>
+
+            @include('panel.admin.events.partials.exhibitors-form-tab', ['event' => $event])
 
             @if($event->exists)
                 {{-- Tab: Certificate --}}

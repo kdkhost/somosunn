@@ -15,6 +15,7 @@
     $user = auth()->user();
     $canEditEvent = $user && ($user->isAdmin() || ($user->hasPermission('events.edit') && (int) $event->user_id === (int) $user->id));
     $backRoute = $canEditEvent ? route('panel.admin.events.edit', $event) : route('panel.admin.events.list');
+    $eventEditRoute = route('panel.admin.events.edit', ['event' => $event, 'tab' => 'exhibitors']);
 @endphp
 
 <div class="panel-theme-shell mx-auto max-w-7xl space-y-6 px-4 py-6"
@@ -41,27 +42,44 @@
         </div>
     </div>
 
+    <div class="rounded-3xl border border-blue-100 bg-blue-50 p-5 shadow-sm dark:border-blue-900/60 dark:bg-blue-500/10">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <p class="text-sm font-black uppercase tracking-[0.22em] text-blue-700 dark:text-blue-200">Configuracao agrupada no evento</p>
+                <p class="mt-2 text-sm font-semibold leading-6 text-blue-900 dark:text-blue-100">
+                    O preco, os lotes, a quantidade total e a exibicao publica devem ser editados no cadastro do evento. O cliente escolhe entre ingresso normal e area de expositor na hora do pagamento.
+                </p>
+            </div>
+            @if($canEditEvent)
+                <a href="{{ $eventEditRoute }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700">
+                    <i class="fas fa-pen-to-square"></i>
+                    Abrir cadastro do evento
+                </a>
+            @endif
+        </div>
+    </div>
+
     <div class="grid gap-4 md:grid-cols-4">
-        <div class="rounded-xl bg-white p-5 shadow-sm dark:bg-slate-900">
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-black uppercase tracking-widest text-slate-500">Total de áreas</p>
             <p class="mt-2 text-3xl font-black text-slate-950 dark:text-white" data-summary="total_slots">{{ (int) $summary['total_slots'] }}</p>
         </div>
-        <div class="rounded-xl bg-white p-5 shadow-sm dark:bg-slate-900">
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-black uppercase tracking-widest text-slate-500">Vendidas/reservadas</p>
             <p class="mt-2 text-3xl font-black text-emerald-700 dark:text-emerald-300" data-summary="sold_slots">{{ (int) $summary['sold_slots'] }}</p>
         </div>
-        <div class="rounded-xl bg-white p-5 shadow-sm dark:bg-slate-900">
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-black uppercase tracking-widest text-slate-500">Restantes</p>
             <p class="mt-2 text-3xl font-black text-yellow-700 dark:text-yellow-200" data-summary="remaining_slots">{{ (int) $summary['remaining_slots'] }}</p>
         </div>
-        <div class="rounded-xl bg-white p-5 shadow-sm dark:bg-slate-900">
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-black uppercase tracking-widest text-slate-500">Receita confirmada</p>
             <p class="mt-2 text-2xl font-black text-blue-700 dark:text-blue-300" data-summary="confirmed_revenue">{{ $money($summary['confirmed_revenue']) }}</p>
         </div>
     </div>
 
     <div class="grid gap-6 xl:grid-cols-5">
-        <form id="exhibitor-settings-form" enctype="multipart/form-data" class="space-y-5 rounded-xl bg-white p-6 shadow-sm dark:bg-slate-900 xl:col-span-2">
+        <form id="exhibitor-settings-form" enctype="multipart/form-data" class="space-y-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:col-span-2">
             @csrf
             <div class="flex items-center justify-between gap-4">
                 <div>
@@ -94,6 +112,7 @@
                     Expositor recebe ingresso incluso
                 </label>
                 <label class="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-200">
+                    <input type="hidden" name="exhibitor_show_publicly" value="0">
                     <input type="checkbox" name="exhibitor_show_publicly" value="1" {{ ($event->exhibitor_show_publicly ?? true) ? 'checked' : '' }} class="h-5 w-5 rounded border-slate-300 text-blue-600">
                     Exibir publicamente
                 </label>
@@ -138,7 +157,7 @@
             </button>
         </form>
 
-        <div class="rounded-xl bg-white p-6 shadow-sm dark:bg-slate-900 xl:col-span-3">
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:col-span-3">
             <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-end">
                 <label class="flex-1 space-y-2">
                     <span class="text-xs font-black uppercase tracking-widest text-slate-500">Busca</span>

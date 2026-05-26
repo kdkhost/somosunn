@@ -2,6 +2,25 @@
 
 ---
 
+## [2026-05-26] - fix(eventos): agrupar venda de expositor no cadastro do evento
+
+### Corrigido
+- A venda de areas para expositores passa a ser configurada diretamente no cadastro do evento no painel novo, em uma aba propria `Expositores`.
+- O checkout publico do evento agora mostra a escolha entre `Participar do evento` e `Comprar area de expositor` quando houver venda ativa, lote valido e vagas disponiveis.
+- A leitura de valores em moeda foi corrigida para aceitar formatos brasileiros e decimais (`250,00`, `250.00`, `R$ 250,00`) sem multiplicar o valor salvo.
+- A pagina `/painel/admin/events/{event}/exhibitors` recebeu orientacao visual para centralizar configuracao no cadastro do evento e continuar como tela de inscricoes, exportacao e acoes administrativas.
+
+### Arquivos principais
+- `app/Http/Controllers/Panel/Admin/EventController.php`
+- `app/Http/Requests/EventExhibitor/EventExhibitorSettingsRequest.php`
+- `resources/views/panel/admin/events/form.blade.php`
+- `resources/views/panel/admin/events/partials/exhibitors-form-tab.blade.php`
+- `resources/views/panel/admin/events/exhibitors/index.blade.php`
+- `resources/views/admin/events/exhibitors/index.blade.php`
+- `resources/views/events/checkout.blade.php`
+
+---
+
 ## [2026-05-26] - fix(painel): publicar gestao de expositores para membros gestores
 
 ### Corrigido

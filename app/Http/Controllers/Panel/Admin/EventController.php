@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel\Admin;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\Plan;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
@@ -169,6 +170,7 @@ class EventController extends Controller
         $data['all_day'] = $request->boolean('all_day');
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
+        $this->applyExhibitorPayload($request, $data);
         $data['user_id'] = Auth::id();
 
         // Eventos sem imagem ficam como rascunho (não publicados)
@@ -240,6 +242,7 @@ class EventController extends Controller
         $data['all_day'] = $request->boolean('all_day');
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
+        $this->applyExhibitorPayload($request, $data, $event);
 
         // Eventos sem imagem (nem atual nem nova) ficam como rascunho
         $hasImage = $request->hasFile('image')
@@ -345,14 +348,33 @@ class EventController extends Controller
 
     private function serializeRequest(Request $request, ?Event $event = null): array
     {
-        $moneyFields = ['price', 'flash_sale_price', 'batch_1_price', 'batch_2_price', 'batch_3_price'];
+        $moneyFields = [
+            'price',
+            'flash_sale_price',
+            'batch_1_price',
+            'batch_2_price',
+            'batch_3_price',
+            'exhibitor_batch_1_price',
+            'exhibitor_batch_2_price',
+            'exhibitor_batch_3_price',
+        ];
         foreach ($moneyFields as $field) {
             if ($request->has($field)) {
                 $request->merge([$field => $this->normalizeMoney($request->$field)]);
             }
         }
 
-        $dateFields = ['start_at', 'end_at', 'flash_sale_ends_at', 'batch_1_deadline', 'batch_2_deadline', 'batch_3_deadline'];
+        $dateFields = [
+            'start_at',
+            'end_at',
+            'flash_sale_ends_at',
+            'batch_1_deadline',
+            'batch_2_deadline',
+            'batch_3_deadline',
+            'exhibitor_batch_1_deadline',
+            'exhibitor_batch_2_deadline',
+            'exhibitor_batch_3_deadline',
+        ];
         foreach ($dateFields as $field) {
             if ($request->has($field) && $request->$field) {
                 $request->merge([$field => str_replace('T', ' ', $request->$field)]);
@@ -394,6 +416,23 @@ class EventController extends Controller
             'batch_2_deadline' => 'nullable|date',
             'batch_3_price' => 'nullable|numeric|min:0',
             'batch_3_deadline' => 'nullable|date',
+            'exhibitor_sales_enabled' => 'nullable|boolean',
+            'exhibitor_total_slots' => 'nullable|integer|min:0|max:100000',
+            'exhibitor_description' => 'nullable|string|max:20000',
+            'exhibitor_internal_notes' => 'nullable|string|max:20000',
+            'exhibitor_area_image' => 'nullable|image|max:10240',
+            'remove_exhibitor_area_image' => 'nullable|boolean',
+            'exhibitor_includes_ticket' => 'nullable|boolean',
+            'exhibitor_show_publicly' => 'nullable|boolean',
+            'exhibitor_batch_1_price' => 'nullable|numeric|min:0|max:999999.99',
+            'exhibitor_batch_1_deadline' => 'nullable|date',
+            'exhibitor_batch_1_slots' => 'nullable|integer|min:0|max:100000',
+            'exhibitor_batch_2_price' => 'nullable|numeric|min:0|max:999999.99',
+            'exhibitor_batch_2_deadline' => 'nullable|date',
+            'exhibitor_batch_2_slots' => 'nullable|integer|min:0|max:100000',
+            'exhibitor_batch_3_price' => 'nullable|numeric|min:0|max:999999.99',
+            'exhibitor_batch_3_deadline' => 'nullable|date',
+            'exhibitor_batch_3_slots' => 'nullable|integer|min:0|max:100000',
             'type' => 'nullable|string|in:event,album',
             'slug' => 'nullable|string|unique:events,slug,' . ($event ? $event->id : 'NULL'),
         ]);
@@ -410,14 +449,54 @@ class EventController extends Controller
 
     private function normalizeMoney($value): float
     {
-        if (!$value) {
-            return 0;
+        return Plan::parseMoneyValue($value) ?? 0.0;
+    }
+
+    private function applyExhibitorPayload(Request $request, array &$data, ?Event $event = null): void
+    {
+        if (($data['type'] ?? 'event') !== 'event') {
+            $data['exhibitor_sales_enabled'] = false;
+            $data['exhibitor_show_publicly'] = false;
+            unset($data['remove_exhibitor_area_image']);
+
+            return;
         }
 
-        $value = str_replace(['R$', ' ', '.'], '', (string) $value);
-        $value = str_replace(',', '.', $value);
+        if ($event && array_key_exists('exhibitor_total_slots', $data)) {
+            $countedSlots = app(\App\Services\EventExhibitorService::class)->countedSlots($event);
+            $newTotalSlots = (int) ($data['exhibitor_total_slots'] ?? 0);
 
-        return (float) $value;
+            if ($newTotalSlots > 0 && $newTotalSlots < $countedSlots) {
+                throw ValidationException::withMessages([
+                    'exhibitor_total_slots' => 'A quantidade total nao pode ser menor que as areas ja vendidas/reservadas.',
+                ]);
+            }
+        }
+
+        if ($request->hasFile('exhibitor_area_image')) {
+            if ($event?->exhibitor_area_image) {
+                UploadStorage::delete($event->exhibitor_area_image);
+            }
+
+            $data['exhibitor_area_image'] = UploadStorage::storeUploadedFile(
+                $request->file('exhibitor_area_image'),
+                'event-exhibitor-areas',
+                null,
+                ['prefix' => 'exhibitor-area']
+            );
+        } elseif ($request->boolean('remove_exhibitor_area_image')) {
+            if ($event?->exhibitor_area_image) {
+                UploadStorage::delete($event->exhibitor_area_image);
+            }
+
+            $data['exhibitor_area_image'] = null;
+        }
+
+        $data['exhibitor_sales_enabled'] = $request->boolean('exhibitor_sales_enabled');
+        $data['exhibitor_includes_ticket'] = $request->boolean('exhibitor_includes_ticket');
+        $data['exhibitor_show_publicly'] = $request->boolean('exhibitor_show_publicly', true);
+
+        unset($data['remove_exhibitor_area_image']);
     }
 
     private function loadCalendarSettings(): array

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\EventExhibitor;
 
+use App\Models\Plan;
 use Illuminate\Foundation\Http\FormRequest;
 
 class EventExhibitorSettingsRequest extends FormRequest
@@ -61,14 +62,6 @@ class EventExhibitorSettingsRequest extends FormRequest
 
     private function normalizeMoney(mixed $value): ?float
     {
-        $value = trim((string) $value);
-        if ($value === '') {
-            return null;
-        }
-
-        $value = str_replace(['R$', ' ', '.'], '', $value);
-        $value = str_replace(',', '.', $value);
-
-        return is_numeric($value) ? round((float) $value, 2) : null;
+        return Plan::parseMoneyValue($value);
     }
 }

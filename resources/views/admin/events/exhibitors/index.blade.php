@@ -116,6 +116,7 @@
                                 <label class="custom-control-label" for="exhibitor_includes_ticket">Expositor recebe ingresso incluso</label>
                             </div>
                             <div class="custom-control custom-switch mb-3">
+                                <input type="hidden" name="exhibitor_show_publicly" value="0">
                                 <input type="checkbox" class="custom-control-input" id="exhibitor_show_publicly" name="exhibitor_show_publicly" value="1" {{ ($event->exhibitor_show_publicly ?? true) ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="exhibitor_show_publicly">Exibir publicamente</label>
                             </div>

@@ -26,6 +26,12 @@
         $fieldInputClasses = 'w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400';
         $fieldReadonlyClasses = 'w-full cursor-not-allowed rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3.5 text-sm font-semibold text-slate-500';
         $fieldErrorClasses = ' border-red-300 bg-red-50/80 text-red-900 placeholder:text-red-300 focus:border-red-500 focus:ring-red-100';
+        $canSellExhibitorArea = method_exists($event, 'canSellExhibitorArea')
+            && (bool) ($event->exhibitor_show_publicly ?? true)
+            && $event->canSellExhibitorArea();
+        $exhibitorPrice = $canSellExhibitorArea ? $event->currentExhibitorPriceFor() : null;
+        $exhibitorBatchLabel = $canSellExhibitorArea ? $event->currentExhibitorBatchLabelFor() : null;
+        $exhibitorRemaining = $canSellExhibitorArea ? (int) $event->remaining_exhibitor_slots : 0;
     @endphp
 
     <div class="min-h-screen bg-slate-50 px-4 pb-20 pt-28">
@@ -108,6 +114,45 @@
 
                     <div class="rounded-2xl bg-white p-6 shadow-lg md:p-8">
                             <h2 class="mb-6 text-2xl font-black text-gray-900">Finalizar Reserva</h2>
+
+                            @if($canSellExhibitorArea)
+                                <div class="mb-6 rounded-3xl border border-blue-100 bg-blue-50/70 p-4">
+                                    <p class="mb-3 text-xs font-black uppercase tracking-[0.22em] text-blue-700">Escolha como deseja participar</p>
+                                    <div class="grid gap-3 md:grid-cols-2">
+                                        <div class="rounded-2xl border-2 border-blue-600 bg-white p-4 shadow-sm">
+                                            <div class="flex items-start gap-3">
+                                                <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600 text-white">
+                                                    <i class="fas fa-ticket-alt"></i>
+                                                </span>
+                                                <div>
+                                                    <p class="text-sm font-black text-slate-950">Participar do evento</p>
+                                                    <p class="mt-1 text-xs font-semibold leading-5 text-slate-500">Ingresso normal para assistir, participar da palestra ou evento.</p>
+                                                    <span class="mt-3 inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-black text-blue-700">Selecionado</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <a href="{{ route('events.exhibitor.show', $event) }}"
+                                            class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-300 hover:bg-white hover:shadow-md">
+                                            <div class="flex items-start gap-3">
+                                                <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white">
+                                                    <i class="fas fa-store"></i>
+                                                </span>
+                                                <div>
+                                                    <p class="text-sm font-black text-slate-950">Comprar area de expositor</p>
+                                                    <p class="mt-1 text-xs font-semibold leading-5 text-slate-500">
+                                                        {{ $exhibitorBatchLabel ?: 'Lote ativo' }} -
+                                                        {{ 'R$ ' . number_format((float) $exhibitorPrice, 2, ',', '.') }}
+                                                        @if($exhibitorRemaining > 0)
+                                                            <span class="block text-blue-700">{{ $exhibitorRemaining }} area(s) disponiveis</span>
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
 
                             @if($isDemo)
                                 <div class="mb-6 rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-yellow-800">
