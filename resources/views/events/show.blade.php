@@ -542,7 +542,26 @@
             ? 'R$ ' . number_format((float) $event->current_price, 2, ',', '.')
             : 'Gratuito';
         $exhibitorDescriptionSource = preg_replace('/<\s*(br|\/p|\/div|\/li|\/h[1-6])\s*\/?>/i', ' ', (string) ($event->exhibitor_description ?? ''));
-        $exhibitorSummary = trim(preg_replace('/\s+/', ' ', strip_tags((string) $exhibitorDescriptionSource)));
+        $rawExhibitorSummary = trim(preg_replace('/\s+/', ' ', strip_tags((string) $exhibitorDescriptionSource)));
+        $descriptionPlainText = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($event->description ?? ''))));
+        $descriptionMentionsExhibitor = \Illuminate\Support\Str::contains(
+            \Illuminate\Support\Str::lower($descriptionPlainText),
+            ['expositor', 'expositores']
+        );
+        $hasConfiguredExhibitorInfo = $rawExhibitorSummary !== '' || !empty($event->exhibitor_area_image);
+        $showExhibitorPublicSection = $showExhibitorOption || $hasConfiguredExhibitorInfo || $descriptionMentionsExhibitor;
+        $exhibitorDetectedPrice = null;
+        if (!$exhibitorPrice && preg_match('/expositor.{0,90}R\$\s*([\d\.\,]+)/iu', $descriptionPlainText, $priceMatches)) {
+            $exhibitorDetectedPrice = 'R$ ' . trim($priceMatches[1]);
+        }
+        $exhibitorPublicPriceLabel = $exhibitorPrice
+            ? 'R$ ' . number_format((float) $exhibitorPrice, 2, ',', '.')
+            : ($exhibitorDetectedPrice ?: 'Sob consulta');
+        $exhibitorPublicBatchLabel = $showExhibitorOption ? ($exhibitorBatch ?: 'A confirmar') : 'Informativo';
+        $exhibitorPublicAvailabilityLabel = $showExhibitorOption
+            ? ($canSellExhibitor ? ((int) $exhibitorRemaining . ' restante(s)') : ($exhibitorStatus['label'] ?? 'Indisponivel'))
+            : 'Consulte a organizacao';
+        $exhibitorSummary = $rawExhibitorSummary;
         $exhibitorSummary = $exhibitorSummary !== ''
             ? \Illuminate\Support\Str::limit($exhibitorSummary, 220)
             : 'Espaco comercial para marcas, empresas e profissionais apresentarem produtos, servicos e conexoes durante o evento.';
@@ -871,8 +890,8 @@
             </div>
         </section>
 
-        @if($showExhibitorOption)
-            <section class="px-4 py-8 md:px-12 lg:px-24">
+        @if($showExhibitorPublicSection)
+            <section id="sobre-expositores" class="px-4 py-8 md:px-12 lg:px-24">
                 <div class="event-shell">
                     <div class="event-exhibitor-band">
                         <div class="event-exhibitor-grid">
@@ -892,18 +911,18 @@
                                 <div class="mt-5 grid gap-3 sm:grid-cols-3">
                                     <div class="event-exhibitor-metric">
                                         <p class="text-xs font-black uppercase tracking-[0.10em] text-slate-500">Lote atual</p>
-                                        <p class="mt-1 text-lg font-black text-slate-950">{{ $exhibitorBatch ?: 'Indisponivel' }}</p>
+                                        <p class="mt-1 text-lg font-black text-slate-950">{{ $exhibitorPublicBatchLabel }}</p>
                                     </div>
                                     <div class="event-exhibitor-metric">
                                         <p class="text-xs font-black uppercase tracking-[0.10em] text-slate-500">Valor</p>
                                         <p class="mt-1 text-lg font-black text-slate-950">
-                                            {{ $exhibitorPrice ? 'R$ ' . number_format((float) $exhibitorPrice, 2, ',', '.') : 'Sob consulta' }}
+                                            {{ $exhibitorPublicPriceLabel }}
                                         </p>
                                     </div>
                                     <div class="event-exhibitor-metric">
                                         <p class="text-xs font-black uppercase tracking-[0.10em] text-slate-500">Disponibilidade</p>
-                                        <p class="mt-1 text-lg font-black {{ $canSellExhibitor ? 'text-emerald-700' : 'text-red-700' }}">
-                                            {{ $canSellExhibitor ? ((int) $exhibitorRemaining . ' restante(s)') : ($exhibitorStatus['label'] ?? 'Indisponivel') }}
+                                        <p class="mt-1 text-lg font-black {{ $canSellExhibitor ? 'text-emerald-700' : 'text-slate-700' }}">
+                                            {{ $exhibitorPublicAvailabilityLabel }}
                                         </p>
                                     </div>
                                 </div>
@@ -933,7 +952,7 @@
                                     </div>
                                 @else
                                     <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-center text-sm font-black text-slate-600">
-                                        Venda de areas para expositores indisponivel no momento
+                                        Informacoes de expositor disponiveis no evento
                                     </div>
                                 @endif
                             </div>
