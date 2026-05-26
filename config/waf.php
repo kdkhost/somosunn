@@ -118,6 +118,9 @@ return [
         '#^/health$#',
         '#^/_debugbar(/|$)#',
         '#^/livewire(/|$)#',
+        '#^/checkout/sumup/(pix|status|recreate)$#',
+        '#^/webhook/sumup(/|$)#',
+        '#^/api/v1/webhooks/sumup$#',
     ],
 
     /*

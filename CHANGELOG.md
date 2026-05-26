@@ -2,6 +2,36 @@
 
 ---
 
+## [2026-05-26] - fix(sumup): liberar SDK do cartao na CSP e autorizar rotas SumUp no WAF
+
+### Problema
+Na tela de reserva de evento (`/eventos/30/reservar`), o checkout SumUp
+exibia `Erro: SDK do SumUp nao carregou.`. A validacao em producao mostrou que
+o header `Content-Security-Policy` ainda nao liberava
+`https://gateway.sumup.com` em `script-src`, bloqueando o script oficial
+`/gateway/ecom/card/v2/sdk.js` antes de `SumUpCard.mount()`.
+
+### Correcoes
+- Adicionado `https://gateway.sumup.com` e `https://api.sumup.com` na CSP para
+  carregamento do SDK/recursos auxiliares do SumUp.
+- Mantida liberacao SumUp em `frame-src` para o iframe seguro do Card Widget.
+- Adicionadas isencoes WAF para endpoints internos criticos do fluxo SumUp:
+  `/checkout/sumup/pix`, `/checkout/sumup/status`,
+  `/checkout/sumup/recreate`, `/webhook/sumup/*` e
+  `/api/v1/webhooks/sumup`.
+- Atualizados testes de CSP para refletir a remocao intencional do
+  `report-uri /csp-report` sem rota implementada.
+
+### Arquivos afetados
+- `app/Http/Middleware/SecurityHeadersMiddleware.php`
+- `config/waf.php`
+- `database/migrations/2026_07_20_000006_create_waf_settings_table.php`
+- `tests/Unit/Middleware/SecurityHeadersMiddlewareTest.php`
+- `tests/Property/CspHeaderGenerationTest.php`
+- `tests/Unit/Waf/WafExemptRoutesTest.php`
+
+---
+
 ## [2026-05-17] - fix(csp): adicionar cdn.datatables.net na CSP + remover report-uri 404
 
 ### Problema

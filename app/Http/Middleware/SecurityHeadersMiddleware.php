@@ -77,6 +77,8 @@ class SecurityHeadersMiddleware
             'https://www.googletagmanager.com',
             'https://www.google-analytics.com',
             'https://unpkg.com',
+            'https://gateway.sumup.com',
+            'https://api.sumup.com',
         ],
         'style-src' => [
             'https://cdn.jsdelivr.net',
@@ -109,6 +111,7 @@ class SecurityHeadersMiddleware
             'https://api.mercadopago.com',
             'https://www.sumup.com',
             'https://gateway.sumup.com',
+            'https://api.sumup.com',
             'https://www.openstreetmap.org',
             'https://maps.google.com',
         ],

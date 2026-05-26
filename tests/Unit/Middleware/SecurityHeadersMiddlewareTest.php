@@ -20,8 +20,7 @@
  * Spec: .kiro/specs/advanced-security-performance (task 12.4)
  *
  * Cobertura:
- *   1. CSP completa com TODAS as directives obrigatorias e
- *      report-uri ao final.
+ *   1. CSP completa com TODAS as directives obrigatorias.
  *   2. Permissions-Policy:
  *        - camera=()       em rotas normais (ex.: /admin/dashboard)
  *        - camera=(self)   em rotas de QR scanner
@@ -32,7 +31,7 @@
  *   6. X-Frame-Options presente em rotas comuns (SAMEORIGIN, valor
  *      definido pelo middleware) e ausente em rotas /embed/.
  *   7. Referrer-Policy: strict-origin-when-cross-origin.
- *   8. report-uri configurado dentro do header CSP.
+ *   8. report-uri desativado quando nao ha endpoint implementado.
  *   9. Fallback CSP minima segura quando o pipeline de geracao
  *      falha (testado diretamente via Reflection no metodo
  *      privado minimalSafeCsp()).
@@ -95,7 +94,7 @@ class SecurityHeadersMiddlewareTest extends TestCase
     /* 1. CSP completa                                                   */
     /* ---------------------------------------------------------------- */
 
-    public function test_csp_contains_all_required_directives_and_report_uri_on_html_response(): void
+    public function test_csp_contains_all_required_directives_on_html_response(): void
     {
         $middleware = new SecurityHeadersMiddleware();
         $request    = Request::create('/admin/dashboard', 'GET');
@@ -130,11 +129,12 @@ class SecurityHeadersMiddlewareTest extends TestCase
             "style-src deve conter 'unsafe-inline' para compatibilidade com Summernote/jQuery plugins."
         );
 
-        // 1.d) report-uri configurado ao final (Requirement 8.7).
-        $this->assertMatchesRegularExpression(
-            '/report-uri\s+\/csp-report/',
+        // 1.d) report-uri permanece desativado enquanto a rota /csp-report
+        // nao existe, evitando 404 em producao.
+        $this->assertStringNotContainsString(
+            'report-uri',
             $csp,
-            "report-uri /csp-report deve estar presente para coleta de violacoes. CSP={$csp}"
+            "report-uri nao deve ser emitido sem endpoint implementado. CSP={$csp}"
         );
     }
 
@@ -163,6 +163,42 @@ class SecurityHeadersMiddlewareTest extends TestCase
                 "CDN '{$cdn}' deveria estar na allowlist base da CSP."
             );
         }
+    }
+
+    public function test_csp_allows_sumup_card_widget_sources(): void
+    {
+        $middleware = new SecurityHeadersMiddleware();
+        $request    = Request::create('/eventos/30/reservar', 'POST');
+
+        $response = $middleware->handle($request, $this->htmlNext());
+        $csp      = (string) $response->headers->get('Content-Security-Policy', '');
+
+        $scriptSrc = $this->extractDirective($csp, 'script-src');
+        $frameSrc  = $this->extractDirective($csp, 'frame-src');
+
+        $this->assertNotNull($scriptSrc, 'script-src ausente.');
+        $this->assertStringContainsString(
+            'https://gateway.sumup.com',
+            (string) $scriptSrc,
+            'script-src deve liberar o SDK oficial do SumUp Card Widget.'
+        );
+        $this->assertStringContainsString(
+            'https://api.sumup.com',
+            (string) $scriptSrc,
+            'script-src deve liberar scripts auxiliares da integracao SumUp.'
+        );
+
+        $this->assertNotNull($frameSrc, 'frame-src ausente.');
+        $this->assertStringContainsString(
+            'https://gateway.sumup.com',
+            (string) $frameSrc,
+            'frame-src deve liberar o iframe seguro do SumUp Card Widget.'
+        );
+        $this->assertStringContainsString(
+            'https://api.sumup.com',
+            (string) $frameSrc,
+            'frame-src deve liberar iframes auxiliares da integracao SumUp.'
+        );
     }
 
     public function test_extra_allowlist_from_settings_is_appended_to_csp(): void
@@ -455,11 +491,7 @@ class SecurityHeadersMiddlewareTest extends TestCase
                 "Directive '{$directive}' deveria continuar presente apesar do allowlist invalido."
             );
         }
-        $this->assertMatchesRegularExpression(
-            '/report-uri\s+\/csp-report/',
-            $csp,
-            'report-uri continua presente mesmo com allowlist extra invalida.'
-        );
+        $this->assertStringNotContainsString('report-uri', $csp);
     }
 
     /* ---------------------------------------------------------------- */

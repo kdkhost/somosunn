@@ -94,6 +94,7 @@ class CspHeaderGenerationTest extends TestCase
         'code.jquery.com',
         'fonts.googleapis.com',
         'fonts.gstatic.com',
+        'gateway.sumup.com',
     ];
 
     /**
