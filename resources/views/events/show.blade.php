@@ -14,6 +14,383 @@
 @endif
 @section('og_type', 'article')
 
+@push('styles')
+    <style>
+        .event-show-premium {
+            background:
+                radial-gradient(circle at top left, rgba(31, 94, 219, 0.16), transparent 34rem),
+                linear-gradient(180deg, #f8fafc 0%, #eef4ff 48%, #ffffff 100%);
+        }
+
+        .event-hero-premium {
+            position: relative;
+            isolation: isolate;
+            min-height: 720px;
+            padding: 128px 24px 72px;
+            overflow: hidden;
+            background: #071225;
+        }
+
+        .event-hero-premium::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            background:
+                linear-gradient(90deg, rgba(7, 18, 37, 0.94) 0%, rgba(10, 29, 61, 0.80) 45%, rgba(8, 22, 45, 0.74) 100%),
+                radial-gradient(circle at 74% 20%, rgba(23, 127, 214, 0.38), transparent 26rem),
+                radial-gradient(circle at 18% 88%, rgba(16, 185, 129, 0.18), transparent 22rem);
+        }
+
+        .event-hero-bg {
+            position: absolute;
+            inset: -32px;
+            z-index: -3;
+            width: calc(100% + 64px);
+            height: calc(100% + 64px);
+            object-fit: cover;
+            opacity: 0.48;
+            transform: scale(1.05);
+        }
+
+        .event-shell {
+            width: min(1180px, 100%);
+            margin-inline: auto;
+        }
+
+        .event-hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+            gap: 40px;
+            align-items: center;
+        }
+
+        .event-copy-panel {
+            max-width: 760px;
+            color: #ffffff;
+            padding: clamp(24px, 4vw, 40px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 34px;
+            background: rgba(3, 7, 18, 0.70);
+            box-shadow: 0 32px 90px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(20px);
+        }
+
+        .event-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 44px;
+            padding: 10px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 999px;
+            color: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(14px);
+            font-weight: 800;
+            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+
+        .event-back-link:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .event-status-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 28px 0 18px;
+        }
+
+        .event-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 36px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+            font-size: 0.78rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .event-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #a7f3d0;
+            font-size: 0.82rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            margin-bottom: 16px;
+        }
+
+        .event-title-premium {
+            color: #ffffff;
+            font-size: clamp(2.8rem, 6vw, 5.8rem);
+            line-height: 0.94;
+            font-weight: 950;
+            letter-spacing: -0.04em;
+            max-width: 820px;
+            text-wrap: balance;
+            text-shadow: 0 24px 60px rgba(0, 0, 0, 0.40);
+        }
+
+        .event-speaker-premium,
+        .event-summary-premium {
+            color: rgba(255, 255, 255, 0.88);
+            text-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+        }
+
+        .event-summary-premium {
+            max-width: 720px;
+            margin-top: 22px;
+            font-size: clamp(1rem, 1.8vw, 1.24rem);
+            line-height: 1.7;
+        }
+
+        .event-fact-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 32px;
+        }
+
+        .event-fact {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            min-height: 112px;
+            padding: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(18px);
+        }
+
+        .event-fact-icon {
+            width: 44px;
+            height: 44px;
+            flex: 0 0 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            color: #06142a;
+            background: #ffffff;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+        }
+
+        .event-fact-label {
+            color: rgba(255, 255, 255, 0.66);
+            font-size: 0.76rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .event-fact-value {
+            margin-top: 5px;
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.45;
+            font-weight: 850;
+        }
+
+        .event-hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .event-hero-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 52px;
+            padding: 14px 20px;
+            border-radius: 18px;
+            font-weight: 950;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .event-hero-action:hover {
+            transform: translateY(-2px);
+        }
+
+        .event-hero-action-primary {
+            color: #071225;
+            background: #ffffff;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
+        }
+
+        .event-hero-action-secondary {
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(14px);
+        }
+
+        .event-purchase-card {
+            position: sticky;
+            top: 112px;
+            overflow: hidden;
+            border-radius: 34px;
+            background: #ffffff;
+            box-shadow: 0 34px 90px rgba(2, 6, 23, 0.32);
+            border: 1px solid rgba(255, 255, 255, 0.72);
+        }
+
+        .event-purchase-media {
+            position: relative;
+            min-height: 190px;
+            background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-2));
+        }
+
+        .event-purchase-media img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .event-purchase-media::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(2, 6, 23, 0.56) 100%);
+        }
+
+        .event-batch-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #eef5ff;
+            color: #1d4ed8;
+            font-size: 0.76rem;
+            font-weight: 950;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .event-price-premium {
+            color: #071225;
+            font-size: clamp(2.5rem, 4vw, 3.7rem);
+            line-height: 0.95;
+            font-weight: 950;
+            letter-spacing: -0.05em;
+        }
+
+        .event-seat-box {
+            border: 1px solid #dbeafe;
+            border-radius: 22px;
+            background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+            padding: 16px;
+        }
+
+        .event-trust-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            color: #475569;
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        .event-trust-row span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            border-radius: 14px;
+            background: #f8fafc;
+        }
+
+        .event-details-section {
+            margin-top: -28px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .event-details-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 34px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 26px 80px rgba(15, 23, 42, 0.10);
+        }
+
+        .event-details-card .editor-content {
+            color: #334155;
+        }
+
+        .event-details-card .editor-content :is(p, li) {
+            color: #334155;
+            line-height: 1.85;
+        }
+
+        .event-details-card .editor-content :is(strong, b) {
+            color: #0f172a;
+        }
+
+        @media (max-width: 1024px) {
+            .event-hero-premium {
+                padding-top: 112px;
+                min-height: auto;
+            }
+
+            .event-hero-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .event-purchase-card {
+                position: relative;
+                top: auto;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .event-hero-premium {
+                padding: 104px 16px 48px;
+            }
+
+            .event-title-premium {
+                font-size: clamp(2.35rem, 15vw, 3.4rem);
+            }
+
+            .event-fact-grid,
+            .event-trust-row {
+                grid-template-columns: 1fr;
+            }
+
+            .event-fact {
+                min-height: auto;
+            }
+
+            .event-hero-action {
+                width: 100%;
+            }
+
+            .event-copy-panel {
+                padding: 22px;
+                border-radius: 28px;
+            }
+        }
+    </style>
+@endpush
+
 @section('content')
     @php
         $suppressFlashErrorToast = true;
@@ -101,32 +478,58 @@
         $exhibitorPrice = $event->currentExhibitorPriceFor();
         $exhibitorBatch = $event->currentExhibitorBatchLabelFor();
         $exhibitorRemaining = $event->remaining_exhibitor_slots;
+        $heroSummarySource = preg_replace('/<\s*(br|\/p|\/div|\/li|\/h[1-6])\s*\/?>/i', ' ', (string) ($event->description ?? ''));
+        $heroSummary = trim(preg_replace('/\s+/', ' ', strip_tags((string) $heroSummarySource)));
+        $heroSummary = $heroSummary !== ''
+            ? \Illuminate\Support\Str::limit($heroSummary, 230)
+            : 'Um encontro pensado para conexoes relevantes, oportunidades reais e experiencias que aproximam pessoas e negocios.';
+        $eventLocationLabel = trim((string) ($event->location ?: $event->address ?: 'Local a confirmar'));
+        $eventAddressLabel = trim((string) ($event->address ?: $eventLocationLabel));
+        $ticketPriceLabel = $event->current_price > 0
+            ? 'R$ ' . number_format((float) $event->current_price, 2, ',', '.')
+            : 'Gratuito';
+        $startDateLabel = $startDate ? $startDate->translatedFormat('d/m/Y (l)') : 'Data a confirmar';
+        $startTimeLabel = $startDate ? $startDate->format('H:i') : 'Horario a confirmar';
+        $endTimeLabel = $endDate ? $endDate->format('H:i') : null;
+        $durationLabel = null;
+        if ($startDate && $endDate) {
+            $diffMinutes = $startDate->diffInMinutes($endDate);
+            $durationHours = intdiv($diffMinutes, 60);
+            $durationMins = $diffMinutes % 60;
+            $durationLabel = '';
+            if ($durationHours > 0) {
+                $durationLabel .= $durationHours . 'h';
+            }
+            if ($durationMins > 0) {
+                $durationLabel .= ($durationHours > 0 ? ' ' : '') . $durationMins . 'min';
+            }
+            if ($durationLabel === '') {
+                $durationLabel = '0min';
+            }
+        }
     @endphp
 
-    <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <div class="event-show-premium min-h-screen">
         <!-- Hero Section -->
-        <section class="pt-24 md:pt-28 pb-6 md:pb-12 px-4 md:px-12 lg:px-24 relative overflow-hidden" style="background:
-                radial-gradient(1200px circle at 15% 25%, {{ $sitePrimary14 }} 0%, transparent 58%),
-                radial-gradient(900px circle at 85% 0%, {{ $siteSecondary08 }} 0%, transparent 55%),
-                linear-gradient(135deg, {{ $sitePrimary14 }} 0%, {{ $siteSecondary08 }} 100%);">
+        <section class="event-hero-premium">
             @if($eventImageUrl)
                 <div class="absolute inset-0 pointer-events-none overflow-hidden">
                     <img src="{{ $eventImageUrl }}" alt=""
-                        class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.2] brightness-90"
-                        style="filter: blur({{ $eventsHeroBlurPx }}px); opacity: 0.65;" loading="lazy" aria-hidden="true">
+                        class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.18] brightness-90"
+                        style="filter: blur({{ max(18, (int) round($eventsHeroBlurPx * 0.55)) }}px); opacity: 0.70;" loading="lazy" aria-hidden="true">
 
                     <!-- Película transparente em cor degradê -->
-                    <div class="absolute inset-0" style="background: linear-gradient(135deg, 
-                            {{ $hexToRgba($sitePrimary, 0.75 * $eventsHeroFilmScale) }} 0%, 
-                            {{ $hexToRgba($siteSecondary, 0.65 * $eventsHeroFilmScale) }} 50%, 
-                            {{ $hexToRgba($sitePrimary, 0.85 * $eventsHeroFilmScale) }} 100%);">
+                    <div class="absolute inset-0" style="background: linear-gradient(115deg,
+                            rgba(3, 7, 18, 0.58) 0%,
+                            {{ $hexToRgba($sitePrimary, 0.20 * $eventsHeroFilmScale) }} 48%,
+                            rgba(7, 18, 37, 0.52) 100%);">
                     </div>
                 </div>
             @endif
 
-            <div class="max-w-7xl mx-auto relative">
+            <div class="event-shell relative">
                 <a href="{{ route('events.index') }}"
-                    class="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-all duration-300 font-semibold drop-shadow-lg">
+                    class="event-back-link mb-6">
                     <i class="fas fa-arrow-left"></i> Voltar para eventos
                 </a>
 
@@ -136,9 +539,9 @@
                     </div>
                 @endif
 
-                <div class="flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
+                <div class="event-hero-grid">
                     <!-- Event Info -->
-                    <div class="flex-1">
+                    <div class="event-copy-panel">
                         @if($isDemo)
                             <span
                                 class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold mb-4">
@@ -153,9 +556,11 @@
                             </span>
                         @endif
 
-                        <h1
-                            class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 md:mb-4 drop-shadow-lg">
-                            {{ $event->title }}</h1>
+                        <div class="event-eyebrow">
+                            <i class="fas fa-bolt"></i> Evento Somos UNN
+                        </div>
+
+                        <h1 class="event-title-premium">{{ $event->title }}</h1>
 
                         @if($event->speaker)
                             <p class="text-lg sm:text-xl font-semibold mb-4 md:mb-6 text-white/90 drop-shadow">
@@ -163,11 +568,7 @@
                             </p>
                         @endif
 
-                        @if($event->description)
-                            <div class="text-base sm:text-lg text-white/80 leading-relaxed mb-6 md:mb-8 drop-shadow editor-content">
-                                {!! $event->description !!}
-                            </div>
-                        @endif
+                        <p class="event-summary-premium">{{ $heroSummary }}</p>
 
                         <div class="grid sm:grid-cols-2 gap-4 mb-8">
                             <div class="bg-white rounded-2xl p-5 shadow-lg">
@@ -219,48 +620,69 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="event-hero-actions">
+                            @if(!$isClosed && !$isDemo && (!$event->capacity || $remainingSeats !== 0))
+                                <a href="{{ route('events.checkout', $event) }}" class="event-hero-action event-hero-action-primary">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    {{ $event->current_price > 0 ? 'Comprar ingresso' : 'Garantir minha vaga' }}
+                                </a>
+                            @endif
+                            @if($canSellExhibitor)
+                                <a href="{{ route('events.exhibitor.show', $event) }}" class="event-hero-action event-hero-action-secondary">
+                                    <i class="fas fa-store"></i> Comprar area para expositor
+                                </a>
+                            @endif
+                        </div>
                     </div>
 
                     <!-- Ticket Card -->
                     <div class="w-full lg:w-96 shrink-0">
-                        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden sticky top-28">
+                        <div class="event-purchase-card">
                             @if($eventImageUrl)
-                                <div class="relative h-44">
+                                <div class="event-purchase-media">
                                     <img src="{{ $eventImageUrl }}" alt="Imagem do evento"
                                         class="absolute inset-0 w-full h-full object-cover" loading="lazy">
-                                    <div class="absolute inset-x-0 top-0 h-2" style="background-color: {{ $eventColor }}"></div>
+                                    <div class="absolute bottom-4 left-4 right-4 z-10 flex items-end justify-between gap-3">
+                                        <div>
+                                            <p class="text-xs font-black uppercase tracking-[0.18em] text-white/75">Ingresso oficial</p>
+                                            <p class="mt-1 text-base font-black leading-tight text-white">{{ \Illuminate\Support\Str::limit($event->title, 42) }}</p>
+                                        </div>
+                                        <span class="rounded-full bg-white/95 px-3 py-2 text-xs font-black text-slate-900 shadow-lg">
+                                            <i class="fas fa-shield-halved mr-1 text-emerald-600"></i> Seguro
+                                        </span>
+                                    </div>
                                 </div>
                             @else
                                 <div class="h-2" style="background-color: {{ $eventColor }}"></div>
                             @endif
                             <div class="p-6">
-                                <div class="text-center mb-6">
+                                <div class="mb-6">
                                     @if($event->current_price > 0)
-                                        <span
-                                            class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider mb-2">
-                                            {{ $event->current_batch_label }}
+                                        <span class="event-batch-badge">
+                                            <i class="fas fa-layer-group"></i> {{ $event->current_batch_label }}
                                         </span>
-                                        <p class="text-sm text-gray-500 mb-1">Investimento</p>
-                                        <p class="text-4xl font-black text-gray-900">R$
-                                            {{ number_format($event->current_price, 2, ',', '.') }}</p>
-                                        <p class="text-sm text-gray-500">por pessoa</p>
+                                        <p class="mt-4 text-sm font-bold text-slate-500">Investimento por pessoa</p>
+                                        <p class="event-price-premium mt-1">R$ {{ number_format($event->current_price, 2, ',', '.') }}</p>
                                     @else
-                                        <p class="text-sm text-gray-500 mb-1">Entrada</p>
-                                        <p class="text-4xl font-black text-green-600">Gratuita</p>
-                                        <p class="text-sm text-gray-500">sujeito a lotação</p>
+                                        <p class="text-sm font-bold text-slate-500">Entrada</p>
+                                        <p class="event-price-premium mt-1 text-emerald-600">Gratuita</p>
                                     @endif
+                                    <p class="mt-2 text-sm font-semibold text-slate-500">
+                                        {{ $startDateLabel }} · {{ $startTimeLabel }}{{ $endTimeLabel ? ' as ' . $endTimeLabel : '' }}
+                                    </p>
                                 </div>
 
                                 @if($event->capacity)
-                                    <div class="mb-6">
+                                    <div class="event-seat-box mb-6">
                                         <div class="flex items-center justify-between text-sm mb-2">
-                                            <span class="text-gray-500">Vagas disponíveis</span>
+                                            <span class="font-bold text-slate-600">Vagas disponiveis</span>
                                             <span
-                                                class="font-bold {{ $remainingSeats === 0 ? 'text-red-600' : 'text-gray-900' }}">
+                                                class="font-black {{ $remainingSeats === 0 ? 'text-red-600' : 'text-slate-950' }}">
                                                 {{ $remainingSeats }} / {{ (int) $event->capacity }}
                                             </span>
                                         </div>
-                                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-3 bg-white rounded-full overflow-hidden shadow-inner">
                                             @php
                                                 $capacity = max(1, (int) $event->capacity);
                                                 $percent = min(100, max(0, (int) round(($confirmedSeats / $capacity) * 100)));
@@ -274,8 +696,8 @@
                                                 <i class="fas fa-ban mr-1"></i> Esgotado
                                             </p>
                                         @elseif($remainingSeats !== null && $remainingSeats <= 5)
-                                            <p class="text-xs text-orange-600 mt-2 font-medium">
-                                                <i class="fas fa-fire mr-1"></i> Últimas vagas!
+                                            <p class="text-xs text-orange-600 mt-2 font-black">
+                                                <i class="fas fa-fire mr-1"></i> Ultimas vagas!
                                             </p>
                                         @endif
                                     </div>
@@ -381,7 +803,7 @@
                                     </div>
                                 @endif
 
-                                <div class="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500">
+                                <div class="event-trust-row mt-5">
                                     <span><i class="fas fa-lock mr-1"></i> Pagamento seguro</span>
                                     <span><i class="fas fa-undo mr-1"></i> Reembolso garantido</span>
                                 </div>
@@ -457,11 +879,19 @@
         </section>
 
         <!-- Event Details -->
-        <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-3xl font-black text-gray-900 mb-8">Sobre o Evento</h2>
+        <section class="event-details-section px-6 pb-16 md:px-12 lg:px-24">
+            <div class="event-details-card mx-auto max-w-5xl p-6 md:p-10">
+                <div class="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                    <div>
+                        <p class="text-sm font-black uppercase tracking-[0.18em] text-blue-700">Detalhes completos</p>
+                        <h2 class="mt-2 text-3xl font-black text-gray-900 md:text-4xl">Sobre o evento</h2>
+                    </div>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-blue-700">
+                        <i class="fas fa-circle-info"></i> Informacoes oficiais
+                    </span>
+                </div>
 
-                <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed editor-content">
+                <div class="prose prose-lg max-w-none leading-relaxed editor-content">
                     {!! $event->description !!}
                 </div>
 
