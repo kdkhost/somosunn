@@ -79,6 +79,7 @@ class Plan extends Model
         'events.create',
         'events.edit',
         'events.delete',
+        'events.exhibitors.manage',
         'mentorships',
         'mentorships.group',
         'mentorships.individual',
@@ -106,6 +107,8 @@ class Plan extends Model
         'courses.certificates',
         'events',
         'events_access',
+        'events.exhibitors.manage',
+        'events_exhibitors_manage',
         'events.recordings',
         'events.vip',
         'events.pitch.priority',
@@ -135,6 +138,7 @@ class Plan extends Model
         'events.create' => 'Criar e divulgar eventos',
         'events.edit' => 'Editar eventos publicados',
         'events.delete' => 'Remover eventos publicados',
+        'events.exhibitors.manage' => 'Gerenciar areas para expositores',
         'events.recordings' => 'Acesso a gravacoes de eventos',
         'events.vip' => 'Eventos VIP/exclusivos',
         'events.pitch.priority' => 'Pitch diferenciado nos eventos',
@@ -198,6 +202,7 @@ class Plan extends Model
             'events.create',
             'events.edit',
             'events.delete',
+            'events.exhibitors.manage',
             'mentorships.create',
             'mentorships.edit',
             'mentorships.delete',
@@ -225,6 +230,7 @@ class Plan extends Model
         ['label' => 'Publicar cursos', 'permission' => 'courses.create'],
         ['label' => 'Publicar mentorias', 'permission' => 'mentorships.create'],
         ['label' => 'Criar e divulgar eventos', 'permission' => 'events.create'],
+        ['label' => 'Gerenciar areas para expositores', 'permission' => 'events.exhibitors.manage'],
         ['label' => 'Mentoria nas dinamicas dos eventos', 'permission' => 'events.mentor'],
         ['label' => 'Perfil parceiro e cupons', 'permission' => 'benefits.club.partner'],
     ];
@@ -836,6 +842,12 @@ class Plan extends Model
             $aliases[] = $m[1] . '.' . $m[2];
         } elseif (preg_match('/^(courses|events|mentorships)\.(create|edit|delete)$/', $feature, $m)) {
             $aliases[] = $m[1] . '_' . $m[2];
+        }
+
+        if ($feature === 'events.exhibitors.manage') {
+            $aliases[] = 'events_exhibitors_manage';
+        } elseif ($feature === 'events_exhibitors_manage') {
+            $aliases[] = 'events.exhibitors.manage';
         }
 
         if ($feature === 'courses_review') {

@@ -390,15 +390,10 @@ class EventExhibitorController extends Controller
             abort(403);
         }
 
-        $canManage = $user->isAdmin()
-            || $user->hasPermission('events.exhibitors.manage')
-            || $user->hasPermission('events.edit');
+        $canManage = method_exists($user, 'canManageEventExhibitors')
+            && $user->canManageEventExhibitors($event);
 
-        abort_unless($canManage, 403, 'Voce nao tem permissao para gerenciar expositores.');
-
-        if (!$user->isAdmin() && (int) $event->user_id !== (int) $user->id) {
-            abort(403, 'Voce nao tem permissao para gerenciar este evento.');
-        }
+        abort_unless($canManage, 403, 'Voce nao tem permissao para gerenciar expositores deste evento.');
     }
 
     protected function ensureRegistrationBelongsToEvent(Event $event, EventExhibitorRegistration $registration): void

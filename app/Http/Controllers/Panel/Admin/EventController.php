@@ -611,6 +611,10 @@ class EventController extends Controller
     {
         $user = Auth::user();
 
+        if ($permission === 'events.view' && $user && method_exists($user, 'canManageEventExhibitors') && $user->canManageEventExhibitors()) {
+            return;
+        }
+
         if (!$user || (!$user->isAdmin() && !$user->hasPermission($permission))) {
             abort(403);
         }

@@ -4,6 +4,7 @@
     $currentTheme = $user->theme_pref ?? 'light';
     $storefrontModuleInstalled = \App\Models\SellerStore::tableAvailable() && \App\Models\SellerProduct::tableAvailable();
     $canAccessInstructorArea = (method_exists($user, 'canAccessInstructorArea') && $user->canAccessInstructorArea());
+    $canManageEventExhibitors = (method_exists($user, 'canManageEventExhibitors') && $user->canManageEventExhibitors());
     $hasPartnerProfile = false;
 
     // Interesse em Noticias (exibe modulo Revistas)
@@ -277,7 +278,14 @@
             'route' => route('panel.admin.events.index'),
             'icon' => 'fas fa-calendar-alt',
             'active' => request()->routeIs('panel.admin.events.*'),
-            'visible' => $canAccessInstructorArea && ($user->hasPermission('events.view') || $user->canAccessFeature('events_access')),
+            'visible' => $canAccessInstructorArea && ($user->hasPermission('events.view') || $user->canAccessFeature('events_access') || $canManageEventExhibitors),
+        ],
+        [
+            'label' => 'Areas para expositores',
+            'route' => route('panel.admin.events.list'),
+            'icon' => 'fas fa-store',
+            'active' => request()->routeIs('panel.admin.events.exhibitors.*'),
+            'visible' => $canAccessInstructorArea && $canManageEventExhibitors,
         ],
         [
             'label' => 'Scanner de ingressos',

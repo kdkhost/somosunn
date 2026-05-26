@@ -40,6 +40,13 @@
                         </button>
                     </form>
                 @endif
+                @if($event->exists && ($event->type ?? 'event') !== 'album' && auth()->user()?->canManageEventExhibitors($event))
+                    <a href="{{ route('panel.admin.events.exhibitors.index', $event) }}"
+                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2">
+                        <i class="fas fa-store"></i>
+                        <span>Areas para expositores</span>
+                    </a>
+                @endif
                 <a href="{{ route('panel.admin.events.index') }}"
                     class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all">
                     Cancelar

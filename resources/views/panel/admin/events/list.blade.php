@@ -9,6 +9,16 @@
 @endsection
 
 @section('panel_content')
+    @php
+        $panelUser = auth()->user();
+        $canCreateEvent = $panelUser && $panelUser->hasPermission('events.create');
+        $canEditEvent = $panelUser && $panelUser->hasPermission('events.edit');
+        $canDeleteEvent = $panelUser && $panelUser->hasPermission('events.delete');
+        $canScanEvents = $panelUser && ($panelUser->hasPermission('events.view') || $panelUser->canAccessFeature('events_access'));
+        $canManageExhibitorsFor = fn ($event) => $panelUser
+            && method_exists($panelUser, 'canManageEventExhibitors')
+            && $panelUser->canManageEventExhibitors($event);
+    @endphp
     <div class="space-y-6">
         {{-- Header --}}
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 transition-all duration-500">
@@ -22,18 +32,20 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-4">
-                @if(!(isset($type) && $type === 'album'))
+                @if(!(isset($type) && $type === 'album') && $canScanEvents)
                 <a href="{{ route('panel.admin.quick-scanner') }}"
                     class="group inline-flex items-center gap-2.5 px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-sm font-black transition-all duration-300 shadow-lg shadow-emerald-200/50 dark:shadow-none hover:scale-105 active:scale-95">
                     <i class="fas fa-qrcode text-lg transition-transform group-hover:rotate-12"></i>
                     <span>Scanner Universal</span>
                 </a>
                 @endif
+                @if($canCreateEvent)
                 <a href="{{ (isset($type) && $type === 'album') ? route('panel.admin.acervo.create') : route('panel.admin.events.create') }}"
                     class="group inline-flex items-center gap-2.5 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-sm font-black transition-all duration-300 shadow-lg shadow-blue-200/50 dark:shadow-none hover:scale-105 active:scale-95">
                     <i class="fas fa-plus text-lg transition-transform group-hover:rotate-12"></i>
                     <span>Novo {{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}</span>
                 </a>
+                @endif
             </div>
         </div>
 
@@ -103,27 +115,29 @@
                                 
                                 <td class="px-6 py-5 text-center">
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" class="sr-only peer ajax-toggle" data-id="{{ $event->id }}" data-field="published" {{ $event->published ? 'checked' : '' }}>
+                                        <input type="checkbox" class="sr-only peer {{ $canEditEvent ? 'ajax-toggle' : '' }}" data-id="{{ $event->id }}" data-field="published" {{ $event->published ? 'checked' : '' }} {{ $canEditEvent ? '' : 'disabled' }}>
                                         <div class="w-12 h-6 bg-slate-200 peer-focus:outline-none dark:peer-focus:ring-white/10 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-[24px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-blue-600 shadow-inner"></div>
                                     </label>
                                 </td>
                                 
                                 <td class="px-6 py-5 text-center">
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" class="sr-only peer ajax-toggle" data-id="{{ $event->id }}" data-field="show_on_gallery" {{ $event->show_on_gallery ? 'checked' : '' }}>
+                                        <input type="checkbox" class="sr-only peer {{ $canEditEvent ? 'ajax-toggle' : '' }}" data-id="{{ $event->id }}" data-field="show_on_gallery" {{ $event->show_on_gallery ? 'checked' : '' }} {{ $canEditEvent ? '' : 'disabled' }}>
                                         <div class="w-12 h-6 bg-slate-200 peer-focus:outline-none dark:peer-focus:ring-white/10 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-[24px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-500 shadow-inner"></div>
                                     </label>
                                 </td>
 
                                 <td class="px-6 py-5 whitespace-nowrap text-right">
                                     <div class="flex items-center justify-end gap-2.5">
+                                        @if($canEditEvent)
                                         <a href="{{ route('panel.admin.events.edit', ['event' => $event, 'tab' => 'gallery']) }}"
                                             class="w-10 h-10 flex items-center justify-center bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-[0.9rem] transition-all duration-300 border border-amber-100 dark:border-amber-800/50 hover:scale-110 active:scale-95 shadow-sm"
                                             title="Gerenciar Mídia">
                                             <i class="fas fa-photo-video"></i>
                                         </a>
+                                        @endif
 
-                                        @if($event->type !== 'album')
+                                        @if($event->type !== 'album' && $canManageExhibitorsFor($event))
                                             <a href="{{ route('panel.admin.events.exhibitors.index', $event) }}"
                                                 class="w-10 h-10 flex items-center justify-center bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-[0.9rem] transition-all duration-300 border border-indigo-100 dark:border-indigo-800/50 hover:scale-110 active:scale-95 shadow-sm"
                                                 title="Áreas para Expositores">
@@ -131,7 +145,7 @@
                                             </a>
                                         @endif
 
-                                        @if($event->is_ticket_enabled && $event->type !== 'album')
+                                        @if($event->is_ticket_enabled && $event->type !== 'album' && $canScanEvents)
                                             <a href="{{ route('panel.admin.events.scanner', $event) }}"
                                                 class="w-10 h-10 flex items-center justify-center bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-[0.9rem] transition-all duration-300 border border-emerald-100 dark:border-emerald-800/50 hover:scale-110 active:scale-95 shadow-sm"
                                                 title="Escanear Ingressos">
@@ -139,12 +153,15 @@
                                             </a>
                                         @endif
 
+                                        @if($canEditEvent)
                                         <a href="{{ route('panel.admin.events.edit', $event) }}"
                                             class="w-10 h-10 flex items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-[0.9rem] transition-all duration-300 border border-blue-100 dark:border-blue-800/50 hover:scale-110 active:scale-95 shadow-sm"
                                             title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        @endif
 
+                                        @if($canDeleteEvent)
                                         <button type="button"
                                             onclick="confirmDelete({{ $event->id }})"
                                             class="w-10 h-10 flex items-center justify-center bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-[0.9rem] transition-all duration-300 border border-red-100 dark:border-red-800/50 hover:scale-110 active:scale-95 shadow-sm"
@@ -156,6 +173,7 @@
                                             @csrf
                                             @method('DELETE')
                                         </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -167,10 +185,12 @@
                                     </div>
                                     <h3 class="text-xl font-black text-slate-900 dark:text-white">Nenhum registro encontrado</h3>
                                     <p class="text-slate-500 dark:text-slate-400 mt-2 max-w-xs mx-auto">Comece criando um novo registro para visualizar aqui.</p>
+                                    @if($canCreateEvent)
                                     <a href="{{ (isset($type) && $type === 'album') ? route('panel.admin.acervo.create') : route('panel.admin.events.create') }}" class="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-200">
                                         <i class="fas fa-plus"></i>
                                         Novo Registro
                                     </a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforelse

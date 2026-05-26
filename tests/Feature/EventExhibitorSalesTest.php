@@ -39,6 +39,38 @@ class EventExhibitorSalesTest extends TestCase
         $this->assertTrue((bool) $event->fresh()->exhibitor_sales_enabled);
     }
 
+    public function test_panel_member_with_content_permission_can_manage_own_event_exhibitors(): void
+    {
+        $member = $this->user([
+            'extra_features' => ['courses.create'],
+        ]);
+
+        $event = $this->event($member, [
+            'exhibitor_total_slots' => 4,
+            'exhibitor_batch_1_price' => 250,
+            'exhibitor_batch_1_deadline' => now()->addDays(10),
+        ]);
+
+        $this->actingAs($member)
+            ->get(route('panel.admin.events.exhibitors.index', $event))
+            ->assertOk()
+            ->assertSee('Expositores', false);
+    }
+
+    public function test_panel_event_list_publishes_exhibitor_area_for_content_member(): void
+    {
+        $member = $this->user([
+            'extra_features' => ['mentorships.create'],
+        ]);
+
+        $event = $this->event($member);
+
+        $this->actingAs($member)
+            ->get(route('panel.admin.events.list'))
+            ->assertOk()
+            ->assertSee(route('panel.admin.events.exhibitors.index', $event), false);
+    }
+
     public function test_public_event_shows_ticket_and_exhibitor_options_when_available(): void
     {
         Setting::set('feature_events', '1');

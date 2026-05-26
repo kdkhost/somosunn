@@ -12,6 +12,9 @@
         'dark' => 'bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-slate-100',
         default => 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
     };
+    $user = auth()->user();
+    $canEditEvent = $user && ($user->isAdmin() || ($user->hasPermission('events.edit') && (int) $event->user_id === (int) $user->id));
+    $backRoute = $canEditEvent ? route('panel.admin.events.edit', $event) : route('panel.admin.events.list');
 @endphp
 
 <div class="panel-theme-shell mx-auto max-w-7xl space-y-6 px-4 py-6"
@@ -29,7 +32,7 @@
             <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">{{ $event->title }}</p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('panel.admin.events.edit', $event) }}" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
+            <a href="{{ $backRoute }}" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
                 <i class="fas fa-arrow-left mr-1"></i> Voltar
             </a>
             <a href="{{ route($routePrefix . '.export', $event) }}" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white hover:bg-emerald-700">

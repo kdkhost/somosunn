@@ -122,6 +122,54 @@ class User extends Authenticatable implements MustVerifyEmail
             || $this->canAccessFeature('mentorships.create');
     }
 
+    public function canManageEventExhibitors(?Event $event = null): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $hasExactPermissionOrFeature = function (string $permission): bool {
+            $snakePermission = str_replace('.', '_', $permission);
+
+            $hasRolePermission = $this->roles()
+                ->whereHas('permissions', fn ($query) => $query->where('name', $permission))
+                ->exists();
+
+            return $hasRolePermission
+                || $this->canAccessFeature($permission)
+                || $this->canAccessFeature($snakePermission);
+        };
+
+        $hasGlobalAccess = $hasExactPermissionOrFeature('events.exhibitors.manage')
+            || $this->canAccessFeature('admin.panel')
+            || $this->canAccessFeature('admin_panel');
+
+        if ($hasGlobalAccess) {
+            return true;
+        }
+
+        $hasScopedAccess = collect([
+            'events.edit',
+            'events.create',
+            'events.ticket.manage',
+            'events.publish',
+            'courses.edit',
+            'courses.create',
+            'mentorships.edit',
+            'mentorships.create',
+        ])->contains(fn (string $permission) => $hasExactPermissionOrFeature($permission));
+
+        if (!$hasScopedAccess) {
+            return false;
+        }
+
+        if (!$event) {
+            return true;
+        }
+
+        return (int) $event->user_id === (int) $this->id;
+    }
+
     public function canAccessInstructorArea(): bool
     {
         if ($this->isAdmin()) {
@@ -129,6 +177,7 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return $this->canSellOnMarketplace()
+            || $this->canManageEventExhibitors()
             || $this->canAccessFeature('courses_access')
             || $this->canAccessFeature('mentorships_access')
             || $this->canAccessFeature('events_access')

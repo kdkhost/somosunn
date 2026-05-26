@@ -116,6 +116,13 @@
                             'desc' => 'Publicar e controlar eventos.'
                         ],
                         [
+                            'enabled' => $access['exhibitors'],
+                            'route' => route('panel.admin.events.list'),
+                            'icon' => 'fa-store',
+                            'title' => 'Areas para expositores',
+                            'desc' => 'Configurar espacos, lotes e inscricoes.'
+                        ],
+                        [
                             'enabled' => $access['certificates'],
                             'route' => route('panel.admin.certificates.index'),
                             'icon' => 'fa-certificate',

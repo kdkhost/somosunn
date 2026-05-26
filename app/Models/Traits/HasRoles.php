@@ -61,9 +61,23 @@ trait HasRoles
             $featureCandidates[] = $base;
             $featureCandidates[] = $base . '_access';
 
+            if (in_array($action, ['view', 'access'], true)) {
+                $featureCandidates[] = $base . '.create';
+                $featureCandidates[] = $base . '.edit';
+                $featureCandidates[] = $base . '.delete';
+                $featureCandidates[] = $base . '_create';
+                $featureCandidates[] = $base . '_edit';
+                $featureCandidates[] = $base . '_delete';
+            }
+
             if (!in_array($action, ['view', 'access'], true)) {
                 $featureCandidates[] = $base . '_' . $action;
             }
+        }
+
+        if (in_array($perm, ['events.view', 'events.access'], true)) {
+            $featureCandidates[] = 'events.exhibitors.manage';
+            $featureCandidates[] = 'events_exhibitors_manage';
         }
 
         if (str_starts_with($perm, 'certificates.')) {

@@ -71,7 +71,10 @@ class EnsureUserIsAdmin
 
         $allowedPrefixes = [];
 
-        if (method_exists($user, 'canAccessInstructorArea') && $user->canAccessInstructorArea()) {
+        $canAccessInstructorArea = method_exists($user, 'canAccessInstructorArea') && $user->canAccessInstructorArea();
+        $canManageEventExhibitors = method_exists($user, 'canManageEventExhibitors') && $user->canManageEventExhibitors();
+
+        if ($canAccessInstructorArea) {
             $allowedPrefixes = array_merge($allowedPrefixes, [
                 'panel.admin.courses.',
                 'panel.admin.mentorships.',
@@ -79,6 +82,10 @@ class EnsureUserIsAdmin
                 'panel.admin.certificates.',
                 'panel.admin.quick-scanner',
             ]);
+        }
+
+        if ($canManageEventExhibitors) {
+            $allowedPrefixes[] = 'panel.admin.events.';
         }
 
         if (method_exists($user, 'canSellOnMarketplace') && $user->canSellOnMarketplace()) {

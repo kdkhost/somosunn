@@ -2,6 +2,28 @@
 
 ---
 
+## [2026-05-26] - fix(painel): publicar gestao de expositores para membros gestores
+
+### Corrigido
+- A gestao de areas para expositores agora aparece no painel novo para membros com permissoes de gestao de cursos, mentorias, eventos ou administracao.
+- A Central do Instrutor e o menu lateral do `/painel` passam a exibir o acesso de expositores quando o membro tem permissao compativel.
+- O formulario e a listagem de eventos do painel novo receberam acesso direto para `Areas para expositores`, respeitando o dono do evento e permissoes granulares.
+- A permissao `events.exhibitors.manage` foi publicada como recurso de plano/usuario para poder ser concedida pelo painel administrativo novo e legado.
+
+### Arquivos principais
+- `app/Models/User.php`
+- `app/Models/Plan.php`
+- `app/Models/Traits/HasRoles.php`
+- `app/Http/Middleware/EnsureUserIsAdmin.php`
+- `app/Http/Controllers/Admin/EventExhibitorController.php`
+- `app/Http/Controllers/Panel/Admin/EventController.php`
+- `resources/views/panel/partials/sidebar.blade.php`
+- `resources/views/panel/instructor/index.blade.php`
+- `resources/views/panel/admin/events/list.blade.php`
+- `resources/views/panel/admin/events/form.blade.php`
+
+---
+
 ## [2026-05-26] - Implementação de Venda de Áreas para Expositores em Eventos
 
 ### Adicionado

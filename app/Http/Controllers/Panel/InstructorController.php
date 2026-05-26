@@ -51,6 +51,7 @@ class InstructorController extends Controller
             'courses' => $user->hasPermission('courses.view') || $user->canAccessFeature('courses_access'),
             'mentorships' => $user->hasPermission('mentorships.view') || $user->canAccessFeature('mentorships_access'),
             'events' => $user->hasPermission('events.view') || $user->canAccessFeature('events_access'),
+            'exhibitors' => method_exists($user, 'canManageEventExhibitors') && $user->canManageEventExhibitors(),
             'certificates' => $user->hasPermission('certificates.view') || $user->canAccessFeature('certificates_access'),
             'jobs' => $user->canAccessFeature('vagas_create'),
             'marketplace' => $user->canSellOnMarketplace(),
