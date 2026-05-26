@@ -1,5 +1,100 @@
 @extends('panel.layouts.app')
 
+@push('styles')
+    <style>
+        .panel-users-pagination {
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+            align-items: stretch;
+        }
+
+        @media (min-width: 640px) {
+            .panel-users-pagination {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .panel-users-pagination__summary {
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .dark .panel-users-pagination__summary {
+            color: #94a3b8;
+        }
+
+        .panel-users-pagination__nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .panel-users-pagination__item {
+            min-width: 2.5rem;
+            height: 2.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.875rem;
+            background: #ffffff;
+            color: #475569;
+            font-size: 0.875rem;
+            font-weight: 800;
+            line-height: 1;
+            transition: all 0.15s ease;
+        }
+
+        .dark .panel-users-pagination__item {
+            border-color: #334155;
+            background: #0f172a;
+            color: #cbd5e1;
+        }
+
+        .panel-users-pagination__item:hover {
+            border-color: #93c5fd;
+            background: #eff6ff;
+            color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .dark .panel-users-pagination__item:hover {
+            border-color: #2563eb;
+            background: rgba(37, 99, 235, 0.16);
+            color: #93c5fd;
+        }
+
+        .panel-users-pagination__item--active {
+            border-color: #2563eb;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
+        }
+
+        .panel-users-pagination__item--disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        .panel-users-pagination__ellipsis {
+            min-width: 2rem;
+            height: 2.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-weight: 900;
+        }
+    </style>
+@endpush
+
 @section('title', 'Usuários')
 
 @section('panel_breadcrumb')
@@ -165,7 +260,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-10 text-center text-slate-400 dark:text-slate-500">
+                                <td colspan="6" class="px-6 py-10 text-center text-slate-400 dark:text-slate-500">
                                     <div class="flex flex-col items-center gap-2">
                                         <i class="fas fa-users text-4xl opacity-20"></i>
                                         <p>Nenhum usuário encontrado.</p>
@@ -178,7 +273,63 @@
             </div>
             @if($users->hasPages())
                 <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
-                    {{ $users->links() }}
+                    @php
+                        $users->appends(request()->query());
+                        $paginaAtual = $users->currentPage();
+                        $ultimaPagina = $users->lastPage();
+                        $inicioJanela = max(1, $paginaAtual - 1);
+                        $fimJanela = min($ultimaPagina, $paginaAtual + 1);
+                    @endphp
+
+                    <div class="panel-users-pagination">
+                        <div class="panel-users-pagination__summary">
+                            Mostrando {{ $users->firstItem() }} a {{ $users->lastItem() }} de {{ $users->total() }} usuários
+                        </div>
+
+                        <nav class="panel-users-pagination__nav" aria-label="Paginação de usuários">
+                            @if($users->onFirstPage())
+                                <span class="panel-users-pagination__item panel-users-pagination__item--disabled" aria-disabled="true">
+                                    <i class="fas fa-chevron-left"></i>
+                                </span>
+                            @else
+                                <a href="{{ $users->previousPageUrl() }}" class="panel-users-pagination__item" rel="prev" aria-label="Página anterior">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            @endif
+
+                            @if($inicioJanela > 1)
+                                <a href="{{ $users->url(1) }}" class="panel-users-pagination__item">1</a>
+                                @if($inicioJanela > 2)
+                                    <span class="panel-users-pagination__ellipsis">...</span>
+                                @endif
+                            @endif
+
+                            @for($pagina = $inicioJanela; $pagina <= $fimJanela; $pagina++)
+                                @if($pagina === $paginaAtual)
+                                    <span class="panel-users-pagination__item panel-users-pagination__item--active" aria-current="page">{{ $pagina }}</span>
+                                @else
+                                    <a href="{{ $users->url($pagina) }}" class="panel-users-pagination__item">{{ $pagina }}</a>
+                                @endif
+                            @endfor
+
+                            @if($fimJanela < $ultimaPagina)
+                                @if($fimJanela < $ultimaPagina - 1)
+                                    <span class="panel-users-pagination__ellipsis">...</span>
+                                @endif
+                                <a href="{{ $users->url($ultimaPagina) }}" class="panel-users-pagination__item">{{ $ultimaPagina }}</a>
+                            @endif
+
+                            @if($users->hasMorePages())
+                                <a href="{{ $users->nextPageUrl() }}" class="panel-users-pagination__item" rel="next" aria-label="Próxima página">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            @else
+                                <span class="panel-users-pagination__item panel-users-pagination__item--disabled" aria-disabled="true">
+                                    <i class="fas fa-chevron-right"></i>
+                                </span>
+                            @endif
+                        </nav>
+                    </div>
                 </div>
             @endif
         </div>
