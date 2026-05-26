@@ -25,10 +25,10 @@
         .event-hero-premium {
             position: relative;
             isolation: isolate;
-            min-height: 720px;
-            padding: 128px 24px 72px;
+            min-height: auto;
+            padding: 96px 24px 44px;
             overflow: hidden;
-            background: #071225;
+            background: #eef6ff;
         }
 
         .event-hero-premium::before {
@@ -37,9 +37,9 @@
             inset: 0;
             z-index: -2;
             background:
-                linear-gradient(90deg, rgba(7, 18, 37, 0.94) 0%, rgba(10, 29, 61, 0.80) 45%, rgba(8, 22, 45, 0.74) 100%),
-                radial-gradient(circle at 74% 20%, rgba(23, 127, 214, 0.38), transparent 26rem),
-                radial-gradient(circle at 18% 88%, rgba(16, 185, 129, 0.18), transparent 22rem);
+                linear-gradient(90deg, rgba(248, 250, 252, 0.86) 0%, rgba(239, 246, 255, 0.72) 55%, rgba(219, 234, 254, 0.70) 100%),
+                radial-gradient(circle at 74% 20%, rgba(23, 127, 214, 0.22), transparent 24rem),
+                radial-gradient(circle at 18% 88%, rgba(16, 185, 129, 0.10), transparent 20rem);
         }
 
         .event-hero-bg {
@@ -60,20 +60,20 @@
 
         .event-hero-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
-            gap: 40px;
-            align-items: center;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 390px);
+            gap: 24px;
+            align-items: start;
         }
 
         .event-copy-panel {
             max-width: 760px;
-            color: #ffffff;
-            padding: clamp(24px, 4vw, 40px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 34px;
-            background: rgba(3, 7, 18, 0.70);
-            box-shadow: 0 32px 90px rgba(0, 0, 0, 0.28);
-            backdrop-filter: blur(20px);
+            color: #0f172a;
+            padding: clamp(20px, 3vw, 28px);
+            border: 1px solid rgba(191, 219, 254, 0.92);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 18px 46px rgba(15, 23, 42, 0.14);
+            backdrop-filter: blur(16px);
         }
 
         .event-back-link {
@@ -82,18 +82,18 @@
             gap: 10px;
             min-height: 44px;
             padding: 10px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.24);
+            border: 1px solid rgba(191, 219, 254, 0.92);
             border-radius: 999px;
-            color: rgba(255, 255, 255, 0.92);
-            background: rgba(255, 255, 255, 0.10);
+            color: #1d4ed8;
+            background: rgba(255, 255, 255, 0.86);
             backdrop-filter: blur(14px);
             font-weight: 800;
             transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
         }
 
         .event-back-link:hover {
-            color: #ffffff;
-            background: rgba(255, 255, 255, 0.18);
+            color: #1e3a8a;
+            background: #ffffff;
             transform: translateY(-1px);
         }
 
@@ -111,9 +111,9 @@
             min-height: 36px;
             padding: 8px 12px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.14);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            color: #ffffff;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
             font-size: 0.78rem;
             font-weight: 900;
             text-transform: uppercase;
@@ -124,72 +124,71 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            color: #a7f3d0;
-            font-size: 0.82rem;
+            color: #1d4ed8;
+            font-size: 0.78rem;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.16em;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .event-title-premium {
-            color: #ffffff;
-            font-size: clamp(2.8rem, 6vw, 5.8rem);
-            line-height: 0.94;
+            color: #0f172a;
+            font-size: clamp(2rem, 4vw, 3.45rem);
+            line-height: 1.04;
             font-weight: 950;
-            letter-spacing: -0.04em;
+            letter-spacing: -0.03em;
             max-width: 820px;
             text-wrap: balance;
-            text-shadow: 0 24px 60px rgba(0, 0, 0, 0.40);
+            text-shadow: none;
         }
 
         .event-speaker-premium,
         .event-summary-premium {
-            color: rgba(255, 255, 255, 0.88);
-            text-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+            color: #334155;
+            text-shadow: none;
         }
 
         .event-summary-premium {
             max-width: 720px;
-            margin-top: 22px;
-            font-size: clamp(1rem, 1.8vw, 1.24rem);
-            line-height: 1.7;
+            margin-top: 14px;
+            font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+            line-height: 1.65;
         }
 
         .event-fact-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-            margin-top: 32px;
+            gap: 12px;
+            margin-top: 22px;
         }
 
         .event-fact {
             display: flex;
             gap: 14px;
             align-items: flex-start;
-            min-height: 112px;
-            padding: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 24px;
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-            backdrop-filter: blur(18px);
+            min-height: 92px;
+            padding: 14px;
+            border: 1px solid #dbeafe;
+            border-radius: 18px;
+            background: #f8fbff;
+            box-shadow: none;
         }
 
         .event-fact-icon {
-            width: 44px;
-            height: 44px;
-            flex: 0 0 44px;
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
             display: grid;
             place-items: center;
-            border-radius: 16px;
-            color: #06142a;
-            background: #ffffff;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+            border-radius: 14px;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-2));
+            box-shadow: 0 10px 22px rgba(31, 94, 219, 0.18);
         }
 
         .event-fact-label {
-            color: rgba(255, 255, 255, 0.66);
+            color: #64748b;
             font-size: 0.76rem;
             font-weight: 900;
             text-transform: uppercase;
@@ -198,8 +197,8 @@
 
         .event-fact-value {
             margin-top: 5px;
-            color: #ffffff;
-            font-size: 1rem;
+            color: #0f172a;
+            font-size: 0.95rem;
             line-height: 1.45;
             font-weight: 850;
         }
@@ -208,7 +207,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
-            margin-top: 30px;
+            margin-top: 18px;
         }
 
         .event-hero-action {
@@ -216,9 +215,9 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            min-height: 52px;
-            padding: 14px 20px;
-            border-radius: 18px;
+            min-height: 46px;
+            padding: 12px 16px;
+            border-radius: 14px;
             font-weight: 950;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
@@ -228,31 +227,31 @@
         }
 
         .event-hero-action-primary {
-            color: #071225;
-            background: #ffffff;
-            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-2));
+            box-shadow: 0 14px 32px rgba(31, 94, 219, 0.22);
         }
 
         .event-hero-action-secondary {
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            background: rgba(255, 255, 255, 0.12);
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            background: #ffffff;
             backdrop-filter: blur(14px);
         }
 
         .event-purchase-card {
             position: sticky;
-            top: 112px;
+            top: 96px;
             overflow: hidden;
-            border-radius: 34px;
+            border-radius: 24px;
             background: #ffffff;
-            box-shadow: 0 34px 90px rgba(2, 6, 23, 0.32);
-            border: 1px solid rgba(255, 255, 255, 0.72);
+            box-shadow: 0 18px 46px rgba(15, 23, 42, 0.16);
+            border: 1px solid #dbeafe;
         }
 
         .event-purchase-media {
             position: relative;
-            min-height: 190px;
+            min-height: 152px;
             background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-2));
         }
 
@@ -287,7 +286,7 @@
 
         .event-price-premium {
             color: #071225;
-            font-size: clamp(2.5rem, 4vw, 3.7rem);
+            font-size: clamp(2rem, 3vw, 2.65rem);
             line-height: 0.95;
             font-weight: 950;
             letter-spacing: -0.05em;
@@ -295,9 +294,9 @@
 
         .event-seat-box {
             border: 1px solid #dbeafe;
-            border-radius: 22px;
+            border-radius: 18px;
             background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
-            padding: 16px;
+            padding: 14px;
         }
 
         .event-trust-row {
@@ -320,7 +319,7 @@
         }
 
         .event-details-section {
-            margin-top: -28px;
+            margin-top: 0;
             position: relative;
             z-index: 3;
         }
@@ -345,13 +344,63 @@
             color: #0f172a;
         }
 
+        .event-exhibitor-band {
+            border: 1px solid #bfdbfe;
+            border-radius: 26px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(239, 246, 255, 0.96)),
+                radial-gradient(circle at 92% 8%, rgba(23, 127, 214, 0.18), transparent 18rem);
+            box-shadow: 0 20px 52px rgba(31, 94, 219, 0.12);
+            overflow: hidden;
+        }
+
+        .event-exhibitor-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(260px, 330px);
+            gap: 22px;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .event-exhibitor-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-2));
+            box-shadow: 0 14px 34px rgba(31, 94, 219, 0.22);
+        }
+
+        .event-exhibitor-metric {
+            border: 1px solid #dbeafe;
+            border-radius: 18px;
+            background: #ffffff;
+            padding: 14px;
+        }
+
+        .event-exhibitor-media {
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            border-radius: 20px;
+            background: #dbeafe;
+        }
+
+        .event-exhibitor-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         @media (max-width: 1024px) {
             .event-hero-premium {
-                padding-top: 112px;
+                padding-top: 92px;
                 min-height: auto;
             }
 
-            .event-hero-grid {
+            .event-hero-grid,
+            .event-exhibitor-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -363,11 +412,11 @@
 
         @media (max-width: 640px) {
             .event-hero-premium {
-                padding: 104px 16px 48px;
+                padding: 84px 16px 34px;
             }
 
             .event-title-premium {
-                font-size: clamp(2.35rem, 15vw, 3.4rem);
+                font-size: clamp(1.85rem, 10vw, 2.5rem);
             }
 
             .event-fact-grid,
@@ -384,8 +433,12 @@
             }
 
             .event-copy-panel {
-                padding: 22px;
-                border-radius: 28px;
+                padding: 18px;
+                border-radius: 22px;
+            }
+
+            .event-exhibitor-grid {
+                padding: 18px;
             }
         }
     </style>
@@ -488,6 +541,11 @@
         $ticketPriceLabel = $event->current_price > 0
             ? 'R$ ' . number_format((float) $event->current_price, 2, ',', '.')
             : 'Gratuito';
+        $exhibitorDescriptionSource = preg_replace('/<\s*(br|\/p|\/div|\/li|\/h[1-6])\s*\/?>/i', ' ', (string) ($event->exhibitor_description ?? ''));
+        $exhibitorSummary = trim(preg_replace('/\s+/', ' ', strip_tags((string) $exhibitorDescriptionSource)));
+        $exhibitorSummary = $exhibitorSummary !== ''
+            ? \Illuminate\Support\Str::limit($exhibitorSummary, 220)
+            : 'Espaco comercial para marcas, empresas e profissionais apresentarem produtos, servicos e conexoes durante o evento.';
         $startDateLabel = $startDate ? $startDate->translatedFormat('d/m/Y (l)') : 'Data a confirmar';
         $startTimeLabel = $startDate ? $startDate->format('H:i') : 'Horario a confirmar';
         $endTimeLabel = $endDate ? $endDate->format('H:i') : null;
@@ -515,14 +573,14 @@
             @if($eventImageUrl)
                 <div class="absolute inset-0 pointer-events-none overflow-hidden">
                     <img src="{{ $eventImageUrl }}" alt=""
-                        class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.18] brightness-90"
-                        style="filter: blur({{ max(18, (int) round($eventsHeroBlurPx * 0.55)) }}px); opacity: 0.70;" loading="lazy" aria-hidden="true">
+                        class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.12] brightness-105"
+                        style="filter: blur({{ max(14, (int) round($eventsHeroBlurPx * 0.42)) }}px); opacity: 0.72;" loading="lazy" aria-hidden="true">
 
                     <!-- Película transparente em cor degradê -->
                     <div class="absolute inset-0" style="background: linear-gradient(115deg,
-                            rgba(3, 7, 18, 0.58) 0%,
-                            {{ $hexToRgba($sitePrimary, 0.20 * $eventsHeroFilmScale) }} 48%,
-                            rgba(7, 18, 37, 0.52) 100%);">
+                            rgba(248, 250, 252, 0.74) 0%,
+                            {{ $hexToRgba($sitePrimary, 0.12 * $eventsHeroFilmScale) }} 48%,
+                            rgba(239, 246, 255, 0.70) 100%);">
                     </div>
                 </div>
             @endif
@@ -563,22 +621,22 @@
                         <h1 class="event-title-premium">{{ $event->title }}</h1>
 
                         @if($event->speaker)
-                            <p class="text-lg sm:text-xl font-semibold mb-4 md:mb-6 text-white/90 drop-shadow">
+                            <p class="event-speaker-premium mt-3 text-base font-bold sm:text-lg">
                                 <i class="fas fa-user-tie mr-2"></i> {{ $event->speaker }}
                             </p>
                         @endif
 
                         <p class="event-summary-premium">{{ $heroSummary }}</p>
 
-                        <div class="grid sm:grid-cols-2 gap-4 mb-8">
-                            <div class="bg-white rounded-2xl p-5 shadow-lg">
+                        <div class="event-fact-grid">
+                            <div class="event-fact">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-14 h-14 btn-primary rounded-xl flex items-center justify-center">
-                                        <i class="fas fa-calendar-alt text-white text-xl"></i>
+                                    <div class="event-fact-icon">
+                                        <i class="fas fa-calendar-alt"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500">Data</p>
-                                        <p class="text-lg font-bold text-gray-900">
+                                        <p class="event-fact-label">Data</p>
+                                        <p class="event-fact-value">
                                             {{ $startDate->translatedFormat('d \d\e F \d\e Y') }}</p>
                                         @if($endDate && !$startDate->isSameDay($endDate))
                                             <p class="text-sm text-gray-500">até {{ $endDate->translatedFormat('d \d\e F \d\e Y') }}</p>
@@ -586,15 +644,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-white rounded-2xl p-5 shadow-lg">
+                            <div class="event-fact">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-14 h-14 rounded-xl flex items-center justify-center"
-                                        style="background: linear-gradient(135deg, #10B981, #14B8A6)">
-                                        <i class="fas fa-clock text-white text-xl"></i>
+                                    <div class="event-fact-icon">
+                                        <i class="fas fa-clock"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500">Horário</p>
-                                        <p class="text-lg font-bold text-gray-900">
+                                        <p class="event-fact-label">Horario</p>
+                                        <p class="event-fact-value">
                                             {{ $startDate->format('H:i') }}
                                             @if($endDate) às {{ $endDate->format('H:i') }} @endif
                                         </p>
@@ -813,6 +870,78 @@
                 </div>
             </div>
         </section>
+
+        @if($showExhibitorOption)
+            <section class="px-4 py-8 md:px-12 lg:px-24">
+                <div class="event-shell">
+                    <div class="event-exhibitor-band">
+                        <div class="event-exhibitor-grid">
+                            <div>
+                                <div class="mb-4 flex items-center gap-4">
+                                    <div class="event-exhibitor-icon">
+                                        <i class="fas fa-store"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-black uppercase tracking-[0.16em] text-blue-700">Espaco comercial</p>
+                                        <h2 class="text-2xl font-black leading-tight text-slate-950 md:text-3xl">Areas para expositores</h2>
+                                    </div>
+                                </div>
+
+                                <p class="max-w-3xl text-base leading-relaxed text-slate-600">{{ $exhibitorSummary }}</p>
+
+                                <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                                    <div class="event-exhibitor-metric">
+                                        <p class="text-xs font-black uppercase tracking-[0.10em] text-slate-500">Lote atual</p>
+                                        <p class="mt-1 text-lg font-black text-slate-950">{{ $exhibitorBatch ?: 'Indisponivel' }}</p>
+                                    </div>
+                                    <div class="event-exhibitor-metric">
+                                        <p class="text-xs font-black uppercase tracking-[0.10em] text-slate-500">Valor</p>
+                                        <p class="mt-1 text-lg font-black text-slate-950">
+                                            {{ $exhibitorPrice ? 'R$ ' . number_format((float) $exhibitorPrice, 2, ',', '.') : 'Sob consulta' }}
+                                        </p>
+                                    </div>
+                                    <div class="event-exhibitor-metric">
+                                        <p class="text-xs font-black uppercase tracking-[0.10em] text-slate-500">Disponibilidade</p>
+                                        <p class="mt-1 text-lg font-black {{ $canSellExhibitor ? 'text-emerald-700' : 'text-red-700' }}">
+                                            {{ $canSellExhibitor ? ((int) $exhibitorRemaining . ' restante(s)') : ($exhibitorStatus['label'] ?? 'Indisponivel') }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                @if($event->exhibitor_includes_ticket)
+                                    <p class="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-black text-emerald-700">
+                                        <i class="fas fa-ticket-alt"></i> Ingresso incluso no pacote de expositor
+                                    </p>
+                                @endif
+                            </div>
+
+                            <div>
+                                @if($event->exhibitor_area_image_url)
+                                    <div class="event-exhibitor-media mb-4">
+                                        <img src="{{ $event->exhibitor_area_image_url }}" alt="Planta ou mapa da area de expositores" loading="lazy">
+                                    </div>
+                                @endif
+
+                                @if($canSellExhibitor)
+                                    <a href="{{ route('events.exhibitor.show', $event) }}"
+                                        class="btn-primary flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-black text-white shadow-lg transition hover:shadow-xl">
+                                        <i class="fas fa-store"></i> Comprar area para expositor
+                                    </a>
+                                @elseif(($exhibitorStatus['key'] ?? '') === 'esgotado')
+                                    <div class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-center text-sm font-black text-red-700">
+                                        Areas para expositores esgotadas
+                                    </div>
+                                @else
+                                    <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-center text-sm font-black text-slate-600">
+                                        Venda de areas para expositores indisponivel no momento
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endif
 
         <!-- Location Section -->
         <section class="py-16 px-6 md:px-12 lg:px-24">
