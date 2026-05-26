@@ -134,11 +134,11 @@
 
         .event-title-premium {
             color: #0f172a;
-            font-size: clamp(2rem, 4vw, 3.45rem);
-            line-height: 1.04;
-            font-weight: 950;
-            letter-spacing: -0.03em;
-            max-width: 820px;
+            font-size: clamp(1.8rem, 3.25vw, 2.85rem);
+            line-height: 1.10;
+            font-weight: 900;
+            letter-spacing: 0;
+            max-width: 760px;
             text-wrap: balance;
             text-shadow: none;
         }
@@ -216,9 +216,10 @@
             justify-content: center;
             gap: 10px;
             min-height: 46px;
-            padding: 12px 16px;
+            padding: 12px 18px;
             border-radius: 14px;
-            font-weight: 950;
+            font-size: 0.95rem;
+            font-weight: 900;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
 
@@ -237,6 +238,44 @@
             border: 1px solid #bfdbfe;
             background: #ffffff;
             backdrop-filter: blur(14px);
+        }
+
+        .event-action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 46px;
+            width: 100%;
+            padding: 12px 18px;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 900;
+            line-height: 1.1;
+            white-space: normal;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .event-action-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .event-action-button-primary {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-2));
+            box-shadow: 0 12px 28px rgba(31, 94, 219, 0.22);
+        }
+
+        .event-action-button-secondary {
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+        }
+
+        .event-action-button-muted {
+            color: #475569;
+            background: #e2e8f0;
         }
 
         .event-purchase-card {
@@ -270,6 +309,25 @@
             background: linear-gradient(180deg, transparent 0%, rgba(2, 6, 23, 0.56) 100%);
         }
 
+        .event-card-ribbon {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 10;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 34px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #0f766e;
+            font-size: 0.76rem;
+            font-weight: 900;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+            backdrop-filter: blur(10px);
+        }
+
         .event-batch-badge {
             display: inline-flex;
             align-items: center;
@@ -300,12 +358,16 @@
         }
 
         .event-trust-row {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            background: #f8fbff;
             color: #475569;
-            font-size: 0.82rem;
-            font-weight: 800;
+            font-size: 0.80rem;
+            font-weight: 850;
         }
 
         .event-trust-row span {
@@ -313,9 +375,15 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            min-height: 42px;
-            border-radius: 14px;
-            background: #f8fafc;
+            min-height: 34px;
+            flex: 1 1 130px;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #334155;
+        }
+
+        .event-trust-row i {
+            color: #1d4ed8;
         }
 
         .event-details-section {
@@ -416,7 +484,7 @@
             }
 
             .event-title-premium {
-                font-size: clamp(1.85rem, 10vw, 2.5rem);
+                font-size: clamp(1.65rem, 8.8vw, 2.25rem);
             }
 
             .event-fact-grid,
@@ -719,14 +787,14 @@
                                 <div class="event-purchase-media">
                                     <img src="{{ $eventImageUrl }}" alt="Imagem do evento"
                                         class="absolute inset-0 w-full h-full object-cover" loading="lazy">
-                                    <div class="absolute bottom-4 left-4 right-4 z-10 flex items-end justify-between gap-3">
+                                    <span class="event-card-ribbon">
+                                        <i class="fas fa-shield-halved"></i> Pagamento seguro
+                                    </span>
+                                    <div class="absolute bottom-4 left-4 right-4 z-10">
                                         <div>
                                             <p class="text-xs font-black uppercase tracking-[0.18em] text-white/75">Ingresso oficial</p>
                                             <p class="mt-1 text-base font-black leading-tight text-white">{{ \Illuminate\Support\Str::limit($event->title, 42) }}</p>
                                         </div>
-                                        <span class="rounded-full bg-white/95 px-3 py-2 text-xs font-black text-slate-900 shadow-lg">
-                                            <i class="fas fa-shield-halved mr-1 text-emerald-600"></i> Seguro
-                                        </span>
                                     </div>
                                 </div>
                             @else
@@ -801,7 +869,7 @@
                                         @if($event->is_ticket_enabled && $userRegistration->ticket_code)
                                             <button type="button"
                                                 onclick='showTicketModal({!! json_encode($ticketPayload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!})'
-                                                class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
+                                                class="event-action-button event-action-button-primary">
                                                 <i class="fas fa-qrcode"></i> Ver Ingresso Digital
                                             </button>
                                             @if($ticketUsed)
@@ -818,31 +886,31 @@
                                         {{-- Botão para comprar ingressos adicionais --}}
                                         @if(!$isClosed && $remainingSeats !== 0)
                                             <a href="{{ route('events.checkout', $event) }}"
-                                                class="w-full mt-3 border-2 border-blue-600 text-blue-700 bg-blue-50 hover:bg-blue-100 py-3 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                                                class="event-action-button event-action-button-secondary mt-3">
                                                 <i class="fas fa-plus-circle"></i> Comprar mais ingressos
                                             </a>
                                         @endif
                                     </div>
                                 @elseif($isClosed)
                                     <a href="{{ route('events.index') }}"
-                                        class="w-full bg-gray-200 text-gray-700 py-4 rounded-2xl font-bold text-lg hover:bg-gray-300 transition flex items-center justify-center gap-2">
+                                        class="event-action-button event-action-button-muted">
                                         <i class="fas fa-calendar-check"></i> Ver próximos eventos
                                     </a>
                                 @elseif($isDemo)
                                     <button type="button" data-demo="1"
-                                        class="js-demo-event-alert w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg opacity-75 cursor-not-allowed flex items-center justify-center gap-2">
+                                        class="js-demo-event-alert event-action-button event-action-button-primary cursor-not-allowed opacity-75">
                                         <i class="fas fa-ticket-alt"></i>
                                         {{ $event->current_price > 0 ? 'Comprar Ingresso' : 'Garantir Minha Vaga' }}
                                     </button>
                                 @elseif($event->capacity && $remainingSeats === 0)
                                     <button
-                                        class="w-full bg-gray-200 text-gray-700 py-4 rounded-2xl font-bold text-lg cursor-not-allowed flex items-center justify-center gap-2"
+                                        class="event-action-button event-action-button-muted cursor-not-allowed"
                                         disabled>
                                         <i class="fas fa-ban"></i> Esgotado
                                     </button>
                                 @else
                                     <a href="{{ route('events.checkout', $event) }}"
-                                        class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
+                                        class="event-action-button event-action-button-primary">
                                         <i class="fas fa-ticket-alt"></i>
                                         {{ $event->current_price > 0 ? 'Comprar Ingresso' : 'Garantir Minha Vaga' }}
                                     </a>
@@ -866,7 +934,7 @@
                                                         </p>
                                                     @endif
                                                     <a href="{{ route('events.exhibitor.show', $event) }}"
-                                                        class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-black text-blue-800 shadow-sm transition hover:bg-blue-100">
+                                                        class="event-action-button event-action-button-secondary mt-3">
                                                         <i class="fas fa-arrow-right"></i> Quero expor neste evento
                                                     </a>
                                                 @elseif(($exhibitorStatus['key'] ?? '') === 'esgotado')
