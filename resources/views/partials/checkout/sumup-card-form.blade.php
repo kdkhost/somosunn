@@ -512,6 +512,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const data = res.data;
+            if (data.status === 'PAID' || data.status === 'SUCCESSFUL') {
+                if (typeof toastr !== 'undefined') toastr.success('Pagamento confirmado!');
+                setTimeout(function() { window.location.href = SUCCESS_URL; }, 800);
+                return;
+            }
+
             console.log('PIX data received:', {
                 checkout_id: data.checkout_id,
                 has_qr_base64: !!data.qr_code_base64,

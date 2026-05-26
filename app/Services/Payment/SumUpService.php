@@ -2,6 +2,7 @@
 
 namespace App\Services\Payment;
 
+use App\Http\Controllers\PaymentWebhookController;
 use App\Models\GatewayAccount;
 use App\Models\Order;
 use App\Models\Setting;
@@ -282,6 +283,139 @@ class SumUpService
     }
 
     /**
+     * Reconcilia transacoes SumUp do pedido consultando a API oficial.
+     *
+     * O webhook pode falhar ou chegar depois do polling. Neste caso, uma
+     * transacao paga antiga nao pode ficar escondida por um checkout pendente
+     * mais recente do mesmo pedido.
+     */
+    public function reconcileOrderTransactions(
+        Order $order,
+        ?string $preferredCheckoutId = null,
+        bool $settlePaidOrder = true
+    ): array {
+        $summary = [
+            'order_id'        => $order->id,
+            'checked'         => 0,
+            'paid'            => false,
+            'settled'         => false,
+            'status'          => (string) ($order->status === 'paid' ? 'PAID' : 'PENDING'),
+            'checkout_id'     => null,
+            'transaction_id'  => null,
+            'payment_method'  => null,
+            'transactions'    => [],
+        ];
+
+        $localPaid = SumUpTransaction::query()
+            ->where('order_id', $order->id)
+            ->where('status', 'PAID')
+            ->latest('id')
+            ->first();
+
+        if ($localPaid && (string) $order->status === 'paid') {
+            return array_merge($summary, [
+                'paid'           => true,
+                'status'         => 'PAID',
+                'checkout_id'    => $localPaid->checkout_id,
+                'transaction_id' => $localPaid->transaction_id,
+                'payment_method' => $this->paymentMethodFromTransaction($localPaid, []),
+            ]);
+        }
+
+        $transactions = SumUpTransaction::query()
+            ->where('order_id', $order->id)
+            ->orderByDesc('id')
+            ->get();
+
+        if ($transactions->isEmpty()) {
+            return $summary;
+        }
+
+        if ($preferredCheckoutId) {
+            $transactions = $transactions
+                ->sortByDesc(fn (SumUpTransaction $transaction) => $transaction->checkout_id === $preferredCheckoutId ? 1 : 0)
+                ->values();
+        }
+
+        $config = $this->getSellerConfig($order);
+
+        foreach ($transactions as $transaction) {
+            if (empty($transaction->checkout_id)) {
+                continue;
+            }
+
+            try {
+                $checkout = $this->getCheckout($transaction->checkout_id, $config['api_key']);
+            } catch (\Throwable $e) {
+                Log::warning('SumUp reconcile: falha ao consultar checkout', [
+                    'order_id'    => $order->id,
+                    'checkout_id' => $transaction->checkout_id,
+                    'error'       => $e->getMessage(),
+                ]);
+                continue;
+            }
+
+            $summary['checked']++;
+
+            $status = $this->normalizeCheckoutStatus($checkout);
+            $transactionId = $this->extractTransactionId($checkout) ?: $transaction->transaction_id;
+            $paymentMethod = $this->paymentMethodFromTransaction($transaction, $checkout);
+            $paidAmount = $this->extractCheckoutAmount($checkout);
+
+            $transaction->forceFill([
+                'status'         => $status,
+                'transaction_id' => $transactionId,
+                'amount'         => $paidAmount ?: $transaction->amount,
+                'raw_response'   => $checkout,
+            ])->save();
+
+            $summary['transactions'][] = [
+                'id'             => $transaction->id,
+                'checkout_id'    => $transaction->checkout_id,
+                'status'         => $status,
+                'transaction_id' => $transactionId,
+            ];
+
+            if ($status !== 'PAID') {
+                if (!$summary['paid'] && $summary['checkout_id'] === null) {
+                    $summary['status'] = $status;
+                    $summary['checkout_id'] = $transaction->checkout_id;
+                }
+                continue;
+            }
+
+            $summary['paid'] = true;
+            $summary['status'] = 'PAID';
+            $summary['checkout_id'] = $transaction->checkout_id;
+            $summary['transaction_id'] = $transactionId;
+            $summary['payment_method'] = $paymentMethod;
+
+            if ($settlePaidOrder && (string) $order->status !== 'paid') {
+                $order = $this->prepareOrderForPaidCheckout($order, $paymentMethod, $paidAmount);
+
+                $payload = array_merge($checkout, [
+                    'event_type'      => 'sumup.reconciled',
+                    'reconciled_at'   => now()->toIso8601String(),
+                    'checkout_id'     => $transaction->checkout_id,
+                    'transaction_id'  => $transactionId,
+                    'payment_method'  => $paymentMethod,
+                    'sumup_tx_id'     => $transaction->id,
+                ]);
+
+                app(PaymentWebhookController::class)
+                    ->processPaidOrder($order, $transactionId ?: $transaction->checkout_id, $payload);
+
+                $summary['settled'] = true;
+                $order->refresh();
+            }
+
+            break;
+        }
+
+        return $summary;
+    }
+
+    /**
      * Cancela um checkout SumUp pendente.
      */
     public function cancelCheckout(string $checkoutId): array
@@ -477,6 +611,102 @@ class SumUpService
     {
         return (string) (Setting::get('sumup_merchant_code') ?: config('payments.sumup.merchant_code', ''));
     }
+
+    private function normalizeCheckoutStatus(array $checkout): string
+    {
+        $statuses = [
+            strtoupper((string) ($checkout['status'] ?? '')),
+            strtoupper((string) data_get($checkout, 'transaction.status', '')),
+        ];
+
+        foreach ((array) data_get($checkout, 'transactions', []) as $transaction) {
+            $statuses[] = strtoupper((string) ($transaction['status'] ?? ''));
+        }
+
+        if (array_intersect($statuses, ['PAID', 'SUCCESSFUL', 'SUCCESS'])) {
+            return 'PAID';
+        }
+
+        if (array_intersect($statuses, ['REFUNDED'])) {
+            return 'REFUNDED';
+        }
+
+        if (array_intersect($statuses, ['FAILED', 'FAIL', 'CANCELLED', 'CANCELED', 'EXPIRED'])) {
+            return 'FAILED';
+        }
+
+        return 'PENDING';
+    }
+
+    private function extractTransactionId(array $checkout): ?string
+    {
+        foreach ((array) data_get($checkout, 'transactions', []) as $transaction) {
+            $id = $transaction['id'] ?? $transaction['transaction_id'] ?? null;
+            if ($id && in_array(strtoupper((string) ($transaction['status'] ?? '')), ['SUCCESSFUL', 'SUCCESS', 'PAID'], true)) {
+                return (string) $id;
+            }
+        }
+
+        foreach ((array) data_get($checkout, 'transactions', []) as $transaction) {
+            $id = $transaction['id'] ?? $transaction['transaction_id'] ?? null;
+            if ($id) {
+                return (string) $id;
+            }
+        }
+
+        $id = $checkout['transaction_id']
+            ?? data_get($checkout, 'transaction.id')
+            ?? null;
+
+        return $id ? (string) $id : null;
+    }
+
+    private function extractCheckoutAmount(array $checkout): ?float
+    {
+        $amount = $checkout['amount']
+            ?? data_get($checkout, 'transaction.amount')
+            ?? data_get($checkout, 'transactions.0.amount')
+            ?? null;
+
+        return is_numeric($amount) ? round((float) $amount, 2) : null;
+    }
+
+    private function paymentMethodFromTransaction(SumUpTransaction $transaction, array $checkout): string
+    {
+        $method = (string) (
+            data_get($checkout, 'payment_type')
+            ?? data_get($checkout, 'transaction.payment_type')
+            ?? data_get($checkout, 'transactions.0.payment_type')
+            ?? $transaction->payment_type
+            ?? ''
+        );
+
+        $method = strtolower($method);
+
+        return str_contains($method, 'pix') ? 'pix' : 'card';
+    }
+
+    private function prepareOrderForPaidCheckout(Order $order, string $paymentMethod, ?float $paidAmount): Order
+    {
+        $metadata = $order->metadata ?? [];
+        $updates = [
+            'payment_method' => $paymentMethod,
+            'metadata'       => array_merge($metadata, [
+                'sumup_reconciled_at' => now()->toIso8601String(),
+            ]),
+        ];
+
+        if ($paidAmount && abs($paidAmount - (float) $order->total_amount) > 0.009) {
+            $updates['total_amount'] = $paidAmount;
+            $updates['metadata']['sumup_reconciled_previous_total'] = (float) $order->total_amount;
+            $updates['metadata']['sumup_reconciled_amount'] = $paidAmount;
+        }
+
+        $order->forceFill($updates)->save();
+
+        return $order->fresh();
+    }
+
     private function buildWebhookUrl(int $orderId, string $token): string
     {
         return url("/webhook/sumup/{$orderId}/{$token}");

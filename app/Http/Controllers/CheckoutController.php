@@ -542,6 +542,19 @@ class CheckoutController extends Controller
         abort_unless(Auth::check() && Auth::id() === $order->user_id, 403);
 
         try {
+            $sync = $sumUpService->reconcileOrderTransactions($order);
+            $order->refresh();
+
+            if ((string) $order->status === 'paid' || ($sync['paid'] ?? false)) {
+                return response()->json([
+                    'success'        => true,
+                    'status'         => 'PAID',
+                    'checkout_id'    => $sync['checkout_id'] ?? null,
+                    'transaction_id' => $sync['transaction_id'] ?? $order->transaction_id,
+                    'message'        => 'Pedido ja esta pago.',
+                ]);
+            }
+
             $result = $sumUpService->processPixCheckout($order);
 
             Log::debug('SumUp PIX result', [
@@ -610,7 +623,25 @@ class CheckoutController extends Controller
         abort_unless(Auth::check() && Auth::id() === $order->user_id, 403);
 
         try {
-            $transaction = \App\Models\SumUpTransaction::where('order_id', $order->id)
+            $checkoutId = (string) $request->query('checkout_id', '');
+            $sync = $sumUpService->reconcileOrderTransactions($order, $checkoutId ?: null);
+            $order->refresh();
+
+            if ((string) $order->status === 'paid' || ($sync['paid'] ?? false)) {
+                return response()->json([
+                    'status'         => 'PAID',
+                    'checkout_id'    => $sync['checkout_id'] ?? $checkoutId,
+                    'transaction_id' => $sync['transaction_id'] ?? $order->transaction_id,
+                    'settled'        => (bool) ($sync['settled'] ?? false),
+                ]);
+            }
+
+            $query = \App\Models\SumUpTransaction::where('order_id', $order->id);
+            if ($checkoutId !== '') {
+                $query->where('checkout_id', $checkoutId);
+            }
+
+            $transaction = $query
                 ->latest()
                 ->first();
 

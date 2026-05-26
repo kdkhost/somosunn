@@ -71,6 +71,7 @@
                                 $ticketState = $reg->ticketStatusState();
                                 $ticketExpired = $ticketState === 'expired';
                                 $ticketUsed = $ticketState === 'used';
+                                $hasQrTicket = (bool) $reg->event->is_ticket_enabled && filled($reg->ticket_code);
                                 $ticketStatusMessage = $reg->ticketStatusMessage();
                                 $ticketPayload = [
                                     'code' => $reg->ticket_code,
@@ -91,18 +92,29 @@
                                         <span class="text-xs font-bold text-red-600 flex items-center gap-1">
                                             <i class="fas fa-ban"></i> Expirado
                                         </span>
+                                    @elseif($hasQrTicket)
+                                        <span class="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                                            <i class="fas fa-check-circle"></i> Disponivel
+                                        </span>
                                     @else
-                                        <span class="text-xs font-bold text-blue-600 flex items-center gap-1">
-                                            <i class="fas fa-clock"></i> Pendente
+                                        <span class="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                                            <i class="fas fa-check-circle"></i> Confirmado
                                         </span>
                                     @endif
                                 </div>
 
-                                <button
-                                    onclick='showTicketModal({!! json_encode($ticketPayload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!})'
-                                    class="bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-300 p-2 rounded-xl transition-all shadow-sm flex items-center gap-2 text-xs font-bold group/btn">
-                                    <i class="fas fa-qrcode"></i> Ver QR Code
-                                </button>
+                                @if($hasQrTicket)
+                                    <button
+                                        onclick='showTicketModal({!! json_encode($ticketPayload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!})'
+                                        class="bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-300 p-2 rounded-xl transition-all shadow-sm flex items-center gap-2 text-xs font-bold group/btn">
+                                        <i class="fas fa-qrcode"></i> Ver QR Code
+                                    </button>
+                                @else
+                                    <a href="{{ route('events.show', $reg->event) }}"
+                                        class="bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 dark:hover:bg-emerald-600 hover:text-white text-slate-700 dark:text-slate-300 p-2 rounded-xl transition-all shadow-sm flex items-center gap-2 text-xs font-bold group/btn">
+                                        <i class="fas fa-calendar-check"></i> Ver evento
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>

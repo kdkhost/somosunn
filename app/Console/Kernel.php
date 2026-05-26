@@ -129,6 +129,16 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar aquecimento de cache das dashboards: ' . $e->getMessage());
         }
 
+        // Concilia SumUp antes de cancelar pendencias, cobrindo webhooks atrasados ou bloqueados.
+        try {
+            $schedule->command('sumup:reconcile-pending --limit=100')
+                ->everyFiveMinutes()
+                ->withoutOverlapping()
+                ->name('sumup-reconcile-pending');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar reconciliacao SumUp: ' . $e->getMessage());
+        }
+
         // Cancela pedidos não pagos após expiração do prazo (PIX, cartão, boleto)
         try {
             $schedule->command('orders:cancel-unpaid')

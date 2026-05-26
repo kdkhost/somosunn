@@ -57,7 +57,7 @@ class SumUpWebhookProcessor
             ?? data_get($payload, 'transaction.id', '');
 
         // Atualiza SumUpTransaction
-        SumUpTransaction::where('order_id', $order->id)->update([
+        SumUpTransaction::where('webhook_token', $webhookToken)->update([
             'status'         => 'PAID',
             'transaction_id' => $transactionId,
             'raw_response'   => $payload,
@@ -76,7 +76,7 @@ class SumUpWebhookProcessor
             return;
         }
 
-        SumUpTransaction::where('order_id', $order->id)->update([
+        SumUpTransaction::where('webhook_token', $webhookToken)->update([
             'status'       => 'FAILED',
             'raw_response' => $payload,
         ]);
@@ -103,7 +103,7 @@ class SumUpWebhookProcessor
             return;
         }
 
-        SumUpTransaction::where('order_id', $order->id)->update([
+        SumUpTransaction::where('webhook_token', $webhookToken)->update([
             'status'       => 'REFUNDED',
             'raw_response' => $payload,
         ]);

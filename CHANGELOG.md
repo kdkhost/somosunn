@@ -2,6 +2,43 @@
 
 ---
 
+## [2026-05-26] - fix(sumup): conciliacao automatica de pedidos pagos e liberacao de ingressos
+
+### Problema
+O pedido `#156` foi quitado na SumUp, mas permaneceu `Pendente` no sistema e
+nao liberou automaticamente a inscricao do evento. A investigacao mostrou que
+o webhook SumUp nao chegou ao sistema e o polling do checkout consultava apenas
+a ultima tentativa local. Como existiam varios checkouts para o mesmo pedido,
+uma tentativa mais nova pendente escondia um checkout PIX anterior ja pago na
+API da SumUp.
+
+### Correcoes
+- Criada reconciliacao oficial via API SumUp para consultar os checkouts do
+  pedido e encontrar qualquer transacao `PAID`/`SUCCESSFUL`, mesmo que nao seja
+  a tentativa mais recente.
+- O endpoint `/checkout/sumup/status` agora reconcilia com a API antes de
+  responder e baixa/libera automaticamente o pedido quando encontra pagamento.
+- O endpoint `/checkout/sumup/pix` nao cria novo PIX se o pedido ja estiver
+  pago ou se a conciliacao detectar pagamento antes da nova cobranca.
+- Adicionado comando `sumup:reconcile-pending`, agendado a cada 5 minutos antes
+  do cancelamento automatico de pedidos pendentes.
+- Webhook SumUp passou a atualizar somente a transacao do token recebido, sem
+  marcar todas as tentativas do pedido como pagas/falhas.
+- Ajustada a tela `painel/ingressos` para eventos sem QR: reservas pagas agora
+  aparecem como `Confirmado` e nao exibem botao de QR Code vazio.
+
+### Arquivos afetados
+- `app/Services/Payment/SumUpService.php`
+- `app/Http/Controllers/CheckoutController.php`
+- `app/Services/Payment/SumUpWebhookProcessor.php`
+- `app/Console/Commands/ReconcilePendingSumUpOrders.php`
+- `app/Console/Kernel.php`
+- `resources/views/partials/checkout/sumup-card-form.blade.php`
+- `resources/views/panel/tickets.blade.php`
+- `tests/Feature/Payment/SumUpReconciliationTest.php`
+
+---
+
 ## [2026-05-26] - fix(sumup): liberar SDK do cartao na CSP e autorizar rotas SumUp no WAF
 
 ### Problema
