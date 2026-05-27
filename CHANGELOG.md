@@ -52,6 +52,17 @@
 
 ---
 
+## [2026-05-27] - fix(quem-somos): padronizar tamanho dos cards
+
+### Corrigido
+- Os cards de `Fundadores` e `Equipe` agora possuem altura fixa e estrutura interna padronizada.
+- Nome, cargo e bio passam a ter limites visuais para evitar quebras de layout e diferencas de altura entre cards.
+
+### Arquivo principal
+- `resources/views/site/institucional/quem-somos.blade.php`
+
+---
+
 ## [2026-05-27] - fix(galeria): ajustar hero ao padrao visual do tema
 
 ### Corrigido
