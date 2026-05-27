@@ -3,10 +3,13 @@
 @section('title', 'Galeria: ' . $event->title . ' - SOMOS UNN')
 
 @php
-    $coverUrl    = $event->gallery_cover_url ?: ($featuredPhoto ? \App\Support\UploadStorage::url($featuredPhoto->file_path) : ($event->image_url ?: asset('img/logo.svg')));
+    $featuredPhotoUrl = $featuredPhoto && $featuredPhoto->hasAccessibleFile()
+        ? \App\Support\UploadStorage::url($featuredPhoto->file_path)
+        : null;
+    $coverUrl    = $event->gallery_cover_url ?: ($featuredPhotoUrl ?: ($event->image_url ?: asset('img/logo.svg')));
     $eventDate   = $event->start_at ? \Carbon\Carbon::parse($event->start_at)->translatedFormat('d \d\e F \d\e Y') : null;
     $photoSlides = $photos->map(fn($item) => [
-        'src'     => \App\Support\UploadStorage::url($item->file_path),
+        'src'     => $item->hasAccessibleFile() ? \App\Support\UploadStorage::url($item->file_path) : $coverUrl,
         'title'   => $event->title,
         'caption' => $item->created_at ? $item->created_at->format('d/m/Y H:i') : '',
     ])->values();
@@ -97,7 +100,10 @@
 
                     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                         @foreach($photos as $item)
-                            @php $photoUrl = \App\Support\UploadStorage::url($item->file_path); @endphp
+                            @php
+                                $photoAvailable = $item->hasAccessibleFile();
+                                $photoUrl = $photoAvailable ? \App\Support\UploadStorage::url($item->file_path) : $coverUrl;
+                            @endphp
                             <button type="button"
                                 data-gallery-open-slide="{{ $loop->index }}"
                                 class="group relative overflow-hidden rounded-[1.8rem] border border-slate-200 bg-slate-950 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_rgba(15,23,42,0.16)]">
@@ -109,6 +115,14 @@
                                         <i class="fas fa-expand text-sm"></i>
                                     </span>
                                 </div>
+                                @unless($photoAvailable)
+                                    <div class="absolute left-4 top-4">
+                                        <span class="inline-flex items-center gap-2 rounded-full border border-yellow-200/40 bg-yellow-400/90 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-slate-950 shadow-sm">
+                                            <i class="fas fa-triangle-exclamation"></i>
+                                            Arquivo indisponível
+                                        </span>
+                                    </div>
+                                @endunless
                                 <div class="absolute inset-x-4 bottom-4">
                                     <p class="text-xs font-bold text-slate-300">
                                         {{ $item->created_at ? $item->created_at->format('d/m/Y') : '' }}
@@ -136,14 +150,26 @@
 
                     <div class="grid gap-6 lg:grid-cols-2">
                         @foreach($videos as $item)
-                            @php $videoUrl = \App\Support\UploadStorage::url($item->file_path); @endphp
+                            @php
+                                $videoAvailable = $item->hasAccessibleFile();
+                                $videoUrl = $videoAvailable ? \App\Support\UploadStorage::url($item->file_path) : null;
+                            @endphp
                             <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-950 shadow-[0_20px_50px_rgba(15,23,42,0.16)]">
-                                <video controls preload="metadata" playsinline data-gallery-video
-                                    poster="{{ $coverUrl }}"
-                                    class="h-72 w-full bg-slate-950 object-cover">
-                                    <source src="{{ $videoUrl }}">
-                                    Seu navegador nao suporta reproducao de video.
-                                </video>
+                                @if($videoAvailable)
+                                    <video controls preload="metadata" playsinline data-gallery-video
+                                        poster="{{ $coverUrl }}"
+                                        class="h-72 w-full bg-slate-950 object-cover">
+                                        <source src="{{ $videoUrl }}">
+                                        Seu navegador nao suporta reproducao de video.
+                                    </video>
+                                @else
+                                    <div class="flex h-72 w-full items-center justify-center bg-slate-900 px-6 text-center text-sm font-bold text-slate-300">
+                                        <span class="inline-flex items-center gap-2 rounded-full border border-yellow-300/20 bg-yellow-300/10 px-4 py-2 text-yellow-100">
+                                            <i class="fas fa-triangle-exclamation"></i>
+                                            Vídeo indisponível no storage
+                                        </span>
+                                    </div>
+                                @endif
                                 <div class="p-5">
                                     <h3 class="font-black text-white">{{ $event->title }}</h3>
                                     @if($item->created_at)

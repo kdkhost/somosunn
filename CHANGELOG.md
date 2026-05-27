@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-05-27] - fix(galeria e revistas): restaurar acesso publico
+
+### Corrigido
+- A galeria publica volta a listar albuns que possuem registros no banco mesmo quando algum arquivo fisico do storage estiver ausente, evitando a impressao de que a galeria foi removida.
+- A pagina do album passa a usar fallback visual limpo para midias ausentes, sem redirecionar o visitante para fora do album.
+- Foram recompostos no servidor os PDFs fisicos ausentes da Revista Manchete 6a e 7a edicoes e atualizados os tamanhos no banco.
+
+### Arquivos principais
+- `app/Http/Controllers/GalleryController.php`
+- `resources/views/site/gallery/show.blade.php`
+
+---
+
 ## [2026-05-26] - fix(painel): padronizar configuração de expositores
 
 ### Corrigido
