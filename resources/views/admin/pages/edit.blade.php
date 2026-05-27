@@ -286,7 +286,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         /* Motor de Repeater Global - Definido fora do ready para disponibilidade imediata */
-        window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData }) {
+        window.initJSONRepeater = function({ containerId, inputId, addButtonId, itemSchema, template, initialData, onRenderItem }) {
             const container = document.getElementById(containerId);
             const input = document.querySelector(`[name="${inputId}"]`);
             const addButton = document.getElementById(addButtonId);
@@ -316,8 +316,9 @@
                     `;
                     wrapper.querySelectorAll('input, textarea, select').forEach(field => {
                         field.addEventListener('input', function() {
-                            const fieldMatch = this.name.match(/\[(.*?)\]/);
-                            if (fieldMatch) items[index][fieldMatch[1]] = this.value;
+                            const brackets = [...this.name.matchAll(/\[([^\]]+)\]/g)].map(match => match[1]);
+                            const fieldKey = brackets.length ? brackets[brackets.length - 1] : null;
+                            if (fieldKey) items[index][fieldKey] = this.value;
                             sync();
                         });
                     });
@@ -325,6 +326,21 @@
                         items.splice(index, 1); render(); sync();
                     };
                     container.appendChild(wrapper);
+
+                    if (typeof onRenderItem === 'function') {
+                        onRenderItem({
+                            wrapper,
+                            item,
+                            index,
+                            updateItem: function (key, value) {
+                                if (!key) {
+                                    return;
+                                }
+                                items[index][key] = value;
+                                sync();
+                            }
+                        });
+                    }
                 });
             }
             addButton.onclick = () => { items.push({ ...itemSchema }); render(); sync(); };

@@ -67,6 +67,225 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    function escHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function normalizeStorageUrl(path) {
+        const value = String(path || '').trim();
+        if (!value) {
+            return '';
+        }
+        if (value.startsWith('http://') || value.startsWith('https://')) {
+            return value;
+        }
+        return `/storage/${value.replace(/^\/+/, '')}`;
+    }
+
+    function notify(type, message) {
+        if (window.toastr && typeof window.toastr[type] === 'function') {
+            window.toastr[type](message);
+            return;
+        }
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: type === 'error' ? 'error' : 'success',
+            title: message,
+            showConfirmButton: false,
+            timer: 2800
+        });
+    }
+
+    async function uploadFounderAvatar(file, onProgress) {
+        const chunkSize = 1024 * 1024;
+        const totalChunks = Math.ceil(file.size / chunkSize);
+        const uploadId = `founder_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+        for (let i = 0; i < totalChunks; i++) {
+            const start = i * chunkSize;
+            const end = Math.min(start + chunkSize, file.size);
+            const chunk = file.slice(start, end);
+            const formData = new FormData();
+            formData.append('file', chunk);
+            formData.append('upload_id', uploadId);
+            formData.append('chunk_index', i);
+            formData.append('total_chunks', totalChunks);
+
+            const chunkResponse = await fetch("{{ route('admin.upload.chunk') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+            const chunkJson = await chunkResponse.json();
+            if (!chunkResponse.ok || !chunkJson.ok) {
+                throw new Error(chunkJson.error || 'Falha ao enviar uma parte da imagem.');
+            }
+
+            if (typeof onProgress === 'function') {
+                onProgress(Math.round(((i + 1) / totalChunks) * 100));
+            }
+        }
+
+        const assembleResponse = await fetch("{{ route('admin.upload.assemble') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ upload_id: uploadId, filename: file.name, total_chunks: totalChunks })
+        });
+        const assembleJson = await assembleResponse.json();
+
+        if (!assembleResponse.ok || !assembleJson.ok || !assembleJson.path) {
+            throw new Error(assembleJson.error || 'Falha ao finalizar upload da imagem.');
+        }
+
+        return assembleJson;
+    }
+
+    function bindFounderDropzones(rootEl, updateItem) {
+        rootEl.querySelectorAll('[data-founder-dropzone]').forEach((dropzone) => {
+            if (dropzone.dataset.bound === '1') {
+                return;
+            }
+            dropzone.dataset.bound = '1';
+
+            const input = dropzone.querySelector('[data-founder-file-input]');
+            const preview = dropzone.querySelector('[data-founder-preview]');
+            const fallback = dropzone.querySelector('[data-founder-fallback]');
+            const progress = dropzone.querySelector('[data-founder-progress]');
+            const removeBtn = dropzone.querySelector('[data-founder-remove]');
+            const hiddenPath = rootEl.querySelector('[data-founder-image-path]');
+            const initialsInput = rootEl.querySelector('[data-founder-initials]');
+
+            function renderInitials() {
+                const initials = (initialsInput?.value || 'F').substring(0, 2).toUpperCase();
+                if (fallback) {
+                    fallback.textContent = initials;
+                }
+            }
+
+            function showImage(url) {
+                if (!preview) {
+                    return;
+                }
+                preview.innerHTML = `<img src="${escHtml(url)}" class="w-100 h-100 object-cover" alt="Avatar">`;
+                preview.classList.remove('d-none');
+                if (fallback) {
+                    fallback.classList.add('d-none');
+                }
+            }
+
+            function clearImage() {
+                if (preview) {
+                    preview.innerHTML = '';
+                    preview.classList.add('d-none');
+                }
+                if (fallback) {
+                    fallback.classList.remove('d-none');
+                }
+                if (hiddenPath) {
+                    hiddenPath.value = '';
+                }
+                updateItem('image', '');
+                renderInitials();
+            }
+
+            async function processFile(file) {
+                if (!file || !file.type.startsWith('image/')) {
+                    notify('error', 'Selecione uma imagem valida para o avatar.');
+                    return;
+                }
+                try {
+                    if (progress) {
+                        progress.classList.remove('d-none');
+                        progress.textContent = 'Enviando... 0%';
+                    }
+                    const uploaded = await uploadFounderAvatar(file, (percent) => {
+                        if (progress) {
+                            progress.textContent = `Enviando... ${percent}%`;
+                        }
+                    });
+                    if (hiddenPath) {
+                        hiddenPath.value = uploaded.path;
+                    }
+                    updateItem('image', uploaded.path);
+                    showImage(uploaded.url || normalizeStorageUrl(uploaded.path));
+                    if (progress) {
+                        progress.textContent = 'Upload concluido';
+                    }
+                    notify('success', 'Avatar enviado com sucesso.');
+                } catch (error) {
+                    notify('error', error.message || 'Nao foi possivel enviar o avatar.');
+                } finally {
+                    if (progress) {
+                        setTimeout(() => progress.classList.add('d-none'), 1200);
+                    }
+                }
+            }
+
+            dropzone.addEventListener('click', function (event) {
+                if (event.target.closest('[data-founder-remove]')) {
+                    return;
+                }
+                input?.click();
+            });
+
+            dropzone.addEventListener('dragover', function (event) {
+                event.preventDefault();
+                dropzone.classList.add('founder-dropzone-active');
+            });
+
+            dropzone.addEventListener('dragleave', function () {
+                dropzone.classList.remove('founder-dropzone-active');
+            });
+
+            dropzone.addEventListener('drop', function (event) {
+                event.preventDefault();
+                dropzone.classList.remove('founder-dropzone-active');
+                const file = event.dataTransfer?.files?.[0];
+                processFile(file);
+            });
+
+            input?.addEventListener('change', function () {
+                processFile(this.files?.[0]);
+                this.value = '';
+            });
+
+            removeBtn?.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Remover avatar?',
+                    text: 'O avatar sera removido deste fundador.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, remover',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        clearImage();
+                    }
+                });
+            });
+
+            initialsInput?.addEventListener('input', renderInitials);
+            renderInitials();
+        });
+    }
+
     if (typeof window.initJSONRepeater === 'function') {
         window.initJSONRepeater({
             containerId: 'founders-repeater-container',
@@ -76,20 +295,35 @@ document.addEventListener('DOMContentLoaded', function() {
             initialData: {!! json_encode($data['founders'] ?? []) !!},
             template: (item, index) => `
                 <div class="row">
-                    <div class="col-md-3 text-center">
-                        <div class="mb-2 mx-auto overflow-hidden rounded shadow-sm border bg-light d-flex align-items-center justify-content-center" style="width:100px; height:100px;">
-                            ${item.image ? `<img src="/storage/${item.image}" class="w-100 h-100 object-cover">` : `<span class="text-muted small">${item.initials || 'F'}</span>`}
+                    <div class="col-md-4 text-center">
+                        <div class="founder-dropzone mb-2 mx-auto overflow-hidden rounded shadow-sm border bg-light d-flex flex-column align-items-center justify-content-center p-2" style="width:130px; min-height:130px;" data-founder-dropzone>
+                            <div class="mb-1 text-primary"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div class="small text-muted mb-2">Arraste ou clique</div>
+                            <div class="mb-2 mx-auto overflow-hidden rounded border bg-white d-flex align-items-center justify-content-center" style="width:82px; height:82px;">
+                                <div data-founder-preview class="${item.image ? '' : 'd-none'} w-100 h-100">
+                                    ${item.image ? `<img src="${escHtml(normalizeStorageUrl(item.image))}" class="w-100 h-100 object-cover" alt="Avatar">` : ``}
+                                </div>
+                                <span data-founder-fallback class="${item.image ? 'd-none' : ''} text-muted small">${escHtml((item.initials || 'F').substring(0, 2).toUpperCase())}</span>
+                            </div>
+                            <div data-founder-progress class="small text-info d-none"></div>
+                            <input type="file" class="d-none" accept="image/*" data-founder-file-input>
+                            <input type="hidden" name="founders[${index}][image]" value="${escHtml(item.image || '')}" data-founder-image-path>
+                            <button type="button" class="btn btn-xs btn-outline-danger mt-2" data-founder-remove>Remover</button>
                         </div>
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-md-8">
                         <div class="form-row">
-                            <div class="form-group col-md-8">
+                            <div class="form-group col-md-7">
                                 <label class="small font-weight-bold">Nome</label>
                                 <input type="text" name="founders[${index}][name]" value="${item.name || ''}" class="form-control form-control-sm">
                             </div>
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-2">
                                 <label class="small font-weight-bold">Iniciais (Avatar)</label>
-                                <input type="text" name="founders[${index}][initials]" value="${item.initials || ''}" class="form-control form-control-sm" maxlength="2">
+                                <input type="text" name="founders[${index}][initials]" value="${item.initials || ''}" class="form-control form-control-sm" maxlength="2" data-founder-initials>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="small font-weight-bold">Cargo</label>
+                                <input type="text" name="founders[${index}][role]" value="${item.role || ''}" class="form-control form-control-sm" placeholder="CEO">
                             </div>
                         </div>
                         <div class="form-group mb-0">
@@ -98,7 +332,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 </div>
-            `
+            `,
+            onRenderItem: ({ wrapper, updateItem }) => bindFounderDropzones(wrapper, updateItem)
         });
 
         window.initJSONRepeater({
@@ -136,6 +371,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<style>
+    .founder-dropzone {
+        border: 2px dashed #d1d5db;
+        cursor: pointer;
+        transition: border-color .2s ease, background-color .2s ease;
+    }
+    .founder-dropzone:hover,
+    .founder-dropzone.founder-dropzone-active {
+        border-color: #1F5EDB;
+        background-color: #eef4ff !important;
+    }
+</style>
 @endpush
 
 <div class="tab-pane fade" id="sec-stats">

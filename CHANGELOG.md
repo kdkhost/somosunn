@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-05-27] - fix(admin cms): upload ajax de avatar em fundadores + ajustes no repeater
+
+### Corrigido
+- A seção `Fundadores` da página `Quem Somos` no admin legado (`/admin/pages/{id}/edit#sec-founders`) agora possui upload de avatar em AJAX com arrasta e solta, clique para selecionar, preview automático e remoção com confirmação.
+- O card de fundador foi reorganizado para incluir `cargo` no mesmo bloco, mantendo edição mais objetiva.
+- O motor global de repeater (`initJSONRepeater`) foi corrigido para sincronizar corretamente campos com nomes aninhados (`founders[index][campo]`), evitando perda silenciosa de dados ao salvar JSON.
+
+### Arquivos principais
+- `resources/views/admin/pages/partials/quem-somos.blade.php`
+- `resources/views/admin/pages/edit.blade.php`
+
+---
+
 ## [2026-05-27] - fix(galeria): ajustar hero ao padrao visual do tema
 
 ### Corrigido
