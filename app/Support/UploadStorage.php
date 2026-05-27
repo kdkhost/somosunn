@@ -838,9 +838,7 @@ class UploadStorage
     {
         return [
             'driver' => 'local',
-            'root' => is_dir(public_path('storage'))
-                ? public_path('storage')
-                : storage_path('app/public'),
+            'root' => storage_path('app/public'),
             'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,

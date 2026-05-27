@@ -25,6 +25,11 @@ class EventMedia extends Model
         return UploadStorage::url($this->file_path);
     }
 
+    public function hasAccessibleFile(): bool
+    {
+        return UploadStorage::exists($this->file_path);
+    }
+
     public function event()
     {
         return $this->belongsTo(Event::class);

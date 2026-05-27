@@ -2,6 +2,22 @@
 
 ---
 
+## [2026-05-26] - fix(galeria): evitar fotos quebradas no site público
+
+### Corrigido
+- A galeria pública agora considera apenas mídias com arquivo físico acessível, evitando cards escuros com imagem quebrada quando o registro existe no banco mas o arquivo não existe mais no storage.
+- A capa de álbum passa a ignorar mídias ausentes e cair para a imagem principal do evento quando necessário.
+- O armazenamento local de novos uploads passa a gravar em `storage/app/public`, mantendo compatibilidade com `.htaccess` do cPanel e reduzindo risco de perda em deploy.
+- Foi adicionado diagnóstico em log quando um álbum possui registros no banco sem arquivos acessíveis.
+
+### Arquivos principais
+- `app/Http/Controllers/GalleryController.php`
+- `app/Models/Event.php`
+- `app/Models/EventMedia.php`
+- `app/Support/UploadStorage.php`
+
+---
+
 ## [2026-05-26] - fix(expositores): checkout como ponto único de escolha
 
 ### Corrigido
