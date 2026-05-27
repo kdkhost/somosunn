@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-05-27] - fix(galeria): ajustar hero ao padrao visual do tema
+
+### Corrigido
+- O topo da pagina de detalhe da galeria (`/galeria/{evento}`) foi ajustado para o padrao visual do site com card claro, contraste legivel e espacamento mais consistente.
+- Foram adicionados scripts utilitarios de diagnostico para conferencia de caminhos de imagens de eventos no servidor.
+
+### Arquivos principais
+- `resources/views/site/gallery/show.blade.php`
+- `tools/check_event_images.php`
+- `tools/diagnose_event_images.php`
+
+---
+
 ## [2026-05-27] - fix(galeria e revistas): restaurar acesso publico
 
 ### Corrigido

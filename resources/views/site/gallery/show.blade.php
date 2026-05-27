@@ -20,59 +20,58 @@
 
 @section('content')
     {{-- Hero --}}
-    <div class="relative overflow-hidden bg-slate-950 pt-28 pb-16 text-white">
+    <div class="relative overflow-hidden pt-28 pb-10">
         <div class="absolute inset-0">
-            <img src="{{ $coverUrl }}" alt="{{ $event->title }}" class="h-full w-full object-cover opacity-20">
-            <div class="absolute inset-0 bg-[linear-gradient(135deg,rgba(2,6,23,0.94),rgba(15,23,42,0.92))]"></div>
-            <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.1),rgba(15,23,42,0.92))]"></div>
+            <img src="{{ $coverUrl }}" alt="{{ $event->title }}" class="h-full w-full object-cover opacity-30">
+            <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,251,255,0.78),rgba(255,255,255,0.96))]"></div>
         </div>
 
         <div class="container relative mx-auto px-4">
             <a href="{{ route('gallery.index') }}"
-                class="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 backdrop-blur transition hover:bg-white/10 hover:text-white">
+                class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
                 <i class="fas fa-arrow-left text-xs"></i> Voltar para a galeria
             </a>
 
-            <div class="mt-8 max-w-4xl">
-                <span class="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-cyan-100">
+            <div class="mt-5 max-w-5xl rounded-[2rem] border border-slate-200/85 bg-white/95 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.1)] md:p-8">
+                <span class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-blue-700">
                     <i class="fas fa-{{ $event->isAlbum() ? 'users' : 'photo-film' }}"></i> {{ $event->isAlbum() ? 'Comunidade UNN' : 'Cobertura oficial' }}
                 </span>
 
-                <h1 class="mt-5 text-4xl font-black tracking-tight text-white md:text-5xl">{{ $event->title }}</h1>
+                <h1 class="mt-4 text-3xl font-black tracking-tight text-slate-950 md:text-5xl">{{ $event->title }}</h1>
 
-                <div class="mt-5 flex flex-wrap gap-3 text-sm text-slate-300">
+                <div class="mt-5 flex flex-wrap gap-2.5 text-sm text-slate-600">
                     @if(!$event->isAlbum() && $eventDate)
-                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur">
-                            <i class="far fa-calendar"></i> {{ $eventDate }}
+                        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 font-semibold">
+                            <i class="far fa-calendar text-blue-600"></i> {{ $eventDate }}
                         </span>
                     @endif
                     @if(!$event->isAlbum() && $event->location)
-                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur">
-                            <i class="fas fa-location-dot"></i> {{ $event->location }}
+                        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 font-semibold">
+                            <i class="fas fa-location-dot text-blue-600"></i> {{ $event->location }}
                         </span>
                     @endif
                     @if($photoCount > 0)
-                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur">
-                            <i class="fas fa-images text-cyan-300"></i> {{ $photoCount }} {{ $photoCount === 1 ? 'foto' : 'fotos' }}
+                        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 font-semibold">
+                            <i class="fas fa-images text-blue-600"></i> {{ $photoCount }} {{ $photoCount === 1 ? 'foto' : 'fotos' }}
                         </span>
                     @endif
                     @if($videoCount > 0)
-                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur">
-                            <i class="fas fa-circle-play text-fuchsia-300"></i> {{ $videoCount }} {{ $videoCount === 1 ? 'video' : 'videos' }}
+                        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 font-semibold">
+                            <i class="fas fa-circle-play text-blue-600"></i> {{ $videoCount }} {{ $videoCount === 1 ? 'video' : 'videos' }}
                         </span>
                     @endif
                 </div>
 
                 @if($photoCount > 0 || $videoCount > 0)
-                    <div class="mt-7 flex flex-wrap gap-3">
+                    <div class="mt-6 flex flex-wrap gap-3">
                         @if($photoCount > 0)
-                            <a href="#galeria-fotos" class="inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-black uppercase tracking-[0.16em] text-slate-950 transition hover:-translate-y-0.5 hover:bg-slate-100">
-                                <i class="fas fa-images text-blue-600"></i> Ver fotos
+                            <a href="#galeria-fotos" class="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#1F5EDB,#177FD6)] px-6 py-2.5 text-sm font-black uppercase tracking-[0.14em] text-white transition hover:brightness-105">
+                                <i class="fas fa-images"></i> Ver fotos
                             </a>
                         @endif
                         @if($videoCount > 0)
-                            <a href="#galeria-videos" class="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-black uppercase tracking-[0.16em] text-white backdrop-blur transition hover:bg-white/10">
-                                <i class="fas fa-circle-play text-fuchsia-300"></i> Ver videos
+                            <a href="#galeria-videos" class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-6 py-2.5 text-sm font-black uppercase tracking-[0.14em] text-blue-700 transition hover:bg-blue-100">
+                                <i class="fas fa-circle-play"></i> Ver videos
                             </a>
                         @endif
                     </div>
