@@ -19,63 +19,59 @@
 @section('meta_description', 'Galeria do evento ' . $event->title . ' - fotos e videos da cobertura oficial.')
 
 @section('content')
-    {{-- Hero --}}
-    <div class="relative overflow-hidden pt-28 pb-10">
-        <div class="absolute inset-0">
-            <img src="{{ $coverUrl }}" alt="{{ $event->title }}" class="h-full w-full object-cover opacity-30">
-            <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,251,255,0.78),rgba(255,255,255,0.96))]"></div>
-        </div>
-
-        <div class="container relative mx-auto px-4">
+    {{-- Hero compacto --}}
+    <div class="pt-24 pb-4">
+        <div class="container mx-auto px-4">
             <a href="{{ route('gallery.index') }}"
-                class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
+                class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
                 <i class="fas fa-arrow-left text-xs"></i> Voltar para a galeria
             </a>
 
-            <div class="mt-5 max-w-5xl rounded-[2rem] border border-slate-200/85 bg-white/95 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.1)] md:p-8">
-                <span class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-blue-700">
-                    <i class="fas fa-{{ $event->isAlbum() ? 'users' : 'photo-film' }}"></i> {{ $event->isAlbum() ? 'Comunidade UNN' : 'Cobertura oficial' }}
-                </span>
-
-                <h1 class="mt-4 text-3xl font-black tracking-tight text-slate-950 md:text-5xl">{{ $event->title }}</h1>
-
-                <div class="mt-5 flex flex-wrap gap-2.5 text-sm text-slate-600">
-                    @if(!$event->isAlbum() && $eventDate)
-                        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 font-semibold">
-                            <i class="far fa-calendar text-blue-600"></i> {{ $eventDate }}
+            <div class="mt-4 rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+                <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                    <div>
+                        <span class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-blue-700">
+                            <i class="fas fa-{{ $event->isAlbum() ? 'users' : 'photo-film' }}"></i> {{ $event->isAlbum() ? 'Comunidade UNN' : 'Cobertura oficial' }}
                         </span>
-                    @endif
-                    @if(!$event->isAlbum() && $event->location)
-                        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 font-semibold">
-                            <i class="fas fa-location-dot text-blue-600"></i> {{ $event->location }}
-                        </span>
-                    @endif
-                    @if($photoCount > 0)
-                        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 font-semibold">
-                            <i class="fas fa-images text-blue-600"></i> {{ $photoCount }} {{ $photoCount === 1 ? 'foto' : 'fotos' }}
-                        </span>
-                    @endif
-                    @if($videoCount > 0)
-                        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 font-semibold">
-                            <i class="fas fa-circle-play text-blue-600"></i> {{ $videoCount }} {{ $videoCount === 1 ? 'video' : 'videos' }}
-                        </span>
+                        <h1 class="mt-3 text-3xl font-black tracking-tight text-slate-950 md:text-5xl">{{ $event->title }}</h1>
+                        <div class="mt-4 flex flex-wrap gap-2 text-sm text-slate-600">
+                            @if(!$event->isAlbum() && $eventDate)
+                                <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 font-semibold">
+                                    <i class="far fa-calendar text-blue-600"></i> {{ $eventDate }}
+                                </span>
+                            @endif
+                            @if(!$event->isAlbum() && $event->location)
+                                <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 font-semibold">
+                                    <i class="fas fa-location-dot text-blue-600"></i> {{ $event->location }}
+                                </span>
+                            @endif
+                            @if($photoCount > 0)
+                                <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 font-semibold">
+                                    <i class="fas fa-images text-blue-600"></i> {{ $photoCount }} {{ $photoCount === 1 ? 'foto' : 'fotos' }}
+                                </span>
+                            @endif
+                            @if($videoCount > 0)
+                                <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 font-semibold">
+                                    <i class="fas fa-circle-play text-blue-600"></i> {{ $videoCount }} {{ $videoCount === 1 ? 'video' : 'videos' }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                    @if($photoCount > 0 || $videoCount > 0)
+                        <div class="flex flex-wrap gap-2 md:justify-end">
+                            @if($photoCount > 0)
+                                <a href="#galeria-fotos" class="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-[linear-gradient(135deg,#1F5EDB,#177FD6)] px-5 py-2.5 text-sm font-black uppercase tracking-[0.12em] text-white transition hover:brightness-105">
+                                    <i class="fas fa-images"></i> Ver fotos
+                                </a>
+                            @endif
+                            @if($videoCount > 0)
+                                <a href="#galeria-videos" class="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-blue-200 bg-blue-50 px-5 py-2.5 text-sm font-black uppercase tracking-[0.12em] text-blue-700 transition hover:bg-blue-100">
+                                    <i class="fas fa-circle-play"></i> Ver videos
+                                </a>
+                            @endif
+                        </div>
                     @endif
                 </div>
-
-                @if($photoCount > 0 || $videoCount > 0)
-                    <div class="mt-6 flex flex-wrap gap-3">
-                        @if($photoCount > 0)
-                            <a href="#galeria-fotos" class="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#1F5EDB,#177FD6)] px-6 py-2.5 text-sm font-black uppercase tracking-[0.14em] text-white transition hover:brightness-105">
-                                <i class="fas fa-images"></i> Ver fotos
-                            </a>
-                        @endif
-                        @if($videoCount > 0)
-                            <a href="#galeria-videos" class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-6 py-2.5 text-sm font-black uppercase tracking-[0.14em] text-blue-700 transition hover:bg-blue-100">
-                                <i class="fas fa-circle-play"></i> Ver videos
-                            </a>
-                        @endif
-                    </div>
-                @endif
             </div>
         </div>
     </div>
