@@ -92,7 +92,7 @@
     }, $menuItems)));
 @endphp
 
-<nav class="sticky inset-x-0 top-0 z-50 bg-white shadow-xl border-b border-slate-100">
+<nav class="fixed inset-x-0 top-0 z-50 bg-white shadow-xl border-b border-slate-100">
     <div class="unn-container py-4 flex items-center justify-between gap-4">
        <a href="{{ route('home') }}" class="flex items-center gap-2 sm:gap-3 shrink min-w-0">
             <div class="inline-flex h-10 sm:h-12 md:h-16 w-auto items-center justify-center overflow-hidden shrink-0">
