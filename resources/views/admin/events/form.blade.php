@@ -903,6 +903,14 @@
     }
 })();
 
+// Garantir que axios esteja disponivel
+if (typeof axios === 'undefined') {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js';
+    script.onload = function() { window.axios = axios; };
+    document.head.appendChild(script);
+}
+
 async function uploadAdminGallery(files) {
     if (!files || files.length === 0) return;
 
