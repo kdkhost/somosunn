@@ -41,6 +41,17 @@
 
 ---
 
+## [2026-05-27] - fix(quem-somos): centralizar cards dinamicamente por quantidade
+
+### Corrigido
+- Em `/quem-somos`, os cards de fundadores e equipe agora se organizam automaticamente conforme a quantidade cadastrada no admin.
+- O alinhamento foi ajustado para manter os blocos centralizados, inclusive quando houver poucos itens ou ultima linha incompleta.
+
+### Arquivo principal
+- `resources/views/site/institucional/quem-somos.blade.php`
+
+---
+
 ## [2026-05-27] - fix(galeria): ajustar hero ao padrao visual do tema
 
 ### Corrigido

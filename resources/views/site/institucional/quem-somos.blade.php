@@ -49,14 +49,14 @@
         <div class="max-w-7xl mx-auto">
             <h2 class="text-3xl font-black text-gray-900 mb-12 text-center">{{ $page->get('founders_title', 'Fundadores') }}</h2>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="flex flex-wrap justify-center gap-8">
                 @foreach($fundadores as $fundador)
                 @php
                     $founderImagePath = (string) ($fundador['image'] ?? '');
                     $founderImageUrl = $founderImagePath !== '' ? UploadStorage::url($founderImagePath) : null;
                     $founderInitials = strtoupper(substr((string) ($fundador['initials'] ?? 'F'), 0, 2));
                 @endphp
-                <div class="bg-white rounded-3xl shadow-lg overflow-hidden text-center h-full border border-slate-100">
+                <div class="w-full max-w-[420px] md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.34rem)] bg-white rounded-3xl shadow-lg overflow-hidden text-center h-full border border-slate-100">
                     <div class="h-24 btn-primary"></div>
                     <div class="flex justify-center -mt-12">
                         <div class="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-slate-100 flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
@@ -82,14 +82,14 @@
         <div class="max-w-7xl mx-auto">
             <h2 class="text-3xl font-black text-gray-900 mb-12 text-center">{{ $page->get('team_title', 'Nossa Equipe') }}</h2>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            <div class="flex flex-wrap justify-center gap-6">
                 @foreach($equipe as $membro)
                 @php
                     $memberImagePath = (string) ($membro['image'] ?? '');
                     $memberImageUrl = $memberImagePath !== '' ? UploadStorage::url($memberImagePath) : null;
                     $memberInitials = strtoupper(substr((string) ($membro['initials'] ?? 'M'), 0, 2));
                 @endphp
-                <div class="text-center bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                <div class="w-[148px] md:w-[160px] text-center bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
                     <div class="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center text-white text-xl font-bold mx-auto mb-3 overflow-hidden">
                         @if($memberImageUrl)
                             <img src="{{ $memberImageUrl }}" alt="{{ $membro['name'] ?? 'Membro' }}" class="w-full h-full object-cover">
