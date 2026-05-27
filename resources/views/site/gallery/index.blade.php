@@ -7,40 +7,36 @@
 @endphp
 
 @section('content')
-    {{-- Hero --}}
-    <div class="relative overflow-hidden bg-slate-950 pt-28 pb-20 text-white">
-        <div class="absolute inset-0">
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.22),_transparent_24%),radial-gradient(circle_at_78%_18%,_rgba(59,130,246,0.24),_transparent_28%),linear-gradient(135deg,_rgba(2,6,23,0.96),_rgba(15,23,42,0.94))]"></div>
-            <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08),rgba(15,23,42,0.92))]"></div>
-        </div>
-
-        <div class="container relative mx-auto px-4">
-            <span class="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-cyan-100">
-                <i class="fas fa-images"></i>
-                Galeria de eventos
-            </span>
-
-            <h1 class="mt-6 max-w-4xl text-4xl font-black tracking-tight text-white md:text-6xl">
-                Reviva cada momento da
-                <span class="bg-[linear-gradient(135deg,#ffffff_0%,#7dd3fc_45%,#60a5fa_100%)] bg-clip-text text-transparent">comunidade</span>
-            </h1>
-
-            <p class="mt-5 max-w-2xl text-base leading-8 text-slate-300">
-                Fotos e videos organizados por evento. Clique em um album para explorar a cobertura completa.
-            </p>
-
-            <div class="mt-6 flex flex-wrap gap-3">
-                <span class="gallery-index-chip">
-                    <i class="fas fa-layer-group text-cyan-300"></i>
-                    {{ $totalAlbums }} {{ $totalAlbums === 1 ? 'album' : 'albuns' }}
+    {{-- Hero compacto --}}
+    <div class="pt-24 pb-4">
+        <div class="container mx-auto px-4">
+            <div class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+                <span class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-blue-700">
+                    <i class="fas fa-images"></i>
+                    Galeria de eventos
                 </span>
+
+                <h1 class="mt-3 text-3xl font-black tracking-tight text-slate-950 md:text-5xl">
+                    Reviva cada momento da comunidade
+                </h1>
+
+                <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600 md:text-base">
+                    Fotos e videos organizados por evento. Clique em um album para explorar a cobertura completa.
+                </p>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-sm font-semibold text-slate-700">
+                        <i class="fas fa-layer-group text-blue-600"></i>
+                        {{ $totalAlbums }} {{ $totalAlbums === 1 ? 'album' : 'albuns' }}
+                    </span>
+                </div>
             </div>
         </div>
     </div>
 
     {{-- Conteudo --}}
     <div class="relative bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_35%,#ffffff_100%)] pb-24">
-        <div class="container relative mx-auto -mt-10 px-4">
+        <div class="container relative mx-auto px-4">
 
             @if($events->isEmpty())
                 <div class="mx-auto max-w-2xl overflow-hidden rounded-[2.5rem] border border-slate-200/70 bg-white p-10 text-center shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
