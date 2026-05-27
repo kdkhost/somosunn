@@ -28,6 +28,19 @@
 
 ---
 
+## [2026-05-27] - fix(admin cms): sec-team com upload ajax de avatar
+
+### Corrigido
+- A aba `Equipe` em `/admin/pages/{id}/edit#sec-team` agora usa o mesmo fluxo da aba de fundadores: upload AJAX com arrasta e solta, preview automatico, progresso e remocao com confirmacao.
+- O JSON de equipe passa a salvar o campo `image` por item no mesmo padrao dos fundadores.
+- O frontend de `/quem-somos` ja reflete essas imagens em cada card de equipe, com fallback por iniciais quando nao houver foto.
+
+### Arquivos principais
+- `resources/views/admin/pages/partials/quem-somos.blade.php`
+- `resources/views/site/institucional/quem-somos.blade.php`
+
+---
+
 ## [2026-05-27] - fix(galeria): ajustar hero ao padrao visual do tema
 
 ### Corrigido

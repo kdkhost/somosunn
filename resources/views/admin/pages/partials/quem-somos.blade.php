@@ -4,7 +4,7 @@
 <div class="tab-pane fade" id="sec-header">
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-users mr-1"></i> Cabeçalho</h3>
+            <h3 class="card-title"><i class="fas fa-users mr-1"></i> Cabecalho</h3>
             <div class="card-tools">
                 <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
                     <input type="checkbox" class="custom-control-input section-toggle" id="toggle-header" data-section="header"
@@ -15,11 +15,11 @@
         </div>
         <div class="card-body">
             <div class="form-group">
-                <label>Subtítulo do hero</label>
-                <input type="text" name="hero_subtitle" class="form-control" value="{{ old('hero_subtitle', $data['hero_subtitle'] ?? '') }}" placeholder="Conheça as pessoas por trás da maior comunidade de networking do Brasil.">
+                <label>Subtitulo do hero</label>
+                <input type="text" name="hero_subtitle" class="form-control" value="{{ old('hero_subtitle', $data['hero_subtitle'] ?? '') }}" placeholder="Conheca as pessoas por tras da maior comunidade de networking do Brasil.">
             </div>
             <div class="form-group mb-0">
-                <label class="font-weight-bold">Imagem de capa <small class="text-muted font-weight-normal">(JPG, PNG, WebP — máx 6 MB)</small></label>
+                <label class="font-weight-bold">Imagem de capa <small class="text-muted font-weight-normal">(JPG, PNG, WebP - max 6 MB)</small></label>
                 @include('admin.components.upload-global', ['name'=>'cover_image', 'accept'=>'image/*'])
             </div>
         </div>
@@ -33,7 +33,7 @@
         </div>
         <div class="card-body">
             <div class="form-group">
-                <label>Título da seção</label>
+                <label>Titulo da secao</label>
                 <input type="text" name="founders_title" class="form-control" value="{{ old('founders_title', $data['founders_title'] ?? '') }}" placeholder="Fundadores">
             </div>
             <div id="founders-repeater-container"></div>
@@ -52,7 +52,7 @@
         </div>
         <div class="card-body">
             <div class="form-group">
-                <label>Título da seção</label>
+                <label>Titulo da secao</label>
                 <input type="text" name="team_title" class="form-control" value="{{ old('team_title', $data['team_title'] ?? '') }}" placeholder="Nossa Equipe">
             </div>
             <div id="team-repeater-container"></div>
@@ -68,22 +68,13 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     function escHtml(value) {
-        return String(value || '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+        return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
     function normalizeStorageUrl(path) {
         const value = String(path || '').trim();
-        if (!value) {
-            return '';
-        }
-        if (value.startsWith('http://') || value.startsWith('https://')) {
-            return value;
-        }
+        if (!value) return '';
+        if (value.startsWith('http://') || value.startsWith('https://')) return value;
         return `/storage/${value.replace(/^\/+/, '')}`;
     }
 
@@ -92,20 +83,13 @@ document.addEventListener('DOMContentLoaded', function() {
             window.toastr[type](message);
             return;
         }
-        Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: type === 'error' ? 'error' : 'success',
-            title: message,
-            showConfirmButton: false,
-            timer: 2800
-        });
+        Swal.fire({ toast: true, position: 'top-end', icon: type === 'error' ? 'error' : 'success', title: message, showConfirmButton: false, timer: 2800 });
     }
 
-    async function uploadFounderAvatar(file, onProgress) {
+    async function uploadAvatar(file, onProgress) {
         const chunkSize = 1024 * 1024;
         const totalChunks = Math.ceil(file.size / chunkSize);
-        const uploadId = `founder_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const uploadId = `member_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
         for (let i = 0; i < totalChunks; i++) {
             const start = i * chunkSize;
@@ -119,73 +103,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const chunkResponse = await fetch("{{ route('admin.upload.chunk') }}", {
                 method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                },
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
                 body: formData
             });
             const chunkJson = await chunkResponse.json();
             if (!chunkResponse.ok || !chunkJson.ok) {
-                throw new Error(chunkJson.error || 'Falha ao enviar uma parte da imagem.');
+                throw new Error(chunkJson.error || 'Falha ao enviar parte da imagem.');
             }
-
-            if (typeof onProgress === 'function') {
-                onProgress(Math.round(((i + 1) / totalChunks) * 100));
-            }
+            if (typeof onProgress === 'function') onProgress(Math.round(((i + 1) / totalChunks) * 100));
         }
 
         const assembleResponse = await fetch("{{ route('admin.upload.assemble') }}", {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
             body: JSON.stringify({ upload_id: uploadId, filename: file.name, total_chunks: totalChunks })
         });
         const assembleJson = await assembleResponse.json();
-
         if (!assembleResponse.ok || !assembleJson.ok || !assembleJson.path) {
             throw new Error(assembleJson.error || 'Falha ao finalizar upload da imagem.');
         }
-
         return assembleJson;
     }
 
-    function bindFounderDropzones(rootEl, updateItem) {
-        rootEl.querySelectorAll('[data-founder-dropzone]').forEach((dropzone) => {
-            if (dropzone.dataset.bound === '1') {
-                return;
-            }
+    function bindDropzone(rootEl, updateItem, cfg) {
+        rootEl.querySelectorAll(cfg.dropzoneSelector).forEach((dropzone) => {
+            if (dropzone.dataset.bound === '1') return;
             dropzone.dataset.bound = '1';
 
-            const input = dropzone.querySelector('[data-founder-file-input]');
-            const preview = dropzone.querySelector('[data-founder-preview]');
-            const fallback = dropzone.querySelector('[data-founder-fallback]');
-            const progress = dropzone.querySelector('[data-founder-progress]');
-            const removeBtn = dropzone.querySelector('[data-founder-remove]');
-            const hiddenPath = rootEl.querySelector('[data-founder-image-path]');
-            const initialsInput = rootEl.querySelector('[data-founder-initials]');
+            const input = dropzone.querySelector(cfg.inputSelector);
+            const preview = dropzone.querySelector(cfg.previewSelector);
+            const fallback = dropzone.querySelector(cfg.fallbackSelector);
+            const progress = dropzone.querySelector(cfg.progressSelector);
+            const removeBtn = dropzone.querySelector(cfg.removeSelector);
+            const hiddenPath = rootEl.querySelector(cfg.hiddenPathSelector);
+            const initialsInput = rootEl.querySelector(cfg.initialsSelector);
 
             function renderInitials() {
-                const initials = (initialsInput?.value || 'F').substring(0, 2).toUpperCase();
-                if (fallback) {
-                    fallback.textContent = initials;
-                }
+                const initials = (initialsInput?.value || cfg.defaultInitial).substring(0, 2).toUpperCase();
+                if (fallback) fallback.textContent = initials;
             }
 
             function showImage(url) {
-                if (!preview) {
-                    return;
-                }
+                if (!preview) return;
                 preview.innerHTML = `<img src="${escHtml(url)}" class="w-100 h-100 object-cover" alt="Avatar">`;
                 preview.classList.remove('d-none');
-                if (fallback) {
-                    fallback.classList.add('d-none');
-                }
+                fallback?.classList.add('d-none');
             }
 
             function clearImage() {
@@ -193,12 +155,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     preview.innerHTML = '';
                     preview.classList.add('d-none');
                 }
-                if (fallback) {
-                    fallback.classList.remove('d-none');
-                }
-                if (hiddenPath) {
-                    hiddenPath.value = '';
-                }
+                fallback?.classList.remove('d-none');
+                if (hiddenPath) hiddenPath.value = '';
                 updateItem('image', '');
                 renderInitials();
             }
@@ -213,74 +171,45 @@ document.addEventListener('DOMContentLoaded', function() {
                         progress.classList.remove('d-none');
                         progress.textContent = 'Enviando... 0%';
                     }
-                    const uploaded = await uploadFounderAvatar(file, (percent) => {
-                        if (progress) {
-                            progress.textContent = `Enviando... ${percent}%`;
-                        }
+                    const uploaded = await uploadAvatar(file, (percent) => {
+                        if (progress) progress.textContent = `Enviando... ${percent}%`;
                     });
-                    if (hiddenPath) {
-                        hiddenPath.value = uploaded.path;
-                    }
+                    if (hiddenPath) hiddenPath.value = uploaded.path;
                     updateItem('image', uploaded.path);
                     showImage(uploaded.url || normalizeStorageUrl(uploaded.path));
-                    if (progress) {
-                        progress.textContent = 'Upload concluido';
-                    }
+                    if (progress) progress.textContent = 'Upload concluido';
                     notify('success', 'Avatar enviado com sucesso.');
                 } catch (error) {
                     notify('error', error.message || 'Nao foi possivel enviar o avatar.');
                 } finally {
-                    if (progress) {
-                        setTimeout(() => progress.classList.add('d-none'), 1200);
-                    }
+                    if (progress) setTimeout(() => progress.classList.add('d-none'), 1200);
                 }
             }
 
             dropzone.addEventListener('click', function (event) {
-                if (event.target.closest('[data-founder-remove]')) {
-                    return;
-                }
+                if (event.target.closest(cfg.removeSelector)) return;
                 input?.click();
             });
-
-            dropzone.addEventListener('dragover', function (event) {
-                event.preventDefault();
-                dropzone.classList.add('founder-dropzone-active');
-            });
-
-            dropzone.addEventListener('dragleave', function () {
-                dropzone.classList.remove('founder-dropzone-active');
-            });
-
+            dropzone.addEventListener('dragover', function (event) { event.preventDefault(); dropzone.classList.add('founder-dropzone-active'); });
+            dropzone.addEventListener('dragleave', function () { dropzone.classList.remove('founder-dropzone-active'); });
             dropzone.addEventListener('drop', function (event) {
                 event.preventDefault();
                 dropzone.classList.remove('founder-dropzone-active');
-                const file = event.dataTransfer?.files?.[0];
-                processFile(file);
+                processFile(event.dataTransfer?.files?.[0]);
             });
-
-            input?.addEventListener('change', function () {
-                processFile(this.files?.[0]);
-                this.value = '';
-            });
-
+            input?.addEventListener('change', function () { processFile(this.files?.[0]); this.value = ''; });
             removeBtn?.addEventListener('click', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 Swal.fire({
                     icon: 'warning',
                     title: 'Remover avatar?',
-                    text: 'O avatar sera removido deste fundador.',
+                    text: cfg.removeMessage,
                     showCancelButton: true,
                     confirmButtonText: 'Sim, remover',
                     cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        clearImage();
-                    }
-                });
+                }).then((result) => { if (result.isConfirmed) clearImage(); });
             });
-
             initialsInput?.addEventListener('input', renderInitials);
             renderInitials();
         });
@@ -333,7 +262,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             `,
-            onRenderItem: ({ wrapper, updateItem }) => bindFounderDropzones(wrapper, updateItem)
+            onRenderItem: ({ wrapper, updateItem }) => bindDropzone(wrapper, updateItem, {
+                dropzoneSelector: '[data-founder-dropzone]',
+                inputSelector: '[data-founder-file-input]',
+                previewSelector: '[data-founder-preview]',
+                fallbackSelector: '[data-founder-fallback]',
+                progressSelector: '[data-founder-progress]',
+                removeSelector: '[data-founder-remove]',
+                hiddenPathSelector: '[data-founder-image-path]',
+                initialsSelector: '[data-founder-initials]',
+                defaultInitial: 'F',
+                removeMessage: 'O avatar sera removido deste fundador.'
+            })
         });
 
         window.initJSONRepeater({
@@ -344,12 +284,23 @@ document.addEventListener('DOMContentLoaded', function() {
             initialData: {!! json_encode($data['team'] ?? []) !!},
             template: (item, index) => `
                 <div class="row">
-                    <div class="col-md-3 text-center">
-                        <div class="mb-2 mx-auto rounded-circle overflow-hidden shadow-sm border bg-light d-flex align-items-center justify-content-center" style="width:80px; height:80px;">
-                            ${item.image ? `<img src="/storage/${item.image}" class="w-100 h-100 object-cover">` : `<span class="text-muted small">${item.initials || 'M'}</span>`}
+                    <div class="col-md-4 text-center">
+                        <div class="founder-dropzone mb-2 mx-auto overflow-hidden rounded shadow-sm border bg-light d-flex flex-column align-items-center justify-content-center p-2" style="width:130px; min-height:130px;" data-team-dropzone>
+                            <div class="mb-1 text-primary"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div class="small text-muted mb-2">Arraste ou clique</div>
+                            <div class="mb-2 mx-auto overflow-hidden rounded border bg-white d-flex align-items-center justify-content-center" style="width:82px; height:82px;">
+                                <div data-team-preview class="${item.image ? '' : 'd-none'} w-100 h-100">
+                                    ${item.image ? `<img src="${escHtml(normalizeStorageUrl(item.image))}" class="w-100 h-100 object-cover" alt="Avatar">` : ``}
+                                </div>
+                                <span data-team-fallback class="${item.image ? 'd-none' : ''} text-muted small">${escHtml((item.initials || 'M').substring(0, 2).toUpperCase())}</span>
+                            </div>
+                            <div data-team-progress class="small text-info d-none"></div>
+                            <input type="file" class="d-none" accept="image/*" data-team-file-input>
+                            <input type="hidden" name="team[${index}][image]" value="${escHtml(item.image || '')}" data-team-image-path>
+                            <button type="button" class="btn btn-xs btn-outline-danger mt-2" data-team-remove>Remover</button>
                         </div>
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-md-8">
                         <div class="form-row">
                             <div class="form-group col-md-8">
                                 <label class="small font-weight-bold">Nome</label>
@@ -357,16 +308,28 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="small font-weight-bold">Iniciais</label>
-                                <input type="text" name="team[${index}][initials]" value="${item.initials || ''}" class="form-control form-control-sm" maxlength="2">
+                                <input type="text" name="team[${index}][initials]" value="${item.initials || ''}" class="form-control form-control-sm" maxlength="2" data-team-initials>
                             </div>
                         </div>
                         <div class="form-group mb-0">
-                            <label class="small font-weight-bold">Cargo / Função</label>
+                            <label class="small font-weight-bold">Cargo / Funcao</label>
                             <input type="text" name="team[${index}][role]" value="${item.role || ''}" class="form-control form-control-sm">
                         </div>
                     </div>
                 </div>
-            `
+            `,
+            onRenderItem: ({ wrapper, updateItem }) => bindDropzone(wrapper, updateItem, {
+                dropzoneSelector: '[data-team-dropzone]',
+                inputSelector: '[data-team-file-input]',
+                previewSelector: '[data-team-preview]',
+                fallbackSelector: '[data-team-fallback]',
+                progressSelector: '[data-team-progress]',
+                removeSelector: '[data-team-remove]',
+                hiddenPathSelector: '[data-team-image-path]',
+                initialsSelector: '[data-team-initials]',
+                defaultInitial: 'M',
+                removeMessage: 'O avatar sera removido deste membro.'
+            })
         });
     }
 });
@@ -388,18 +351,18 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="tab-pane fade" id="sec-stats">
     <div class="card card-outline card-info">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> UNN em Números</h3>
+            <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> UNN em Numeros</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
-                <label>Título da seção</label>
+                <label>Titulo da secao</label>
                 <input type="text" name="stats_title" class="form-control" value="{{ old('stats_title', $data['stats_title'] ?? '') }}">
             </div>
             <hr>
             @foreach ([1,2,3,4] as $i)
             <div class="form-row">
                 <div class="form-group col-md-4">
-                    <label>Número {{ $i }}</label>
+                    <label>Numero {{ $i }}</label>
                     <input type="text" name="stat_{{ $i }}_value" class="form-control" value="{{ old('stat_'.$i.'_value', $data['stat_'.$i.'_value'] ?? '') }}">
                 </div>
                 <div class="form-group col-md-8">
@@ -419,11 +382,11 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="card-body">
             <div class="form-group">
-                <label>Título</label>
+                <label>Titulo</label>
                 <input type="text" name="cta_title" class="form-control" value="{{ old('cta_title', $data['cta_title'] ?? '') }}">
             </div>
             <div class="form-group mb-0">
-                <label>Texto do botão</label>
+                <label>Texto do botao</label>
                 <input type="text" name="cta_btn" class="form-control" value="{{ old('cta_btn', $data['cta_btn'] ?? '') }}">
             </div>
         </div>
