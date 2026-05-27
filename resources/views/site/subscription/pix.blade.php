@@ -3,7 +3,7 @@
 @section('title', 'Pagamento via Pix')
 
 @section('content')
-<div class="min-h-screen bg-slate-50 pt-32 pb-20 px-4">
+<div class="min-h-screen bg-slate-50 pt-8 md:pt-32 pb-20 px-4">
     <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl p-8 text-center">
         <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600">
             <i class="fa-brands fa-pix text-3xl"></i>

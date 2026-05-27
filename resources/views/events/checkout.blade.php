@@ -34,7 +34,7 @@
         $exhibitorRemaining = $canSellExhibitorArea ? (int) $event->remaining_exhibitor_slots : 0;
     @endphp
 
-    <div class="min-h-screen bg-slate-50 px-4 pb-20 pt-28">
+    <div class="min-h-screen bg-slate-50 px-4 pb-20 pt-6 md:pt-28">
         <div class="mx-auto max-w-5xl">
             <a href="{{ route('events.show', $event) }}"
                 class="mb-6 inline-flex items-center gap-2 text-gray-600 transition hover:text-blue-700">

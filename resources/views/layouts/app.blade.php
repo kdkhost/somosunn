@@ -933,7 +933,7 @@
         @endauth
     @endif
 
-    <main class="{{ $showNavigation ? 'pt-20 lg:pt-24' : 'pt-0' }} min-h-[calc(100vh-80px)]">
+    <main class="pt-0 min-h-[calc(100vh-80px)]">
         @yield('content')
     </main>
 

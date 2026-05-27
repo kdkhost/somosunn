@@ -61,7 +61,7 @@
 @endpush
 
 @section('content')
-    <div class="min-h-screen bg-slate-50 pt-32 pb-20 px-4">
+    <div class="min-h-screen bg-slate-50 pt-8 md:pt-32 pb-20 px-4">
         <div class="max-w-6xl mx-auto">
             <div class="grid lg:grid-cols-3 gap-8">
                 <!-- Sidebar: Resumo do Pedido -->

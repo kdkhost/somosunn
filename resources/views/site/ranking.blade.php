@@ -23,7 +23,7 @@
         </section>
         <!-- Ranking Pódio (Top 3) -->
         @if($podium->isNotEmpty())
-            <section class="pt-24 pb-20">
+            <section class="pt-10 md:pt-24 pb-20">
                 <div class="unn-container px-4">
                     <div class="grid lg:grid-cols-3 gap-8 items-end max-w-5xl mx-auto">
                         @foreach($podium as $rank)

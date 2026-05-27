@@ -60,7 +60,7 @@
 
     <div class="min-h-screen bg-slate-50">
         {{-- Hero Section --}}
-        <section class="unn-jobs-hero pt-32 pb-20 border-b border-slate-100 overflow-hidden">
+        <section class="unn-jobs-hero pt-16 md:pt-32 pb-20 border-b border-slate-100 overflow-hidden">
             <div class="container mx-auto px-4 relative z-10">
                 <div class="max-w-4xl mx-auto">
                     {{-- Breadcrumb --}}

@@ -7,7 +7,7 @@
     $isPaid = $order->status === 'paid';
     $planLabel = $planName ?: 'Assinatura Premium';
 @endphp
-<div class="min-h-screen bg-slate-50 pt-32 pb-20 px-4 flex items-center justify-center">
+<div class="min-h-screen bg-slate-50 pt-8 md:pt-32 pb-20 px-4 flex items-center justify-center">
     <div class="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 text-center animate-fadeInUp">
         <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 {{ $isPaid ? 'bg-green-100' : 'bg-yellow-100' }}">
             <i class="fas {{ $isPaid ? 'fa-check' : 'fa-hourglass-half' }} text-5xl {{ $isPaid ? 'text-green-500' : 'text-yellow-700' }}"></i>

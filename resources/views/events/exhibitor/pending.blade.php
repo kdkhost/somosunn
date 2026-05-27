@@ -3,7 +3,7 @@
 @section('title', 'Pagamento pendente - ' . $event->title)
 
 @section('content')
-<div class="min-h-screen bg-slate-50 px-4 pb-20 pt-28">
+<div class="min-h-screen bg-slate-50 px-4 pb-20 pt-6 md:pt-28">
     <div class="mx-auto max-w-3xl">
         <div class="rounded-2xl bg-white p-8 shadow-lg">
             <div class="flex items-start gap-4">

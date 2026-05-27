@@ -20,7 +20,7 @@
 
 @section('content')
     {{-- Hero compacto --}}
-    <div class="pt-24 pb-4">
+    <div class="pt-4 pb-4">
         <div class="container mx-auto px-4">
             <a href="{{ route('gallery.index') }}"
                 class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
@@ -78,7 +78,7 @@
 
     {{-- Conteudo --}}
     <div class="relative bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_38%,#ffffff_100%)] pb-24">
-        <div class="container relative mx-auto -mt-8 space-y-8 px-4">
+        <div class="container relative mx-auto mt-0 space-y-8 px-4">
 
             {{-- Fotos --}}
             @if($photoCount > 0)

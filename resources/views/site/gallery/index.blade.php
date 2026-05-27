@@ -8,7 +8,7 @@
 
 @section('content')
     {{-- Hero compacto --}}
-    <div class="pt-24 pb-4">
+    <div class="pt-4 pb-4">
         <div class="container mx-auto px-4">
             <div class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
                 <span class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-blue-700">

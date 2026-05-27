@@ -7,7 +7,7 @@
     $retryUrl = data_get($order->metadata, 'mercadopago_init_point') ?? data_get($order->metadata, 'mercadopago_sandbox_init_point');
 @endphp
 
-<div class="min-h-screen bg-slate-50 pt-28 pb-20 px-4">
+<div class="min-h-screen bg-slate-50 pt-6 md:pt-28 pb-20 px-4">
     <div class="max-w-3xl mx-auto">
         <div class="bg-white rounded-2xl shadow-lg p-8">
             <div class="flex items-start gap-4">
@@ -55,4 +55,3 @@
     </div>
 </div>
 @endsection
-
