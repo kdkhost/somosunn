@@ -15,6 +15,19 @@
 
 ---
 
+## [2026-05-27] - fix(quem-somos): cards alinhados e imagens do admin aplicadas
+
+### Corrigido
+- A pagina publica `/quem-somos` foi ajustada para usar corretamente as imagens configuradas no administrativo (capa, foto dos fundadores e foto da equipe).
+- O bloco de fundadores recebeu padronizacao de cards (altura, borda, avatar, tipografia e espacamento), eliminando inconsistencias visuais.
+- Quando nao houver imagem cadastrada, o sistema agora usa fallback com iniciais sem quebrar layout.
+- O hero da pagina foi compactado para reduzir espacos desnecessarios no topo.
+
+### Arquivo principal
+- `resources/views/site/institucional/quem-somos.blade.php`
+
+---
+
 ## [2026-05-27] - fix(galeria): ajustar hero ao padrao visual do tema
 
 ### Corrigido
