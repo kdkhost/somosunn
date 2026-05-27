@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-05-26] - fix(painel): padronizar configuração de expositores
+
+### Corrigido
+- A aba `Expositores` do cadastro de evento no painel novo deixou de usar layout dividido em duas colunas, mantendo a configuração em fluxo único e mais previsível.
+- O upload de imagem, planta ou mapa da área de expositor foi padronizado com arrasta e solta, preview imediato e visualização da imagem atual.
+- Os textos auxiliares e o checklist foram reorganizados em blocos empilhados para evitar tela bagunçada em resoluções menores.
+
+### Arquivos principais
+- `resources/views/panel/admin/events/partials/exhibitors-form-tab.blade.php`
+
+---
+
 ## [2026-05-26] - fix(galeria): evitar fotos quebradas no site público
 
 ### Corrigido
