@@ -16,10 +16,10 @@
                 <p class="text-muted mb-0">{{ $event->title }}</p>
             </div>
             <div class="col-sm-4 text-sm-right mt-2 mt-sm-0">
-                <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-outline-secondary">
+                <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-outline-secondary text-nowrap">
                     <i class="fas fa-arrow-left mr-1"></i> Voltar ao evento
                 </a>
-                <a href="{{ route($routePrefix . '.export', $event) }}" class="btn btn-outline-success" id="btn-export-exhibitors">
+                <a href="{{ route($routePrefix . '.export', $event) }}" class="btn btn-outline-success text-nowrap" id="btn-export-exhibitors">
                     <i class="fas fa-file-csv mr-1"></i> Exportar CSV
                 </a>
             </div>
@@ -82,7 +82,7 @@
                         <h3 class="card-title mb-0"><i class="fas fa-sliders-h mr-1"></i> Configuração</h3>
                         <span class="badge {{ $statusBadge }}" id="exhibitor-status-badge">{{ $status['label'] ?? 'Inativo' }}</span>
                     </div>
-                    <form id="exhibitor-settings-form" enctype="multipart/form-data">
+                    <form id="exhibitor-settings-form" method="POST" action="{{ route($routePrefix . '.settings', $event) }}" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">

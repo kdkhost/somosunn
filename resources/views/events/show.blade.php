@@ -220,6 +220,7 @@
             border-radius: 14px;
             font-size: 0.95rem;
             font-weight: 900;
+            white-space: nowrap;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
 
@@ -252,7 +253,7 @@
             font-size: 0.95rem;
             font-weight: 900;
             line-height: 1.1;
-            white-space: normal;
+            white-space: nowrap;
             text-align: center;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
@@ -376,10 +377,13 @@
             justify-content: center;
             gap: 8px;
             min-height: 34px;
-            flex: 1 1 130px;
+            flex: 1 1 0;
+            min-width: max-content;
+            padding: 0 10px;
             border-radius: 12px;
             background: #ffffff;
             color: #334155;
+            white-space: nowrap;
         }
 
         .event-trust-row i {
@@ -485,6 +489,18 @@
 
             .event-title-premium {
                 font-size: clamp(1.65rem, 8.8vw, 2.25rem);
+            }
+
+            .event-action-button,
+            .event-hero-action {
+                font-size: 0.86rem;
+                padding-inline: 14px;
+            }
+
+            .event-trust-row {
+                gap: 6px;
+                padding: 6px;
+                font-size: 0.74rem;
             }
 
             .event-fact-grid,
@@ -617,7 +633,7 @@
             ['expositor', 'expositores']
         );
         $hasConfiguredExhibitorInfo = $rawExhibitorSummary !== '' || !empty($event->exhibitor_area_image);
-        $showExhibitorPublicSection = $showExhibitorOption || $hasConfiguredExhibitorInfo || $descriptionMentionsExhibitor;
+        $showExhibitorPublicSection = $canSellExhibitor;
         $exhibitorDetectedPrice = null;
         if (!$exhibitorPrice && preg_match('/expositor.{0,90}R\$\s*([\d\.\,]+)/iu', $descriptionPlainText, $priceMatches)) {
             $exhibitorDetectedPrice = 'R$ ' . trim($priceMatches[1]);
@@ -773,8 +789,8 @@
                                 </a>
                             @endif
                             @if($canSellExhibitor)
-                                <a href="{{ route('events.exhibitor.show', $event) }}" class="event-hero-action event-hero-action-secondary">
-                                    <i class="fas fa-store"></i> Comprar area para expositor
+                                <a href="{{ route('events.checkout', $event) }}" class="event-hero-action event-hero-action-secondary">
+                                    <i class="fas fa-store"></i> Escolher como participar
                                 </a>
                             @endif
                         </div>
@@ -916,7 +932,7 @@
                                     </a>
                                 @endif
 
-                                @if($showExhibitorOption)
+                                @if($canSellExhibitor)
                                     <div class="mt-4 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-left">
                                         <div class="flex items-start gap-3">
                                             <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-blue-700 shadow-sm">
@@ -933,9 +949,9 @@
                                                             <i class="fas fa-ticket-alt mr-1"></i> Ingresso incluso no pacote
                                                         </p>
                                                     @endif
-                                                    <a href="{{ route('events.exhibitor.show', $event) }}"
+                                                    <a href="{{ route('events.checkout', $event) }}"
                                                         class="event-action-button event-action-button-secondary mt-3">
-                                                        <i class="fas fa-arrow-right"></i> Quero expor neste evento
+                                                        <i class="fas fa-arrow-right"></i> Escolher no checkout
                                                     </a>
                                                 @elseif(($exhibitorStatus['key'] ?? '') === 'esgotado')
                                                     <p class="mt-1 text-sm font-bold text-red-700">Áreas para expositores esgotadas</p>
@@ -1010,9 +1026,9 @@
                                 @endif
 
                                 @if($canSellExhibitor)
-                                    <a href="{{ route('events.exhibitor.show', $event) }}"
+                                    <a href="{{ route('events.checkout', $event) }}"
                                         class="btn-primary flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-black text-white shadow-lg transition hover:shadow-xl">
-                                        <i class="fas fa-store"></i> Comprar area para expositor
+                                        <i class="fas fa-store"></i> Escolher no checkout
                                     </a>
                                 @elseif(($exhibitorStatus['key'] ?? '') === 'esgotado')
                                     <div class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-center text-sm font-black text-red-700">

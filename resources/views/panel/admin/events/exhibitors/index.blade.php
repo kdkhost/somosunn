@@ -33,10 +33,10 @@
             <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">{{ $event->title }}</p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ $backRoute }}" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
+            <a href="{{ $backRoute }}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
                 <i class="fas fa-arrow-left mr-1"></i> Voltar
             </a>
-            <a href="{{ route($routePrefix . '.export', $event) }}" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white hover:bg-emerald-700">
+            <a href="{{ route($routePrefix . '.export', $event) }}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white hover:bg-emerald-700">
                 <i class="fas fa-file-csv mr-1"></i> Exportar CSV
             </a>
         </div>
@@ -45,13 +45,13 @@
     <div class="rounded-3xl border border-blue-100 bg-blue-50 p-5 shadow-sm dark:border-blue-900/60 dark:bg-blue-500/10">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-                <p class="text-sm font-black uppercase tracking-[0.22em] text-blue-700 dark:text-blue-200">Configuracao agrupada no evento</p>
+                <p class="text-sm font-black uppercase tracking-[0.22em] text-blue-700 dark:text-blue-200">Configuração agrupada no evento</p>
                 <p class="mt-2 text-sm font-semibold leading-6 text-blue-900 dark:text-blue-100">
-                    O preco, os lotes, a quantidade total e a exibicao publica devem ser editados no cadastro do evento. O cliente escolhe entre ingresso normal e area de expositor na hora do pagamento.
+                    Edite em <strong>Eventos &gt; Editar evento &gt; aba Expositores</strong>. Ali ficam preço, lotes, quantidade total e exibição pública. No checkout, o cliente escolhe ingresso normal ou área de expositor.
                 </p>
             </div>
             @if($canEditEvent)
-                <a href="{{ $eventEditRoute }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700">
+                <a href="{{ $eventEditRoute }}" class="inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-blue-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700">
                     <i class="fas fa-pen-to-square"></i>
                     Abrir cadastro do evento
                 </a>
@@ -79,85 +79,7 @@
     </div>
 
     <div class="grid gap-6 xl:grid-cols-5">
-        <form id="exhibitor-settings-form" enctype="multipart/form-data" class="space-y-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:col-span-2">
-            @csrf
-            <div class="flex items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-lg font-black text-slate-950 dark:text-white">Configuração</h2>
-                    <span id="exhibitor-status-badge" class="mt-2 inline-flex rounded-full px-3 py-1 text-xs font-black {{ $badgeColor }}">{{ $status['label'] ?? 'Inativo' }}</span>
-                </div>
-                <button type="button" id="btn-toggle-exhibitor" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
-                    {{ $event->exhibitor_sales_enabled ? 'Desativar' : 'Ativar' }}
-                </button>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-2">
-                <label class="space-y-2">
-                    <span class="text-xs font-black uppercase tracking-widest text-slate-500">Quantidade total</span>
-                    <input type="number" min="0" name="exhibitor_total_slots" value="{{ old('exhibitor_total_slots', $event->exhibitor_total_slots) }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold dark:border-slate-700 dark:bg-slate-950 dark:text-white">
-                </label>
-                <label class="space-y-2">
-                    <span class="text-xs font-black uppercase tracking-widest text-slate-500">Quantidade vendida</span>
-                    <input type="text" value="{{ (int) $summary['sold_slots'] }}" readonly class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-bold text-slate-500 dark:border-slate-700 dark:bg-slate-800">
-                </label>
-            </div>
-
-            <div class="grid gap-3">
-                <label class="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-200">
-                    <input type="checkbox" name="exhibitor_sales_enabled" value="1" {{ $event->exhibitor_sales_enabled ? 'checked' : '' }} class="h-5 w-5 rounded border-slate-300 text-blue-600">
-                    Publicar venda de áreas
-                </label>
-                <label class="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-200">
-                    <input type="checkbox" name="exhibitor_includes_ticket" value="1" {{ $event->exhibitor_includes_ticket ? 'checked' : '' }} class="h-5 w-5 rounded border-slate-300 text-blue-600">
-                    Expositor recebe ingresso incluso
-                </label>
-                <label class="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-200">
-                    <input type="hidden" name="exhibitor_show_publicly" value="0">
-                    <input type="checkbox" name="exhibitor_show_publicly" value="1" {{ ($event->exhibitor_show_publicly ?? true) ? 'checked' : '' }} class="h-5 w-5 rounded border-slate-300 text-blue-600">
-                    Exibir publicamente
-                </label>
-            </div>
-
-            <label class="space-y-2 block">
-                <span class="text-xs font-black uppercase tracking-widest text-slate-500">Descrição pública</span>
-                <textarea name="exhibitor_description" rows="4" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white">{{ old('exhibitor_description', $event->exhibitor_description) }}</textarea>
-            </label>
-            <label class="space-y-2 block">
-                <span class="text-xs font-black uppercase tracking-widest text-slate-500">Observações internas</span>
-                <textarea name="exhibitor_internal_notes" rows="3" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white">{{ old('exhibitor_internal_notes', $event->exhibitor_internal_notes) }}</textarea>
-            </label>
-
-            <div class="space-y-2">
-                <span class="text-xs font-black uppercase tracking-widest text-slate-500">Imagem, planta ou mapa</span>
-                <input type="file" name="exhibitor_area_image" accept="image/*" class="filepond" data-max-file-size="10MB">
-                @if($event->exhibitor_area_image_url)
-                    <a href="{{ $event->exhibitor_area_image_url }}" target="_blank" class="inline-flex text-sm font-bold text-blue-700 dark:text-blue-300">Ver imagem atual</a>
-                    <label class="ml-3 inline-flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-300">
-                        <input type="checkbox" name="remove_exhibitor_area_image" value="1"> Remover atual
-                    </label>
-                @endif
-            </div>
-
-            <div class="space-y-3">
-                <h3 class="text-sm font-black uppercase tracking-widest text-slate-500">Lotes</h3>
-                @for($i = 1; $i <= 3; $i++)
-                    <div class="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
-                        <p class="mb-3 font-black text-slate-900 dark:text-white">{{ $i }}º lote</p>
-                        <div class="grid gap-3 sm:grid-cols-3">
-                            <input type="text" name="exhibitor_batch_{{ $i }}_price" placeholder="Preço" value="{{ old('exhibitor_batch_' . $i . '_price', $event->{'exhibitor_batch_' . $i . '_price'}) }}" class="js-money rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white">
-                            <input type="datetime-local" name="exhibitor_batch_{{ $i }}_deadline" value="{{ optional($event->{'exhibitor_batch_' . $i . '_deadline'})->format('Y-m-d\TH:i') }}" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white">
-                            <input type="number" min="0" name="exhibitor_batch_{{ $i }}_slots" placeholder="Limite" value="{{ old('exhibitor_batch_' . $i . '_slots', $event->{'exhibitor_batch_' . $i . '_slots'}) }}" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white">
-                        </div>
-                    </div>
-                @endfor
-            </div>
-
-            <button type="submit" class="w-full rounded-xl bg-blue-600 px-5 py-3 font-black text-white hover:bg-blue-700">
-                <i class="fas fa-save mr-1"></i> Salvar configurações
-            </button>
-        </form>
-
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:col-span-3">
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:col-span-5">
             <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-end">
                 <label class="flex-1 space-y-2">
                     <span class="text-xs font-black uppercase tracking-widest text-slate-500">Busca</span>

@@ -2,6 +2,22 @@
 
 ---
 
+## [2026-05-26] - fix(expositores): checkout como ponto único de escolha
+
+### Corrigido
+- O bloco público de `Áreas para expositores` agora só aparece quando o evento possui venda de expositor ativa, lote válido e vagas disponíveis.
+- Os botões da página pública do evento foram padronizados para evitar quebra de linha em `Quero expor`, `Pagamento seguro` e `Reembolso garantido`.
+- A tela `/painel/admin/events/{event}/exhibitors` foi simplificada para gestão de inscrições, exportação e resumo, deixando a edição em `Editar evento > Expositores`.
+- O formulário legado `/admin/events/{event}/exhibitors` passou a ter action explícita para evitar POST acidental na rota GET durante upload.
+- Os atalhos de expositor na página pública apontam para o checkout do evento, onde o usuário escolhe entre ingresso normal e área de expositor.
+
+### Arquivos principais
+- `resources/views/events/show.blade.php`
+- `resources/views/panel/admin/events/exhibitors/index.blade.php`
+- `resources/views/admin/events/exhibitors/index.blade.php`
+
+---
+
 ## [2026-05-26] - fix(eventos): agrupar venda de expositor no cadastro do evento
 
 ### Corrigido
