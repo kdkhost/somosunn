@@ -142,7 +142,7 @@
                         @if($store->logo_url)
                             <img src="{{ $store->logo_url }}" alt="Logo" class="mt-4 h-28 w-28 rounded-3xl object-cover border border-slate-200 dark:border-slate-700">
                         @endif
-                        <input type="file" name="logo" accept="image/*" class="mt-4 block w-full text-sm text-slate-500 dark:text-slate-300">
+                        <input type="file" name="logo" accept="image/*" class="filepond mt-4">
                         <label class="mt-3 inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                             <input type="hidden" name="remove_logo" value="0">
                             <input type="checkbox" name="remove_logo" value="1" class="rounded border-slate-300 text-red-500"> Remover logo atual
@@ -154,7 +154,7 @@
                         @if($store->banner_url)
                             <img src="{{ $store->banner_url }}" alt="Banner" class="mt-4 h-40 w-full rounded-3xl object-cover border border-slate-200 dark:border-slate-700">
                         @endif
-                        <input type="file" name="banner" accept="image/*" class="mt-4 block w-full text-sm text-slate-500 dark:text-slate-300">
+                        <input type="file" name="banner" accept="image/*" class="filepond mt-4">
                         <label class="mt-3 inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                             <input type="hidden" name="remove_banner" value="0">
                             <input type="checkbox" name="remove_banner" value="1" class="rounded border-slate-300 text-red-500"> Remover banner atual
