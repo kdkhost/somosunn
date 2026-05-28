@@ -619,7 +619,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::post('points-rules/exchange-settings', [\App\Http\Controllers\Panel\Admin\PointsRuleController::class, 'updateExchangeSettings'])->name('points-rules.exchange-settings');
         Route::resource('points-rules', \App\Http\Controllers\Panel\Admin\PointsRuleController::class);
         Route::get('marketplace/lojas', [\App\Http\Controllers\Panel\Admin\SellerStoreController::class, 'index'])->name('marketplace.stores.index');
-        Route::post('marketplace/lojas/{store}/toggle', [\App\Http\Controllers\Panel\Admin\SellerStoreController::class, 'toggle'])->name('marketplace.stores.toggle');
+        Route::post('marketplace/lojas/{store:id}/toggle', [\App\Http\Controllers\Panel\Admin\SellerStoreController::class, 'toggle'])->name('marketplace.stores.toggle');
         Route::get('marketplace/produtos', [\App\Http\Controllers\Panel\Admin\SellerProductController::class, 'index'])->name('marketplace.products.index');
         Route::post('marketplace/produtos/{product}/toggle', [\App\Http\Controllers\Panel\Admin\SellerProductController::class, 'toggle'])->name('marketplace.products.toggle');
         Route::post('redemptions/{redemption}/approve', [\App\Http\Controllers\Panel\Admin\RedemptionController::class, 'approve'])->name('redemptions.approve');
@@ -742,7 +742,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
         Route::post('/pedidos/{order}/envio', [\App\Http\Controllers\Admin\SellerOrderController::class, 'updateShipment'])->name('orders.shipment.update');
         Route::get('/sales', [\App\Http\Controllers\Admin\MarketplaceController::class, 'sales'])->name('sales');
         Route::get('/lojas', [\App\Http\Controllers\Admin\MarketplaceController::class, 'stores'])->name('stores.index');
-        Route::post('/lojas/{store}/toggle', [\App\Http\Controllers\Admin\MarketplaceController::class, 'toggleStore'])->name('stores.toggle');
+        Route::post('/lojas/{store:id}/toggle', [\App\Http\Controllers\Admin\MarketplaceController::class, 'toggleStore'])->name('stores.toggle');
         Route::get('/catalogo', [\App\Http\Controllers\Admin\MarketplaceController::class, 'catalog'])->name('catalog.index');
         Route::post('/catalogo/{product}/toggle', [\App\Http\Controllers\Admin\MarketplaceController::class, 'toggleCatalogProduct'])->name('catalog.toggle');
     });

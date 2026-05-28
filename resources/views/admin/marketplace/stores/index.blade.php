@@ -101,7 +101,7 @@
                                     <span class="badge {{ $statusBadge }}"><i class="fas {{ $statusIcon }} mr-1"></i>{{ $statusLabel }}</span>
                                 </td>
                                 <td class="text-right">
-                                    <form action="{{ route('admin.marketplace.stores.toggle', $store) }}" method="POST" class="d-inline-block">
+                                    <form action="{{ route('admin.marketplace.stores.toggle', ['store' => $store->id]) }}" method="POST" class="d-inline-block">
                                         @csrf
                                         <input type="hidden" name="is_blocked" value="{{ $store->is_blocked ? 0 : 1 }}">
                                         <button type="submit" class="btn btn-sm {{ $store->is_blocked ? 'btn-outline-success' : 'btn-outline-danger' }} rounded-pill elevation-1">

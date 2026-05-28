@@ -32,7 +32,7 @@
                             <td class="px-4 py-4 text-slate-600 dark:text-slate-300">{{ $store->user->name ?? '-' }}</td>
                             <td class="px-4 py-4 text-slate-600 dark:text-slate-300">{{ $store->is_blocked ? 'Bloqueada' : ($store->is_published ? 'Publicada' : 'Rascunho') }}</td>
                             <td class="px-4 py-4 text-right">
-                                <form action="{{ route('panel.admin.marketplace.stores.toggle', $store) }}" method="POST">
+                                <form action="{{ route('panel.admin.marketplace.stores.toggle', ['store' => $store->id]) }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="is_blocked" value="{{ $store->is_blocked ? 0 : 1 }}">
                                     <button type="submit" class="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-xs font-black {{ $store->is_blocked ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-300' }}">
