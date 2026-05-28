@@ -419,7 +419,7 @@
                             ['para', ['ul', 'ol', 'paragraph']],
                             ['table', ['table']],
                             ['insert', ['link', 'picture', 'video']],
-                            ['view', ['fullscreen', 'codeview', 'help']]
+                            ['view', ['fullscreen', 'codeview']]
                         ],
                         callbacks: {
                             onChange: function (contents) { $field.val(contents); }
