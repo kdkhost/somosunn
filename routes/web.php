@@ -454,6 +454,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::post('/pagamentos/testar', [\App\Http\Controllers\Panel\MarketplaceController::class, 'testCredentials'])->name('payments.test');
         Route::get('/loja', [\App\Http\Controllers\Panel\MarketplaceStoreController::class, 'edit'])->name('store.edit');
         Route::post('/loja', [\App\Http\Controllers\Panel\MarketplaceStoreController::class, 'update'])->name('store.update');
+        Route::post('/loja/upload', [\App\Http\Controllers\Panel\MarketplaceStoreController::class, 'uploadMedia'])->name('store.upload-media');
         Route::get('/produtos', [\App\Http\Controllers\Panel\SellerProductController::class, 'index'])->name('products.index');
         Route::get('/produtos/novo', [\App\Http\Controllers\Panel\SellerProductController::class, 'create'])->name('products.create');
         Route::post('/produtos', [\App\Http\Controllers\Panel\SellerProductController::class, 'store'])->name('products.store');

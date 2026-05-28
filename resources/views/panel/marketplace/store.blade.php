@@ -71,24 +71,54 @@
             <div class="grid gap-6 md:grid-cols-2">
                 <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 shadow-sm">
                     <h2 class="text-lg font-black text-slate-900 dark:text-white">Logo</h2>
-                    @if($store->logo_url)
-                        <img src="{{ $store->logo_url }}" alt="Logo" class="mt-4 h-28 w-28 rounded-3xl object-cover border border-slate-200 dark:border-slate-700">
-                    @endif
-                    <input type="file" name="logo" accept="image/*" class="filepond mt-4">
+                    <input type="hidden" name="logo_path" value="">
+                    <input type="hidden" name="remove_logo" value="0">
+                    <div class="store-upload-zone mt-4" data-field="logo" data-current="{{ $store->logo_url }}">
+                        <div class="store-upload-placeholder">
+                            @if($store->logo_url)
+                                <img src="{{ $store->logo_url }}" alt="Logo" class="h-28 w-28 rounded-3xl object-cover border border-slate-200 dark:border-slate-700 mx-auto">
+                            @endif
+                            <div class="mt-3 text-sm text-slate-500 dark:text-slate-400">Arraste uma imagem ou clique para selecionar</div>
+                        </div>
+                        <div class="store-upload-progress hidden">
+                            <div class="store-upload-bar-bg"><div class="store-upload-bar-fill"></div></div>
+                            <div class="store-upload-percent text-xs text-slate-500 mt-1"></div>
+                        </div>
+                        <div class="store-upload-preview hidden">
+                            <img src="" alt="Preview" class="h-28 w-28 rounded-3xl object-cover border border-slate-200 dark:border-slate-700 mx-auto">
+                            <div class="mt-2 text-xs text-emerald-600 font-bold">Enviado</div>
+                            <button type="button" class="store-upload-remove text-xs text-red-500 mt-1 hover:underline">Remover</button>
+                        </div>
+                        <input type="file" accept="image/*" class="store-upload-input" style="display:none">
+                    </div>
                     <label class="mt-3 inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                        <input type="hidden" name="remove_logo" value="0">
                         <input type="checkbox" name="remove_logo" value="1" class="rounded border-slate-300 text-red-500"> Remover logo atual
                     </label>
                 </div>
 
                 <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 shadow-sm">
                     <h2 class="text-lg font-black text-slate-900 dark:text-white">Banner</h2>
-                    @if($store->banner_url)
-                        <img src="{{ $store->banner_url }}" alt="Banner" class="mt-4 h-40 w-full rounded-3xl object-cover border border-slate-200 dark:border-slate-700">
-                    @endif
-                    <input type="file" name="banner" accept="image/*" class="filepond mt-4">
+                    <input type="hidden" name="banner_path" value="">
+                    <input type="hidden" name="remove_banner" value="0">
+                    <div class="store-upload-zone mt-4" data-field="banner" data-current="{{ $store->banner_url }}">
+                        <div class="store-upload-placeholder">
+                            @if($store->banner_url)
+                                <img src="{{ $store->banner_url }}" alt="Banner" class="h-40 w-full rounded-3xl object-cover border border-slate-200 dark:border-slate-700">
+                            @endif
+                            <div class="mt-3 text-sm text-slate-500 dark:text-slate-400">Arraste uma imagem ou clique para selecionar</div>
+                        </div>
+                        <div class="store-upload-progress hidden">
+                            <div class="store-upload-bar-bg"><div class="store-upload-bar-fill"></div></div>
+                            <div class="store-upload-percent text-xs text-slate-500 mt-1"></div>
+                        </div>
+                        <div class="store-upload-preview hidden">
+                            <img src="" alt="Preview" class="h-40 w-full rounded-3xl object-cover border border-slate-200 dark:border-slate-700">
+                            <div class="mt-2 text-xs text-emerald-600 font-bold">Enviado</div>
+                            <button type="button" class="store-upload-remove text-xs text-red-500 mt-1 hover:underline">Remover</button>
+                        </div>
+                        <input type="file" accept="image/*" class="store-upload-input" style="display:none">
+                    </div>
                     <label class="mt-3 inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                        <input type="hidden" name="remove_banner" value="0">
                         <input type="checkbox" name="remove_banner" value="1" class="rounded border-slate-300 text-red-500"> Remover banner atual
                     </label>
                 </div>
@@ -192,20 +222,191 @@
     </div>
 @endsection
 
+@push('styles')
+<style>
+.store-upload-zone {
+    position: relative;
+    border: 2px dashed #cbd5e1;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s ease;
+    background: #f8fafc;
+}
+.store-upload-zone:hover,
+.store-upload-zone.is-dragover {
+    border-color: #6366f1;
+    background: #eef2ff;
+}
+.store-upload-zone.has-file {
+    border-style: solid;
+    border-color: #6366f1;
+    background: #fff;
+}
+.dark .store-upload-zone {
+    background: rgba(15,23,42,.4);
+    border-color: rgba(148,163,184,.2);
+}
+.dark .store-upload-zone:hover,
+.dark .store-upload-zone.is-dragover {
+    border-color: #818cf8;
+    background: rgba(99,102,241,.1);
+}
+.store-upload-bar-bg {
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: .75rem;
+}
+.dark .store-upload-bar-bg { background: #334155; }
+.store-upload-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 3px;
+    transition: width .3s ease;
+}
+</style>
+@endpush
+
 @push('scripts')
     <script>
         (function () {
+            function initStoreUploadZones() {
+                const uploadUrl = @json(route('panel.marketplace.store.upload-media'));
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+                document.querySelectorAll('.store-upload-zone').forEach(function (zone) {
+                    if (zone.dataset.uploadInit === '1') return;
+                    zone.dataset.uploadInit = '1';
+
+                    const field = zone.dataset.field;
+                    const placeholder = zone.querySelector('.store-upload-placeholder');
+                    const progress = zone.querySelector('.store-upload-progress');
+                    const progressFill = zone.querySelector('.store-upload-bar-fill');
+                    const progressPercent = zone.querySelector('.store-upload-percent');
+                    const preview = zone.querySelector('.store-upload-preview');
+                    const previewImg = preview.querySelector('img');
+                    const removeBtn = zone.querySelector('.store-upload-remove');
+                    const input = zone.querySelector('.store-upload-input');
+                    const hiddenPath = document.querySelector('input[name="' + field + '_path"]');
+                    const removeCheckbox = document.querySelector('input[name="remove_' + field + '"][type="checkbox"]');
+
+                    function resetZone() {
+                        hiddenPath.value = '';
+                        placeholder.hidden = false;
+                        progress.classList.add('hidden');
+                        preview.classList.add('hidden');
+                        zone.classList.remove('has-file');
+                        input.value = '';
+                    }
+
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            resetZone();
+                        });
+                    }
+
+                    if (removeCheckbox) {
+                        removeCheckbox.addEventListener('change', function () {
+                            if (this.checked) resetZone();
+                        });
+                    }
+
+                    function uploadFile(file) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('field', field);
+
+                        placeholder.hidden = true;
+                        progress.classList.remove('hidden');
+                        zone.classList.add('has-file');
+
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('POST', uploadUrl, true);
+                        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+                        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                        xhr.upload.addEventListener('progress', function (e) {
+                            if (!e.lengthComputable) return;
+                            const pct = Math.round((e.loaded / e.total) * 100);
+                            progressFill.style.width = pct + '%';
+                            progressPercent.textContent = pct + '%';
+                        });
+
+                        xhr.addEventListener('load', function () {
+                            progress.classList.add('hidden');
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                try {
+                                    const resp = JSON.parse(xhr.responseText);
+                                    if (resp.success && resp.path) {
+                                        hiddenPath.value = resp.path;
+                                        if (previewImg) previewImg.src = resp.url;
+                                        preview.classList.remove('hidden');
+                                        placeholder.hidden = true;
+                                        if (removeCheckbox) removeCheckbox.checked = false;
+                                    }
+                                } catch (e) {
+                                    resetZone();
+                                }
+                            } else {
+                                resetZone();
+                            }
+                        });
+
+                        xhr.addEventListener('error', function () {
+                            resetZone();
+                        });
+
+                        xhr.send(formData);
+                    }
+
+                    input.addEventListener('change', function () {
+                        if (input.files && input.files[0]) {
+                            uploadFile(input.files[0]);
+                        }
+                    });
+
+                    ['dragenter', 'dragover'].forEach(function (evt) {
+                        zone.addEventListener(evt, function (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            zone.classList.add('is-dragover');
+                        });
+                    });
+
+                    ['dragleave', 'dragend'].forEach(function (evt) {
+                        zone.addEventListener(evt, function (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            zone.classList.remove('is-dragover');
+                        });
+                    });
+
+                    zone.addEventListener('drop', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        zone.classList.remove('is-dragover');
+                        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+                            uploadFile(e.dataTransfer.files[0]);
+                        }
+                    });
+
+                    zone.addEventListener('click', function () {
+                        input.click();
+                    });
+                });
+            }
+
             function initMarketplaceStoreBioEditor() {
-                if (!(window.jQuery && $.fn && $.fn.summernote)) {
-                    return;
-                }
+                if (!(window.jQuery && $.fn && $.fn.summernote)) return;
 
                 $('.store-bio-editor').each(function () {
                     const $field = $(this);
-
-                    if ($field.next('.note-editor').length) {
-                        return;
-                    }
+                    if ($field.next('.note-editor').length) return;
 
                     $field.summernote({
                         height: 260,
@@ -221,9 +422,7 @@
                             ['view', ['fullscreen', 'codeview', 'help']]
                         ],
                         callbacks: {
-                            onChange: function (contents) {
-                                $field.val(contents);
-                            }
+                            onChange: function (contents) { $field.val(contents); }
                         }
                     });
 
@@ -239,17 +438,13 @@
                 const taglineInput = document.querySelector('input[name="tagline"]');
                 const brandTarget = document.getElementById('store_preview_brand_name');
                 const taglineTarget = document.getElementById('store_preview_tagline');
-
                 const previewPrimaryBadge = document.getElementById('store_preview_primary_badge');
                 const previewAccentBadge = document.getElementById('store_preview_accent_badge');
                 const previewPrimaryButton = document.getElementById('store_preview_button_primary');
                 const previewAccentButton = document.getElementById('store_preview_button_accent');
                 const defaultTagline = @json($isPlatformStore ? 'Loja oficial da plataforma dentro do ecossistema UNN.' : 'Loja premium dentro do ecossistema UNN.');
 
-                const defaultColors = {
-                    primary: '#1F5EDB',
-                    accent: '#0F172A',
-                };
+                const defaultColors = { primary: '#1F5EDB', accent: '#0F172A' };
 
                 const colorGroups = {
                     primary: {
@@ -274,123 +469,62 @@
 
                 const normalizeHexColor = (value, fallback) => {
                     const cleaned = String(value || '').trim().toUpperCase().replace(/[^0-9A-F#]/g, '');
-                    const withHash = cleaned.startsWith('#') ? cleaned : `#${cleaned}`;
+                    const withHash = cleaned.startsWith('#') ? cleaned : '#' + cleaned;
                     return /^#[0-9A-F]{6}$/.test(withHash) ? withHash : fallback;
                 };
 
                 const hexToRgb = (hex) => {
-                    const normalized = normalizeHexColor(hex, '#000000').slice(1);
-                    return {
-                        r: parseInt(normalized.slice(0, 2), 16),
-                        g: parseInt(normalized.slice(2, 4), 16),
-                        b: parseInt(normalized.slice(4, 6), 16),
-                    };
+                    const n = normalizeHexColor(hex, '#000000').slice(1);
+                    return { r: parseInt(n.slice(0,2),16), g: parseInt(n.slice(2,4),16), b: parseInt(n.slice(4,6),16) };
                 };
 
                 const contrastColor = (hex) => {
                     const { r, g, b } = hexToRgb(hex);
-                    const luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
-                    return luminance > 170 ? '#0F172A' : '#FFFFFF';
+                    return (0.299*r + 0.587*g + 0.114*b) > 170 ? '#0F172A' : '#FFFFFF';
                 };
 
-                const rgba = (hex, alpha) => {
+                const rgba = (hex, a) => {
                     const { r, g, b } = hexToRgb(hex);
-                    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
                 };
 
                 const syncPreviewTexts = () => {
-                    if (brandTarget && brandInput) {
-                        brandTarget.textContent = brandInput.value.trim() || 'Sua marca';
-                    }
-
-                    if (taglineTarget && taglineInput) {
-                        taglineTarget.textContent = taglineInput.value.trim() || defaultTagline;
-                    }
+                    if (brandTarget && brandInput) brandTarget.textContent = brandInput.value.trim() || 'Sua marca';
+                    if (taglineTarget && taglineInput) taglineTarget.textContent = taglineInput.value.trim() || defaultTagline;
                 };
 
                 const syncColors = () => {
-                    const primary = normalizeHexColor(colorGroups.primary.text ? colorGroups.primary.text.value : '', colorGroups.primary.fallback);
-                    const accent = normalizeHexColor(colorGroups.accent.text ? colorGroups.accent.text.value : '', colorGroups.accent.fallback);
+                    const p = normalizeHexColor(colorGroups.primary.text ? colorGroups.primary.text.value : '', colorGroups.primary.fallback);
+                    const a = normalizeHexColor(colorGroups.accent.text ? colorGroups.accent.text.value : '', colorGroups.accent.fallback);
 
                     Object.values(colorGroups).forEach((group) => {
-                        if (!group.text || !group.picker) {
-                            return;
-                        }
-
-                        const current = group === colorGroups.primary ? primary : accent;
-                        const textColor = contrastColor(current);
-
-                        group.text.value = current;
-                        group.picker.value = current;
-
-                        if (group.swatch) {
-                            group.swatch.style.backgroundColor = current;
-                        }
-
-                        if (group.label) {
-                            group.label.textContent = current;
-                        }
-
-                        if (group.chip) {
-                            group.chip.style.backgroundColor = current;
-                            group.chip.style.color = textColor;
-                            group.chip.style.boxShadow = `0 10px 25px ${rgba(current, 0.22)}`;
-                        }
-
-                        if (group.card) {
-                            group.card.style.borderColor = rgba(current, 0.25);
-                            group.card.style.boxShadow = `inset 0 0 0 1px ${rgba(current, 0.08)}`;
-                            group.card.style.background = `linear-gradient(180deg, ${rgba(current, 0.16)}, ${rgba(current, 0.04)})`;
-                        }
+                        if (!group.text || !group.picker) return;
+                        const cur = group === colorGroups.primary ? p : a;
+                        const tc = contrastColor(cur);
+                        group.text.value = cur;
+                        group.picker.value = cur;
+                        if (group.swatch) group.swatch.style.backgroundColor = cur;
+                        if (group.label) group.label.textContent = cur;
+                        if (group.chip) { group.chip.style.backgroundColor = cur; group.chip.style.color = tc; group.chip.style.boxShadow = '0 10px 25px ' + rgba(cur, 0.22); }
+                        if (group.card) { group.card.style.borderColor = rgba(cur, 0.25); group.card.style.boxShadow = 'inset 0 0 0 1px ' + rgba(cur, 0.08); group.card.style.background = 'linear-gradient(180deg, ' + rgba(cur, 0.16) + ', ' + rgba(cur, 0.04) + ')'; }
                     });
 
-                    if (preview) {
-                        preview.style.background = `linear-gradient(135deg, ${primary}, ${accent})`;
-                        preview.style.boxShadow = `0 20px 45px ${rgba(primary, 0.22)}`;
-                    }
-
-                    if (previewPrimaryBadge) {
-                        previewPrimaryBadge.style.backgroundColor = primary;
-                        previewPrimaryBadge.style.color = contrastColor(primary);
-                    }
-
-                    if (previewAccentBadge) {
-                        previewAccentBadge.style.backgroundColor = accent;
-                        previewAccentBadge.style.color = contrastColor(accent);
-                    }
-
-                    if (previewPrimaryButton) {
-                        previewPrimaryButton.style.backgroundColor = primary;
-                        previewPrimaryButton.style.color = contrastColor(primary);
-                    }
-
-                    if (previewAccentButton) {
-                        previewAccentButton.style.backgroundColor = accent;
-                        previewAccentButton.style.color = contrastColor(accent);
-                    }
+                    if (preview) { preview.style.background = 'linear-gradient(135deg, ' + p + ', ' + a + ')'; preview.style.boxShadow = '0 20px 45px ' + rgba(p, 0.22); }
+                    if (previewPrimaryBadge) { previewPrimaryBadge.style.backgroundColor = p; previewPrimaryBadge.style.color = contrastColor(p); }
+                    if (previewAccentBadge) { previewAccentBadge.style.backgroundColor = a; previewAccentBadge.style.color = contrastColor(a); }
+                    if (previewPrimaryButton) { previewPrimaryButton.style.backgroundColor = p; previewPrimaryButton.style.color = contrastColor(p); }
+                    if (previewAccentButton) { previewAccentButton.style.backgroundColor = a; previewAccentButton.style.color = contrastColor(a); }
                 };
 
                 Object.values(colorGroups).forEach((group) => {
-                    if (!group.text || !group.picker) {
-                        return;
-                    }
-
-                    group.picker.addEventListener('input', function () {
-                        group.text.value = this.value.toUpperCase();
-                        syncColors();
-                    });
-
+                    if (!group.text || !group.picker) return;
+                    group.picker.addEventListener('input', function () { group.text.value = this.value.toUpperCase(); syncColors(); });
                     group.text.addEventListener('input', syncColors);
                     group.text.addEventListener('blur', syncColors);
                 });
 
-                if (brandInput) {
-                    brandInput.addEventListener('input', syncPreviewTexts);
-                }
-
-                if (taglineInput) {
-                    taglineInput.addEventListener('input', syncPreviewTexts);
-                }
+                if (brandInput) brandInput.addEventListener('input', syncPreviewTexts);
+                if (taglineInput) taglineInput.addEventListener('input', syncPreviewTexts);
 
                 syncPreviewTexts();
                 syncColors();
@@ -398,10 +532,12 @@
 
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', function () {
+                    initStoreUploadZones();
                     initMarketplaceStoreBioEditor();
                     initMarketplaceStoreColorPreview();
                 });
             } else {
+                initStoreUploadZones();
                 initMarketplaceStoreBioEditor();
                 initMarketplaceStoreColorPreview();
             }

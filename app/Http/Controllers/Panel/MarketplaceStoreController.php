@@ -94,11 +94,17 @@ class MarketplaceStoreController extends Controller
             $store->banner_path = null;
         }
 
-        if ($request->hasFile('logo')) {
+        $uploadedLogoPath = $request->input('logo_path');
+        if ($uploadedLogoPath) {
+            $data['logo_path'] = $uploadedLogoPath;
+        } elseif ($request->hasFile('logo')) {
             $data['logo_path'] = UploadStorage::storeUploadedFile($request->file('logo'), 'uploads/imagens/marketplace/stores/logos');
         }
 
-        if ($request->hasFile('banner')) {
+        $uploadedBannerPath = $request->input('banner_path');
+        if ($uploadedBannerPath) {
+            $data['banner_path'] = $uploadedBannerPath;
+        } elseif ($request->hasFile('banner')) {
             $data['banner_path'] = UploadStorage::storeUploadedFile($request->file('banner'), 'uploads/imagens/marketplace/stores/banners');
         }
 
@@ -147,6 +153,30 @@ class MarketplaceStoreController extends Controller
         return redirect()
             ->route('panel.marketplace.store.edit')
             ->with('success', 'Configuracoes da loja atualizadas com sucesso.');
+    }
+
+    public function uploadMedia(Request $request)
+    {
+        if (!SellerStore::tableAvailable()) {
+            return response()->json(['success' => false, 'message' => 'Modulo nao instalado.'], 422);
+        }
+
+        $request->validate([
+            'file' => ['required', 'image', 'max:6144'],
+        ]);
+
+        $field = $request->input('field', 'logo');
+        $directory = $field === 'banner'
+            ? 'uploads/imagens/marketplace/stores/banners'
+            : 'uploads/imagens/marketplace/stores/logos';
+
+        $path = UploadStorage::storeUploadedFile($request->file('file'), $directory);
+
+        return response()->json([
+            'success' => true,
+            'path' => $path,
+            'url' => UploadStorage::url($path),
+        ]);
     }
 
     private function normalizeHexColor(?string $value, string $fallback): string

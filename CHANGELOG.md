@@ -2,6 +2,26 @@
 
 ---
 
+## [2026-05-28] - feat(loja): upload arrasta-e-solta com progresso para logo e banner
+
+### Adicionado
+- Upload de logo e banner na pagina `/painel/marketplace/loja` agora usa dropzone customizado com XHR upload individual por campo:
+  - Arrasta-e-solta ou clique para selecionar
+  - Barra de progresso com percentual durante o upload
+  - Preview da imagem imediatamente apos o envio
+  - Botao "Remover" para limpar o campo
+  - Path do arquivo pre-salvo via rota `store.upload-media` e armazenado em hidden input (`logo_path` / `banner_path`)
+- Metodo `MarketplaceStoreController::uploadMedia()` — recebe `file` + `field`, salva via `UploadStorage::storeUploadedFile()`, retorna JSON
+- Rota `POST /painel/marketplace/loja/upload` → `panel.marketplace.store.upload-media`
+- `update()` agora prioriza path do hidden input (pre-enviado), com fallback para `$request->hasFile()` (upload direto)
+
+### Arquivos principais
+- `app/Http/Controllers/Panel/MarketplaceStoreController.php`
+- `resources/views/panel/marketplace/store.blade.php`
+- `routes/web.php`
+
+---
+
 ## [2026-05-27] - fix(admin cms): upload ajax de avatar em fundadores + ajustes no repeater
 
 ### Corrigido
