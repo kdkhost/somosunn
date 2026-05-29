@@ -234,6 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const METHOD_CARD = {{ $methodCard ? 'true' : 'false' }};
     const METHOD_PIX  = {{ $methodPix  ? 'true' : 'false' }};
     const AMOUNT      = {{ $amount }};
+    const BASE_AMOUNT = {{ $baseAmount }};
     const MAX_INSTALLMENTS   = {{ $maxInstallments }};
     const NO_INTEREST_UP_TO  = {{ $noInterestUpTo }};
     const INSTALLMENT_TAX    = {{ $installmentTax }};
@@ -347,6 +348,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function updateCheckoutSummary(total) {
+        var formattedTotal = 'R$ ' + total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        var sidebarTotal = document.getElementById('checkout-total') || document.querySelector('[data-checkout-total]') || document.querySelector('.checkout-total-value');
+        if (sidebarTotal) {
+            sidebarTotal.textContent = formattedTotal;
+        }
+        document.querySelectorAll('[data-dynamic-total], .dynamic-total, .order-total-value').forEach(function(el) {
+            el.textContent = formattedTotal;
+        });
+        var itemPriceEl = document.getElementById('checkout-item-price');
+        if (itemPriceEl) {
+            itemPriceEl.textContent = formattedTotal;
+        }
+        var subtotalEl = document.getElementById('checkout-subtotal');
+        if (subtotalEl) {
+            subtotalEl.textContent = formattedTotal;
+        }
+    }
+
     window.onCustomInstallmentChange = function(value) {
         var n = parseInt(value, 10);
         console.log('Custom installment selected:', n);
@@ -362,25 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Atualizar o resumo lateral (coluna ao lado) com o valor atualizado
-        var formattedTotal = 'R$ ' + totalWithInterest.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        var sidebarTotal = document.getElementById('checkout-total') || document.querySelector('[data-checkout-total]') || document.querySelector('.checkout-total-value');
-        if (sidebarTotal) {
-            sidebarTotal.textContent = formattedTotal;
-        }
-        // Tambem tenta atualizar qualquer elemento com classe ou data-attribute de total
-        document.querySelectorAll('[data-dynamic-total], .dynamic-total, .order-total-value').forEach(function(el) {
-            el.textContent = formattedTotal;
-        });
-        // Atualiza o preco do item no resumo (card escuro)
-        var itemPriceEl = document.getElementById('checkout-item-price');
-        if (itemPriceEl) {
-            itemPriceEl.textContent = formattedTotal;
-        }
-        // Atualiza subtotal se existir
-        var subtotalEl = document.getElementById('checkout-subtotal');
-        if (subtotalEl && n > 1 && option && option.has_interest) {
-            subtotalEl.textContent = formattedTotal;
-        }
+        updateCheckoutSummary(totalWithInterest);
 
         // Debounce para recriar o checkout no backend (so se o valor mudar)
         if (installmentDebounceTimer) clearTimeout(installmentDebounceTimer);
@@ -421,6 +423,8 @@ document.addEventListener('DOMContentLoaded', function() {
             btnPix  && btnPix.classList.remove('border-slate-200', 'bg-white', 'text-slate-600');
             btnCard && btnCard.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700');
             btnCard && btnCard.classList.add('border-slate-200', 'bg-white', 'text-slate-600');
+
+            updateCheckoutSummary(BASE_AMOUNT);
 
             if (!pixLoaded) {
                 loadSumupPix();

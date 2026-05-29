@@ -58,7 +58,7 @@ class SumUpService
         ])->save();
 
         $payload = [
-            'checkout_reference' => $this->checkoutReference($order),
+            'checkout_reference' => $this->checkoutReference($order, $options),
             'amount'             => $breakdown['charge_amount'],
             'currency'           => $order->currency ?? 'BRL',
             'merchant_code'      => $config['merchant_code'],
@@ -73,6 +73,12 @@ class SumUpService
         }
 
         // Registra webhook dinâmico
+        $order->forceFill([
+            'metadata' => array_merge($order->metadata ?? [], [
+                'sumup_checkout_id' => $response['id'],
+            ]),
+        ])->save();
+
         $this->registerWebhook($order, $webhookToken, $config['api_key']);
 
         // Persiste a transação
@@ -108,8 +114,7 @@ class SumUpService
      */
     public function calculateBreakdown(Order $order, int $installments = 1): array
     {
-        // Prioriza o valor base gravado em metadata (se o pedido ja passou por este fluxo antes)
-        $baseAmount = (float) (data_get($order->metadata, 'sumup_base_amount') ?? $order->total_amount);
+        $baseAmount = $this->baseAmountForOrder($order);
         $installments = max(1, $installments);
 
         $passFee        = (bool)(int) Setting::get('sumup_pass_fee', 0);
@@ -206,10 +211,11 @@ class SumUpService
     public function processPixCheckout(Order $order): array
     {
         $config   = $this->getSellerConfig($order);
-        $checkoutId = trim((string) data_get($order->metadata, 'sumup_checkout_id', ''));
-        $checkout = $checkoutId !== ''
-            ? ['checkout_id' => $checkoutId]
-            : $this->createCheckout($order, ['payment_type' => 'PIX']);
+        $checkout = $this->createCheckout($order, [
+            'payment_type' => 'PIX',
+            'installments' => 1,
+            'reference_suffix' => 'PIX-' . now()->format('YmdHis') . '-' . Str::random(6),
+        ]);
 
         // Submete o checkout como PIX (sem personal_details — conta SumUp do vendedor)
         $payload = ['payment_type' => 'pix'];
@@ -736,11 +742,29 @@ class SumUpService
         return $order->fresh();
     }
 
-    private function checkoutReference(Order $order): string
+    private function checkoutReference(Order $order, array $options = []): string
     {
         $reference = trim((string) data_get($order->metadata, 'gateway_reference', ''));
+        $reference = $reference !== '' ? $reference : 'ORDER-' . $order->id;
+        $suffix = trim((string) ($options['reference_suffix'] ?? ''));
 
-        return $reference !== '' ? $reference : 'ORDER-' . $order->id . '-' . time();
+        return $suffix !== '' ? $reference . '-' . $suffix : $reference;
+    }
+
+    private function baseAmountForOrder(Order $order): float
+    {
+        $order->loadMissing('items');
+        $itemsTotal = $order->items->sum(fn ($item) => (float) $item->price * max(1, (int) $item->quantity));
+        if ($itemsTotal > 0) {
+            return round($itemsTotal, 2);
+        }
+
+        $metadataBase = data_get($order->metadata, 'sumup_base_amount');
+        if (is_numeric($metadataBase) && (float) $metadataBase > 0) {
+            return round((float) $metadataBase, 2);
+        }
+
+        return round((float) $order->total_amount, 2);
     }
 
     private function buildWebhookUrl(int $orderId, string $token): string

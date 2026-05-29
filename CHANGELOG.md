@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-05-29] - fix(sumup): corrigir troca entre cartao parcelado e PIX de expositor
+
+### Corrigido
+- O checkout SumUp de vagas de expositor agora gera referencias unicas ao recriar cobrancas de cartao parcelado e PIX, evitando `DUPLICATED_CHECKOUT` em novas tentativas do mesmo pedido.
+- O valor base do pedido passa a priorizar a soma dos itens, impedindo que juros ou taxas do parcelamento sejam incorporados ao valor do PIX.
+- Ao alternar visualmente de cartao para PIX, o resumo do checkout volta ao valor base da vaga.
+
+### Arquivos principais
+- `app/Services/Payment/SumUpService.php`
+- `app/Http/Controllers/CheckoutController.php`
+- `resources/views/partials/checkout/sumup-card-form.blade.php`
+
 ## [2026-05-29] - fix(sumup): reutilizar checkout em cartao de expositor
 
 ### Corrigido

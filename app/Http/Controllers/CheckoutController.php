@@ -707,8 +707,10 @@ class CheckoutController extends Controller
         }
 
         try {
+            $installments = (int) $request->input('installments');
             $checkout = $sumUpService->createCheckout($order, [
-                'installments' => (int) $request->input('installments'),
+                'installments' => $installments,
+                'reference_suffix' => 'CARD-' . $installments . 'X-' . now()->format('YmdHis') . '-' . \Illuminate\Support\Str::random(6),
             ]);
 
             $order->refresh();
