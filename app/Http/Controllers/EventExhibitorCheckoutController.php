@@ -132,18 +132,21 @@ class EventExhibitorCheckoutController extends Controller
 
         if ($gatewayProvider === 'sumup') {
             try {
-                $checkout = $sumUpService->createCheckout($order, [
-                    'description' => 'Area expositor: ' . $event->title,
-                    'return_url' => route('events.exhibitor.success', [
-                        'event' => $event,
-                        'order' => $order,
-                        'token' => data_get($order->metadata, 'public_token'),
-                    ]),
-                ]);
+                $existingCheckoutId = trim((string) data_get($order->metadata, 'sumup_checkout_id', ''));
+                $checkout = $existingCheckoutId !== ''
+                    ? ['checkout_id' => $existingCheckoutId]
+                    : $sumUpService->createCheckout($order, [
+                        'description' => 'Area expositor: ' . $event->title,
+                        'return_url' => route('events.exhibitor.success', [
+                            'event' => $event,
+                            'order' => $order,
+                            'token' => data_get($order->metadata, 'public_token'),
+                        ]),
+                    ]);
 
                 $order->update([
                     'metadata' => array_merge($order->metadata ?? [], [
-                        'sumup_checkout_id' => $checkout['checkout_id'] ?? null,
+                        'sumup_checkout_id' => $checkout['checkout_id'] ?? $existingCheckoutId,
                     ]),
                 ]);
 

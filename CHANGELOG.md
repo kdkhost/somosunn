@@ -2,6 +2,15 @@
 
 ---
 
+## [2026-05-29] - fix(sumup): reutilizar checkout em cartao de expositor
+
+### Corrigido
+- O checkout SumUp de vagas de expositor agora reutiliza o `sumup_checkout_id` ja gravado no pedido tambem para pagamento por cartao, evitando nova criacao com a mesma referencia `EXHIBITOR-*`.
+- A protecao complementa o fluxo de PIX e impede erro `DUPLICATED_CHECKOUT` quando o cliente alterna metodo ou tenta continuar o pagamento de uma reserva ja iniciada.
+
+### Arquivos principais
+- `app/Http/Controllers/EventExhibitorCheckoutController.php`
+
 ## [2026-05-29] - fix(sumup): reutilizar checkout em PIX de expositor
 
 ### Corrigido
