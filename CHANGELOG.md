@@ -2,6 +2,15 @@
 
 ---
 
+## [2026-05-29] - fix(sumup): reutilizar checkout em PIX de expositor
+
+### Corrigido
+- O pagamento PIX de vagas de expositor agora reutiliza o `sumup_checkout_id` ja criado para o pedido quando existir, evitando erro `DUPLICATED_CHECKOUT` da SumUp ao alternar entre cartao e PIX ou tentar gerar o PIX novamente.
+- A transacao local SumUp passa a registrar o tipo `PIX` e a resposta mais recente da API quando o checkout existente e convertido para PIX.
+
+### Arquivos principais
+- `app/Services/Payment/SumUpService.php`
+
 ## [2026-05-28] - feat(loja): upload arrasta-e-solta com progresso para logo e banner
 
 ### Adicionado

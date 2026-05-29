@@ -206,12 +206,26 @@ class SumUpService
     public function processPixCheckout(Order $order): array
     {
         $config   = $this->getSellerConfig($order);
-        $checkout = $this->createCheckout($order, ['payment_type' => 'PIX']);
+        $checkoutId = trim((string) data_get($order->metadata, 'sumup_checkout_id', ''));
+        $checkout = $checkoutId !== ''
+            ? ['checkout_id' => $checkoutId]
+            : $this->createCheckout($order, ['payment_type' => 'PIX']);
 
         // Submete o checkout como PIX (sem personal_details — conta SumUp do vendedor)
         $payload = ['payment_type' => 'pix'];
 
         $response = $this->put("/v0.1/checkouts/{$checkout['checkout_id']}", $payload, $config['api_key']);
+
+        SumUpTransaction::query()
+            ->where('order_id', $order->id)
+            ->where('checkout_id', $checkout['checkout_id'])
+            ->latest('id')
+            ->first()
+            ?->forceFill([
+                'payment_type' => 'PIX',
+                'raw_response' => $response,
+            ])
+            ->save();
 
         Log::debug('SumUp PIX checkout response', [
             'checkout_id' => $checkout['checkout_id'],
