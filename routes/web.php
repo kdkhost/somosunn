@@ -699,6 +699,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('/orders/{order}/approve', [\App\Http\Controllers\Admin\OrderController::class, 'approveManually'])->name('orders.approve');
     Route::post('/orders/{order}/cancel', [\App\Http\Controllers\Admin\OrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('/orders/report/{format}', [\App\Http\Controllers\Admin\OrderController::class, 'exportReport'])->name('orders.report.export');
+
+    Route::prefix('buyer-communication')->name('buyer-communication.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\BuyerCommunicationController::class, 'index'])->name('index');
+        Route::post('individual', [\App\Http\Controllers\Admin\BuyerCommunicationController::class, 'sendIndividual'])->name('individual');
+        Route::post('bulk', [\App\Http\Controllers\Admin\BuyerCommunicationController::class, 'sendBulk'])->name('bulk');
+        Route::get('search-users', [\App\Http\Controllers\Admin\BuyerCommunicationController::class, 'searchUsers'])->name('search-users');
+        Route::get('preview-recipients', [\App\Http\Controllers\Admin\BuyerCommunicationController::class, 'previewRecipients'])->name('preview-recipients');
+    });
+
     Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity_logs.index');
     Route::post('/activity-logs/clear', [\App\Http\Controllers\Admin\ActivityLogController::class, 'clear'])->name('activity_logs.clear');
     Route::get('/certificates', [\App\Http\Controllers\Admin\CertificateController::class, 'index'])->name('certificates.index');

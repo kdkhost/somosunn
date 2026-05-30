@@ -9,7 +9,9 @@
 - **Dados do comprador**: Exibição de telefone e endereço do comprador nas listagens e detalhes de pedidos em ambos os painéis.
 - **Exportação atualizada**: CSV e XML de relatórios de vendas agora incluem colunas de Tipo, Telefone e Endereço do comprador.
 - **Cancelamento de pedidos**: Botão de cancelamento para pedidos pendentes no painel novo (rota `panel.admin.orders.cancel`).
-- **Módulo de comunicação com compradores**: Nova seção no painel novo (`/painel/admin/comunicacao-compradores`) para envio de mensagens:
+- **Módulo de comunicação com compradores** (ambos os painéis):
+  - Admin antigo: `/admin/buyer-communication` com interface AdminLTE
+  - Painel novo: `/painel/admin/buyer-communication` com interface Tailwind
   - Envio individual: buscar usuário por nome/email e enviar notificação/email.
   - Envio em massa: filtrar por tipo de compra e enviar para múltiplos compradores.
   - Preview de destinatários antes do envio em massa.
@@ -18,15 +20,17 @@
 ### Arquivos principais
 - `app/Models/Order.php` — adicionado `SALE_TYPE_LABELS`, `saleTypeLabel()`, `scopeOfSaleType()`, `buyerAddress()`
 - `app/Http/Controllers/Admin/OrderController.php` — filtro por tipo e exportação com dados de comprador
+- `app/Http/Controllers/Admin/BuyerCommunicationController.php` — controller de comunicação (admin antigo)
 - `app/Http/Controllers/Panel/Admin/OrderController.php` — filtro por tipo e método `cancel()`
-- `app/Http/Controllers/Panel/Admin/BuyerCommunicationController.php` — novo controller de comunicação
+- `app/Http/Controllers/Panel/Admin/BuyerCommunicationController.php` — controller de comunicação (painel novo)
 - `app/Notifications/BuyerNotification.php` — nova classe de notificação para compradores
 - `resources/views/admin/orders/index.blade.php` — filtro por tipo e colunas de comprador
 - `resources/views/admin/orders/show.blade.php` — telefone e endereço do comprador
+- `resources/views/admin/buyer-communication/index.blade.php` — view do módulo de comunicação (admin antigo)
 - `resources/views/panel/admin/orders/index.blade.php` — filtro por tipo e coluna tipo
 - `resources/views/panel/admin/orders/show.blade.php` — telefone/endereço e botão cancelar
-- `resources/views/panel/admin/buyer-communication/index.blade.php` — view do módulo de comunicação
-- `routes/web.php` — rotas de cancelamento e comunicação
+- `resources/views/panel/admin/buyer-communication/index.blade.php` — view do módulo de comunicação (painel novo)
+- `routes/web.php` — rotas de cancelamento e comunicação (ambos painéis)
 
 ---
 
