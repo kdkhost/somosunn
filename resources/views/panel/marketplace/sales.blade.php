@@ -33,7 +33,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
+    <div class="grid grid-cols-1 gap-5 mt-6">
         <div
             class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-5 transition-colors duration-300">
             <div class="text-sm font-bold text-slate-500 dark:text-slate-500 transition-colors">Vendas pagas</div>

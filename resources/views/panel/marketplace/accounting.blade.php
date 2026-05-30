@@ -105,7 +105,7 @@
         </div>
     </div>
 
-    <div class="mt-6 grid gap-6 xl:grid-cols-2">
+    <div class="mt-6 grid gap-6 grid-cols-1">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
             <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800">
                 <h2 class="text-lg font-extrabold text-slate-900 dark:text-white">Vendas detalhadas</h2>

@@ -128,7 +128,7 @@
                 <i class="fas fa-user text-slate-500"></i> Dados pessoais
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+            <div class="grid grid-cols-1 gap-4 mt-5">
                 <div>
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Nome completo *</label>
                     <input name="name" value="{{ old('name', $user->name) }}" required maxlength="80"
@@ -364,7 +364,7 @@
             <h2 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                 <i class="fas fa-share-alt text-slate-500"></i> Redes sociais
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+            <div class="grid grid-cols-1 gap-4 mt-5">
                 <div>
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Website</label>
                     <input name="website" value="{{ old('website', $user->website) }}" maxlength="120"
@@ -410,7 +410,7 @@
             <h2 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                 <i class="fas fa-lock text-slate-500"></i> Privacidade e Preferências
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+            <div class="grid grid-cols-1 gap-4 mt-5">
                 <label
                     class="flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                     <input type="checkbox" name="show_email_public" {{ old('show_email_public', (bool) $user->show_email_public) ? 'checked' : '' }}

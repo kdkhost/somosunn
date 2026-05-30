@@ -2,6 +2,25 @@
 
 ---
 
+## [2026-05-29] - ux(painel): ajustar layout de duas colunas para uma coluna
+
+### Ajustado
+- **Layout de painel novo**: Páginas principais ajustadas de duas colunas para uma coluna para melhor visualização e compreensão:
+  - `/painel/marketplace/contabilidade` - tabelas de vendas e compras agora em coluna única
+  - `/painel/marketplace/pagamentos` - gateways de pagamento em coluna única
+  - `/painel/marketplace/vendas` - cards de estatísticas em coluna única
+  - `/painel/perfil` - formulários de edição em coluna única
+  - `/painel/dashboard` - checklist de networking em coluna única
+
+### Arquivos principais
+- `resources/views/panel/marketplace/accounting.blade.php`
+- `resources/views/panel/marketplace/payments.blade.php`
+- `resources/views/panel/marketplace/sales.blade.php`
+- `resources/views/panel/profile/edit.blade.php`
+- `resources/views/panel/dashboard.blade.php`
+
+---
+
 ## [2026-05-29] - feat(vendas): relatorios por tipo, dados de comprador e modulo de comunicacao
 
 ### Adicionado

@@ -158,7 +158,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 flex-1">
+            <div class="grid grid-cols-1 gap-5 flex-1">
                 @php
                     $checkItems = [
                         ['key' => 'plano_ativo', 'label' => 'Plano Premium Ativo', 'icon' => 'fa-gem', 'url' => route('planos')],
