@@ -330,7 +330,7 @@
                 @endforeach
             </div>
 
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 gap-6">
                 <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
                     <div class="flex items-center justify-between mb-6">
                         <div>

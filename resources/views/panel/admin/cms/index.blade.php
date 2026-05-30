@@ -151,7 +151,7 @@
                             <textarea name="manifesto" class="cms-editor">{{ old('manifesto', $contents['manifesto'] ?? '') }}</textarea>
                         </div>
 
-                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 border-t border-slate-100 dark:border-slate-800 pt-8">
+                        <div class="grid grid-cols-1 gap-8 border-t border-slate-100 dark:border-slate-800 pt-8">
                             <div>
                                 <label
                                     class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">
@@ -172,7 +172,7 @@
                         </div>
                     </div>
                 @elseif($slug === 'footer')
-                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 max-w-5xl">
+                    <div class="grid grid-cols-1 gap-6 max-w-5xl">
                         <div>
                             <label
                                 class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 transition-colors">

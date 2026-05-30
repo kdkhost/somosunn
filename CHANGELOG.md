@@ -10,7 +10,11 @@
   - `/painel/marketplace/pagamentos` - gateways de pagamento em coluna única
   - `/painel/marketplace/vendas` - cards de estatísticas em coluna única
   - `/painel/perfil` - formulários de edição em coluna única
-  - `/painel/dashboard` - checklist de networking em coluna única
+  - `/painel/dashboard` - checklist de networking e distribuição por tipo em coluna única
+  - `/painel/referral/partials/share-kit` - snippets de iframe e HTML responsivo em coluna única
+  - `/painel/admin/pages/partials/portal` - níveis da comunidade em coluna única
+  - `/painel/admin/dashboard` - produtos mais visitados em coluna única
+  - `/painel/admin/cms/index` - visão/valores e footer em coluna única
 
 ### Arquivos principais
 - `resources/views/panel/marketplace/accounting.blade.php`
@@ -18,6 +22,10 @@
 - `resources/views/panel/marketplace/sales.blade.php`
 - `resources/views/panel/profile/edit.blade.php`
 - `resources/views/panel/dashboard.blade.php`
+- `resources/views/panel/referral/partials/share-kit.blade.php`
+- `resources/views/panel/admin/pages/partials/portal.blade.php`
+- `resources/views/panel/admin/dashboard.blade.php`
+- `resources/views/panel/admin/cms/index.blade.php`
 
 ---
 

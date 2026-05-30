@@ -141,7 +141,7 @@
                 placeholder="Niveis da Comunidade">
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 gap-6">
             @foreach ([1, 2, 3, 4] as $i)
                 <div class="rounded-3xl border border-slate-100 dark:border-slate-800 p-5 bg-slate-50 dark:bg-slate-800/20 space-y-4">
                     <h3 class="text-sm font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Nivel {{ $i }}</h3>

@@ -303,7 +303,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-4 grid gap-4 xl:grid-cols-2">
+                            <div class="mt-4 grid gap-4 grid-cols-1">
                                 <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
                                     <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Iframe</p>
                                     <pre class="mt-3 overflow-x-auto whitespace-pre-wrap rounded-2xl bg-slate-950 px-4 py-3 text-xs leading-6 text-slate-200">{{ $widget['iframe_snippet'] }}</pre>
