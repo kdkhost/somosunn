@@ -109,8 +109,14 @@
                         </button>
 
                         <div id="recipients-preview" class="alert alert-info hidden">
-                            <p><span id="recipients-count" class="font-bold">0</span> compradores serão notificados.</p>
-                            <div id="recipients-list" class="mt-2" style="max-height: 150px; overflow-y: auto; font-size: 12px;"></div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <p class="mb-0"><span id="recipients-count" class="font-bold">0</span> compradores encontrados.</p>
+                                <label class="mb-0 small">
+                                    <input type="checkbox" id="select-all-recipients"> Selecionar todos
+                                </label>
+                            </div>
+                            <div id="recipients-list" class="mt-2" style="max-height: 200px; overflow-y: auto; font-size: 12px;"></div>
+                            <input type="hidden" name="selected_recipients" id="selected-recipients-input" value="">
                         </div>
 
                         <div class="form-group">
@@ -237,9 +243,33 @@
                 .then(data => {
                     document.getElementById('recipients-count').textContent = data.count;
                     const listDiv = document.getElementById('recipients-list');
-                    listDiv.innerHTML = data.users.map(u => `<div>${u.name} (${u.email})</div>`).join('');
+                    listDiv.innerHTML = data.users.map(u => `
+                        <label class="d-flex align-items-center p-2 bg-light rounded mb-1" style="cursor: pointer;">
+                            <input type="checkbox" class="recipient-checkbox mr-2" value="${u.id}" checked>
+                            <span class="small">${u.name} (${u.email})</span>
+                        </label>
+                    `).join('');
                     document.getElementById('recipients-preview').classList.remove('hidden');
+                    updateSelectedRecipients();
                 });
+        }
+
+        document.getElementById('select-all-recipients').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.recipient-checkbox');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            updateSelectedRecipients();
+        });
+
+        document.getElementById('recipients-list').addEventListener('change', function(e) {
+            if (e.target.classList.contains('recipient-checkbox')) {
+                updateSelectedRecipients();
+            }
+        });
+
+        function updateSelectedRecipients() {
+            const checkboxes = document.querySelectorAll('.recipient-checkbox:checked');
+            const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+            document.getElementById('selected-recipients-input').value = selectedIds.join(',');
         }
 
         document.addEventListener('click', function(e) {
