@@ -244,9 +244,11 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Dados recebidos:', data);
                     document.getElementById('modal-recipients-count').textContent = data.count;
                     const listDiv = document.getElementById('modal-recipients-list');
                     if (data.users && data.users.length > 0) {
+                        console.log('Renderizando', data.users.length, 'destinatários');
                         listDiv.innerHTML = data.users.map(u => `
                             <label class="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700">
                                 <input type="checkbox" class="recipient-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="${u.id}" checked>
@@ -254,6 +256,7 @@
                             </label>
                         `).join('');
                     } else {
+                        console.log('Nenhum destinatário encontrado');
                         listDiv.innerHTML = '<p class="text-sm text-slate-500 dark:text-slate-400">Nenhum destinatário encontrado com os filtros selecionados.</p>';
                     }
                     document.getElementById('recipients-modal').classList.remove('hidden');
