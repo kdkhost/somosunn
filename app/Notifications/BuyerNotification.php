@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\NotificationLog;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -32,11 +33,11 @@ class BuyerNotification extends Notification implements ShouldQueue
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject($this->details['subject'] ?? 'Nova mensagem')
-            ->greeting('Olá, ' . $notifiable->name . '!')
-            ->line($this->details['message'] ?? '')
-            ->line('Obrigado por fazer parte da UNN.')
-            ->salutation('Equipe UNN');
+            ->view('emails.system', [
+                'subject' => $this->details['subject'] ?? 'Nova mensagem',
+                'content' => $this->details['message'] ?? '',
+            ])
+            ->subject($this->details['subject'] ?? 'Nova mensagem');
     }
 
     public function toArray($notifiable): array
@@ -47,5 +48,22 @@ class BuyerNotification extends Notification implements ShouldQueue
             'action_url' => $this->details['action_url'] ?? null,
             'action_label' => $this->details['action_label'] ?? null,
         ];
+    }
+
+    public function sent($notifiable, $channel = null)
+    {
+        NotificationLog::create([
+            'user_id' => $notifiable->id,
+            'type' => 'buyer_communication',
+            'subject' => $this->details['subject'] ?? 'Nova mensagem',
+            'message' => $this->details['message'] ?? '',
+            'sent_via_email' => $this->sendEmail,
+            'sent_via_database' => true,
+            'metadata' => [
+                'action_url' => $this->details['action_url'] ?? null,
+                'action_label' => $this->details['action_label'] ?? null,
+            ],
+            'sent_at' => now(),
+        ]);
     }
 }

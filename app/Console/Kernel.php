@@ -258,6 +258,16 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar limpeza de notificações: ' . $e->getMessage());
         }
 
+        // Solicita feedback de compradores 14 dias após a compra
+        try {
+            $schedule->command('feedback:request-daily')
+                ->dailyAt('09:00')
+                ->withoutOverlapping()
+                ->name('feedback-request-daily');
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao configurar solicitação de feedback: ' . $e->getMessage());
+        }
+
         // Log rotation (advanced-security-performance, Requirement 10.4)
         try {
             $schedule->command('logs:cleanup')

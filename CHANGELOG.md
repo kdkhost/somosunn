@@ -2,6 +2,29 @@
 
 ---
 
+## [2026-05-30] - feat(notificacoes): template personalizado, historico e sistema de feedback
+
+### Adicionado
+- **Template de email personalizado**: BuyerNotification agora usa template `emails.system` com branding da plataforma
+- **Histórico de envios**: Tabela `notification_logs` registra todas as notificações enviadas para auditoria administrativa
+- **Sistema de reviews/feedbacks**: Tabela `reviews` para armazenar avaliações de produtos/serviços comprados
+- **Job agendado de feedback**: Command `feedback:request-daily` roda diariamente às 09:00
+- **Solicitação automática**: 14 dias após compra, cliente recebe email solicitando avaliação
+- **Notificação FeedbackRequestNotification**: Envia email com link para deixar avaliação
+- **Modelos**: NotificationLog e Review com relacionamentos e casts apropriados
+
+### Arquivos principais
+- `app/Notifications/BuyerNotification.php`
+- `app/Models/NotificationLog.php`
+- `app/Models/Review.php`
+- `app/Console/Commands/RequestFeedbackCommand.php`
+- `app/Notifications/FeedbackRequestNotification.php`
+- `app/Console/Kernel.php`
+- `database/migrations/2026_05_30_004450_create_notification_logs_table.php`
+- `database/migrations/2026_05_30_004532_create_reviews_table.php`
+
+---
+
 ## [2026-05-30] - feat(comunicacao): adicionar modal para selecao de destinatarios
 
 ### Adicionado
