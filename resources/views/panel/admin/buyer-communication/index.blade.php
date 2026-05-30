@@ -112,24 +112,16 @@
                             </div>
                         </div>
 
-                        <button type="button" onclick="previewRecipients()"
+                        <button type="button" onclick="openRecipientsModal()"
                             class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-xl transition-all">
-                            <i class="fas fa-eye"></i> Visualizar Destinatários
+                            <i class="fas fa-users"></i> Selecionar Destinatários
                         </button>
 
-                        <div id="recipients-preview" class="hidden p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-700">
-                            <div class="flex items-center justify-between mb-3">
-                                <p class="text-sm text-slate-600 dark:text-slate-400">
-                                    <span id="recipients-count" class="font-bold text-slate-900 dark:text-white">0</span> compradores encontrados.
-                                </p>
-                                <label class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-                                    <input type="checkbox" id="select-all-recipients" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                                    Selecionar todos
-                                </label>
-                            </div>
-                            <div id="recipients-list" class="mt-2 max-h-48 overflow-y-auto space-y-2"></div>
-                            <input type="hidden" name="selected_recipients" id="selected-recipients-input" value="">
-                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 text-center">
+                            <span id="selected-count">0</span> destinatários selecionados
+                        </p>
+
+                        <input type="hidden" name="selected_recipients" id="selected-recipients-input" value="">
 
                         <div>
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Assunto</label>
@@ -235,7 +227,7 @@
             document.getElementById('user-search').value = '';
         }
 
-        function previewRecipients() {
+        function openRecipientsModal() {
             const serviceType = document.getElementById('service-type-select').value;
             const itemId = document.getElementById('item-select').value;
             const dateFrom = document.getElementById('date-from').value;
@@ -252,26 +244,32 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('recipients-count').textContent = data.count;
-                    const listDiv = document.getElementById('recipients-list');
+                    document.getElementById('modal-recipients-count').textContent = data.count;
+                    const listDiv = document.getElementById('modal-recipients-list');
                     listDiv.innerHTML = data.users.map(u => `
-                        <label class="flex items-center gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700">
+                        <label class="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700">
                             <input type="checkbox" class="recipient-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="${u.id}" checked>
-                            <span class="text-xs text-slate-700 dark:text-slate-300">${u.name} (${u.email})</span>
+                            <span class="text-sm text-slate-700 dark:text-slate-300">${u.name} (${u.email})</span>
                         </label>
                     `).join('');
-                    document.getElementById('recipients-preview').classList.remove('hidden');
+                    document.getElementById('recipients-modal').classList.remove('hidden');
+                    document.getElementById('recipients-modal').classList.add('flex');
                     updateSelectedRecipients();
                 });
         }
 
-        document.getElementById('select-all-recipients').addEventListener('change', function() {
+        function closeRecipientsModal() {
+            document.getElementById('recipients-modal').classList.add('hidden');
+            document.getElementById('recipients-modal').classList.remove('flex');
+        }
+
+        document.getElementById('modal-select-all-recipients').addEventListener('change', function() {
             const checkboxes = document.querySelectorAll('.recipient-checkbox');
             checkboxes.forEach(cb => cb.checked = this.checked);
             updateSelectedRecipients();
         });
 
-        document.getElementById('recipients-list').addEventListener('change', function(e) {
+        document.getElementById('modal-recipients-list').addEventListener('change', function(e) {
             if (e.target.classList.contains('recipient-checkbox')) {
                 updateSelectedRecipients();
             }
@@ -281,6 +279,7 @@
             const checkboxes = document.querySelectorAll('.recipient-checkbox:checked');
             const selectedIds = Array.from(checkboxes).map(cb => cb.value);
             document.getElementById('selected-recipients-input').value = selectedIds.join(',');
+            document.getElementById('selected-count').textContent = selectedIds.length;
         }
 
         document.addEventListener('click', function(e) {
@@ -289,4 +288,33 @@
             }
         });
     </script>
+
+    <!-- Modal de Seleção de Destinatários -->
+    <div id="recipients-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden m-4">
+            <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Selecionar Destinatários</h3>
+                    <button type="button" onclick="closeRecipientsModal()" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="flex items-center justify-between mt-4">
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        <span id="modal-recipients-count" class="font-bold text-slate-900 dark:text-white">0</span> compradores encontrados.
+                    </p>
+                    <label class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                        <input type="checkbox" id="modal-select-all-recipients" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        Selecionar todos
+                    </label>
+                </div>
+            </div>
+            <div id="modal-recipients-list" class="p-6 overflow-y-auto max-h-[60vh] space-y-2"></div>
+            <div class="p-6 border-t border-slate-200 dark:border-slate-700">
+                <button type="button" onclick="closeRecipientsModal()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all">
+                    <i class="fas fa-check"></i> Confirmar Seleção
+                </button>
+            </div>
+        </div>
+    </div>
 @endsection

@@ -2,6 +2,24 @@
 
 ---
 
+## [2026-05-30] - feat(comunicacao): adicionar modal para selecao de destinatarios
+
+### Adicionado
+- **Modal de seleção**: Lista de destinatários exibida em modal em vez de inline
+- **Botão "Selecionar Destinatários"**: Abre modal com lista de compradores filtrados
+- **Contador de selecionados**: Exibe quantidade de destinatários selecionados no formulário
+- **Checkboxes no modal**: Cada destinatário tem checkbox para selecionar/deselecionar
+- **Checkbox "Selecionar todos"**: Permite selecionar todos os destinatários de uma vez no modal
+- **Comportamento padrão**: Todos os destinatários vêm marcados por padrão
+- **Botão "Confirmar Seleção"**: Fecha modal e mantém seleção para envio
+- **Implementado em ambos**: Painel novo (modal customizado) e admin antigo (modal Bootstrap)
+
+### Arquivos principais
+- `resources/views/panel/admin/buyer-communication/index.blade.php`
+- `resources/views/admin/buyer-communication/index.blade.php`
+
+---
+
 ## [2026-05-30] - feat(comunicacao): adicionar selecao de destinatarios e corrigir filtro item_id
 
 ### Corrigido

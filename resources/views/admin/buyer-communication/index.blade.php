@@ -104,20 +104,15 @@
                             </div>
                         </div>
 
-                        <button type="button" onclick="previewRecipients()" class="btn btn-light btn-block mb-3">
-                            <i class="fas fa-eye mr-2"></i> Visualizar Destinatários
+                        <button type="button" onclick="openRecipientsModal()" class="btn btn-light btn-block mb-3">
+                            <i class="fas fa-users mr-2"></i> Selecionar Destinatários
                         </button>
 
-                        <div id="recipients-preview" class="alert alert-info hidden">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <p class="mb-0"><span id="recipients-count" class="font-bold">0</span> compradores encontrados.</p>
-                                <label class="mb-0 small">
-                                    <input type="checkbox" id="select-all-recipients"> Selecionar todos
-                                </label>
-                            </div>
-                            <div id="recipients-list" class="mt-2" style="max-height: 200px; overflow-y: auto; font-size: 12px;"></div>
-                            <input type="hidden" name="selected_recipients" id="selected-recipients-input" value="">
-                        </div>
+                        <p class="text-center small text-muted">
+                            <span id="selected-count">0</span> destinatários selecionados
+                        </p>
+
+                        <input type="hidden" name="selected_recipients" id="selected-recipients-input" value="">
 
                         <div class="form-group">
                             <label>Assunto</label>
@@ -224,7 +219,7 @@
             document.getElementById('user-search').value = '';
         }
 
-        function previewRecipients() {
+        function openRecipientsModal() {
             const serviceType = document.getElementById('service-type-select').value;
             const itemId = document.getElementById('item-select').value;
             const dateFrom = document.getElementById('date-from').value;
@@ -241,26 +236,30 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('recipients-count').textContent = data.count;
-                    const listDiv = document.getElementById('recipients-list');
+                    document.getElementById('modal-recipients-count').textContent = data.count;
+                    const listDiv = document.getElementById('modal-recipients-list');
                     listDiv.innerHTML = data.users.map(u => `
                         <label class="d-flex align-items-center p-2 bg-light rounded mb-1" style="cursor: pointer;">
                             <input type="checkbox" class="recipient-checkbox mr-2" value="${u.id}" checked>
                             <span class="small">${u.name} (${u.email})</span>
                         </label>
                     `).join('');
-                    document.getElementById('recipients-preview').classList.remove('hidden');
+                    $('#recipientsModal').modal('show');
                     updateSelectedRecipients();
                 });
         }
 
-        document.getElementById('select-all-recipients').addEventListener('change', function() {
+        function closeRecipientsModal() {
+            $('#recipientsModal').modal('hide');
+        }
+
+        document.getElementById('modal-select-all-recipients').addEventListener('change', function() {
             const checkboxes = document.querySelectorAll('.recipient-checkbox');
             checkboxes.forEach(cb => cb.checked = this.checked);
             updateSelectedRecipients();
         });
 
-        document.getElementById('recipients-list').addEventListener('change', function(e) {
+        document.getElementById('modal-recipients-list').addEventListener('change', function(e) {
             if (e.target.classList.contains('recipient-checkbox')) {
                 updateSelectedRecipients();
             }
@@ -270,6 +269,7 @@
             const checkboxes = document.querySelectorAll('.recipient-checkbox:checked');
             const selectedIds = Array.from(checkboxes).map(cb => cb.value);
             document.getElementById('selected-recipients-input').value = selectedIds.join(',');
+            document.getElementById('selected-count').textContent = selectedIds.length;
         }
 
         document.addEventListener('click', function(e) {
@@ -278,4 +278,32 @@
             }
         });
     </script>
+
+    <!-- Modal de Seleção de Destinatários -->
+    <div class="modal fade" id="recipientsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Selecionar Destinatários</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeRecipientsModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p class="mb-0"><span id="modal-recipients-count" class="font-bold">0</span> compradores encontrados.</p>
+                        <label class="mb-0 small">
+                            <input type="checkbox" id="modal-select-all-recipients"> Selecionar todos
+                        </label>
+                    </div>
+                    <div id="modal-recipients-list" style="max-height: 400px; overflow-y: auto;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="closeRecipientsModal()">
+                        <i class="fas fa-check mr-2"></i> Confirmar Seleção
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
