@@ -2,6 +2,24 @@
 
 ---
 
+## [2026-05-30] - feat(comunicacao): filtros avancados para comunicacao com compradores
+
+### Adicionado
+- **Filtro por tipo de serviço**: Eventos, Cursos, Mentorias, Marketplace
+- **Seleção dinâmica de itens**: Ao selecionar tipo de serviço, lista itens específicos disponíveis
+- **Filtro por período**: Data inicial e final para segmentar compradores por data de compra
+- **Endpoint get-items**: Carrega itens dinamicamente baseado no tipo de serviço
+- **Validação de datas**: Data final deve ser igual ou posterior à data inicial
+
+### Arquivos principais
+- `app/Http/Controllers/Panel/Admin/BuyerCommunicationController.php`
+- `app/Http/Controllers/Admin/BuyerCommunicationController.php`
+- `resources/views/panel/admin/buyer-communication/index.blade.php`
+- `resources/views/admin/buyer-communication/index.blade.php`
+- `routes/web.php`
+
+---
+
 ## [2026-05-30] - fix(menu): ajustar visibilidade comunicacao com compradores no admin antigo
 
 ### Ajustado

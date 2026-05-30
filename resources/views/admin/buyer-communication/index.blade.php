@@ -72,13 +72,36 @@
                         @csrf
 
                         <div class="form-group">
-                            <label>Filtrar por Tipo de Compra</label>
-                            <select name="sale_type" id="sale-type-select" class="form-control">
-                                <option value="">Todos os compradores</option>
-                                @foreach($saleTypeLabels ?? [] as $key => $label)
-                                    <option value="{{ $key }}">{{ $label }}</option>
-                                @endforeach
+                            <label>Tipo de Serviço</label>
+                            <select name="service_type" id="service-type-select" class="form-control">
+                                <option value="">Todos os tipos</option>
+                                <option value="event">Eventos</option>
+                                <option value="course">Cursos</option>
+                                <option value="mentorship">Mentorias</option>
+                                <option value="marketplace">Marketplace</option>
                             </select>
+                        </div>
+
+                        <div class="form-group" id="item-select-container" style="display: none;">
+                            <label>Item Específico</label>
+                            <select name="item_id" id="item-select" class="form-control">
+                                <option value="">Todos os itens deste tipo</option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Data Inicial</label>
+                                    <input type="date" name="date_from" id="date-from" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Data Final</label>
+                                    <input type="date" name="date_to" id="date-to" class="form-control">
+                                </div>
+                            </div>
                         </div>
 
                         <button type="button" onclick="previewRecipients()" class="btn btn-light btn-block mb-3">
@@ -118,6 +141,31 @@
 
     <script>
         let searchTimeout;
+
+        // Carregar itens baseado no tipo de serviço
+        document.getElementById('service-type-select').addEventListener('change', function() {
+            const serviceType = this.value;
+            const itemContainer = document.getElementById('item-select-container');
+            const itemSelect = document.getElementById('item-select');
+
+            if (serviceType) {
+                itemContainer.style.display = 'block';
+                itemSelect.innerHTML = '<option value="">Todos os itens deste tipo</option>';
+
+                fetch('{{ route('admin.buyer-communication.get-items') }}?service_type=' + encodeURIComponent(serviceType))
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.id;
+                            option.textContent = item.name;
+                            itemSelect.appendChild(option);
+                        });
+                    });
+            } else {
+                itemContainer.style.display = 'none';
+            }
+        });
 
         document.getElementById('user-search').addEventListener('input', function() {
             clearTimeout(searchTimeout);
@@ -171,8 +219,18 @@
         }
 
         function previewRecipients() {
-            const saleType = document.getElementById('sale-type-select').value;
-            const url = '{{ route('admin.buyer-communication.preview-recipients') }}' + (saleType ? '?sale_type=' + saleType : '');
+            const serviceType = document.getElementById('service-type-select').value;
+            const itemId = document.getElementById('item-select').value;
+            const dateFrom = document.getElementById('date-from').value;
+            const dateTo = document.getElementById('date-to').value;
+
+            const params = new URLSearchParams();
+            if (serviceType) params.append('service_type', serviceType);
+            if (itemId) params.append('item_id', itemId);
+            if (dateFrom) params.append('date_from', dateFrom);
+            if (dateTo) params.append('date_to', dateTo);
+
+            const url = '{{ route('admin.buyer-communication.preview-recipients') }}' + (params.toString() ? '?' + params.toString() : '');
 
             fetch(url)
                 .then(response => response.json())
