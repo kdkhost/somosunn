@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-05-30] - fix(comunicacao): corrigir botao selecionar todos no modal
+
+### Corrigido
+- **Botão selecionar todos**: Substituído addEventListener direto por delegação de eventos no document
+- **Checkboxes dinâmicos**: Event listener agora funciona mesmo quando checkboxes são adicionados dinamicamente ao DOM
+- **Sincronização**: Atualiza contador de selecionados ao marcar/desmarcar todos
+
+### Arquivos principais
+- `resources/views/panel/admin/buyer-communication/index.blade.php`
+- `resources/views/admin/buyer-communication/index.blade.php`
+
+---
+
 ## [2026-05-30] - fix(comunicacao): corrigir carregamento de usuarios no modal de destinatarios
 
 ### Corrigido

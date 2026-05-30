@@ -261,24 +261,24 @@
             $('#recipientsModal').modal('hide');
         }
 
-        document.getElementById('modal-select-all-recipients').addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('.recipient-checkbox');
-            checkboxes.forEach(cb => cb.checked = this.checked);
-            updateSelectedRecipients();
-        });
-
-        document.getElementById('modal-recipients-list').addEventListener('change', function(e) {
-            if (e.target.classList.contains('recipient-checkbox')) {
-                updateSelectedRecipients();
-            }
-        });
-
         function updateSelectedRecipients() {
             const checkboxes = document.querySelectorAll('.recipient-checkbox:checked');
             const selectedIds = Array.from(checkboxes).map(cb => cb.value);
             document.getElementById('selected-recipients-input').value = selectedIds.join(',');
             document.getElementById('selected-count').textContent = selectedIds.length;
         }
+
+        // Delegação de eventos para checkboxes dinâmicos
+        document.addEventListener('change', function(e) {
+            if (e.target.id === 'modal-select-all-recipients') {
+                const checkboxes = document.querySelectorAll('.recipient-checkbox');
+                checkboxes.forEach(cb => cb.checked = e.target.checked);
+                updateSelectedRecipients();
+            }
+            if (e.target.classList.contains('recipient-checkbox')) {
+                updateSelectedRecipients();
+            }
+        });
 
         document.addEventListener('click', function(e) {
             if (!e.target.closest('#user-search') && !e.target.closest('#user-results')) {
