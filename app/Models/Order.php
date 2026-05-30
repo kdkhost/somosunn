@@ -10,6 +10,19 @@ class Order extends Model
 {
     use HasFactory;
 
+    /**
+     * Rotulos legiveis por tipo de venda (item_type do OrderItem).
+     * A ordem reflete a prioridade ao determinar o tipo principal do pedido.
+     */
+    public const SALE_TYPE_LABELS = [
+        'event' => 'Evento',
+        'event_exhibitor_area' => 'Expositor',
+        'mentorship' => 'Mentoria',
+        'course' => 'Curso',
+        'seller_product' => 'Marketplace',
+        'plan' => 'Plano/Assinatura',
+    ];
+
     protected $fillable = [
         'user_id',
         'seller_id',
@@ -97,6 +110,86 @@ class Order extends Model
         return $query
             ->where('status', 'paid')
             ->where('is_manual_approval', true);
+    }
+
+    /**
+     * Filtra pedidos que contenham ao menos um item do tipo informado.
+     */
+    public function scopeOfSaleType($query, ?string $type)
+    {
+        $type = trim((string) $type);
+        if ($type === '' || !array_key_exists($type, self::SALE_TYPE_LABELS)) {
+            return $query;
+        }
+
+        return $query->whereHas('items', function ($itemQuery) use ($type) {
+            $itemQuery->where('item_type', $type);
+        });
+    }
+
+    /**
+     * Retorna o tipo principal de venda do pedido com base nos itens,
+     * com fallback para o sale_type/context gravado no metadata.
+     */
+    public function primarySaleType(): ?string
+    {
+        $items = $this->relationLoaded('items') ? $this->items : $this->items()->get();
+
+        foreach (array_keys(self::SALE_TYPE_LABELS) as $type) {
+            if ($items->contains(fn ($item) => (string) $item->item_type === $type)) {
+                return $type;
+            }
+        }
+
+        $metaType = trim((string) data_get($this->metadata, 'sale_type', ''));
+        if ($metaType !== '' && array_key_exists($metaType, self::SALE_TYPE_LABELS)) {
+            return $metaType;
+        }
+
+        return null;
+    }
+
+    /**
+     * Rotulo legivel do tipo principal de venda.
+     */
+    public function saleTypeLabel(): string
+    {
+        $type = $this->primarySaleType();
+
+        return $type !== null ? self::SALE_TYPE_LABELS[$type] : 'Outro';
+    }
+
+    /**
+     * Endereco do comprador formatado em linha unica (a partir do usuario).
+     */
+    public function buyerAddress(): string
+    {
+        $user = $this->relationLoaded('user') ? $this->user : $this->user()->first();
+        if (!$user) {
+            return '';
+        }
+
+        $street = trim((string) ($user->street ?? ''));
+        $number = trim((string) ($user->number ?? ''));
+        $line = $street;
+        if ($number !== '') {
+            $line = $line !== '' ? $line . ', ' . $number : $number;
+        }
+
+        $parts = array_filter([
+            $line,
+            trim((string) ($user->complement ?? '')),
+            trim((string) ($user->neighborhood ?? '')),
+            trim((string) ($user->city ?? '')),
+            trim((string) ($user->state ?? '')),
+            trim((string) ($user->cep ?? '')),
+        ], fn ($value) => $value !== '');
+
+        if (empty($parts)) {
+            return trim((string) ($user->address ?? ''));
+        }
+
+        return implode(' - ', $parts);
     }
 
     public function getChargedAmountAttribute(): float

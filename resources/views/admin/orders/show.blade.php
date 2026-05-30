@@ -23,6 +23,12 @@
                     </div>
                     <h3 class="profile-username text-center">{{ $order->user->name }}</h3>
                     <p class="text-muted text-center">{{ $order->user->email }}</p>
+                    @if($order->user->phone)
+                        <p class="text-muted text-center text-sm"><i class="fas fa-phone mr-1"></i>{{ $order->user->phone }}</p>
+                    @endif
+                    @if($order->buyerAddress())
+                        <p class="text-muted text-center text-xs"><i class="fas fa-map-marker-alt mr-1"></i>{{ $order->buyerAddress() }}</p>
+                    @endif
 
                     <ul class="list-group list-group-unbordered mb-3">
                         <li class="list-group-item">

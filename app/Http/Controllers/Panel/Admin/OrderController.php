@@ -29,9 +29,17 @@ class OrderController extends Controller
             $query->where('status', request('status'));
         }
 
+        if (request('sale_type')) {
+            $query->saleType(request('sale_type'));
+        }
+
         $orders = $query->latest()->paginate(20)->withQueryString();
 
-        return view('panel.admin.orders.index', compact('orders'));
+        return view('panel.admin.orders.index', [
+            'orders' => $orders,
+            'saleTypeLabels' => Order::SALE_TYPE_LABELS,
+            'saleType' => request('sale_type'),
+        ]);
     }
 
     public function show(Order $order)
@@ -68,5 +76,16 @@ class OrderController extends Controller
         }
 
         return round((float) $normalizedAmount, 2);
+    }
+
+    public function cancel(Order $order)
+    {
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Apenas pedidos pendentes podem ser cancelados.');
+        }
+
+        $order->update(['status' => 'cancelled']);
+
+        return back()->with('success', 'Pedido cancelado com sucesso.');
     }
 }

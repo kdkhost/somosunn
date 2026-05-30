@@ -27,6 +27,12 @@
                         </div>
                         <h3 class="text-lg font-bold text-slate-900">{{ $order->user->name ?? 'Usuario removido' }}</h3>
                         <p class="text-sm text-slate-500">{{ $order->user->email ?? 'Sem e-mail' }}</p>
+                        @if($order->user->phone)
+                            <p class="text-sm text-slate-500 mt-1"><i class="fas fa-phone mr-1"></i>{{ $order->user->phone }}</p>
+                        @endif
+                        @if($order->buyerAddress())
+                            <p class="text-xs text-slate-400 mt-1"><i class="fas fa-map-marker-alt mr-1"></i>{{ $order->buyerAddress() }}</p>
+                        @endif
                     </div>
 
                     <div class="mt-6 space-y-3">
@@ -141,6 +147,23 @@
                         </form>
                     @endif
                 </div>
+
+                @if($order->status === 'pending')
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 border-l-4 border-l-amber-500">
+                        <h4 class="font-bold text-amber-700 mb-2">Acoes Pendentes</h4>
+                        <p class="text-xs text-amber-600 mb-4 leading-relaxed">
+                            Este pedido esta aguardando pagamento. Voce pode cancela-lo se necessario.
+                        </p>
+                        <form action="{{ route('panel.admin.orders.cancel', $order->id) }}" method="POST"
+                            onsubmit="return confirmAction(event, 'Cancelar pedido?', 'Deseja realmente cancelar este pedido?');">
+                            @csrf
+                            <button type="submit"
+                                class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-bold rounded-xl transition-all border border-amber-200">
+                                <i class="fas fa-times"></i> Cancelar Pedido
+                            </button>
+                        </form>
+                    </div>
+                @endif
 
                 @if($order->status === 'paid' && $order->remaining_refundable_amount > 0)
                     <div id="refund-actions" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 border-l-4 border-l-red-500">

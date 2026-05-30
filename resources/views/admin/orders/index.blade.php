@@ -83,6 +83,15 @@
                     </select>
                 </div>
                 <div class="col-md-2 mb-2">
+                    <label class="mb-1 text-xs font-weight-bold text-muted">Tipo</label>
+                    <select name="sale_type" class="form-control">
+                        <option value="">Todos</option>
+                        @foreach($saleTypeLabels ?? [] as $key => $label)
+                            <option value="{{ $key }}" {{ $saleType === $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
                     <label class="mb-1 text-xs font-weight-bold text-muted">Escopo da Lista</label>
                     <select name="payment_scope" class="form-control">
                         <option value="all" {{ $paymentScope === 'all' ? 'selected' : '' }}>Todos</option>
@@ -172,7 +181,10 @@
                     <thead>
                         <tr class="bg-light">
                             <th class="border-0 pl-4">ID</th>
+                            <th class="border-0">Tipo</th>
                             <th class="border-0">Cliente</th>
+                            <th class="border-0">Telefone</th>
+                            <th class="border-0">Endereço</th>
                             <th class="border-0 text-right">Valor</th>
                             <th class="border-0">Pagamento</th>
                             <th class="border-0 text-center">Origem</th>
@@ -195,6 +207,9 @@
                                     <span class="font-weight-bold text-primary">#{{ $order->id }}</span>
                                 </td>
                                 <td>
+                                    <span class="badge badge-light border px-2 py-1 text-xs">{{ $order->saleTypeLabel() }}</span>
+                                </td>
+                                <td>
                                     <div class="d-flex align-items-center">
                                         <img src="{{ $avatarUrl }}" class="img-circle elevation-1 mr-2"
                                             style="width:34px;height:34px;object-fit:cover"
@@ -203,6 +218,14 @@
                                             <div class="font-weight-bold text-sm">{{ $order->user->name ?? 'Usuário removido' }}</div>
                                             <small class="text-muted">{{ $order->user->email ?? '' }}</small>
                                         </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-sm">{{ $order->user->phone ?? '-' }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-xs text-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $order->buyerAddress() }}">
+                                        {{ $order->buyerAddress() ?: '-' }}
                                     </div>
                                 </td>
                                 <td class="text-right" data-order="{{ (float) $order->total_amount }}">
@@ -245,7 +268,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center py-5">
+                                <td colspan="11" class="text-center py-5">
                                     <div class="mb-3">
                                         <i class="fas fa-shopping-cart fa-3x text-muted"></i>
                                     </div>

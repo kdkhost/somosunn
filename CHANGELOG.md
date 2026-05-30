@@ -2,6 +2,34 @@
 
 ---
 
+## [2026-05-29] - feat(vendas): relatorios por tipo, dados de comprador e modulo de comunicacao
+
+### Adicionado
+- **Relatórios de vendas por tipo**: Filtro e exibição do tipo de venda (evento, mentoria, marketplace, curso, plano) nas telas de pedidos do admin antigo e painel novo.
+- **Dados do comprador**: Exibição de telefone e endereço do comprador nas listagens e detalhes de pedidos em ambos os painéis.
+- **Exportação atualizada**: CSV e XML de relatórios de vendas agora incluem colunas de Tipo, Telefone e Endereço do comprador.
+- **Cancelamento de pedidos**: Botão de cancelamento para pedidos pendentes no painel novo (rota `panel.admin.orders.cancel`).
+- **Módulo de comunicação com compradores**: Nova seção no painel novo (`/painel/admin/comunicacao-compradores`) para envio de mensagens:
+  - Envio individual: buscar usuário por nome/email e enviar notificação/email.
+  - Envio em massa: filtrar por tipo de compra e enviar para múltiplos compradores.
+  - Preview de destinatários antes do envio em massa.
+  - Opção de enviar apenas notificação interna ou também por e-mail.
+
+### Arquivos principais
+- `app/Models/Order.php` — adicionado `SALE_TYPE_LABELS`, `saleTypeLabel()`, `scopeOfSaleType()`, `buyerAddress()`
+- `app/Http/Controllers/Admin/OrderController.php` — filtro por tipo e exportação com dados de comprador
+- `app/Http/Controllers/Panel/Admin/OrderController.php` — filtro por tipo e método `cancel()`
+- `app/Http/Controllers/Panel/Admin/BuyerCommunicationController.php` — novo controller de comunicação
+- `app/Notifications/BuyerNotification.php` — nova classe de notificação para compradores
+- `resources/views/admin/orders/index.blade.php` — filtro por tipo e colunas de comprador
+- `resources/views/admin/orders/show.blade.php` — telefone e endereço do comprador
+- `resources/views/panel/admin/orders/index.blade.php` — filtro por tipo e coluna tipo
+- `resources/views/panel/admin/orders/show.blade.php` — telefone/endereço e botão cancelar
+- `resources/views/panel/admin/buyer-communication/index.blade.php` — view do módulo de comunicação
+- `routes/web.php` — rotas de cancelamento e comunicação
+
+---
+
 ## [2026-05-29] - fix(sumup): corrigir troca entre cartao parcelado e PIX de expositor
 
 ### Corrigido

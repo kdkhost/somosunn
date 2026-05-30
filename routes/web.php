@@ -553,7 +553,16 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::resource('plans', \App\Http\Controllers\Panel\Admin\PlanController::class);
         Route::resource('orders', \App\Http\Controllers\Panel\Admin\OrderController::class)->only(['index', 'show']);
         Route::post('orders/{order}/refund', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'refund'])->name('orders.refund');
+        Route::post('orders/{order}/cancel', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'cancel'])->name('orders.cancel');
         Route::post('orders/{order}/invoice', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'issueForOrder'])->name('orders.invoice');
+
+        Route::prefix('buyer-communication')->name('buyer-communication.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Panel\Admin\BuyerCommunicationController::class, 'index'])->name('index');
+            Route::post('individual', [\App\Http\Controllers\Panel\Admin\BuyerCommunicationController::class, 'sendIndividual'])->name('individual');
+            Route::post('bulk', [\App\Http\Controllers\Panel\Admin\BuyerCommunicationController::class, 'sendBulk'])->name('bulk');
+            Route::get('search-users', [\App\Http\Controllers\Panel\Admin\BuyerCommunicationController::class, 'searchUsers'])->name('search-users');
+            Route::get('preview-recipients', [\App\Http\Controllers\Panel\Admin\BuyerCommunicationController::class, 'previewRecipients'])->name('preview-recipients');
+        });
         Route::get('invoices/{invoice}/pdf', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'pdf'])->name('invoices.pdf');
         Route::post('invoices/{invoice}/send', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'send'])->name('invoices.send');
         Route::resource('invoices', \App\Http\Controllers\Panel\Admin\InvoiceController::class);

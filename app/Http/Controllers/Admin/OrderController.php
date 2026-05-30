@@ -20,6 +20,7 @@ class OrderController extends Controller
     {
         $search = trim((string) $request->input('search', ''));
         $status = trim((string) $request->input('status', ''));
+        $saleType = trim((string) $request->input('sale_type', ''));
         $paymentScope = trim((string) $request->input('payment_scope', 'all'));
         $period = $this->resolvePeriod($request);
 
@@ -29,6 +30,7 @@ class OrderController extends Controller
 
         $this->applySearchFilter($ordersQuery, $search);
         $this->applyPeriodFilter($ordersQuery, $period['from'], $period['to']);
+        $ordersQuery->ofSaleType($saleType);
 
         if ($status !== '') {
             $ordersQuery->where('status', $status);
@@ -41,6 +43,7 @@ class OrderController extends Controller
         $summaryBaseQuery = Order::query()->where('status', 'paid');
         $this->applySearchFilter($summaryBaseQuery, $search);
         $this->applyPeriodFilter($summaryBaseQuery, $period['from'], $period['to']);
+        $summaryBaseQuery->ofSaleType($saleType);
 
         $accountedRevenue = (float) (clone $summaryBaseQuery)->financialPaid()->sum('total_amount');
         $accountedCount = (int) (clone $summaryBaseQuery)->financialPaid()->count();
@@ -53,6 +56,8 @@ class OrderController extends Controller
             'period' => $period,
             'search' => $search,
             'status' => $status,
+            'saleType' => $saleType,
+            'saleTypeLabels' => Order::SALE_TYPE_LABELS,
             'paymentScope' => $paymentScope,
             'accountedRevenue' => $accountedRevenue,
             'accountedCount' => $accountedCount,
@@ -169,15 +174,17 @@ class OrderController extends Controller
         }
 
         $search = trim((string) $request->input('search', ''));
+        $saleType = trim((string) $request->input('sale_type', ''));
         $period = $this->resolvePeriod($request);
 
         $ordersQuery = Order::query()
-            ->with(['user:id,name,email', 'seller:id,name,email', 'invoice:id,order_id,number,status', 'manualApprover:id,name'])
+            ->with(['user', 'items', 'seller:id,name,email', 'invoice:id,order_id,number,status', 'manualApprover:id,name'])
             ->where('status', 'paid')
             ->orderByDesc(DB::raw('COALESCE(orders.paid_at, orders.manual_approved_at, orders.created_at)'));
 
         $this->applySearchFilter($ordersQuery, $search);
         $this->applyPeriodFilter($ordersQuery, $period['from'], $period['to']);
+        $ordersQuery->ofSaleType($saleType);
         $this->applyPaymentScopeFilter($ordersQuery, $reportScope);
 
         $orders = $ordersQuery->get();
@@ -185,6 +192,7 @@ class OrderController extends Controller
         $summaryBaseQuery = Order::query()->where('status', 'paid');
         $this->applySearchFilter($summaryBaseQuery, $search);
         $this->applyPeriodFilter($summaryBaseQuery, $period['from'], $period['to']);
+        $summaryBaseQuery->ofSaleType($saleType);
 
         $summary = [
             'accounted_count' => (int) (clone $summaryBaseQuery)->financialPaid()->count(),
@@ -355,8 +363,11 @@ class OrderController extends Controller
             fputcsv($handle, [
                 'Pedido',
                 'Data financeira',
+                'Tipo',
                 'Cliente',
                 'E-mail',
+                'Telefone',
+                'Endereco',
                 'Origem',
                 'Metodo',
                 'Total',
@@ -375,8 +386,11 @@ class OrderController extends Controller
                 fputcsv($handle, [
                     '#' . $order->id,
                     $financialDate ? $financialDate->format('d/m/Y H:i') : '-',
+                    $order->saleTypeLabel(),
                     (string) ($order->user->name ?? 'Usuario removido'),
                     (string) ($order->user->email ?? ''),
+                    (string) ($order->user->phone ?? ''),
+                    $order->buyerAddress(),
                     $source,
                     (string) ($order->payment_method ?: $order->gateway ?: '-'),
                     number_format((float) ($order->total_amount ?? 0), 2, '.', ''),
@@ -416,8 +430,11 @@ class OrderController extends Controller
             $orderNode = $ordersNode->addChild('order');
             $orderNode->addChild('id', (string) $order->id);
             $orderNode->addChild('financial_date', $financialDate ? $financialDate->format(DATE_ATOM) : '');
+            $orderNode->addChild('sale_type', htmlspecialchars($order->saleTypeLabel()));
             $orderNode->addChild('customer_name', htmlspecialchars((string) ($order->user->name ?? 'Usuario removido')));
             $orderNode->addChild('customer_email', htmlspecialchars((string) ($order->user->email ?? '')));
+            $orderNode->addChild('customer_phone', htmlspecialchars((string) ($order->user->phone ?? '')));
+            $orderNode->addChild('customer_address', htmlspecialchars($order->buyerAddress()));
             $orderNode->addChild('source', $order->is_manual_approval ? 'manual' : 'accounted');
             $orderNode->addChild('payment_method', htmlspecialchars((string) ($order->payment_method ?: $order->gateway ?: '-')));
             $orderNode->addChild('total_amount', number_format((float) ($order->total_amount ?? 0), 2, '.', ''));

@@ -53,9 +53,38 @@
                     </div>
                 </div>
 
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" @click.away="open = false"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm">
+                        <i class="fas fa-tag text-slate-400 dark:text-slate-500"></i>
+                        <span>Tipo: {{ $saleTypeLabels[$saleType ?? ''] ?? 'Todos' }}</span>
+                        <i class="fas fa-chevron-down text-xs text-slate-400 dark:text-slate-500"></i>
+                    </button>
+                    <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 py-2 z-50 origin-top-right focus:outline-none"
+                        style="display: none;">
+                        <a href="{{ route('panel.admin.orders.index', array_merge(request()->except('sale_type'), ['sale_type' => null])) }}"
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <span class="w-2 h-2 rounded-full bg-slate-400"></span> Todos
+                        </a>
+                        @foreach($saleTypeLabels ?? [] as $key => $label)
+                            <a href="{{ route('panel.admin.orders.index', array_merge(request()->except('sale_type'), ['sale_type' => $key])) }}"
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span> {{ $label }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+
                 <form action="{{ route('panel.admin.orders.index') }}" method="GET" class="relative">
                     @if(request('status'))
                         <input type="hidden" name="status" value="{{ request('status') }}">
+                    @endif
+                    @if(request('sale_type'))
+                        <input type="hidden" name="sale_type" value="{{ request('sale_type') }}">
                     @endif
                     <div class="relative">
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
@@ -75,6 +104,7 @@
                         <tr
                             class="bg-slate-50/50 dark:bg-slate-950 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-100 dark:border-slate-800">
                             <th class="px-6 py-4">Pedido</th>
+                            <th class="px-6 py-4">Tipo</th>
                             <th class="px-6 py-4">Cliente</th>
                             <th class="px-6 py-4">Gateway</th>
                             <th class="px-6 py-4">Status</th>
@@ -90,6 +120,12 @@
                                     <span
                                         class="font-mono text-xs font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700">
                                         #{{ $order->id }}
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 transition-colors">
+                                        {{ $order->saleTypeLabel() }}
                                     </span>
                                 </td>
 
@@ -232,7 +268,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-12 text-center">
+                                <td colspan="8" class="px-6 py-12 text-center">
                                     <div
                                         class="w-16 h-16 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <i class="fas fa-shopping-cart text-slate-300 dark:text-slate-700 text-xl"></i>
