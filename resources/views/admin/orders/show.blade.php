@@ -162,6 +162,15 @@
                                 </form>
                             @endif
                         </div>
+                    @elseif($order->status === 'paid')
+                        <form action="{{ route('admin.orders.cancel', $order->id) }}" method="POST" class="mt-2"
+                            id="form-cancel-{{ $order->id }}"
+                            onsubmit="return confirmAction(event, 'Cancelar pedido?', 'Deseja realmente cancelar este pedido pago?');">
+                            @csrf
+                            <button type="submit" class="btn btn-warning btn-block">
+                                <i class="fas fa-times mr-1"></i> Cancelar Pedido
+                            </button>
+                        </form>
                     @elseif($order->status === 'pending')
                         @if($canManualApprove ?? false)
                             <form action="{{ route('admin.orders.approve', $order->id) }}" method="POST" class="inline-block"

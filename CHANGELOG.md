@@ -2,6 +2,21 @@
 
 ---
 
+## [2026-05-29] - feat(pedidos): adicionar cancelamento para pedidos pagos
+
+### Adicionado
+- **Cancelamento de pedidos pagos**: Agora e possivel cancelar pedidos com status `paid` (pagos) em ambos os painéis
+- **Painel novo**: Botao "Cancelar Pedido" exibido para pedidos pendentes e pagos
+- **Admin antigo**: Botao "Cancelar Pedido" exibido para pedidos pendentes e pagos
+- **Controller ajustado**: Metodo `cancel` do painel novo agora aceita status `pending` e `paid`
+
+### Arquivos principais
+- `app/Http/Controllers/Panel/Admin/OrderController.php`
+- `resources/views/panel/admin/orders/show.blade.php`
+- `resources/views/admin/orders/show.blade.php`
+
+---
+
 ## [2026-05-29] - ux(painel): ajustar layout de duas colunas para uma coluna
 
 ### Ajustado

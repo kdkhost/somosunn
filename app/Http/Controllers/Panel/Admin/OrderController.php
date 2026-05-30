@@ -80,8 +80,8 @@ class OrderController extends Controller
 
     public function cancel(Order $order)
     {
-        if ($order->status !== 'pending') {
-            return back()->with('error', 'Apenas pedidos pendentes podem ser cancelados.');
+        if (!in_array($order->status, ['pending', 'paid'])) {
+            return back()->with('error', 'Apenas pedidos pendentes ou pagos podem ser cancelados.');
         }
 
         $order->update(['status' => 'cancelled']);

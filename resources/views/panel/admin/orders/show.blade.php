@@ -163,6 +163,21 @@
                             </button>
                         </form>
                     </div>
+                @elseif($order->status === 'paid')
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 border-l-4 border-l-amber-500">
+                        <h4 class="font-bold text-amber-700 mb-2">Acoes do Pedido</h4>
+                        <p class="text-xs text-amber-600 mb-4 leading-relaxed">
+                            Este pedido esta pago. Voce pode cancela-lo se necessario.
+                        </p>
+                        <form action="{{ route('panel.admin.orders.cancel', $order->id) }}" method="POST"
+                            onsubmit="return confirmAction(event, 'Cancelar pedido?', 'Deseja realmente cancelar este pedido pago?');">
+                            @csrf
+                            <button type="submit"
+                                class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-bold rounded-xl transition-all border border-amber-200">
+                                <i class="fas fa-times"></i> Cancelar Pedido
+                            </button>
+                        </form>
+                    </div>
                 @endif
 
                 @if($order->status === 'paid' && $order->remaining_refundable_amount > 0)
