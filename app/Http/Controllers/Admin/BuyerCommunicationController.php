@@ -91,7 +91,7 @@ class BuyerCommunicationController extends Controller
             ->whereHas('user');
 
         if ($request->filled('service_type')) {
-            $query->saleType($request->service_type);
+            $query->ofSaleType($request->service_type);
         }
 
         if ($request->filled('item_id')) {
@@ -150,7 +150,7 @@ class BuyerCommunicationController extends Controller
             ->whereHas('user');
 
         if ($request->filled('service_type')) {
-            $query->saleType($request->service_type);
+            $query->ofSaleType($request->service_type);
         }
 
         if ($request->filled('item_id')) {

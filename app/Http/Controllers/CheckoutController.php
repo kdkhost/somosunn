@@ -83,6 +83,10 @@ class CheckoutController extends Controller
             return redirect()->guest(route('login'))->with('error', 'Faca login para finalizar a compra do curso.');
         }
 
+        if (!Auth::user()->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice')->with('error', 'Por favor, verifique seu e-mail antes de realizar compras.');
+        }
+
         $seller = $course->creator ?: User::find($course->user_id);
         if (!$seller || !$seller->canSellOnMarketplace()) {
             return redirect()

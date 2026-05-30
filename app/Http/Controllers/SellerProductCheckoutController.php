@@ -26,6 +26,10 @@ class SellerProductCheckoutController extends Controller
             return redirect()->guest(route('login'))->with('error', 'Faca login para finalizar a compra.');
         }
 
+        if (!Auth::user()->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice')->with('error', 'Por favor, verifique seu e-mail antes de realizar compras.');
+        }
+
         $totals = $cartService->totals();
         if ($totals['items']->isEmpty()) {
             return redirect()->route('seller-products.cart.show')->with('error', 'Seu carrinho esta vazio.');

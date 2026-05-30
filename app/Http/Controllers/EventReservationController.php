@@ -24,6 +24,10 @@ class EventReservationController extends Controller
 {
     public function checkout(Event $event)
     {
+        if (Auth::check() && !Auth::user()->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice')->with('error', 'Por favor, verifique seu e-mail antes de realizar compras.');
+        }
+
         $this->abortIfDisabledOrUnpublished($event);
 
         if ($this->isEventClosed($event)) {

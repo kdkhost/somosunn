@@ -2,6 +2,26 @@
 
 ---
 
+## [2026-05-30] - fix(comunicacao): corrigir filtro de comunicacao e adicionar trava de email
+
+### Corrigido
+- **Filtro de comunicação**: Corrigido scope de `saleType` para `ofSaleType` nos controllers de comunicação
+- Agora o filtro por tipo de serviço funciona corretamente para listar destinatários
+
+### Adicionado
+- **Trava de validação de email**: Clientes só podem realizar compras após verificar o e-mail
+- Aplicado em: Cursos (CheckoutController), Eventos (EventReservationController), Marketplace (SellerProductCheckoutController)
+- Mensagem de erro redireciona para página de verificação de e-mail
+
+### Arquivos principais
+- `app/Http/Controllers/Panel/Admin/BuyerCommunicationController.php`
+- `app/Http/Controllers/Admin/BuyerCommunicationController.php`
+- `app/Http/Controllers/CheckoutController.php`
+- `app/Http/Controllers/EventReservationController.php`
+- `app/Http/Controllers/SellerProductCheckoutController.php`
+
+---
+
 ## [2026-05-30] - feat(comunicacao): filtros avancados para comunicacao com compradores
 
 ### Adicionado
