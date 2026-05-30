@@ -81,6 +81,7 @@ class BuyerCommunicationController extends Controller
             'item_id' => 'nullable|integer',
             'date_from' => 'nullable|date',
             'date_to' => 'nullable|date|after_or_equal:date_from',
+            'selected_recipients' => 'nullable|string',
             'subject' => 'required|string|max:255',
             'message' => 'required|string',
             'send_email' => 'boolean',
@@ -95,7 +96,9 @@ class BuyerCommunicationController extends Controller
         }
 
         if ($request->filled('item_id')) {
-            $query->where('item_id', $request->item_id);
+            $query->whereHas('items', function ($itemQuery) use ($request) {
+                $itemQuery->where('item_id', $request->item_id);
+            });
         }
 
         if ($request->filled('date_from')) {
@@ -108,6 +111,12 @@ class BuyerCommunicationController extends Controller
 
         $orders = $query->get();
         $users = $orders->pluck('user')->unique('id');
+
+        // Filtrar por destinatários selecionados
+        if ($request->filled('selected_recipients')) {
+            $selectedIds = explode(',', $request->selected_recipients);
+            $users = $users->filter(fn($user) => in_array($user->id, $selectedIds));
+        }
 
         $details = [
             'subject' => $request->subject,
@@ -154,7 +163,9 @@ class BuyerCommunicationController extends Controller
         }
 
         if ($request->filled('item_id')) {
-            $query->where('item_id', $request->item_id);
+            $query->whereHas('items', function ($itemQuery) use ($request) {
+                $itemQuery->where('item_id', $request->item_id);
+            });
         }
 
         if ($request->filled('date_from')) {

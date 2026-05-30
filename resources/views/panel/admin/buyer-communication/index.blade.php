@@ -118,10 +118,17 @@
                         </button>
 
                         <div id="recipients-preview" class="hidden p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-700">
-                            <p class="text-sm text-slate-600 dark:text-slate-400">
-                                <span id="recipients-count" class="font-bold text-slate-900 dark:text-white">0</span> compradores serão notificados.
-                            </p>
-                            <div id="recipients-list" class="mt-2 max-h-32 overflow-y-auto text-xs text-slate-500 dark:text-slate-400"></div>
+                            <div class="flex items-center justify-between mb-3">
+                                <p class="text-sm text-slate-600 dark:text-slate-400">
+                                    <span id="recipients-count" class="font-bold text-slate-900 dark:text-white">0</span> compradores encontrados.
+                                </p>
+                                <label class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                                    <input type="checkbox" id="select-all-recipients" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                    Selecionar todos
+                                </label>
+                            </div>
+                            <div id="recipients-list" class="mt-2 max-h-48 overflow-y-auto space-y-2"></div>
+                            <input type="hidden" name="selected_recipients" id="selected-recipients-input" value="">
                         </div>
 
                         <div>
@@ -247,9 +254,33 @@
                 .then(data => {
                     document.getElementById('recipients-count').textContent = data.count;
                     const listDiv = document.getElementById('recipients-list');
-                    listDiv.innerHTML = data.users.map(u => `<div>${u.name} (${u.email})</div>`).join('');
+                    listDiv.innerHTML = data.users.map(u => `
+                        <label class="flex items-center gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700">
+                            <input type="checkbox" class="recipient-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="${u.id}" checked>
+                            <span class="text-xs text-slate-700 dark:text-slate-300">${u.name} (${u.email})</span>
+                        </label>
+                    `).join('');
                     document.getElementById('recipients-preview').classList.remove('hidden');
+                    updateSelectedRecipients();
                 });
+        }
+
+        document.getElementById('select-all-recipients').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.recipient-checkbox');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            updateSelectedRecipients();
+        });
+
+        document.getElementById('recipients-list').addEventListener('change', function(e) {
+            if (e.target.classList.contains('recipient-checkbox')) {
+                updateSelectedRecipients();
+            }
+        });
+
+        function updateSelectedRecipients() {
+            const checkboxes = document.querySelectorAll('.recipient-checkbox:checked');
+            const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+            document.getElementById('selected-recipients-input').value = selectedIds.join(',');
         }
 
         document.addEventListener('click', function(e) {

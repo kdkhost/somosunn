@@ -2,6 +2,26 @@
 
 ---
 
+## [2026-05-30] - feat(comunicacao): adicionar selecao de destinatarios e corrigir filtro item_id
+
+### Corrigido
+- **Filtro por item_id**: Corrigido para usar `whereHas('items')` em vez de `where('item_id')` direto na tabela orders
+- Agora o filtro por item específico funciona corretamente
+
+### Adicionado
+- **Checkboxes de seleção**: Cada destinatário tem checkbox para selecionar/deselecionar individualmente
+- **Checkbox "Selecionar todos"**: Permite selecionar todos os destinatários de uma vez
+- **Campo hidden selected_recipients**: Envia IDs dos destinatários selecionados para o controller
+- **Filtro por destinatários selecionados**: Controller filtra apenas os destinatários marcados antes de enviar
+- **Visualização melhorada**: Lista de destinatários com checkboxes em painel novo
+
+### Arquivos principais
+- `app/Http/Controllers/Panel/Admin/BuyerCommunicationController.php`
+- `app/Http/Controllers/Admin/BuyerCommunicationController.php`
+- `resources/views/panel/admin/buyer-communication/index.blade.php`
+
+---
+
 ## [2026-05-30] - fix(comunicacao): corrigir filtro de comunicacao e adicionar trava de email
 
 ### Corrigido
