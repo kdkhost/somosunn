@@ -150,6 +150,8 @@
                                         <p>Catalogo produtos</p>
                                     </a>
                                 </li>
+                            @endif
+                            @if(auth()->user()->isAdmin())
                                 <li class="nav-item">
                                     <a href="{{ route('admin.buyer-communication.index') }}"
                                         class="nav-link {{ $is('admin.buyer-communication.*') }}">

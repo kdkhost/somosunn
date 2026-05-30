@@ -2,6 +2,17 @@
 
 ---
 
+## [2026-05-30] - fix(menu): ajustar visibilidade comunicacao com compradores no admin antigo
+
+### Ajustado
+- **Condição de visibilidade**: Removida dependência do módulo storefront para exibir "Comunicação com compradores" no admin antigo
+- Agora aparece apenas para admins, independente do módulo storefront estar instalado
+
+### Arquivos principais
+- `resources/views/admin/partials/sidebar.blade.php`
+
+---
+
 ## [2026-05-30] - fix(menu): adicionar comunicacao com compradores nos menus
 
 ### Adicionado
