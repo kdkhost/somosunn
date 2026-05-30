@@ -113,6 +113,18 @@
                                             <i class="fas fa-download"></i> Baixar
                                         </a>
                                     @endif
+                                    @if($order->status === 'paid' && $item->item_type === 'seller_product')
+                                        @php
+                                            $product = $item->product;
+                                            $canRequestCancellation = $product && $product->cancellation_period_days > 0 && $order->created_at->addDays($product->cancellation_period_days)->isFuture();
+                                        @endphp
+                                        @if($canRequestCancellation)
+                                            <a href="{{ route('panel.cancellation-requests.create', [$order->id, $item->id]) }}"
+                                                class="inline-flex items-center gap-2 rounded-2xl bg-amber-50 hover:bg-amber-100 border border-amber-200 px-4 py-2 text-xs font-bold text-amber-700 transition">
+                                                <i class="fas fa-times-circle"></i> Solicitar Cancelamento
+                                            </a>
+                                        @endif
+                                    @endif
                                 </div>
                             </div>
                         @endforeach

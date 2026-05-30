@@ -52,6 +52,7 @@ class SellerProduct extends Model
         'digital_instructions',
         'metadata',
         'published_at',
+        'cancellation_period_days',
     ];
 
     protected $casts = [

@@ -2,6 +2,29 @@
 
 ---
 
+## [2026-05-30] - feat(cancelamento): sistema de solicitacoes de cancelamento para clientes
+
+### Adicionado
+- **Campo de periodo de cancelamento**: Vendedores podem definir periodo (em dias) em que clientes podem solicitar cancelamento de produtos
+- **Modelo CancellationRequest**: Sistema para rastrear solicitacoes de cancelamento com status (pending, approved, rejected)
+- **Controller de solicitacoes**: Painel do cliente pode criar e listar solicitacoes de cancelamento
+- **Botao de solicitacao**: Botao "Solicitar Cancelamento" aparece no painel do cliente para itens comprados dentro do periodo definido pelo vendedor
+- **Validacao de periodo**: Botao so aparece se o produto tiver periodo configurado e a compra estiver dentro do prazo
+
+### Arquivos principais
+- `app/Models/SellerProduct.php` - campo cancellation_period_days
+- `app/Models/CancellationRequest.php` - novo modelo
+- `app/Http/Controllers/Panel/CancellationRequestController.php` - novo controller
+- `database/migrations/2026_05_30_000332_add_cancellation_period_days_to_seller_products_table.php`
+- `database/migrations/2026_05_30_000404_create_cancellation_requests_table.php`
+- `resources/views/admin/marketplace/products/form.blade.php` - campo no formulario
+- `resources/views/panel/cancellation-requests/index.blade.php` - nova view
+- `resources/views/panel/cancellation-requests/create.blade.php` - nova view
+- `resources/views/panel/purchases/index.blade.php` - botao de solicitacao
+- `routes/web.php` - rotas para solicitacoes
+
+---
+
 ## [2026-05-29] - feat(pedidos): adicionar cancelamento para pedidos pagos
 
 ### Adicionado

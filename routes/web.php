@@ -480,6 +480,11 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
     Route::get('/meus-pontos', [\App\Http\Controllers\Panel\PointsController::class, 'index'])->name('points.index');
     Route::get('/reputacao', [\App\Http\Controllers\Panel\ReputationController::class, 'show'])->name('reputation');
     Route::get('/indicacoes', [\App\Http\Controllers\Panel\ReferralController::class, 'index'])->name('referral.index');
+    Route::prefix('solicitacoes-cancelamento')->name('cancellation-requests.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Panel\CancellationRequestController::class, 'index'])->name('index');
+        Route::get('/criar/{order_id}/{item_id?}', [\App\Http\Controllers\Panel\CancellationRequestController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Panel\CancellationRequestController::class, 'store'])->name('store');
+    });
     Route::get('/indicacoes/exportar', [\App\Http\Controllers\Panel\ReferralController::class, 'export'])->name('referral.export');
     Route::get('/indicacoes/dados', [\App\Http\Controllers\Panel\ReferralController::class, 'stats'])->name('referral.stats');
     Route::post('/indicacoes/track', [\App\Http\Controllers\Panel\ReferralController::class, 'track'])->name('referral.track');

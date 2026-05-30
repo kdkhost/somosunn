@@ -102,6 +102,12 @@
                                 <input type="text" id="seller-product-points-preview" value="" readonly class="form-control font-weight-bold bg-light">
                                 <small class="form-text text-muted">Conversao baseada na cotacao configurada pela plataforma.</small>
                             </div>
+                            <div class="form-group col-md-6">
+                                <label for="cancellation_period_days">Periodo de cancelamento (dias)</label>
+                                <input type="number" name="cancellation_period_days" id="cancellation_period_days" value="{{ old('cancellation_period_days', $product->cancellation_period_days) }}" class="form-control @error('cancellation_period_days') is-invalid @enderror" min="0" placeholder="Ex.: 7">
+                                <small class="form-text text-muted">Dias apos a compra em que o cliente pode solicitar cancelamento. 0 = nao permite cancelamento.</small>
+                                @error('cancellation_period_days')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                            </div>
                             <div class="form-group col-md-12 seller-product-external-row">
                                 <label for="external_checkout_url">URL de compra externa</label>
                                 <input type="url" name="external_checkout_url" id="external_checkout_url" value="{{ old('external_checkout_url', $product->external_checkout_url) }}" class="form-control @error('external_checkout_url') is-invalid @enderror" placeholder="https://sualojaexterna.com/produto">
