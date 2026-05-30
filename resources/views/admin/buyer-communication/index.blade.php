@@ -238,14 +238,22 @@
                 .then(data => {
                     document.getElementById('modal-recipients-count').textContent = data.count;
                     const listDiv = document.getElementById('modal-recipients-list');
-                    listDiv.innerHTML = data.users.map(u => `
-                        <label class="d-flex align-items-center p-2 bg-light rounded mb-1" style="cursor: pointer;">
-                            <input type="checkbox" class="recipient-checkbox mr-2" value="${u.id}" checked>
-                            <span class="small">${u.name} (${u.email})</span>
-                        </label>
-                    `).join('');
+                    if (data.users && data.users.length > 0) {
+                        listDiv.innerHTML = data.users.map(u => `
+                            <label class="d-flex align-items-center p-2 bg-light rounded mb-1" style="cursor: pointer;">
+                                <input type="checkbox" class="recipient-checkbox mr-2" value="${u.id}" checked>
+                                <span class="small">${u.name} (${u.email})</span>
+                            </label>
+                        `).join('');
+                    } else {
+                        listDiv.innerHTML = '<p class="text-muted small">Nenhum destinatário encontrado com os filtros selecionados.</p>';
+                    }
                     $('#recipientsModal').modal('show');
                     updateSelectedRecipients();
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar destinatários:', error);
+                    alert('Erro ao carregar destinatários. Verifique o console para mais detalhes.');
                 });
         }
 

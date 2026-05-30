@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-05-30] - fix(comunicacao): adicionar tratamento de erro e mensagem de lista vazia no modal
+
+### Corrigido
+- **Tratamento de erro no modal**: Adicionado catch para exibir erro no console e alert ao usuário
+- **Mensagem de lista vazia**: Exibe mensagem amigável quando não há destinatários com os filtros selecionados
+- **Verificação de dados**: Valida se data.users existe e tem itens antes de renderizar lista
+
+### Arquivos principais
+- `resources/views/panel/admin/buyer-communication/index.blade.php`
+- `resources/views/admin/buyer-communication/index.blade.php`
+
+---
+
 ## [2026-05-30] - feat(notificacoes): template personalizado, historico e sistema de feedback
 
 ### Adicionado

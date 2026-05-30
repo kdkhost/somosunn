@@ -246,15 +246,23 @@
                 .then(data => {
                     document.getElementById('modal-recipients-count').textContent = data.count;
                     const listDiv = document.getElementById('modal-recipients-list');
-                    listDiv.innerHTML = data.users.map(u => `
-                        <label class="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="checkbox" class="recipient-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="${u.id}" checked>
-                            <span class="text-sm text-slate-700 dark:text-slate-300">${u.name} (${u.email})</span>
-                        </label>
-                    `).join('');
+                    if (data.users && data.users.length > 0) {
+                        listDiv.innerHTML = data.users.map(u => `
+                            <label class="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700">
+                                <input type="checkbox" class="recipient-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="${u.id}" checked>
+                                <span class="text-sm text-slate-700 dark:text-slate-300">${u.name} (${u.email})</span>
+                            </label>
+                        `).join('');
+                    } else {
+                        listDiv.innerHTML = '<p class="text-sm text-slate-500 dark:text-slate-400">Nenhum destinatário encontrado com os filtros selecionados.</p>';
+                    }
                     document.getElementById('recipients-modal').classList.remove('hidden');
                     document.getElementById('recipients-modal').classList.add('flex');
                     updateSelectedRecipients();
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar destinatários:', error);
+                    alert('Erro ao carregar destinatários. Verifique o console para mais detalhes.');
                 });
         }
 
