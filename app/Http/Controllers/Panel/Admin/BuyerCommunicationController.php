@@ -177,12 +177,15 @@ class BuyerCommunicationController extends Controller
         }
 
         $orders = $query->limit(50)->get();
-        $users = $orders->pluck('user')->unique('id');
+        $users = $orders->map(function ($order) {
+            return $order->user;
+        })->filter()->unique('id')->values();
 
         \Log::info('Preview recipients', [
             'filters' => $request->all(),
             'orders_count' => $orders->count(),
             'users_count' => $users->count(),
+            'users_sample' => $users->take(3)->toArray(),
         ]);
 
         return response()->json([

@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-05-30] - fix(comunicacao): corrigir carregamento de usuarios no modal de destinatarios
+
+### Corrigido
+- **Carregamento de usuários**: Substituído `pluck('user')` por `map` + `filter` para garantir usuários válidos
+- **Sincronização count/users**: Agora o count corresponde corretamente à lista de usuários retornados
+- **Valores reindexados**: Adicionado `values()` para reindexar array após filtro
+
+### Arquivos principais
+- `app/Http/Controllers/Panel/Admin/BuyerCommunicationController.php`
+- `app/Http/Controllers/Admin/BuyerCommunicationController.php`
+
+---
+
 ## [2026-05-30] - fix(comunicacao): adicionar tratamento de erro e mensagem de lista vazia no modal
 
 ### Corrigido
