@@ -333,6 +333,7 @@
         ['label' => 'Editor de Faturas', 'route' => route('panel.admin.invoices.editor'), 'icon' => 'fas fa-paint-brush', 'active' => request()->routeIs('panel.admin.invoices.editor*'), 'visible' => $user->isAdmin()],
         ['label' => 'Cupons', 'route' => route('panel.admin.coupons.index'), 'icon' => 'fas fa-ticket-alt', 'active' => request()->routeIs('panel.admin.coupons.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Afiliados', 'route' => route('panel.admin.referrals.index'), 'icon' => 'fas fa-bullhorn', 'active' => request()->routeIs('panel.admin.referrals.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Comunicação com compradores', 'route' => route('panel.admin.buyer-communication.index'), 'icon' => 'fas fa-envelope-open-text', 'active' => request()->routeIs('panel.admin.buyer-communication.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Lojas marketplace', 'route' => route('panel.admin.marketplace.stores.index'), 'icon' => 'fas fa-store-alt', 'active' => request()->routeIs('panel.admin.marketplace.stores.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Produtos marketplace', 'route' => route('panel.admin.marketplace.products.index'), 'icon' => 'fas fa-boxes-stacked', 'active' => request()->routeIs('panel.admin.marketplace.products.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Regras de pontos', 'route' => route('panel.admin.points-rules.index'), 'icon' => 'fas fa-star', 'active' => request()->routeIs('panel.admin.points-rules.*'), 'visible' => $user->isAdmin()],

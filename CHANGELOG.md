@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-05-30] - fix(menu): adicionar comunicacao com compradores nos menus
+
+### Adicionado
+- **Item de menu no painel novo**: "Comunicação com compradores" adicionado na seção Gestão do menu Administração
+- **Item de menu no admin antigo**: "Comunicação com compradores" adicionado na seção Marketplace
+
+### Arquivos principais
+- `resources/views/panel/partials/sidebar.blade.php`
+- `resources/views/admin/partials/sidebar.blade.php`
+
+---
+
 ## [2026-05-30] - feat(cancelamento): sistema de solicitacoes de cancelamento para clientes
 
 ### Adicionado

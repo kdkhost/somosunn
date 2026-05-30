@@ -147,9 +147,18 @@
                                     <a href="{{ route('admin.marketplace.catalog.index') }}"
                                         class="nav-link {{ $is('admin.marketplace.catalog.*') }}">
                                         <i class="fas fa-boxes-stacked nav-icon"></i>
-                                        <p>Produtos marketplace</p>
+                                        <p>Catalogo produtos</p>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.buyer-communication.index') }}"
+                                        class="nav-link {{ $is('admin.buyer-communication.*') }}">
+                                        <i class="fas fa-envelope-open-text nav-icon"></i>
+                                        <p>Comunicação com compradores</p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if(auth()->user()->isAdmin())
                                 <li class="nav-item">
                                     <a href="{{ route('admin.splits.index') }}"
                                         class="nav-link {{ $is('admin.splits.*') }}">
@@ -157,6 +166,7 @@
                                         <p>Extrato de Splits</p>
                                     </a>
                                 </li>
+                            @endif
                             @endif
                         </ul>
                     </li>
