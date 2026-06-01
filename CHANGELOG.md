@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-06-01] - fix(vendas): corrigir alerta de DataTables em lista vazia
+
+### Corrigido
+- **Gerenciamento de Vendas**: Removida linha manual com `colspan` no corpo da tabela quando não há vendas
+- **DataTables**: Corrigido alerta `Incorrect column count` ao carregar a tela sem registros
+- **Coluna de ações**: Ajustado índice da coluna não ordenável para a coluna correta
+
+### Arquivos principais
+- `resources/views/admin/orders/index.blade.php`
+
+---
+
 ## [2026-05-30] - fix(comunicacao): corrigir botao selecionar todos no modal
 
 ### Corrigido

@@ -194,7 +194,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($orders as $order)
+                        @foreach($orders as $order)
                             @php
                                 $photo = trim((string) optional($order->user)->photo);
                                 $avatarUrl = $photo !== ''
@@ -266,17 +266,7 @@
                                     </a>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="11" class="text-center py-5">
-                                    <div class="mb-3">
-                                        <i class="fas fa-shopping-cart fa-3x text-muted"></i>
-                                    </div>
-                                    <h5 class="text-muted font-weight-bold">Nenhuma venda encontrada</h5>
-                                    <p class="text-muted">Ajuste os filtros ou aguarde novas vendas serem registradas.</p>
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -321,10 +311,11 @@
                     [0, 'desc']
                 ],
                 columnDefs: [
-                    { targets: 7, orderable: false, searchable: false }
+                    { targets: 10, orderable: false, searchable: false }
                 ],
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json'
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json',
+                    emptyTable: 'Nenhuma venda encontrada. Ajuste os filtros ou aguarde novas vendas serem registradas.'
                 }
             });
         });
