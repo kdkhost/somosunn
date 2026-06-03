@@ -1633,3 +1633,8 @@ A migration `2026_07_22_000006_seed_multi_provider_s3` cria 22 chaves vazias na 
 - Azul principal: #1F5EDB (--unn-azul-1)
 - Azul secundario: #177FD6 (--unn-azul-2)
 - Azul escuro: #1D3FC4 (--unn-azul-3)
+## [2026-06-03] - fix(sumup): reutilizar checkout em reservas de eventos
+
+- A reserva paga de eventos via SumUp agora reutiliza o checkout já salvo no pedido ou na transação local ao reenviar a reserva, evitando o erro `DUPLICATED_CHECKOUT`.
+- Corrigido o salvamento do identificador retornado por `SumUpService::createCheckout()`: o fluxo usava a chave inexistente `id` e apagava o `sumup_checkout_id` criado pelo serviço.
+- Arquivos principais: `app/Http/Controllers/EventReservationController.php`, `CHANGELOG.md`.

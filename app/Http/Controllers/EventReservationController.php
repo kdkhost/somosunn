@@ -7,6 +7,7 @@ use App\Models\EventRegistration;
 use App\Models\Order;
 use App\Models\CouponRedemption;
 use App\Models\Plan;
+use App\Models\SumUpTransaction;
 use App\Models\User;
 use App\Services\CouponService;
 use App\Services\OrderSettlementService;
@@ -1057,16 +1058,28 @@ class EventReservationController extends Controller
                 return back()->with('error', 'Não foi possível iniciar o pagamento via SumUp. O organizador ainda não configurou as credenciais do gateway.');
             }
 
-            // Criar checkout SumUp
-            $checkout = $sumUpService->createCheckout($order, [
-                'description' => 'Ingresso: ' . $event->title . ($order->user ? ' - ' . $order->user->name : ''),
-                'return_url' => route('events.payment.success', $order->id),
-            ]);
+            // Reutilizar o checkout já criado evita DUPLICATED_CHECKOUT ao reenviar a reserva.
+            $existingCheckoutId = trim((string) data_get($order->metadata, 'sumup_checkout_id', ''));
+            if ($existingCheckoutId === '') {
+                $existingCheckoutId = trim((string) SumUpTransaction::query()
+                    ->where('order_id', $order->id)
+                    ->latest('id')
+                    ->value('checkout_id'));
+            }
+
+            $checkout = $existingCheckoutId !== ''
+                ? ['checkout_id' => $existingCheckoutId]
+                : $sumUpService->createCheckout($order, [
+                    'description' => 'Ingresso: ' . $event->title . ($order->user ? ' - ' . $order->user->name : ''),
+                    'return_url' => route('events.payment.success', $order->id),
+                ]);
+
+            $checkoutId = trim((string) ($checkout['checkout_id'] ?? $checkout['id'] ?? $existingCheckoutId));
 
             // Salvar dados do checkout no pedido
             $order->update([
                 'metadata' => array_merge($order->metadata ?? [], [
-                    'sumup_checkout_id' => $checkout['id'] ?? null,
+                    'sumup_checkout_id' => $checkoutId,
                     'sumup_checkout_url' => $checkout['checkout_url'] ?? null,
                 ]),
             ]);
@@ -1091,7 +1104,7 @@ class EventReservationController extends Controller
 
             return view('checkout.transparent', [
                 'order'                    => $order,
-                'checkoutId'               => $checkout['checkout_id'] ?? $checkout['id'] ?? '',
+                'checkoutId'               => $checkoutId,
                 'publicKey'                => $sumupPublicKey,
                 'gateway'                  => 'sumup',
                 'sumupMethodCard'          => $methodCard,
