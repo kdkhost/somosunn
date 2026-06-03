@@ -525,6 +525,8 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
     // Admin Area (Tailwind)
     Route::prefix('admin')->name('admin.')->middleware([\App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/security', [\App\Http\Controllers\Admin\Waf\WafSettingsController::class, 'index'])->name('security');
+        Route::put('/security', [\App\Http\Controllers\Admin\Waf\WafSettingsController::class, 'update'])->name('security.update');
         Route::get('/dashboard/stats', [\App\Http\Controllers\Admin\DashboardController::class, 'stats'])->name('dashboard.stats');
         Route::get('/system-health', [\App\Http\Controllers\Admin\DashboardController::class, 'systemHealth'])->name('dashboard.system-health');
         Route::get('/quick-scanner', [\App\Http\Controllers\Admin\QuickScannerController::class, 'index'])->name('quick-scanner');
@@ -903,6 +905,11 @@ Route::get('/email/verify/{id}/{hash}', [App\Http\Controllers\Auth\EmailVerifica
 Route::post('/email/verification-notification', [App\Http\Controllers\Auth\EmailVerificationController::class, 'store'])
     ->middleware(['auth', 'throttle:6,1'])
     ->name('verification.send');
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(function () {
+    Route::get('/security', [\App\Http\Controllers\Admin\Waf\WafSettingsController::class, 'index'])->name('security');
+    Route::put('/security', [\App\Http\Controllers\Admin\Waf\WafSettingsController::class, 'update'])->name('security.update');
+});
 
 /*
 |--------------------------------------------------------------------------

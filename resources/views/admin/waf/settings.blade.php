@@ -34,7 +34,7 @@
                 Tabela <code>waf_settings</code> nao encontrada. Execute <code>php artisan migrate</code>.
             </div>
         @else
-            <form method="POST" action="{{ route('admin.waf.settings.update') }}">
+            <form method="POST" action="{{ route('admin.security.update') }}">
                 @csrf
                 @method('PUT')
 

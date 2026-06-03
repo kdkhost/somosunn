@@ -673,7 +673,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.waf.settings') }}" class="nav-link {{ request()->routeIs('admin.waf.settings*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.security') }}" class="nav-link {{ request()->routeIs('admin.security*', 'admin.waf.settings*') ? 'active' : '' }}">
                                     <i class="fas fa-cog nav-icon"></i>
                                     <p>Configuracoes</p>
                                 </a>

@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-06-03] - fix(seguranca): confirmar persistencia real das configuracoes WAF
+
+- Criada a rota oficial `/admin/security` para configuracoes do WAF, mantendo compatibilidade com `/admin/waf/settings`.
+- O painel novo recebeu a mesma configuracao em `/painel/admin/security`, restrita ao superadministrador.
+- A gravacao agora ocorre em transacao e somente retorna sucesso depois de reler e confirmar cada valor no banco.
+- Os limiares passam a ser gravados na chave canonica `waf.thresholds`, exatamente a mesma consumida pelo mecanismo ativo do WAF.
+- Valores antigos gravados incorretamente em chaves separadas sao consolidados automaticamente por migration.
+- Falhas de banco agora retornam erro real e desfazem toda a alteracao, eliminando mensagens falsas de sucesso.
+- Arquivos principais: `app/Http/Controllers/Admin/Waf/WafSettingsController.php`, `resources/views/admin/waf/settings.blade.php`, `resources/views/panel/admin/waf/settings.blade.php`, `routes/web.php`, `database/migrations/2026_06_03_234500_consolidate_waf_security_settings.php`, `tests/Feature/WafSecuritySettingsPersistenceTest.php`.
+
+---
+
 ## [2026-06-03] - fix(acesso supervisionado): isolar sessoes e identificar supervisor
 
 - O acesso supervisionado agora cria uma sessao limpa ao entrar na conta de outro usuario, impedindo vazamento de formularios, erros, URLs e dados temporarios do superadministrador.
