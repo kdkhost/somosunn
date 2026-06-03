@@ -314,11 +314,16 @@ class User extends Authenticatable implements MustVerifyEmail
             }
 
             if (empty($user->referral_code)) {
-                do {
+                for ($attempt = 0; $attempt < 20; $attempt++) {
                     $code = 'UNN' . strtoupper(\Illuminate\Support\Str::random(7));
-                } while (self::where('referral_code', $code)->exists());
+                    if (!self::where('referral_code', $code)->exists()) {
+                        $user->referral_code = $code;
 
-                $user->referral_code = $code;
+                        return;
+                    }
+                }
+
+                throw new \RuntimeException('Nao foi possivel gerar um codigo de indicacao unico.');
             }
         });
     }

@@ -20,4 +20,13 @@ class Conversation extends Model
     {
         return $this->hasMany(Message::class);
     }
+
+    public function scopePrivateBetween($query, int $firstUserId, int $secondUserId)
+    {
+        return $query
+            ->whereHas('users', fn($query) => $query->where('users.id', $firstUserId))
+            ->whereHas('users', fn($query) => $query->where('users.id', $secondUserId))
+            ->withCount('users')
+            ->having('users_count', 2);
+    }
 }

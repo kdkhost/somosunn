@@ -4,10 +4,11 @@ namespace App\Notifications;
 
 use App\Services\Mail\SystemMailTemplateService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class JobVacancyPublished extends Notification
+class JobVacancyPublished extends Notification implements ShouldQueue
 {
     use Queueable;
 

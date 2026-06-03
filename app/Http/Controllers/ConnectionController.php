@@ -85,11 +85,9 @@ class ConnectionController extends Controller
 
         // Cria conversa privada se não existir
         $me = Auth::user();
-        $conversation = $me->conversations()->whereHas('users', function ($q) use ($user) {
-            $q->where('users.id', $user->id);
-        })->get()->filter(function ($c) {
-            return $c->users()->count() == 2;
-        })->first();
+        $conversation = \App\Models\Conversation::query()
+            ->privateBetween((int) $me->id, (int) $user->id)
+            ->first();
 
         if (!$conversation) {
             $conversation = \App\Models\Conversation::create([

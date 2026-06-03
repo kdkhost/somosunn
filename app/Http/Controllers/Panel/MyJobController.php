@@ -50,8 +50,11 @@ class MyJobController extends Controller
 
         if (in_array((string) ($vacancy->visibility ?? 'both'), ['external', 'both', 'public'], true)) {
             // Notificar a comunidade quando a vaga tiver alcance publico
-            $users = User::all();
-            Notification::send($users, new JobVacancyPublished($vacancy));
+            User::query()
+                ->select(['id', 'name', 'email'])
+                ->chunkById(250, function ($users) use ($vacancy) {
+                    Notification::send($users, new JobVacancyPublished($vacancy));
+                });
             $message = 'Vaga publicada e comunidade notificada com sucesso!';
         } else {
             $message = 'Vaga publicada com sucesso!';

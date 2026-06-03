@@ -15,18 +15,15 @@ class ChatController extends Controller
         if (!Auth::check())
             return [];
 
+        $userId = (int) Auth::id();
+
         return \App\Models\Connection::where('status', 'blocked')
-            ->where(function ($q) {
-                $q->where('requester_id', Auth::id())->orWhere('requested_id', Auth::id());
+            ->where(function ($q) use ($userId) {
+                $q->where('requester_id', $userId)->orWhere('requested_id', $userId);
             })
-            ->get()
-            ->map(function ($connection) {
-                return $connection->requester_id === Auth::id()
-                    ? $connection->requested_id
-                    : $connection->requester_id;
-            })
-            ->unique()
-            ->values()
+            ->selectRaw('CASE WHEN requester_id = ? THEN requested_id ELSE requester_id END AS blocked_user_id', [$userId])
+            ->distinct()
+            ->pluck('blocked_user_id')
             ->toArray();
     }
 
@@ -61,11 +58,9 @@ class ChatController extends Controller
             return redirect()->route('chat.index')->with('error', 'Você não pode conversar com você mesmo.');
         }
 
-        $conversation = $me->conversations()->whereHas('users', function ($q) use ($targetUser) {
-            $q->where('users.id', $targetUser->id);
-        })->get()->filter(function ($c) {
-            return $c->users()->count() == 2;
-        })->first();
+        $conversation = Conversation::query()
+            ->privateBetween((int) $me->id, (int) $targetUser->id)
+            ->first();
 
         if ($conversation) {
             return redirect()->route('chat.show', $conversation->id);
@@ -219,11 +214,9 @@ class ChatController extends Controller
 
         $me = Auth::user();
 
-        $conversation = $me->conversations()->whereHas('users', function ($q) use ($user) {
-            $q->where('users.id', $user->id);
-        })->get()->filter(function ($c) {
-            return $c->users()->count() == 2;
-        })->first();
+        $conversation = Conversation::query()
+            ->privateBetween((int) $me->id, (int) $user->id)
+            ->first();
 
         if (!$conversation) {
             $conversation = Conversation::create([
@@ -269,11 +262,9 @@ class ChatController extends Controller
 
         $me = Auth::user();
 
-        $conversation = $me->conversations()->whereHas('users', function ($q) use ($user) {
-            $q->where('users.id', $user->id);
-        })->get()->filter(function ($c) {
-            return $c->users()->count() == 2;
-        })->first();
+        $conversation = Conversation::query()
+            ->privateBetween((int) $me->id, (int) $user->id)
+            ->first();
 
         if (!$conversation) {
             return response()->json(['success' => false, 'message' => 'Conversa não iniciada.']);

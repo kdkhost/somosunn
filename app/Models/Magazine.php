@@ -65,17 +65,19 @@ class Magazine extends Model
             $base = 'revista';
         }
 
-        $slug = $base;
-        $i = 1;
-        while (static::query()
-            ->where('slug', $slug)
-            ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
-            ->exists()
-        ) {
-            $slug = $base . '-' . (++$i);
+        for ($i = 1; $i <= 1000; $i++) {
+            $slug = $i === 1 ? $base : $base . '-' . $i;
+            $exists = static::query()
+                ->where('slug', $slug)
+                ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
+                ->exists();
+
+            if (!$exists) {
+                return $slug;
+            }
         }
 
-        return $slug;
+        throw new \RuntimeException('Nao foi possivel gerar um slug unico para a revista.');
     }
 
     public function creator()

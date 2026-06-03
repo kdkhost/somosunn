@@ -2,6 +2,23 @@
 
 ---
 
+## [2026-06-03] - perf(banco): reduzir gargalos, N+1 e risco de loops infinitos
+
+- A contabilidade do marketplace deixou de carregar todas as vendas e compras com relacionamentos na memoria antes da paginacao; resumos e CSV agora processam pedidos incrementalmente em lotes.
+- O filtro de periodo financeiro deixou de usar `COALESCE` sobre colunas, permitindo que o MariaDB aproveite indices por vendedor, comprador, status e datas financeiras.
+- A abertura de conversa privada nos paineis legado e novo deixou de executar uma consulta adicional para cada conversa encontrada.
+- A listagem de certificados pendentes nos dois paineis deixou de consultar certificados uma vez por matricula e passou a usar uma unica consulta correlacionada.
+- Comunicacoes em massa com compradores agora selecionam destinatarios diretamente no banco e despacham notificacoes em lotes nos paineis legado e novo.
+- Publicacao de vagas deixou de carregar toda a comunidade e enviar emails durante a requisicao; os destinatarios sao processados em lotes e a notificacao segue pela fila.
+- Consultas acima do limite configuravel `DB_SLOW_QUERY_MS` passam a ser registradas sem incluir os valores sensiveis dos bindings.
+- Conexoes com o banco recebem timeout configuravel por `DB_CONNECT_TIMEOUT`, evitando requisicoes presas quando o servidor MariaDB estiver indisponivel.
+- Carregamentos N+1 passam a ser detectados e registrados no ambiente de desenvolvimento.
+- Geradores de codigo de indicacao e slugs de lojas, revistas, planos e produtos agora possuem limite explicito de tentativas, eliminando risco de loop infinito nos paineis legado e novo.
+- Adicionados indices compostos prioritarios para pedidos, participantes de conversas e mensagens nao lidas.
+- Arquivos principais: `app/Http/Controllers/Panel/MarketplaceAccountingController.php`, `app/Http/Controllers/Admin/ChatController.php`, `app/Providers/AppServiceProvider.php`, `database/migrations/2026_06_03_235500_add_priority_database_performance_indexes.php`, `tests/Feature/DatabasePerformanceGuardTest.php`.
+
+---
+
 ## [2026-06-03] - fix(seguranca): confirmar persistencia real das configuracoes WAF
 
 - Criada a rota oficial `/admin/security` para configuracoes do WAF, mantendo compatibilidade com `/admin/waf/settings`.

@@ -30,7 +30,8 @@ class CertificateController extends Controller
         // 2. Pending Certificates (Enrollment completed but no Certificate)
         // We look for all completion types (Course, Mentorship, Event)
         $queryPending = Enrollment::with(['user', 'enrollable'])
-            ->whereNotNull('completed_at');
+            ->whereNotNull('completed_at')
+            ->withoutCertificate();
 
         // REFINING ACCESS CONTROL
         if (!$user->isAdmin()) {
@@ -58,24 +59,7 @@ class CertificateController extends Controller
 
         $issuedCertificates = $queryIssued->get();
 
-        // Better Pending Logic: filter out those who already have a certificate for that specific enrollment
-        $pendingEnrollments = $queryPending->get()->filter(function ($enrollment) {
-            if (!$enrollment->user || !$enrollment->enrollable) {
-                return false;
-            }
-
-            $query = Certificate::where('user_id', $enrollment->user_id);
-
-            if ($enrollment->enrollable_type === Course::class) {
-                $query->where('course_id', $enrollment->enrollable_id);
-            } elseif ($enrollment->enrollable_type === Mentorship::class) {
-                $query->where('mentorship_id', $enrollment->enrollable_id);
-            } elseif ($enrollment->enrollable_type === Event::class) {
-                $query->where('event_id', $enrollment->enrollable_id);
-            }
-
-            return !$query->exists();
-        });
+        $pendingEnrollments = $queryPending->get();
 
         return view('admin.certificates.index', compact('issuedCertificates', 'pendingEnrollments'));
     }

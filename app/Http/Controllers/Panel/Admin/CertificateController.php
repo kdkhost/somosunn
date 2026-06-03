@@ -28,7 +28,8 @@ class CertificateController extends Controller
 
         // Pending Certificates
         $queryPending = Enrollment::with(['user', 'enrollable'])
-            ->whereNotNull('completed_at');
+            ->whereNotNull('completed_at')
+            ->withoutCertificate();
 
         if (!$user->isAdmin()) {
             $myCourseIds = Course::where('user_id', $user->id)->pluck('id');
@@ -55,20 +56,7 @@ class CertificateController extends Controller
         $issuedCertificates = $queryIssued->paginate(15, ['*'], 'issued_page');
         $issuedCertificates->appends(request()->all());
 
-        $pendingEnrollments = $queryPending->get()->filter(function ($enrollment) {
-            if (!$enrollment->user || !$enrollment->enrollable) {
-                return false;
-            }
-
-            $query = Certificate::where('user_id', $enrollment->user_id);
-            if ($enrollment->enrollable_type === Course::class)
-                $query->where('course_id', $enrollment->enrollable_id);
-            elseif ($enrollment->enrollable_type === Mentorship::class)
-                $query->where('mentorship_id', $enrollment->enrollable_id);
-            elseif ($enrollment->enrollable_type === Event::class)
-                $query->where('event_id', $enrollment->enrollable_id);
-            return !$query->exists();
-        });
+        $pendingEnrollments = $queryPending->get();
 
         return view('panel.admin.certificates.index', compact('issuedCertificates', 'pendingEnrollments'));
     }

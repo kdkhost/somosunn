@@ -22,13 +22,16 @@ class AffiliateShareKitService
             return $user;
         }
 
-        do {
+        for ($attempt = 0; $attempt < 20; $attempt++) {
             $code = 'UNN' . strtoupper(substr(md5($user->id . microtime()), 0, 7));
-        } while (User::where('referral_code', $code)->exists());
+            if (!User::where('referral_code', $code)->exists()) {
+                $user->forceFill(['referral_code' => $code])->save();
 
-        $user->forceFill(['referral_code' => $code])->save();
+                return $user->refresh();
+            }
+        }
 
-        return $user->refresh();
+        throw new \RuntimeException('Nao foi possivel gerar um codigo de indicacao unico.');
     }
 
     public function buildForUser(User $user): array

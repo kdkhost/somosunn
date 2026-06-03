@@ -38,14 +38,8 @@ class ChatController extends Controller
             return redirect()->route('admin.chat.index')->with('error', 'Você não pode conversar com você mesmo.');
         }
 
-        $conversation = $me->conversations()
-            ->whereHas('users', function ($q) use ($targetUser) {
-                $q->where('users.id', $targetUser->id);
-            })
-            ->get()
-            ->filter(function ($c) {
-                return $c->users()->count() == 2;
-            })
+        $conversation = Conversation::query()
+            ->privateBetween((int) $me->id, (int) $targetUser->id)
             ->first();
 
         if ($conversation) {
@@ -151,4 +145,3 @@ class ChatController extends Controller
         return response()->json($messages);
     }
 }
-

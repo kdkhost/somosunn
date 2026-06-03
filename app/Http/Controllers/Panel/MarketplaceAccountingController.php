@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MarketplaceAccountingController extends Controller
@@ -20,9 +18,7 @@ class MarketplaceAccountingController extends Controller
 
         [$salesQuery, $purchasesQuery, $period] = $this->buildQueries((int) $user->id, $request);
 
-        $salesOrders = (clone $salesQuery)->get();
-        $purchaseOrders = (clone $purchasesQuery)->get();
-        $summary = $this->buildSummary($salesOrders, $purchaseOrders);
+        $summary = $this->buildSummaryFromQueries($salesQuery, $purchasesQuery);
 
         $sales = $salesQuery->paginate(20, ['*'], 'sales_page')->withQueryString();
         $purchases = $purchasesQuery->paginate(20, ['*'], 'purchases_page')->withQueryString();
@@ -36,12 +32,10 @@ class MarketplaceAccountingController extends Controller
         abort_unless($user && ($user->isAdmin() || $user->canSellOnMarketplace()), 403);
 
         [$salesQuery, $purchasesQuery, $period] = $this->buildQueries((int) $user->id, $request);
-        $salesOrders = $salesQuery->get();
-        $purchaseOrders = $purchasesQuery->get();
-        $summary = $this->buildSummary($salesOrders, $purchaseOrders);
+        $summary = $this->buildSummaryFromQueries($salesQuery, $purchasesQuery);
         $filename = 'contabilidade-membro-' . now()->format('Ymd-His') . '.csv';
 
-        return response()->streamDownload(function () use ($summary, $salesOrders, $purchaseOrders, $period) {
+        return response()->streamDownload(function () use ($summary, $salesQuery, $purchasesQuery, $period) {
             $handle = fopen('php://output', 'w');
             if (!$handle) {
                 return;
@@ -62,7 +56,7 @@ class MarketplaceAccountingController extends Controller
 
             fputcsv($handle, ['VENDAS']);
             fputcsv($handle, ['Pedido', 'Data', 'Comprador', 'Itens', 'Cobranca', 'Estorno', 'Taxas', 'Liquido', 'Status']);
-            foreach ($salesOrders as $order) {
+            foreach ((clone $salesQuery)->reorder()->lazyById(250) as $order) {
                 fputcsv($handle, [
                     '#' . $order->id,
                     optional($this->financialDate($order))->format('d/m/Y H:i'),
@@ -79,7 +73,7 @@ class MarketplaceAccountingController extends Controller
             fputcsv($handle, []);
             fputcsv($handle, ['COMPRAS']);
             fputcsv($handle, ['Pedido', 'Data', 'Vendedor', 'Itens', 'Cobranca', 'Estorno', 'Despesa liquida', 'Status']);
-            foreach ($purchaseOrders as $order) {
+            foreach ((clone $purchasesQuery)->reorder()->lazyById(250) as $order) {
                 fputcsv($handle, [
                     '#' . $order->id,
                     optional($this->financialDate($order))->format('d/m/Y H:i'),
@@ -127,20 +121,14 @@ class MarketplaceAccountingController extends Controller
             ->with(['user:id,name,email', 'seller:id,name,email', 'items'])
             ->where('seller_id', $userId)
             ->whereIn('status', ['paid', 'refunded'])
-            ->whereBetween(
-                DB::raw('COALESCE(orders.paid_at, orders.manual_approved_at, orders.created_at)'),
-                [$period['from']->copy()->startOfDay(), $period['to']->copy()->endOfDay()]
-            )
+            ->where(fn($query) => $this->applyFinancialPeriod($query, $period))
             ->latest('id');
 
         $purchasesQuery = Order::query()
             ->with(['user:id,name,email', 'seller:id,name,email', 'items'])
             ->where('user_id', $userId)
             ->whereIn('status', ['paid', 'refunded'])
-            ->whereBetween(
-                DB::raw('COALESCE(orders.paid_at, orders.manual_approved_at, orders.created_at)'),
-                [$period['from']->copy()->startOfDay(), $period['to']->copy()->endOfDay()]
-            )
+            ->where(fn($query) => $this->applyFinancialPeriod($query, $period))
             ->latest('id');
 
         return [$salesQuery, $purchasesQuery, $period];
@@ -149,29 +137,78 @@ class MarketplaceAccountingController extends Controller
     /**
      * @return array<string,float|int>
      */
-    private function buildSummary(Collection $salesOrders, Collection $purchaseOrders): array
+    private function buildSummaryFromQueries($salesQuery, $purchasesQuery): array
     {
-        $salesGross = round((float) $salesOrders->sum(fn(Order $order) => (float) $order->charged_amount), 2);
-        $salesRefunds = round((float) $salesOrders->sum(fn(Order $order) => (float) $order->refunded_amount), 2);
-        $salesFees = round((float) $salesOrders->sum(fn(Order $order) => (float) $this->orderFees($order)), 2);
-        $salesNet = round((float) $salesOrders->sum(fn(Order $order) => (float) $this->orderNetForSeller($order)), 2);
+        $columns = [
+            'id',
+            'status',
+            'total_amount',
+            'fee_amount',
+            'platform_fee_amount',
+            'metadata',
+            'refunded_at',
+        ];
 
-        $purchaseGross = round((float) $purchaseOrders->sum(fn(Order $order) => (float) $order->charged_amount), 2);
-        $purchaseRefunds = round((float) $purchaseOrders->sum(fn(Order $order) => (float) $order->refunded_amount), 2);
-        $purchaseNet = round((float) $purchaseOrders->sum(fn(Order $order) => (float) $this->orderNetExpense($order)), 2);
+        return $this->buildSummary(
+            (clone $salesQuery)->withoutEagerLoads()->select($columns)->reorder()->lazyById(500),
+            (clone $purchasesQuery)->withoutEagerLoads()->select($columns)->reorder()->lazyById(500)
+        );
+    }
+
+    /**
+     * @param iterable<Order> $salesOrders
+     * @param iterable<Order> $purchaseOrders
+     * @return array<string,float|int>
+     */
+    private function buildSummary(iterable $salesOrders, iterable $purchaseOrders): array
+    {
+        $salesCount = $purchaseCount = 0;
+        $salesGross = $salesRefunds = $salesFees = $salesNet = 0.0;
+        $purchaseGross = $purchaseRefunds = $purchaseNet = 0.0;
+
+        foreach ($salesOrders as $order) {
+            $salesCount++;
+            $salesGross += (float) $order->charged_amount;
+            $salesRefunds += (float) $order->refunded_amount;
+            $salesFees += $this->orderFees($order);
+            $salesNet += $this->orderNetForSeller($order);
+        }
+
+        foreach ($purchaseOrders as $order) {
+            $purchaseCount++;
+            $purchaseGross += (float) $order->charged_amount;
+            $purchaseRefunds += (float) $order->refunded_amount;
+            $purchaseNet += $this->orderNetExpense($order);
+        }
 
         return [
-            'sales_count' => (int) $salesOrders->count(),
-            'sales_gross' => $salesGross,
-            'sales_refunds' => $salesRefunds,
-            'sales_fees' => $salesFees,
-            'sales_net' => $salesNet,
-            'purchase_count' => (int) $purchaseOrders->count(),
-            'purchase_gross' => $purchaseGross,
-            'purchase_refunds' => $purchaseRefunds,
-            'purchase_net' => $purchaseNet,
+            'sales_count' => $salesCount,
+            'sales_gross' => round($salesGross, 2),
+            'sales_refunds' => round($salesRefunds, 2),
+            'sales_fees' => round($salesFees, 2),
+            'sales_net' => round($salesNet, 2),
+            'purchase_count' => $purchaseCount,
+            'purchase_gross' => round($purchaseGross, 2),
+            'purchase_refunds' => round($purchaseRefunds, 2),
+            'purchase_net' => round($purchaseNet, 2),
             'overall_net' => round($salesNet - $purchaseNet, 2),
         ];
+    }
+
+    private function applyFinancialPeriod($query, array $period): void
+    {
+        $range = [$period['from']->copy()->startOfDay(), $period['to']->copy()->endOfDay()];
+
+        $query
+            ->whereBetween('paid_at', $range)
+            ->orWhere(function ($query) use ($range) {
+                $query->whereNull('paid_at')->whereBetween('manual_approved_at', $range);
+            })
+            ->orWhere(function ($query) use ($range) {
+                $query->whereNull('paid_at')
+                    ->whereNull('manual_approved_at')
+                    ->whereBetween('created_at', $range);
+            });
     }
 
     private function orderFees(Order $order): float

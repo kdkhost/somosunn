@@ -19,7 +19,7 @@ class UserObserver
         if ($user->role !== 'admin' && $user->role !== 'superadmin') {
             
             // Buscar todos os admins (Excluir superadmin)
-            $admins = User::where('role', 'admin')->get();
+            $admins = User::where('role', 'admin')->select('id')->cursor();
 
             foreach ($admins as $admin) {
                 // Criar conexão aceita

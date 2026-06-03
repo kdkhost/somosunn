@@ -132,20 +132,19 @@ trait HandlesPlanFormData
             $base = 'plano';
         }
 
-        $slug = $base;
-        $suffix = 2;
-
-        while (
-            Plan::query()
+        for ($suffix = 1; $suffix <= 1000; $suffix++) {
+            $slug = $suffix === 1 ? $base : $base . '-' . $suffix;
+            $exists = Plan::query()
                 ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
                 ->where('slug', $slug)
-                ->exists()
-        ) {
-            $slug = $base . '-' . $suffix;
-            $suffix++;
+                ->exists();
+
+            if (!$exists) {
+                return $slug;
+            }
         }
 
-        return $slug;
+        throw new \RuntimeException('Nao foi possivel gerar um slug unico para o plano.');
     }
 
     protected function normalizePlanMoneyInputs(Request $request): void

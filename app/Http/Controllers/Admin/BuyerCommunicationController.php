@@ -87,7 +87,7 @@ class BuyerCommunicationController extends Controller
             'send_email' => 'boolean',
         ]);
 
-        $query = Order::with('user')
+        $query = Order::query()
             ->where('status', 'paid')
             ->whereHas('user');
 
@@ -109,13 +109,13 @@ class BuyerCommunicationController extends Controller
             $query->where('created_at', '<=', $request->date_to . ' 23:59:59');
         }
 
-        $orders = $query->get();
-        $users = $orders->pluck('user')->unique('id');
+        $usersQuery = User::query()
+            ->whereIn('id', (clone $query)->select('user_id')->distinct());
 
         // Filtrar por destinatários selecionados
         if ($request->filled('selected_recipients')) {
-            $selectedIds = explode(',', $request->selected_recipients);
-            $users = $users->filter(fn($user) => in_array($user->id, $selectedIds));
+            $selectedIds = array_values(array_filter(array_map('intval', explode(',', $request->selected_recipients))));
+            $usersQuery->whereIn('id', $selectedIds);
         }
 
         $details = [
@@ -126,10 +126,10 @@ class BuyerCommunicationController extends Controller
         ];
 
         $count = 0;
-        foreach ($users as $user) {
-            $user->notify(new BuyerNotification($details, $request->boolean('send_email')));
-            $count++;
-        }
+        $usersQuery->select(['id', 'name', 'email'])->chunkById(250, function ($users) use ($details, $request, &$count) {
+            Notification::send($users, new BuyerNotification($details, $request->boolean('send_email')));
+            $count += $users->count();
+        });
 
         return back()->with('success', "Mensagem enviada para {$count} compradores.");
     }

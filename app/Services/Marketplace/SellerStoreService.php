@@ -245,13 +245,14 @@ class SellerStoreService
             }
         }
 
-        $suffix = 2;
-        do {
+        for ($suffix = 2; $suffix <= 1000; $suffix++) {
             $candidate = $base . '-' . $suffix;
-            $suffix++;
-        } while ($this->slugExists($candidate, $ignoreStore));
+            if (!$this->slugExists($candidate, $ignoreStore)) {
+                return $candidate;
+            }
+        }
 
-        return $candidate;
+        throw new \RuntimeException('Nao foi possivel gerar um endereco unico para a loja.');
     }
 
     private function slugExists(string $slug, ?SellerStore $ignoreStore = null): bool

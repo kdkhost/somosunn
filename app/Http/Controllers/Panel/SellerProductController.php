@@ -372,19 +372,19 @@ class SellerProductController extends Controller
             $base = 'produto';
         }
 
-        $slug = $base;
-        $suffix = 2;
-        while (
-            SellerProduct::query()
+        for ($suffix = 1; $suffix <= 1000; $suffix++) {
+            $slug = $suffix === 1 ? $base : $base . '-' . $suffix;
+            $exists = SellerProduct::query()
                 ->where('seller_store_id', $storeId)
                 ->where('slug', $slug)
                 ->when($ignoreProductId, fn($query) => $query->where('id', '!=', $ignoreProductId))
-                ->exists()
-        ) {
-            $slug = $base . '-' . $suffix;
-            $suffix++;
+                ->exists();
+
+            if (!$exists) {
+                return $slug;
+            }
         }
 
-        return $slug;
+        throw new \RuntimeException('Nao foi possivel gerar um slug unico para o produto.');
     }
 }

@@ -22,6 +22,11 @@ use Illuminate\Support\Str;
 return [
     'default' => env('DB_CONNECTION', 'mysql'),
 
+    'performance' => [
+        'slow_query_ms' => (int) env('DB_SLOW_QUERY_MS', 1000),
+        'log_slow_queries' => (bool) env('DB_LOG_SLOW_QUERIES', true),
+    ],
+
     'connections' => [
         'sqlite' => [
             'driver' => 'sqlite',
@@ -47,6 +52,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::ATTR_TIMEOUT => (int) env('DB_CONNECT_TIMEOUT', 5),
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],

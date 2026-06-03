@@ -26,6 +26,8 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Events\QueryExecuted;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -96,6 +98,31 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        Model::preventLazyLoading(!App::isProduction());
+        Model::handleLazyLoadingViolationUsing(function (Model $model, string $relation): void {
+            Log::warning('Carregamento N+1 detectado', [
+                'model' => $model::class,
+                'relation' => $relation,
+                'route' => request()?->route()?->getName(),
+            ]);
+        });
+
+        if (config('database.performance.log_slow_queries', true)) {
+            DB::listen(function (QueryExecuted $query): void {
+                $threshold = max(100, (int) config('database.performance.slow_query_ms', 1000));
+                if ($query->time < $threshold) {
+                    return;
+                }
+
+                Log::warning('Consulta lenta detectada', [
+                    'connection' => $query->connectionName,
+                    'duration_ms' => round($query->time, 2),
+                    'sql' => $query->sql,
+                    'route' => request()?->route()?->getName(),
+                ]);
+            });
+        }
+
         // Paginação: usar Bootstrap-5 como padrão (AdminLTE usa Bootstrap)
         // O painel Tailwind usa ->links() que herda este padrão mas funciona OK
         // pois Bootstrap-5 pagination é compatível com ambos os temas
