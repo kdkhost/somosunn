@@ -1194,7 +1194,10 @@
             class="position-fixed bg-warning text-dark px-3 py-2 rounded shadow font-weight-bold d-flex align-items-center"
             style="bottom: 1rem; left: 1rem; z-index: 9999; font-size: 0.8rem; max-width: 250px;">
             <i class="fas fa-user-secret mr-2"></i>
-            <span class="text-truncate mr-2">{{ auth()->user()->name }}</span>
+            <span class="text-truncate mr-2">
+                Supervisor: {{ session('impersonator_name', 'Administrador') }}<br>
+                Conta: {{ session('impersonated_user_name', auth()->user()->name) }}
+            </span>
             <a href="{{ route('admin.impersonate.stop') }}" class="btn btn-xs btn-danger">Sair</a>
             <button onclick="document.getElementById('impersonation-badge').style.display='none'"
                 class="btn btn-xs btn-link text-dark ml-1 p-0" title="Minimizar">

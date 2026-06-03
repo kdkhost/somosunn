@@ -887,7 +887,10 @@
         <div id="impersonation-badge"
             class="fixed bottom-4 left-4 z-[9999] bg-yellow-400 text-yellow-900 px-3 py-2 rounded-lg shadow-lg text-xs font-bold flex items-center gap-2 max-w-xs">
             <i class="fas fa-user-secret"></i>
-            <span class="truncate">{{ auth()->user()->name }}</span>
+            <span class="truncate">
+                Supervisor: {{ session('impersonator_name', 'Administrador') }}<br>
+                Conta: {{ session('impersonated_user_name', auth()->user()->name) }}
+            </span>
             <a href="{{ route('admin.impersonate.stop') }}"
                 class="bg-yellow-900 text-yellow-100 px-2 py-1 rounded hover:bg-yellow-800 transition whitespace-nowrap">
                 Sair

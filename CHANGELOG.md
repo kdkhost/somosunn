@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-06-03] - fix(acesso supervisionado): isolar sessoes e identificar supervisor
+
+- O acesso supervisionado agora cria uma sessao limpa ao entrar na conta de outro usuario, impedindo vazamento de formularios, erros, URLs e dados temporarios do superadministrador.
+- Ao encerrar, a sessao da conta acessada tambem e descartada antes de restaurar a conta do supervisor.
+- O aviso exibido nos layouts legado e novo identifica separadamente o nome do supervisor e o nome da conta acessada.
+- Acesso supervisionado encadeado foi bloqueado para evitar troca de identidade inconsistente.
+- Um middleware valida continuamente a identidade da conta acessada e desativa cache durante a supervisao, evitando exibicao de paginas antigas ou sessoes inconsistentes.
+- Adicionados testes de isolamento de sessao, exibicao dos dados da conta acessada, restauracao do supervisor e bloqueio de acesso encadeado.
+- Arquivos principais: `app/Http/Controllers/Admin/ImpersonateController.php`, `app/Http/Middleware/ProtectSupervisedAccess.php`, `app/Http/Kernel.php`, `resources/views/layouts/app.blade.php`, `resources/views/admin/layouts/app.blade.php`, `tests/Feature/SupervisedAccessIsolationTest.php`.
+
+---
+
 ## [2026-06-03] - feat(emails): tornar templates personalizados obrigatorios
 
 - Todo disparo de email do sistema passa a usar um registro editavel de `mail_templates` e o layout oficial `emails.system`.
