@@ -3,7 +3,9 @@
 namespace App\Services\Mail;
 
 use App\Models\MailTemplate;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Mail;
 
 class SystemMailTemplateService
 {
@@ -35,6 +37,49 @@ class SystemMailTemplateService
             'content' => $content,
             'template' => $template,
         ];
+    }
+
+    public function renderOrCreate(string $slug, array $data, array $defaults): ?array
+    {
+        MailTemplate::firstOrCreate(['slug' => $slug], array_merge([
+            'name' => ucfirst(str_replace(['_', '-'], ' ', $slug)),
+            'category' => 'sistema',
+            'locale' => 'pt-BR',
+            'subject' => '{{site.name}}',
+            'body' => '<p>Conteudo do email.</p>',
+            'is_active' => true,
+        ], $defaults));
+
+        return $this->renderFullHtml($slug, $this->withSiteData($data));
+    }
+
+    public function mailMessage(string $slug, array $data, array $defaults): MailMessage
+    {
+        $rendered = $this->renderOrCreate($slug, $data, $defaults);
+
+        return (new MailMessage)
+            ->subject($rendered['subject'] ?? '')
+            ->view('emails.system', array_merge(
+                app(SystemMailLayoutData::class)->make(),
+                ['content' => $rendered['content'] ?? '']
+            ));
+    }
+
+    public function send(string $slug, string|array $to, array $data, array $defaults, ?callable $configure = null): bool
+    {
+        $rendered = $this->renderOrCreate($slug, $data, $defaults);
+        if (!$rendered) {
+            return false;
+        }
+
+        Mail::html($rendered['html'], function ($message) use ($to, $rendered, $configure) {
+            $message->to($to)->subject($rendered['subject']);
+            if ($configure) {
+                $configure($message);
+            }
+        });
+
+        return true;
     }
 
     /**
@@ -135,9 +180,27 @@ class SystemMailTemplateService
 
         return [
             'subject' => $rendered['subject'],
+            'content' => $rendered['content'],
             'html' => $fullHtml,
             'template' => $rendered['template']
         ];
     }
-}
 
+    private function withSiteData(array $data): array
+    {
+        if (isset($data['site'])) {
+            return $data;
+        }
+
+        $layout = app(SystemMailLayoutData::class)->make();
+        $data['site'] = [
+            'name' => $layout['siteName'],
+            'logo' => $layout['logoUrl'],
+            'primary_color' => $layout['primaryColor'],
+            'secondary_color' => $layout['secondaryColor'],
+            'url' => url('/'),
+        ];
+
+        return $data;
+    }
+}

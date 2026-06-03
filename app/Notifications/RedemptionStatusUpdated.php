@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Redemption;
+use App\Services\Mail\SystemMailTemplateService;
 use App\Support\EmailQueueSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,27 +37,22 @@ class RedemptionStatusUpdated extends Notification implements ShouldQueue
         $payload = $this->statusPayload();
         $itemName = (string) ($this->redemption->item->name ?? 'Item resgatado');
 
-        $mail = (new MailMessage)
-            ->subject('Atualizacao no seu resgate: ' . $payload['label'])
-            ->greeting('Ola, ' . $notifiable->name . '!')
-            ->line(str_replace(':item', $itemName, $payload['message']));
-
-        if ($this->redemption->provider_name) {
-            $mail->line('Responsavel: **' . $this->redemption->provider_name . '**');
-        }
-
-        if ($this->redemption->tracking_code) {
-            $mail->line('Codigo de rastreio: **' . $this->redemption->tracking_code . '**');
-        }
-
-        if ($this->redemption->tracking_url) {
-            $mail->line('Acompanhe a entrega: ' . $this->redemption->tracking_url);
-        }
-
-        return $mail
-            ->action('Ver meus resgates', route('panel.redemptions.history'))
-            ->line('Obrigado por fazer parte da nossa comunidade.')
-            ->salutation('Atenciosamente, Equipe SOMOS UNN');
+        return app(SystemMailTemplateService::class)->mailMessage('redemption_status_updated', [
+            'user' => ['name' => $notifiable->name],
+            'redemption' => [
+                'status_label' => $payload['label'],
+                'message' => str_replace(':item', $itemName, $payload['message']),
+                'provider_name' => $this->redemption->provider_name ?? '',
+                'tracking_code' => $this->redemption->tracking_code ?? '',
+                'tracking_url' => $this->redemption->tracking_url ?? '',
+                'history_url' => route('panel.redemptions.history'),
+            ],
+        ], [
+            'name' => 'Atualizacao de Resgate',
+            'category' => 'sistema',
+            'subject' => 'Atualizacao no seu resgate: {{redemption.status_label}}',
+            'body' => '<h2>Ola, {{user.name}}!</h2><p>{{redemption.message}}</p><p><strong>Responsavel:</strong> {{redemption.provider_name}}<br><strong>Rastreio:</strong> {{redemption.tracking_code}}</p><p><a href="{{redemption.history_url}}">Ver meus resgates</a></p>',
+        ]);
     }
 
     public function toArray($notifiable): array

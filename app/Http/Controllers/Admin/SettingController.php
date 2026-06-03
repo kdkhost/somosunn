@@ -1323,10 +1323,12 @@ class SettingController extends Controller
                 </table>
             </div>';
 
-            \Mail::html($layout, function ($message) use ($request, $subject) {
-                $message->to($request->smtp_test_email)
-                    ->subject($subject);
-            });
+            app(\App\Services\Mail\SystemMailTemplateService::class)->send('smtp_test', $request->smtp_test_email, $data, [
+                'name' => 'Teste de Configuracao SMTP',
+                'category' => 'sistema',
+                'subject' => 'Teste de Envio SMTP - {{site.name}}',
+                'body' => '<h1>Ola, {{user.name}}!</h1><p>Este e um email de teste para validar as configuracoes SMTP de <strong>{{site.name}}</strong>.</p>',
+            ]);
 
             return response()->json(['success' => true, 'message' => 'E-mail de teste enviado com sucesso!']);
         } catch (\Exception $e) {

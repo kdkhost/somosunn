@@ -2,9 +2,9 @@
 
 namespace App\Mail;
 
+use App\Mail\Concerns\UsesMailTemplate;
 use App\Models\Order;
 use App\Support\EmailQueueSettings;
-use App\Services\Mail\SystemMailLayoutData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 
 class PaymentConfirmedMail extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, UsesMailTemplate;
 
     public $order;
 
@@ -29,12 +29,17 @@ class PaymentConfirmedMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        $layout = app(SystemMailLayoutData::class)->make();
-
-        return $this
-            ->subject('Pagamento Confirmado - Pedido #' . $this->order->id)
-            ->view('emails.payment_confirmed', array_merge($layout, [
-                'order' => $this->order,
-            ]));
+        return $this->buildFromTemplate('payment_confirmed', [
+            'user' => ['name' => $this->order->user->name ?? 'Cliente'],
+            'order' => [
+                'id' => $this->order->id,
+                'total' => 'R$ ' . number_format((float) $this->order->total_amount, 2, ',', '.'),
+            ],
+        ], [
+            'name' => 'Pagamento Confirmado',
+            'category' => 'financeiro',
+            'subject' => 'Pagamento confirmado - Pedido #{{order.id}}',
+            'body' => '<h2>Pagamento confirmado!</h2><p>Ola, {{user.name}}.</p><p>O pagamento do pedido <strong>#{{order.id}}</strong>, no valor de <strong>{{order.total}}</strong>, foi confirmado.</p>',
+        ]);
     }
 }

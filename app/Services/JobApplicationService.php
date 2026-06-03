@@ -4,11 +4,10 @@ namespace App\Services;
 
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
-use App\Models\MailTemplate;
 use App\Models\User;
 use App\Notifications\JobApplicationReceived;
+use App\Services\Mail\SystemMailTemplateService;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -124,28 +123,38 @@ class JobApplicationService
     private function sendTemplateEmail(string $slug, string $to, array $vars): void
     {
         try {
-            // Transformar chaves {var} para {{var}} se necessário para Blade, 
-            // ou garantir que o serviço trate ambos. O serviço SystemMailTemplateService
-            // usa {{var}}. Vamos ajustar as variáveis para o padrão Blade.
             $bladeVars = [];
             foreach ($vars as $k => $v) {
                 $cleanKey = trim($k, '{}');
                 $bladeVars[$cleanKey] = $v;
             }
 
-            $rendered = app(\App\Services\Mail\SystemMailTemplateService::class)->renderFullHtml($slug, $bladeVars);
-
-            if (!$rendered) {
-                Log::warning("sendTemplateEmail[$slug]: Template nao encontrado ou inativo.");
-                return;
-            }
-
-            Mail::html($rendered['html'], function ($m) use ($to, $rendered) {
-                $m->to($to)->subject($rendered['subject']);
-            });
+            app(SystemMailTemplateService::class)->send(
+                $slug,
+                $to,
+                $bladeVars,
+                $this->defaultApplicationTemplates()[$slug]
+            );
         } catch (\Throwable $e) {
             Log::error("sendTemplateEmail[$slug] error: " . $e->getMessage());
         }
     }
-}
 
+    private function defaultApplicationTemplates(): array
+    {
+        return [
+            'job_apply_candidate' => [
+                'name' => 'Candidatura Recebida pelo Candidato',
+                'category' => 'vagas',
+                'subject' => 'Candidatura enviada para {{vacancy_title}}',
+                'body' => '<h2>Ola, {{name}}!</h2><p>Sua candidatura para <strong>{{vacancy_title}}</strong>, na empresa {{company}}, foi enviada com sucesso.</p><p>Local: {{location}}</p>',
+            ],
+            'job_apply_owner' => [
+                'name' => 'Nova Candidatura para Responsavel da Vaga',
+                'category' => 'vagas',
+                'subject' => 'Nova candidatura para {{vacancy_title}}',
+                'body' => '<h2>Ola, {{owner_name}}!</h2><p><strong>{{candidate}}</strong> candidatou-se para {{vacancy_title}}.</p><p><a href="{{candidates_url}}">Ver candidatos</a></p>',
+            ],
+        ];
+    }
+}

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
+use App\Services\Mail\SystemMailTemplateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
@@ -63,39 +63,28 @@ class ContactController extends Controller
             'outro' => 'Outro assunto',
         ];
 
-        $siteName = Setting::get('app_name') ?: config('app.name', 'UNN');
         $subjectText = $subjectLabels[$data['subject']] ?? $data['subject'];
-        $mailSubject = "[Contato] {$subjectText} - {$siteName}";
-
-        // Busca configurações visuais do site
-        $logo = Setting::get('logo_admin') ?: Setting::get('logo_front') ?: Setting::get('logo_image');
-        $logoUrl = $logo ? asset($logo) : asset('img/logo.svg');
-        $primaryColor = Setting::get('site_color_primary') ?? '#1F5EDB';
-        $secondaryColor = Setting::get('site_color_secondary') ?? '#177FD6';
-
-        // Renderiza o conteúdo do email
-        $content = view('emails.contact', [
-            'data' => [
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'phone' => $data['phone'] ?? null,
-                'subject' => $subjectText,
-                'message' => $data['message'],
-                'ip' => $request->ip(),
-                'userAgent' => (string) $request->userAgent(),
-            ],
-        ])->render();
-
-        // Wrap com layout do sistema (mesmo padrão dos outros emails)
-        $html = $this->wrapWithSystemLayout($content, $siteName, $logoUrl, $primaryColor, $secondaryColor);
 
         // Carregar CC e BCC das configurações
         $ccEmails = $this->parseEmailList(Setting::get('smtp_cc', ''));
         $bccEmails = $this->parseEmailList(Setting::get('smtp_bcc', ''));
 
         try {
-            Mail::html($html, function ($message) use ($to, $mailSubject, $data, $ccEmails, $bccEmails) {
-                $message->to($to)->subject($mailSubject);
+            app(SystemMailTemplateService::class)->send('contact_form_received', $to, [
+                'contact' => [
+                    'name' => $data['name'],
+                    'email' => $data['email'],
+                    'phone' => $data['phone'] ?? 'Nao informado',
+                    'subject' => $subjectText,
+                    'message' => nl2br(e($data['message'])),
+                    'ip' => $request->ip(),
+                ],
+            ], [
+                'name' => 'Formulario de Contato Recebido',
+                'category' => 'sistema',
+                'subject' => '[Contato] {{contact.subject}} - {{site.name}}',
+                'body' => '<h2>Novo contato recebido</h2><p><strong>Nome:</strong> {{contact.name}}<br><strong>Email:</strong> {{contact.email}}<br><strong>Telefone:</strong> {{contact.phone}}<br><strong>Assunto:</strong> {{contact.subject}}</p><p><strong>Mensagem:</strong></p><div>{!! $contact[\'message\'] ?? \'\' !!}</div><p><small>IP: {{contact.ip}}</small></p>',
+            ], function ($message) use ($data, $ccEmails, $bccEmails) {
                 $message->replyTo($data['email'], $data['name']);
                 
                 if (!empty($ccEmails)) {
@@ -110,7 +99,7 @@ class ContactController extends Controller
                 'to' => $to,
                 'cc' => $ccEmails,
                 'bcc' => $bccEmails,
-                'subject' => $mailSubject,
+                'subject' => $subjectText,
                 'from_name' => $data['name'],
                 'from_email' => $data['email'],
             ]);
@@ -274,17 +263,4 @@ class ContactController extends Controller
         return $valid;
     }
 
-    /**
-     * Wrap email content with system layout (header with logo, footer)
-     */
-    private function wrapWithSystemLayout(string $content, string $siteName, string $logoUrl, string $primaryColor, string $secondaryColor): string
-    {
-        return view('emails.system', [
-            'content' => $content,
-            'siteName' => $siteName,
-            'logoUrl' => $logoUrl,
-            'primaryColor' => $primaryColor,
-            'secondaryColor' => $secondaryColor,
-        ])->render();
-    }
 }

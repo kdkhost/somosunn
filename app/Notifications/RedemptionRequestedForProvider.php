@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Redemption;
 use App\Models\User;
+use App\Services\Mail\SystemMailTemplateService;
 use App\Support\EmailQueueSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -40,34 +41,23 @@ class RedemptionRequestedForProvider extends Notification implements ShouldQueue
         $buyerName = (string) ($this->redemption->user->name ?? 'Membro');
         $actionUrl = $this->actionUrl($notifiable);
 
-        $mail = (new MailMessage)
-            ->subject('Novo resgate com UNNBIT: ' . $itemName)
-            ->greeting('Ola!')
-            ->line('Um membro acabou de trocar UNNBIT por um item do seu catalogo.')
-            ->line('**Comprador:** ' . $buyerName)
-            ->line('**Item:** ' . $itemName)
-            ->line('**Tipo:** ' . $this->redemption->item_type_label)
-            ->line('**UNNBIT consumidos:** ' . number_format((int) $this->redemption->points_spent, 0, ',', '.') . ' UNNBIT');
-
-        if ($this->redemption->reference_value !== null) {
-            $mail->line('**Valor de referencia:** R$ ' . number_format((float) $this->redemption->reference_value, 2, ',', '.'));
-        }
-
-        if ($this->redemption->estimated_delivery_at) {
-            $mail->line('**Prazo previsto:** ' . $this->redemption->estimated_delivery_at->format('d/m/Y'));
-        }
-
-        if ($this->redemption->fulfillment_instructions) {
-            $mail->line('**Regras de entrega/fornecimento:** ' . strip_tags((string) $this->redemption->fulfillment_instructions));
-        }
-
-        if ($actionUrl !== null) {
-            $mail->action('Abrir gestao de resgates', $actionUrl);
-        }
-
-        return $mail
-            ->line('O item deve ser entregue conforme o tipo cadastrado no sistema e alinhado com o comprador dentro das regras da plataforma.')
-            ->salutation('Equipe SOMOS UNN');
+        return app(SystemMailTemplateService::class)->mailMessage('redemption_requested_provider', [
+            'redemption' => [
+                'buyer_name' => $buyerName,
+                'item_name' => $itemName,
+                'item_type' => $this->redemption->item_type_label,
+                'points' => number_format((int) $this->redemption->points_spent, 0, ',', '.'),
+                'reference_value' => $this->redemption->reference_value !== null ? 'R$ ' . number_format((float) $this->redemption->reference_value, 2, ',', '.') : '',
+                'delivery_date' => $this->redemption->estimated_delivery_at?->format('d/m/Y') ?? '',
+                'instructions' => strip_tags((string) ($this->redemption->fulfillment_instructions ?? '')),
+                'action_url' => $actionUrl ?? '',
+            ],
+        ], [
+            'name' => 'Novo Resgate para Fornecedor',
+            'category' => 'sistema',
+            'subject' => 'Novo resgate com UNNBIT: {{redemption.item_name}}',
+            'body' => '<h2>Novo resgate recebido</h2><p><strong>Comprador:</strong> {{redemption.buyer_name}}<br><strong>Item:</strong> {{redemption.item_name}}<br><strong>Tipo:</strong> {{redemption.item_type}}<br><strong>UNNBIT:</strong> {{redemption.points}}</p><p><a href="{{redemption.action_url}}">Abrir gestao de resgates</a></p>',
+        ]);
     }
 
     public function toArray($notifiable): array

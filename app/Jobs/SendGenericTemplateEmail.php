@@ -2,14 +2,13 @@
 
 namespace App\Jobs;
 
-use App\Services\Mail\SystemMailLayoutData;
+use App\Services\Mail\SystemMailTemplateService;
 use App\Support\EmailQueueSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Mail;
 
 class SendGenericTemplateEmail implements ShouldQueue
 {
@@ -55,10 +54,16 @@ class SendGenericTemplateEmail implements ShouldQueue
 
     public function handle(): void
     {
-        $layout = app(SystemMailLayoutData::class)->make();
-
-        Mail::send('emails.system', array_merge($layout, ['content' => $this->htmlContent]), function ($message) {
-            $message->to($this->toEmail)->subject($this->subject);
-        });
+        app(SystemMailTemplateService::class)->send('generic_system_email', $this->toEmail, [
+            'message' => [
+                'subject' => $this->subject,
+                'content' => $this->htmlContent,
+            ],
+        ], [
+            'name' => 'Email Generico do Sistema',
+            'category' => 'sistema',
+            'subject' => '{{message.subject}}',
+            'body' => '{!! $message[\'content\'] ?? \'\' !!}',
+        ]);
     }
 }

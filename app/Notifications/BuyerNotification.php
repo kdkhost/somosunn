@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\NotificationLog;
+use App\Services\Mail\SystemMailTemplateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -32,12 +33,19 @@ class BuyerNotification extends Notification implements ShouldQueue
 
     public function toMail($notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->view('emails.system', [
+        return app(SystemMailTemplateService::class)->mailMessage('buyer_communication', [
+            'notification' => [
                 'subject' => $this->details['subject'] ?? 'Nova mensagem',
-                'content' => $this->details['message'] ?? '',
-            ])
-            ->subject($this->details['subject'] ?? 'Nova mensagem');
+                'message' => $this->details['message'] ?? '',
+                'action_url' => $this->details['action_url'] ?? '',
+                'action_label' => $this->details['action_label'] ?? 'Ver detalhes',
+            ],
+        ], [
+            'name' => 'Comunicacao com Compradores',
+            'category' => 'marketing',
+            'subject' => '{{notification.subject}}',
+            'body' => '<div>{!! $notification[\'message\'] ?? \'\' !!}</div><p><a href="{{notification.action_url}}">{{notification.action_label}}</a></p>',
+        ]);
     }
 
     public function toArray($notifiable): array

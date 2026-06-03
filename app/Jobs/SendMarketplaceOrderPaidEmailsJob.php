@@ -4,11 +4,11 @@ namespace App\Jobs;
 
 use App\Models\Course;
 use App\Models\Event;
-use App\Models\MailTemplate;
 use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\Mail\SystemMailLayoutData;
+use App\Services\Mail\SystemMailTemplateService;
 use App\Support\EmailQueueSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,10 +16,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
 {
@@ -305,37 +303,13 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
             return;
         }
 
-        $template = MailTemplate::query()->where('slug', $slug)->first();
-
-        if (!$template) {
-            $defaults = $this->defaultTemplates();
-            if (isset($defaults[$slug])) {
-                $template = MailTemplate::firstOrCreate(['slug' => $slug], $defaults[$slug]);
-            }
-        }
-
-        if (!$template || !(bool) $template->is_active) {
+        $defaults = $this->defaultTemplates();
+        if (!isset($defaults[$slug])) {
             return;
         }
 
         try {
-            [$subject, $content] = $this->renderTemplate($template, $data);
-
-            $subject = trim(preg_replace('/\\s+/', ' ', strip_tags($subject)));
-            if ($subject === '') {
-                $subject = (string) ($template->name ?? 'Notificação');
-            }
-
-            $allowed = '<p><a><strong><em><ul><ol><li><br><img><table><tr><td><th><tbody><thead><h1><h2><h3><h4><h5><span><div><style><center>';
-            $content = strip_tags($content, $allowed);
-
-            $html = view('emails.system', array_merge($layout, [
-                'content' => $content,
-            ]))->render();
-
-            Mail::html($html, function ($message) use ($toEmail, $subject) {
-                $message->to($toEmail)->subject($subject);
-            });
+            app(SystemMailTemplateService::class)->send($slug, $toEmail, $data, $defaults[$slug]);
         } catch (\Throwable $e) {
             Log::warning('Marketplace email: falha ao enviar template ' . $slug . ' para ' . $toEmail . ': ' . $e->getMessage());
         }
@@ -421,43 +395,4 @@ class SendMarketplaceOrderPaidEmailsJob implements ShouldQueue
         ];
     }
 
-    private function renderTemplate(MailTemplate $template, array $data): array
-    {
-        $subject = (string) ($template->subject ?? '');
-        $body = (string) ($template->body ?? '');
-
-        try {
-            $subjectRendered = (string) Blade::render($subject, $data);
-            $bodyRendered = (string) Blade::render($body, $data);
-            return [$subjectRendered, $bodyRendered];
-        } catch (\Throwable $e) {
-            // fallback: {{key.subkey}}
-            $subjectRendered = $this->replacePlaceholders($subject, $data);
-            $bodyRendered = $this->replacePlaceholders($body, $data);
-            return [$subjectRendered, $bodyRendered];
-        }
-    }
-
-    private function replacePlaceholders(string $text, array $data): string
-    {
-        $rendered = $text;
-
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                foreach ($value as $subKey => $subValue) {
-                    if (is_array($subValue)) {
-                        continue;
-                    }
-                    $pattern = '/\\{\\{\\s*' . preg_quote((string) $key . '.' . (string) $subKey, '/') . '\\s*\\}\\}/';
-                    $rendered = preg_replace($pattern, (string) $subValue, $rendered);
-                }
-                continue;
-            }
-
-            $pattern = '/\\{\\{\\s*' . preg_quote((string) $key, '/') . '\\s*\\}\\}/';
-            $rendered = preg_replace($pattern, (string) $value, $rendered);
-        }
-
-        return (string) $rendered;
-    }
 }

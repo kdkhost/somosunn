@@ -2,22 +2,17 @@
 
 namespace App\Mail;
 
-use App\Models\MailTemplate;
+use App\Mail\Concerns\UsesMailTemplate;
 use App\Models\Order;
-use App\Models\Setting;
 use App\Support\EmailQueueSettings;
-use App\Services\Mail\SystemMailLayoutData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Blade;
 
 class OrderAbandonedCart extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, UsesMailTemplate;
 
     public $order;
 
@@ -34,27 +29,12 @@ class OrderAbandonedCart extends Mailable implements ShouldQueue
 
     public function build()
     {
-        // 1. Fetch Template
-        $template = MailTemplate::where('slug', 'abandoned-cart')->first();
-
-        if (!$template) {
-            // Fallback if template is deleted or missing
-            return $this->subject('Você esqueceu algo no carrinho!')
-                ->markdown('emails.raw', ['content' => 'Olá ' . $this->order->user->name . ', você tem um pedido pendente (#' . $this->order->id . '). Acesse sua conta para finalizar a compra.']);
-        }
-
-        // 2. Prepare Data
-        $data = $this->prepareData();
-
-        // 3. Render Subject and Body
-        $subject = $this->renderString($template->subject, $data);
-        $body = $this->renderString($template->body, $data);
-
-        // 4. Apply System Layout (header/footer)
-        $layoutData = app(SystemMailLayoutData::class)->make();
-
-        return $this->subject($subject)
-            ->view('emails.system', array_merge($layoutData, ['content' => $body]));
+        return $this->buildFromTemplate('abandoned-cart', $this->prepareData(), [
+            'name' => 'Carrinho Abandonado',
+            'category' => 'marketplace',
+            'subject' => 'Voce esqueceu algo no carrinho - {{site.name}}',
+            'body' => '<h2>Ola, {{user.name}}!</h2><p>Voce possui o pedido pendente <strong>#{{order.id}}</strong>, no valor de <strong>{{order.total}}</strong>.</p><p><a href="{{abandoned_cart.link}}">Finalizar compra</a></p>',
+        ]);
     }
 
     protected function prepareData()
@@ -77,24 +57,5 @@ class OrderAbandonedCart extends Mailable implements ShouldQueue
                 'link' => $link
             ]
         ];
-    }
-
-    protected function renderString($string, $data)
-    {
-        try {
-            return Blade::render($string, $data);
-        } catch (\Exception $e) {
-            // Fallback regex replacement if Blade fails
-            foreach ($data as $key => $value) {
-                if (is_array($value)) {
-                    foreach ($value as $subKey => $subValue) {
-                        $string = str_replace('{{' . $key . '.' . $subKey . '}}', $subValue, $string);
-                    }
-                } else {
-                    $string = str_replace('{{' . $key . '}}', $value, $string);
-                }
-            }
-            return $string;
-        }
     }
 }

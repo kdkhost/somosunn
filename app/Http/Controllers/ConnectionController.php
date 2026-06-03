@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Connection;
 use App\Models\User;
+use App\Services\Mail\SystemMailTemplateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 
 class ConnectionController extends Controller
 {
@@ -51,12 +51,15 @@ class ConnectionController extends Controller
             try {
                 $requesterName = Auth::user()->name;
                 $profileUrl = route('social.profile', $requesterId);
-                Mail::raw(
-                    "Voce recebeu uma solicitacao de conexao de {$requesterName}.\n\nAcesse o perfil para aceitar ou recusar: {$profileUrl}",
-                    function ($message) use ($user) {
-                        $message->to($user->email)->subject('Nova solicitacao de conexao');
-                    }
-                );
+                app(SystemMailTemplateService::class)->send('connection_request', $user->email, [
+                    'user' => ['name' => $user->name],
+                    'requester' => ['name' => $requesterName, 'profile_url' => $profileUrl],
+                ], [
+                    'name' => 'Solicitacao de Conexao',
+                    'category' => 'conta',
+                    'subject' => 'Nova solicitacao de conexao',
+                    'body' => '<h2>Ola, {{user.name}}!</h2><p><strong>{{requester.name}}</strong> enviou uma solicitacao de conexao.</p><p><a href="{{requester.profile_url}}">Ver perfil e responder</a></p>',
+                ]);
             } catch (\Throwable $e) {
                 \Log::warning('Falha ao enviar email de conexao: ' . $e->getMessage());
             }

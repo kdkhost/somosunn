@@ -2,8 +2,8 @@
 
 namespace App\Notifications;
 
+use App\Services\Mail\SystemMailTemplateService;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -11,53 +11,33 @@ class JobVacancyPublished extends Notification
 {
     use Queueable;
 
-    protected $vacancy;
-
-    private function vacancyUrl(): string
+    public function __construct(protected $vacancy)
     {
-        return route('jobs.public.show', $this->vacancy) . '#candidatura';
     }
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct($vacancy)
-    {
-        $this->vacancy = $vacancy;
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
         return ['mail', 'database'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Nova Oportunidade: ' . $this->vacancy->title)
-            ->greeting('Olá, membro SOMOS UNN!')
-            ->line('Uma nova vaga de emprego acaba de ser publicada na nossa comunidade.')
-            ->line('**Vaga:** ' . $this->vacancy->title)
-            ->line('**Empresa:** ' . ($this->vacancy->company_name ?? 'Confidencial'))
-            ->line('**Localização:** ' . ($this->vacancy->location ?? 'Não informado'))
-            ->action('Ver Detalhes da Vaga', $this->vacancyUrl())
-            ->line('Aproveite esta oportunidade estratégica de networking e carreira!')
-            ->salutation('Atenciosamente, Equipe SOMOS UNN');
+        return app(SystemMailTemplateService::class)->mailMessage('job_vacancy_published', [
+            'user' => ['name' => $notifiable->name ?? 'Membro'],
+            'vacancy' => [
+                'title' => $this->vacancy->title,
+                'company' => $this->vacancy->company_name ?? 'Confidencial',
+                'location' => $this->vacancy->location ?? 'Nao informado',
+                'url' => $this->vacancyUrl(),
+            ],
+        ], [
+            'name' => 'Nova Vaga Publicada',
+            'category' => 'vagas',
+            'subject' => 'Nova oportunidade: {{vacancy.title}}',
+            'body' => '<h2>Ola, {{user.name}}!</h2><p>Uma nova vaga foi publicada.</p><p><strong>Vaga:</strong> {{vacancy.title}}<br><strong>Empresa:</strong> {{vacancy.company}}<br><strong>Localizacao:</strong> {{vacancy.location}}</p><p><a href="{{vacancy.url}}">Ver detalhes da vaga</a></p>',
+        ]);
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(object $notifiable): array
     {
         return [
@@ -67,5 +47,10 @@ class JobVacancyPublished extends Notification
             'action_label' => 'Candidatar-se',
             'company' => $this->vacancy->company_name,
         ];
+    }
+
+    private function vacancyUrl(): string
+    {
+        return route('jobs.public.show', $this->vacancy) . '#candidatura';
     }
 }

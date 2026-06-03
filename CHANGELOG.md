@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-06-03] - feat(emails): tornar templates personalizados obrigatorios
+
+- Todo disparo de email do sistema passa a usar um registro editavel de `mail_templates` e o layout oficial `emails.system`.
+- O servico central `SystemMailTemplateService` agora cria automaticamente templates ausentes, respeita templates inativos e centraliza envios diretos.
+- Migrados para templates personalizados: verificacao de email, redefinicao de senha, solicitacao de conexao, denuncia de post, formulario de contato, pagamento confirmado, carrinho abandonado, marketplace, candidaturas, comunicacao com compradores, pedido de avaliacao, nova vaga, designacao de marketing e resgates.
+- O email generico usado por alertas, backups e rotinas internas agora tambem passa pelo template editavel `generic_system_email`.
+- Novos templates sao registrados por migration e aparecem nos paineis legado e novo.
+- Adicionada trava automatizada que rejeita novos disparos com `Mail::raw`, `Mail::html` fora da rota central ou `MailMessage` montado manualmente.
+- Arquivos principais: `app/Services/Mail/SystemMailTemplateService.php`, `app/Jobs/SendGenericTemplateEmail.php`, `app/Mail`, `app/Notifications`, `app/Http/Controllers/ConnectionController.php`, `app/Http/Controllers/ContactController.php`, `app/Http/Controllers/SocialController.php`, `database/migrations/2026_06_03_230000_register_mandatory_system_mail_templates.php`, `tests/Feature/MandatoryMailTemplatesTest.php`.
+
+---
+
 ## [2026-06-03] - feat(splits): restringir chave PIX e vincular destinatarios padrao
 
 - A chave PIX de recebimentos agora aparece e pode ser alterada somente por superadmins, admins e pela pessoa atualmente designada como responsavel de marketing.

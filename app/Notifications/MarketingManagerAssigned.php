@@ -2,8 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Jobs\SendGenericTemplateEmail;
-use App\Models\MailTemplate;
 use App\Services\Mail\SystemMailTemplateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
@@ -43,28 +41,12 @@ class MarketingManagerAssigned extends Notification
             ],
         ];
 
-        $service = app(SystemMailTemplateService::class);
-        $rendered = $service->renderFullHtml($slug, $data);
-
-        if ($rendered) {
-            // Template personalizado existe e esta ativo — usa ele
-            SendGenericTemplateEmail::dispatch(
-                $notifiable->email,
-                $rendered['subject'],
-                $rendered['html']
-            );
-        } else {
-            // Fallback: cria conteudo padrao e envia pelo layout do sistema
-            $subject = "Voce foi designado como Responsavel de Marketing da {$platformName}";
-            $content = "<p>Ola <strong>{$notifiable->name}</strong>,</p>"
-                . "<p>O administrador da plataforma <strong>{$platformName}</strong> designou voce como <strong>Responsavel de Marketing</strong>.</p>"
-                . "<p>A partir de agora voce tera acesso a uma area exclusiva no seu painel com informacoes sobre os valores destinados ao marketing da plataforma.</p>"
-                . "<p>Alem disso, voce sera responsavel por coordenar o profissional que fara o trafego pago da plataforma.</p>"
-                . "<p><a href=\"{$panelUrl}\" style=\"display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#1F5EDB,#177FD6);color:#fff;border-radius:8px;text-decoration:none;font-weight:bold;\">Acessar painel de Marketing</a></p>"
-                . "<p>Qualquer duvida, entre em contato com o administrador.</p>";
-
-            SendGenericTemplateEmail::dispatch($notifiable->email, $subject, $content);
-        }
+        app(SystemMailTemplateService::class)->send($slug, $notifiable->email, $data, [
+            'name' => 'Responsavel de Marketing Designado',
+            'category' => 'marketing',
+            'subject' => 'Voce foi designado como Responsavel de Marketing da {{platform.name}}',
+            'body' => '<h2>Ola, {{user.name}}!</h2><p>Voce foi designado como <strong>Responsavel de Marketing</strong> da {{platform.name}}.</p><p><a href="{{panel.url}}">Acessar painel de Marketing</a></p>',
+        ]);
     }
 
     public function toDatabase($notifiable): array

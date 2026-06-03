@@ -61,6 +61,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Mail\SystemMailTemplateService;
 use App\Models\Connection;
 use App\Models\Post;
 use App\Models\PostComment;
@@ -77,7 +78,6 @@ use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class SocialController extends Controller
@@ -695,12 +695,15 @@ class SocialController extends Controller
 
         if (!empty($adminEmails)) {
             try {
-                Mail::raw(
-                    "Denuncia de post #{$post->id}\nAutor: {$post->user->name}\nDenunciante: " . Auth::user()->name . "\nMotivo: {$report->reason}",
-                    function ($message) use ($adminEmails) {
-                        $message->to($adminEmails)->subject('Denuncia de post na comunidade');
-                    }
-                );
+                app(SystemMailTemplateService::class)->send('social_post_reported', $adminEmails, [
+                    'post' => ['id' => $post->id, 'author' => $post->user->name],
+                    'report' => ['author' => Auth::user()->name, 'reason' => $report->reason],
+                ], [
+                    'name' => 'Denuncia de Post',
+                    'category' => 'sistema',
+                    'subject' => 'Denuncia de post na comunidade',
+                    'body' => '<h2>Denuncia de post #{{post.id}}</h2><p><strong>Autor:</strong> {{post.author}}<br><strong>Denunciante:</strong> {{report.author}}</p><p><strong>Motivo:</strong> {{report.reason}}</p>',
+                ]);
             } catch (\Throwable $e) {
                 Log::warning('Falha ao notificar admins sobre denuncia de post: ' . $e->getMessage());
             }
