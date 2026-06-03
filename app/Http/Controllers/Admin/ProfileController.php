@@ -59,6 +59,10 @@ class ProfileController extends Controller
             // Privacidade - SEM validação boolean (checkboxes não enviam quando desmarcados)
         ]);
 
+        if (!$user->canManageReceivingPixKey()) {
+            unset($data['pix_key']);
+        }
+
         // Converte checkboxes para boolean
         $data['show_email_public'] = $request->has('show_email_public');
         $data['show_phone_public'] = $request->has('show_phone_public');

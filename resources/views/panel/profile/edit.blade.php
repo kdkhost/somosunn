@@ -277,6 +277,7 @@
                     <textarea name="bio" rows="4" maxlength="500" placeholder="Conte um pouco sobre você"
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">{{ old('bio', $user->bio) }}</textarea>
                 </div>
+                @if($user->canManageReceivingPixKey())
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2">
                         <i class="fas fa-wallet"></i> Chave PIX para Recebimentos
@@ -284,9 +285,9 @@
                     <input name="pix_key" value="{{ old('pix_key', $user->pix_key) }}" maxlength="255"
                         placeholder="E-mail, CPF, Celular ou Chave Aleatória"
                         class="mt-2 w-full rounded-2xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/20 dark:bg-blue-900/10 px-4 py-3 text-sm dark:text-white focus:border-blue-500 focus:ring-blue-500">
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Esta chave será utilizada para o repasse
-                        automático de suas comissões e vendas no marketplace.</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Esta chave será utilizada nos splits destinados ao seu perfil.</p>
                 </div>
+                @endif
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 border-t border-slate-100 dark:border-slate-800 pt-6">

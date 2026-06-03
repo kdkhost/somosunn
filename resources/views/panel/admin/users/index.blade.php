@@ -102,7 +102,26 @@
 @endsection
 
 @section('panel_content')
+    @php
+        $marketingUserId = (int) \App\Models\Setting::get('platform_marketing_user_id', 0);
+        $marketingUser = $marketingUserId > 0 ? \App\Models\User::find($marketingUserId) : null;
+    @endphp
+
     <div class="space-y-6">
+        <div class="rounded-2xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20 p-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-black text-purple-900 dark:text-purple-100">Responsável de Marketing</h3>
+                    <p class="text-xs text-purple-700 dark:text-purple-300">
+                        {{ $marketingUser ? $marketingUser->name . ' (' . $marketingUser->email . ')' : 'Nenhuma pessoa designada.' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <!-- Header & Toolbar -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -239,6 +258,15 @@
                                                 <i class="fas fa-user-secret"></i>
                                             </a>
                                         @endif
+
+                                        <button type="button"
+                                            class="btn-toggle-marketing w-8 h-8 rounded-lg flex items-center justify-center transition {{ $marketingUserId === $u->id ? 'text-white bg-purple-600 hover:bg-purple-700' : 'text-slate-400 dark:text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30' }}"
+                                            title="{{ $marketingUserId === $u->id ? 'Remover como Responsável de Marketing' : 'Definir como Responsável de Marketing' }}"
+                                            data-url="{{ route('panel.admin.users.marketing-manager', $u) }}"
+                                            data-action="{{ $marketingUserId === $u->id ? 'unset' : 'set' }}"
+                                            data-name="{{ $u->name }}">
+                                            <i class="fas fa-bullhorn"></i>
+                                        </button>
                                         
                                         <a href="{{ route('panel.admin.users.edit', $u) }}" 
                                            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition" title="Editar">
@@ -335,3 +363,45 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('click', async function (event) {
+    const button = event.target.closest('.btn-toggle-marketing');
+    if (!button) return;
+
+    const assigning = button.dataset.action === 'set';
+    const confirmed = await Swal.fire({
+        icon: 'question',
+        title: assigning ? 'Definir responsável de marketing?' : 'Remover responsável de marketing?',
+        text: assigning
+            ? button.dataset.name + ' passará a receber o split de marketing configurado.'
+            : button.dataset.name + ' deixará de receber os próximos splits de marketing.',
+        showCancelButton: true,
+        confirmButtonText: assigning ? 'Definir' : 'Remover',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (!confirmed.isConfirmed) return;
+
+    const response = await fetch(button.dataset.url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ action: button.dataset.action })
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+        await Swal.fire('Erro', data.message || 'Não foi possível atualizar o responsável de marketing.', 'error');
+        return;
+    }
+
+    await Swal.fire('Concluído', data.message, 'success');
+    window.location.reload();
+});
+</script>
+@endpush

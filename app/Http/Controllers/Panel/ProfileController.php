@@ -65,6 +65,10 @@ class ProfileController extends Controller
             'theme_pref' => 'nullable|string|in:light,dark',
         ]);
 
+        if (!$user->canManageReceivingPixKey()) {
+            unset($data['pix_key']);
+        }
+
         $data['show_email_public'] = $request->has('show_email_public');
         $data['show_phone_public'] = $request->has('show_phone_public');
         $data['show_address_public'] = $request->has('show_address_public');

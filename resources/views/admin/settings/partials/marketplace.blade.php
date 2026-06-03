@@ -70,9 +70,7 @@
                 <label>Plataforma (%)</label>
                 <input type="number" name="marketplace_split_platform_percent" class="form-control split-input"
                     value="{{ $settings['marketplace_split_platform_percent'] ?? '10' }}" min="0" max="100" step="0.01">
-                <input type="text" name="marketplace_split_platform_pix" class="form-control mt-1 form-control-sm"
-                    value="{{ $settings['marketplace_split_platform_pix'] ?? '' }}" placeholder="Chave PIX Plataforma">
-                <small class="text-muted">Taxas, juros e repasse operacional.</small>
+                <small class="text-muted">Usa a chave PIX do perfil do admin da plataforma.</small>
             </div>
         </div>
         <div class="col-md-3">
@@ -80,9 +78,7 @@
                 <label>Tráfego Pago (%)</label>
                 <input type="number" name="marketplace_split_traffic_percent" class="form-control split-input"
                     value="{{ $settings['marketplace_split_traffic_percent'] ?? '10' }}" min="0" max="100" step="0.01">
-                <input type="text" name="marketplace_split_traffic_pix" class="form-control mt-1 form-control-sm"
-                    value="{{ $settings['marketplace_split_traffic_pix'] ?? '' }}" placeholder="Chave PIX Tráfego">
-                <small class="text-muted">Fundo de marketing e anúncios.</small>
+                <small class="text-muted">Usa a chave PIX do responsável de marketing atual.</small>
             </div>
         </div>
         <div class="col-md-3">

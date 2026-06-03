@@ -114,6 +114,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === 'superadmin' || $this->level === 'superadmin';
     }
 
+    public function isMarketingManager(): bool
+    {
+        return (int) Setting::get('platform_marketing_user_id', 0) === (int) $this->id;
+    }
+
+    public function canManageReceivingPixKey(): bool
+    {
+        return $this->isAdmin() || $this->isMarketingManager();
+    }
+
     public function canSellOnMarketplace(): bool
     {
         return $this->canAccessFeature('marketplace.sell')

@@ -385,7 +385,13 @@ class PaymentWebhookController extends Controller
 
         // Admin da plataforma (quem recebe o split "platform")
         $platformAdminId = (int) Setting::get('platform_admin_user_id', 0);
-        $platformAdmin = $platformAdminId > 0 ? User::find($platformAdminId) : null;
+        $configuredPlatformAdmin = $platformAdminId > 0 ? User::find($platformAdminId) : null;
+        $platformAdmin = $configuredPlatformAdmin?->isAdmin() ? $configuredPlatformAdmin : null;
+        $platformAdmin ??= User::query()
+            ->where(fn ($query) => $query->where('role', 'admin')->orWhere('level', 'sucesso'))
+            ->oldest('id')
+            ->first();
+        $platformAdmin ??= $superadmin;
 
         // Determinar gateway usado (informativo para o painel de splits)
         $gateway = (string) ($order->gateway ?? '');
@@ -427,9 +433,9 @@ class PaymentWebhookController extends Controller
             } elseif ($split['type'] === 'superadmin' && $superadmin) {
                 $pixKey = $superadmin->pix_key;
             } elseif ($split['type'] === 'platform') {
-                $pixKey = $platformAdmin?->pix_key ?? Setting::get('marketplace_split_platform_pix');
+                $pixKey = $platformAdmin?->pix_key;
             } elseif ($split['type'] === 'traffic') {
-                $pixKey = $marketingManager?->pix_key ?? Setting::get('marketplace_split_traffic_pix');
+                $pixKey = $marketingManager?->pix_key;
             }
 
             // Status: sempre "pending" até confirmação manual pelo admin/superadmin.

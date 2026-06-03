@@ -553,6 +553,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
             Route::post('/run-all', [\App\Http\Controllers\Panel\Admin\CronController::class, 'runAll'])->name('run-all');
         });
 
+        Route::post('users/{user}/marketing-manager', [\App\Http\Controllers\Admin\UserController::class, 'setMarketingManager'])->name('users.marketing-manager');
         Route::resource('users', \App\Http\Controllers\Panel\Admin\UserController::class);
         Route::post('plans/{plan}/toggle-active', [\App\Http\Controllers\Panel\Admin\PlanController::class, 'toggleActive'])->name('plans.toggle-active');
         Route::resource('plans', \App\Http\Controllers\Panel\Admin\PlanController::class);

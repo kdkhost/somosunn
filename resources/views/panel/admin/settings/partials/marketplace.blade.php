@@ -75,10 +75,10 @@
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @foreach([
-                    'marketplace_split_seller_percent' => ['Vendedor (%)', '70', null, 'Valor líquido'],
-                    'marketplace_split_platform_percent' => ['Plataforma (%)', '10', 'marketplace_split_platform_pix', 'Taxas, juros e repasse'],
-                    'marketplace_split_traffic_percent' => ['Tráfego Pago (%)', '10', 'marketplace_split_traffic_pix', 'Fundo de marketing'],
-                    'marketplace_split_superadmin_percent' => ['Superadmin (%)', '10', null, 'Participação Superadmin'],
+                    'marketplace_split_seller_percent' => ['Vendedor (%)', '70', 'Valor líquido'],
+                    'marketplace_split_platform_percent' => ['Plataforma (%)', '10', 'Chave PIX do perfil do admin'],
+                    'marketplace_split_traffic_percent' => ['Tráfego Pago (%)', '10', 'Chave PIX do responsável de marketing atual'],
+                    'marketplace_split_superadmin_percent' => ['Superadmin (%)', '10', 'Chave PIX do perfil do superadmin'],
                 ] as $field => $meta)
                 <div class="space-y-2">
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-2">{{ $meta[0] }}</label>
@@ -88,17 +88,8 @@
                             class="split-input w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold text-slate-800 dark:text-white">
                         <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none font-bold text-slate-400">%</div>
                     </div>
-                    @if($meta[2])
-                        <input type="text" name="{{ $meta[2] }}" 
-                            value="{{ $settings[$meta[2]] ?? '' }}"
-                            placeholder="Chave PIX {{ str_replace(' (%)', '', $meta[0]) }}"
-                            class="w-full px-3 py-2 rounded-xl border-slate-100 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-800/50 focus:border-blue-500 outline-none transition-all text-[10px] font-medium text-slate-600 dark:text-slate-300">
-                    @endif
                     <p class="text-[9px] text-slate-400 italic">
-                        {{ $meta[3] }}
-                        @if($field === 'marketplace_split_superadmin_percent')
-                            (config. no perfil)
-                        @endif
+                        {{ $meta[2] }}
                     </p>
                 </div>
                 @endforeach

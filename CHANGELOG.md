@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-06-03] - feat(splits): restringir chave PIX e vincular destinatarios padrao
+
+- A chave PIX de recebimentos agora aparece e pode ser alterada somente por superadmins, admins e pela pessoa atualmente designada como responsavel de marketing.
+- Ao trocar o responsavel de marketing, a chave PIX do responsavel anterior permanece salva e a nova pessoa recebe automaticamente o campo no perfil, vazio quando nunca tiver cadastrado uma chave.
+- O painel novo passou a permitir definir ou remover o responsavel de marketing, mantendo paridade com o painel legado.
+- As chaves PIX genericas de plataforma e trafego foram removidas das configuracoes de marketplace nos dois paineis; cada destinatario informa sua propria chave no perfil autorizado.
+- Os splits de cada venda paga continuam sendo gerados automaticamente e agora vinculam o split da plataforma a um admin padrao quando nenhum admin especifico estiver configurado.
+- Os splits de plataforma e marketing usam exclusivamente a chave PIX pessoal do destinatario atual, sem reaproveitar uma chave generica de configuracao.
+- Arquivos principais: `app/Models/User.php`, `app/Http/Controllers/Panel/ProfileController.php`, `app/Http/Controllers/Admin/ProfileController.php`, `app/Http/Controllers/PaymentWebhookController.php`, `resources/views/panel/profile/edit.blade.php`, `resources/views/admin/profile/edit.blade.php`, `resources/views/panel/admin/users/index.blade.php`, `resources/views/panel/admin/settings/partials/marketplace.blade.php`, `resources/views/admin/settings/partials/marketplace.blade.php`, `routes/web.php`, `tests/Feature/ReceivingPixKeyAndSplitsTest.php`.
+
+---
+
 ## [2026-06-01] - fix(vendas): corrigir alerta de DataTables em lista vazia
 
 ### Corrigido

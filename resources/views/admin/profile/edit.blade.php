@@ -210,6 +210,7 @@
                                     </div>
                                 </div>
 
+                                @if($user->canManageReceivingPixKey())
                                 <div class="form-group row">
                                     <label for="inputPix"
                                         class="col-sm-3 col-form-label text-primary font-weight-bold">Chave PIX
@@ -217,10 +218,10 @@
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control border-primary" id="inputPix" name="pix_key"
                                             value="{{ $user->pix_key }}" placeholder="E-mail, CPF, Celular ou Aleatória">
-                                        <small class="text-muted">Chave PIX para recebimento automatizado de comissões e
-                                            rateios de faturamento.</small>
+                                        <small class="text-muted">Chave PIX utilizada nos splits destinados ao seu perfil.</small>
                                     </div>
                                 </div>
+                                @endif
 
                                 <hr>
 
