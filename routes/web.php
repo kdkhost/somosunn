@@ -563,6 +563,8 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::post('orders/{order}/refund', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'refund'])->name('orders.refund');
         Route::post('orders/{order}/cancel', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'cancel'])->name('orders.cancel');
         Route::post('orders/{order}/invoice', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'issueForOrder'])->name('orders.invoice');
+        Route::get('splits', [\App\Http\Controllers\Panel\Admin\SplitController::class, 'index'])->name('splits.index');
+        Route::post('splits/{split}/pay', [\App\Http\Controllers\Panel\Admin\SplitController::class, 'pay'])->name('splits.pay');
 
         Route::prefix('buyer-communication')->name('buyer-communication.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Panel\Admin\BuyerCommunicationController::class, 'index'])->name('index');

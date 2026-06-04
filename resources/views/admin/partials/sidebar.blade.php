@@ -165,7 +165,7 @@
                                     <a href="{{ route('admin.splits.index') }}"
                                         class="nav-link {{ $is('admin.splits.*') }}">
                                         <i class="fas fa-money-bill-wave nav-icon text-success"></i>
-                                        <p>Extrato de Splits</p>
+                                        <p>Contabilidade de Rateios</p>
                                     </a>
                                 </li>
                             @endif

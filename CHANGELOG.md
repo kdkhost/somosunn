@@ -2,6 +2,15 @@
 
 ---
 
+## [2026-06-04] - fix(rateios): restaurar contabilidade global de splits no painel novo
+
+- Restaurada no painel novo a pagina administrativa global de rateios, com totais, filtros, destinatarios, chaves PIX e liquidacao de splits pendentes.
+- O acesso agora aparece em `Administracao > Gestao > Contabilidade de Rateios`.
+- O item equivalente no painel legado foi renomeado para deixar sua finalidade clara.
+- Arquivos principais: `app/Http/Controllers/Panel/Admin/SplitController.php`, `resources/views/panel/admin/splits/index.blade.php`, `resources/views/panel/partials/sidebar.blade.php`, `resources/views/admin/partials/sidebar.blade.php`, `routes/web.php`.
+
+---
+
 ## [2026-06-04] - fix(faturas): impedir erro 500 quando o SMTP rejeita o envio
 
 - O envio manual de faturas nos paineis legado e novo agora captura falhas do SMTP e retorna uma mensagem administrativa clara, sem exibir erro 500.
