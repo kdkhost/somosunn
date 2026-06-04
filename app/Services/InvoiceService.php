@@ -145,8 +145,15 @@ class InvoiceService
         $invoice->save();
 
         if ($sync || !EmailQueueSettings::shouldQueue()) {
-            // Immediate processing (no queue)
-            SendInvoiceEmailJob::dispatchSync((int) $invoice->id, $force);
+            try {
+                SendInvoiceEmailJob::dispatchSync((int) $invoice->id, $force);
+            } catch (\Throwable $e) {
+                $invoice->email_queued_at = null;
+                $invoice->save();
+
+                throw $e;
+            }
+
             return;
         }
 

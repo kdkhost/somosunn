@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class InvoiceController extends Controller
@@ -152,7 +153,18 @@ class InvoiceController extends Controller
     public function send(Invoice $invoice, Request $request, InvoiceService $service)
     {
         $force = $request->boolean('force', true);
-        $service->queueInvoiceEmail($invoice, $force);
+
+        try {
+            $service->queueInvoiceEmail($invoice, $force);
+        } catch (\Throwable $e) {
+            Log::error('Falha no envio manual da fatura pelo painel administrativo.', [
+                'invoice_id' => $invoice->id,
+                'user_id' => auth()->id(),
+                'exception' => $e,
+            ]);
+
+            return back()->with('error', 'Nao foi possivel enviar a fatura. Verifique as configuracoes e credenciais SMTP e tente novamente.');
+        }
 
         $message = \App\Support\EmailQueueSettings::shouldQueue()
             ? 'Envio de fatura enfileirado.'

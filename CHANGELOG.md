@@ -2,6 +2,15 @@
 
 ---
 
+## [2026-06-04] - fix(faturas): impedir erro 500 quando o SMTP rejeita o envio
+
+- O envio manual de faturas nos paineis legado e novo agora captura falhas do SMTP e retorna uma mensagem administrativa clara, sem exibir erro 500.
+- Falhas no envio sincrono limpam `email_queued_at`, permitindo uma nova tentativa depois da correcao das credenciais.
+- Adicionados testes de regressao para as duas rotas de envio manual.
+- Arquivos principais: `app/Services/InvoiceService.php`, `app/Http/Controllers/Admin/InvoiceController.php`, `app/Http/Controllers/Panel/Admin/InvoiceController.php`, `tests/Feature/InvoiceManualSendFailureTest.php`.
+
+---
+
 ## [2026-06-03] - perf(banco): reduzir gargalos, N+1 e risco de loops infinitos
 
 - O widget de saude do sistema deixou de usar o tamanho total do disco do servidor fisico e passou a medir a instalacao em `public_html` e a conta da aplicacao, com cache de 60s para evitar custo a cada acesso.
