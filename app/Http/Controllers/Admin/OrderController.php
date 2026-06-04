@@ -38,18 +38,30 @@ class OrderController extends Controller
 
         $this->applyPaymentScopeFilter($ordersQuery, $paymentScope);
 
-        $orders = $ordersQuery->get();
+        // Otimização: Usar paginação para evitar carregar milhares de registros de uma vez
+        $orders = $ordersQuery->paginate(20)->withQueryString();
 
         $summaryBaseQuery = Order::query()->where('status', 'paid');
         $this->applySearchFilter($summaryBaseQuery, $search);
         $this->applyPeriodFilter($summaryBaseQuery, $period['from'], $period['to']);
         $summaryBaseQuery->ofSaleType($saleType);
 
-        $accountedRevenue = (float) (clone $summaryBaseQuery)->financialPaid()->sum('total_amount');
-        $accountedCount = (int) (clone $summaryBaseQuery)->financialPaid()->count();
-        $manualRevenue = (float) (clone $summaryBaseQuery)->manualApproved()->sum('total_amount');
-        $manualCount = (int) (clone $summaryBaseQuery)->manualApproved()->count();
-        $manualUsersCount = (int) (clone $summaryBaseQuery)->manualApproved()->distinct('user_id')->count('user_id');
+        // Otimização: Consolidar queries de resumo
+        $summaryMetrics = (clone $summaryBaseQuery)
+            ->selectRaw("
+                SUM(CASE WHEN (is_manual_approval IS NULL OR is_manual_approval = 0) THEN total_amount ELSE 0 END) as accounted_revenue,
+                SUM(CASE WHEN (is_manual_approval IS NULL OR is_manual_approval = 0) THEN 1 ELSE 0 END) as accounted_count,
+                SUM(CASE WHEN is_manual_approval = 1 THEN total_amount ELSE 0 END) as manual_revenue,
+                SUM(CASE WHEN is_manual_approval = 1 THEN 1 ELSE 0 END) as manual_count,
+                COUNT(DISTINCT CASE WHEN is_manual_approval = 1 THEN user_id END) as manual_users_count
+            ")
+            ->first();
+
+        $accountedRevenue = (float) $summaryMetrics->accounted_revenue;
+        $accountedCount = (int) $summaryMetrics->accounted_count;
+        $manualRevenue = (float) $summaryMetrics->manual_revenue;
+        $manualCount = (int) $summaryMetrics->manual_count;
+        $manualUsersCount = (int) $summaryMetrics->manual_users_count;
 
         return view('admin.orders.index', [
             'orders' => $orders,

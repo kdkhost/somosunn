@@ -4,6 +4,12 @@
 
 ## [2026-06-03] - perf(banco): reduzir gargalos, N+1 e risco de loops infinitos
 
+- Otimização profunda do `DashboardMetricsService`: consolidação de múltiplas queries de agregação em `selectRaw`, substituição de `whereMonth/Year` por ranges de data eficientes e eliminação de 7 queries em loop no gráfico de linha do tempo.
+- Implementação de cache de nível de requisição para verificações de existência de tabelas (`Schema::hasTable`), reduzindo overhead de metadados.
+- Otimização do `DashboardController`: cache de 1 hora para cálculo de ranking e uso de ranges de data em logs de pontos.
+- Refatoração do `OrderController`: implementada paginação (20 registros/página) para evitar travamentos em bases grandes e consolidação de queries de KPI financeiro.
+- Otimização do `UserController`: implementada paginação, busca eficiente e uso de `withCount` para evitar N+1 na listagem de ingressos (redução de 2 queries por linha).
+- Adicionados 12 novos índices de performance prioritários cobrindo `users.points`, `courses.slug`, `lessons.order`, `enrollments.user_id`, `activity_logs.created_at` e `service_visits`.
 - A contabilidade do marketplace deixou de carregar todas as vendas e compras com relacionamentos na memoria antes da paginacao; resumos e CSV agora processam pedidos incrementalmente em lotes.
 - O filtro de periodo financeiro deixou de usar `COALESCE` sobre colunas, permitindo que o MariaDB aproveite indices por vendedor, comprador, status e datas financeiras.
 - A abertura de conversa privada nos paineis legado e novo deixou de executar uma consulta adicional para cada conversa encontrada.
@@ -14,8 +20,7 @@
 - Conexoes com o banco recebem timeout configuravel por `DB_CONNECT_TIMEOUT`, evitando requisicoes presas quando o servidor MariaDB estiver indisponivel.
 - Carregamentos N+1 passam a ser detectados e registrados no ambiente de desenvolvimento.
 - Geradores de codigo de indicacao e slugs de lojas, revistas, planos e produtos agora possuem limite explicito de tentativas, eliminando risco de loop infinito nos paineis legado e novo.
-- Adicionados indices compostos prioritarios para pedidos, participantes de conversas e mensagens nao lidas.
-- Arquivos principais: `app/Http/Controllers/Panel/MarketplaceAccountingController.php`, `app/Http/Controllers/Admin/ChatController.php`, `app/Providers/AppServiceProvider.php`, `database/migrations/2026_06_03_235500_add_priority_database_performance_indexes.php`, `tests/Feature/DatabasePerformanceGuardTest.php`.
+- Arquivos principais: `app/Services/DashboardMetricsService.php`, `app/Http/Controllers/Panel/DashboardController.php`, `app/Http/Controllers/Admin/OrderController.php`, `app/Http/Controllers/Admin/UserController.php`, `database/migrations/2026_06_03_235600_add_extra_performance_indexes.php`, `app/Http/Controllers/Panel/MarketplaceAccountingController.php`, `app/Http/Controllers/Admin/ChatController.php`, `app/Providers/AppServiceProvider.php`.
 
 ---
 

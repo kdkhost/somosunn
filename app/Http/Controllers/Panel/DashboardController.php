@@ -149,10 +149,18 @@ class DashboardController extends Controller
         $pontosEsteMes = 0;
         try {
             $userPoints = (int) ($user->points ?? 0);
-            $rankPosition = User::where('points', '>', $userPoints)->count() + 1;
+            
+            // Otimização: Cache do ranking por 1 hora (ou use um job para calcular periodicamente)
+            $rankPosition = Cache::remember('user_rank_' . $user->id, now()->addHour(), function() use ($userPoints) {
+                return User::where('points', '>', $userPoints)->count() + 1;
+            });
+
+            // Otimização: Usar range de datas ao invés de whereYear/whereMonth
+            $startOfMonth = now()->startOfMonth();
+            $endOfMonth = now()->endOfMonth();
+            
             $pontosEsteMes = (int) PointsLog::where('user_id', $user->id)
-                ->whereYear('created_at', now()->year)
-                ->whereMonth('created_at', now()->month)
+                ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                 ->sum('points');
         } catch (\Throwable) {
         }
@@ -173,9 +181,16 @@ class DashboardController extends Controller
         ));
     }
 
+    private static array $schemaCache = [];
+
     private function supportsSellerHealthMetrics(): bool
     {
-        return Schema::hasTable('redeemable_items')
+        $cacheKey = 'supports_seller_health_metrics';
+        if (isset(self::$schemaCache[$cacheKey])) {
+            return self::$schemaCache[$cacheKey];
+        }
+
+        return self::$schemaCache[$cacheKey] = Schema::hasTable('redeemable_items')
             && Schema::hasTable('redemptions')
             && Schema::hasColumn('redeemable_items', 'provider_type')
             && Schema::hasColumn('redeemable_items', 'provider_user_id')

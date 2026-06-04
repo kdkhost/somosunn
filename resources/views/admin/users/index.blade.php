@@ -5,9 +5,6 @@
 
 @section('content')
     @php
-        $totalUsers = $users->count();
-        $totalAdmins = $users->whereIn('role', ['admin', 'superadmin'])->count();
-        $totalMembers = $users->where('role', 'member')->count() + $users->whereNull('role')->count();
         $marketingUserId = (int) \App\Models\Setting::get('platform_marketing_user_id', 0);
         $marketingUser = $marketingUserId > 0 ? \App\Models\User::find($marketingUserId) : null;
     @endphp
@@ -130,7 +127,7 @@
                                 <td class="text-center">
                                     <span class="badge badge-info px-2 py-1">
                                         <i class="fas fa-ticket-alt mr-1" style="font-size:9px;"></i>
-                                        {{ $user->getCheckedInTicketsCount() }} / {{ $user->getTotalTicketsCount() }}
+                                        {{ $user->checked_in_tickets_count }} / {{ $user->total_tickets_count }}
                                     </span>
                                 </td>
                                 <td class="text-center">
@@ -174,6 +171,16 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+            <div class="card-footer bg-white border-top py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted text-sm">
+                        Mostrando <b>{{ $users->firstItem() }}</b> até <b>{{ $users->lastItem() }}</b> de <b>{{ $users->total() }}</b> usuários
+                    </div>
+                    <div>
+                        {{ $users->links() }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

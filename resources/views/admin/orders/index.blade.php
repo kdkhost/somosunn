@@ -270,6 +270,16 @@
                     </tbody>
                 </table>
             </div>
+            <div class="card-footer bg-white border-top py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted text-sm">
+                        Mostrando <b>{{ $orders->firstItem() }}</b> até <b>{{ $orders->lastItem() }}</b> de <b>{{ $orders->total() }}</b> resultados
+                    </div>
+                    <div>
+                        {{ $orders->links() }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

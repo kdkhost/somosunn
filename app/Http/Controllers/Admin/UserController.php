@@ -20,17 +20,37 @@ class UserController extends Controller
         return Plan::siteFeatureLabels();
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim((string) $request->input('search', ''));
         $query = User::latest();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%")
+                  ->orWhere('id', $search);
+            });
+        }
 
         if (!$this->isSuperadmin()) {
             $query->where('role', '!=', 'superadmin');
         }
 
-        $users = $query->get();
+        // Otimização: KPIs calculados via banco de dados
+        $totalUsers = (clone $query)->count();
+        $totalAdmins = (clone $query)->whereIn('role', ['admin', 'superadmin'])->count();
+        $totalMembers = $totalUsers - $totalAdmins;
 
-        return view('admin.users.index', compact('users'));
+        // Otimização: comCount para evitar N+1 na listagem
+        $users = $query->withCount([
+            'eventRegistrations as total_tickets_count',
+            'eventRegistrations as checked_in_tickets_count' => function ($q) {
+                $q->whereNotNull('check_in_at');
+            }
+        ])->paginate(20)->withQueryString();
+
+        return view('admin.users.index', compact('users', 'search', 'totalUsers', 'totalAdmins', 'totalMembers'));
     }
 
     public function create()

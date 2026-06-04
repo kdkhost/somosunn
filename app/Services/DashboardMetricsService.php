@@ -67,6 +67,17 @@ class DashboardMetricsService
         ];
     }
 
+    private static array $tableExistenceCache = [];
+
+    private function tableExists(string $table): bool
+    {
+        if (isset(self::$tableExistenceCache[$table])) {
+            return self::$tableExistenceCache[$table];
+        }
+
+        return self::$tableExistenceCache[$table] = Schema::hasTable($table);
+    }
+
     private function buildPanelStats(User $user): array
     {
         $plan = $user->activePlan();
@@ -85,16 +96,21 @@ class DashboardMetricsService
         try {
             if ($user->isAdmin() || $user->isSuperAdmin()) {
                 $stats['courses_count'] = (int) Course::count();
-                $stats['orders_paid_count'] = (int) Order::where('status', 'paid')->count();
-                $stats['orders_paid_total'] = (float) Order::where('status', 'paid')->sum('total_amount');
-                $stats['seller_paid_count'] = (int) Order::where('status', 'paid')->count();
-                $stats['seller_net_total'] = (float) Order::where('status', 'paid')->sum('total_amount')
-                    - (float) Order::where('status', 'paid')->sum('platform_fee_amount');
+
+                $orderMetrics = Order::where('status', 'paid')
+                    ->selectRaw('COUNT(*) as count, SUM(total_amount) as total, SUM(platform_fee_amount) as platform_fee')
+                    ->first();
+
+                $stats['orders_paid_count'] = (int) $orderMetrics->count;
+                $stats['orders_paid_total'] = (float) $orderMetrics->total;
+                $stats['seller_paid_count'] = (int) $orderMetrics->count;
+                $stats['seller_net_total'] = (float) $orderMetrics->total - (float) $orderMetrics->platform_fee;
 
                 $salesChart = $this->buildSalesChart(function (int $month, int $year): int {
+                    $start = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+                    $end = $start->copy()->endOfMonth();
                     return (int) Order::where('status', 'paid')
-                        ->whereMonth('created_at', $month)
-                        ->whereYear('created_at', $year)
+                        ->whereBetween('created_at', [$start, $end])
                         ->count();
                 });
 
@@ -105,20 +121,27 @@ class DashboardMetricsService
                 }
             } else {
                 $stats['courses_count'] = (int) Course::where('user_id', $user->id)->count();
-                $stats['orders_paid_count'] = (int) Order::where('user_id', $user->id)->where('status', 'paid')->count();
-                $stats['orders_paid_total'] = (float) Order::where('user_id', $user->id)->where('status', 'paid')->sum('total_amount');
-                $stats['seller_paid_count'] = (int) Order::where('seller_id', $user->id)->where('status', 'paid')->count();
-                $stats['seller_net_total'] = (float) max(
-                    0,
-                    (float) Order::where('seller_id', $user->id)->where('status', 'paid')->sum('total_amount')
-                    - (float) Order::where('seller_id', $user->id)->where('status', 'paid')->sum('platform_fee_amount')
-                );
+
+                $buyerMetrics = Order::where('user_id', $user->id)->where('status', 'paid')
+                    ->selectRaw('COUNT(*) as count, SUM(total_amount) as total')
+                    ->first();
+
+                $stats['orders_paid_count'] = (int) $buyerMetrics->count;
+                $stats['orders_paid_total'] = (float) $buyerMetrics->total;
+
+                $sellerMetrics = Order::where('seller_id', $user->id)->where('status', 'paid')
+                    ->selectRaw('COUNT(*) as count, SUM(total_amount) as total, SUM(platform_fee_amount) as platform_fee')
+                    ->first();
+
+                $stats['seller_paid_count'] = (int) $sellerMetrics->count;
+                $stats['seller_net_total'] = (float) max(0, (float) $sellerMetrics->total - (float) $sellerMetrics->platform_fee);
 
                 $salesChart = $this->buildSalesChart(function (int $month, int $year) use ($user): int {
+                    $start = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+                    $end = $start->copy()->endOfMonth();
                     return (int) Order::where('seller_id', $user->id)
                         ->where('status', 'paid')
-                        ->whereMonth('created_at', $month)
-                        ->whereYear('created_at', $year)
+                        ->whereBetween('created_at', [$start, $end])
                         ->count();
                 });
 
@@ -185,12 +208,30 @@ class DashboardMetricsService
 
         try {
             if ($isAdmin) {
-                $payload['totalRevenue'] = (float) Order::financialPaid()->sum('total_amount');
-                $payload['revenueToday'] = (float) Order::financialPaid()->whereDate('created_at', now()->toDateString())->sum('total_amount');
-                $payload['refundedAmount'] = (float) Order::where('status', 'refunded')->sum('total_amount');
-                $payload['totalOrders'] = (int) Order::count();
-                $payload['totalUsers'] = (int) User::count();
-                $payload['usersToday'] = (int) User::whereDate('created_at', now()->toDateString())->count();
+                $orderMetrics = Order::query()
+                    ->selectRaw("
+                        SUM(CASE WHEN (status = 'paid' AND (is_manual_approval IS NULL OR is_manual_approval = 0)) THEN total_amount ELSE 0 END) as total_revenue,
+                        SUM(CASE WHEN (status = 'paid' AND (is_manual_approval IS NULL OR is_manual_approval = 0) AND DATE(created_at) = ?) THEN total_amount ELSE 0 END) as revenue_today,
+                        SUM(CASE WHEN status = 'refunded' THEN total_amount ELSE 0 END) as refunded_amount,
+                        COUNT(*) as total_orders
+                    ", [now()->toDateString()])
+                    ->first();
+
+                $payload['totalRevenue'] = (float) $orderMetrics->total_revenue;
+                $payload['revenueToday'] = (float) $orderMetrics->revenue_today;
+                $payload['refundedAmount'] = (float) $orderMetrics->refunded_amount;
+                $payload['totalOrders'] = (int) $orderMetrics->total_orders;
+
+                $userMetrics = User::query()
+                    ->selectRaw("
+                        COUNT(*) as total_users,
+                        SUM(CASE WHEN DATE(created_at) = ? THEN 1 ELSE 0 END) as users_today
+                    ", [now()->toDateString()])
+                    ->first();
+
+                $payload['totalUsers'] = (int) $userMetrics->total_users;
+                $payload['usersToday'] = (int) $userMetrics->users_today;
+
                 $payload['coursesCount'] = (int) Course::count();
                 $payload['mentorshipsCount'] = $this->tableExists('mentorships') ? (int) Mentorship::count() : 0;
                 $payload['eventsCount'] = $this->tableExists('events') ? (int) Event::count() : 0;
@@ -200,31 +241,22 @@ class DashboardMetricsService
 
                 // Otimização: calcular saúde do cliente via queries agregadas ao invés de iterar todos
                 $now = now()->toDateTimeString();
-                $totalUsersCount = (int) User::count();
+                $totalUsersCount = $payload['totalUsers'];
 
-                // Usuários com plano ativo (plan_id preenchido E (sem expiração OU expiração futura))
-                $withActivePlan = (int) User::whereNotNull('plan_id')
+                $planMetrics = User::whereNotNull('plan_id')
                     ->where('plan_id', '>', 0)
                     ->where(function ($q) use ($now) {
                         $q->whereNull('plan_expires_at')
                           ->orWhere('plan_expires_at', '>', $now);
                     })
-                    ->count();
+                    ->selectRaw("
+                        COUNT(*) as with_active_plan,
+                        SUM(CASE WHEN (phone IS NOT NULL AND phone != '' AND occupation IS NOT NULL AND occupation != '' AND city IS NOT NULL AND city != '' AND state IS NOT NULL AND state != '') THEN 1 ELSE 0 END) as with_active_plan_complete
+                    ")
+                    ->first();
 
-                // Usuários com plano ativo E perfil completo (campos essenciais preenchidos)
-                $withActivePlanComplete = (int) User::whereNotNull('plan_id')
-                    ->where('plan_id', '>', 0)
-                    ->where(function ($q) use ($now) {
-                        $q->whereNull('plan_expires_at')
-                          ->orWhere('plan_expires_at', '>', $now);
-                    })
-                    ->where(function ($q) {
-                        $q->whereNotNull('phone')->where('phone', '!=', '')
-                          ->whereNotNull('occupation')->where('occupation', '!=', '')
-                          ->whereNotNull('city')->where('city', '!=', '')
-                          ->whereNotNull('state')->where('state', '!=', '');
-                    })
-                    ->count();
+                $withActivePlan = (int) $planMetrics->with_active_plan;
+                $withActivePlanComplete = (int) $planMetrics->with_active_plan_complete;
 
                 $payload['customerHealth']['Alta'] = $withActivePlanComplete;
                 $payload['customerHealth']['Média'] = $withActivePlan - $withActivePlanComplete;
@@ -523,15 +555,23 @@ class DashboardMetricsService
 
     private function buildServiceVisitTimeline($query): array
     {
+        $startDate = now()->subDays(6)->startOfDay();
+        
+        $visitData = (clone $query)
+            ->where('visited_at', '>=', $startDate)
+            ->selectRaw("DATE(visited_at) as date, COUNT(*) as total")
+            ->groupBy('date')
+            ->pluck('total', 'date')
+            ->toArray();
+
         $labels = [];
         $data = [];
 
         foreach (range(6, 0) as $days) {
             $date = now()->subDays($days);
             $labels[] = $date->translatedFormat('d/m');
-            $data[] = (int) (clone $query)
-                ->whereBetween('visited_at', [$date->copy()->startOfDay(), $date->copy()->endOfDay()])
-                ->count();
+            $dateStr = $date->toDateString();
+            $data[] = (int) ($visitData[$dateStr] ?? 0);
         }
 
         return [
@@ -770,15 +810,6 @@ class DashboardMetricsService
             return (int) $resolver();
         } catch (\Throwable) {
             return 0;
-        }
-    }
-
-    private function tableExists(string $table): bool
-    {
-        try {
-            return Schema::hasTable($table);
-        } catch (\Throwable) {
-            return false;
         }
     }
 }
