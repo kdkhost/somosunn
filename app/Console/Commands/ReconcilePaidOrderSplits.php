@@ -14,7 +14,7 @@ class ReconcilePaidOrderSplits extends Command
 
     public function handle(OrderSplitService $splitService): int
     {
-        $query = Order::query()->where('status', 'paid')->where('total_amount', '>', 0);
+        $query = Order::query()->where('status', 'paid');
         $orderId = (int) $this->option('order');
 
         if ($orderId > 0) {

@@ -13,13 +13,24 @@ class OrderSplitService
 {
     public function syncForPaidOrder(Order $order): void
     {
-        if ((string) $order->status !== 'paid' || (float) $order->total_amount <= 0) {
+        if ((string) $order->status !== 'paid') {
             return;
         }
 
         $order->loadMissing('seller');
 
         DB::transaction(function () use ($order) {
+            if ((float) $order->total_amount <= 0) {
+                OrderSplit::query()->where('order_id', $order->id)->delete();
+                $order->platform_fee_amount = 0;
+                $order->metadata = array_merge($order->metadata ?? [], [
+                    'platform_fee_percent' => MarketplaceFee::deductionPercent($order->seller),
+                ]);
+                $order->save();
+
+                return;
+            }
+
             $existing = OrderSplit::query()
                 ->where('order_id', $order->id)
                 ->lockForUpdate()

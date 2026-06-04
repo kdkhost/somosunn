@@ -161,6 +161,33 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
         $this->assertSame('20.00', $order->fresh()->platform_fee_amount);
     }
 
+    public function test_free_paid_order_has_no_splits_and_updates_effective_percentage(): void
+    {
+        $buyer = $this->user('member', 'buyer-free-sale@unn.test');
+        $adminSeller = $this->user('admin', 'admin-free-sale@unn.test', 'pix-admin');
+        $this->user('superadmin', 'superadmin-free-sale@unn.test', 'pix-superadmin');
+        $marketing = $this->user('member', 'marketing-free-sale@unn.test', 'pix-marketing');
+
+        Setting::set('platform_marketing_user_id', (string) $marketing->id);
+
+        $order = Order::create([
+            'user_id' => $buyer->id,
+            'seller_id' => $adminSeller->id,
+            'status' => 'paid',
+            'total_amount' => 0,
+            'platform_fee_amount' => 30,
+            'currency' => 'BRL',
+            'gateway' => 'free',
+            'metadata' => ['platform_fee_percent' => 30],
+        ]);
+
+        app(OrderSplitService::class)->syncForPaidOrder($order);
+
+        $this->assertSame(0, OrderSplit::where('order_id', $order->id)->count());
+        $this->assertSame('0.00', $order->fresh()->platform_fee_amount);
+        $this->assertSame(20.0, (float) data_get($order->fresh()->metadata, 'platform_fee_percent'));
+    }
+
     public function test_regular_member_cannot_change_pix_key_through_profile_endpoint(): void
     {
         $member = $this->user('member', 'member-profile@unn.test', 'pix-original');

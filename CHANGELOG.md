@@ -7,6 +7,7 @@
 - Vendas de admin, superadmin ou responsavel de marketing deixam de descontar a propria parcela administrativa; normalmente o desconto passa de 30% para 20%.
 - Quando o vendedor acumula mais de uma funcao recebedora, somente as parcelas destinadas a outras pessoas permanecem como desconto e repasse pendente.
 - A taxa efetiva agora e gravada no pedido e usada pelo Mercado Pago, pelos demais gateways e por todos os tipos de venda.
+- A conciliacao tambem corrige pedidos gratuitos antigos, mantendo valor de taxa zerado e removendo o percentual historico incorreto.
 - As listagens administrativas legada e nova passam a exibir todos os usuarios encontrados, sem limite de 20 registros por pagina e sem consultas extras por usuario nas contagens de ingressos.
 - Arquivos principais: `app/Support/MarketplaceFee.php`, `app/Services/OrderSplitService.php`, controladores de checkout, `app/Services/Payment/MercadoPagoService.php`, controladores e views de usuarios.
 
