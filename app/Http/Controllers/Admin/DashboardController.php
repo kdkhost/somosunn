@@ -59,6 +59,18 @@ class DashboardController extends Controller
         }
     }
 
+    private static array $schemaCache = [];
+
+    private function hasColumn(string $table, string $column): bool
+    {
+        $key = "{$table}.{$column}";
+        if (isset(self::$schemaCache[$key])) {
+            return self::$schemaCache[$key];
+        }
+
+        return self::$schemaCache[$key] = \Schema::hasColumn($table, $column);
+    }
+
     /**
      * Retorna informações de saúde do sistema para exibição na dashboard.
      */
@@ -86,7 +98,7 @@ class DashboardController extends Controller
 
         $onlineRecent = 0;
         try {
-            if (\Schema::hasColumn('users', 'last_activity_at')) {
+            if ($this->hasColumn('users', 'last_activity_at')) {
                 $onlineRecent = \App\Models\User::where('last_activity_at', '>', now()->subMinutes(5))->count();
             }
         } catch (\Throwable $e) {

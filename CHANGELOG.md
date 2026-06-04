@@ -13,6 +13,9 @@
 - Corrigida falha no `MercadoPagoService` que enviava CPFs/CNPJs incompletos ou mal formatados para a API, evitando erros de transação (Error 2067).
 - Otimizado o mecanismo de decisão do `WafEngine` para garantir status HTTP 429 correto em rate limits e logs mais precisos durante rebaixamentos.
 - Implementada validação de 14 dígitos para CNPJ em pagamentos via Pix e Cartão de Crédito no Mercado Pago.
+- Adicionado pacote `laravel/tinker` ao `composer.json` para suportar depuração via CLI.
+- Otimizada a verificação de saúde do sistema no `Admin/DashboardController` com cache de colunas de banco de dados.
+- Corrigidas referências a Seeders inexistentes e placeholders de rotas em blade files.
 - A contabilidade do marketplace deixou de carregar todas as vendas e compras com relacionamentos na memoria antes da paginacao; resumos e CSV agora processam pedidos incrementalmente em lotes.
 - O filtro de periodo financeiro deixou de usar `COALESCE` sobre colunas, permitindo que o MariaDB aproveite indices por vendedor, comprador, status e datas financeiras.
 - A abertura de conversa privada nos paineis legado e novo deixou de executar uma consulta adicional para cada conversa encontrada.
