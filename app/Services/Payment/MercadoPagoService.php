@@ -151,6 +151,11 @@ class MercadoPagoService
                 'type'   => 'CPF',
                 'number' => $cpf,
             ];
+        } elseif (strlen($cpf) === 14) {
+            $payer['identification'] = [
+                'type'   => 'CNPJ',
+                'number' => $cpf,
+            ];
         }
 
         $pixExpirationMinutes = (int) (Setting::get('mercadopago_pix_expiration_minutes') ?: Setting::get('pix_expiration_minutes', 10) ?: 10);
@@ -212,9 +217,14 @@ class MercadoPagoService
         $payer = [
             'email' => $payerEmail,
         ];
-        if ($cpf !== '') {
+        if (strlen($cpf) === 11) {
             $payer['identification'] = [
                 'type' => 'CPF',
+                'number' => $cpf,
+            ];
+        } elseif (strlen($cpf) === 14) {
+            $payer['identification'] = [
+                'type' => 'CNPJ',
                 'number' => $cpf,
             ];
         }

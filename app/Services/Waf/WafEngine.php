@@ -169,6 +169,15 @@ final class WafEngine
                 default                 => WafDecision::allowed('below_threshold'),
             };
 
+            // Ajuste fino para o status de bloqueio baseado no rate limit ou rebaixamento
+            if ($decision->isBlocked()) {
+                $status = 403;
+                if ($rateResult !== null && ! $rateResult['allowed']) {
+                    $status = 429;
+                }
+                $decision = WafDecision::blocked($status, $score, $matches, $this->describeReasons($matches));
+            }
+
             // Persiste WAF_Event se nao for allowed (ou se amostragem estiver ativa)
             if (! $decision->isAllowed() || $this->shouldSampleAllowed()) {
                 $eventId = $this->logger->log($ctx, $decision);

@@ -10,6 +10,9 @@
 - Refatoração do `OrderController`: implementada paginação (20 registros/página) para evitar travamentos em bases grandes e consolidação de queries de KPI financeiro.
 - Otimização do `UserController`: implementada paginação, busca eficiente e uso de `withCount` para evitar N+1 na listagem de ingressos (redução de 2 queries por linha).
 - Adicionados 12 novos índices de performance prioritários cobrindo `users.points`, `courses.slug`, `lessons.order`, `enrollments.user_id`, `activity_logs.created_at` e `service_visits`.
+- Corrigida falha no `MercadoPagoService` que enviava CPFs/CNPJs incompletos ou mal formatados para a API, evitando erros de transação (Error 2067).
+- Otimizado o mecanismo de decisão do `WafEngine` para garantir status HTTP 429 correto em rate limits e logs mais precisos durante rebaixamentos.
+- Implementada validação de 14 dígitos para CNPJ em pagamentos via Pix e Cartão de Crédito no Mercado Pago.
 - A contabilidade do marketplace deixou de carregar todas as vendas e compras com relacionamentos na memoria antes da paginacao; resumos e CSV agora processam pedidos incrementalmente em lotes.
 - O filtro de periodo financeiro deixou de usar `COALESCE` sobre colunas, permitindo que o MariaDB aproveite indices por vendedor, comprador, status e datas financeiras.
 - A abertura de conversa privada nos paineis legado e novo deixou de executar uma consulta adicional para cada conversa encontrada.
