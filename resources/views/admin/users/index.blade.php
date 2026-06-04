@@ -175,10 +175,9 @@
             <div class="card-footer bg-white border-top py-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="text-muted text-sm">
-                        Mostrando <b>{{ $users->firstItem() }}</b> até <b>{{ $users->lastItem() }}</b> de <b>{{ $users->total() }}</b> usuários
+                        Exibindo todos os <b>{{ $users->count() }}</b> usuários encontrados.
                     </div>
                     <div>
-                        {{ $users->links() }}
                     </div>
                 </div>
             </div>

@@ -150,8 +150,8 @@ class SellerProductCheckoutController extends Controller
 
         $order = null;
         DB::transaction(function () use (&$order, $totals, $subtotal, $shippingAmount, $total, $shippingQuote, $data, $sellerStore, $chosenGateway) {
-            $platformFeeAmount = MarketplaceFee::amount($subtotal);
-            $platformFeePercent = MarketplaceFee::percent();
+            $platformFeeAmount = MarketplaceFee::deductionAmount($subtotal, $sellerStore->user);
+            $platformFeePercent = MarketplaceFee::deductionPercent($sellerStore->user);
 
             foreach ($totals['items'] as $row) {
                 $product = $row['product']->fresh(['store.user']);

@@ -44,11 +44,13 @@ class UserController extends Controller
 
         // Otimização: comCount para evitar N+1 na listagem
         $users = $query->withCount([
-            'eventRegistrations as total_tickets_count',
+            'eventRegistrations as total_tickets_count' => function ($q) {
+                $q->whereIn('status', [\App\Models\EventRegistration::STATUS_PAID, \App\Models\EventRegistration::STATUS_CONFIRMED]);
+            },
             'eventRegistrations as checked_in_tickets_count' => function ($q) {
                 $q->whereNotNull('check_in_at');
             }
-        ])->paginate(20)->withQueryString();
+        ])->get();
 
         return view('admin.users.index', compact('users', 'search', 'totalUsers', 'totalAdmins', 'totalMembers'));
     }

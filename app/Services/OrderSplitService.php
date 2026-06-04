@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderSplit;
 use App\Models\Setting;
 use App\Models\User;
+use App\Support\MarketplaceFee;
 use Illuminate\Support\Facades\DB;
 
 class OrderSplitService
@@ -50,6 +51,9 @@ class OrderSplitService
                 ->sum('amount');
 
             $order->platform_fee_amount = round((float) $externalAmount, 2);
+            $order->metadata = array_merge($order->metadata ?? [], [
+                'platform_fee_percent' => MarketplaceFee::deductionPercent($order->seller),
+            ]);
             $order->save();
         });
     }
@@ -61,7 +65,7 @@ class OrderSplitService
     {
         $total = (float) $order->total_amount;
         $seller = $order->seller;
-        $platformOwner = $seller?->isAdmin() ? $seller : $this->platformOwner();
+        $platformOwner = $seller?->isAdmin() && !$seller->isSuperAdmin() ? $seller : $this->platformOwner();
         $superadmin = $this->superadmin();
         $revenueOwner = $seller ?? $platformOwner;
         $marketingManager = $this->marketingManager();
@@ -82,9 +86,7 @@ class OrderSplitService
 
             $receiver = $share['receiver'];
             $receiverId = $receiver?->id;
-            $consolidateWithSeller = in_array($share['type'], ['seller', 'platform'], true)
-                && $receiverId !== null
-                && $receiverId === $seller?->id;
+            $consolidateWithSeller = $receiverId !== null && $receiverId === $seller?->id;
             $key = $consolidateWithSeller
                 ? 'seller:' . $receiverId
                 : $share['type'] . ':' . ($receiverId ?? 'unassigned');
@@ -96,10 +98,7 @@ class OrderSplitService
                     'percentage' => 0.0,
                     'amount' => 0.0,
                     'pix_key' => $receiver?->pix_key,
-                    'auto_paid' => $receiverId !== null
-                        && $revenueOwner?->isAdmin()
-                        && $receiverId === $revenueOwner->id
-                        && in_array($share['type'], ['seller', 'platform'], true),
+                    'auto_paid' => $receiverId !== null && $receiverId === $seller?->id,
                 ];
             }
 
@@ -138,7 +137,7 @@ class OrderSplitService
         foreach (['platform_owner_id', 'platform_admin_user_id'] as $key) {
             $userId = (int) Setting::get($key, 0);
             $user = $userId > 0 ? User::find($userId) : null;
-            if ($user?->isAdmin()) {
+            if ($user?->isAdmin() && !$user->isSuperAdmin()) {
                 return $user;
             }
         }

@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Setting;
+use App\Models\User;
 
 final class MarketplaceFee
 {
@@ -35,5 +36,45 @@ final class MarketplaceFee
 
         return round($totalAmount * ($percent / 100), 2);
     }
-}
 
+    public static function deductionPercent(User|int|null $seller): float
+    {
+        $seller = is_int($seller) ? User::find($seller) : $seller;
+
+        $percent = static::splitPercent('marketplace_split_platform_percent', 10)
+            + static::splitPercent('marketplace_split_traffic_percent', 10)
+            + static::splitPercent('marketplace_split_superadmin_percent', 10);
+
+        if (!$seller) {
+            return min(100, $percent);
+        }
+
+        if ($seller->isAdmin() && !$seller->isSuperAdmin()) {
+            $percent -= static::splitPercent('marketplace_split_platform_percent', 10);
+        }
+
+        if ($seller->isSuperAdmin()) {
+            $percent -= static::splitPercent('marketplace_split_superadmin_percent', 10);
+        }
+
+        if ($seller->isMarketingManager()) {
+            $percent -= static::splitPercent('marketplace_split_traffic_percent', 10);
+        }
+
+        return min(100, max(0, $percent));
+    }
+
+    public static function deductionAmount(float $totalAmount, User|int|null $seller): float
+    {
+        if ($totalAmount <= 0) {
+            return 0.0;
+        }
+
+        return round($totalAmount * (static::deductionPercent($seller) / 100), 2);
+    }
+
+    private static function splitPercent(string $key, float $default): float
+    {
+        return max(0, (float) Setting::get($key, $default));
+    }
+}

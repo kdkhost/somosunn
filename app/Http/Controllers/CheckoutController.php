@@ -165,8 +165,8 @@ class CheckoutController extends Controller
                 }
 
                 $finalTotal = max(0, round($originalTotal - $discountAmount, 2));
-                $platformFeePercent = MarketplaceFee::percent();
-                $platformFeeAmount = MarketplaceFee::amount($finalTotal);
+                $platformFeePercent = MarketplaceFee::deductionPercent($course->user_id);
+                $platformFeeAmount = MarketplaceFee::deductionAmount($finalTotal, $course->user_id);
 
                 $order = Order::create([
                     'user_id' => Auth::id(),

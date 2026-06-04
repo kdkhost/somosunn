@@ -89,6 +89,10 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getTotalTicketsCount(): int
     {
+        if (array_key_exists('total_tickets_count', $this->attributes)) {
+            return (int) $this->attributes['total_tickets_count'];
+        }
+
         return $this->eventRegistrations()
             ->whereIn('status', [EventRegistration::STATUS_PAID, EventRegistration::STATUS_CONFIRMED])
             ->count();
@@ -99,6 +103,10 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getCheckedInTicketsCount(): int
     {
+        if (array_key_exists('checked_in_tickets_count', $this->attributes)) {
+            return (int) $this->attributes['checked_in_tickets_count'];
+        }
+
         return $this->eventRegistrations()
             ->whereNotNull('check_in_at')
             ->count();

@@ -425,8 +425,8 @@ class EventReservationController extends Controller
                 }
 
                 $finalTotal = max(0, round($originalTotal - $discountAmount, 2));
-                $platformFeePercent = MarketplaceFee::percent();
-                $platformFeeAmount = MarketplaceFee::amount($finalTotal);
+                $platformFeePercent = MarketplaceFee::deductionPercent($sellerId > 0 ? $sellerId : null);
+                $platformFeeAmount = MarketplaceFee::deductionAmount($finalTotal, $sellerId > 0 ? $sellerId : null);
 
                 if (!$order) {
                     $order = Order::create([
@@ -983,7 +983,7 @@ class EventReservationController extends Controller
 
     private function createFreeEventOrder(Event $event, int $userId, int $sellerId, int $quantity, float $regularUnitPrice, float $effectiveUnitPrice): Order
     {
-        $platformFeePercent = MarketplaceFee::percent();
+        $platformFeePercent = MarketplaceFee::deductionPercent($sellerId > 0 ? $sellerId : null);
 
         $order = Order::create([
             'user_id' => $userId,

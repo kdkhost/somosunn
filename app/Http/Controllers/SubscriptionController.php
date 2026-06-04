@@ -233,8 +233,8 @@ class SubscriptionController extends Controller
             }
 
             $sellerId = $plan->seller_id;
-            $platformFeePercent = \App\Support\MarketplaceFee::percent();
-            $platformFeeAmount = $sellerId ? \App\Support\MarketplaceFee::amount($effectivePrice) : 0.0;
+            $platformFeePercent = \App\Support\MarketplaceFee::deductionPercent($sellerId);
+            $platformFeeAmount = $sellerId ? \App\Support\MarketplaceFee::deductionAmount($effectivePrice, $sellerId) : 0.0;
 
             $order = Order::create([
                 'user_id' => $user->id,
@@ -488,8 +488,8 @@ class SubscriptionController extends Controller
 
         // Criar pedido
         $sellerId = $plan->seller_id;
-        $platformFeePercent = \App\Support\MarketplaceFee::percent();
-        $platformFeeAmount = $sellerId ? \App\Support\MarketplaceFee::amount($effectivePrice) : 0.0;
+        $platformFeePercent = \App\Support\MarketplaceFee::deductionPercent($sellerId);
+        $platformFeeAmount = $sellerId ? \App\Support\MarketplaceFee::deductionAmount($effectivePrice, $sellerId) : 0.0;
 
         $order = Order::create([
             'user_id' => $user->id,

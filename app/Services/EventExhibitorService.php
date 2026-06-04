@@ -164,9 +164,9 @@ class EventExhibitorService
 
             $unitPrice = round((float) $batch['price'], 2);
             $totalPrice = round($unitPrice * $quantity, 2);
-            $platformFeePercent = MarketplaceFee::percent();
-            $platformFeeAmount = MarketplaceFee::amount($totalPrice);
             $sellerId = (int) ($lockedEvent->user_id ?? 0);
+            $platformFeePercent = MarketplaceFee::deductionPercent($sellerId > 0 ? $sellerId : null);
+            $platformFeeAmount = MarketplaceFee::deductionAmount($totalPrice, $sellerId > 0 ? $sellerId : null);
             $reserveExpiresAt = now()->addMinutes($this->reserveMinutes());
 
             $order = Order::create([

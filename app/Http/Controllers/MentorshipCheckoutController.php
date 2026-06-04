@@ -179,8 +179,8 @@ class MentorshipCheckoutController extends Controller
                 }
 
                 $finalTotal = max(0, round($originalTotal - $discountAmount, 2));
-                $platformFeePercent = MarketplaceFee::percent();
-                $platformFeeAmount = MarketplaceFee::amount($finalTotal);
+                $platformFeePercent = MarketplaceFee::deductionPercent((int) $mentorship->mentor_id);
+                $platformFeeAmount = MarketplaceFee::deductionAmount($finalTotal, (int) $mentorship->mentor_id);
 
                 $order = Order::create([
                     'user_id' => Auth::id(),

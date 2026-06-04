@@ -299,7 +299,10 @@
                     </tbody>
                 </table>
             </div>
-            @if($users->hasPages())
+            <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm text-slate-500 dark:text-slate-400">
+                Exibindo todos os <strong>{{ $users->count() }}</strong> usuários encontrados.
+            </div>
+            @if(false)
                 <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
                     @php
                         $users->appends(request()->query());

@@ -8,6 +8,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Exception;
+use App\Support\MarketplaceFee;
 
 class MercadoPagoService
 {
@@ -26,7 +27,7 @@ class MercadoPagoService
             $feeBaseAmount = $originalAmount;
         }
 
-        $feePercent = (float) Setting::get('marketplace_platform_fee_percent', 0);
+        $feePercent = MarketplaceFee::deductionPercent($order->seller_id);
         $globalBehavior = Setting::get('marketplace_fee_behavior', 'absorb');
 
         // Check Seller Override

@@ -2,6 +2,16 @@
 
 ---
 
+## [2026-06-04] - fix(rateios): descontar somente parcelas externas e exibir todos os usuarios
+
+- Vendas de admin, superadmin ou responsavel de marketing deixam de descontar a propria parcela administrativa; normalmente o desconto passa de 30% para 20%.
+- Quando o vendedor acumula mais de uma funcao recebedora, somente as parcelas destinadas a outras pessoas permanecem como desconto e repasse pendente.
+- A taxa efetiva agora e gravada no pedido e usada pelo Mercado Pago, pelos demais gateways e por todos os tipos de venda.
+- As listagens administrativas legada e nova passam a exibir todos os usuarios encontrados, sem limite de 20 registros por pagina e sem consultas extras por usuario nas contagens de ingressos.
+- Arquivos principais: `app/Support/MarketplaceFee.php`, `app/Services/OrderSplitService.php`, controladores de checkout, `app/Services/Payment/MercadoPagoService.php`, controladores e views de usuarios.
+
+---
+
 ## [2026-06-04] - fix(rateios): consolidar administrador-vendedor e centralizar splits
 
 - Quando o vendedor tambem e administrador da plataforma, somente as parcelas de vendedor e plataforma sao consolidadas, sem descontar e devolver para a mesma pessoa.

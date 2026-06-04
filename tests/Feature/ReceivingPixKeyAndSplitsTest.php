@@ -104,6 +104,61 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
         $this->assertSplit($order, 'traffic', $marketing, 'pix-marketing', 10, 10, 'pending');
         $this->assertSplit($order, 'superadmin', $superadmin, 'pix-superadmin', 10, 10, 'pending');
         $this->assertSame('20.00', $order->fresh()->platform_fee_amount);
+        $this->assertSame(20.0, (float) data_get($order->fresh()->metadata, 'platform_fee_percent'));
+    }
+
+    public function test_superadmin_seller_keeps_superadmin_share_and_only_deducts_external_shares(): void
+    {
+        $buyer = $this->user('member', 'buyer-superadmin-sale@unn.test');
+        $admin = $this->user('admin', 'admin-superadmin-sale@unn.test', 'pix-admin');
+        $superadminSeller = $this->user('superadmin', 'superadmin-seller@unn.test', 'pix-superadmin-seller');
+        $marketing = $this->user('member', 'marketing-superadmin-sale@unn.test', 'pix-marketing');
+
+        Setting::set('platform_marketing_user_id', (string) $marketing->id);
+
+        $order = Order::create([
+            'user_id' => $buyer->id,
+            'seller_id' => $superadminSeller->id,
+            'status' => 'paid',
+            'total_amount' => 100,
+            'currency' => 'BRL',
+            'gateway' => 'sumup',
+        ]);
+
+        app(OrderSplitService::class)->syncForPaidOrder($order);
+
+        $this->assertSame(3, OrderSplit::where('order_id', $order->id)->count());
+        $this->assertSplit($order, 'seller', $superadminSeller, 'pix-superadmin-seller', 80, 80, 'paid');
+        $this->assertSplit($order, 'platform', $admin, 'pix-admin', 10, 10, 'pending');
+        $this->assertSplit($order, 'traffic', $marketing, 'pix-marketing', 10, 10, 'pending');
+        $this->assertSame('20.00', $order->fresh()->platform_fee_amount);
+    }
+
+    public function test_marketing_manager_seller_keeps_traffic_share_and_only_deducts_external_shares(): void
+    {
+        $buyer = $this->user('member', 'buyer-marketing-sale@unn.test');
+        $sellerMarketing = $this->user('member', 'seller-marketing@unn.test', 'pix-seller-marketing');
+        $admin = $this->user('admin', 'admin-marketing-sale@unn.test', 'pix-admin');
+        $superadmin = $this->user('superadmin', 'superadmin-marketing-sale@unn.test', 'pix-superadmin');
+
+        Setting::set('platform_marketing_user_id', (string) $sellerMarketing->id);
+
+        $order = Order::create([
+            'user_id' => $buyer->id,
+            'seller_id' => $sellerMarketing->id,
+            'status' => 'paid',
+            'total_amount' => 100,
+            'currency' => 'BRL',
+            'gateway' => 'sumup',
+        ]);
+
+        app(OrderSplitService::class)->syncForPaidOrder($order);
+
+        $this->assertSame(3, OrderSplit::where('order_id', $order->id)->count());
+        $this->assertSplit($order, 'seller', $sellerMarketing, 'pix-seller-marketing', 80, 80, 'paid');
+        $this->assertSplit($order, 'platform', $admin, 'pix-admin', 10, 10, 'pending');
+        $this->assertSplit($order, 'superadmin', $superadmin, 'pix-superadmin', 10, 10, 'pending');
+        $this->assertSame('20.00', $order->fresh()->platform_fee_amount);
     }
 
     public function test_regular_member_cannot_change_pix_key_through_profile_endpoint(): void
