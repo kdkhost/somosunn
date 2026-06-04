@@ -16,7 +16,7 @@
         ];
         $serviceVisitTopItems = collect($serviceVisitTopItems ?? []);
         $serviceVisitOwnerLeaders = collect($serviceVisitOwnerLeaders ?? []);
-        $dashboardRefreshMs = max(3000, (int) config('dashboard.refresh_interval_ms', 10000));
+        $dashboardRefreshMs = max(3000, (int) config('dashboard.refresh_interval_ms', 30000));
         $gestao = [
             ['route' => 'panel.admin.users.index', 'icon' => 'fa-users-cog', 'color' => 'blue', 'title' => 'Usuários', 'desc' => 'Membros e níveis'],
             ['route' => 'panel.admin.plans.index', 'icon' => 'fa-gem', 'color' => 'indigo', 'title' => 'Planos', 'desc' => 'Pacotes e preços'],
@@ -479,7 +479,9 @@
                 })
                 .then(r => r.json())
                 .then(data => {
-                    const diskColor = data.disk.percent > 90 ? 'rose' : (data.disk.percent > 75 ? 'amber' : 'emerald');
+                    const hasQuota = !!data.disk.quota_available;
+                    const diskPercent = hasQuota ? data.disk.percent : null;
+                    const diskColor = !hasQuota ? 'blue' : (diskPercent > 90 ? 'rose' : (diskPercent > 75 ? 'amber' : 'emerald'));
                     const cronColor = data.cron.active ? 'emerald' : 'rose';
                     const cronLabel = data.cron.active ? 'Ativo' : 'Inativo';
 
@@ -491,14 +493,12 @@
                                         <i class="fas fa-hdd"></i>
                                     </div>
                                     <div>
-                                        <p class="text-xs font-bold text-slate-400 uppercase">Disco</p>
-                                        <p class="text-lg font-black text-slate-900 dark:text-white">${data.disk.percent}%</p>
+                                        <p class="text-xs font-bold text-slate-400 uppercase">Hospedagem</p>
+                                        <p class="text-lg font-black text-slate-900 dark:text-white">${hasQuota ? (diskPercent + '%') : (data.disk.install_used_gb + ' GB')}</p>
                                     </div>
                                 </div>
-                                <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div class="h-full bg-${diskColor}-500 rounded-full transition-all" style="width:${data.disk.percent}%"></div>
-                                </div>
-                                <p class="text-xs text-slate-500 mt-1">${data.disk.used_gb} GB / ${data.disk.total_gb} GB (${data.disk.free_gb} GB livres)</p>
+                                ${hasQuota ? '<div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden"><div class="h-full bg-' + diskColor + '-500 rounded-full transition-all" style="width:' + diskPercent + '%"></div></div>' : ''}
+                                <p class="text-xs text-slate-500 mt-1">${hasQuota ? (data.disk.account_used_gb + ' GB / ' + data.disk.total_gb + ' GB na conta') : (data.disk.install_used_gb + ' GB na instalacao public_html')}</p>
                             </div>
                             <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40">
                                 <div class="flex items-center gap-3 mb-2">
@@ -560,7 +560,7 @@
                                 </div>
                             </div>
                         </div>
-                        ${data.disk.percent > 90 ? '<div class="mt-4 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800"><p class="text-sm text-rose-700 dark:text-rose-300 font-semibold"><i class="fas fa-exclamation-triangle mr-2"></i>Disco com ' + data.disk.percent + '% de uso. Apenas ' + data.disk.free_gb + ' GB livres.</p></div>' : ''}
+                        ${hasQuota && diskPercent > 90 ? '<div class="mt-4 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800"><p class="text-sm text-rose-700 dark:text-rose-300 font-semibold"><i class="fas fa-exclamation-triangle mr-2"></i>Conta com ' + diskPercent + '% de uso. Apenas ' + data.disk.free_gb + ' GB livres.</p></div>' : ''}
                         ${!data.cron.active ? '<div class="mt-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"><p class="text-sm text-amber-700 dark:text-amber-300 font-semibold"><i class="fas fa-exclamation-circle mr-2"></i>Cron inativo. Verifique o middleware RunInternalCron.</p></div>' : ''}
                     `;
                 })

@@ -765,7 +765,7 @@
 
             window.UNNServiceVisitsRealtime.start({
                 statsUrl: @json(route('admin.dashboard.stats')),
-                refreshMs: @json(max(3000, (int) config('dashboard.refresh_interval_ms', 10000))),
+                refreshMs: @json(max(3000, (int) config('dashboard.refresh_interval_ms', 30000))),
                 onPayload: renderLegacyAdminServiceVisits,
             });
 
@@ -902,7 +902,9 @@
                     })
                     .then(r => r.json())
                     .then(data => {
-                        const diskColor = data.disk.percent > 90 ? '#ef4444' : (data.disk.percent > 75 ? '#f59e0b' : '#10b981');
+                        const hasQuota = !!data.disk.quota_available;
+                        const diskPercent = hasQuota ? data.disk.percent : null;
+                        const diskColor = !hasQuota ? '#3b82f6' : (diskPercent > 90 ? '#ef4444' : (diskPercent > 75 ? '#f59e0b' : '#10b981'));
                         const cronColor = data.cron.active ? '#10b981' : '#ef4444';
                         const cronLabel = data.cron.active ? 'Ativo' : 'Inativo';
 
@@ -912,12 +914,10 @@
                                     <div class="info-box bg-light shadow-sm mb-0">
                                         <span class="info-box-icon" style="background:${diskColor}20; color:${diskColor}"><i class="fas fa-hdd"></i></span>
                                         <div class="info-box-content">
-                                            <span class="info-box-text">Disco</span>
-                                            <span class="info-box-number">${data.disk.percent}%</span>
-                                            <small class="text-muted">${data.disk.used_gb} GB / ${data.disk.total_gb} GB</small>
-                                            <div class="progress mt-1" style="height:4px;">
-                                                <div class="progress-bar" style="width:${data.disk.percent}%; background:${diskColor};"></div>
-                                            </div>
+                                            <span class="info-box-text">Hospedagem</span>
+                                            <span class="info-box-number">${hasQuota ? (diskPercent + '%') : (data.disk.install_used_gb + ' GB')}</span>
+                                            <small class="text-muted">${hasQuota ? (data.disk.account_used_gb + ' GB / ' + data.disk.total_gb + ' GB na conta') : (data.disk.install_used_gb + ' GB em public_html')}</small>
+                                            ${hasQuota ? '<div class="progress mt-1" style="height:4px;"><div class="progress-bar" style="width:' + diskPercent + '%; background:' + diskColor + ';"></div></div>' : '<small class="text-muted d-block mt-1">Quota da conta nao exposta pelo shell</small>'}
                                         </div>
                                     </div>
                                 </div>
@@ -981,7 +981,7 @@
                                     </div>
                                 </div>
                             </div>
-                            ${data.disk.percent > 90 ? '<div class="alert alert-danger mt-2 mb-0 py-2"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Atenção:</strong> Disco com ' + data.disk.percent + '% de uso. Apenas ' + data.disk.free_gb + ' GB livres. Considere limpar arquivos antigos.</div>' : ''}
+                            ${hasQuota && diskPercent > 90 ? '<div class="alert alert-danger mt-2 mb-0 py-2"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Atencao:</strong> Conta com ' + diskPercent + '% de uso. Apenas ' + data.disk.free_gb + ' GB livres.</div>' : ''}
                             ${!data.cron.active ? '<div class="alert alert-warning mt-2 mb-0 py-2"><i class="fas fa-exclamation-circle mr-2"></i><strong>Cron inativo.</strong> Verifique se o middleware RunInternalCron está ativo e se há acessos regulares ao sistema.</div>' : ''}
                         `;
                     })
