@@ -58,6 +58,13 @@ class SplitController extends Controller
             ], 422);
         }
 
+        if (empty($split->pix_key)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cadastre a chave PIX do destinatario antes de liquidar este rateio.',
+            ], 422);
+        }
+
         $split->update(['status' => 'paid']);
 
         return response()->json([

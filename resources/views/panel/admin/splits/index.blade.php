@@ -16,7 +16,7 @@
         <div>
             <h1 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Contabilidade de Rateios</h1>
             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Acompanhe todos os splits gerados e liquide os repasses pendentes.
+                Valores do proprio administrador-vendedor sao liquidados automaticamente. Repasses externos permanecem pendentes ate a transferencia real.
             </p>
         </div>
 
@@ -94,14 +94,21 @@
                                     <span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $split->status === 'paid' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' }}">
                                         {{ $split->status === 'paid' ? 'Liquidado' : 'Pendente' }}
                                     </span>
+                                    @if($split->status !== 'paid' && !$split->pix_key)
+                                        <div class="mt-1 text-[11px] font-bold text-red-500">Chave PIX ausente</div>
+                                    @elseif($split->status !== 'paid')
+                                        <div class="mt-1 text-[11px] text-slate-400">Repasse externo</div>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 whitespace-nowrap">{{ $split->created_at->format('d/m/Y H:i') }}</td>
                                 <td class="px-5 py-4 text-right">
-                                    @if($split->status !== 'paid')
+                                    @if($split->status !== 'paid' && $split->pix_key)
                                         <button type="button" data-pay-url="{{ route('panel.admin.splits.pay', $split) }}"
                                             class="js-pay-split rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700">
                                             Liquidar
                                         </button>
+                                    @elseif($split->status !== 'paid')
+                                        <span class="text-xs font-bold text-red-500">Cadastre o PIX</span>
                                     @else
                                         <span class="text-xs font-bold text-slate-400">Concluido</span>
                                     @endif

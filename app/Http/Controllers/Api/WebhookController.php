@@ -140,6 +140,7 @@ class WebhookController extends Controller
     {
         Log::info("Fulfilling Order #{$order->id}");
 
+        app(\App\Services\OrderSplitService::class)->syncForPaidOrder($order);
         $order->load('items');
 
         foreach ($order->items as $item) {

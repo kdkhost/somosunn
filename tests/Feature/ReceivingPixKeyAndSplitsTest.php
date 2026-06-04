@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Http\Controllers\PaymentWebhookController;
 use App\Models\Order;
 use App\Models\OrderSplit;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\OrderSplitService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -67,14 +67,43 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
             'gateway' => 'sumup',
         ]);
 
-        $method = new \ReflectionMethod(PaymentWebhookController::class, 'calculateAndSaveSplits');
-        $method->setAccessible(true);
-        $method->invoke(app(PaymentWebhookController::class), $order);
+        app(OrderSplitService::class)->syncForPaidOrder($order);
 
-        $this->assertSplit($order, 'seller', $seller, 'pix-seller');
-        $this->assertSplit($order, 'platform', $admin, 'pix-admin');
-        $this->assertSplit($order, 'traffic', $marketing, 'pix-marketing');
-        $this->assertSplit($order, 'superadmin', $superadmin, 'pix-superadmin');
+        $this->assertSplit($order, 'seller', $seller, 'pix-seller', 25, 25, 'pending');
+        $this->assertSplit($order, 'platform', $admin, 'pix-admin', 25, 25, 'pending');
+        $this->assertSplit($order, 'traffic', $marketing, 'pix-marketing', 25, 25, 'pending');
+        $this->assertSplit($order, 'superadmin', $superadmin, 'pix-superadmin', 25, 25, 'pending');
+    }
+
+    public function test_admin_seller_keeps_own_shares_without_self_repayment(): void
+    {
+        $buyer = $this->user('member', 'buyer-admin-sale@unn.test');
+        $adminSeller = $this->user('admin', 'admin-seller@unn.test', 'pix-admin-seller');
+        $superadmin = $this->user('superadmin', 'superadmin-admin-sale@unn.test', 'pix-superadmin');
+        $marketing = $this->user('member', 'marketing-admin-sale@unn.test', 'pix-marketing');
+
+        Setting::set('platform_marketing_user_id', (string) $marketing->id);
+        Setting::set('marketplace_split_seller_percent', '70');
+        Setting::set('marketplace_split_platform_percent', '10');
+        Setting::set('marketplace_split_traffic_percent', '10');
+        Setting::set('marketplace_split_superadmin_percent', '10');
+
+        $order = Order::create([
+            'user_id' => $buyer->id,
+            'seller_id' => $adminSeller->id,
+            'status' => 'paid',
+            'total_amount' => 100,
+            'currency' => 'BRL',
+            'gateway' => 'sumup',
+        ]);
+
+        app(OrderSplitService::class)->syncForPaidOrder($order);
+
+        $this->assertSame(3, OrderSplit::where('order_id', $order->id)->count());
+        $this->assertSplit($order, 'seller', $adminSeller, 'pix-admin-seller', 80, 80, 'paid');
+        $this->assertSplit($order, 'traffic', $marketing, 'pix-marketing', 10, 10, 'pending');
+        $this->assertSplit($order, 'superadmin', $superadmin, 'pix-superadmin', 10, 10, 'pending');
+        $this->assertSame('20.00', $order->fresh()->platform_fee_amount);
     }
 
     public function test_regular_member_cannot_change_pix_key_through_profile_endpoint(): void
@@ -112,16 +141,16 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
             ->assertSee('name="pix_key"', false);
     }
 
-    private function assertSplit(Order $order, string $type, User $receiver, string $pixKey): void
+    private function assertSplit(Order $order, string $type, User $receiver, string $pixKey, float $amount, float $percentage, string $status): void
     {
         $this->assertDatabaseHas('order_splits', [
             'order_id' => $order->id,
             'receiver_type' => $type,
             'receiver_id' => $receiver->id,
-            'amount' => 25,
-            'percentage' => 25,
+            'amount' => $amount,
+            'percentage' => $percentage,
             'pix_key' => $pixKey,
-            'status' => 'pending',
+            'status' => $status,
         ]);
     }
 

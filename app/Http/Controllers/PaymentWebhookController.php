@@ -313,8 +313,6 @@ class PaymentWebhookController extends Controller
             ]);
             Log::info("Order #{$order->id} marked as PAID via Webhook");
 
-            // Calcular Split de Pagamento
-            $this->calculateAndSaveSplits($order);
         } else {
             $order->update([
                 'transaction_id' => $order->transaction_id ?: (string) $transactionId,
@@ -322,6 +320,7 @@ class PaymentWebhookController extends Controller
             ]);
         }
 
+        app(\App\Services\OrderSplitService::class)->syncForPaidOrder($order);
         app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
         $this->confirmEventRegistrationsForOrder($order);
         app(EventExhibitorService::class)->confirmPaidOrder($order);
@@ -361,6 +360,9 @@ class PaymentWebhookController extends Controller
 
     private function calculateAndSaveSplits(Order $order)
     {
+        app(\App\Services\OrderSplitService::class)->syncForPaidOrder($order);
+        return;
+
         $total = (float) $order->total_amount;
         if ($total <= 0)
             return;

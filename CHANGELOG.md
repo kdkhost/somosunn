@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-06-04] - fix(rateios): consolidar administrador-vendedor e centralizar splits
+
+- Quando o vendedor tambem e administrador da plataforma, somente as parcelas de vendedor e plataforma sao consolidadas, sem descontar e devolver para a mesma pessoa.
+- A parcela do superadmin permanece independente e e sempre gerada para o superadmin, em qualquer venda.
+- A parcela consolidada que ja pertence ao administrador-vendedor passa a ser liquidada automaticamente; somente repasses externos reais permanecem pendentes.
+- O trafego pago e sempre vinculado ao responsavel de marketing atualmente designado no sistema.
+- A geracao foi centralizada para funcionar em webhooks, conciliacoes, vendas gratuitas e aprovacoes manuais, independentemente do tipo de venda ou gateway.
+- O painel bloqueia liquidacao manual quando o destinatario externo nao possui chave PIX.
+- Adicionado comando `splits:reconcile-paid` para corrigir pedidos pagos existentes.
+- Arquivos principais: `app/Services/OrderSplitService.php`, `app/Services/OrderSettlementService.php`, `app/Http/Controllers/PaymentWebhookController.php`, `app/Http/Controllers/Api/WebhookController.php`, `app/Console/Commands/ReconcilePaidOrderSplits.php`.
+
+---
+
 ## [2026-06-04] - fix(rateios): restaurar contabilidade global de splits no painel novo
 
 - Restaurada no painel novo a pagina administrativa global de rateios, com totais, filtros, destinatarios, chaves PIX e liquidacao de splits pendentes.

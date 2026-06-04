@@ -143,7 +143,7 @@
                                         <div class="text-xs text-muted">{{ $split->created_at->format('d/m/y') }}</div>
                                     </td>
                                     <td>
-                                        @if(in_array($split->receiver_type, ['seller', 'superadmin']) && $split->receiver)
+                                        @if($split->receiver)
                                             <div class="d-flex align-items-center">
                                                 <div class="d-flex align-items-center justify-content-center rounded-circle bg-{{ $cfg['color'] }} mr-2"
                                                     style="width:32px; height:32px; flex-shrink:0;">
@@ -203,7 +203,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        @if($split->status === 'pending')
+                                        @if($split->status === 'pending' && $split->pix_key)
                                             <button type="button"
                                                 class="btn btn-sm btn-success rounded-pill px-3 elevation-1 btn-liquidate"
                                                 data-id="{{ $split->id }}"
@@ -213,6 +213,8 @@
                                                 title="Confirmar pagamento">
                                                 <i class="fas fa-hand-holding-usd mr-1"></i> Pagar
                                             </button>
+                                        @elseif($split->status === 'pending')
+                                            <span class="text-danger text-xs font-weight-bold">Cadastre o PIX</span>
                                         @else
                                             <span class="text-success"><i class="fas fa-check-double"></i></span>
                                         @endif

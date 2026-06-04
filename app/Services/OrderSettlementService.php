@@ -69,6 +69,7 @@ class OrderSettlementService
         $order->metadata = $metadata;
         $order->save();
 
+        app(OrderSplitService::class)->syncForPaidOrder($order);
         app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
         $this->confirmEventRegistrationsForOrder($order);
         app(EventExhibitorService::class)->confirmPaidOrder($order);

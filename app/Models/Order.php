@@ -81,6 +81,11 @@ class Order extends Model
         return $this->hasOne(Invoice::class);
     }
 
+    public function splits()
+    {
+        return $this->hasMany(OrderSplit::class);
+    }
+
     public function exhibitorRegistrations()
     {
         return $this->hasMany(EventExhibitorRegistration::class);
