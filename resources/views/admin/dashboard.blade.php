@@ -954,7 +954,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-4 col-sm-6 mb-2">
-                                    <div class="d-flex align-items-center p-2 rounded" style="background:#f8f9fa;">
+                                    <div class="d-flex align-items-center p-2 rounded bg-light shadow-sm">
                                         <i class="fas fa-user-clock text-primary mr-2"></i>
                                         <div>
                                             <div class="text-xs text-muted">Online agora</div>
@@ -963,7 +963,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-6 mb-2">
-                                    <div class="d-flex align-items-center p-2 rounded" style="background:#f8f9fa;">
+                                    <div class="d-flex align-items-center p-2 rounded bg-light shadow-sm">
                                         <i class="fas fa-shopping-cart text-warning mr-2"></i>
                                         <div>
                                             <div class="text-xs text-muted">Pedidos Pendentes</div>
@@ -972,7 +972,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-6 mb-2">
-                                    <div class="d-flex align-items-center p-2 rounded" style="background:#f8f9fa;">
+                                    <div class="d-flex align-items-center p-2 rounded bg-light shadow-sm">
                                         <i class="fas fa-tasks text-info mr-2"></i>
                                         <div>
                                             <div class="text-xs text-muted">Jobs na Fila</div>

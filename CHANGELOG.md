@@ -7,6 +7,7 @@
 - O widget de saude do sistema deixou de usar o tamanho total do disco do servidor fisico e passou a medir a instalacao em `public_html` e a conta da aplicacao, com cache de 60s para evitar custo a cada acesso.
 - Quando a quota da conta nao estiver exposta pelo shell da hospedagem, o dashboard deixa isso explicito e mostra o tamanho real da instalacao, sem fingir um total do servidor.
 - O refresh automatico do dashboard foi desacelerado de 10s para 30s por padrao, reduzindo carga recorrente em banco, fila e metricas administrativas.
+- O resumo inferior do widget de saude no painel legado voltou a respeitar automaticamente o tema ativo dark/light, removendo fundo fixo claro no modo escuro.
 
 - Otimização profunda do `DashboardMetricsService`: consolidação de múltiplas queries de agregação em `selectRaw`, substituição de `whereMonth/Year` por ranges de data eficientes e eliminação de 7 queries em loop no gráfico de linha do tempo.
 - Implementação de cache de nível de requisição para verificações de existência de tabelas (`Schema::hasTable`), reduzindo overhead de metadados.
