@@ -109,7 +109,7 @@ class OrderSplitService
                     'percentage' => 0.0,
                     'amount' => 0.0,
                     'pix_key' => $receiver?->pix_key,
-                    'auto_paid' => $receiverId !== null && $receiverId === $seller?->id,
+                    'auto_paid' => true,
                 ];
             }
 

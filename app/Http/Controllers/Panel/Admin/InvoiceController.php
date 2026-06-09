@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\InvoiceService;
+use App\Services\OrderSettlementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -131,6 +132,20 @@ class InvoiceController extends Controller
 
         $invoice->ensureNumber();
         $invoice->save();
+
+        if ($invoice->status === 'paid' && $invoice->order_id) {
+            $invoice->load('order');
+            if ($invoice->order && $invoice->order->status !== 'paid') {
+                app(OrderSettlementService::class)->settleAsPaid($invoice->order, [
+                    'manual_approval' => true,
+                    'approver_id' => (int) auth()->id(),
+                    'transaction_id' => 'INV-' . $invoice->id . '-' . now()->format('YmdHis'),
+                    'payment_method' => 'manual_approval_invoice',
+                    'send_notifications' => true,
+                    'queue_invoice_email' => !$request->boolean('send_email'),
+                ]);
+            }
+        }
 
         if ($request->boolean('send_email')) {
             $service->queueInvoiceEmail($invoice, true);
