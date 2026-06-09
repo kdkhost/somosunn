@@ -2,6 +2,20 @@
 
 ---
 
+## [2026-06-09] - fix(faturas): baixa manual na fatura agora atualiza o pedido + rateios auto-pagos
+
+### Corrigido
+- Ao marcar uma fatura como `paid` pelo admin, o pedido vinculado agora é automaticamente atualizado para `paid` com settlement completo (splits, fulfillments, notificações)
+- Todos os rateios (seller, superadmin, marketing, plataforma) agora são criados como `paid` no momento do pagamento — não apenas o do seller
+- Correção retroativa aplicada às ordens #191 e #192 que estavam `cancelled` com faturas já pagas
+
+### Arquivos principais
+- `app/Http/Controllers/Admin/InvoiceController.php`
+- `app/Http/Controllers/Panel/Admin/InvoiceController.php`
+- `app/Services/OrderSplitService.php`
+
+---
+
 ## [2026-06-04] - fix(rateios): descontar somente parcelas externas e exibir todos os usuarios
 
 - Vendas de admin, superadmin ou responsavel de marketing deixam de descontar a propria parcela administrativa; normalmente o desconto passa de 30% para 20%.
