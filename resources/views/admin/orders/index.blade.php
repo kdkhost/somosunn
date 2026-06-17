@@ -184,8 +184,8 @@
                             <th class="border-0">Tipo</th>
                             <th class="border-0">Cliente</th>
                             <th class="border-0">Telefone</th>
-                            <th class="border-0">Endereço</th>
                             <th class="border-0 text-right">Valor</th>
+                            <th class="border-0 text-right">Desconto</th>
                             <th class="border-0">Pagamento</th>
                             <th class="border-0 text-center">Origem</th>
                             <th class="border-0 text-center">Status</th>
@@ -226,19 +226,20 @@
                                 <td>
                                     <div class="text-sm order-phone-value">{{ $order->user->phone ?? '-' }}</div>
                                 </td>
-                                <td>
-                                    <div class="text-xs text-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $order->buyerAddress() }}">
-                                        {{ $order->buyerAddress() ?: '-' }}
-                                    </div>
-                                </td>
-                                <td class="text-right order-amount-cell" data-order="{{ (float) $order->total_amount }}">
+                                <td class="text-right order-amount-cell" data-order="{{ $grossAmount }}">
                                     <div class="order-amount-main">R$ {{ number_format($grossAmount, 2, ',', '.') }}</div>
+                                </td>
+                                <td class="text-right order-discount-cell" data-order="{{ $discountAmount }}">
                                     @if($discountAmount > 0)
                                         <div class="order-coupon-line" title="Cupom {{ $couponCode ?: '-' }}">
-                                            <span class="order-coupon-code">{{ $couponCode ?: '-' }}</span>
                                             <span class="order-discount-value">- R$ {{ number_format($discountAmount, 2, ',', '.') }}</span>
+                                            @if($couponCode)
+                                                <span class="order-coupon-code">{{ $couponCode }}</span>
+                                            @endif
                                         </div>
                                         <div class="order-net-value">Líquido R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
+                                    @else
+                                        <span class="text-muted text-xs">-</span>
                                     @endif
                                 </td>
                                 <td>
@@ -312,7 +313,7 @@
             margin: 0;
         }
         #orders-table .order-amount-cell {
-            min-width: 150px;
+            min-width: 96px;
             white-space: nowrap;
         }
         #orders-table .order-amount-main {
@@ -324,9 +325,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.35rem;
+            gap: 0.4rem;
             max-width: 100%;
-            margin-top: 0.25rem;
         }
         #orders-table .order-coupon-code {
             display: inline-block;
@@ -354,6 +354,10 @@
             color: #adb5bd;
             font-size: 11px;
             line-height: 1.2;
+        }
+        #orders-table .order-discount-cell {
+            min-width: 128px;
+            white-space: nowrap;
         }
         #orders-table .order-phone-value {
             min-width: 132px;

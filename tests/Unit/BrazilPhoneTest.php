@@ -24,6 +24,13 @@ class BrazilPhoneTest extends TestCase
         $this->assertSame('(21) 99813-2544', BrazilPhone::format('(21) 9813-2544'));
     }
 
+    public function test_it_does_not_use_country_code_as_area_code(): void
+    {
+        $this->assertSame('(21) 968-0546', BrazilPhone::format('(55) 21968-0546'));
+        $this->assertSame('(21) 968-0546', BrazilPhone::format('55219680546'));
+        $this->assertSame('(55) 99999-9999', BrazilPhone::format('55999999999'));
+    }
+
     public function test_user_model_formats_phone_on_read_and_write(): void
     {
         $user = new User();

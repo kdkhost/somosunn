@@ -2,6 +2,21 @@
 
 ---
 
+## [2026-06-17] - fix(admin): separar desconto e corrigir DDD em pedidos
+
+### Corrigido
+- Telefones que vinham com `55` como código do país deixam de exibir esse código como DDD na listagem e passam a priorizar o DDD real dentro dos parênteses.
+- A listagem de pedidos do painel antigo removeu a coluna de endereço para ganhar espaço e separou `Valor` e `Desconto` em colunas próprias.
+- A listagem equivalente do painel novo também separa `Valor` e `Desconto`, mantendo cupom e líquido organizados sem quebrar o layout.
+
+### Arquivos principais
+- `app/Support/BrazilPhone.php`
+- `resources/views/admin/orders/index.blade.php`
+- `resources/views/panel/admin/orders/index.blade.php`
+- `tests/Unit/BrazilPhoneTest.php`
+
+---
+
 ## [2026-06-17] - fix(admin): impedir exclusão de itens com histórico financeiro
 
 ### Corrigido

@@ -109,6 +109,7 @@
                             <th class="px-6 py-4">Gateway</th>
                             <th class="px-6 py-4">Status</th>
                             <th class="px-6 py-4">Valor</th>
+                            <th class="px-6 py-4">Desconto</th>
                             <th class="px-6 py-4">Data</th>
                             <th class="px-6 py-4 text-right">Ações</th>
                         </tr>
@@ -223,27 +224,34 @@
                                     @endif
                                 </td>
 
-                                <td class="px-6 py-4 whitespace-nowrap" style="min-width: 160px;">
+                                <td class="px-6 py-4 whitespace-nowrap" style="min-width: 105px;">
                                     <div class="font-semibold text-slate-900 dark:text-white text-sm transition-colors" style="line-height: 1.15;">
                                         R$ {{ number_format($grossAmount, 2, ',', '.') }}
                                     </div>
-                                    @if($discountAmount > 0)
-                                        <div class="mt-1 inline-flex max-w-full items-center gap-2" title="Cupom {{ $couponCode ?: '-' }}">
-                                            <span class="inline-flex truncate rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-bold uppercase text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-900/25 dark:text-emerald-300" style="max-width: 78px; font-size: 10px; line-height: 1;">
-                                                {{ $couponCode ?: '-' }}
-                                            </span>
-                                            <span class="font-bold text-emerald-600 dark:text-emerald-400" style="font-size: 11px;">
-                                                - R$ {{ number_format($discountAmount, 2, ',', '.') }}
-                                            </span>
-                                        </div>
-                                        <div class="text-slate-500 dark:text-slate-400" style="font-size: 11px; line-height: 1.15;">
-                                            Líquido R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}
-                                        </div>
-                                    @endif
                                     @if($order->refunded_amount > 0)
                                         <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                                             Estornado: R$ {{ number_format($order->refunded_amount, 2, ',', '.') }}
                                         </div>
+                                    @endif
+                                </td>
+
+                                <td class="px-6 py-4 whitespace-nowrap" style="min-width: 150px;">
+                                    @if($discountAmount > 0)
+                                        <div class="mt-1 inline-flex max-w-full items-center gap-2" title="Cupom {{ $couponCode ?: '-' }}">
+                                            <span class="font-bold text-emerald-600 dark:text-emerald-400" style="font-size: 11px;">
+                                                - R$ {{ number_format($discountAmount, 2, ',', '.') }}
+                                            </span>
+                                            @if($couponCode)
+                                                <span class="inline-flex truncate rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-bold uppercase text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-900/25 dark:text-emerald-300" style="max-width: 78px; font-size: 10px; line-height: 1;">
+                                                    {{ $couponCode }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="text-slate-500 dark:text-slate-400" style="font-size: 11px; line-height: 1.15;">
+                                            Líquido R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}
+                                        </div>
+                                    @else
+                                        <span class="text-xs text-slate-400 dark:text-slate-500">-</span>
                                     @endif
                                 </td>
 
@@ -286,7 +294,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-6 py-12 text-center">
+                                <td colspan="9" class="px-6 py-12 text-center">
                                     <div
                                         class="w-16 h-16 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <i class="fas fa-shopping-cart text-slate-300 dark:text-slate-700 text-xl"></i>
