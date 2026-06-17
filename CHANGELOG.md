@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-06-17] - fix(admin): evitar alerta duplicado ao alternar tema
+
+### Corrigido
+- A troca de tema dark/light no painel antigo deixou de abrir SweetAlert junto com a notificação Toastr.
+- Flash messages globais do layout antigo foram centralizadas no partial de notificações, mantendo SweetAlert apenas para confirmações explícitas.
+- O botão de alternância de tema passou a usar um único handler JavaScript, evitando submit duplicado.
+
+### Arquivos principais
+- `resources/views/admin/layouts/app.blade.php`
+- `resources/views/admin/partials/navbar.blade.php`
+
+---
+
 ## [2026-06-17] - fix(eventos): segurança de cupons, grupo e rotas sensíveis
 
 ### Corrigido

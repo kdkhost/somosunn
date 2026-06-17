@@ -1703,38 +1703,7 @@
                 toastr.info("{{ session('toastr_info') }}");
             @endif
 
-            // Notificações Globais SweetAlert2 (Laravel Flash Messages)
-            @if(session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sucesso!',
-                    text: "{{ session('success') }}",
-                    confirmButtonColor: '#3b82f6',
-                    timer: 4000,
-                    timerProgressBar: true,
-                    customClass: { popup: 'rounded-[32px]' }
-                });
-            @endif
-
-            @if(session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Ops!',
-                    text: "{{ session('error') }}",
-                    confirmButtonColor: '#ef4444',
-                    customClass: { popup: 'rounded-[32px]' }
-                });
-            @endif
-
-            @if(session('info'))
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Informação',
-                    text: "{{ session('info') }}",
-                    confirmButtonColor: '#3b82f6',
-                    customClass: { popup: 'rounded-[32px]' }
-                });
-            @endif
+            // Flash messages de sessão ficam centralizadas em admin.partials.notifications (Toastr).
         });
 
         window.showSuccess = function (msg) {
@@ -2283,7 +2252,8 @@
             });
         };
 
-        $('#themeToggleBtn').on('click', function () {
+        $('#themeToggleBtn').on('click', function (event) {
+            event.preventDefault();
             const input = $('#site_theme_input');
             input.val(input.val() === 'dark' ? 'light' : 'dark');
             $('#themeToggleForm').submit();
