@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-06-17] - fix(eventos): cupom integral confirma inscricao sem checkout
+
+### Corrigido
+- Cupom comum com 100% de desconto em evento pago agora baixa o pedido como gratuito, confirma a inscricao e redireciona para o evento sem abrir cartao, PIX ou parcelamento.
+- Pedidos de evento com total `0,00` agora possuem trava defensiva nas rotas de selecao/processamento de gateway para nao gerar cobranca indevida.
+- A deteccao de indice legado de inscricoes de evento foi mantida no caminho do banco MariaDB/MySQL usado pelo projeto.
+
+### Arquivos principais
+- `app/Http/Controllers/EventReservationController.php`
+
+---
+
 ## [2026-06-17] - fix(eventos): reserva de cupom reaproveita pedido pendente
 
 ### Corrigido
