@@ -44,9 +44,23 @@
 
             $('[data-event-tab-target]').on('click', function (event) {
                 event.preventDefault();
-                var target = $(this).data('event-tab-target');
-                if (target && $(target).length) {
-                    $(target).tab('show');
+                var paneSelector = $(this).attr('href');
+                var tabSelector = $(this).data('event-tab-target');
+                var $pane = paneSelector ? $(paneSelector) : $();
+                var $tab = tabSelector ? $(tabSelector) : $();
+
+                if ($pane.length && $tab.length) {
+                    $('#event-tabs .nav-link').removeClass('active').attr('aria-selected', 'false');
+                    $('#event-tabs-content > .tab-pane').removeClass('show active').hide();
+
+                    $tab.addClass('active').attr('aria-selected', 'true');
+                    $pane.addClass('show active').show();
+
+                    var tabName = paneSelector.replace('#legacy-', '');
+                    var url = new URL(window.location);
+                    url.searchParams.set('tab', tabName);
+                    window.history.replaceState({}, '', url);
+                    $tab.trigger('shown.bs.tab');
                 }
             });
         });

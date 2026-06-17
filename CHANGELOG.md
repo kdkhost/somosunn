@@ -2,6 +2,17 @@
 
 ---
 
+## [2026-06-17] - fix(admin): atalho de cupons do evento
+
+### Corrigido
+- O botão superior `Cupons gratuitos` no formulário de evento do painel antigo voltou a abrir o conteúdo da aba de cupons corretamente.
+- O atalho agora sincroniza explicitamente o link da aba, o painel ativo e o parâmetro `tab=coupons` da URL.
+
+### Arquivos principais
+- `resources/views/admin/events/form.blade.php`
+
+---
+
 ## [2026-06-17] - fix(admin): tema dark/light em tempo real
 
 ### Corrigido
