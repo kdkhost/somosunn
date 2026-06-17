@@ -53,17 +53,25 @@ class SoldContentGuard
             return null;
         }
 
-        $title = OrderItem::query()
+        $baseQuery = OrderItem::query()
             ->whereIn('item_type', $types)
             ->where('item_id', $itemId)
             ->whereNotNull('title')
             ->where('title', '!=', '')
+            ->whereHas('order', function ($query) {
+                $query->whereIn('status', self::FINANCIAL_HISTORY_STATUSES);
+            });
+
+        $title = (clone $baseQuery)
             ->whereHas('order', function ($query) use ($userId) {
-                $query->where('user_id', $userId)
-                    ->whereIn('status', self::FINANCIAL_HISTORY_STATUSES);
+                $query->where('user_id', $userId);
             })
             ->latest('id')
             ->value('title');
+
+        if ($title === null) {
+            $title = $baseQuery->latest('id')->value('title');
+        }
 
         return $title !== null ? trim((string) $title) ?: null : null;
     }
