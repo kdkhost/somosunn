@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel\Admin;
 use App\Http\Controllers\Concerns\HandlesPlanFormData;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
+use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -106,6 +107,8 @@ class PlanController extends Controller
 
     public function destroy(Plan $plan)
     {
+        app(SoldContentGuard::class)->preventDeletionIfSold('plan', (int) $plan->id, 'plano');
+
         $this->deletePlanImageIfExists($plan);
         $plan->delete();
 

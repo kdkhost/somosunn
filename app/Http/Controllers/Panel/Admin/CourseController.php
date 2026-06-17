@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Panel\Admin;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -216,6 +217,7 @@ class CourseController extends Controller
     {
         $this->ensurePermission('courses.delete');
         $this->ensureCanManage($course);
+        app(SoldContentGuard::class)->preventDeletionIfSold('course', (int) $course->id, 'curso');
 
         $this->deleteFileIfExists($course->thumbnail);
         $this->deleteFileIfExists($course->certificate_bg);

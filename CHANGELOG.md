@@ -2,6 +2,23 @@
 
 ---
 
+## [2026-06-17] - fix(admin): impedir exclusão de itens com histórico financeiro
+
+### Corrigido
+- Cursos, mentorias, eventos, produtos do marketplace e planos não podem mais ser excluídos quando já possuem venda, fatura ou histórico financeiro vinculado.
+- A proteção foi aplicada no painel antigo e no painel novo antes de qualquer arquivo físico ser removido.
+- A coluna de telefone da listagem de pedidos no painel antigo não quebra mais a máscara brasileira em duas linhas.
+
+### Arquivos principais
+- `app/Services/Content/SoldContentGuard.php`
+- `app/Http/Controllers/Admin/*Controller.php`
+- `app/Http/Controllers/Panel/Admin/*Controller.php`
+- `app/Http/Controllers/Panel/CourseController.php`
+- `app/Http/Controllers/Panel/SellerProductController.php`
+- `resources/views/admin/orders/index.blade.php`
+
+---
+
 ## [2026-06-17] - fix(admin): compactar valor com cupom na listagem de pedidos
 
 ### Corrigido

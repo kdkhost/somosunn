@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Event;
 use App\Models\Setting;
+use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
@@ -444,6 +445,7 @@ class EventController extends Controller
     {
         $this->ensurePermission('events.delete');
         $this->ensureCanManage($event);
+        app(SoldContentGuard::class)->preventDeletionIfSold(['event', 'event_exhibitor_area'], (int) $event->id, 'evento');
 
         $isAlbum = $event->type === 'album';
         $redirectRoute = $isAlbum ? 'admin.events.acervo' : 'admin.events.index';

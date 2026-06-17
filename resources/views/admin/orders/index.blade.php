@@ -224,7 +224,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="text-sm">{{ $order->user->phone ?? '-' }}</div>
+                                    <div class="text-sm order-phone-value">{{ $order->user->phone ?? '-' }}</div>
                                 </td>
                                 <td>
                                     <div class="text-xs text-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $order->buyerAddress() }}">
@@ -354,6 +354,11 @@
             color: #adb5bd;
             font-size: 11px;
             line-height: 1.2;
+        }
+        #orders-table .order-phone-value {
+            min-width: 132px;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
         }
     </style>
 @endpush

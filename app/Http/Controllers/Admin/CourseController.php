@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Enrollment;
 use App\Models\OrderItem;
+use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -367,6 +368,7 @@ class CourseController extends Controller
     {
         $this->ensurePermission('courses.delete');
         $this->ensureCanManage($course);
+        app(SoldContentGuard::class)->preventDeletionIfSold('course', (int) $course->id, 'curso');
 
         $course->delete();
         return redirect()->route('admin.courses.index')->with('success', 'Curso removido');

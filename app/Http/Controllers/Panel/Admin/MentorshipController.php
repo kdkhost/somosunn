@@ -6,6 +6,7 @@ use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Mentorship;
 use App\Models\User;
+use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use App\Services\PointsService;
@@ -187,6 +188,7 @@ class MentorshipController extends Controller
     {
         $this->ensurePermission('mentorships.delete');
         $this->ensureOwnership($mentorship);
+        app(SoldContentGuard::class)->preventDeletionIfSold('mentorship', (int) $mentorship->id, 'mentoria');
 
         $this->deletePublicImageIfExists($mentorship->image);
         UploadStorage::delete($mentorship->certificate_bg);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -133,8 +134,10 @@ class CourseController extends Controller
     public function destroy(Course $course)
     {
         $this->authorize('delete', $course);
+        app(SoldContentGuard::class)->preventDeletionIfSold('course', (int) $course->id, 'curso');
+
         $course->delete();
-        return redirect()->route('panel.courses.index')->with('success', 'Curso excluido com sucesso!');
+        return redirect()->route('panel.courses.index')->with('success', 'Curso excluído com sucesso!');
     }
 
     protected function repairLegacyOwnershipForCurrentUser($user): void

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Mentorship;
 use App\Models\User;
+use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -221,6 +222,7 @@ class MentorshipController extends Controller
     {
         $this->ensurePermission('mentorships.delete');
         $this->ensureOwnership($mentorship);
+        app(SoldContentGuard::class)->preventDeletionIfSold('mentorship', (int) $mentorship->id, 'mentoria');
 
         $mentorship->delete();
 

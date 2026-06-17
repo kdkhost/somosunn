@@ -6,6 +6,7 @@ use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Plan;
+use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
@@ -330,6 +331,7 @@ class EventController extends Controller
     {
         $this->ensurePermission('events.delete');
         $this->ensureCanManage($event);
+        app(SoldContentGuard::class)->preventDeletionIfSold(['event', 'event_exhibitor_area'], (int) $event->id, 'evento');
 
         if ($event->image) {
             Storage::disk('public')->delete($event->image);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SellerProduct;
 use App\Models\SellerProductMedia;
 use App\Models\SellerStore;
+use App\Services\Content\SoldContentGuard;
 use App\Services\Marketplace\SellerProductChannelSyncService;
 use App\Services\Marketplace\SellerStoreService;
 use App\Services\PointsExchangeService;
@@ -113,6 +114,7 @@ class SellerProductController extends Controller
         }
 
         abort_unless((int) $product->user_id === (int) auth()->id(), 403);
+        app(SoldContentGuard::class)->preventDeletionIfSold('seller_product', (int) $product->id, 'produto');
 
         $channelSyncService->detachBeforeProductDeletion($product);
 
