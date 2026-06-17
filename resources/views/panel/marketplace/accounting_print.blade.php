@@ -39,8 +39,10 @@
 
     <div class="grid">
         <div class="card">
-            <div class="label">Receita bruta de vendas</div>
+            <div class="label">Valor bruto dos produtos vendidos</div>
             <div class="value">{{ $money($summary['sales_gross'] ?? 0) }}</div>
+            <p>Descontos: {{ $money($summary['sales_discounts'] ?? 0) }}</p>
+            <p>Cobrado: {{ $money($summary['sales_charged'] ?? 0) }}</p>
         </div>
         <div class="card">
             <div class="label">Despesas em compras</div>
@@ -61,6 +63,9 @@
                     <th>Data</th>
                     <th>Comprador</th>
                     <th>Itens</th>
+                    <th>Bruto</th>
+                    <th>Desconto</th>
+                    <th>Cupom</th>
                     <th>Cobranca</th>
                     <th>Estorno</th>
                     <th>Taxas</th>
@@ -74,6 +79,9 @@
                         <td>{{ optional($order->paid_at ?: $order->created_at)->format('d/m/Y H:i') }}</td>
                         <td>{{ $order->user->name ?? 'Usuario removido' }}</td>
                         <td>{{ $orderItemsLabel($order) }}</td>
+                        <td>{{ $money($order->gross_amount) }}</td>
+                        <td>{{ $money($order->financial_discount_amount) }}</td>
+                        <td>{{ $order->coupon_code ?: '-' }}</td>
                         <td>{{ $money($order->charged_amount) }}</td>
                         <td>{{ $money($order->refunded_amount) }}</td>
                         <td>{{ $money((float) $order->platform_fee_amount + (float) $order->fee_amount) }}</td>
@@ -81,7 +89,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8">Nenhuma venda no periodo.</td>
+                        <td colspan="11">Nenhuma venda no periodo.</td>
                     </tr>
                 @endforelse
             </tbody>

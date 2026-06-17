@@ -6,6 +6,8 @@
     @php
         $orders = $orders ?? null;
         $paidTotal = (float) ($paidTotal ?? 0);
+        $discountTotal = (float) ($discountTotal ?? 0);
+        $chargedTotal = (float) ($chargedTotal ?? 0);
         $platformFeeTotal = (float) ($platformFeeTotal ?? 0);
         $netTotal = (float) ($netTotal ?? 0);
         $paidCount = (int) ($paidCount ?? 0);
@@ -33,7 +35,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-5 mt-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
         <div
             class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-5 transition-colors duration-300">
             <div class="text-sm font-bold text-slate-500 dark:text-slate-500 transition-colors">Vendas pagas</div>
@@ -97,6 +99,9 @@
                                 'refunded' => 'bg-slate-500/10 text-slate-700 dark:text-slate-400',
                                 default => 'bg-slate-500/10 text-slate-700 dark:text-slate-400',
                             };
+                            $grossAmount = (float) $order->gross_amount;
+                            $discountAmount = (float) $order->financial_discount_amount;
+                            $couponCode = $order->coupon_code;
                         @endphp
                         <tr class="divide-slate-100 dark:divide-slate-800 transition-colors">
                             <td class="px-6 py-4 font-extrabold text-slate-900 dark:text-white">#{{ $order->id }}</td>
@@ -106,8 +111,18 @@
                             </td>
                             <td class="px-6 py-4 text-slate-700 dark:text-slate-400">
                                 {{ $itemsLabel !== '' ? $itemsLabel : '—' }}</td>
-                            <td class="px-6 py-4 font-extrabold text-slate-900 dark:text-white">R$
-                                {{ number_format((float) ($order->total_amount ?? 0), 2, ',', '.') }}</td>
+                            <td class="px-6 py-4">
+                                <div class="font-extrabold text-slate-900 dark:text-white">R$
+                                    {{ number_format($grossAmount, 2, ',', '.') }}</div>
+                                @if($discountAmount > 0)
+                                    <div class="mt-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                        Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
+                                    </div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">
+                                        Liquido: R$ {{ number_format((float) ($order->total_amount ?? 0), 2, ',', '.') }}
+                                    </div>
+                                @endif
+                            </td>
                             <td class="px-6 py-4">
                                 <span
                                     class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold {{ $statusClass }}">

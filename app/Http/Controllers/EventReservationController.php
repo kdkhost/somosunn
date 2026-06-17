@@ -540,6 +540,16 @@ class EventReservationController extends Controller
                     'discount_amount' => $discountAmount,
                 ];
 
+                if ($coupon && $discountAmount > 0) {
+                    $itemData['coupon'] = [
+                        'id' => (int) $coupon->id,
+                        'code' => (string) $coupon->code,
+                        'discount_type' => (string) $coupon->discount_type,
+                        'discount_value' => (float) $coupon->discount_value,
+                        'discount_amount' => round($discountAmount, 2),
+                    ];
+                }
+
                 if ($discountAmount > 0 && $quantity > 1) {
                     foreach ($couponService->splitUnitPrices($finalTotal, $quantity) as $split) {
                         $order->items()->create([

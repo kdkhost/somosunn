@@ -382,7 +382,10 @@ class OrderController extends Controller
                 'Endereco',
                 'Origem',
                 'Metodo',
-                'Total',
+                'Valor bruto',
+                'Desconto',
+                'Cupom',
+                'Total liquido',
                 'Fatura',
                 'Aprovado manual por',
             ]);
@@ -405,6 +408,9 @@ class OrderController extends Controller
                     $order->buyerAddress(),
                     $source,
                     (string) ($order->payment_method ?: $order->gateway ?: '-'),
+                    number_format((float) $order->gross_amount, 2, '.', ''),
+                    number_format((float) $order->financial_discount_amount, 2, '.', ''),
+                    (string) ($order->coupon_code ?: ''),
                     number_format((float) ($order->total_amount ?? 0), 2, '.', ''),
                     $invoiceLabel,
                     (string) ($order->manualApprover->name ?? ''),
@@ -449,6 +455,9 @@ class OrderController extends Controller
             $orderNode->addChild('customer_address', htmlspecialchars($order->buyerAddress()));
             $orderNode->addChild('source', $order->is_manual_approval ? 'manual' : 'accounted');
             $orderNode->addChild('payment_method', htmlspecialchars((string) ($order->payment_method ?: $order->gateway ?: '-')));
+            $orderNode->addChild('gross_amount', number_format((float) $order->gross_amount, 2, '.', ''));
+            $orderNode->addChild('discount_amount', number_format((float) $order->financial_discount_amount, 2, '.', ''));
+            $orderNode->addChild('coupon_code', htmlspecialchars((string) ($order->coupon_code ?: '')));
             $orderNode->addChild('total_amount', number_format((float) ($order->total_amount ?? 0), 2, '.', ''));
             $orderNode->addChild('invoice_number', htmlspecialchars($invoiceLabel));
             $orderNode->addChild('manual_approver', htmlspecialchars((string) ($order->manualApprover->name ?? '')));

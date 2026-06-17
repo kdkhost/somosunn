@@ -7,6 +7,11 @@
 @endsection
 
 @section('content')
+    @php
+        $grossAmount = (float) $order->gross_amount;
+        $discountAmount = (float) $order->financial_discount_amount;
+        $couponCode = $order->coupon_code;
+    @endphp
     <div class="row">
         <div class="col-md-4">
             <div class="card card-primary card-outline">
@@ -52,7 +57,17 @@
                             <a class="float-right">{{ $order->created_at->format('d/m/Y H:i') }}</a>
                         </li>
                         <li class="list-group-item">
-                            <b>Total</b>
+                            <b>Valor bruto</b>
+                            <a class="float-right">R$ {{ number_format($grossAmount, 2, ',', '.') }}</a>
+                        </li>
+                        @if($discountAmount > 0)
+                            <li class="list-group-item">
+                                <b>Cupom {{ $couponCode ?: '-' }}</b>
+                                <a class="float-right text-success font-weight-bold">- R$ {{ number_format($discountAmount, 2, ',', '.') }}</a>
+                            </li>
+                        @endif
+                        <li class="list-group-item">
+                            <b>Total liquido</b>
                             <a class="float-right">R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</a>
                         </li>
                         @if($order->refunded_amount > 0)
@@ -221,10 +236,17 @@
                         </thead>
                         <tbody>
                             @foreach($order->items as $item)
+                                @php($itemGross = (float) $item->gross_unit_price)
                                 <tr>
                                     <td>{{ $item->title }}</td>
                                     <td>{{ $item->item_type }}</td>
-                                    <td>R$ {{ number_format((float) $item->price, 2, ',', '.') }}</td>
+                                    <td>
+                                        R$ {{ number_format($itemGross, 2, ',', '.') }}
+                                        @if($discountAmount > 0)
+                                            <div class="text-success small font-weight-bold">Cupom {{ $couponCode ?: '-' }}</div>
+                                            <div class="text-muted small">Liquido: R$ {{ number_format((float) $item->price, 2, ',', '.') }}</div>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

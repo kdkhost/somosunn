@@ -2,6 +2,7 @@
 
 @php
     $company = app(\App\Services\InvoiceService::class)->companyInfo();
+    $invoiceCouponCode = trim((string) data_get($invoice->metadata, 'coupon.code', ''));
 @endphp
 
 @section('page_title', 'Fatura ' . ($invoice->number ?: ('#' . $invoice->id)))
@@ -53,7 +54,7 @@
                         <span>R$ {{ number_format((float) $invoice->subtotal, 2, ',', '.') }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <span class="text-muted">Desconto</span>
+                        <span class="text-muted">Desconto{{ $invoiceCouponCode !== '' ? ' - cupom ' . $invoiceCouponCode : '' }}</span>
                         <span>R$ {{ number_format((float) $invoice->discount_amount, 2, ',', '.') }}</span>
                     </div>
                     <div class="d-flex justify-content-between font-weight-bold">

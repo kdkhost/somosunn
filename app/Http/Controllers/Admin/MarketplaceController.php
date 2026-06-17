@@ -17,10 +17,13 @@ class MarketplaceController extends Controller
         $userId = (int) Auth::id();
         $storefrontModuleInstalled = SellerStore::tableAvailable() && SellerProduct::tableAvailable();
 
-        $paidTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('total_amount');
-        $platformFeeTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('platform_fee_amount');
-        $netTotal = (float) max(0, $paidTotal - $platformFeeTotal);
-        $paidCount = (int) Order::where('seller_id', $userId)->financialPaid()->count();
+        $paidOrders = Order::with('items')->where('seller_id', $userId)->financialPaid()->get();
+        $paidTotal = (float) $paidOrders->sum(fn (Order $order) => $order->gross_amount);
+        $discountTotal = (float) $paidOrders->sum(fn (Order $order) => $order->financial_discount_amount);
+        $chargedTotal = (float) $paidOrders->sum(fn (Order $order) => (float) $order->total_amount);
+        $platformFeeTotal = (float) $paidOrders->sum(fn (Order $order) => (float) $order->platform_fee_amount);
+        $netTotal = (float) max(0, $chargedTotal - $platformFeeTotal);
+        $paidCount = (int) $paidOrders->count();
         $pendingCount = (int) Order::where('seller_id', $userId)->where('status', 'pending')->count();
         $platformFeePercent = MarketplaceFee::percent();
 
@@ -29,7 +32,7 @@ class MarketplaceController extends Controller
 
         $paymentsConfigured = $mpAccessToken !== '' && $mpPublicKey !== '';
 
-        return view('admin.marketplace.index', compact('paidTotal', 'platformFeeTotal', 'netTotal', 'paidCount', 'pendingCount', 'paymentsConfigured', 'platformFeePercent', 'storefrontModuleInstalled'));
+        return view('admin.marketplace.index', compact('paidTotal', 'discountTotal', 'chargedTotal', 'platformFeeTotal', 'netTotal', 'paidCount', 'pendingCount', 'paymentsConfigured', 'platformFeePercent', 'storefrontModuleInstalled'));
     }
 
     public function payments()
@@ -88,12 +91,15 @@ class MarketplaceController extends Controller
             ->latest('id')
             ->paginate(20);
 
-        $paidTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('total_amount');
-        $platformFeeTotal = (float) Order::where('seller_id', $userId)->financialPaid()->sum('platform_fee_amount');
-        $netTotal = (float) max(0, $paidTotal - $platformFeeTotal);
-        $paidCount = (int) Order::where('seller_id', $userId)->financialPaid()->count();
+        $paidOrders = Order::with('items')->where('seller_id', $userId)->financialPaid()->get();
+        $paidTotal = (float) $paidOrders->sum(fn (Order $order) => $order->gross_amount);
+        $discountTotal = (float) $paidOrders->sum(fn (Order $order) => $order->financial_discount_amount);
+        $chargedTotal = (float) $paidOrders->sum(fn (Order $order) => (float) $order->total_amount);
+        $platformFeeTotal = (float) $paidOrders->sum(fn (Order $order) => (float) $order->platform_fee_amount);
+        $netTotal = (float) max(0, $chargedTotal - $platformFeeTotal);
+        $paidCount = (int) $paidOrders->count();
 
-        return view('admin.marketplace.sales', compact('orders', 'paidTotal', 'platformFeeTotal', 'netTotal', 'paidCount'));
+        return view('admin.marketplace.sales', compact('orders', 'paidTotal', 'discountTotal', 'chargedTotal', 'platformFeeTotal', 'netTotal', 'paidCount'));
     }
 
     public function stores(Request $request)

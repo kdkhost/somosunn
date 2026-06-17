@@ -128,7 +128,10 @@
                 <th>Cliente</th>
                 <th>Pagamento</th>
                 <th>Origem</th>
-                <th>Total</th>
+                <th>Valor bruto</th>
+                <th>Desconto</th>
+                <th>Cupom</th>
+                <th>Total liquido</th>
                 <th>Fatura</th>
                 <th>Aprovado por</th>
             </tr>
@@ -141,6 +144,7 @@
                     if ($order->invoice) {
                         $invoiceLabel = (string) ($order->invoice->number ?: ('#' . $order->invoice->id));
                     }
+                    $discountAmount = (float) $order->financial_discount_amount;
                 @endphp
                 <tr>
                     <td>#{{ $order->id }}</td>
@@ -157,13 +161,16 @@
                             <span class="badge badge-accounted">Contabilizado</span>
                         @endif
                     </td>
+                    <td>R$ {{ number_format((float) $order->gross_amount, 2, ',', '.') }}</td>
+                    <td>R$ {{ number_format($discountAmount, 2, ',', '.') }}</td>
+                    <td>{{ $order->coupon_code ?: '-' }}</td>
                     <td>R$ {{ number_format((float) ($order->total_amount ?? 0), 2, ',', '.') }}</td>
                     <td>{{ $invoiceLabel }}</td>
                     <td>{{ $order->manualApprover->name ?? '-' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" style="text-align:center;">Nenhum pedido encontrado no periodo.</td>
+                    <td colspan="11" style="text-align:center;">Nenhum pedido encontrado no periodo.</td>
                 </tr>
             @endforelse
         </tbody>

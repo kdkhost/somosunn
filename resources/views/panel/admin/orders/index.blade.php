@@ -115,6 +115,11 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($orders as $order)
+                            @php
+                                $grossAmount = (float) $order->gross_amount;
+                                $discountAmount = (float) $order->financial_discount_amount;
+                                $couponCode = $order->coupon_code;
+                            @endphp
                             <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span
@@ -220,8 +225,16 @@
 
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="font-semibold text-slate-900 dark:text-white text-sm transition-colors">
-                                        R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}
+                                        R$ {{ number_format($grossAmount, 2, ',', '.') }}
                                     </div>
+                                    @if($discountAmount > 0)
+                                        <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+                                            Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
+                                        </div>
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">
+                                            Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}
+                                        </div>
+                                    @endif
                                     @if($order->refunded_amount > 0)
                                         <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                                             Estornado: R$ {{ number_format($order->refunded_amount, 2, ',', '.') }}

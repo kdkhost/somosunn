@@ -77,9 +77,11 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mt-6">
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5">
-            <div class="text-sm font-bold text-slate-500">Receita bruta de vendas</div>
+            <div class="text-sm font-bold text-slate-500">Valor bruto dos produtos vendidos</div>
             <div class="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{{ $money($summary['sales_gross'] ?? 0) }}</div>
-            <div class="mt-2 text-xs text-slate-500">{{ (int) ($summary['sales_count'] ?? 0) }} pedido(s) vendidos</div>
+            <div class="mt-2 text-xs text-slate-500">
+                {{ (int) ($summary['sales_count'] ?? 0) }} pedido(s) vendidos • Descontos {{ $money($summary['sales_discounts'] ?? 0) }} • Cobrado {{ $money($summary['sales_charged'] ?? 0) }}
+            </div>
         </div>
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5">
             <div class="text-sm font-bold text-slate-500">Estornos + taxas</div>
@@ -116,7 +118,7 @@
                         <tr>
                             <th class="text-left px-6 py-4">Pedido</th>
                             <th class="text-left px-6 py-4">Comprador</th>
-                            <th class="text-left px-6 py-4">Liquido</th>
+                            <th class="text-left px-6 py-4">Valores</th>
                             <th class="text-left px-6 py-4">Status</th>
                         </tr>
                     </thead>
@@ -133,8 +135,15 @@
                                     <div class="text-xs text-slate-500">{{ $order->user->email ?? '' }}</div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="font-extrabold text-slate-900 dark:text-white">{{ $money($order->charged_amount - $order->refunded_amount - ((float) $order->platform_fee_amount + (float) $order->fee_amount)) }}</div>
-                                    <div class="text-xs text-slate-500">Bruto {{ $money($order->charged_amount) }} | Taxas {{ $money((float) $order->platform_fee_amount + (float) $order->fee_amount) }}</div>
+                                    <div class="font-extrabold text-slate-900 dark:text-white">Bruto {{ $money($order->gross_amount) }}</div>
+                                    @if($order->financial_discount_amount > 0)
+                                        <div class="text-xs font-bold text-emerald-600">
+                                            Cupom {{ $order->coupon_code ?: '-' }}: - {{ $money($order->financial_discount_amount) }}
+                                        </div>
+                                    @endif
+                                    <div class="text-xs text-slate-500">
+                                        Cobrado {{ $money($order->charged_amount) }} | Taxas {{ $money((float) $order->platform_fee_amount + (float) $order->fee_amount) }} | Liquido {{ $money($order->charged_amount - $order->refunded_amount - ((float) $order->platform_fee_amount + (float) $order->fee_amount)) }}
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold {{ $statusBadge($order->status) }}">

@@ -2,6 +2,28 @@
 
 ---
 
+## [2026-06-17] - fix(financeiro): fatura e venda registram cupom integral
+
+### Corrigido
+- Pedidos de evento adquiridos com cupom de 100% agora mantem o valor bruto do ingresso, o desconto aplicado e o codigo do cupom para controle financeiro.
+- Faturas emitidas a partir do pedido passam a registrar subtotal bruto, desconto do cupom e total liquido, incluindo o codigo do cupom na tela e no PDF.
+- As telas de vendas/pedidos dos dois paineis exibem valor bruto, cupom utilizado, desconto e liquido cobrado.
+- Relatorios e contabilidade do marketplace passam a exportar bruto, desconto, cupom e cobranca separadamente.
+
+### Arquivos principais
+- `app/Models/Order.php`
+- `app/Models/OrderItem.php`
+- `app/Services/InvoiceService.php`
+- `app/Http/Controllers/Admin/OrderController.php`
+- `app/Http/Controllers/Panel/MarketplaceAccountingController.php`
+- `resources/views/admin/orders/*`
+- `resources/views/panel/admin/orders/*`
+- `resources/views/admin/invoices/show.blade.php`
+- `resources/views/panel/admin/invoices/show.blade.php`
+- `resources/views/pdf/invoice.blade.php`
+
+---
+
 ## [2026-06-17] - fix(eventos): cupom integral confirma inscricao sem checkout
 
 ### Corrigido

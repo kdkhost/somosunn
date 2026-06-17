@@ -7,6 +7,9 @@
 @endsection
 
 @section('panel_content')
+    @php
+        $invoiceCouponCode = trim((string) data_get($invoice->metadata, 'coupon.code', ''));
+    @endphp
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div class="space-y-1">
@@ -141,7 +144,7 @@
                         @if($invoice->discount_amount > 0)
                             <div
                                 class="flex justify-between items-center text-emerald-400 dark:text-emerald-500 text-xs uppercase tracking-wider font-bold transition-colors">
-                                <span>Desconto</span>
+                                <span>Desconto{{ $invoiceCouponCode !== '' ? ' - cupom ' . $invoiceCouponCode : '' }}</span>
                                 <span>- R$ {{ number_format((float) $invoice->discount_amount, 2, ',', '.') }}</span>
                             </div>
                         @endif

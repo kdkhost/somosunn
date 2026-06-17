@@ -3,6 +3,11 @@
 @section('title', 'Detalhes do Pedido')
 
 @section('content')
+    @php
+        $grossAmount = (float) $order->gross_amount;
+        $discountAmount = (float) $order->financial_discount_amount;
+        $couponCode = $order->coupon_code;
+    @endphp
     <div class="space-y-6">
         <div class="flex items-center gap-4 text-sm text-slate-500">
             <a href="{{ route('panel.admin.orders.index') }}" class="hover:text-blue-600 transition-colors">Vendas</a>
@@ -72,7 +77,21 @@
                         </div>
 
                         <div class="flex justify-between items-center py-2 border-b border-slate-50">
-                            <span class="text-sm text-slate-500">Total do pedido</span>
+                            <span class="text-sm text-slate-500">Valor bruto</span>
+                            <span class="text-sm font-bold text-slate-900">R$
+                                {{ number_format($grossAmount, 2, ',', '.') }}</span>
+                        </div>
+
+                        @if($discountAmount > 0)
+                            <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                                <span class="text-sm text-slate-500">Cupom {{ $couponCode ?: '-' }}</span>
+                                <span class="text-sm font-bold text-emerald-700">- R$
+                                    {{ number_format($discountAmount, 2, ',', '.') }}</span>
+                            </div>
+                        @endif
+
+                        <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                            <span class="text-sm text-slate-500">Total liquido</span>
                             <span class="text-sm font-bold text-slate-900">R$
                                 {{ number_format((float) $order->total_amount, 2, ',', '.') }}</span>
                         </div>
@@ -267,11 +286,16 @@
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             @foreach($order->items as $item)
+                                @php($itemGross = (float) $item->gross_unit_price)
                                 <tr>
                                     <td class="px-6 py-4 text-sm font-medium text-slate-900">{{ $item->title }}</td>
                                     <td class="px-6 py-4 text-sm text-slate-500">{{ $item->item_type }}</td>
                                     <td class="px-6 py-4 text-sm font-medium text-slate-900 text-right">R$
-                                        {{ number_format((float) $item->price, 2, ',', '.') }}</td>
+                                        {{ number_format($itemGross, 2, ',', '.') }}
+                                        @if($discountAmount > 0)
+                                            <div class="text-xs font-bold text-emerald-600">Cupom {{ $couponCode ?: '-' }}</div>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -279,7 +303,12 @@
                             <tr>
                                 <td colspan="2" class="px-6 py-4 text-sm font-bold text-slate-900 text-right">Total</td>
                                 <td class="px-6 py-4 text-sm font-bold text-slate-900 text-right">R$
-                                    {{ number_format((float) $order->total_amount, 2, ',', '.') }}</td>
+                                    {{ number_format($grossAmount, 2, ',', '.') }}
+                                    @if($discountAmount > 0)
+                                        <div class="text-xs text-emerald-700">Desconto: - R$ {{ number_format($discountAmount, 2, ',', '.') }}</div>
+                                        <div class="text-xs text-slate-500">Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
+                                    @endif
+                                </td>
                             </tr>
                         </tfoot>
                     </table>

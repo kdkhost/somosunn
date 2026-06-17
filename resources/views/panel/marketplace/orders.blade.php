@@ -12,12 +12,22 @@
 
         <div class="space-y-4">
             @forelse($orders as $order)
+                @php
+                    $grossAmount = (float) $order->gross_amount;
+                    $discountAmount = (float) $order->financial_discount_amount;
+                    $couponCode = $order->coupon_code;
+                @endphp
                 <article class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 shadow-sm">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div>
                             <h2 class="text-xl font-black text-slate-900 dark:text-white">Pedido #{{ $order->id }}</h2>
                             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Comprador: {{ $order->user->name ?? 'Cliente' }} ? {{ $order->user->email ?? '-' }}</p>
-                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Total: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }} ? Status do pagamento: {{ strtoupper($order->status) }}</p>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Bruto: R$ {{ number_format($grossAmount, 2, ',', '.') }} ? Status do pagamento: {{ strtoupper($order->status) }}</p>
+                            @if($discountAmount > 0)
+                                <p class="mt-1 text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                                    Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }} ? Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}
+                                </p>
+                            @endif
                         </div>
                         @if($order->shipment)
                             <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black {{ in_array($order->shipment->status, ['shipped', 'delivered']) ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200' }}">
@@ -36,7 +46,9 @@
                                             <p class="font-bold text-slate-900 dark:text-white">{{ $item->title }}</p>
                                             <p class="text-xs text-slate-500 dark:text-slate-400">{{ strtoupper($item->item_type) }} ? Qtde {{ $item->quantity }}</p>
                                         </div>
-                                        <div class="text-sm font-black text-slate-900 dark:text-white">R$ {{ number_format((float) $item->price, 2, ',', '.') }}</div>
+                                        <div class="text-sm font-black text-slate-900 dark:text-white">
+                                            R$ {{ number_format((float) $item->gross_unit_price, 2, ',', '.') }}
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>

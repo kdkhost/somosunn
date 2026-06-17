@@ -212,6 +212,61 @@ class Order extends Model
         return round((float) $this->total_amount, 2);
     }
 
+    public function getCouponCodeAttribute(): ?string
+    {
+        foreach (['coupon.code', 'event_coupon.code'] as $path) {
+            $code = trim((string) data_get($this->metadata, $path, ''));
+
+            if ($code !== '') {
+                return $code;
+            }
+        }
+
+        return null;
+    }
+
+    public function getFinancialDiscountAmountAttribute(): float
+    {
+        $discount = 0.0;
+
+        foreach (['coupon.discount_amount', 'event_coupon.discount_amount'] as $path) {
+            $value = data_get($this->metadata, $path);
+
+            if (is_numeric($value) && (float) $value > 0) {
+                $discount += (float) $value;
+            }
+        }
+
+        return round(max(0, $discount), 2);
+    }
+
+    public function getGrossAmountAttribute(): float
+    {
+        $metadataGross = data_get($this->metadata, 'original_total_amount');
+        if (is_numeric($metadataGross) && (float) $metadataGross > 0) {
+            return round((float) $metadataGross, 2);
+        }
+
+        $items = $this->relationLoaded('items') ? $this->items : $this->items()->get();
+        $itemsGross = (float) $items->sum(fn ($item) => (float) $item->line_gross_amount);
+
+        if ($itemsGross > 0) {
+            return round($itemsGross, 2);
+        }
+
+        $discount = $this->financial_discount_amount;
+        if ($discount > 0) {
+            return round((float) $this->total_amount + $discount, 2);
+        }
+
+        return round((float) $this->total_amount, 2);
+    }
+
+    public function getNetAmountAttribute(): float
+    {
+        return round((float) $this->total_amount, 2);
+    }
+
     public function getRefundedAmountAttribute(): float
     {
         if ((string) $this->status === 'refunded') {

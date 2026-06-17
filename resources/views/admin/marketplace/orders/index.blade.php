@@ -11,7 +11,7 @@
         $shippedCount = 0;
         $revenueTotal = 0;
         foreach ($orders as $o) {
-            if ($o->status === 'paid') { $paidCount++; $revenueTotal += (float) $o->total_amount; }
+            if ($o->status === 'paid') { $paidCount++; $revenueTotal += (float) $o->gross_amount; }
             elseif ($o->status === 'pending') $pendingCount++;
             if ($o->shipment && in_array($o->shipment->status, ['shipped', 'delivered'])) $shippedCount++;
         }
@@ -89,6 +89,9 @@
             };
             $hasShipment = (bool) $order->shipment;
             $shipStatus = $order->shipment?->status;
+            $grossAmount = (float) $order->gross_amount;
+            $discountAmount = (float) $order->financial_discount_amount;
+            $couponCode = $order->coupon_code;
         @endphp
 
         <div class="card shadow-sm mb-3 border-left-{{ $statusColor }}" style="border-left-width:4px !important;">
@@ -116,7 +119,13 @@
 
                     {{-- Col 3: Valor + Status --}}
                     <div class="col-md-2 col-6 mt-2 mt-md-0">
-                        <div class="font-weight-bold" style="font-size:16px;">R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
+                        <div class="font-weight-bold" style="font-size:16px;">R$ {{ number_format($grossAmount, 2, ',', '.') }}</div>
+                        @if($discountAmount > 0)
+                            <div class="text-success font-weight-bold" style="font-size:10px;">
+                                Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
+                            </div>
+                            <div class="text-muted" style="font-size:10px;">Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
+                        @endif
                         <span class="badge badge-{{ $statusColor }} mt-1">
                             <i class="fas fa-circle mr-1" style="font-size:6px;"></i>{{ $statusLabel }}
                         </span>

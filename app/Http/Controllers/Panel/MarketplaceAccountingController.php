@@ -46,7 +46,9 @@ class MarketplaceAccountingController extends Controller
             fputcsv($handle, ['Gerado em', now()->format('d/m/Y H:i')]);
             fputcsv($handle, []);
 
-            fputcsv($handle, ['Receita bruta de vendas', number_format((float) $summary['sales_gross'], 2, '.', '')]);
+            fputcsv($handle, ['Valor bruto dos produtos vendidos', number_format((float) $summary['sales_gross'], 2, '.', '')]);
+            fputcsv($handle, ['Descontos em vendas', number_format((float) $summary['sales_discounts'], 2, '.', '')]);
+            fputcsv($handle, ['Total cobrado em vendas', number_format((float) $summary['sales_charged'], 2, '.', '')]);
             fputcsv($handle, ['Estornos sobre vendas', number_format((float) $summary['sales_refunds'], 2, '.', '')]);
             fputcsv($handle, ['Taxas e comissoes', number_format((float) $summary['sales_fees'], 2, '.', '')]);
             fputcsv($handle, ['Resultado liquido das vendas', number_format((float) $summary['sales_net'], 2, '.', '')]);
@@ -55,13 +57,16 @@ class MarketplaceAccountingController extends Controller
             fputcsv($handle, []);
 
             fputcsv($handle, ['VENDAS']);
-            fputcsv($handle, ['Pedido', 'Data', 'Comprador', 'Itens', 'Cobranca', 'Estorno', 'Taxas', 'Liquido', 'Status']);
+            fputcsv($handle, ['Pedido', 'Data', 'Comprador', 'Itens', 'Bruto', 'Desconto', 'Cupom', 'Cobranca', 'Estorno', 'Taxas', 'Liquido', 'Status']);
             foreach ((clone $salesQuery)->reorder()->lazyById(250) as $order) {
                 fputcsv($handle, [
                     '#' . $order->id,
                     optional($this->financialDate($order))->format('d/m/Y H:i'),
                     (string) ($order->user->name ?? 'Usuario removido'),
                     $this->orderItemsLabel($order),
+                    number_format((float) $order->gross_amount, 2, '.', ''),
+                    number_format((float) $order->financial_discount_amount, 2, '.', ''),
+                    (string) ($order->coupon_code ?: ''),
                     number_format((float) $order->charged_amount, 2, '.', ''),
                     number_format((float) $order->refunded_amount, 2, '.', ''),
                     number_format((float) $this->orderFees($order), 2, '.', ''),
@@ -163,12 +168,14 @@ class MarketplaceAccountingController extends Controller
     private function buildSummary(iterable $salesOrders, iterable $purchaseOrders): array
     {
         $salesCount = $purchaseCount = 0;
-        $salesGross = $salesRefunds = $salesFees = $salesNet = 0.0;
-        $purchaseGross = $purchaseRefunds = $purchaseNet = 0.0;
+        $salesGross = $salesDiscounts = $salesCharged = $salesRefunds = $salesFees = $salesNet = 0.0;
+        $purchaseGross = $purchaseDiscounts = $purchaseCharged = $purchaseRefunds = $purchaseNet = 0.0;
 
         foreach ($salesOrders as $order) {
             $salesCount++;
-            $salesGross += (float) $order->charged_amount;
+            $salesGross += (float) $order->gross_amount;
+            $salesDiscounts += (float) $order->financial_discount_amount;
+            $salesCharged += (float) $order->charged_amount;
             $salesRefunds += (float) $order->refunded_amount;
             $salesFees += $this->orderFees($order);
             $salesNet += $this->orderNetForSeller($order);
@@ -176,7 +183,9 @@ class MarketplaceAccountingController extends Controller
 
         foreach ($purchaseOrders as $order) {
             $purchaseCount++;
-            $purchaseGross += (float) $order->charged_amount;
+            $purchaseGross += (float) $order->gross_amount;
+            $purchaseDiscounts += (float) $order->financial_discount_amount;
+            $purchaseCharged += (float) $order->charged_amount;
             $purchaseRefunds += (float) $order->refunded_amount;
             $purchaseNet += $this->orderNetExpense($order);
         }
@@ -184,11 +193,15 @@ class MarketplaceAccountingController extends Controller
         return [
             'sales_count' => $salesCount,
             'sales_gross' => round($salesGross, 2),
+            'sales_discounts' => round($salesDiscounts, 2),
+            'sales_charged' => round($salesCharged, 2),
             'sales_refunds' => round($salesRefunds, 2),
             'sales_fees' => round($salesFees, 2),
             'sales_net' => round($salesNet, 2),
             'purchase_count' => $purchaseCount,
             'purchase_gross' => round($purchaseGross, 2),
+            'purchase_discounts' => round($purchaseDiscounts, 2),
+            'purchase_charged' => round($purchaseCharged, 2),
             'purchase_refunds' => round($purchaseRefunds, 2),
             'purchase_net' => round($purchaseNet, 2),
             'overall_net' => round($salesNet - $purchaseNet, 2),

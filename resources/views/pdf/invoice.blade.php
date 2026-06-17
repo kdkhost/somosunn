@@ -37,6 +37,7 @@
         ? (is_string($invoice->due_at) ? $invoice->due_at : $invoice->due_at->format('d/m/Y'))
         : null;
     $status = (string) ($invoice->status ?? 'issued');
+    $invoiceCouponCode = trim((string) data_get($invoice->metadata ?? [], 'coupon.code', ''));
 
     $fmtMoney = function ($v) {
         return 'R$ ' . number_format((float) $v, 2, ',', '.');
@@ -437,7 +438,7 @@
                 </div>
                 @if((float) $invoice->discount_amount > 0)
                     <div class="total-row">
-                        <div class="total-label">Desconto</div>
+                        <div class="total-label">Desconto{{ $invoiceCouponCode !== '' ? ' - cupom ' . $invoiceCouponCode : '' }}</div>
                         <div class="total-value">- {{ $fmtMoney($invoice->discount_amount) }}</div>
                     </div>
                 @endif

@@ -7,6 +7,8 @@
     @php
         $orders = $orders ?? collect();
         $paidTotal = (float) ($paidTotal ?? 0);
+        $discountTotal = (float) ($discountTotal ?? 0);
+        $chargedTotal = (float) ($chargedTotal ?? 0);
         $platformFeeTotal = (float) ($platformFeeTotal ?? 0);
         $netTotal = (float) ($netTotal ?? 0);
         $paidCount = (int) ($paidCount ?? 0);
@@ -62,6 +64,8 @@
                 <h6 class="font-weight-bold mb-1"><i class="fas fa-chart-pie mr-2"></i>Resumo Financeiro</h6>
                 <p class="mb-0 text-muted">
                     Bruto <strong>R$ {{ number_format($paidTotal, 2, ',', '.') }}</strong>
+                    &minus; Descontos <strong>R$ {{ number_format($discountTotal, 2, ',', '.') }}</strong>
+                    = Cobrado <strong>R$ {{ number_format($chargedTotal, 2, ',', '.') }}</strong>
                     &minus; Comissão <strong>R$ {{ number_format($platformFeeTotal, 2, ',', '.') }}</strong>
                     = Líquido <strong class="text-success">R$ {{ number_format($netTotal, 2, ',', '.') }}</strong>
                 </p>
@@ -106,6 +110,9 @@
                     };
                     $items = $order->items ?? collect();
                     $gateway = ucfirst($order->gateway ?? 'manual');
+                    $grossAmount = (float) $order->gross_amount;
+                    $discountAmount = (float) $order->financial_discount_amount;
+                    $couponCode = $order->coupon_code;
                 @endphp
 
                 <div class="border-bottom px-4 py-3">
@@ -137,8 +144,15 @@
 
                         {{-- Valor --}}
                         <div class="col-md-2 col-4 mt-1 mt-md-0">
-                            <div class="font-weight-bold" style="font-size:15px;">R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
-                            <div class="text-muted" style="font-size:10px;">{{ $gateway }}</div>
+                            <div class="font-weight-bold" style="font-size:15px;">R$ {{ number_format($grossAmount, 2, ',', '.') }}</div>
+                            @if($discountAmount > 0)
+                                <div class="text-success font-weight-bold" style="font-size:10px;">
+                                    Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
+                                </div>
+                                <div class="text-muted" style="font-size:10px;">Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
+                            @else
+                                <div class="text-muted" style="font-size:10px;">{{ $gateway }}</div>
+                            @endif
                         </div>
 
                         {{-- Status --}}

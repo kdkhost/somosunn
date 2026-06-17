@@ -6,6 +6,7 @@ use App\Jobs\SendInvoiceEmailJob;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Setting;
 use App\Support\EmailQueueSettings;
 use Dompdf\Dompdf;
@@ -19,7 +20,13 @@ class InvoiceService
     {
         $existing = Invoice::query()->where('order_id', (int) $order->id)->first();
         if ($existing) {
-            return $existing;
+            $source = (string) data_get($existing->metadata, 'source', 'order');
+
+            if ($source !== 'order') {
+                return $existing;
+            }
+
+            return DB::transaction(fn () => $this->syncFromOrder($existing, $order, $createdBy));
         }
 
         return DB::transaction(function () use ($order, $createdBy) {
@@ -31,46 +38,108 @@ class InvoiceService
                 'currency' => (string) ($order->currency ?: 'BRL'),
                 'issued_at' => $order->created_at ?? now(),
                 'paid_at' => $order->status === 'paid' ? now() : null,
-                'metadata' => [
-                    'source' => 'order',
-                    'gateway' => $order->gateway,
-                    'transaction_id' => $order->transaction_id,
-                    'order_metadata' => $order->metadata,
-                ],
             ]);
 
-            $items = $order->items()->get();
-            $subtotal = 0.0;
-
-            foreach ($items as $idx => $orderItem) {
-                $quantity = (int) ($orderItem->quantity ?: 1);
-                $unit = (float) ($orderItem->price ?: 0);
-                $lineTotal = round($unit * $quantity, 2);
-                $subtotal += $lineTotal;
-
-                InvoiceItem::create([
-                    'invoice_id' => (int) $invoice->id,
-                    'item_type' => (string) ($orderItem->item_type ?? ''),
-                    'item_id' => (int) ($orderItem->item_id ?? 0) ?: null,
-                    'description' => (string) ($orderItem->title ?: ($orderItem->item_type . ' #' . $orderItem->item_id)),
-                    'quantity' => max(1, $quantity),
-                    'unit_price' => $unit,
-                    'total_price' => $lineTotal,
-                    'data' => $orderItem->data,
-                    'sort_order' => $idx,
-                ]);
-            }
-
-            $subtotal = round($subtotal, 2);
-
-            $invoice->subtotal = $subtotal;
-            $invoice->discount_amount = 0;
-            $invoice->total_amount = $subtotal;
-            $invoice->ensureNumber();
-            $invoice->save();
-
-            return $invoice;
+            return $this->syncFromOrder($invoice, $order, $createdBy);
         });
+    }
+
+    private function syncFromOrder(Invoice $invoice, Order $order, ?int $createdBy = null): Invoice
+    {
+        $order->loadMissing('items');
+
+        $couponCode = $order->coupon_code;
+        $grossAmount = (float) $order->gross_amount;
+        $discountAmount = min($grossAmount, (float) $order->financial_discount_amount);
+        $couponNote = $couponCode && $discountAmount > 0
+            ? 'Cupom utilizado: ' . $couponCode . ' - desconto de R$ ' . number_format($discountAmount, 2, ',', '.') . '.'
+            : null;
+
+        $invoice->fill([
+            'user_id' => (int) $order->user_id,
+            'order_id' => (int) $order->id,
+            'created_by' => $invoice->created_by ?: $createdBy,
+            'status' => $order->status === 'paid' ? 'paid' : 'issued',
+            'currency' => (string) ($order->currency ?: 'BRL'),
+            'issued_at' => $invoice->issued_at ?: ($order->created_at ?? now()),
+            'paid_at' => $order->status === 'paid' ? ($invoice->paid_at ?: now()) : null,
+            'notes' => $couponNote ?: $invoice->notes,
+            'metadata' => array_merge($invoice->metadata ?? [], [
+                'source' => 'order',
+                'gateway' => $order->gateway,
+                'transaction_id' => $order->transaction_id,
+                'gross_amount' => round($grossAmount, 2),
+                'discount_amount' => round($discountAmount, 2),
+                'net_amount' => round((float) $order->total_amount, 2),
+                'coupon' => $couponCode ? [
+                    'code' => $couponCode,
+                    'discount_amount' => round($discountAmount, 2),
+                ] : null,
+                'order_metadata' => $order->metadata,
+            ]),
+        ]);
+
+        $invoice->save();
+        $invoice->items()->delete();
+
+        $subtotal = 0.0;
+        $items = $order->items;
+        $itemsCount = max(1, $items->count());
+
+        foreach ($items as $idx => $orderItem) {
+            $quantity = max(1, (int) ($orderItem->quantity ?: 1));
+            $unit = $this->invoiceUnitPriceForOrderItem($orderItem, $grossAmount, $itemsCount);
+            $lineTotal = round($unit * $quantity, 2);
+            $subtotal += $lineTotal;
+
+            InvoiceItem::create([
+                'invoice_id' => (int) $invoice->id,
+                'item_type' => (string) ($orderItem->item_type ?? ''),
+                'item_id' => (int) ($orderItem->item_id ?? 0) ?: null,
+                'description' => (string) ($orderItem->title ?: ($orderItem->item_type . ' #' . $orderItem->item_id)),
+                'quantity' => $quantity,
+                'unit_price' => $unit,
+                'total_price' => $lineTotal,
+                'data' => array_merge($orderItem->data ?? [], [
+                    'financial' => [
+                        'gross_unit_price' => $unit,
+                        'net_unit_price' => round((float) $orderItem->price, 2),
+                        'coupon_code' => $couponCode,
+                        'discount_amount' => round($discountAmount, 2),
+                    ],
+                ]),
+                'sort_order' => $idx,
+            ]);
+        }
+
+        $subtotal = round($subtotal, 2);
+        if ($subtotal <= 0 && $grossAmount > 0) {
+            $subtotal = round($grossAmount, 2);
+        }
+
+        $discountAmount = min($subtotal, $discountAmount);
+
+        $invoice->subtotal = $subtotal;
+        $invoice->discount_amount = round($discountAmount, 2);
+        $invoice->total_amount = max(0, round($subtotal - $discountAmount, 2));
+        $invoice->ensureNumber();
+        $invoice->save();
+
+        return $invoice->fresh(['items', 'order', 'user']);
+    }
+
+    private function invoiceUnitPriceForOrderItem(OrderItem $orderItem, float $orderGrossAmount, int $itemsCount): float
+    {
+        $unit = (float) $orderItem->gross_unit_price;
+        if ($unit > 0) {
+            return round($unit, 2);
+        }
+
+        if ($itemsCount === 1 && $orderGrossAmount > 0) {
+            return round($orderGrossAmount / max(1, (int) $orderItem->quantity), 2);
+        }
+
+        return round((float) $orderItem->price, 2);
     }
 
     public function createManual(array $invoiceData, array $items, ?int $createdBy = null): Invoice

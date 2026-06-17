@@ -201,6 +201,9 @@
                                     ? ((str_starts_with($photo, 'http://') || str_starts_with($photo, 'https://')) ? $photo : asset($photo))
                                     : asset('img/default-user.svg');
                                 $financialDate = $order->paid_at ?? $order->manual_approved_at ?? $order->created_at;
+                                $grossAmount = (float) $order->gross_amount;
+                                $discountAmount = (float) $order->financial_discount_amount;
+                                $couponCode = $order->coupon_code;
                             @endphp
                             <tr>
                                 <td class="pl-4" data-order="{{ (int) $order->id }}">
@@ -229,7 +232,13 @@
                                     </div>
                                 </td>
                                 <td class="text-right" data-order="{{ (float) $order->total_amount }}">
-                                    <span class="font-weight-bold" style="font-size:14px;">R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</span>
+                                    <span class="font-weight-bold" style="font-size:14px;">R$ {{ number_format($grossAmount, 2, ',', '.') }}</span>
+                                    @if($discountAmount > 0)
+                                        <div class="text-success font-weight-bold text-xs">
+                                            Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
+                                        </div>
+                                        <small class="text-muted">Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</small>
+                                    @endif
                                 </td>
                                 <td>
                                     <span class="badge badge-info px-2 py-1">{{ ucfirst($order->gateway ?: 'manual') }}</span>
