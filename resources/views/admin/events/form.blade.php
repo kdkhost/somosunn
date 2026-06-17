@@ -5,6 +5,7 @@
 @section('content')
     @php
         $canManageGroupLink = auth()->user() && auth()->user()->hasPermission('admin.events.group_link.manage');
+        $canManageEventCoupons = auth()->user() && auth()->user()->hasPermission('admin.events.coupons.view');
     @endphp
     <style>
         #legacy-general:not(.active), #legacy-certificate:not(.active), #legacy-gallery:not(.active) { 
@@ -30,6 +31,27 @@
         });
     </script>
     @endpush
+    @if($event->exists && ($event->type ?? 'event') !== 'album')
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+            <div class="mb-2 mb-md-0">
+                <h5 class="mb-0 font-weight-bold">
+                    <i class="fas fa-calendar-check text-primary mr-2"></i>{{ $event->title }}
+                </h5>
+            </div>
+            <div class="d-flex flex-wrap" style="gap: 10px;">
+                @if($canManageEventCoupons)
+                    <a href="{{ route('admin.events.coupons.index', $event) }}" class="btn btn-success rounded-pill elevation-1">
+                        <i class="fas fa-ticket-alt mr-2"></i>Cupons gratuitos
+                    </a>
+                @endif
+                @if($canManageGroupLink)
+                    <a href="#legacy-general" class="btn btn-outline-success rounded-pill elevation-1" data-toggle="tab">
+                        <i class="fab fa-whatsapp mr-2"></i>Link do WhatsApp
+                    </a>
+                @endif
+            </div>
+        </div>
+    @endif
     <div class="card card-primary card-outline card-tabs">
         <div class="card-header p-0 pt-1 border-bottom-0">
             <ul class="nav nav-tabs" id="event-tabs" role="tablist">
@@ -46,7 +68,7 @@
                     <a class="nav-link {{ request('tab') === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-toggle="tab" href="#legacy-gallery" role="tab"
                         aria-controls="legacy-gallery" aria-selected="{{ request('tab') === 'gallery' ? 'true' : 'false' }}">Galeria de Fotos</a>
                 </li>
-                @if(auth()->user()?->hasPermission('admin.events.coupons.view'))
+                @if($canManageEventCoupons)
                     <li class="nav-item event-only-field">
                         <a class="nav-link" href="{{ route('admin.events.coupons.index', $event) }}">
                             <i class="fas fa-ticket-alt mr-1"></i> Cupons

@@ -3,6 +3,13 @@
 @section('page_title', 'Cupons do Evento')
 
 @section('content')
+@php
+    $adminUser = auth()->user();
+    $canCreateCoupon = $adminUser && $adminUser->hasPermission('admin.events.coupons.create');
+    $canEditCoupon = $adminUser && $adminUser->hasPermission('admin.events.coupons.edit');
+    $canDeleteCoupon = $adminUser && $adminUser->hasPermission('admin.events.coupons.delete');
+    $canToggleCoupon = $adminUser && $adminUser->hasPermission('admin.events.coupons.toggle');
+@endphp
 <div class="container-fluid">
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header d-flex flex-wrap align-items-center justify-content-between">
@@ -13,12 +20,14 @@
                 <small class="text-muted d-block">{{ $event->title }}</small>
             </div>
             <div class="ml-auto">
-                <a href="{{ route($eventsRoutePrefix . '.edit', $event) }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+                <a href="{{ route($eventsRoutePrefix . '.edit', $event) }}" class="btn btn-outline-secondary btn-sm rounded-pill" data-pjax>
                     <i class="fas fa-arrow-left mr-1"></i> Voltar
                 </a>
-                <a href="{{ route($routePrefix . '.create', $event) }}" class="btn btn-primary btn-sm rounded-pill">
-                    <i class="fas fa-plus mr-1"></i> Novo cupom
-                </a>
+                @if($canCreateCoupon)
+                    <a href="{{ route($routePrefix . '.create', $event) }}" class="btn btn-primary btn-sm rounded-pill" data-pjax>
+                        <i class="fas fa-plus mr-1"></i> Novo cupom
+                    </a>
+                @endif
             </div>
         </div>
         <div class="card-body p-0">
@@ -63,22 +72,28 @@
                                 </td>
                                 <td class="text-right">
                                     <div class="btn-group btn-group-sm">
-                                        <form method="POST" action="{{ route($routePrefix . '.toggle', [$event, $coupon]) }}">
-                                            @csrf
-                                            <button type="submit" class="btn btn-outline-{{ $coupon->active ? 'secondary' : 'success' }}" title="{{ $coupon->active ? 'Desativar' : 'Ativar' }}">
-                                                <i class="fas fa-toggle-{{ $coupon->active ? 'on' : 'off' }}"></i>
-                                            </button>
-                                        </form>
-                                        <a href="{{ route($routePrefix . '.edit', [$event, $coupon]) }}" class="btn btn-outline-info" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form method="POST" action="{{ route($routePrefix . '.destroy', [$event, $coupon]) }}" class="form-delete">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="btn btn-outline-danger btn-delete" title="Excluir">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        @if($canToggleCoupon)
+                                            <form method="POST" action="{{ route($routePrefix . '.toggle', [$event, $coupon]) }}" class="ajax-form d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-outline-{{ $coupon->active ? 'secondary' : 'success' }}" title="{{ $coupon->active ? 'Desativar' : 'Ativar' }}">
+                                                    <i class="fas fa-toggle-{{ $coupon->active ? 'on' : 'off' }}"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                        @if($canEditCoupon)
+                                            <a href="{{ route($routePrefix . '.edit', [$event, $coupon]) }}" class="btn btn-outline-info" title="Editar" data-pjax>
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        @endif
+                                        @if($canDeleteCoupon)
+                                            <form method="POST" action="{{ route($routePrefix . '.destroy', [$event, $coupon]) }}" class="ajax-form form-delete d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-outline-danger btn-delete" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -87,6 +102,13 @@
                                 <td colspan="6" class="text-center py-5 text-muted">
                                     <i class="fas fa-ticket-alt fa-2x d-block mb-2"></i>
                                     Nenhum cupom cadastrado para este evento.
+                                    @if($canCreateCoupon)
+                                        <div class="mt-3">
+                                            <a href="{{ route($routePrefix . '.create', $event) }}" class="btn btn-primary btn-sm rounded-pill" data-pjax>
+                                                <i class="fas fa-plus mr-1"></i> Criar primeiro cupom
+                                            </a>
+                                        </div>
+                                    @endif
                                 </td>
                             </tr>
                         @endforelse
