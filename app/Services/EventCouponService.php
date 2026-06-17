@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Event;
 use App\Models\EventCoupon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class EventCouponService
@@ -39,6 +40,22 @@ class EventCouponService
      */
     public function validateFreeCouponLocked(Event $event, string $code, float $subtotal, int $uses = 1): array
     {
+        $result = $this->validateCouponLocked($event, $code, $subtotal, $uses);
+
+        if ($result['discount_amount'] < max(0, $subtotal) - 0.009) {
+            throw ValidationException::withMessages([
+                'coupon_code' => 'Este cupom não libera gratuidade integral para o evento.',
+            ]);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array{coupon: EventCoupon, discount_amount: float}
+     */
+    public function validateCouponLocked(Event $event, string $code, float $subtotal, int $uses = 1): array
+    {
         $code = $this->normalizeCode($code);
         if ($code === '') {
             throw ValidationException::withMessages(['coupon_code' => 'Informe um cupom válido.']);
@@ -50,16 +67,19 @@ class EventCouponService
             ->lockForUpdate()
             ->first();
 
-        if (!$coupon || !$coupon->active) {
-            throw ValidationException::withMessages(['coupon_code' => 'Cupom inválido ou inativo para este evento.']);
+        if (!$coupon) {
+            throw ValidationException::withMessages(['coupon_code' => 'Cupom inválido para este evento.']);
         }
 
-        $now = now();
-        if ($coupon->starts_at && $now->lt($coupon->starts_at)) {
+        if (!$coupon->active) {
+            throw ValidationException::withMessages(['coupon_code' => 'Cupom inativo.']);
+        }
+
+        if ($coupon->starts_at && now()->lt($coupon->starts_at)) {
             throw ValidationException::withMessages(['coupon_code' => 'Este cupom ainda não está ativo.']);
         }
 
-        if ($coupon->expires_at && $now->gt($coupon->expires_at)) {
+        if ($coupon->expires_at && now()->gt($coupon->expires_at)) {
             throw ValidationException::withMessages(['coupon_code' => 'Este cupom expirou.']);
         }
 
@@ -68,20 +88,52 @@ class EventCouponService
             throw ValidationException::withMessages(['coupon_code' => 'Cupom esgotado.']);
         }
 
-        $discountAmount = $this->discountAmount($coupon, $subtotal);
-        if ($discountAmount < max(0, $subtotal) - 0.009) {
-            throw ValidationException::withMessages(['coupon_code' => 'Este cupom não libera gratuidade integral para o evento.']);
-        }
-
         return [
             'coupon' => $coupon,
-            'discount_amount' => round($discountAmount, 2),
+            'discount_amount' => round($this->discountAmount($coupon, $subtotal), 2),
         ];
+    }
+
+    public function canUse(EventCoupon $coupon, int $uses = 1): bool
+    {
+        if (!$coupon->active) {
+            return false;
+        }
+
+        $uses = max(1, (int) $uses);
+        $now = now();
+
+        if ($coupon->starts_at && $now->lt($coupon->starts_at)) {
+            return false;
+        }
+
+        if ($coupon->expires_at && $now->gt($coupon->expires_at)) {
+            return false;
+        }
+
+        if ($coupon->max_uses !== null && ((int) $coupon->used_count + $uses) > (int) $coupon->max_uses) {
+            return false;
+        }
+
+        return true;
     }
 
     public function consumeLocked(EventCoupon $coupon, int $uses = 1): void
     {
-        $coupon->increment('used_count', max(1, (int) $uses));
+        $uses = max(1, (int) $uses);
+
+        if (!$this->canUse($coupon, $uses)) {
+            throw ValidationException::withMessages(['coupon_code' => 'Cupom esgotado ou indisponível.']);
+        }
+
+        $coupon->increment('used_count', $uses);
+
+        Log::info('Uso de cupom de evento registrado', [
+            'event_id' => $coupon->event_id,
+            'coupon_id' => $coupon->id,
+            'uses' => $uses,
+            'used_count' => (int) $coupon->fresh()->used_count,
+        ]);
     }
 
     public function discountAmount(EventCoupon $coupon, float $subtotal): float

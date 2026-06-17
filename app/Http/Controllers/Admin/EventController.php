@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Event;
 use App\Models\Setting;
+use App\Rules\WhatsAppGroupLinkRule;
 use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
@@ -174,7 +175,7 @@ class EventController extends Controller
             'is_somos_unicas' => 'nullable|boolean',
             'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
             'event_url' => 'nullable|url|max:255',
-            'whatsapp_group_link' => 'nullable|url|max:2048',
+            'whatsapp_group_link' => ['nullable', 'url', 'max:2048', new WhatsAppGroupLinkRule()],
             'is_ticket_enabled' => 'nullable|boolean',
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
             'scanner_radius_value' => 'nullable|numeric|min:0.001',
@@ -323,7 +324,7 @@ class EventController extends Controller
             'is_somos_unicas' => 'nullable|boolean',
             'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
             'event_url' => 'nullable|url|max:255',
-            'whatsapp_group_link' => 'nullable|url|max:2048',
+            'whatsapp_group_link' => ['nullable', 'url', 'max:2048', new WhatsAppGroupLinkRule()],
             'is_ticket_enabled' => 'nullable|boolean',
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
             'scanner_radius_value' => 'nullable|numeric|min:0.001',

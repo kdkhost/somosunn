@@ -899,20 +899,13 @@
                                             @endif
                                         @endif
 
-                                        {{-- Botão para comprar ingressos adicionais --}}
-                                        @if(filled($event->whatsapp_group_link))
-                                            <form method="POST" action="{{ route('events.group.join', $event) }}" class="mt-3">
-                                                @csrf
-                                                <button type="submit" class="event-action-button event-action-button-primary">
-                                                    <i class="fab fa-whatsapp"></i> Entrar no grupo do evento
-                                                </button>
-                                            </form>
-                                            @if($userRegistration->joined_group_at)
-                                                <p class="mt-2 text-xs font-bold text-slate-500">
-                                                    Entrada registrada em {{ $userRegistration->joined_group_at->format('d/m/Y H:i') }}.
-                                                </p>
-                                            @endif
-                                        @endif
+                                        {{-- Acesso ao grupo do evento --}}
+                                        @include('events.partials.group-access', [
+                                            'event' => $event,
+                                            'registration' => $userRegistration,
+                                            'buttonClass' => 'event-action-button event-action-button-primary',
+                                            'wrapClass' => 'mt-3',
+                                        ])
 
                                         @if(!$isClosed && $remainingSeats !== 0)
                                             <a href="{{ route('events.checkout', $event) }}"

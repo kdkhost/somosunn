@@ -23,32 +23,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Bloqueia rotas sensíveis (install, migrations, debug) em produção.
- *
- * Regras:
- *   - Em APP_ENV=production, bloqueia rotas listadas abaixo
- *   - Permite acesso se:
- *     a) Usuário autenticado com role super-admin, OU
- *     b) Header/query `maintenance_token` == env('MAINTENANCE_SECRET')
- *   - Registra tentativa bloqueada no canal `security`
- *
- * NÃO remove rotas — apenas protege.
- *
- * Prompt de segurança item 1: Rotas Sensíveis
- */
 class BlockSensitiveRoutesInProduction
 {
-    /**
-     * Padrões de rotas sensíveis (regex PCRE).
-     */
     private const SENSITIVE_PATTERNS = [
-        '#^/?run-migrations#i',
+        '#^/?debug-test$#i',
+        '#^/?limpar-cache$#i',
+        '#^/?run-migrations$#i',
+        '#^/?demo-somos-unicas$#i',
         '#^/?install(/|$)#i',
         '#^/?backend/install(/|$)#i',
         '#^/?run$#i',
         '#^/?test-connection$#i',
-        '#^/?demo-somos-unicas#i',
         '#^/?telescope(/|$)#i',
         '#^/?horizon(/|$)#i',
         '#^/?_debugbar(/|$)#i',
@@ -58,72 +43,74 @@ class BlockSensitiveRoutesInProduction
 
     public function handle(Request $request, Closure $next): Response
     {
-        // Bloqueia em qualquer ambiente que não seja localhost real
-        // (APP_ENV=local em servidor remoto ainda é produção de fato)
-        $isRealLocal = in_array($request->ip(), ['127.0.0.1', '::1'])
-            || str_starts_with($request->ip(), '192.168.')
-            || app()->runningInConsole()
-            || app()->runningUnitTests();
-
-        if ($isRealLocal && app()->environment('local', 'testing')) {
+        if (!$this->isSensitiveRoute($request)) {
             return $next($request);
         }
 
+        if ($this->shouldBlock($request)) {
+            $this->logBlockedAttempt($request);
+            abort(404);
+        }
+
+        return $next($request);
+    }
+
+    private function isSensitiveRoute(Request $request): bool
+    {
         $path = '/' . ltrim($request->path(), '/');
 
-        // Verifica se a rota é sensível
-        $isSensitive = false;
         foreach (self::SENSITIVE_PATTERNS as $pattern) {
-            if (@preg_match($pattern, $path) === 1) {
-                $isSensitive = true;
-                break;
+            if (preg_match($pattern, $path) === 1) {
+                return true;
             }
         }
 
-        if (! $isSensitive) {
-            return $next($request);
+        return false;
+    }
+
+    private function shouldBlock(Request $request): bool
+    {
+        if (app()->runningUnitTests()) {
+            return false;
         }
 
-        // Permite se tem token de manutenção válido
-        $secret = env('MAINTENANCE_SECRET');
-        if ($secret && strlen($secret) >= 8) {
-            $token = $request->header('X-Maintenance-Token')
-                ?? $request->query('maintenance_token');
-
-            if ($token && hash_equals($secret, $token)) {
-                return $next($request);
-            }
+        if ($this->isLocalHttpRequest($request) && app()->environment('local', 'testing')) {
+            return false;
         }
 
-        // Permite se é superadmin autenticado
-        $user = $request->user();
-        if ($user) {
-            $isSuperAdmin = method_exists($user, 'hasRole')
-                ? $user->hasRole('super-admin')
-                : (($user->role ?? '') === 'super-admin' || ($user->is_superadmin ?? false));
-
-            if ($isSuperAdmin) {
-                return $next($request);
-            }
+        if ($this->isInstallerRoute($request) && (bool) config('maintenance.allow_installer', false)) {
+            return false;
         }
 
-        // Bloqueia e registra
+        return !(bool) config('maintenance.allow_sensitive_routes', false);
+    }
+
+    private function isLocalHttpRequest(Request $request): bool
+    {
+        $ip = (string) $request->ip();
+
+        return in_array($ip, ['127.0.0.1', '::1'], true) || str_starts_with($ip, '192.168.');
+    }
+
+    private function isInstallerRoute(Request $request): bool
+    {
+        $path = '/' . ltrim($request->path(), '/');
+
+        return preg_match('#^/?install(/|$)#i', $path) === 1
+            || preg_match('#^/?backend/install(/|$)#i', $path) === 1;
+    }
+
+    private function logBlockedAttempt(Request $request): void
+    {
         try {
-            Log::channel('security')->warning('Tentativa de acesso a rota sensível bloqueada', [
-                'path'       => $path,
-                'ip'         => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'user_id'    => $user?->id,
+            Log::warning('Rota de manutencao bloqueada', [
+                'path' => '/' . ltrim($request->path(), '/'),
+                'method' => $request->method(),
+                'ip_hash' => hash('sha256', (string) $request->ip()),
+                'user_id' => $request->user()?->id,
             ]);
-        } catch (\Throwable $e) {
-            // Canal security pode não existir ainda
-            Log::warning('Rota sensível bloqueada: ' . $path, ['ip' => $request->ip()]);
+        } catch (\Throwable) {
+            // Nao interrompe a resposta 404 caso o canal de log esteja indisponivel.
         }
-
-        if ($request->expectsJson()) {
-            return response()->json(['error' => 'forbidden'], 403);
-        }
-
-        abort(403, 'Acesso negado.');
     }
 }

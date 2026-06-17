@@ -2,6 +2,31 @@
 
 ---
 
+## [2026-06-17] - fix(eventos): segurança de cupons, grupo e rotas sensíveis
+
+### Corrigido
+- Cupons de evento passam a validar código, tipo, datas, limites e valores por `EventCouponRequest`, reaproveitado no painel antigo e no painel novo.
+- O link do grupo do WhatsApp do evento agora aceita somente hosts oficiais do WhatsApp e a entrada no grupo passa por serviço dedicado com registro de acesso.
+- O botão "Entrar no grupo do evento" foi centralizado em partial única para manter o mesmo comportamento na página do evento e na confirmação de pagamento.
+- Cupons já usados em inscrição não podem mais ser excluídos; devem ser desativados para preservar o histórico financeiro.
+- Rotas sensíveis de manutenção foram movidas para `routes/modules/maintenance.php` e ficam fechadas por padrão com resposta 404 em ambiente real.
+- O bloqueio antigo `if (false && ...)` de marketplace foi substituído por `MARKETPLACE_REQUIRE_SELLER_ENABLED`.
+- Flags de gateway foram isoladas em `config/payments.php` sem quebrar o toggle administrativo já existente.
+
+### Arquivos principais
+- `app/Http/Requests/Admin/EventCouponRequest.php`
+- `app/Rules/WhatsAppGroupLinkRule.php`
+- `app/Services/Event/EventGroupAccessService.php`
+- `app/Http/Controllers/Admin/EventCouponController.php`
+- `app/Http/Controllers/EventGroupController.php`
+- `routes/modules/maintenance.php`
+- `app/Http/Middleware/BlockSensitiveRoutesInProduction.php`
+- `config/maintenance.php`
+- `config/marketplace.php`
+- `tests/Unit/EventCouponAndWhatsAppRuleTest.php`
+
+---
+
 ## [2026-06-17] - fix(site): eventos pagos fora de palestras gratuitas
 
 ### Corrigido

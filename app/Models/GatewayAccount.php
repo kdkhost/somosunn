@@ -45,6 +45,14 @@ class GatewayAccount extends Model
      */
     public static function resolveForSeller(int $sellerId): array
     {
+        if (!static::isMercadoPagoEnabledByConfig()) {
+            return [
+                'mpEnabled' => false,
+                'mpPublicKey' => '',
+                'source' => 'disabled',
+            ];
+        }
+
         // Se o "vendedor" e admin/superadmin, ele e a propria plataforma.
         // Nesse caso o toggle global (mercadopago_enabled) deve controlar o gateway,
         // mesmo que haja uma gateway_account cadastrada em nome dele.
@@ -103,6 +111,15 @@ class GatewayAccount extends Model
      */
     public static function resolveForSellerSumUp(int $sellerId): array
     {
+        if (!static::isSumUpEnabledByConfig()) {
+            return [
+                'sumupEnabled' => false,
+                'apiKey' => '',
+                'merchantCode' => '',
+                'source' => 'disabled',
+            ];
+        }
+
         // Se o vendedor e admin, toggle global SumUp decide.
         if ($sellerId > 0 && static::isPlatformOwner($sellerId)) {
             $sumupToggle = (int) Setting::get('sumup_enabled', 0) === 1;
@@ -211,7 +228,8 @@ class GatewayAccount extends Model
     private static function resolveGlobalSettings(): array
     {
         // Respeita o toggle global - se desativado, nao retorna como habilitado
-        $mpToggle = (int) Setting::get('mercadopago_enabled', 0) === 1;
+        $mpToggle = static::isMercadoPagoEnabledByConfig()
+            && (int) Setting::get('mercadopago_enabled', 0) === 1;
 
         $mpEnv    = (string) Setting::get('mercadopago_env', 'sandbox');
         $mpPrefix = $mpEnv === 'production' ? 'mercadopago_prod_' : 'mercadopago_sandbox_';
@@ -234,6 +252,10 @@ class GatewayAccount extends Model
      */
     private static function resolveMercadoPagoForSeller(int $sellerId): ?array
     {
+        if (!static::isMercadoPagoEnabledByConfig()) {
+            return null;
+        }
+
         // Se o vendedor e admin, toggle global decide.
         if ($sellerId > 0 && static::isPlatformOwner($sellerId)) {
             if (!(int) Setting::get('mercadopago_enabled', 0)) {
@@ -301,6 +323,10 @@ class GatewayAccount extends Model
      */
     private static function resolveSumUpForSeller(int $sellerId): ?array
     {
+        if (!static::isSumUpEnabledByConfig()) {
+            return null;
+        }
+
         // Se o vendedor e admin, toggle global decide
         if ($sellerId > 0 && static::isPlatformOwner($sellerId)) {
             if (!(int) Setting::get('sumup_enabled', 0)) {
@@ -375,5 +401,15 @@ class GatewayAccount extends Model
         }
 
         return null;
+    }
+
+    private static function isMercadoPagoEnabledByConfig(): bool
+    {
+        return (bool) config('payments.mercadopago.enabled', true);
+    }
+
+    private static function isSumUpEnabledByConfig(): bool
+    {
+        return (bool) config('payments.sumup.enabled', true);
     }
 }

@@ -3,36 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use App\Models\EventRegistration;
+use App\Services\Event\EventGroupAccessService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class EventGroupController extends Controller
 {
+    public function __construct(private EventGroupAccessService $groupAccess)
+    {
+    }
+
     public function join(Request $request, Event $event)
     {
         $user = $request->user();
         abort_unless($user, 403);
 
-        $link = trim((string) $event->whatsapp_group_link);
-        if ($link === '') {
-            return redirect()->route('events.show', $event)->with('error', 'O grupo deste evento ainda não está disponível.');
-        }
-
-        $registration = EventRegistration::query()
-            ->where('event_id', (int) $event->id)
-            ->where('user_id', (int) $user->id)
-            ->whereIn('status', EventRegistration::COUNTED_STATUSES)
-            ->latest('id')
-            ->first();
-
-        if (!$registration) {
-            return redirect()->route('events.show', $event)->with('error', 'Confirme sua inscrição antes de acessar o grupo do evento.');
-        }
-
-        if (!$registration->joined_group_at) {
-            $registration->forceFill(['joined_group_at' => now()])->save();
+        try {
+            $link = $this->groupAccess->resolveJoinLink($event, $user, $request);
+        } catch (ValidationException $exception) {
+            return redirect()
+                ->route('events.show', $event)
+                ->with('error', $this->firstValidationMessage($exception));
         }
 
         return redirect()->away($link);
+    }
+
+    private function firstValidationMessage(ValidationException $exception): string
+    {
+        $messages = collect($exception->errors())->flatten();
+
+        return (string) ($messages->first() ?: 'Não foi possível liberar o grupo deste evento.');
     }
 }

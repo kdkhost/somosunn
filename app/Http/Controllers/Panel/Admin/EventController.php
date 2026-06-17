@@ -6,6 +6,7 @@ use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Plan;
+use App\Rules\WhatsAppGroupLinkRule;
 use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
@@ -405,7 +406,7 @@ class EventController extends Controller
             'all_day' => 'nullable|boolean',
             'is_certificate_enabled' => 'nullable|boolean',
             'is_ticket_enabled' => 'nullable|boolean',
-            'whatsapp_group_link' => 'nullable|url|max:2048',
+            'whatsapp_group_link' => ['nullable', 'url', 'max:2048', new WhatsAppGroupLinkRule()],
             'visibility' => $this->visibilityRule(),
             'certificate_settings' => 'nullable|json',
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',

@@ -661,6 +661,11 @@ class Event extends Model
         return $this->hasMany(EventCoupon::class);
     }
 
+    public function hasWhatsappGroup(): bool
+    {
+        return filled($this->whatsapp_group_link);
+    }
+
     public function exhibitorRegistrations()
     {
         return $this->hasMany(EventExhibitorRegistration::class);

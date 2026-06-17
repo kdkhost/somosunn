@@ -2,6 +2,8 @@
 
 return [
     'mercadopago' => [
+        'enabled' => env('PAYMENT_MERCADOPAGO_ENABLED', true),
+
         /**
          * Chave pública de produção ou sandbox, obtida no painel de credenciais.
          */
@@ -42,6 +44,8 @@ return [
     ],
 
     'sumup' => [
+        'enabled' => env('PAYMENT_SUMUP_ENABLED', true),
+
         /**
          * Chave de API SumUp para autenticação nas chamadas de API.
          */
