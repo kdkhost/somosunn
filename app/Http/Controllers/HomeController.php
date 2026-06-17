@@ -18,15 +18,26 @@ class HomeController extends Controller
         $demoMode = (bool) config('app.demo_mode');
 
         $freeEvents = collect();
+        $promotionalEvents = collect();
         $paidMentorings = collect();
 
         if (view()->shared('unnDbAvailable')) {
             try {
-                $freeEvents = ContentVisibility::applyPublicFilter(
-                    Event::query()->where('published', true)->where('type', 'event'),
+                $eventBaseQuery = fn () => ContentVisibility::applyPublicFilter(
+                    Event::query()
+                        ->where('published', true)
+                        ->where('type', 'event'),
                     'events'
-                )
-                    ->publicUpcoming()
+                )->publicUpcoming();
+
+                $freeEvents = $eventBaseQuery()
+                    ->actuallyFreeForPublic()
+                    ->orderBy('start_at')
+                    ->limit(6)
+                    ->get();
+
+                $promotionalEvents = $eventBaseQuery()
+                    ->paidForPublic()
                     ->orderBy('start_at')
                     ->limit(6)
                     ->get();
@@ -83,6 +94,7 @@ class HomeController extends Controller
 
         return view('site.index', [
             'freeEvents' => $freeEvents,
+            'promotionalEvents' => $promotionalEvents,
             'paidMentorings' => $paidMentorings,
             'levelSummary' => $levelSummary,
             'topRankings' => $topRankings,

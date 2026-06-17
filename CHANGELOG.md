@@ -2,6 +2,20 @@
 
 ---
 
+## [2026-06-17] - fix(site): eventos pagos fora de palestras gratuitas
+
+### Corrigido
+- A home pública não classifica mais qualquer evento futuro como palestra gratuita.
+- A seção "Palestras gratuitas" agora exibe somente eventos com entrada, lotes e preço promocional zerados.
+- Eventos pagos passam a aparecer na seção "Eventos em destaque", com lote/preço visíveis e sem selo de gratuidade.
+
+### Arquivos principais
+- `app/Models/Event.php`
+- `app/Http/Controllers/HomeController.php`
+- `resources/views/site/index.blade.php`
+
+---
+
 ## [2026-06-17] - fix(admin): calendário de cupons legível no tema escuro
 
 ### Corrigido

@@ -267,6 +267,37 @@ class Event extends Model
         return 'Entrada';
     }
 
+    public function isActuallyFreeForPublic(): bool
+    {
+        foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price', 'flash_sale_price'] as $field) {
+            if (round((float) ($this->{$field} ?? 0), 2) > 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function scopeActuallyFreeForPublic(Builder $query): Builder
+    {
+        foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price', 'flash_sale_price'] as $field) {
+            $query->where(function (Builder $query) use ($field) {
+                $query->whereNull($field)->orWhere($field, '<=', 0);
+            });
+        }
+
+        return $query;
+    }
+
+    public function scopePaidForPublic(Builder $query): Builder
+    {
+        return $query->where(function (Builder $query) {
+            foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price', 'flash_sale_price'] as $field) {
+                $query->orWhere($field, '>', 0);
+            }
+        });
+    }
+
     public function publicDeadlineAt(): ?Carbon
     {
         $reference = $this->end_at ?: $this->start_at;

@@ -241,7 +241,7 @@
         @endif
 
         <!-- Palestras Gratuitas -->
-        @if($homePage->get('events_enabled', true))
+        @if($homePage->get('events_enabled', true) && $freeEvents->isNotEmpty())
         <section class="py-16 w-full overflow-x-hidden">
             <div class="unn-container">
                 <div class="flex justify-between items-center mb-8">
@@ -307,6 +307,82 @@
                 </div>
 
                 <div class="text-center mt-8">
+                    <a href="{{ route('events.index') }}"
+                        class="inline-flex items-center gap-2 font-semibold hover:underline"
+                        style="color: var(--unn-azul-1)">
+                        Ver todos os eventos <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+        @endif
+
+        @if($homePage->get('events_enabled', true) && ($promotionalEvents ?? collect())->isNotEmpty())
+        <section class="py-16 bg-white w-full overflow-x-hidden">
+            <div class="unn-container">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-black text-gray-900">Eventos em destaque</h2>
+                        <p class="text-gray-500">Divulgação dos próximos encontros da comunidade</p>
+                    </div>
+                    <a href="{{ route('events.index') }}"
+                        class="hidden md:inline-flex items-center gap-2 font-semibold" style="color: var(--unn-azul-1)">
+                        Ver todos os eventos <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="grid auto-rows-fr md:grid-cols-3 gap-8">
+                    @foreach($promotionalEvents as $event)
+                        @php
+                            $isEventClosed = method_exists($event, 'isClosedForPublic') && $event->isClosedForPublic();
+                            $eventPrice = (float) (
+                                $event->current_price
+                                ?: $event->price
+                                ?: $event->batch_1_price
+                                ?: $event->batch_2_price
+                                ?: $event->batch_3_price
+                                ?: $event->flash_sale_price
+                                ?: 0
+                            );
+                        @endphp
+                        <article class="home-selling-card bg-slate-50 rounded-3xl p-8 border border-blue-100 shadow-sm h-full flex flex-col transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                            <div class="home-selling-body">
+                                <div class="flex flex-wrap items-center gap-2 mb-4">
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
+                                        {{ $event->current_batch_label ?: 'Ingresso' }}
+                                    </span>
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-black text-white"
+                                        style="background: var(--unn-azul-1)">
+                                        R$ {{ number_format($eventPrice, 2, ',', '.') }}
+                                    </span>
+                                </div>
+                                <h3 class="home-selling-title text-xl font-bold text-gray-900 mb-3 line-clamp-2">{{ $event->title }}</h3>
+                                <p class="home-selling-copy text-gray-600 text-sm mb-4 line-clamp-3">{{ Str::limit(strip_tags((string) ($event->description ?? '')), 100) }}</p>
+                                <div class="home-selling-meta flex items-center gap-4 text-sm text-gray-500 mb-3">
+                                    <span><i class="fas fa-calendar mr-1"></i>
+                                        {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y H:i') }}</span>
+                                </div>
+                                <div class="home-selling-meta flex items-center gap-2 text-sm text-gray-500 mb-6">
+                                    <i class="fas fa-map-marker-alt"></i> {{ $event->location }}
+                                </div>
+                            </div>
+                            <div class="home-selling-footer mt-auto pt-4 border-t border-blue-100">
+                                @if($isEventClosed)
+                                    <span class="home-selling-action block w-full bg-slate-100 text-slate-400 py-3 rounded-xl font-semibold text-center cursor-not-allowed border border-slate-200">
+                                        Evento encerrado
+                                    </span>
+                                @else
+                                    <a href="{{ route('events.show', $event->id) }}"
+                                        class="home-selling-action block w-full btn-primary text-white py-3 rounded-xl font-semibold text-center">
+                                        Ver detalhes
+                                    </a>
+                                @endif
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+
+                <div class="text-center mt-8 md:hidden">
                     <a href="{{ route('events.index') }}"
                         class="inline-flex items-center gap-2 font-semibold hover:underline"
                         style="color: var(--unn-azul-1)">
