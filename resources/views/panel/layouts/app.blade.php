@@ -5,6 +5,7 @@
     <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-image-preview.css') }}?v=3" rel="stylesheet">
     <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.css') }}?v=3" rel="stylesheet">
     <link href="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-type.css') }}?v=3" rel="stylesheet">
+    <link href="{{ asset('vendor/flatpickr/css/flatpickr.min.css') }}?v=3" rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
     <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
@@ -272,6 +273,88 @@
             color: #e2e8f0;
         }
 
+        html.dark .flatpickr-calendar {
+            background: #0f172a;
+            border: 1px solid #334155;
+            box-shadow: 0 18px 45px rgba(2, 6, 23, 0.5);
+            color: #e2e8f0;
+        }
+
+        html.dark .flatpickr-calendar.arrowTop::before,
+        html.dark .flatpickr-calendar.arrowTop::after {
+            border-bottom-color: #0f172a;
+        }
+
+        html.dark .flatpickr-calendar.arrowBottom::before,
+        html.dark .flatpickr-calendar.arrowBottom::after {
+            border-top-color: #0f172a;
+        }
+
+        html.dark .flatpickr-months,
+        html.dark .flatpickr-months .flatpickr-month,
+        html.dark .flatpickr-current-month .flatpickr-monthDropdown-months,
+        html.dark .flatpickr-current-month input.cur-year,
+        html.dark .flatpickr-weekdays,
+        html.dark .flatpickr-time {
+            background: #0f172a;
+            color: #f8fafc !important;
+            fill: #f8fafc;
+        }
+
+        html.dark .flatpickr-monthDropdown-month,
+        html.dark .flatpickr-weekday,
+        html.dark .flatpickr-day {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark .flatpickr-day.prevMonthDay,
+        html.dark .flatpickr-day.nextMonthDay,
+        html.dark .flatpickr-day.flatpickr-disabled {
+            color: #64748b !important;
+        }
+
+        html.dark .flatpickr-day:hover,
+        html.dark .flatpickr-day:focus {
+            background: #1e293b;
+            border-color: #334155;
+            color: #ffffff !important;
+        }
+
+        html.dark .flatpickr-day.today {
+            border-color: #60a5fa;
+        }
+
+        html.dark .flatpickr-day.selected,
+        html.dark .flatpickr-day.startRange,
+        html.dark .flatpickr-day.endRange {
+            background: #1F5EDB;
+            border-color: #1F5EDB;
+            color: #ffffff !important;
+        }
+
+        html.dark .flatpickr-time input,
+        html.dark .flatpickr-time .flatpickr-am-pm {
+            background: #020617;
+            color: #f8fafc !important;
+        }
+
+        html.dark .flatpickr-time input:hover,
+        html.dark .flatpickr-time .flatpickr-am-pm:hover {
+            background: #1e293b;
+        }
+
+        html.dark .flatpickr-months .flatpickr-prev-month,
+        html.dark .flatpickr-months .flatpickr-next-month {
+            color: #cbd5e1;
+            fill: #cbd5e1;
+        }
+
+        html.dark .flatpickr-months .flatpickr-prev-month:hover,
+        html.dark .flatpickr-months .flatpickr-next-month:hover {
+            color: #60a5fa;
+            fill: #60a5fa;
+        }
+
         .filepond--credits {
             display: none !important;
             visibility: hidden !important;
@@ -504,6 +587,8 @@
         <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-size.js') }}?v=3"></script>
         <script src="{{ asset('vendor/filepond/plugins/filepond-plugin-file-validate-type.js') }}?v=3"></script>
         <script src="{{ asset('vendor/filepond/filepond.js') }}?v=3"></script>
+        <script src="{{ asset('vendor/flatpickr/js/flatpickr.min.js') }}?v=3"></script>
+        <script src="{{ asset('vendor/flatpickr/js/l10n/pt.js') }}?v=3"></script>
 
         <script src="https://unpkg.com/@yaireo/tagify"></script>
 
@@ -1010,9 +1095,38 @@
                     attachUploadProgressToForms(root);
                 };
 
+                window.initializePanelDateTimePickers = function (root = document) {
+                    if (!window.flatpickr) {
+                        return;
+                    }
+
+                    try {
+                        if (flatpickr.l10ns && flatpickr.l10ns.pt) {
+                            flatpickr.localize(flatpickr.l10ns.pt);
+                        }
+                    } catch (e) { }
+
+                    root.querySelectorAll('[data-datetime-picker]').forEach(function (input) {
+                        if (input._flatpickr) {
+                            return;
+                        }
+
+                        flatpickr(input, {
+                            enableTime: true,
+                            time_24hr: true,
+                            allowInput: true,
+                            disableMobile: true,
+                            altInput: true,
+                            altFormat: 'd/m/Y H:i',
+                            dateFormat: 'Y-m-d H:i'
+                        });
+                    });
+                };
+
                 // Funcao global injetada pós-Navegação SPA
                 window.initPanelScripts = function () {
                     window.initializePanelFileUploads(document);
+                    window.initializePanelDateTimePickers(document);
 
                     // Flash messages já são exibidas pelo layout pai (layouts/app.blade.php)
                 };

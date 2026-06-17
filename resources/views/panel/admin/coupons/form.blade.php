@@ -168,15 +168,17 @@
 
                             <div class="space-y-1.5">
                                 <label for="starts_at" class="text-sm font-bold text-slate-700 dark:text-slate-300 transition-colors">Data de Início</label>
-                                <input type="datetime-local" name="starts_at" id="starts_at"
-                                    value="{{ old('starts_at', $coupon->starts_at ? $coupon->starts_at->format('Y-m-d\TH:i') : '') }}"
+                                <input type="text" name="starts_at" id="starts_at"
+                                    value="{{ old('starts_at', $coupon->starts_at ? $coupon->starts_at->format('Y-m-d H:i') : '') }}"
+                                    data-datetime-picker placeholder="DD/MM/AAAA HH:MM" autocomplete="off"
                                     class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 dark:text-white">
                             </div>
 
                             <div class="space-y-1.5">
                                 <label for="ends_at" class="text-sm font-bold text-slate-700 dark:text-slate-300 transition-colors">Data de Término</label>
-                                <input type="datetime-local" name="ends_at" id="ends_at"
-                                    value="{{ old('ends_at', $coupon->ends_at ? $coupon->ends_at->format('Y-m-d\TH:i') : '') }}"
+                                <input type="text" name="ends_at" id="ends_at"
+                                    value="{{ old('ends_at', $coupon->ends_at ? $coupon->ends_at->format('Y-m-d H:i') : '') }}"
+                                    data-datetime-picker placeholder="DD/MM/AAAA HH:MM" autocomplete="off"
                                     class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 dark:text-white">
                             </div>
                         </div>

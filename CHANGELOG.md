@@ -2,6 +2,23 @@
 
 ---
 
+## [2026-06-17] - fix(admin): calendário de cupons legível no tema escuro
+
+### Corrigido
+- O seletor de data/hora dos cupons deixou de abrir com fundo branco ilegível no tema escuro do painel antigo.
+- Cupons comuns e cupons de evento passam a usar Flatpickr com exibição brasileira `DD/MM/AAAA HH:MM`, mantendo o valor enviado no formato aceito pelo backend.
+- O mesmo comportamento foi aplicado no painel novo para evitar divergência entre `/admin` e o painel administrativo novo.
+
+### Arquivos principais
+- `resources/views/admin/layouts/app.blade.php`
+- `resources/views/admin/coupons/form.blade.php`
+- `resources/views/admin/events/coupons/form.blade.php`
+- `resources/views/panel/layouts/app.blade.php`
+- `resources/views/panel/admin/coupons/form.blade.php`
+- `resources/views/panel/admin/events/coupons/form.blade.php`
+
+---
+
 ## [2026-06-17] - fix(admin): separar desconto e corrigir DDD em pedidos
 
 ### Corrigido

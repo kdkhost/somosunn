@@ -136,6 +136,88 @@
             --summernote-link: #60a5fa;
         }
 
+        .dark-mode .flatpickr-calendar {
+            background: #111827;
+            border: 1px solid #334155;
+            box-shadow: 0 18px 45px rgba(2, 6, 23, 0.45);
+            color: #e5e7eb;
+        }
+
+        .dark-mode .flatpickr-calendar.arrowTop::before,
+        .dark-mode .flatpickr-calendar.arrowTop::after {
+            border-bottom-color: #111827;
+        }
+
+        .dark-mode .flatpickr-calendar.arrowBottom::before,
+        .dark-mode .flatpickr-calendar.arrowBottom::after {
+            border-top-color: #111827;
+        }
+
+        .dark-mode .flatpickr-months,
+        .dark-mode .flatpickr-months .flatpickr-month,
+        .dark-mode .flatpickr-current-month .flatpickr-monthDropdown-months,
+        .dark-mode .flatpickr-current-month input.cur-year,
+        .dark-mode .flatpickr-weekdays,
+        .dark-mode .flatpickr-time {
+            background: #111827;
+            color: #f8fafc !important;
+            fill: #f8fafc;
+        }
+
+        .dark-mode .flatpickr-monthDropdown-month,
+        .dark-mode .flatpickr-weekday,
+        .dark-mode .flatpickr-day {
+            color: #cbd5e1 !important;
+        }
+
+        .dark-mode .flatpickr-day.prevMonthDay,
+        .dark-mode .flatpickr-day.nextMonthDay,
+        .dark-mode .flatpickr-day.flatpickr-disabled {
+            color: #64748b !important;
+        }
+
+        .dark-mode .flatpickr-day:hover,
+        .dark-mode .flatpickr-day:focus {
+            background: #1e293b;
+            border-color: #334155;
+            color: #ffffff !important;
+        }
+
+        .dark-mode .flatpickr-day.today {
+            border-color: #60a5fa;
+        }
+
+        .dark-mode .flatpickr-day.selected,
+        .dark-mode .flatpickr-day.startRange,
+        .dark-mode .flatpickr-day.endRange {
+            background: #1F5EDB;
+            border-color: #1F5EDB;
+            color: #ffffff !important;
+        }
+
+        .dark-mode .flatpickr-time input,
+        .dark-mode .flatpickr-time .flatpickr-am-pm {
+            background: #0f172a;
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .flatpickr-time input:hover,
+        .dark-mode .flatpickr-time .flatpickr-am-pm:hover {
+            background: #1e293b;
+        }
+
+        .dark-mode .flatpickr-months .flatpickr-prev-month,
+        .dark-mode .flatpickr-months .flatpickr-next-month {
+            color: #cbd5e1;
+            fill: #cbd5e1;
+        }
+
+        .dark-mode .flatpickr-months .flatpickr-prev-month:hover,
+        .dark-mode .flatpickr-months .flatpickr-next-month:hover {
+            color: #60a5fa;
+            fill: #60a5fa;
+        }
+
         /* ═══════════════════════════════════════════════════════════════
            DARK MODE PREMIUM - Texto SEMPRE visível (branco sobre escuro)
            ═══════════════════════════════════════════════════════════════ */
@@ -2335,6 +2417,9 @@
                     enableTime: true,
                     time_24hr: true,
                     allowInput: true,
+                    disableMobile: true,
+                    altInput: true,
+                    altFormat: 'd/m/Y H:i',
                     dateFormat: 'Y-m-d H:i'
                 });
             });

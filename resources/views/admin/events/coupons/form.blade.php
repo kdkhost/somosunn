@@ -77,14 +77,14 @@
                     <div class="col-md-6">
                         <div class="form-group mb-md-0">
                             <label>Começa em</label>
-                            <input type="datetime-local" name="starts_at" value="{{ old('starts_at', $coupon->starts_at ? $coupon->starts_at->format('Y-m-d\\TH:i') : '') }}" class="form-control">
+                            <input type="text" name="starts_at" value="{{ old('starts_at', $coupon->starts_at ? $coupon->starts_at->format('Y-m-d H:i') : '') }}" class="form-control" data-datetime-picker placeholder="DD/MM/AAAA HH:MM" autocomplete="off">
                             @error('starts_at')<small class="text-danger">{{ $message }}</small>@enderror
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group mb-0">
                             <label>Expira em</label>
-                            <input type="datetime-local" name="expires_at" value="{{ old('expires_at', $coupon->expires_at ? $coupon->expires_at->format('Y-m-d\\TH:i') : '') }}" class="form-control">
+                            <input type="text" name="expires_at" value="{{ old('expires_at', $coupon->expires_at ? $coupon->expires_at->format('Y-m-d H:i') : '') }}" class="form-control" data-datetime-picker placeholder="DD/MM/AAAA HH:MM" autocomplete="off">
                             @error('expires_at')<small class="text-danger">{{ $message }}</small>@enderror
                         </div>
                     </div>

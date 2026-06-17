@@ -105,14 +105,14 @@
                 </div>
                 <div class="form-group col-md-3">
                     <label>Início (opcional)</label>
-                    <input name="starts_at" class="form-control" data-datetime-picker value="{{ old('starts_at', optional($coupon->starts_at)->format('Y-m-d H:i')) }}" placeholder="AAAA-MM-DD HH:MM" autocomplete="off">
+                    <input name="starts_at" class="form-control" data-datetime-picker value="{{ old('starts_at', optional($coupon->starts_at)->format('Y-m-d H:i')) }}" placeholder="DD/MM/AAAA HH:MM" autocomplete="off">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col-md-3">
                     <label>Término (opcional)</label>
-                    <input name="ends_at" class="form-control" data-datetime-picker value="{{ old('ends_at', optional($coupon->ends_at)->format('Y-m-d H:i')) }}" placeholder="AAAA-MM-DD HH:MM" autocomplete="off">
+                    <input name="ends_at" class="form-control" data-datetime-picker value="{{ old('ends_at', optional($coupon->ends_at)->format('Y-m-d H:i')) }}" placeholder="DD/MM/AAAA HH:MM" autocomplete="off">
                 </div>
                 <div class="form-group col-md-9">
                     <div class="alert alert-info mb-0 mt-4">

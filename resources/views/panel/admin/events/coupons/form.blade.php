@@ -53,13 +53,13 @@
 
             <label class="space-y-2">
                 <span class="text-xs font-black uppercase tracking-widest text-slate-500">Começa em</span>
-                <input type="datetime-local" name="starts_at" value="{{ old('starts_at', $coupon->starts_at ? $coupon->starts_at->format('Y-m-d\\TH:i') : '') }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                <input type="text" name="starts_at" value="{{ old('starts_at', $coupon->starts_at ? $coupon->starts_at->format('Y-m-d H:i') : '') }}" data-datetime-picker placeholder="DD/MM/AAAA HH:MM" autocomplete="off" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
                 @error('starts_at')<span class="text-xs font-bold text-red-600">{{ $message }}</span>@enderror
             </label>
 
             <label class="space-y-2">
                 <span class="text-xs font-black uppercase tracking-widest text-slate-500">Expira em</span>
-                <input type="datetime-local" name="expires_at" value="{{ old('expires_at', $coupon->expires_at ? $coupon->expires_at->format('Y-m-d\\TH:i') : '') }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                <input type="text" name="expires_at" value="{{ old('expires_at', $coupon->expires_at ? $coupon->expires_at->format('Y-m-d H:i') : '') }}" data-datetime-picker placeholder="DD/MM/AAAA HH:MM" autocomplete="off" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
                 @error('expires_at')<span class="text-xs font-bold text-red-600">{{ $message }}</span>@enderror
             </label>
         </div>
