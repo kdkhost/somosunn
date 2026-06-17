@@ -181,6 +181,7 @@
         <li class="nav-item mr-2 d-flex align-items-center">
             <form method="POST" action="{{ route('admin.settings.update') }}" id="themeToggleForm" class="m-0 p-0">
                 @csrf
+                <input type="hidden" name="current_group" value="appearance">
                 <input type="hidden" name="site_theme" id="site_theme_input"
                     value="{{ $settings['site_theme'] ?? 'light' }}">
                 <a class="nav-link" href="#" id="themeToggleBtn" role="button" title="Alternar tema">

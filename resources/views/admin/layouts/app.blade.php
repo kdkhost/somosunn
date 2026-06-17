@@ -2252,11 +2252,74 @@
             });
         };
 
+        let adminThemeSaving = false;
+
+        function applyAdminTheme(theme) {
+            const isDark = theme === 'dark';
+            const icon = $('#themeToggleBtn i');
+
+            document.body.classList.toggle('dark-mode', isDark);
+            $('#site_theme_input').val(theme);
+            icon
+                .toggleClass('fa-moon', !isDark)
+                .toggleClass('fa-sun text-warning', isDark);
+
+            if (typeof window.syncSummernoteThemeDefaults === 'function') {
+                window.syncSummernoteThemeDefaults();
+            }
+        }
+
         $('#themeToggleBtn').on('click', function (event) {
             event.preventDefault();
-            const input = $('#site_theme_input');
-            input.val(input.val() === 'dark' ? 'light' : 'dark');
-            $('#themeToggleForm').submit();
+
+            if (adminThemeSaving) {
+                return;
+            }
+
+            const form = document.getElementById('themeToggleForm');
+            const input = document.getElementById('site_theme_input');
+
+            if (!form || !input || typeof window.fetch !== 'function') {
+                $('#themeToggleForm').submit();
+                return;
+            }
+
+            const previousTheme = input.value === 'dark' ? 'dark' : 'light';
+            const nextTheme = previousTheme === 'dark' ? 'light' : 'dark';
+            const formData = new FormData(form);
+
+            formData.set('site_theme', nextTheme);
+            formData.set('current_group', 'appearance');
+            applyAdminTheme(nextTheme);
+
+            adminThemeSaving = true;
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('Não foi possível salvar o tema.');
+                    }
+
+                    return response.json().catch(function () {
+                        return {};
+                    });
+                })
+                .catch(function () {
+                    applyAdminTheme(previousTheme);
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('Não foi possível salvar o tema. Tente novamente.');
+                    }
+                })
+                .finally(function () {
+                    adminThemeSaving = false;
+                });
         });
 
         const logo = $('.brand-logo-img');

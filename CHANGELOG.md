@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-06-17] - fix(admin): tema dark/light em tempo real
+
+### Corrigido
+- A troca de tema dark/light no painel antigo voltou a aplicar o visual imediatamente, sem depender do recarregamento da página.
+- O tema continua sendo salvo em background nas configurações de aparência.
+- O ícone do botão de tema acompanha a mudança instantaneamente e reverte caso o salvamento falhe.
+
+### Arquivos principais
+- `resources/views/admin/layouts/app.blade.php`
+- `resources/views/admin/partials/navbar.blade.php`
+
+---
+
 ## [2026-06-17] - fix(admin): cupons em aba interna do evento
 
 ### Corrigido
