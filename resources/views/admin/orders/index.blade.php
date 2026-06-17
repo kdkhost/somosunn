@@ -231,13 +231,14 @@
                                         {{ $order->buyerAddress() ?: '-' }}
                                     </div>
                                 </td>
-                                <td class="text-right" data-order="{{ (float) $order->total_amount }}">
-                                    <span class="font-weight-bold" style="font-size:14px;">R$ {{ number_format($grossAmount, 2, ',', '.') }}</span>
+                                <td class="text-right order-amount-cell" data-order="{{ (float) $order->total_amount }}">
+                                    <div class="order-amount-main">R$ {{ number_format($grossAmount, 2, ',', '.') }}</div>
                                     @if($discountAmount > 0)
-                                        <div class="text-success font-weight-bold text-xs">
-                                            Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
+                                        <div class="order-coupon-line" title="Cupom {{ $couponCode ?: '-' }}">
+                                            <span class="order-coupon-code">{{ $couponCode ?: '-' }}</span>
+                                            <span class="order-discount-value">- R$ {{ number_format($discountAmount, 2, ',', '.') }}</span>
                                         </div>
-                                        <small class="text-muted">Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</small>
+                                        <div class="order-net-value">Líquido R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
                                     @endif
                                 </td>
                                 <td>
@@ -309,6 +310,50 @@
         }
         #orders-table_wrapper .pagination {
             margin: 0;
+        }
+        #orders-table .order-amount-cell {
+            min-width: 150px;
+            white-space: nowrap;
+        }
+        #orders-table .order-amount-main {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        #orders-table .order-coupon-line {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.35rem;
+            max-width: 100%;
+            margin-top: 0.25rem;
+        }
+        #orders-table .order-coupon-code {
+            display: inline-block;
+            max-width: 76px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            padding: 0.12rem 0.4rem;
+            border-radius: 999px;
+            border: 1px solid rgba(40, 167, 69, 0.25);
+            background: rgba(40, 167, 69, 0.12);
+            color: #79d18a;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+        #orders-table .order-discount-value {
+            color: #9cd8a7;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        #orders-table .order-net-value {
+            margin-top: 0.15rem;
+            color: #adb5bd;
+            font-size: 11px;
+            line-height: 1.2;
         }
     </style>
 @endpush

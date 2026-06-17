@@ -244,7 +244,7 @@
                                         R$ {{ number_format($itemGross, 2, ',', '.') }}
                                         @if($discountAmount > 0)
                                             <div class="text-success small font-weight-bold">Cupom {{ $couponCode ?: '-' }}</div>
-                                            <div class="text-muted small">Liquido: R$ {{ number_format((float) $item->price, 2, ',', '.') }}</div>
+                                            <div class="text-muted small">Líquido: R$ {{ number_format((float) $item->price, 2, ',', '.') }}</div>
                                         @endif
                                     </td>
                                 </tr>

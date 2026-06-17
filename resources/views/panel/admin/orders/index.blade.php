@@ -12,7 +12,7 @@
             <div>
                 <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">Vendas</h1>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">
-                    Gerencie todos os pedidos e transacoes da plataforma.
+                    Gerencie todos os pedidos e transações da plataforma.
                 </p>
             </div>
 
@@ -110,7 +110,7 @@
                             <th class="px-6 py-4">Status</th>
                             <th class="px-6 py-4">Valor</th>
                             <th class="px-6 py-4">Data</th>
-                            <th class="px-6 py-4 text-right">Acoes</th>
+                            <th class="px-6 py-4 text-right">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -147,8 +147,8 @@
                                         </div>
                                         <div class="min-w-0">
                                             <div class="font-medium text-slate-900 dark:text-white text-sm truncate max-w-[150px]"
-                                                title="{{ $order->user->name ?? 'Usuario removido' }}">
-                                                {{ $order->user->name ?? 'Usuario removido' }}
+                                                title="{{ $order->user->name ?? 'Usuário removido' }}">
+                                                {{ $order->user->name ?? 'Usuário removido' }}
                                             </div>
                                             <div class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[150px]"
                                                 title="{{ $order->user->email ?? '' }}">
@@ -223,16 +223,21 @@
                                     @endif
                                 </td>
 
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-semibold text-slate-900 dark:text-white text-sm transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap" style="min-width: 160px;">
+                                    <div class="font-semibold text-slate-900 dark:text-white text-sm transition-colors" style="line-height: 1.15;">
                                         R$ {{ number_format($grossAmount, 2, ',', '.') }}
                                     </div>
                                     @if($discountAmount > 0)
-                                        <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-                                            Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
+                                        <div class="mt-1 inline-flex max-w-full items-center gap-2" title="Cupom {{ $couponCode ?: '-' }}">
+                                            <span class="inline-flex truncate rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-bold uppercase text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-900/25 dark:text-emerald-300" style="max-width: 78px; font-size: 10px; line-height: 1;">
+                                                {{ $couponCode ?: '-' }}
+                                            </span>
+                                            <span class="font-bold text-emerald-600 dark:text-emerald-400" style="font-size: 11px;">
+                                                - R$ {{ number_format($discountAmount, 2, ',', '.') }}
+                                            </span>
                                         </div>
-                                        <div class="text-xs text-slate-500 dark:text-slate-400">
-                                            Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}
+                                        <div class="text-slate-500 dark:text-slate-400" style="font-size: 11px; line-height: 1.15;">
+                                            Líquido R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}
                                         </div>
                                     @endif
                                     @if($order->refunded_amount > 0)

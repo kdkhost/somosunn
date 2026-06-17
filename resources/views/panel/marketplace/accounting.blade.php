@@ -91,7 +91,7 @@
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5">
             <div class="text-sm font-bold text-slate-500">Resultado liquido de vendas</div>
             <div class="mt-2 text-3xl font-extrabold text-emerald-600">{{ $money($summary['sales_net'] ?? 0) }}</div>
-            <div class="mt-2 text-xs text-slate-500">Apos comissoes e estornos</div>
+            <div class="mt-2 text-xs text-slate-500">Após comissões e estornos</div>
         </div>
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5">
             <div class="text-sm font-bold text-slate-500">Despesas em compras</div>
@@ -103,7 +103,7 @@
             <div class="mt-2 text-3xl font-extrabold {{ ($summary['overall_net'] ?? 0) >= 0 ? 'text-blue-600' : 'text-rose-600' }}">
                 {{ $money($summary['overall_net'] ?? 0) }}
             </div>
-            <div class="mt-2 text-xs text-slate-500">Vendas liquidas menos despesas de compras na plataforma</div>
+            <div class="mt-2 text-xs text-slate-500">Vendas líquidas menos despesas de compras na plataforma</div>
         </div>
     </div>
 
@@ -131,7 +131,7 @@
                                     <div class="text-xs text-slate-500 mt-1">{{ $order->items->pluck('title')->filter()->take(2)->join(', ') ?: 'Sem itens' }}</div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="font-bold text-slate-900 dark:text-white">{{ $order->user->name ?? 'Usuario removido' }}</div>
+                                    <div class="font-bold text-slate-900 dark:text-white">{{ $order->user->name ?? 'Usuário removido' }}</div>
                                     <div class="text-xs text-slate-500">{{ $order->user->email ?? '' }}</div>
                                 </td>
                                 <td class="px-6 py-4">
@@ -142,7 +142,7 @@
                                         </div>
                                     @endif
                                     <div class="text-xs text-slate-500">
-                                        Cobrado {{ $money($order->charged_amount) }} | Taxas {{ $money((float) $order->platform_fee_amount + (float) $order->fee_amount) }} | Liquido {{ $money($order->charged_amount - $order->refunded_amount - ((float) $order->platform_fee_amount + (float) $order->fee_amount)) }}
+                                        Cobrado {{ $money($order->charged_amount) }} | Taxas {{ $money((float) $order->platform_fee_amount + (float) $order->fee_amount) }} | Líquido {{ $money($order->charged_amount - $order->refunded_amount - ((float) $order->platform_fee_amount + (float) $order->fee_amount)) }}
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">

@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-06-17] - fix(admin): compactar valor com cupom na listagem de pedidos
+
+### Corrigido
+- A coluna de valor na listagem de pedidos do painel antigo e do painel novo agora exibe cupom, desconto e líquido em formato compacto, sem aumentar excessivamente a altura das linhas.
+- O cupom continua visível para controle financeiro, mas como chip curto ao lado do desconto aplicado.
+- Rótulos financeiros relacionados a cupom e contabilidade foram ajustados para português brasileiro com acentuação correta.
+
+### Arquivos principais
+- `resources/views/admin/orders/index.blade.php`
+- `resources/views/panel/admin/orders/index.blade.php`
+
+---
+
 ## [2026-06-17] - fix(financeiro): fatura e venda registram cupom integral
 
 ### Corrigido

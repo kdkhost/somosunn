@@ -21,11 +21,11 @@
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div>
                             <h2 class="text-xl font-black text-slate-900 dark:text-white">Pedido #{{ $order->id }}</h2>
-                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Comprador: {{ $order->user->name ?? 'Cliente' }} ? {{ $order->user->email ?? '-' }}</p>
-                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Bruto: R$ {{ number_format($grossAmount, 2, ',', '.') }} ? Status do pagamento: {{ strtoupper($order->status) }}</p>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Comprador: {{ $order->user->name ?? 'Cliente' }} &middot; {{ $order->user->email ?? '-' }}</p>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Bruto: R$ {{ number_format($grossAmount, 2, ',', '.') }} &middot; Status do pagamento: {{ strtoupper($order->status) }}</p>
                             @if($discountAmount > 0)
                                 <p class="mt-1 text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                                    Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }} ? Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}
+                                    Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }} &middot; Líquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}
                                 </p>
                             @endif
                         </div>
@@ -44,7 +44,7 @@
                                     <div class="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 dark:bg-slate-950 px-4 py-3">
                                         <div>
                                             <p class="font-bold text-slate-900 dark:text-white">{{ $item->title }}</p>
-                                            <p class="text-xs text-slate-500 dark:text-slate-400">{{ strtoupper($item->item_type) }} ? Qtde {{ $item->quantity }}</p>
+                                            <p class="text-xs text-slate-500 dark:text-slate-400">{{ strtoupper($item->item_type) }} &middot; Qtde {{ $item->quantity }}</p>
                                         </div>
                                         <div class="text-sm font-black text-slate-900 dark:text-white">
                                             R$ {{ number_format((float) $item->gross_unit_price, 2, ',', '.') }}
@@ -57,8 +57,8 @@
                         <div class="rounded-3xl border border-slate-100 dark:border-slate-800 p-5">
                             <h3 class="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Fulfillment</h3>
                             @if($order->shipment)
-                                <p class="mt-4 text-sm text-slate-600 dark:text-slate-300">Servico: <strong>{{ $order->shipment->service_name }}</strong> ? Frete R$ {{ number_format((float) $order->shipment->shipping_amount, 2, ',', '.') }}</p>
-                                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Destino: {{ $order->shipment->postal_code }} ? {{ $order->shipment->city }}/{{ $order->shipment->state }}</p>
+                                <p class="mt-4 text-sm text-slate-600 dark:text-slate-300">Serviço: <strong>{{ $order->shipment->service_name }}</strong> &middot; Frete R$ {{ number_format((float) $order->shipment->shipping_amount, 2, ',', '.') }}</p>
+                                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Destino: {{ $order->shipment->postal_code }} &middot; {{ $order->shipment->city }}/{{ $order->shipment->state }}</p>
 
                                 <form action="{{ route('panel.marketplace.orders.shipment.update', $order) }}" method="POST" class="mt-4 space-y-4">
                                     @csrf

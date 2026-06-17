@@ -30,7 +30,7 @@
                                 </span>
                             @endif
                         </div>
-                        <h3 class="text-lg font-bold text-slate-900">{{ $order->user->name ?? 'Usuario removido' }}</h3>
+                        <h3 class="text-lg font-bold text-slate-900">{{ $order->user->name ?? 'Usuário removido' }}</h3>
                         <p class="text-sm text-slate-500">{{ $order->user->email ?? 'Sem e-mail' }}</p>
                         @if($order->user->phone)
                             <p class="text-sm text-slate-500 mt-1"><i class="fas fa-phone mr-1"></i>{{ $order->user->phone }}</p>
@@ -306,7 +306,7 @@
                                     {{ number_format($grossAmount, 2, ',', '.') }}
                                     @if($discountAmount > 0)
                                         <div class="text-xs text-emerald-700">Desconto: - R$ {{ number_format($discountAmount, 2, ',', '.') }}</div>
-                                        <div class="text-xs text-slate-500">Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
+                                        <div class="text-xs text-slate-500">Líquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
                                     @endif
                                 </td>
                             </tr>

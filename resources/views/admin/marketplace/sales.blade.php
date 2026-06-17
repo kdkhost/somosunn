@@ -149,7 +149,7 @@
                                 <div class="text-success font-weight-bold" style="font-size:10px;">
                                     Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
                                 </div>
-                                <div class="text-muted" style="font-size:10px;">Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
+                                <div class="text-muted" style="font-size:10px;">Líquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
                             @else
                                 <div class="text-muted" style="font-size:10px;">{{ $gateway }}</div>
                             @endif

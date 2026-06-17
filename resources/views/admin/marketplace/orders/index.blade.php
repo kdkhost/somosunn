@@ -124,7 +124,7 @@
                             <div class="text-success font-weight-bold" style="font-size:10px;">
                                 Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
                             </div>
-                            <div class="text-muted" style="font-size:10px;">Liquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
+                            <div class="text-muted" style="font-size:10px;">Líquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
                         @endif
                         <span class="badge badge-{{ $statusColor }} mt-1">
                             <i class="fas fa-circle mr-1" style="font-size:6px;"></i>{{ $statusLabel }}

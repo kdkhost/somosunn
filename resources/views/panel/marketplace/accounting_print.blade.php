@@ -66,10 +66,10 @@
                     <th>Bruto</th>
                     <th>Desconto</th>
                     <th>Cupom</th>
-                    <th>Cobranca</th>
+                    <th>Cobrança</th>
                     <th>Estorno</th>
                     <th>Taxas</th>
-                    <th>Liquido</th>
+                    <th>Líquido</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,7 +77,7 @@
                     <tr>
                         <td>#{{ $order->id }}</td>
                         <td>{{ optional($order->paid_at ?: $order->created_at)->format('d/m/Y H:i') }}</td>
-                        <td>{{ $order->user->name ?? 'Usuario removido' }}</td>
+                        <td>{{ $order->user->name ?? 'Usuário removido' }}</td>
                         <td>{{ $orderItemsLabel($order) }}</td>
                         <td>{{ $money($order->gross_amount) }}</td>
                         <td>{{ $money($order->financial_discount_amount) }}</td>
@@ -105,9 +105,9 @@
                     <th>Data</th>
                     <th>Vendedor</th>
                     <th>Itens</th>
-                    <th>Cobranca</th>
+                    <th>Cobrança</th>
                     <th>Estorno</th>
-                    <th>Despesa liquida</th>
+                    <th>Despesa líquida</th>
                 </tr>
             </thead>
             <tbody>

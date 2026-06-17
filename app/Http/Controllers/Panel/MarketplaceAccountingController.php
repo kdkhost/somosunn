@@ -50,19 +50,19 @@ class MarketplaceAccountingController extends Controller
             fputcsv($handle, ['Descontos em vendas', number_format((float) $summary['sales_discounts'], 2, '.', '')]);
             fputcsv($handle, ['Total cobrado em vendas', number_format((float) $summary['sales_charged'], 2, '.', '')]);
             fputcsv($handle, ['Estornos sobre vendas', number_format((float) $summary['sales_refunds'], 2, '.', '')]);
-            fputcsv($handle, ['Taxas e comissoes', number_format((float) $summary['sales_fees'], 2, '.', '')]);
-            fputcsv($handle, ['Resultado liquido das vendas', number_format((float) $summary['sales_net'], 2, '.', '')]);
+            fputcsv($handle, ['Taxas e comissões', number_format((float) $summary['sales_fees'], 2, '.', '')]);
+            fputcsv($handle, ['Resultado líquido das vendas', number_format((float) $summary['sales_net'], 2, '.', '')]);
             fputcsv($handle, ['Despesas em compras', number_format((float) $summary['purchase_net'], 2, '.', '')]);
             fputcsv($handle, ['Resultado geral', number_format((float) $summary['overall_net'], 2, '.', '')]);
             fputcsv($handle, []);
 
             fputcsv($handle, ['VENDAS']);
-            fputcsv($handle, ['Pedido', 'Data', 'Comprador', 'Itens', 'Bruto', 'Desconto', 'Cupom', 'Cobranca', 'Estorno', 'Taxas', 'Liquido', 'Status']);
+            fputcsv($handle, ['Pedido', 'Data', 'Comprador', 'Itens', 'Bruto', 'Desconto', 'Cupom', 'Cobrança', 'Estorno', 'Taxas', 'Líquido', 'Status']);
             foreach ((clone $salesQuery)->reorder()->lazyById(250) as $order) {
                 fputcsv($handle, [
                     '#' . $order->id,
                     optional($this->financialDate($order))->format('d/m/Y H:i'),
-                    (string) ($order->user->name ?? 'Usuario removido'),
+                    (string) ($order->user->name ?? 'Usuário removido'),
                     $this->orderItemsLabel($order),
                     number_format((float) $order->gross_amount, 2, '.', ''),
                     number_format((float) $order->financial_discount_amount, 2, '.', ''),
@@ -77,7 +77,7 @@ class MarketplaceAccountingController extends Controller
 
             fputcsv($handle, []);
             fputcsv($handle, ['COMPRAS']);
-            fputcsv($handle, ['Pedido', 'Data', 'Vendedor', 'Itens', 'Cobranca', 'Estorno', 'Despesa liquida', 'Status']);
+            fputcsv($handle, ['Pedido', 'Data', 'Vendedor', 'Itens', 'Cobrança', 'Estorno', 'Despesa líquida', 'Status']);
             foreach ((clone $purchasesQuery)->reorder()->lazyById(250) as $order) {
                 fputcsv($handle, [
                     '#' . $order->id,
