@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Coupon;
 use App\Models\CouponRedemption;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 
 class CouponService
@@ -27,7 +28,7 @@ class CouponService
      *
      * @return array{coupon: Coupon, discount_amount: float}
      */
-    public function validateAndCalculateLocked(string $code, string $context, int $contextId, int $userId, float $subtotal): array
+    public function validateAndCalculateLocked(string $code, string $context, int $contextId, int $userId, float $subtotal, ?int $currentOrderId = null): array
     {
         $code = $this->normalizeCode($code);
         if ($code === '') {
@@ -67,6 +68,12 @@ class CouponService
                 $q->whereNull('reserved_until')->orWhere('reserved_until', '>=', $now);
             });
 
+        if ($currentOrderId) {
+            $activeRedemptions->where(function ($q) use ($currentOrderId) {
+                $q->whereNull('order_id')->orWhere('order_id', '<>', $currentOrderId);
+            });
+        }
+
         $totalActiveUses = (int) $activeRedemptions->count();
         if ($coupon->max_uses !== null && $totalActiveUses >= (int) $coupon->max_uses) {
             throw ValidationException::withMessages(['coupon_code' => 'Cupom esgotado.']);
@@ -79,6 +86,11 @@ class CouponService
                 ->whereIn('status', $activeStatuses)
                 ->where(function ($q) use ($now) {
                     $q->whereNull('reserved_until')->orWhere('reserved_until', '>=', $now);
+                })
+                ->when($currentOrderId, function ($query) use ($currentOrderId) {
+                    $query->where(function ($q) use ($currentOrderId) {
+                        $q->whereNull('order_id')->orWhere('order_id', '<>', $currentOrderId);
+                    });
                 })
                 ->count();
 
@@ -97,14 +109,46 @@ class CouponService
 
     public function reserveRedemption(Coupon $coupon, int $userId, int $orderId, float $discountAmount, ?Carbon $reservedUntil = null): CouponRedemption
     {
-        return CouponRedemption::create([
+        $payload = [
             'coupon_id' => $coupon->id,
             'user_id' => $userId,
             'order_id' => $orderId,
             'status' => 'reserved',
             'discount_amount' => $discountAmount,
             'reserved_until' => $reservedUntil ?? now()->addMinutes(30),
-        ]);
+        ];
+
+        $existing = CouponRedemption::query()
+            ->where('coupon_id', $coupon->id)
+            ->where('order_id', $orderId)
+            ->lockForUpdate()
+            ->first();
+
+        if ($existing) {
+            $existing->fill($payload)->save();
+            return $existing->fresh();
+        }
+
+        try {
+            return CouponRedemption::create($payload);
+        } catch (QueryException $e) {
+            if (!$this->isDuplicateCouponOrderRedemption($e)) {
+                throw $e;
+            }
+
+            $existing = CouponRedemption::query()
+                ->where('coupon_id', $coupon->id)
+                ->where('order_id', $orderId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$existing) {
+                throw $e;
+            }
+
+            $existing->fill($payload)->save();
+            return $existing->fresh();
+        }
     }
 
     public function markOrderRedemptionAsUsed(int $orderId): void
@@ -162,5 +206,17 @@ class CouponService
         $discount = min($discount, $subtotal);
 
         return round($discount, 2);
+    }
+
+    private function isDuplicateCouponOrderRedemption(QueryException $e): bool
+    {
+        $message = (string) $e->getMessage();
+        $sqlState = is_array($e->errorInfo ?? null) && isset($e->errorInfo[0]) ? (string) $e->errorInfo[0] : '';
+        $driverCode = is_array($e->errorInfo ?? null) && isset($e->errorInfo[1]) ? (string) $e->errorInfo[1] : '';
+
+        return $sqlState === '23000'
+            && ($driverCode === '1062'
+                || str_contains($message, 'coupon_redemptions_coupon_id_order_id')
+                || str_contains($message, 'coupon_id_order_id'));
     }
 }

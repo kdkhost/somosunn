@@ -2,6 +2,20 @@
 
 ---
 
+## [2026-06-17] - fix(eventos): reserva de cupom reaproveita pedido pendente
+
+### Corrigido
+- A aplicação de cupom em evento pago agora é idempotente quando o pedido pendente já possui reserva do mesmo cupom.
+- O serviço de cupons deixou de criar uma segunda linha em `coupon_redemptions` para o mesmo `coupon_id` e `order_id`, evitando o erro de chave duplicada no checkout.
+- A validação de limite de uso ignora a reserva do próprio pedido reaproveitado, sem liberar uso duplicado para outros pedidos.
+
+### Arquivos principais
+- `app/Services/CouponService.php`
+- `app/Http/Controllers/EventReservationController.php`
+- `tests/Feature/CouponServiceReservationTest.php`
+
+---
+
 ## [2026-06-17] - feat(eventos): cupons de gratuidade e grupo WhatsApp pós-inscrição
 
 ### Adicionado

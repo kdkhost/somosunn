@@ -470,7 +470,8 @@ class EventReservationController extends Controller
                         CouponService::CONTEXT_EVENT,
                         (int) $event->id,
                         (int) $user->id,
-                        (float) $originalTotal
+                        (float) $originalTotal,
+                        $order ? (int) $order->id : null
                     );
                     $coupon = $result['coupon'];
                     $discountAmount = (float) $result['discount_amount'];
