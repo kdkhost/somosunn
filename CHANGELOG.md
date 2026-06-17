@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-06-17] - fix(admin): galeria de evento no tema escuro
+
+### Corrigido
+- A área de upload da galeria do evento no painel antigo deixou de ficar branca no tema escuro.
+- O estado de arrastar/soltar arquivos agora usa classes CSS e acompanha corretamente dark/light.
+- A mensagem de galeria vazia recebeu classe própria para manter contraste e borda no dark.
+
+### Arquivos principais
+- `resources/views/admin/events/form.blade.php`
+
+---
+
 ## [2026-06-17] - fix(admin): evitar alerta duplicado ao alternar tema
 
 ### Corrigido

@@ -705,7 +705,7 @@
 
                             <div class="premium-upload-box mb-4 event-gallery-upload-box" id="eventMediaUploadBox">
                                 <div class="drop-zone-area p-5 text-center rounded event-gallery-drop-zone" id="eventDropZone"
-                                    style="border: 2px dashed #d0dae8; background: #f8fafc; cursor:pointer; transition: all 0.2s;">
+                                    role="button" tabindex="0" aria-label="Selecionar fotos e vídeos do evento">
                                     <div class="drop-zone-content">
                                         <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3 d-block"></i>
                                         <h5 class="font-weight-bold">Arraste fotos e vídeos aqui</h5>
@@ -762,7 +762,7 @@
                                 </div>
                                 @empty
                                     <div class="col-12" id="noMediaMessage">
-                                        <div class="alert alert-light text-center border">Nenhuma mídia enviada ainda.</div>
+                                        <div class="alert alert-light text-center border event-gallery-empty-state">Nenhuma mídia enviada ainda.</div>
                                     </div>
                                 @endforelse
                             </div>
@@ -835,6 +835,53 @@
         .event-gallery-drop-zone {
             overflow: hidden;
             max-width: 100%;
+        }
+
+        .event-gallery-drop-zone {
+            border: 2px dashed #d0dae8;
+            background: #f8fafc;
+            color: #0f172a;
+            cursor: pointer;
+            transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+
+        .event-gallery-drop-zone:hover,
+        .event-gallery-drop-zone.dragover,
+        .event-gallery-upload-box.dragover .event-gallery-drop-zone {
+            border-color: #2563eb;
+            background: #eff6ff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, .08);
+        }
+
+        .event-gallery-empty-state {
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .dark-mode .event-gallery-drop-zone {
+            border-color: #475569 !important;
+            background: #0f172a !important;
+            color: #f1f5f9 !important;
+            box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .08);
+        }
+
+        .dark-mode .event-gallery-drop-zone:hover,
+        .dark-mode .event-gallery-drop-zone.dragover,
+        .dark-mode .event-gallery-upload-box.dragover .event-gallery-drop-zone {
+            border-color: #60a5fa !important;
+            background: #162032 !important;
+            box-shadow: 0 0 0 4px rgba(96, 165, 250, .12);
+        }
+
+        .dark-mode .event-gallery-drop-zone .text-muted,
+        .dark-mode .event-gallery-drop-zone .text-secondary {
+            color: #a1b4cc !important;
+        }
+
+        .dark-mode .event-gallery-empty-state {
+            background: #162032 !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
         }
 
         .event-gallery-media-grid {
@@ -926,19 +973,22 @@
     const fileInput = document.getElementById('adminGalleryInput');
     if (dropZone && fileInput) {
         dropZone.addEventListener('click', function() { fileInput.click(); });
+        dropZone.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fileInput.click();
+            }
+        });
         dropZone.addEventListener('dragover', function(e) {
             e.preventDefault();
-            dropZone.style.borderColor = '#3b82f6';
-            dropZone.style.background = '#eff6ff';
+            dropZone.classList.add('dragover');
         });
         dropZone.addEventListener('dragleave', function() {
-            dropZone.style.borderColor = '#d0dae8';
-            dropZone.style.background = '#f8fafc';
+            dropZone.classList.remove('dragover');
         });
         dropZone.addEventListener('drop', function(e) {
             e.preventDefault();
-            dropZone.style.borderColor = '#d0dae8';
-            dropZone.style.background = '#f8fafc';
+            dropZone.classList.remove('dragover');
             if (e.dataTransfer.files.length) uploadAdminGallery(e.dataTransfer.files);
         });
         fileInput.addEventListener('change', function() {
@@ -1088,7 +1138,7 @@ async function deleteAdminMedia(id) {
             if (container && container.children.length === 0) {
                 container.innerHTML = `
                     <div class="col-12" id="noMediaMessage">
-                        <div class="alert alert-light text-center border">Nenhuma midia enviada ainda.</div>
+                        <div class="alert alert-light text-center border event-gallery-empty-state">Nenhuma mídia enviada ainda.</div>
                     </div>
                 `;
             }
