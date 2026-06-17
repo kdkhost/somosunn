@@ -14,6 +14,7 @@ use App\Services\Marketplace\SellerProductFulfillmentService;
 use App\Support\EmailQueueSettings;
 use App\Notifications\AppNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class OrderSettlementService
@@ -152,12 +153,24 @@ class OrderSettlementService
                 }
 
                 if ($event->capacity && !$event->hasCapacityFor((int) $registration->quantity)) {
-                    $registration->update(['status' => EventRegistration::STATUS_CANCELLED]);
+                    $cancelPayload = ['status' => EventRegistration::STATUS_CANCELLED];
+                    if (Schema::hasColumn('event_registrations', 'payment_status')) {
+                        $cancelPayload['payment_status'] = EventRegistration::PAYMENT_CANCELLED;
+                    }
+
+                    $registration->update($cancelPayload);
                     $needsManualRefund = true;
                     continue;
                 }
 
-                $registration->update(['status' => EventRegistration::STATUS_PAID]);
+                $paidPayload = ['status' => EventRegistration::STATUS_PAID];
+                if (Schema::hasColumn('event_registrations', 'payment_status')) {
+                    $paidPayload['payment_status'] = ((string) $order->gateway === 'free' || data_get($order->metadata, 'is_free_checkout'))
+                        ? EventRegistration::PAYMENT_FREE
+                        : EventRegistration::PAYMENT_PAID;
+                }
+
+                $registration->update($paidPayload);
             }
 
             if ($needsManualRefund) {

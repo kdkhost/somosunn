@@ -173,6 +173,7 @@ class EventController extends Controller
             'is_somos_unicas' => 'nullable|boolean',
             'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
             'event_url' => 'nullable|url|max:255',
+            'whatsapp_group_link' => 'nullable|url|max:2048',
             'is_ticket_enabled' => 'nullable|boolean',
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
             'scanner_radius_value' => 'nullable|numeric|min:0.001',
@@ -233,6 +234,9 @@ class EventController extends Controller
         $data['user_id'] = Auth::id();
         $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
+        if (!$this->canManageGroupLink()) {
+            unset($data['whatsapp_group_link']);
+        }
         $data = $this->applyScannerRestrictionPayload($request, $data);
         $data = $this->applyVisibilityData($request, $data, null, false, 'events');
 
@@ -318,6 +322,7 @@ class EventController extends Controller
             'is_somos_unicas' => 'nullable|boolean',
             'visibility' => 'nullable|string|in:ambos,somos_unn,somos_unicas',
             'event_url' => 'nullable|url|max:255',
+            'whatsapp_group_link' => 'nullable|url|max:2048',
             'is_ticket_enabled' => 'nullable|boolean',
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
             'scanner_radius_value' => 'nullable|numeric|min:0.001',
@@ -392,6 +397,9 @@ class EventController extends Controller
             $data['is_certificate_enabled'] = $request->boolean('is_certificate_enabled');
         }
         $data['is_ticket_enabled'] = $request->boolean('is_ticket_enabled');
+        if (!$this->canManageGroupLink()) {
+            unset($data['whatsapp_group_link']);
+        }
         $data = $this->applyScannerRestrictionPayload($request, $data);
         $data = $this->applyVisibilityData(
             $request,
@@ -781,6 +789,13 @@ class EventController extends Controller
     /**
      * Verifica se o usuário pode gerenciar todos os eventos.
      */
+    protected function canManageGroupLink(): bool
+    {
+        $user = Auth::user();
+
+        return $user && ($user->isAdmin() || $user->hasPermission('admin.events.group_link.manage'));
+    }
+
     private function canManageAllEvents(): bool
     {
         $user = Auth::user();

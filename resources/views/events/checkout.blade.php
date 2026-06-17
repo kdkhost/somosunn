@@ -241,15 +241,15 @@
 
                                 @if($isPaid)
                                     <div class="{{ $fieldPanelClasses }}">
-                                        <label for="event_checkout_coupon" class="{{ $fieldLabelClasses }}">Cupom de desconto</label>
+                                        <label for="event_checkout_coupon" class="{{ $fieldLabelClasses }}">Cupom de desconto ou gratuidade</label>
                                         <input id="event_checkout_coupon" type="text" name="coupon_code"
-                                            value="{{ old('coupon_code') }}" placeholder="Ex: BLACKFRIDAY26"
+                                            value="{{ old('coupon_code') }}" placeholder="Ex: CONVIDADO100"
                                             class="{{ $fieldInputClasses }}{{ $errors->has('coupon_code') ? $fieldErrorClasses : '' }}"
                                             {{ $isDemo ? 'disabled' : '' }}>
                                         @error('coupon_code')
                                             <p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>
                                         @enderror
-                                        <p class="{{ $fieldHintClasses }}">Opcional. Aplique o cupom antes de seguir para o pagamento.</p>
+                                        <p class="{{ $fieldHintClasses }}">Opcional. Se o cupom liberar gratuidade integral, a inscrição será confirmada sem pagamento.</p>
                                     </div>
                                 @endif
 

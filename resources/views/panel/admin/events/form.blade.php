@@ -7,6 +7,9 @@
 @endsection
 
 @section('panel_content')
+    @php
+        $canManageGroupLink = auth()->user() && auth()->user()->hasPermission('admin.events.group_link.manage');
+    @endphp
     <div
         x-data="{
             tab: '{{ request('tab', 'general') }}',
@@ -44,7 +47,14 @@
                     <a href="{{ route('panel.admin.events.exhibitors.index', $event) }}"
                         class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2">
                         <i class="fas fa-store"></i>
-                        <span>Inscricoes de expositores</span>
+                        <span>Inscrições de expositores</span>
+                    </a>
+                @endif
+                @if($event->exists && ($event->type ?? 'event') !== 'album' && auth()->user()?->hasPermission('admin.events.coupons.view'))
+                    <a href="{{ route('panel.admin.events.coupons.index', $event) }}"
+                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>Cupons gratuitos</span>
                     </a>
                 @endif
                 <a href="{{ route('panel.admin.events.index') }}"
@@ -228,6 +238,22 @@
                                 </div>
                             @endif
                         </div>
+
+                        @if($canManageGroupLink)
+                            <div class="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-5 dark:border-emerald-900/50 dark:bg-emerald-500/10" x-show="type === 'event'">
+                                <label class="block text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase mb-2">
+                                    <i class="fab fa-whatsapp mr-1"></i> Link do grupo do WhatsApp
+                                </label>
+                                <input type="url" name="whatsapp_group_link"
+                                    value="{{ old('whatsapp_group_link', $event->whatsapp_group_link) }}"
+                                    placeholder="https://chat.whatsapp.com/..."
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-950 border border-emerald-200 dark:border-emerald-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-slate-900 dark:text-white font-medium">
+                                <p class="mt-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300">O botão de entrada aparece somente para participantes com inscrição confirmada.</p>
+                                @error('whatsapp_group_link')
+                                    <p class="mt-2 text-xs font-bold text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        @endif
 
                         <div>
                             <label

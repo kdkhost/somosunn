@@ -2,6 +2,38 @@
 
 ---
 
+## [2026-06-17] - feat(eventos): cupons de gratuidade e grupo WhatsApp pós-inscrição
+
+### Adicionado
+- Eventos agora possuem `whatsapp_group_link`, gerenciado com permissão granular nos dois painéis administrativos.
+- Nova tabela `event_coupons` para cupons vinculados ao evento, com tipo, valor, limite de usos, vigência, status e criador.
+- `event_registrations` agora registra `coupon_id`, `payment_status` e `joined_group_at`.
+- O checkout de evento pago aceita cupom de gratuidade integral e confirma a inscrição sem gateway de pagamento.
+- Participantes confirmados veem o botão "Entrar no grupo do evento" e o acesso registra a data/hora de entrada.
+- Telas de cupons disponíveis no painel legado `admin.events.*` e no painel novo `panel.admin.events.*`.
+
+### Permissoes
+- `admin.events.coupons.view`
+- `admin.events.coupons.create`
+- `admin.events.coupons.edit`
+- `admin.events.coupons.delete`
+- `admin.events.coupons.toggle`
+- `admin.events.group_link.manage`
+
+### Arquivos principais
+- `database/migrations/2026_06_17_100000_add_event_group_link_coupons_and_registration_fields.php`
+- `app/Models/EventCoupon.php`
+- `app/Services/EventCouponService.php`
+- `app/Http/Controllers/Admin/EventCouponController.php`
+- `app/Http/Controllers/Panel/Admin/EventCouponController.php`
+- `app/Http/Controllers/EventReservationController.php`
+- `app/Http/Controllers/EventGroupController.php`
+- `resources/views/admin/events/coupons/*`
+- `resources/views/panel/admin/events/coupons/*`
+- `tests/Feature/FreeMarketplaceOrdersTest.php`
+
+---
+
 ## [2026-06-09] - fix(faturas): baixa manual na fatura agora atualiza o pedido + rateios auto-pagos
 
 ### Corrigido

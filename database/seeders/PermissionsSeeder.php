@@ -49,6 +49,12 @@ class PermissionsSeeder extends Seeder
                 'events.ticket.manage' => 'Gerenciar ingressos',
                 'events.exhibitors.manage' => 'Gerenciar áreas de expositores',
                 'events.checkin' => 'Fazer check-in de participantes',
+                'admin.events.coupons.view' => 'Ver cupons de eventos',
+                'admin.events.coupons.create' => 'Criar cupons de eventos',
+                'admin.events.coupons.edit' => 'Editar cupons de eventos',
+                'admin.events.coupons.delete' => 'Excluir cupons de eventos',
+                'admin.events.coupons.toggle' => 'Ativar/desativar cupons de eventos',
+                'admin.events.group_link.manage' => 'Gerenciar link do grupo do evento',
             ],
             'planos' => [
                 'plans.view' => 'Listar planos',
@@ -236,6 +242,7 @@ class PermissionsSeeder extends Seeder
                 'mentorships.view', 'mentorships.create', 'mentorships.edit', 'mentorships.delete', 'mentorships.schedule', 'mentorships.sessions',
                 // Eventos
                 'events.view', 'events.create', 'events.edit', 'events.delete', 'events.publish', 'events.ticket.manage', 'events.exhibitors.manage', 'events.checkin',
+                'admin.events.coupons.view', 'admin.events.coupons.create', 'admin.events.coupons.edit', 'admin.events.coupons.delete', 'admin.events.coupons.toggle', 'admin.events.group_link.manage',
                 // Planos (apenas visualizar)
                 'plans.view', 'plans.edit', 'plans.feature.toggle', 'plans.discount.manage',
                 // Cupons

@@ -3,6 +3,9 @@
 @section('page_title', $event->exists ? ($event->type === 'album' ? 'Editar Álbum' : 'Editar Evento') : (request('type') === 'album' ? 'Novo Álbum' : 'Novo Evento'))
 
 @section('content')
+    @php
+        $canManageGroupLink = auth()->user() && auth()->user()->hasPermission('admin.events.group_link.manage');
+    @endphp
     <style>
         #legacy-general:not(.active), #legacy-certificate:not(.active), #legacy-gallery:not(.active) { 
             display: none !important; 
@@ -43,6 +46,13 @@
                     <a class="nav-link {{ request('tab') === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-toggle="tab" href="#legacy-gallery" role="tab"
                         aria-controls="legacy-gallery" aria-selected="{{ request('tab') === 'gallery' ? 'true' : 'false' }}">Galeria de Fotos</a>
                 </li>
+                @if(auth()->user()?->hasPermission('admin.events.coupons.view'))
+                    <li class="nav-item event-only-field">
+                        <a class="nav-link" href="{{ route('admin.events.coupons.index', $event) }}">
+                            <i class="fas fa-ticket-alt mr-1"></i> Cupons
+                        </a>
+                    </li>
+                @endif
                 @endif
             </ul>
         </div>
@@ -227,6 +237,18 @@
                                     </label>
                                     <small class="d-block text-muted">Desmarque para ocultar o evento do site. Eventos sem imagem de capa ficam automaticamente como rascunho.</small>
                                 </div>
+                                @if($canManageGroupLink)
+                                    <div class="form-group mb-3">
+                                        <label class="font-weight-bold">
+                                            <i class="fab fa-whatsapp text-success mr-1"></i> Link do grupo do WhatsApp
+                                        </label>
+                                        <input type="url" name="whatsapp_group_link" class="form-control"
+                                            value="{{ old('whatsapp_group_link', $event->whatsapp_group_link) }}"
+                                            placeholder="https://chat.whatsapp.com/...">
+                                        <small class="text-muted">O botão para entrar no grupo aparece somente após a inscrição confirmada.</small>
+                                        @error('whatsapp_group_link')<small class="text-danger d-block">{{ $message }}</small>@enderror
+                                    </div>
+                                @endif
                             </div>
                             <div class="col-md-6">
                                 <label>Mapa (Clique para marcar)</label>

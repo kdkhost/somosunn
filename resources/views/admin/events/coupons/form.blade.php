@@ -1,0 +1,90 @@
+@extends('admin.layouts.app')
+
+@section('page_title', $coupon->exists ? 'Editar Cupom do Evento' : 'Novo Cupom do Evento')
+
+@section('content')
+<div class="container-fluid">
+    <div class="card card-outline card-primary shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title font-weight-bold mb-0">
+                <i class="fas fa-ticket-alt mr-2"></i>{{ $coupon->exists ? 'Editar cupom' : 'Novo cupom' }}
+            </h3>
+            <small class="text-muted d-block">{{ $event->title }}</small>
+        </div>
+        <form method="POST" action="{{ $coupon->exists ? route($routePrefix . '.update', [$event, $coupon]) : route($routePrefix . '.store', $event) }}">
+            @csrf
+            @if($coupon->exists) @method('PUT') @endif
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Código do cupom</label>
+                            <input name="code" value="{{ old('code', $coupon->code) }}" class="form-control text-uppercase" maxlength="40" required placeholder="EX: CONVIDADO100">
+                            @error('code')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select name="type" class="form-control js-event-coupon-type">
+                                <option value="free" {{ old('type', $coupon->type ?: 'free') === 'free' ? 'selected' : '' }}>Gratuidade total</option>
+                                <option value="percent" {{ old('type', $coupon->type) === 'percent' ? 'selected' : '' }}>Percentual</option>
+                                <option value="fixed" {{ old('type', $coupon->type) === 'fixed' ? 'selected' : '' }}>Valor fixo</option>
+                            </select>
+                            @error('type')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group js-discount-value-wrap">
+                            <label>Valor do desconto</label>
+                            <input name="discount_value" value="{{ old('discount_value', $coupon->discount_value ? number_format((float) $coupon->discount_value, 2, ',', '.') : '100,00') }}" class="form-control mask-money">
+                            <small class="text-muted">Para gratuidade total o sistema usa 100% automaticamente.</small>
+                            @error('discount_value')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Limite de usos</label>
+                            <input type="number" min="1" name="max_uses" value="{{ old('max_uses', $coupon->max_uses) }}" class="form-control" placeholder="Ilimitado">
+                            @error('max_uses')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select name="active" class="form-control">
+                                <option value="1" {{ old('active', $coupon->active ?? true) ? 'selected' : '' }}>Ativo</option>
+                                <option value="0" {{ !old('active', $coupon->active ?? true) ? 'selected' : '' }}>Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-md-0">
+                            <label>Começa em</label>
+                            <input type="datetime-local" name="starts_at" value="{{ old('starts_at', $coupon->starts_at ? $coupon->starts_at->format('Y-m-d\\TH:i') : '') }}" class="form-control">
+                            @error('starts_at')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-0">
+                            <label>Expira em</label>
+                            <input type="datetime-local" name="expires_at" value="{{ old('expires_at', $coupon->expires_at ? $coupon->expires_at->format('Y-m-d\\TH:i') : '') }}" class="form-control">
+                            @error('expires_at')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ route($routePrefix . '.index', $event) }}" class="btn btn-outline-secondary rounded-pill">Cancelar</a>
+                <button class="btn btn-primary rounded-pill"><i class="fas fa-save mr-1"></i> Salvar cupom</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection

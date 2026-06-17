@@ -5,15 +5,18 @@ namespace Tests\Feature;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Event;
+use App\Models\EventCoupon;
 use App\Models\EventRegistration;
 use App\Models\Mentorship;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\LegalConsentService;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
+use Mockery;
 use Tests\TestCase;
 
 class FreeMarketplaceOrdersTest extends TestCase
@@ -28,6 +31,10 @@ class FreeMarketplaceOrdersTest extends TestCase
 
         Notification::fake();
         Setting::flushRuntimeCache();
+
+        $legalConsentMock = Mockery::mock(LegalConsentService::class);
+        $legalConsentMock->shouldReceive('hasAcceptedCurrentVersion')->andReturn(true);
+        $this->app->instance(LegalConsentService::class, $legalConsentMock);
 
         $this->originalDefaultConnection = (string) config('database.default');
         $this->originalSqliteDatabase = (string) config('database.connections.sqlite.database');
@@ -49,6 +56,7 @@ class FreeMarketplaceOrdersTest extends TestCase
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->string('role')->nullable();
             $table->string('level')->nullable();
@@ -92,6 +100,15 @@ class FreeMarketplaceOrdersTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::create('rate_limit_blocks', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('ip_address', 45);
+            $table->string('reason', 100);
+            $table->timestamp('blocked_until');
+            $table->unsignedInteger('attempts')->default(1);
+            $table->timestamp('created_at')->useCurrent();
+        });
+
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
@@ -112,6 +129,22 @@ class FreeMarketplaceOrdersTest extends TestCase
             $table->boolean('published')->default(false);
             $table->boolean('all_day')->default(false);
             $table->boolean('is_ticket_enabled')->default(false);
+            $table->string('whatsapp_group_link')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('event_coupons', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('event_id');
+            $table->string('code', 40);
+            $table->string('type', 20)->default('free');
+            $table->decimal('discount_value', 10, 2)->default(100);
+            $table->unsignedInteger('max_uses')->nullable();
+            $table->unsignedInteger('used_count')->default(0);
+            $table->dateTime('starts_at')->nullable();
+            $table->dateTime('expires_at')->nullable();
+            $table->boolean('active')->default(true);
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
         });
 
@@ -120,12 +153,41 @@ class FreeMarketplaceOrdersTest extends TestCase
             $table->unsignedBigInteger('event_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('order_id')->nullable();
+            $table->unsignedBigInteger('coupon_id')->nullable();
             $table->string('status')->default('pending');
+            $table->string('payment_status', 30)->default('pending');
             $table->string('ticket_code')->nullable();
             $table->decimal('price', 10, 2)->default(0);
             $table->unsignedInteger('quantity')->default(1);
             $table->timestamp('check_in_at')->nullable();
+            $table->timestamp('joined_group_at')->nullable();
             $table->timestamps();
+        });
+
+        Schema::create('event_exhibitor_registrations', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('event_id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('order_id');
+            $table->string('name');
+            $table->string('email');
+            $table->string('phone', 50)->nullable();
+            $table->string('document', 30)->nullable();
+            $table->string('company_name')->nullable();
+            $table->string('company_document', 30)->nullable();
+            $table->string('brand_name')->nullable();
+            $table->text('description')->nullable();
+            $table->unsignedInteger('quantity')->default(1);
+            $table->decimal('unit_price', 10, 2)->default(0);
+            $table->decimal('total_price', 10, 2)->default(0);
+            $table->string('batch_label', 30)->nullable();
+            $table->string('status', 30)->default('pending');
+            $table->string('payment_status', 30)->default('pending');
+            $table->timestamp('paid_at')->nullable();
+            $table->timestamp('cancelled_at')->nullable();
+            $table->text('metadata')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('courses', function (Blueprint $table) {
@@ -185,6 +247,18 @@ class FreeMarketplaceOrdersTest extends TestCase
             $table->decimal('price', 10, 2)->default(0);
             $table->unsignedInteger('quantity')->default(1);
             $table->text('data')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('order_splits', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('order_id');
+            $table->string('receiver_type');
+            $table->unsignedBigInteger('receiver_id')->nullable();
+            $table->decimal('amount', 15, 2)->default(0);
+            $table->decimal('percentage', 5, 2)->default(0);
+            $table->string('status')->default('pending');
+            $table->string('pix_key')->nullable();
             $table->timestamps();
         });
 
@@ -310,6 +384,118 @@ class FreeMarketplaceOrdersTest extends TestCase
         $this->assertSame(EventRegistration::STATUS_PAID, $registration->status);
     }
 
+    public function test_paid_event_coupon_confirms_free_registration_and_consumes_coupon(): void
+    {
+        $seller = User::create([
+            'name' => 'Seller Coupon',
+            'email' => 'seller-event-coupon@test.com',
+            'role' => 'admin',
+            'level' => 'superadmin',
+        ]);
+
+        $buyer = User::create([
+            'name' => 'Buyer Coupon',
+            'email' => 'buyer-event-coupon@test.com',
+            'role' => 'member',
+            'level' => 'iniciante',
+        ]);
+
+        $event = Event::create([
+            'user_id' => $seller->id,
+            'title' => 'Evento Pago com Cupom',
+            'description' => 'Evento pago liberado por cupom',
+            'start_at' => now()->addDay(),
+            'published' => true,
+            'price' => 150,
+            'is_ticket_enabled' => true,
+        ]);
+
+        $coupon = EventCoupon::create([
+            'event_id' => $event->id,
+            'code' => 'CONVIDADO100',
+            'type' => EventCoupon::TYPE_FREE,
+            'discount_value' => 100,
+            'max_uses' => 3,
+            'active' => true,
+            'created_by' => $seller->id,
+        ]);
+
+        $response = $this
+            ->actingAs($buyer)
+            ->post(route('events.reserve', $event), [
+                'quantity' => 2,
+                'coupon_code' => 'convidado100',
+            ]);
+
+        $response->assertRedirect(route('events.show', $event));
+        $response->assertSessionHas('success');
+
+        $order = Order::query()->where('user_id', $buyer->id)->first();
+        $this->assertNotNull($order);
+        $this->assertSame('paid', $order->status);
+        $this->assertSame('free', $order->gateway);
+        $this->assertSame(0.0, (float) $order->total_amount);
+        $this->assertSame('CONVIDADO100', data_get($order->metadata, 'event_coupon.code'));
+        $this->assertSame(300.0, (float) data_get($order->metadata, 'event_coupon.discount_amount'));
+
+        $this->assertSame(2, (int) $coupon->fresh()->used_count);
+        $this->assertSame(2, EventRegistration::query()->where('event_id', $event->id)->where('user_id', $buyer->id)->count());
+        $this->assertSame(2, EventRegistration::query()
+            ->where('event_id', $event->id)
+            ->where('user_id', $buyer->id)
+            ->where('coupon_id', $coupon->id)
+            ->where('status', EventRegistration::STATUS_PAID)
+            ->where('payment_status', EventRegistration::PAYMENT_FREE)
+            ->count());
+    }
+
+    public function test_confirmed_registration_can_open_event_whatsapp_group(): void
+    {
+        $user = User::create([
+            'name' => 'Buyer Group',
+            'email' => 'buyer-event-group@test.com',
+            'role' => 'member',
+            'level' => 'iniciante',
+        ]);
+
+        $event = Event::create([
+            'title' => 'Evento com Grupo',
+            'description' => 'Evento com grupo privado',
+            'start_at' => now()->addDay(),
+            'published' => true,
+            'price' => 0,
+            'whatsapp_group_link' => 'https://chat.whatsapp.com/teste123',
+        ]);
+
+        $order = Order::create([
+            'user_id' => $user->id,
+            'status' => 'paid',
+            'total_amount' => 0,
+            'currency' => 'BRL',
+            'gateway' => 'free',
+        ]);
+
+        $registration = EventRegistration::create([
+            'event_id' => $event->id,
+            'user_id' => $user->id,
+            'order_id' => $order->id,
+            'status' => EventRegistration::STATUS_PAID,
+            'payment_status' => EventRegistration::PAYMENT_FREE,
+            'price' => 0,
+            'quantity' => 1,
+        ]);
+
+        $html = view('events.payment.success', compact('order', 'event', 'registration'))->render();
+        $this->assertStringContainsString('Entrar no grupo do evento', $html);
+
+        $response = $this
+            ->actingAs($user)
+            ->post(route('events.group.join', $event));
+
+        $response->assertRedirect('https://chat.whatsapp.com/teste123');
+        $this->assertNotNull($registration->fresh()->joined_group_at);
+    }
+
     public function test_free_mentorship_creates_paid_order_and_enrollment(): void
     {
         $seller = User::create([
@@ -368,6 +554,7 @@ class FreeMarketplaceOrdersTest extends TestCase
             'role' => 'member',
             'level' => 'iniciante',
         ]);
+        $buyer->forceFill(['email_verified_at' => now()])->save();
 
         $course = Course::create([
             'user_id' => $seller->id,

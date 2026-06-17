@@ -4,13 +4,16 @@ namespace Tests\Feature;
 
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Models\Order;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\LegalConsentService;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Mockery;
 use Tests\TestCase;
 
 class EventReservationDuplicateRegistrationTest extends TestCase
@@ -25,6 +28,10 @@ class EventReservationDuplicateRegistrationTest extends TestCase
 
         Notification::fake();
         Setting::flushRuntimeCache();
+
+        $legalConsentMock = Mockery::mock(LegalConsentService::class);
+        $legalConsentMock->shouldReceive('hasAcceptedCurrentVersion')->andReturn(true);
+        $this->app->instance(LegalConsentService::class, $legalConsentMock);
 
         $this->originalDefaultConnection = (string) config('database.default');
         $this->originalSqliteDatabase = (string) config('database.connections.sqlite.database');
@@ -92,12 +99,36 @@ class EventReservationDuplicateRegistrationTest extends TestCase
             $table->unique(['event_id', 'user_id']);
         });
 
+        Schema::create('orders', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('seller_id')->nullable();
+            $table->string('status')->default('pending');
+            $table->timestamp('paid_at')->nullable();
+            $table->decimal('total_amount', 10, 2)->default(0);
+            $table->decimal('fee_amount', 10, 2)->default(0);
+            $table->decimal('platform_fee_amount', 10, 2)->default(0);
+            $table->string('currency')->nullable();
+            $table->string('gateway')->nullable();
+            $table->text('metadata')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('key')->unique();
             $table->text('value')->nullable();
             $table->string('group')->nullable();
             $table->timestamps();
+        });
+
+        Schema::create('rate_limit_blocks', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('ip_address', 45);
+            $table->string('reason', 100);
+            $table->timestamp('blocked_until');
+            $table->unsignedInteger('attempts')->default(1);
+            $table->timestamp('created_at')->useCurrent();
         });
 
         Schema::create('subscriptions', function (Blueprint $table) {
@@ -146,9 +177,18 @@ class EventReservationDuplicateRegistrationTest extends TestCase
             'price' => 0,
         ]);
 
+        $order = Order::create([
+            'user_id' => $user->id,
+            'status' => 'paid',
+            'total_amount' => 0,
+            'currency' => 'BRL',
+            'gateway' => 'free',
+        ]);
+
         EventRegistration::create([
             'event_id' => $event->id,
             'user_id' => $user->id,
+            'order_id' => $order->id,
             'status' => EventRegistration::STATUS_CONFIRMED,
             'price' => 0,
             'quantity' => 1,

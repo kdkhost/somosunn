@@ -164,6 +164,12 @@
                                                         title="Áreas para Expositores">
                                                         <i class="fas fa-store"></i>
                                                     </a>
+                                                    @if(auth()->user()?->hasPermission('admin.events.coupons.view'))
+                                                        <a href="{{ route('admin.events.coupons.index', $event) }}" class="btn btn-outline-success elevation-1"
+                                                            title="Cupons de gratuidade">
+                                                            <i class="fas fa-ticket-alt"></i>
+                                                        </a>
+                                                    @endif
                                                 @endif
                                                 @if($event->is_ticket_enabled)
                                                     <a href="{{ route('admin.events.scanner', $event) }}" class="btn btn-outline-success elevation-1"

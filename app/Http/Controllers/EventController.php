@@ -73,6 +73,7 @@ class EventController extends Controller
             $userRegistration = \App\Models\EventRegistration::where('event_id', $event->id)
                 ->where('user_id', auth()->id())
                 ->whereIn('status', \App\Models\EventRegistration::COUNTED_STATUSES)
+                ->latest('id')
                 ->first();
         }
 

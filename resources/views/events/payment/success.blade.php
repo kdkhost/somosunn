@@ -47,6 +47,19 @@
                     <i class="fas fa-ticket-alt mr-2"></i>
                     Sua vaga está confirmada. Guarde o número do pedido para referência.
                 </div>
+                @if($event && $registration && in_array($registration->status, \App\Models\EventRegistration::COUNTED_STATUSES, true) && filled($event->whatsapp_group_link))
+                    <form method="POST" action="{{ route('events.group.join', $event) }}" class="mt-4">
+                        @csrf
+                        <button type="submit" class="w-full rounded-xl bg-green-600 px-6 py-3 text-center font-bold text-white hover:bg-green-700 sm:w-auto">
+                            <i class="fab fa-whatsapp mr-2"></i>Entrar no grupo do evento
+                        </button>
+                    </form>
+                    @if($registration->joined_group_at)
+                        <p class="mt-2 text-xs font-bold text-slate-500">
+                            Entrada registrada em {{ $registration->joined_group_at->format('d/m/Y H:i') }}.
+                        </p>
+                    @endif
+                @endif
             @endif
 
             <div class="mt-8 flex flex-col sm:flex-row gap-3">

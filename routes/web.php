@@ -254,6 +254,7 @@ Route::middleware(['auth', 'check.feature:events_delete'])->group(function () {
 });
 Route::get('/eventos/{event}/checkout', [\App\Http\Controllers\EventReservationController::class, 'checkout'])->name('events.checkout');
 Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservationController::class, 'reserve'])->name('events.reserve');
+Route::post('/eventos/{event}/entrar-no-grupo', [\App\Http\Controllers\EventGroupController::class, 'join'])->middleware('auth')->name('events.group.join');
 Route::get('/eventos/{event}/expositor', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'show'])->name('events.exhibitor.show');
 Route::post('/eventos/{event}/expositor/checkout', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'checkout'])->middleware('throttle:6,1')->name('events.exhibitor.checkout');
 Route::get('/eventos/{event}/expositor/sucesso/{order}', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'success'])->name('events.exhibitor.success');
@@ -612,6 +613,13 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::post('events/{event}/toggle-field', [\App\Http\Controllers\Panel\Admin\EventController::class, 'toggleField'])->name('events.toggle-field');
         Route::post('events/{event}/set-cover', [\App\Http\Controllers\Panel\Admin\EventController::class, 'setCover'])->name('events.set-cover');
         Route::post('events/calendar/settings', [\App\Http\Controllers\Panel\Admin\EventController::class, 'updateCalendarSettings'])->name('events.calendar.settings');
+        Route::get('events/{event}/coupons', [\App\Http\Controllers\Panel\Admin\EventCouponController::class, 'index'])->name('events.coupons.index');
+        Route::get('events/{event}/coupons/create', [\App\Http\Controllers\Panel\Admin\EventCouponController::class, 'create'])->name('events.coupons.create');
+        Route::post('events/{event}/coupons', [\App\Http\Controllers\Panel\Admin\EventCouponController::class, 'store'])->name('events.coupons.store');
+        Route::get('events/{event}/coupons/{coupon}/edit', [\App\Http\Controllers\Panel\Admin\EventCouponController::class, 'edit'])->name('events.coupons.edit');
+        Route::put('events/{event}/coupons/{coupon}', [\App\Http\Controllers\Panel\Admin\EventCouponController::class, 'update'])->name('events.coupons.update');
+        Route::post('events/{event}/coupons/{coupon}/toggle', [\App\Http\Controllers\Panel\Admin\EventCouponController::class, 'toggle'])->name('events.coupons.toggle');
+        Route::delete('events/{event}/coupons/{coupon}', [\App\Http\Controllers\Panel\Admin\EventCouponController::class, 'destroy'])->name('events.coupons.destroy');
         Route::get('events/{event}/exhibitors', [\App\Http\Controllers\Panel\Admin\EventExhibitorController::class, 'index'])->name('events.exhibitors.index');
         Route::post('events/{event}/exhibitors/settings', [\App\Http\Controllers\Panel\Admin\EventExhibitorController::class, 'settings'])->name('events.exhibitors.settings');
         Route::post('events/{event}/exhibitors/toggle', [\App\Http\Controllers\Panel\Admin\EventExhibitorController::class, 'toggle'])->name('events.exhibitors.toggle');
@@ -741,6 +749,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::post('events/{event}/toggle-published', [\App\Http\Controllers\Admin\EventController::class, 'togglePublished'])->name('events.toggle-published');
     Route::post('events/{event}/move', [\App\Http\Controllers\Admin\EventController::class, 'move'])->name('events.move');
     Route::post('events/{event}/set-cover', [\App\Http\Controllers\Admin\EventController::class, 'setCover'])->name('events.set-cover');
+    Route::get('events/{event}/coupons', [\App\Http\Controllers\Admin\EventCouponController::class, 'index'])->name('events.coupons.index');
+    Route::get('events/{event}/coupons/create', [\App\Http\Controllers\Admin\EventCouponController::class, 'create'])->name('events.coupons.create');
+    Route::post('events/{event}/coupons', [\App\Http\Controllers\Admin\EventCouponController::class, 'store'])->name('events.coupons.store');
+    Route::get('events/{event}/coupons/{coupon}/edit', [\App\Http\Controllers\Admin\EventCouponController::class, 'edit'])->name('events.coupons.edit');
+    Route::put('events/{event}/coupons/{coupon}', [\App\Http\Controllers\Admin\EventCouponController::class, 'update'])->name('events.coupons.update');
+    Route::post('events/{event}/coupons/{coupon}/toggle', [\App\Http\Controllers\Admin\EventCouponController::class, 'toggle'])->name('events.coupons.toggle');
+    Route::delete('events/{event}/coupons/{coupon}', [\App\Http\Controllers\Admin\EventCouponController::class, 'destroy'])->name('events.coupons.destroy');
     Route::get('events/{event}/exhibitors', [\App\Http\Controllers\Admin\EventExhibitorController::class, 'index'])->name('events.exhibitors.index');
     Route::post('events/{event}/exhibitors/settings', [\App\Http\Controllers\Admin\EventExhibitorController::class, 'settings'])->name('events.exhibitors.settings');
     Route::post('events/{event}/exhibitors/toggle', [\App\Http\Controllers\Admin\EventExhibitorController::class, 'toggle'])->name('events.exhibitors.toggle');

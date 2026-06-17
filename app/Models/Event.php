@@ -77,6 +77,7 @@ class Event extends Model
         'exhibitor_batch_3_deadline',
         'exhibitor_batch_3_slots',
         'exhibitor_show_publicly',
+        'whatsapp_group_link',
     ];
 
     protected $casts = [
@@ -622,6 +623,11 @@ class Event extends Model
     public function registrations()
     {
         return $this->hasMany(EventRegistration::class);
+    }
+
+    public function coupons()
+    {
+        return $this->hasMany(EventCoupon::class);
     }
 
     public function exhibitorRegistrations()

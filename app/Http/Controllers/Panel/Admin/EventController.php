@@ -403,6 +403,7 @@ class EventController extends Controller
             'all_day' => 'nullable|boolean',
             'is_certificate_enabled' => 'nullable|boolean',
             'is_ticket_enabled' => 'nullable|boolean',
+            'whatsapp_group_link' => 'nullable|url|max:2048',
             'visibility' => $this->visibilityRule(),
             'certificate_settings' => 'nullable|json',
             'scanner_restriction_mode' => 'nullable|string|in:disabled,exact,radius',
@@ -436,6 +437,10 @@ class EventController extends Controller
             'type' => 'nullable|string|in:event,album',
             'slug' => 'nullable|string|unique:events,slug,' . ($event ? $event->id : 'NULL'),
         ]);
+
+        if (!$this->canManageGroupLink()) {
+            unset($validated['whatsapp_group_link']);
+        }
 
         return $this->applyScannerRestrictionPayload($request, $validated);
     }
@@ -697,6 +702,13 @@ class EventController extends Controller
         if (!$user || (!$user->isAdmin() && !$user->hasPermission($permission))) {
             abort(403);
         }
+    }
+
+    protected function canManageGroupLink(): bool
+    {
+        $user = Auth::user();
+
+        return $user && ($user->isAdmin() || $user->hasPermission('admin.events.group_link.manage'));
     }
 
     protected function ensureCanManage(Event $event): void

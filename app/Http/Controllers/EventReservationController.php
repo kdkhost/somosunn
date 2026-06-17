@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\EventCoupon;
 use App\Models\EventRegistration;
 use App\Models\Order;
 use App\Models\CouponRedemption;
@@ -10,6 +11,7 @@ use App\Models\Plan;
 use App\Models\SumUpTransaction;
 use App\Models\User;
 use App\Services\CouponService;
+use App\Services\EventCouponService;
 use App\Services\OrderSettlementService;
 use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
@@ -77,7 +79,7 @@ class EventReservationController extends Controller
         return view('events.checkout', compact('event', 'registration', 'mpEnabled', 'preferredGateway', 'activeGateways'));
     }
 
-    public function reserve(Request $request, Event $event, CouponService $couponService, \App\Services\Payment\MercadoPagoService $mpService, \App\Services\Payment\SumUpService $sumUpService, OrderSettlementService $orderSettlementService)
+    public function reserve(Request $request, Event $event, CouponService $couponService, EventCouponService $eventCouponService, \App\Services\Payment\MercadoPagoService $mpService, \App\Services\Payment\SumUpService $sumUpService, OrderSettlementService $orderSettlementService)
     {
         $this->abortIfDisabledOrUnpublished($event);
 
@@ -113,11 +115,21 @@ class EventReservationController extends Controller
         ]);
 
         $isPaid = (float) $event->effective_price > 0;
+        $regularUnitPrice = (float) $event->current_price;
+        $currentPrice = (float) $event->effective_price;
+        $couponCode = $eventCouponService->normalizeCode($request->input('coupon_code'));
+        $originalTotalPreview = round($currentPrice * $quantity, 2);
+        $potentialFreeEventCoupon = $isPaid
+            ? $eventCouponService->findPotentialFreeCoupon($event, $couponCode, $originalTotalPreview)
+            : null;
+        $requiresPayment = $isPaid && !$potentialFreeEventCoupon;
         $seller = $event->user ?: User::find($event->user_id);
         $sellerId = $seller ? (int) $seller->id : (int) ($event->user_id ?? 0);
         
         // Detectar todos os gateways ativos para o vendedor
-        $activeGateways = \App\Models\GatewayAccount::resolveAllActiveGatewaysForSeller($sellerId);
+        $activeGateways = $requiresPayment
+            ? \App\Models\GatewayAccount::resolveAllActiveGatewaysForSeller($sellerId)
+            : [];
         $activeProviders = array_column($activeGateways, 'provider');
 
         // Determinar o gateway a usar
@@ -125,7 +137,7 @@ class EventReservationController extends Controller
         $gatewayConfig = null;
         $paymentsConfigured = false;
 
-        if ($isPaid) {
+        if ($requiresPayment) {
             if (empty($activeGateways)) {
                 return redirect()
                     ->route('events.show', $event)
@@ -136,21 +148,29 @@ class EventReservationController extends Controller
                 // Múltiplos gateways: exigir campo gateway no request
                 $selectedGateway = $request->input('gateway');
                 if (!$selectedGateway) {
-                    return response()->json([
-                        'error' => 'O campo gateway é obrigatório quando há múltiplos gateways disponíveis.',
-                    ], 422);
+                    if ($request->ajax() || $request->expectsJson()) {
+                        return response()->json([
+                            'error' => 'O campo gateway é obrigatório quando há múltiplos gateways disponíveis.',
+                        ], 422);
+                    }
+
+                    return back()->with('error', 'Selecione o método de pagamento.')->withInput();
                 }
 
                 if (!in_array($selectedGateway, $activeProviders, true)) {
-                    \Log::warning('EventReservation: gateway inválido informado pelo cliente', [
+                    \Log::warning('EventReservation: gateway invÃ¡lido informado pelo cliente', [
                         'order_id' => null,
                         'event_id' => $event->id,
                         'gateway_informado' => $selectedGateway,
                         'gateways_ativos' => $activeProviders,
                     ]);
-                    return response()->json([
-                        'error' => 'Gateway de pagamento inválido ou não disponível para este evento.',
-                    ], 422);
+                    if ($request->ajax() || $request->expectsJson()) {
+                        return response()->json([
+                            'error' => 'Gateway de pagamento inválido ou não disponível para este evento.',
+                        ], 422);
+                    }
+
+                    return back()->with('error', 'Gateway de pagamento inválido ou não disponível para este evento.')->withInput();
                 }
 
                 $gatewayProvider = $selectedGateway;
@@ -158,18 +178,22 @@ class EventReservationController extends Controller
                 // Apenas 1 gateway ativo: usar diretamente sem exigir o campo no request
                 $gatewayProvider = $activeGateways[0]['provider'];
 
-                // Se o cliente informou um gateway, validar que é o ativo
+                // Se o cliente informou um gateway, validar que Ã© o ativo
                 $selectedGateway = $request->input('gateway');
                 if ($selectedGateway && !in_array($selectedGateway, $activeProviders, true)) {
-                    \Log::warning('EventReservation: gateway inválido informado pelo cliente', [
+                    \Log::warning('EventReservation: gateway invÃ¡lido informado pelo cliente', [
                         'order_id' => null,
                         'event_id' => $event->id,
                         'gateway_informado' => $selectedGateway,
                         'gateways_ativos' => $activeProviders,
                     ]);
-                    return response()->json([
-                        'error' => 'Gateway de pagamento inválido ou não disponível para este evento.',
-                    ], 422);
+                    if ($request->ajax() || $request->expectsJson()) {
+                        return response()->json([
+                            'error' => 'Gateway de pagamento inválido ou não disponível para este evento.',
+                        ], 422);
+                    }
+
+                    return back()->with('error', 'Gateway de pagamento inválido ou não disponível para este evento.')->withInput();
                 }
             }
 
@@ -183,14 +207,14 @@ class EventReservationController extends Controller
             $paymentsConfigured = $gatewayConfig !== null;
         }
 
-        // Manter compatibilidade com código existente
+        // Manter compatibilidade com cÃ³digo existente
         $gateways = [
             'mpEnabled' => $gatewayProvider === 'mercadopago' && $paymentsConfigured,
             'preferredGateway' => $gatewayProvider,
             'mpPublicKey' => ($gatewayProvider === 'mercadopago' && $gatewayConfig) ? ($gatewayConfig['config']['mpPublicKey'] ?? '') : '',
         ];
 
-        if ($isPaid) {
+        if ($requiresPayment) {
             if (false && $seller && !$seller->canSellOnMarketplace()) {
                 return redirect()
                     ->route('events.show', $event)
@@ -209,7 +233,7 @@ class EventReservationController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
-                'cpf' => $isPaid ? 'required|string' : 'nullable|string',
+                'cpf' => $requiresPayment ? 'required|string' : 'nullable|string',
                 'phone' => 'nullable|string|max:50',
                 'password' => 'required|min:8|confirmed',
             ]);
@@ -246,13 +270,11 @@ class EventReservationController extends Controller
         $registration = null;
         $order = null;
         $alreadyRegistered = false;
-        $regularUnitPrice = (float) $event->current_price;
-        $currentPrice = (float) $event->effective_price;
-        $couponCode = $isPaid ? $couponService->normalizeCode($request->input('coupon_code')) : '';
+        $genericCouponCode = $requiresPayment ? $couponService->normalizeCode($request->input('coupon_code')) : '';
         $usesSingleRegistrationPerUser = $this->usesSingleEventRegistrationPerUser();
 
         try {
-            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $regularUnitPrice, $currentPrice, $couponCode, $couponService, $orderSettlementService, &$registration, &$order, &$alreadyRegistered, $gatewayProvider, $usesSingleRegistrationPerUser) {
+            DB::transaction(function () use ($event, $user, $sellerId, $quantity, $isPaid, $requiresPayment, $regularUnitPrice, $currentPrice, $couponCode, $genericCouponCode, $couponService, $eventCouponService, $orderSettlementService, &$registration, &$order, &$alreadyRegistered, $gatewayProvider, $usesSingleRegistrationPerUser) {
                 $existingCountedRegistration = EventRegistration::where('event_id', $event->id)
                     ->where('user_id', $user->id)
                     ->whereIn('status', EventRegistration::COUNTED_STATUSES)
@@ -306,7 +328,20 @@ class EventReservationController extends Controller
                 // Permitir múltiplas reservas mesmo se já houver uma confirmada/paga.
                 // A restrição única de (event_id, user_id) foi removida do banco.
 
-                if (!$isPaid) {
+                $freeEventCoupon = null;
+                $freeCouponDiscountAmount = 0.0;
+                if ($isPaid && !$requiresPayment) {
+                    $freeCouponResult = $eventCouponService->validateFreeCouponLocked(
+                        $event,
+                        $couponCode,
+                        round($currentPrice * $quantity, 2),
+                        $quantity
+                    );
+                    $freeEventCoupon = $freeCouponResult['coupon'];
+                    $freeCouponDiscountAmount = (float) $freeCouponResult['discount_amount'];
+                }
+
+                if (!$requiresPayment) {
                     $order = $this->createFreeEventOrder(
                         $event,
                         (int) $user->id,
@@ -316,6 +351,10 @@ class EventReservationController extends Controller
                         $currentPrice
                     );
 
+                    if ($freeEventCoupon) {
+                        $this->attachEventCouponToFreeOrder($order, $freeEventCoupon, $freeCouponDiscountAmount, $quantity, $currentPrice);
+                    }
+
                     if ($usesSingleRegistrationPerUser) {
                         $legacyRegistration = EventRegistration::where('event_id', $event->id)
                             ->where('user_id', $user->id)
@@ -324,24 +363,31 @@ class EventReservationController extends Controller
 
                         if ($legacyRegistration) {
                             $legacyRegistration->update([
-                                'order_id' => $order->id,
-                                'status' => EventRegistration::STATUS_PENDING,
-                                'price' => 0,
-                                'quantity' => $quantity,
-                                'ticket_code' => $event->is_ticket_enabled
-                                    ? ($legacyRegistration->ticket_code ?: Str::uuid()->toString())
-                                    : null,
+                                ...$this->eventRegistrationPayload([
+                                    'order_id' => $order->id,
+                                    'coupon_id' => $freeEventCoupon?->id,
+                                    'status' => EventRegistration::STATUS_PENDING,
+                                    'payment_status' => $freeEventCoupon ? EventRegistration::PAYMENT_FREE : EventRegistration::PAYMENT_PENDING,
+                                    'price' => 0,
+                                    'quantity' => $quantity,
+                                    'ticket_code' => $event->is_ticket_enabled
+                                        ? ($legacyRegistration->ticket_code ?: Str::uuid()->toString())
+                                        : null,
+                                ]),
                             ]);
+                            $registration = $legacyRegistration->fresh();
                         } else {
-                            EventRegistration::create([
+                            $registration = EventRegistration::create($this->eventRegistrationPayload([
                                 'event_id' => $event->id,
                                 'user_id' => $user->id,
                                 'order_id' => $order->id,
+                                'coupon_id' => $freeEventCoupon?->id,
                                 'status' => EventRegistration::STATUS_PENDING,
+                                'payment_status' => $freeEventCoupon ? EventRegistration::PAYMENT_FREE : EventRegistration::PAYMENT_PENDING,
                                 'price' => 0,
                                 'quantity' => $quantity,
                                 'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
-                            ]);
+                            ]));
                         }
                     } else {
                         EventRegistration::where('event_id', $event->id)
@@ -350,16 +396,22 @@ class EventReservationController extends Controller
                             ->delete();
 
                         for ($i = 0; $i < $quantity; $i++) {
-                            EventRegistration::create([
+                            $registration = EventRegistration::create($this->eventRegistrationPayload([
                                 'event_id' => $event->id,
                                 'user_id' => $user->id,
                                 'order_id' => $order->id,
+                                'coupon_id' => $freeEventCoupon?->id,
                                 'status' => EventRegistration::STATUS_PENDING,
+                                'payment_status' => $freeEventCoupon ? EventRegistration::PAYMENT_FREE : EventRegistration::PAYMENT_PENDING,
                                 'price' => 0,
                                 'quantity' => 1,
                                 'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
-                            ]);
+                            ]));
                         }
+                    }
+
+                    if ($freeEventCoupon) {
+                        $eventCouponService->consumeLocked($freeEventCoupon, $quantity);
                     }
 
                     // Notificar confirmação da vaga (Evento Gratuito)
@@ -412,9 +464,9 @@ class EventReservationController extends Controller
                 $discountAmount = 0.0;
                 $coupon = null;
 
-                if ($couponCode !== '') {
+                if ($genericCouponCode !== '') {
                     $result = $couponService->validateAndCalculateLocked(
-                        $couponCode,
+                        $genericCouponCode,
                         CouponService::CONTEXT_EVENT,
                         (int) $event->id,
                         (int) $user->id,
@@ -536,26 +588,30 @@ class EventReservationController extends Controller
                             ->first();
 
                     if ($legacyRegistration) {
-                        $legacyRegistration->update([
+                        $legacyRegistration->update($this->eventRegistrationPayload([
                             'order_id' => $order->id,
+                            'coupon_id' => null,
                             'status' => EventRegistration::STATUS_PENDING,
+                            'payment_status' => EventRegistration::PAYMENT_PENDING,
                             'price' => $unitPrice,
                             'quantity' => $quantity,
                             'ticket_code' => $event->is_ticket_enabled
                                 ? ($legacyRegistration->ticket_code ?: Str::uuid()->toString())
                                 : null,
-                        ]);
+                        ]));
                         $registration = $legacyRegistration->fresh();
                     } else {
-                        $registration = EventRegistration::create([
+                        $registration = EventRegistration::create($this->eventRegistrationPayload([
                             'event_id' => $event->id,
                             'user_id' => $user->id,
                             'order_id' => $order->id,
+                            'coupon_id' => null,
                             'status' => EventRegistration::STATUS_PENDING,
+                            'payment_status' => EventRegistration::PAYMENT_PENDING,
                             'price' => $unitPrice,
                             'quantity' => $quantity,
                             'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
-                        ]);
+                        ]));
                     }
                 } else {
                     EventRegistration::where('event_id', $event->id)
@@ -564,15 +620,17 @@ class EventReservationController extends Controller
                         ->delete();
 
                     for ($i = 0; $i < $quantity; $i++) {
-                        $registration = EventRegistration::create([
+                        $registration = EventRegistration::create($this->eventRegistrationPayload([
                             'event_id' => $event->id,
                             'user_id' => $user->id,
                             'order_id' => $order->id,
+                            'coupon_id' => null,
                             'status' => EventRegistration::STATUS_PENDING,
+                            'payment_status' => EventRegistration::PAYMENT_PENDING,
                             'price' => $unitPrice,
                             'quantity' => 1,
                             'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
-                        ]);
+                        ]));
                     }
                 }
             });
@@ -592,14 +650,14 @@ class EventReservationController extends Controller
         }
 
         if ($alreadyRegistered) {
-            return redirect()->route('events.show', $event)->with('success', 'Sua vaga ja esta confirmada.');
+            return redirect()->route('events.show', $event)->with('success', 'Sua vaga já está confirmada.');
         }
 
         if ($registration && in_array($registration->status, EventRegistration::COUNTED_STATUSES, true)) {
             return redirect()->route('events.show', $event)->with('success', 'Sua vaga já está confirmada.');
         }
 
-        if (!$isPaid) {
+        if (!$requiresPayment) {
             // Gamificação: inscrição gratuita confirmada
             if ($registration && $user) {
                 try {
@@ -1025,6 +1083,45 @@ class EventReservationController extends Controller
         ]);
 
         return $order;
+    }
+
+    private function attachEventCouponToFreeOrder(Order $order, EventCoupon $coupon, float $discountAmount, int $quantity, float $effectiveUnitPrice): void
+    {
+        $couponPayload = [
+            'id' => (int) $coupon->id,
+            'code' => (string) $coupon->code,
+            'type' => (string) $coupon->type,
+            'discount_value' => (float) $coupon->discount_value,
+            'discount_amount' => round($discountAmount, 2),
+            'uses' => max(1, (int) $quantity),
+        ];
+
+        $order->update([
+            'metadata' => array_merge($order->metadata ?? [], [
+                'event_coupon' => $couponPayload,
+                'original_total_amount' => round($effectiveUnitPrice * max(1, (int) $quantity), 2),
+                'is_free_checkout' => true,
+            ]),
+        ]);
+
+        $order->items()->get()->each(function ($item) use ($couponPayload) {
+            $item->update([
+                'data' => array_merge($item->data ?? [], [
+                    'event_coupon' => $couponPayload,
+                ]),
+            ]);
+        });
+    }
+
+    private function eventRegistrationPayload(array $payload): array
+    {
+        foreach (['coupon_id', 'payment_status', 'joined_group_at'] as $column) {
+            if (array_key_exists($column, $payload) && !Schema::hasColumn('event_registrations', $column)) {
+                unset($payload[$column]);
+            }
+        }
+
+        return $payload;
     }
 
     /**

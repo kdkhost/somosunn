@@ -15,6 +15,11 @@ class EventRegistration extends Model
     public const STATUS_CONFIRMED = 'confirmed';
     public const STATUS_CANCELLED = 'cancelled';
 
+    public const PAYMENT_PENDING = 'pending';
+    public const PAYMENT_PAID = 'paid';
+    public const PAYMENT_FREE = 'free';
+    public const PAYMENT_CANCELLED = 'cancelled';
+
     public const COUNTED_STATUSES = [
         self::STATUS_PAID,
         self::STATUS_CONFIRMED,
@@ -24,17 +29,21 @@ class EventRegistration extends Model
         'event_id',
         'user_id',
         'order_id',
+        'coupon_id',
         'status',
+        'payment_status',
         'price',
         'quantity',
         'ticket_code',
         'check_in_at',
+        'joined_group_at',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'quantity' => 'integer',
         'check_in_at' => 'datetime',
+        'joined_group_at' => 'datetime',
     ];
 
     public function event()
@@ -50,6 +59,11 @@ class EventRegistration extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function coupon()
+    {
+        return $this->belongsTo(EventCoupon::class, 'coupon_id');
     }
 
     public function isTicketUsed(): bool

@@ -145,6 +145,14 @@
                                             </a>
                                         @endif
 
+                                        @if($event->type !== 'album' && $panelUser?->hasPermission('admin.events.coupons.view'))
+                                            <a href="{{ route('panel.admin.events.coupons.index', $event) }}"
+                                                class="w-10 h-10 flex items-center justify-center bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-[0.9rem] transition-all duration-300 border border-emerald-100 dark:border-emerald-800/50 hover:scale-110 active:scale-95 shadow-sm"
+                                                title="Cupons de gratuidade">
+                                                <i class="fas fa-ticket-alt"></i>
+                                            </a>
+                                        @endif
+
                                         @if($event->is_ticket_enabled && $event->type !== 'album' && $canScanEvents)
                                             <a href="{{ route('panel.admin.events.scanner', $event) }}"
                                                 class="w-10 h-10 flex items-center justify-center bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-[0.9rem] transition-all duration-300 border border-emerald-100 dark:border-emerald-800/50 hover:scale-110 active:scale-95 shadow-sm"
