@@ -48,8 +48,13 @@
             <div class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1 transition-colors">R$
                 {{ number_format($netTotal, 2, ',', '.') }}</div>
             <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 transition-colors">
-                Bruto: R$ {{ number_format($paidTotal, 2, ',', '.') }} • Comissão: R$
-                {{ number_format($platformFeeTotal, 2, ',', '.') }}
+                Bruto: R$ {{ number_format($paidTotal, 2, ',', '.') }} &middot; Descontos: R$
+                {{ number_format($discountTotal, 2, ',', '.') }} &middot; Cobrado: R$
+                {{ number_format($chargedTotal, 2, ',', '.') }}
+            </div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 transition-colors">
+                Comissão: R$ {{ number_format($platformFeeTotal, 2, ',', '.') }} &middot; Líquido: R$
+                {{ number_format($netTotal, 2, ',', '.') }}
             </div>
         </div>
     </div>
@@ -119,7 +124,7 @@
                                         Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
                                     </div>
                                     <div class="text-xs text-slate-500 dark:text-slate-400">
-                                        Liquido: R$ {{ number_format((float) ($order->total_amount ?? 0), 2, ',', '.') }}
+                                        Líquido: R$ {{ number_format((float) ($order->total_amount ?? 0), 2, ',', '.') }}
                                     </div>
                                 @endif
                             </td>
