@@ -45,6 +45,29 @@ class SoldContentGuard
             ->exists();
     }
 
+    public function titleFromFinancialHistory(int $userId, string|array $itemTypes, int $itemId): ?string
+    {
+        $types = $this->expandItemTypeAliases(array_values(array_filter(Arr::wrap($itemTypes))));
+
+        if ($userId <= 0 || $itemId <= 0 || $types === []) {
+            return null;
+        }
+
+        $title = OrderItem::query()
+            ->whereIn('item_type', $types)
+            ->where('item_id', $itemId)
+            ->whereNotNull('title')
+            ->where('title', '!=', '')
+            ->whereHas('order', function ($query) use ($userId) {
+                $query->where('user_id', $userId)
+                    ->whereIn('status', self::FINANCIAL_HISTORY_STATUSES);
+            })
+            ->latest('id')
+            ->value('title');
+
+        return $title !== null ? trim((string) $title) ?: null : null;
+    }
+
     private function expandItemTypeAliases(array $itemTypes): array
     {
         $aliases = [

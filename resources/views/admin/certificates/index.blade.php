@@ -51,9 +51,9 @@
                                     <td data-sort="{{ $cert->issued_at->format('YmdHis') }}">
                                         {{ $cert->issued_at->format('d/m/Y H:i') }}
                                     </td>
-                                    <td>{{ optional($cert->user)->name ?? 'Usuario removido' }}</td>
+                                    <td>{{ optional($cert->user)->name ?? 'Usuário removido' }}</td>
                                     <td><span class="badge badge-info">{{ $type }}</span></td>
-                                    <td>{{ optional($product)->title ?? 'Conteudo removido' }}</td>
+                                    <td>{{ $cert->content_title }}</td>
                                     <td><small>{{ $cert->cert_hash }}</small></td>
                                     </td>
                                     <td>
@@ -127,9 +127,9 @@
                                     @endphp
                                     <tr>
                                         <td>{{ $enrollment->completed_at ? $enrollment->completed_at->format('d/m/Y') : '-' }}</td>
-                                        <td>{{ optional($enrollment->user)->name ?? 'Usuario removido' }}</td>
+                                        <td>{{ optional($enrollment->user)->name ?? 'Usuário removido' }}</td>
                                         <td><span class="badge badge-secondary">{{ $typeLabel }}</span></td>
-                                        <td>{{ optional($enrollment->enrollable)->title ?? 'Conteudo removido' }}</td>
+                                        <td>{{ $enrollment->content_title }}</td>
                                         <td>
                                             <form action="{{ route('admin.certificates.generate') }}" method="POST"
                                                 class="d-inline">

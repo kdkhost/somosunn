@@ -8,13 +8,18 @@
 - Cursos, mentorias, eventos, produtos do marketplace e planos não podem mais ser excluídos quando já possuem venda, fatura ou histórico financeiro vinculado.
 - A proteção foi aplicada no painel antigo e no painel novo antes de qualquer arquivo físico ser removido.
 - A coluna de telefone da listagem de pedidos no painel antigo não quebra mais a máscara brasileira em duas linhas.
+- Certificados e pendências passam a usar o título salvo no pedido quando o cadastro antigo já foi removido, evitando "Conteúdo removido" quando existe histórico financeiro.
 
 ### Arquivos principais
 - `app/Services/Content/SoldContentGuard.php`
+- `app/Models/Certificate.php`
+- `app/Models/Enrollment.php`
 - `app/Http/Controllers/Admin/*Controller.php`
 - `app/Http/Controllers/Panel/Admin/*Controller.php`
 - `app/Http/Controllers/Panel/CourseController.php`
 - `app/Http/Controllers/Panel/SellerProductController.php`
+- `resources/views/admin/certificates/index.blade.php`
+- `resources/views/panel/admin/certificates/index.blade.php`
 - `resources/views/admin/orders/index.blade.php`
 
 ---

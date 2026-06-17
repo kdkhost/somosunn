@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Services\Content\SoldContentGuard;
 
 class Enrollment extends Model
 {
@@ -26,6 +27,27 @@ class Enrollment extends Model
     public function enrollable()
     {
         return $this->morphTo();
+    }
+
+    public function getContentTitleAttribute(): string
+    {
+        $title = trim((string) ($this->enrollable?->title ?? ''));
+        if ($title !== '') {
+            return $title;
+        }
+
+        $type = match ((string) $this->enrollable_type) {
+            Course::class => 'course',
+            Mentorship::class => 'mentorship',
+            Event::class => 'event',
+            default => '',
+        };
+
+        return app(SoldContentGuard::class)->titleFromFinancialHistory(
+            (int) $this->user_id,
+            $type,
+            (int) $this->enrollable_id
+        ) ?: 'Conteúdo removido';
     }
 
     public function scopeWithoutCertificate($query)

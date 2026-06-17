@@ -84,7 +84,7 @@
                                         </div>
                                         <div>
                                             <p class="text-sm font-bold text-slate-900 dark:text-white transition-colors">
-                                                {{ optional($cert->user)->name ?? 'Usuario removido' }}</p>
+                                                {{ optional($cert->user)->name ?? 'Usuário removido' }}</p>
                                             <p class="text-xs text-slate-400 dark:text-slate-500 transition-colors">
                                                 {{ optional($cert->user)->email ?? '-' }}</p>
                                         </div>
@@ -96,7 +96,7 @@
                                         {{ $cert->course_id ? 'Curso' : ($cert->mentorship_id ? 'Mentoria' : 'Evento') }}
                                     </span>
                                     <span class="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
-                                        {{ $cert->course->title ?? $cert->mentorship->title ?? $cert->event->title ?? 'N/A' }}
+                                        {{ $cert->content_title }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 transition-colors">
@@ -184,7 +184,7 @@
                                         </div>
                                         <div>
                                             <p class="text-sm font-bold text-slate-900 dark:text-white transition-colors">
-                                                {{ optional($enrollment->user)->name ?? 'Usuario removido' }}</p>
+                                                {{ optional($enrollment->user)->name ?? 'Usuário removido' }}</p>
                                             <p class="text-xs text-slate-400 dark:text-slate-500 transition-colors">
                                                 {{ optional($enrollment->user)->email ?? '-' }}</p>
                                         </div>
@@ -196,7 +196,7 @@
                                         {{ $enrollment->enrollable_type === 'App\Models\Course' ? 'Curso' : ($enrollment->enrollable_type === 'App\Models\Mentorship' ? 'Mentoria' : 'Evento') }}
                                     </span>
                                     <span class="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
-                                        {{ optional($enrollment->enrollable)->title ?? 'Conteudo removido' }}
+                                        {{ $enrollment->content_title }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 transition-colors">
