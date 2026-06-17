@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Panel\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\OrderCancellationService;
 use App\Services\OrderRefundService;
 use Illuminate\Http\Request;
 
@@ -78,14 +79,16 @@ class OrderController extends Controller
         return round((float) $normalizedAmount, 2);
     }
 
-    public function cancel(Order $order)
+    public function cancel(Order $order, OrderCancellationService $orderCancellationService)
     {
-        if (!in_array($order->status, ['pending', 'paid'])) {
-            return back()->with('error', 'Apenas pedidos pendentes ou pagos podem ser cancelados.');
+        try {
+            $order = $orderCancellationService->cancel($order);
+
+            return back()->with('success', $order->status === 'refunded'
+                ? 'Pedido pago estornado com sucesso.'
+                : 'Pedido cancelado com sucesso.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Erro ao cancelar pedido: ' . $e->getMessage());
         }
-
-        $order->update(['status' => 'cancelled']);
-
-        return back()->with('success', 'Pedido cancelado com sucesso.');
     }
 }

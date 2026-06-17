@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\OrderCancellationService;
 use App\Services\OrderRefundService;
 use App\Services\OrderSettlementService;
 use Dompdf\Dompdf;
@@ -145,32 +146,17 @@ class OrderController extends Controller
         return auth()->check() && auth()->user()->isSuperAdmin();
     }
 
-    public function cancel(Order $order)
+    public function cancel(Order $order, OrderCancellationService $orderCancellationService)
     {
-        if ($order->status === 'paid') {
-            return $this->refund($order);
+        try {
+            $order = $orderCancellationService->cancel($order);
+
+            return back()->with('success', $order->status === 'refunded'
+                ? 'Pedido pago estornado com sucesso.'
+                : 'Pedido cancelado com sucesso.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Erro ao cancelar pedido: ' . $e->getMessage());
         }
-
-        if ($order->status === 'cancelled') {
-            return back()->with('error', 'Pedido ja cancelado.');
-        }
-
-        if ($order->gateway === 'mercadopago' && $order->transaction_id) {
-            try {
-                $service = new \App\Services\Payment\MercadoPagoService();
-                $service->cancelPayment($order);
-            } catch (\Exception $e) {
-                \Log::error('Erro ao cancelar no MP: ' . $e->getMessage());
-            }
-        }
-
-        $order->update([
-            'status' => 'cancelled',
-            'cancelled_at' => now(),
-            'metadata' => array_merge($order->metadata ?? [], ['cancelled_by' => auth()->id()]),
-        ]);
-
-        return back()->with('success', 'Pedido cancelado.');
     }
 
     public function exportReport(Request $request, string $format)

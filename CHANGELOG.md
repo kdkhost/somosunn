@@ -2,6 +2,20 @@
 
 ---
 
+## [2026-06-17] - fix(admin): erro 500 ao cancelar pedido pago
+
+### Corrigido
+- O cancelamento de pedido pago no painel antigo deixou de chamar internamente o método de estorno com parâmetros incorretos.
+- Os painéis antigo e novo agora usam a mesma regra de cancelamento de pedidos.
+- Pedidos pagos com cobrança real passam por estorno automático quando o gateway permite; pedidos gratuitos, de cupom 100% ou aprovação manual podem ser cancelados sem acionar gateway.
+
+### Arquivos principais
+- `app/Services/OrderCancellationService.php`
+- `app/Http/Controllers/Admin/OrderController.php`
+- `app/Http/Controllers/Panel/Admin/OrderController.php`
+
+---
+
 ## [2026-06-17] - fix(admin): atalho de cupons do evento
 
 ### Corrigido
