@@ -6,9 +6,22 @@
     @php
         $canManageGroupLink = auth()->user() && auth()->user()->hasPermission('admin.events.group_link.manage');
         $canManageEventCoupons = auth()->user() && auth()->user()->hasPermission('admin.events.coupons.view');
+        $isEditableEventRecord = $event->exists && (($event->type ?? 'event') !== 'album');
+        $activeEventTab = request('tab');
+        $activeEventTab = in_array($activeEventTab, ['certificate', 'gallery', 'coupons'], true) ? $activeEventTab : 'general';
+        $activeEventTab = (!$event->exists && $activeEventTab !== 'general') ? 'general' : $activeEventTab;
+        $activeEventTab = (!$isEditableEventRecord && $activeEventTab === 'coupons') ? 'general' : $activeEventTab;
+        $activeEventTab = (!$canManageEventCoupons && $activeEventTab === 'coupons') ? 'general' : $activeEventTab;
+        $canCreateEventCoupon = $isEditableEventRecord && auth()->user() && auth()->user()->hasPermission('admin.events.coupons.create');
+        $canEditEventCoupon = $isEditableEventRecord && auth()->user() && auth()->user()->hasPermission('admin.events.coupons.edit');
+        $canDeleteEventCoupon = $isEditableEventRecord && auth()->user() && auth()->user()->hasPermission('admin.events.coupons.delete');
+        $canToggleEventCoupon = $isEditableEventRecord && auth()->user() && auth()->user()->hasPermission('admin.events.coupons.toggle');
+        $eventCoupons = ($isEditableEventRecord && $canManageEventCoupons)
+            ? $event->coupons()->with('creator:id,name')->latest('id')->get()
+            : collect();
     @endphp
     <style>
-        #legacy-general:not(.active), #legacy-certificate:not(.active), #legacy-gallery:not(.active) { 
+        #legacy-general:not(.active), #legacy-certificate:not(.active), #legacy-gallery:not(.active), #legacy-coupons:not(.active) {
             display: none !important; 
         }
     </style>
@@ -28,6 +41,14 @@
                     $('#legacy-' + urlTab).addClass('show active');
                 }
             }
+
+            $('[data-event-tab-target]').on('click', function (event) {
+                event.preventDefault();
+                var target = $(this).data('event-tab-target');
+                if (target && $(target).length) {
+                    $(target).tab('show');
+                }
+            });
         });
     </script>
     @endpush
@@ -40,7 +61,7 @@
             </div>
             <div class="d-flex flex-wrap" style="gap: 10px;">
                 @if($canManageEventCoupons)
-                    <a href="{{ route('admin.events.coupons.index', $event) }}" class="btn btn-success rounded-pill elevation-1">
+                    <a href="#legacy-coupons" class="btn btn-success rounded-pill elevation-1" data-event-tab-target="#coupons-tab">
                         <i class="fas fa-ticket-alt mr-2"></i>Cupons gratuitos
                     </a>
                 @endif
@@ -56,21 +77,22 @@
         <div class="card-header p-0 pt-1 border-bottom-0">
             <ul class="nav nav-tabs" id="event-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link {{ request('tab') !== 'gallery' ? 'active' : '' }}" id="general-tab" data-toggle="tab" href="#legacy-general" role="tab"
-                        aria-controls="legacy-general" aria-selected="{{ request('tab') !== 'gallery' ? 'true' : 'false' }}">Dados Gerais</a>
+                    <a class="nav-link {{ $activeEventTab === 'general' ? 'active' : '' }}" id="general-tab" data-toggle="tab" href="#legacy-general" role="tab"
+                        aria-controls="legacy-general" aria-selected="{{ $activeEventTab === 'general' ? 'true' : 'false' }}">Dados Gerais</a>
                 </li>
                 <li class="nav-item event-only-field">
-                    <a class="nav-link" id="cert-tab" data-toggle="tab" href="#legacy-certificate" role="tab"
-                        aria-controls="legacy-certificate" aria-selected="false">Certificado</a>
+                    <a class="nav-link {{ $activeEventTab === 'certificate' ? 'active' : '' }}" id="cert-tab" data-toggle="tab" href="#legacy-certificate" role="tab"
+                        aria-controls="legacy-certificate" aria-selected="{{ $activeEventTab === 'certificate' ? 'true' : 'false' }}">Certificado</a>
                 </li>
                 @if($event->exists)
                 <li class="nav-item">
-                    <a class="nav-link {{ request('tab') === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-toggle="tab" href="#legacy-gallery" role="tab"
-                        aria-controls="legacy-gallery" aria-selected="{{ request('tab') === 'gallery' ? 'true' : 'false' }}">Galeria de Fotos</a>
+                    <a class="nav-link {{ $activeEventTab === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-toggle="tab" href="#legacy-gallery" role="tab"
+                        aria-controls="legacy-gallery" aria-selected="{{ $activeEventTab === 'gallery' ? 'true' : 'false' }}">Galeria de Fotos</a>
                 </li>
-                @if($canManageEventCoupons)
+                @if($isEditableEventRecord && $canManageEventCoupons)
                     <li class="nav-item event-only-field">
-                        <a class="nav-link" href="{{ route('admin.events.coupons.index', $event) }}">
+                        <a class="nav-link {{ $activeEventTab === 'coupons' ? 'active' : '' }}" id="coupons-tab" data-toggle="tab" href="#legacy-coupons" role="tab"
+                            aria-controls="legacy-coupons" aria-selected="{{ $activeEventTab === 'coupons' ? 'true' : 'false' }}">
                             <i class="fas fa-ticket-alt mr-1"></i> Cupons
                         </a>
                     </li>
@@ -81,7 +103,7 @@
         <div class="card-body">
             <div class="tab-content" id="event-tabs-content">
                 <!-- TAB GERAL -->
-                <div class="tab-pane {{ request('tab') !== 'gallery' ? 'show active' : '' }}" id="legacy-general" role="tabpanel" aria-labelledby="general-tab">
+                <div class="tab-pane {{ $activeEventTab === 'general' ? 'show active' : '' }}" id="legacy-general" role="tabpanel" aria-labelledby="general-tab">
                     <form method="POST" enctype="multipart/form-data" autocomplete="off"
                         action="{{ $event->exists ? route('admin.events.update', $event) : route('admin.events.store') }}">
                         @csrf
@@ -366,7 +388,7 @@
                 </div>
 
                 <!-- TAB CERTIFICADO -->
-                <div class="tab-pane event-only-field" id="legacy-certificate" role="tabpanel" aria-labelledby="cert-tab">
+                <div class="tab-pane event-only-field {{ $activeEventTab === 'certificate' ? 'show active' : '' }}" id="legacy-certificate" role="tabpanel" aria-labelledby="cert-tab">
                     @if(!$event->exists)
                         <div class="alert alert-info border-0 shadow-sm">
                             <i class="fas fa-info-circle mr-2"></i> Você poderá configurar o certificado após salvar o evento
@@ -681,7 +703,7 @@
 
                 <!-- TAB GALERIA -->
                 @if($event->exists)
-                <div class="tab-pane {{ request('tab') === 'gallery' ? 'show active' : '' }}" id="legacy-gallery" role="tabpanel" aria-labelledby="gallery-tab">
+                <div class="tab-pane {{ $activeEventTab === 'gallery' ? 'show active' : '' }}" id="legacy-gallery" role="tabpanel" aria-labelledby="gallery-tab">
                     <div class="card shadow-sm border-0 mt-3 event-gallery-panel" style="overflow:hidden">
                         <div class="card-body">
                             <h4 class="mb-3">Galeria de Fotos e Vídeos do Evento</h4>
@@ -769,6 +791,111 @@
                         </div>
                     </div>
                 </div>
+                @if($isEditableEventRecord && $canManageEventCoupons)
+                <div class="tab-pane {{ $activeEventTab === 'coupons' ? 'show active' : '' }}" id="legacy-coupons" role="tabpanel" aria-labelledby="coupons-tab">
+                    <div class="card shadow-sm border-0 mt-3 event-coupons-panel">
+                        <div class="card-header d-flex flex-wrap align-items-center justify-content-between">
+                            <div>
+                                <h3 class="card-title font-weight-bold mb-0">
+                                    <i class="fas fa-ticket-alt mr-2"></i>Cupons de gratuidade
+                                </h3>
+                                <small class="text-muted d-block">{{ $event->title }}</small>
+                            </div>
+                            @if($canCreateEventCoupon)
+                                <a href="{{ route('admin.events.coupons.create', $event) }}" class="btn btn-primary btn-sm rounded-pill ml-auto" data-pjax>
+                                    <i class="fas fa-plus mr-1"></i> Novo cupom
+                                </a>
+                            @endif
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 event-coupons-table">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Tipo</th>
+                                            <th>Usos</th>
+                                            <th>Validade</th>
+                                            <th>Status</th>
+                                            <th class="text-right">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($eventCoupons as $coupon)
+                                            <tr>
+                                                <td><span class="badge badge-dark px-3 py-2">{{ $coupon->code }}</span></td>
+                                                <td>
+                                                    @if($coupon->type === \App\Models\EventCoupon::TYPE_FREE)
+                                                        <span class="badge badge-success">Gratuidade total</span>
+                                                    @elseif($coupon->type === \App\Models\EventCoupon::TYPE_PERCENT)
+                                                        <span class="badge badge-info">{{ number_format((float) $coupon->discount_value, 2, ',', '.') }}%</span>
+                                                    @else
+                                                        <span class="badge badge-warning">R$ {{ number_format((float) $coupon->discount_value, 2, ',', '.') }}</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <strong>{{ (int) $coupon->used_count }}</strong>
+                                                    <span class="text-muted">/ {{ $coupon->max_uses ? (int) $coupon->max_uses : 'ilimitado' }}</span>
+                                                </td>
+                                                <td class="small text-muted">
+                                                    @if($coupon->starts_at)<div>Início: {{ $coupon->starts_at->format('d/m/Y H:i') }}</div>@endif
+                                                    @if($coupon->expires_at)<div>Fim: {{ $coupon->expires_at->format('d/m/Y H:i') }}</div>@endif
+                                                    @if(!$coupon->starts_at && !$coupon->expires_at)<span>Sem período definido</span>@endif
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-{{ $coupon->active ? 'success' : 'secondary' }}">
+                                                        {{ $coupon->active ? 'Ativo' : 'Inativo' }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-right">
+                                                    <div class="btn-group btn-group-sm">
+                                                        @if($canToggleEventCoupon)
+                                                            <form method="POST" action="{{ route('admin.events.coupons.toggle', [$event, $coupon]) }}" class="ajax-form d-inline">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-outline-{{ $coupon->active ? 'secondary' : 'success' }}" title="{{ $coupon->active ? 'Desativar' : 'Ativar' }}">
+                                                                    <i class="fas fa-toggle-{{ $coupon->active ? 'on' : 'off' }}"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                        @if($canEditEventCoupon)
+                                                            <a href="{{ route('admin.events.coupons.edit', [$event, $coupon]) }}" class="btn btn-outline-info" title="Editar" data-pjax>
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                        @endif
+                                                        @if($canDeleteEventCoupon)
+                                                            <form method="POST" action="{{ route('admin.events.coupons.destroy', [$event, $coupon]) }}" class="ajax-form form-delete d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="button" class="btn btn-outline-danger btn-delete" title="Excluir">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="text-center py-5 text-muted">
+                                                    <i class="fas fa-ticket-alt fa-2x d-block mb-2"></i>
+                                                    Nenhum cupom cadastrado para este evento.
+                                                    @if($canCreateEventCoupon)
+                                                        <div class="mt-3">
+                                                            <a href="{{ route('admin.events.coupons.create', $event) }}" class="btn btn-primary btn-sm rounded-pill" data-pjax>
+                                                                <i class="fas fa-plus mr-1"></i> Criar primeiro cupom
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
                 @endif
 
             </div>
@@ -837,6 +964,22 @@
             max-width: 100%;
         }
 
+        .event-gallery-upload-box {
+            border: 2px dashed #d0dae8;
+            border-radius: 1.5rem;
+            background: #f8fafc;
+            padding: 1.4rem;
+            box-shadow: none;
+        }
+
+        .event-gallery-upload-box:hover,
+        .event-gallery-upload-box.dragover {
+            border-color: #b8c8dd;
+            background: #f8fafc;
+            box-shadow: none;
+            transform: none;
+        }
+
         .event-gallery-drop-zone {
             border: 2px dashed #d0dae8;
             background: #f8fafc;
@@ -863,6 +1006,20 @@
             background: #0f172a !important;
             color: #f1f5f9 !important;
             box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .08);
+        }
+
+        .dark-mode .event-gallery-upload-box {
+            border-color: #334155 !important;
+            background: #162032 !important;
+            box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .06);
+        }
+
+        .dark-mode .event-gallery-upload-box:hover,
+        .dark-mode .event-gallery-upload-box.dragover {
+            border-color: #475569 !important;
+            background: #162032 !important;
+            box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .08);
+            transform: none;
         }
 
         .dark-mode .event-gallery-drop-zone:hover,

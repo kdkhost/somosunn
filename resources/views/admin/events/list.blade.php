@@ -165,7 +165,7 @@
                                                         <i class="fas fa-store"></i>
                                                     </a>
                                                     @if(auth()->user()?->hasPermission('admin.events.coupons.view'))
-                                                        <a href="{{ route('admin.events.coupons.index', $event) }}" class="btn btn-outline-success elevation-1"
+                                                        <a href="{{ route('admin.events.edit', ['event' => $event, 'tab' => 'coupons']) }}" class="btn btn-outline-success elevation-1"
                                                             title="Cupons de gratuidade">
                                                             <i class="fas fa-ticket-alt"></i>
                                                         </a>

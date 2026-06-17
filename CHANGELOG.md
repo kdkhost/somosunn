@@ -2,6 +2,22 @@
 
 ---
 
+## [2026-06-17] - fix(admin): cupons em aba interna do evento
+
+### Corrigido
+- A opção `Cupons` no formulário de evento do painel antigo passou a abrir como aba interna, sem navegar para uma página isolada.
+- Os botões e retornos do CRUD de cupons no painel antigo agora voltam para `Editar Evento > Cupons`.
+- A moldura externa da área de upload da galeria do evento deixou de herdar fundo branco nos estados normal, hover e arrastar/soltar do tema escuro.
+
+### Arquivos principais
+- `resources/views/admin/events/form.blade.php`
+- `app/Http/Controllers/Admin/EventCouponController.php`
+- `resources/views/admin/events/coupons/form.blade.php`
+- `resources/views/admin/events/coupons/index.blade.php`
+- `resources/views/admin/events/list.blade.php`
+
+---
+
 ## [2026-06-17] - fix(admin): galeria de evento no tema escuro
 
 ### Corrigido

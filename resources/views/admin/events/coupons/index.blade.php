@@ -20,7 +20,7 @@
                 <small class="text-muted d-block">{{ $event->title }}</small>
             </div>
             <div class="ml-auto">
-                <a href="{{ route($eventsRoutePrefix . '.edit', $event) }}" class="btn btn-outline-secondary btn-sm rounded-pill" data-pjax>
+                <a href="{{ route($eventsRoutePrefix . '.edit', ['event' => $event, 'tab' => 'coupons']) }}" class="btn btn-outline-secondary btn-sm rounded-pill" data-pjax>
                     <i class="fas fa-arrow-left mr-1"></i> Voltar
                 </a>
                 @if($canCreateCoupon)

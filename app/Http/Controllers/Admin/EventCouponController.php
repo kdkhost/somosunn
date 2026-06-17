@@ -152,7 +152,7 @@ class EventCouponController extends Controller
             return response()->json(['success' => true, 'message' => 'Cupom removido.']);
         }
 
-        return redirect()->route($this->routePrefix . '.index', $event)->with('success', 'Cupom removido.');
+        return redirect()->to($this->couponsReturnUrl($event))->with('success', 'Cupom removido.');
     }
 
     protected function redirectOrJson(Request $request, string $message)
@@ -161,11 +161,20 @@ class EventCouponController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $message,
-                'redirect' => route($this->routePrefix . '.index', $request->route('event')),
+                'redirect' => $this->couponsReturnUrl($request->route('event')),
             ]);
         }
 
-        return redirect()->route($this->routePrefix . '.index', $request->route('event'))->with('success', $message);
+        return redirect()->to($this->couponsReturnUrl($request->route('event')))->with('success', $message);
+    }
+
+    protected function couponsReturnUrl(Event $event): string
+    {
+        if ($this->routePrefix === 'admin.events.coupons') {
+            return route($this->eventsRoutePrefix . '.edit', ['event' => $event, 'tab' => 'coupons']);
+        }
+
+        return route($this->routePrefix . '.index', $event);
     }
 
     protected function ensureAccess(Event $event, string $permission): void
