@@ -2,6 +2,20 @@
 
 ---
 
+## [2026-06-18] - docs(projeto): regra permanente dos dois painéis
+
+### Adicionado
+- Registrada no `AGENTS.md` a regra permanente de que toda funcionalidade administrativa deve considerar os dois painéis: `/admin` e `/painel/admin`.
+- Criado `RELATORIO_AUDITORIA_E_CORRECOES_SOMOSUNN.md` com a seção `Painéis Administrativos`, documentando rotas, controllers, permissões, recursos compartilhados e validações.
+- Documentado que as rotas administrativas legadas de eventos neste checkout usam `/admin/events` e `/painel/admin/events`, preservando compatibilidade com o código atual.
+
+### Arquivos principais
+- `AGENTS.md`
+- `RELATORIO_AUDITORIA_E_CORRECOES_SOMOSUNN.md`
+- `CHANGELOG.md`
+
+---
+
 ## [2026-06-18] - fix(painel): impressão física do ingresso
 
 ### Corrigido
