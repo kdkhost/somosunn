@@ -180,6 +180,9 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Telefone</label>
                             <input type="tel" name="phone"
+                                data-mask="(99) 9999[9]-9999"
+                                inputmode="tel"
+                                autocomplete="tel"
                                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition"
                                 style="--tw-ring-color: var(--unn-azul-1)"
                                 placeholder="(00) 00000-0000" value="{{ old('phone') }}">
