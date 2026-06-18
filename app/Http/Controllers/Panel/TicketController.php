@@ -35,6 +35,22 @@ class TicketController extends Controller
         $registration->load(['event', 'order']);
         abort_unless($registration->event, 404);
 
-        return view('panel.tickets.show', compact('registration'));
+        $printRegistrations = EventRegistration::with(['event', 'order'])
+            ->where('user_id', Auth::id())
+            ->where('event_id', $registration->event_id)
+            ->whereIn('status', EventRegistration::COUNTED_STATUSES)
+            ->when(
+                $registration->order_id,
+                fn ($query) => $query->where('order_id', $registration->order_id),
+                fn ($query) => $query->whereKey($registration->getKey())
+            )
+            ->orderBy('id')
+            ->get();
+
+        if ($printRegistrations->isEmpty()) {
+            $printRegistrations = collect([$registration]);
+        }
+
+        return view('panel.tickets.show', compact('registration', 'printRegistrations'));
     }
 }

@@ -7,23 +7,16 @@
     $logo = \App\Models\Setting::getUrl('logo_front') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg');
     $startAt = $event?->start_at ? \Carbon\Carbon::parse($event->start_at) : null;
     $endAt = $event?->end_at ? \Carbon\Carbon::parse($event->end_at) : null;
-    $ticketState = $registration->ticketStatusState();
-    $ticketUsed = $ticketState === 'used';
-    $ticketExpired = $ticketState === 'expired';
-    $hasQrTicket = (bool) $event?->is_ticket_enabled && filled($registration->ticket_code);
-    $ticketCode = (string) ($registration->ticket_code ?: 'REG-' . str_pad((string) $registration->id, 6, '0', STR_PAD_LEFT));
-    $ticketNumber = str_pad((string) $registration->id, 4, '0', STR_PAD_LEFT);
-    $quantity = max(1, (int) ($registration->quantity ?? 1));
+    $ticketImage = $event->image_url ?: asset('img/logo.svg');
     $locationLabel = $event?->location ?: ($event?->address ?: 'Local a confirmar');
     $addressLabel = $event?->address ?: $locationLabel;
-    $ticketImage = $event->image_url ?: asset('img/logo.svg');
-    $ticketLabel = $ticketUsed ? 'Já utilizado' : ($ticketExpired ? 'Expirado' : ($hasQrTicket ? 'Ingresso válido' : 'Reserva confirmada'));
-    $ticketStatusClass = $ticketUsed ? 'ticket-status--used' : ($ticketExpired ? 'ticket-status--expired' : 'ticket-status--valid');
+    $batchLabel = trim((string) ($event->current_batch_label ?? 'Ingresso do evento'));
+    $printRegistrations = $printRegistrations ?? collect([$registration]);
+    $printTicketCount = $printRegistrations->sum(fn ($item) => max(1, (int) ($item->quantity ?? 1)));
     $weekdayLabel = $startAt ? $startAt->locale('pt_BR')->translatedFormat('l') : 'Evento';
     $monthLabel = $startAt ? $startAt->locale('pt_BR')->translatedFormat('F') : 'A confirmar';
     $dayLabel = $startAt ? $startAt->format('d') : '--';
     $timeLabel = $startAt ? $startAt->format('H:i') : '--:--';
-    $batchLabel = trim((string) ($event->current_batch_label ?? 'Ingresso do evento'));
 @endphp
 
 @section('title', 'Ingresso - ' . $event->title)
@@ -38,24 +31,41 @@
     <style>
         .ticket-print-area {
             color: #111827;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
         }
 
-        .ticket-scroll {
-            overflow-x: auto;
-            padding-bottom: 0.75rem;
+        .ticket-print-sheet {
+            display: grid;
+            grid-template-columns: 17cm;
+            justify-content: center;
+            gap: 0.35cm;
+            min-width: 17cm;
+        }
+
+        .ticket-print-slot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 17cm;
+            height: 7cm;
+            border: 0.03cm dashed #94a3b8;
+            border-radius: 0.18cm;
+            background: #f8fafc;
+            padding: 1cm;
         }
 
         .event-paper-ticket {
             position: relative;
             display: grid;
-            grid-template-columns: 158px minmax(0, 1fr) 210px;
-            min-width: 1040px;
-            min-height: 322px;
+            grid-template-columns: 2.3cm minmax(0, 1fr) 3.1cm;
+            width: 15cm;
+            height: 5cm;
             overflow: hidden;
-            border: 1px solid #a7b5c8;
-            border-radius: 10px;
-            background: #f8fafc;
-            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+            border: 0.035cm solid #64748b;
+            border-radius: 0.12cm;
+            background: #ffffff;
+            box-shadow: 0 0.45cm 1.3cm rgba(15, 23, 42, 0.2);
             font-family: Arial, Helvetica, sans-serif;
         }
 
@@ -64,21 +74,21 @@
             content: "";
             position: absolute;
             top: 50%;
-            z-index: 9;
-            width: 28px;
-            height: 28px;
+            z-index: 8;
+            width: 0.34cm;
+            height: 0.34cm;
+            border: 0.02cm solid #94a3b8;
             border-radius: 999px;
-            background: rgb(15 23 42);
-            border: 1px solid rgba(255, 255, 255, 0.45);
+            background: #f8fafc;
             transform: translateY(-50%);
         }
 
         .event-paper-ticket::before {
-            left: 144px;
+            left: 2.13cm;
         }
 
         .event-paper-ticket::after {
-            right: 196px;
+            right: 2.93cm;
         }
 
         .ticket-stub,
@@ -88,19 +98,25 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            gap: 12px;
+            gap: 0.12cm;
             background:
-                repeating-linear-gradient(0deg, rgba(31, 94, 219, 0.06) 0 2px, transparent 2px 9px),
-                linear-gradient(180deg, #ffffff 0%, #edf6ff 100%);
-            padding: 16px 14px;
+                repeating-linear-gradient(0deg, rgba(31, 94, 219, 0.07) 0 0.035cm, transparent 0.035cm 0.18cm),
+                linear-gradient(180deg, #ffffff 0%, #eef6ff 100%);
+            padding: 0.18cm 0.16cm;
         }
 
         .ticket-stub {
-            border-right: 2px dashed #6b7280;
+            border-right: 0.04cm dashed #64748b;
         }
 
         .ticket-qr-stub {
-            border-left: 2px dashed #6b7280;
+            border-left: 0.04cm dashed #64748b;
+        }
+
+        .ticket-logo {
+            max-width: 1.55cm;
+            max-height: 0.48cm;
+            object-fit: contain;
         }
 
         .ticket-stub-title {
@@ -108,50 +124,60 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            font-size: 13px;
+            color: #0f172a;
+            font-size: 0.16cm;
             font-weight: 900;
-            line-height: 1.12;
+            line-height: 1.08;
             text-transform: uppercase;
         }
 
         .ticket-number {
-            border: 1px solid #94a3b8;
+            border: 0.02cm solid #94a3b8;
             background: #ffffff;
             color: #0f172a;
             font-family: "Courier New", monospace;
-            font-size: 18px;
+            font-size: 0.2cm;
             font-weight: 900;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.04cm;
             line-height: 1;
-            padding: 8px 10px;
+            padding: 0.09cm 0.05cm;
             text-align: center;
         }
 
         .ticket-side-meta {
-            border-top: 1px solid #d1d5db;
-            border-bottom: 1px solid #d1d5db;
-            padding: 10px 0;
+            border-top: 0.02cm solid #d1d5db;
+            border-bottom: 0.02cm solid #d1d5db;
+            color: #0f172a;
+            padding: 0.12cm 0;
             text-align: center;
             text-transform: uppercase;
+        }
+
+        .ticket-side-meta-day {
+            display: block;
+            color: #1f5edb;
+            font-size: 0.48cm;
+            font-weight: 900;
+            line-height: 0.9;
         }
 
         .ticket-main {
             position: relative;
             isolation: isolate;
-            min-height: 322px;
             overflow: hidden;
-            background: #0f172a;
+            background: #ffffff;
         }
 
         .ticket-main::before {
             content: "";
             position: absolute;
-            inset: 0;
+            inset: -0.25cm;
             z-index: -2;
             background-image: var(--ticket-bg);
             background-position: center;
             background-size: cover;
-            filter: saturate(1.15) contrast(1.03);
+            opacity: 0.13;
+            filter: grayscale(0.1) saturate(0.85) contrast(1.05);
         }
 
         .ticket-main::after {
@@ -160,120 +186,137 @@
             inset: 0;
             z-index: -1;
             background:
-                linear-gradient(90deg, rgba(248, 250, 252, 0.92) 0%, rgba(248, 250, 252, 0.68) 34%, rgba(15, 23, 42, 0.18) 58%, rgba(15, 23, 42, 0.62) 100%),
-                linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
+                linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.78)),
+                radial-gradient(circle at 70% 24%, rgba(31, 94, 219, 0.14), transparent 42%);
         }
 
         .ticket-main-inner {
             display: grid;
             grid-template-rows: auto 1fr auto;
-            min-height: 322px;
-            padding: 22px 26px 18px;
+            height: 100%;
+            padding: 0.22cm 0.26cm 0.18cm;
         }
 
         .ticket-main-top {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
-            gap: 22px;
+            gap: 0.24cm;
         }
 
         .ticket-date-block {
-            min-width: 166px;
-            border: 2px solid #0f172a;
-            background: rgba(255, 255, 255, 0.92);
+            min-width: 1.45cm;
+            border: 0.035cm solid #0f172a;
+            background: rgba(255, 255, 255, 0.88);
             color: #0f172a;
-            padding: 10px 14px;
+            padding: 0.09cm 0.1cm;
             text-align: center;
             text-transform: uppercase;
-            box-shadow: 8px 8px 0 rgba(31, 94, 219, 0.9);
+            box-shadow: 0.13cm 0.13cm 0 rgba(31, 94, 219, 0.88);
         }
 
         .ticket-date-block strong {
             display: block;
-            font-size: 56px;
+            font-size: 0.72cm;
             font-weight: 900;
-            line-height: 0.9;
+            line-height: 0.88;
         }
 
         .ticket-title-area {
-            max-width: 560px;
+            min-width: 0;
+            flex: 1;
             color: #0f172a;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
         }
 
         .ticket-brand {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            border: 1px solid rgba(15, 23, 42, 0.18);
-            background: rgba(255, 255, 255, 0.78);
-            padding: 7px 12px;
-            font-size: 11px;
+            gap: 0.12cm;
+            border: 0.02cm solid rgba(15, 23, 42, 0.2);
+            background: rgba(255, 255, 255, 0.7);
+            padding: 0.06cm 0.1cm;
+            font-size: 0.13cm;
             font-weight: 900;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.02cm;
             text-transform: uppercase;
         }
 
         .ticket-event-title {
-            margin-top: 14px;
-            font-size: clamp(28px, 4vw, 46px);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-top: 0.12cm;
+            font-size: 0.45cm;
             font-weight: 900;
-            line-height: 0.95;
+            line-height: 0.96;
             text-transform: uppercase;
         }
 
         .ticket-event-subtitle {
-            margin-top: 12px;
-            max-width: 520px;
-            font-size: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-top: 0.08cm;
+            max-width: 6.2cm;
+            font-size: 0.18cm;
             font-weight: 700;
-            line-height: 1.35;
+            line-height: 1.2;
+            color: #334155;
         }
 
         .ticket-ribbon {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            border: 2px solid #ffffff;
+            gap: 0.18cm;
+            border: 0.035cm solid #ffffff;
             background: linear-gradient(90deg, #1f5edb, #1539b4);
             color: #ffffff;
-            padding: 10px 14px;
+            padding: 0.11cm 0.16cm;
             text-transform: uppercase;
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.24);
+            box-shadow: 0 0.12cm 0.28cm rgba(15, 23, 42, 0.2);
         }
 
         .ticket-ribbon span {
-            font-size: 14px;
+            font-size: 0.18cm;
             font-weight: 900;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.02cm;
         }
 
         .ticket-main-bottom {
             display: grid;
             grid-template-columns: 1fr auto;
             align-items: end;
-            gap: 18px;
+            gap: 0.14cm;
         }
 
         .ticket-location-strip {
-            border: 1px solid rgba(15, 23, 42, 0.2);
-            background: rgba(255, 255, 255, 0.88);
+            border: 0.02cm solid rgba(15, 23, 42, 0.18);
+            background: rgba(255, 255, 255, 0.76);
             color: #111827;
-            padding: 11px 14px;
+            padding: 0.11cm 0.14cm;
+        }
+
+        .ticket-location-strip p {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .ticket-status {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 142px;
-            border: 2px solid currentColor;
-            background: rgba(255, 255, 255, 0.92);
-            padding: 10px 12px;
-            font-size: 13px;
+            min-width: 1.55cm;
+            border: 0.035cm solid currentColor;
+            background: rgba(255, 255, 255, 0.86);
+            padding: 0.11cm 0.08cm;
+            font-size: 0.16cm;
             font-weight: 900;
+            text-align: center;
             text-transform: uppercase;
             transform: rotate(-2deg);
         }
@@ -296,29 +339,26 @@
         }
 
         .ticket-qr-frame {
-            border: 1px solid #94a3b8;
+            border: 0.02cm solid #94a3b8;
             background: #ffffff;
-            padding: 8px;
+            padding: 0.08cm;
         }
 
         .qr-holder canvas,
         .qr-holder img {
-            width: 126px !important;
-            height: 126px !important;
             display: block;
+            width: 1.72cm !important;
+            height: 1.72cm !important;
         }
 
         .ticket-code {
             word-break: break-all;
+            color: #0f172a;
             font-family: "Courier New", monospace;
-            font-size: 11px;
+            font-size: 0.13cm;
             font-weight: 900;
-            line-height: 1.2;
+            line-height: 1.18;
             text-align: center;
-        }
-
-        .ticket-details-after {
-            color: inherit;
         }
 
         .ticket-info-box {
@@ -333,23 +373,22 @@
         }
 
         @media (max-width: 768px) {
-            .ticket-print-actions {
-                border-radius: 1.25rem;
-            }
-
-            .event-paper-ticket {
-                min-width: 960px;
+            .ticket-print-area {
+                margin-inline: -1rem;
+                padding-inline: 1rem;
             }
         }
 
         @media print {
             @page {
-                size: A4 landscape;
-                margin: 8mm;
+                size: A4 portrait;
+                margin: 0.85cm 2cm;
             }
 
             html,
             body {
+                width: 21cm;
+                min-height: 29.7cm;
                 background: #ffffff !important;
             }
 
@@ -363,16 +402,41 @@
             }
 
             .ticket-print-area {
-                position: fixed !important;
-                inset: 0 !important;
-                width: 100% !important;
-                padding: 0 !important;
+                position: absolute !important;
+                inset: 0 auto auto 0 !important;
+                width: 17cm !important;
                 margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
             }
 
-            .ticket-scroll {
-                overflow: visible !important;
-                padding: 0 !important;
+            .ticket-print-sheet {
+                display: block !important;
+                width: 17cm !important;
+                min-width: 17cm !important;
+                gap: 0 !important;
+            }
+
+            .ticket-print-slot {
+                width: 17cm !important;
+                height: 7cm !important;
+                margin: 0 !important;
+                padding: 1cm !important;
+                border: 0.03cm dashed #94a3b8 !important;
+                border-radius: 0 !important;
+                background: #ffffff !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+
+            .ticket-print-slot:nth-child(4n) {
+                break-after: page !important;
+                page-break-after: always !important;
+            }
+
+            .ticket-print-slot:last-child {
+                break-after: auto !important;
+                page-break-after: auto !important;
             }
 
             .ticket-print-actions,
@@ -381,9 +445,8 @@
             }
 
             .event-paper-ticket {
-                width: 100% !important;
-                min-width: 0 !important;
-                min-height: 178mm !important;
+                width: 15cm !important;
+                height: 5cm !important;
                 box-shadow: none !important;
                 print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
@@ -392,7 +455,6 @@
             .event-paper-ticket::before,
             .event-paper-ticket::after {
                 background: #ffffff !important;
-                border-color: #94a3b8;
             }
         }
     </style>
@@ -405,7 +467,9 @@
                 <div>
                     <p class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">INGRESSO DIGITAL</p>
                     <h1 class="mt-2 text-2xl font-black text-slate-900 dark:text-white md:text-3xl">{{ $event->title }}</h1>
-                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Formato de ingresso para imprimir ou apresentar no check-in do evento.</p>
+                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                        Tamanho final de cada ingresso: 15 x 5 cm. A impressão usa A4 retrato com até 4 ingressos por folha.
+                    </p>
                 </div>
 
                 <div class="flex flex-col gap-3 sm:flex-row">
@@ -417,113 +481,138 @@
                     <button type="button" onclick="window.print()"
                         class="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700">
                         <i class="fas fa-print"></i>
-                        Imprimir ingresso
+                        Imprimir {{ $printTicketCount }} {{ $printTicketCount === 1 ? 'ingresso' : 'ingressos' }}
                     </button>
                 </div>
             </div>
         </div>
 
         <section class="ticket-print-area">
-            <div class="ticket-scroll">
-                <div class="event-paper-ticket" style="--ticket-bg: url('{{ $ticketImage }}');">
-                    <aside class="ticket-stub">
-                        <div>
-                            <img src="{{ $logo }}" alt="SOMOS UNN" class="mb-3 h-10 max-w-full object-contain">
-                            <div class="ticket-stub-title">{{ $event->title }}</div>
-                        </div>
+            <div class="ticket-print-sheet">
+                @php $printedCopy = 0; @endphp
+                @foreach($printRegistrations as $ticketRegistration)
+                    @php
+                        $copies = max(1, (int) ($ticketRegistration->quantity ?? 1));
+                        $itemState = $ticketRegistration->ticketStatusState();
+                        $itemUsed = $itemState === 'used';
+                        $itemExpired = $itemState === 'expired';
+                        $itemHasQrTicket = (bool) $event?->is_ticket_enabled && filled($ticketRegistration->ticket_code);
+                        $itemTicketCode = (string) ($ticketRegistration->ticket_code ?: 'REG-' . str_pad((string) $ticketRegistration->id, 6, '0', STR_PAD_LEFT));
+                        $itemTicketLabel = $itemUsed ? 'Já utilizado' : ($itemExpired ? 'Expirado' : ($itemHasQrTicket ? 'Ingresso válido' : 'Reserva confirmada'));
+                        $itemTicketStatusClass = $itemUsed ? 'ticket-status--used' : ($itemExpired ? 'ticket-status--expired' : 'ticket-status--valid');
+                    @endphp
 
-                        <div class="ticket-side-meta">
-                            <p class="text-[11px] font-black tracking-wide text-slate-500">{{ $weekdayLabel }}</p>
-                            <p class="text-3xl font-black leading-none text-blue-700">{{ $dayLabel }}</p>
-                            <p class="text-xs font-black tracking-wide text-slate-900">{{ $monthLabel }}</p>
-                            <p class="mt-1 text-xs font-black text-slate-600">{{ $timeLabel }}</p>
-                        </div>
+                    @for($copy = 1; $copy <= $copies; $copy++)
+                        @php
+                            $printedCopy++;
+                            $copySuffix = $copies > 1 ? '-' . str_pad((string) $copy, 2, '0', STR_PAD_LEFT) : '';
+                            $ticketNumber = str_pad((string) $ticketRegistration->id, 4, '0', STR_PAD_LEFT) . $copySuffix;
+                            $qrId = 'ticket-qrcode-' . $ticketRegistration->id . '-' . $copy;
+                        @endphp
 
-                        <div class="space-y-2">
-                            <div class="ticket-number">{{ $ticketNumber }}</div>
-                            <p class="text-center text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Canhoto</p>
-                            <p class="line-clamp-2 text-center text-[11px] font-bold text-slate-700">{{ $locationLabel }}</p>
-                        </div>
-                    </aside>
-
-                    <main class="ticket-main">
-                        <div class="ticket-main-inner">
-                            <div class="ticket-main-top">
-                                <div class="ticket-date-block">
-                                    <span class="text-xs font-black tracking-[0.16em]">{{ $weekdayLabel }}</span>
-                                    <strong>{{ $dayLabel }}</strong>
-                                    <span class="text-sm font-black tracking-[0.18em]">{{ $monthLabel }}</span>
-                                </div>
-
-                                <div class="ticket-title-area">
-                                    <div class="ticket-brand">
-                                        <img src="{{ $logo }}" alt="SOMOS UNN" class="h-8 max-w-[110px] object-contain">
-                                        <span>Universidade de Negócios e Networking</span>
+                        <div class="ticket-print-slot">
+                            <div class="event-paper-ticket" style="--ticket-bg: url('{{ $ticketImage }}');">
+                                <aside class="ticket-stub">
+                                    <div>
+                                        <img src="{{ $logo }}" alt="SOMOS UNN" class="ticket-logo mb-1">
+                                        <div class="ticket-stub-title">{{ $event->title }}</div>
                                     </div>
-                                    <h2 class="ticket-event-title">{{ $event->title }}</h2>
-                                    <p class="ticket-event-subtitle">
-                                        {{ \Illuminate\Support\Str::limit(trim(strip_tags((string) $event->description)), 150) ?: 'Apresente este ingresso no check-in do evento.' }}
-                                    </p>
-                                </div>
-                            </div>
 
-                            <div class="flex items-center justify-end">
-                                <div class="ticket-ribbon">
-                                    <span>{{ $batchLabel }}</span>
-                                    <span>{{ $hasQrTicket ? 'QR Code' : 'Reserva' }}</span>
-                                    <span>#{{ $ticketNumber }}</span>
-                                </div>
-                            </div>
+                                    <div class="ticket-side-meta">
+                                        <p class="text-[0.12cm] font-black tracking-wide text-slate-500">{{ $weekdayLabel }}</p>
+                                        <span class="ticket-side-meta-day">{{ $dayLabel }}</span>
+                                        <p class="text-[0.13cm] font-black tracking-wide text-slate-900">{{ $monthLabel }}</p>
+                                        <p class="mt-[0.02cm] text-[0.13cm] font-black text-slate-600">{{ $timeLabel }}</p>
+                                    </div>
 
-                            <div class="ticket-main-bottom">
-                                <div class="ticket-location-strip">
-                                    <p class="text-[11px] font-black uppercase tracking-[0.16em] text-blue-700">Local do evento</p>
-                                    <p class="mt-1 text-base font-black">{{ $locationLabel }}</p>
-                                    @if($addressLabel && $addressLabel !== $locationLabel)
-                                        <p class="mt-1 text-xs font-bold text-slate-700">{{ $addressLabel }}</p>
-                                    @endif
-                                </div>
+                                    <div class="space-y-[0.06cm]">
+                                        <div class="ticket-number">{{ $ticketNumber }}</div>
+                                        <p class="text-center text-[0.1cm] font-black uppercase tracking-[0.04cm] text-slate-500">Canhoto</p>
+                                        <p class="line-clamp-2 text-center text-[0.12cm] font-bold text-slate-700">{{ $locationLabel }}</p>
+                                    </div>
+                                </aside>
 
-                                <div class="ticket-status {{ $ticketStatusClass }}">{{ $ticketLabel }}</div>
+                                <main class="ticket-main">
+                                    <div class="ticket-main-inner">
+                                        <div class="ticket-main-top">
+                                            <div class="ticket-date-block">
+                                                <span class="text-[0.12cm] font-black tracking-[0.04cm]">{{ $weekdayLabel }}</span>
+                                                <strong>{{ $dayLabel }}</strong>
+                                                <span class="text-[0.14cm] font-black tracking-[0.04cm]">{{ $monthLabel }}</span>
+                                            </div>
+
+                                            <div class="ticket-title-area">
+                                                <div class="ticket-brand">
+                                                    <img src="{{ $logo }}" alt="SOMOS UNN" class="ticket-logo">
+                                                    <span>Universidade de Negócios</span>
+                                                </div>
+                                                <h2 class="ticket-event-title">{{ $event->title }}</h2>
+                                                <p class="ticket-event-subtitle">
+                                                    {{ \Illuminate\Support\Str::limit(trim(strip_tags((string) $event->description)), 115) ?: 'Apresente este ingresso no check-in do evento.' }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center justify-end">
+                                            <div class="ticket-ribbon">
+                                                <span>{{ $batchLabel }}</span>
+                                                <span>{{ $itemHasQrTicket ? 'QR Code' : 'Reserva' }}</span>
+                                                <span>#{{ $ticketNumber }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="ticket-main-bottom">
+                                            <div class="ticket-location-strip">
+                                                <p class="text-[0.11cm] font-black uppercase tracking-[0.04cm] text-blue-700">Local do evento</p>
+                                                <p class="mt-[0.03cm] text-[0.18cm] font-black">{{ $locationLabel }}</p>
+                                                @if($addressLabel && $addressLabel !== $locationLabel)
+                                                    <p class="mt-[0.02cm] text-[0.12cm] font-bold text-slate-700">{{ $addressLabel }}</p>
+                                                @endif
+                                            </div>
+
+                                            <div class="ticket-status {{ $itemTicketStatusClass }}">{{ $itemTicketLabel }}</div>
+                                        </div>
+                                    </div>
+                                </main>
+
+                                <aside class="ticket-qr-stub">
+                                    <div>
+                                        <div class="ticket-number">{{ $ticketNumber }}</div>
+                                        <p class="mt-[0.06cm] text-center text-[0.1cm] font-black uppercase tracking-[0.04cm] text-slate-500">Ingresso</p>
+                                    </div>
+
+                                    <div class="ticket-qr-box">
+                                        @if($itemHasQrTicket)
+                                            <div class="ticket-qr-frame">
+                                                <div id="{{ $qrId }}" class="qr-holder ticket-qrcode" data-code="{{ $itemTicketCode }}"></div>
+                                            </div>
+                                        @else
+                                            <div class="flex h-[1.9cm] w-[1.9cm] flex-col items-center justify-center border border-slate-300 bg-white p-[0.1cm] text-center">
+                                                <i class="fas fa-ticket-alt text-[0.42cm] text-blue-600"></i>
+                                                <p class="mt-[0.08cm] text-[0.12cm] font-black text-slate-900">Reserva</p>
+                                                <p class="mt-[0.02cm] text-[0.1cm] text-slate-500">Check-in manual</p>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <div class="space-y-[0.07cm]">
+                                        <p class="ticket-code">{{ $itemTicketCode }}</p>
+                                        <div class="grid grid-cols-2 gap-[0.06cm] text-center text-[0.1cm] font-black uppercase text-slate-600">
+                                            <div class="border border-slate-300 bg-white p-[0.06cm]">
+                                                <span class="block text-slate-400">Pedido</span>
+                                                #{{ $ticketRegistration->order?->id ?: $order?->id ?: '-' }}
+                                            </div>
+                                            <div class="border border-slate-300 bg-white p-[0.06cm]">
+                                                <span class="block text-slate-400">Via</span>
+                                                {{ $printedCopy }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </aside>
                             </div>
                         </div>
-                    </main>
-
-                    <aside class="ticket-qr-stub">
-                        <div>
-                            <div class="ticket-number">{{ $ticketNumber }}</div>
-                            <p class="mt-2 text-center text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Ingresso</p>
-                        </div>
-
-                        <div class="ticket-qr-box">
-                            @if($hasQrTicket)
-                                <div class="ticket-qr-frame">
-                                    <div id="ticket-qrcode" class="qr-holder" data-code="{{ $ticketCode }}"></div>
-                                </div>
-                            @else
-                                <div class="flex h-[144px] w-[144px] flex-col items-center justify-center border border-slate-300 bg-white p-3 text-center">
-                                    <i class="fas fa-ticket-alt text-3xl text-blue-600"></i>
-                                    <p class="mt-2 text-xs font-black text-slate-900">Reserva confirmada</p>
-                                    <p class="mt-1 text-[10px] text-slate-500">Check-in manual</p>
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="space-y-2">
-                            <p class="ticket-code">{{ $ticketCode }}</p>
-                            <div class="grid grid-cols-2 gap-2 text-center text-[10px] font-black uppercase text-slate-600">
-                                <div class="border border-slate-300 bg-white p-2">
-                                    <span class="block text-slate-400">Pedido</span>
-                                    #{{ $order?->id ?: '-' }}
-                                </div>
-                                <div class="border border-slate-300 bg-white p-2">
-                                    <span class="block text-slate-400">Qtd.</span>
-                                    {{ $quantity }}
-                                </div>
-                            </div>
-                        </div>
-                    </aside>
-                </div>
+                    @endfor
+                @endforeach
             </div>
         </section>
 
@@ -534,9 +623,9 @@
                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $user?->email }}</p>
             </div>
             <div class="ticket-info-box rounded-3xl p-5">
-                <p class="text-xs font-black uppercase tracking-wide text-slate-400">Status do ingresso</p>
-                <p class="mt-2 font-black text-slate-900 dark:text-white">{{ $ticketLabel }}</p>
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $registration->ticketStatusMessage() }}</p>
+                <p class="text-xs font-black uppercase tracking-wide text-slate-400">Impressão</p>
+                <p class="mt-2 font-black text-slate-900 dark:text-white">{{ $printTicketCount }} {{ $printTicketCount === 1 ? 'ingresso' : 'ingressos' }}</p>
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Até 4 por folha A4 em orientação retrato.</p>
             </div>
             <div class="ticket-info-box rounded-3xl p-5">
                 <p class="text-xs font-black uppercase tracking-wide text-slate-400">Data do evento</p>
@@ -553,25 +642,25 @@
 @endsection
 
 @push('scripts')
-    @if($hasQrTicket)
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const target = document.getElementById('ticket-qrcode');
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof QRCode === 'undefined') {
+                return;
+            }
 
-                if (!target || typeof QRCode === 'undefined') {
-                    return;
-                }
+            document.querySelectorAll('.ticket-qrcode[data-code]').forEach(function (target) {
+                target.innerHTML = '';
 
                 new QRCode(target, {
                     text: target.dataset.code,
-                    width: 126,
-                    height: 126,
+                    width: 65,
+                    height: 65,
                     colorDark: '#0f172a',
                     colorLight: '#ffffff',
                     correctLevel: QRCode.CorrectLevel.H
                 });
             });
-        </script>
-    @endif
+        });
+    </script>
 @endpush

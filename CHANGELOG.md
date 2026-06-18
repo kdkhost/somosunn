@@ -2,6 +2,20 @@
 
 ---
 
+## [2026-06-18] - fix(painel): impressão física do ingresso
+
+### Corrigido
+- O ingresso digital passa a usar a imagem do evento como marca d'água bem clara, preservando a leitura dos dados.
+- A impressão foi ajustada para A4 em orientação retrato, com cada ingresso no tamanho final de 15 x 5 cm.
+- Cada slot de impressão respeita área máxima de 17 x 7 cm com borda de margem de erro para corte.
+- Quando o pedido possui mais de um ingresso, a página organiza até 4 ingressos por folha.
+
+### Arquivos principais
+- `app/Http/Controllers/Panel/TicketController.php`
+- `resources/views/panel/tickets/show.blade.php`
+
+---
+
 ## [2026-06-18] - fix(painel): visual do ingresso no modelo de bilhete
 
 ### Corrigido
