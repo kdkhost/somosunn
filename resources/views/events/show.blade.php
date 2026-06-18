@@ -880,7 +880,7 @@
                                     <div class="text-center">
                                         <div
                                             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-bold mb-4 w-full justify-center {{ $ticketUsed ? 'bg-emerald-100 text-emerald-800' : 'bg-green-100 text-green-800' }}">
-                                            <i class="fas {{ $ticketUsed ? 'fa-check-double' : 'fa-check-circle' }}"></i> {{ $ticketUsed ? 'Ingresso ja utilizado' : 'Vaga Confirmada' }}
+                                            <i class="fas {{ $ticketUsed ? 'fa-check-double' : 'fa-check-circle' }}"></i> {{ $ticketUsed ? 'Ingresso já utilizado' : 'Vaga confirmada' }}
                                         </div>
                                         @if($event->is_ticket_enabled && $userRegistration->ticket_code)
                                             <button type="button"
@@ -1312,20 +1312,20 @@
             stateOverlayLabel.className = 'rotate-[-10deg] rounded-xl border-2 px-4 py-2 text-center text-lg font-black uppercase tracking-[0.12em]';
 
             if (payload.state === 'used') {
-                stateAlert.textContent = payload.statusMessage || 'Ja utilizado.';
+                stateAlert.textContent = payload.statusMessage || 'Já utilizado.';
                 stateAlert.classList.add('border', 'border-emerald-200', 'bg-emerald-50', 'text-emerald-700');
                 stateAlert.classList.remove('hidden');
                 stateOverlay.classList.remove('hidden');
                 stateOverlay.classList.add('border-emerald-300');
-                stateOverlayLabel.textContent = 'Ja utilizado';
+                stateOverlayLabel.textContent = 'Já utilizado';
                 stateOverlayLabel.classList.add('border-emerald-600', 'bg-emerald-600/10', 'text-emerald-700');
             } else if (payload.state === 'expired') {
-                stateAlert.textContent = payload.statusMessage || 'Ingresso invalido ou expirado.';
+                stateAlert.textContent = payload.statusMessage || 'Ingresso inválido ou expirado.';
                 stateAlert.classList.add('border', 'border-red-200', 'bg-red-50', 'text-red-700');
                 stateAlert.classList.remove('hidden');
                 stateOverlay.classList.remove('hidden');
                 stateOverlay.classList.add('border-red-300');
-                stateOverlayLabel.textContent = 'Ingresso invalido ou expirado';
+                stateOverlayLabel.textContent = 'Ingresso inválido ou expirado';
                 stateOverlayLabel.classList.add('border-red-600', 'bg-red-600/10', 'text-red-700');
             } else {
                 stateAlert.textContent = '';

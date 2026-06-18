@@ -96,13 +96,13 @@ class EventRegistration extends Model
                 ? $this->check_in_at
                 : Carbon::parse($this->check_in_at);
 
-            return 'Ja utilizado em ' . $checkInAt->format('d/m/Y H:i') . '.';
+            return 'Já utilizado em ' . $checkInAt->format('d/m/Y H:i') . '.';
         }
 
         if ($this->isTicketExpired()) {
-            return 'Ingresso invalido ou expirado. ' . ($this->event?->scannerStatusMessage() ?? '');
+            return 'Ingresso inválido ou expirado. ' . ($this->event?->scannerStatusMessage() ?? '');
         }
 
-        return 'Ingresso valido para leitura.';
+        return 'Ingresso válido para leitura.';
     }
 }

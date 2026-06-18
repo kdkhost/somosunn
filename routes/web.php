@@ -306,6 +306,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
     Route::get('/', [\App\Http\Controllers\Panel\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/stats', [\App\Http\Controllers\Panel\DashboardController::class, 'stats'])->name('dashboard.stats');
     Route::get('/ingressos', [\App\Http\Controllers\Panel\TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/ingressos/{registration}', [\App\Http\Controllers\Panel\TicketController::class, 'show'])->name('tickets.show');
     Route::get('/recebimentos', [\App\Http\Controllers\Panel\SplitController::class, 'index'])->name('splits.index');
     Route::get('/marketing', [\App\Http\Controllers\Panel\MarketingController::class, 'index'])->name('marketing.index');
     Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');

@@ -23,4 +23,18 @@ class TicketController extends Controller
 
         return view('panel.tickets', compact('registrations'));
     }
+
+    /**
+     * Exibe o ingresso digital com detalhes do evento e QR Code quando habilitado.
+     */
+    public function show(EventRegistration $registration)
+    {
+        abort_unless((int) $registration->user_id === (int) Auth::id(), 403);
+        abort_unless(in_array((string) $registration->status, EventRegistration::COUNTED_STATUSES, true), 404);
+
+        $registration->load(['event', 'order']);
+        abort_unless($registration->event, 404);
+
+        return view('panel.tickets.show', compact('registration'));
+    }
 }

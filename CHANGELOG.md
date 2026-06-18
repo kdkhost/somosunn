@@ -2,6 +2,27 @@
 
 ---
 
+## [2026-06-18] - feat(painel): ingresso digital imprimível
+
+### Adicionado
+- A tela `Meus Ingressos` do painel do membro agora exibe cada inscrição de evento como um card visual de ingresso, com imagem do evento, data, local, status e botão `Ver ingresso`.
+- Cada ingresso adquirido passa a ter uma página própria com desenho de ingresso em formato paisagem, detalhes do evento, participante, pedido, código do ingresso e opção de impressão.
+- Quando o evento possui QR Code habilitado, o QR é exibido dentro do ingresso para apresentação no check-in.
+
+### Corrigido
+- Textos do painel de ingressos foram revisados para PT-BR legível e sem acentuação quebrada.
+- Fallbacks do QR Code na página pública do evento também foram padronizados com acentuação correta.
+
+### Arquivos principais
+- `routes/web.php`
+- `app/Http/Controllers/Panel/TicketController.php`
+- `app/Models/EventRegistration.php`
+- `resources/views/panel/tickets.blade.php`
+- `resources/views/panel/tickets/show.blade.php`
+- `resources/views/events/show.blade.php`
+
+---
+
 ## [2026-06-17] - fix(eventos): revogacao de ingressos legados
 
 ### Corrigido
