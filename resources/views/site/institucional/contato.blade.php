@@ -3,15 +3,14 @@
 @section('title', 'Contato - UNN')
 
 @php
-    $companyName = \App\Models\Setting::get('company_name') ?: 'UNN';
     $companyEmail = \App\Models\Setting::get('company_email') ?: 'contato@somosunn.com.br';
     $companyPhone = \App\Models\Setting::get('company_phone') ?: '(11) 99999-9999';
     $companyZip = \App\Models\Setting::get('company_zip') ?: '01310-100';
-    $companyAddress = \App\Models\Setting::get('company_address') ?: 'Av. Paulista, 1000';
+    $companyAddress = \App\Models\Setting::get('company_address') ?: 'Av. Paulista';
     $companyNumber = (string) \App\Models\Setting::get('company_number', '1001');
     $companyComplement = \App\Models\Setting::get('company_complement') ?: null;
     $companyDistrict = \App\Models\Setting::get('company_district') ?: 'Bela Vista';
-    $companyCity = \App\Models\Setting::get('company_city') ?: 'São Paulo';
+    $companyCity = \App\Models\Setting::get('company_city') ?: 'Sao Paulo';
     $companyState = \App\Models\Setting::get('company_state') ?: 'SP';
 
     $normalizeSocialUrl = function ($value, string $network): ?string {
@@ -58,12 +57,10 @@
         ['url' => $socialLinkedin, 'icon' => 'fab fa-linkedin', 'title' => 'LinkedIn'],
         ['url' => $socialYoutube, 'icon' => 'fab fa-youtube', 'title' => 'YouTube'],
         ['url' => $socialFacebook, 'icon' => 'fab fa-facebook', 'title' => 'Facebook'],
-    ], function ($item) {
-        return !empty($item['url']);
-    }));
+    ], fn ($item) => !empty($item['url'])));
 
     $fullAddress = trim(implode(', ', array_filter([
-        $companyAddress . ($companyNumber ? ' ' . $companyNumber : ''),
+        $companyAddress . ($companyNumber !== '' ? ' ' . $companyNumber : ''),
         $companyComplement,
         $companyDistrict,
         $companyCity . ' - ' . $companyState,
@@ -71,7 +68,7 @@
         'Brasil',
     ])));
 
-    $mapQuery = $fullAddress !== '' ? rawurlencode($fullAddress) : rawurlencode('São Paulo, Brasil');
+    $mapQuery = $fullAddress !== '' ? rawurlencode($fullAddress) : rawurlencode('Sao Paulo, Brasil');
     $mapOpenUrl = 'https://www.google.com/maps/search/?api=1&query=' . $mapQuery;
     $recaptchaSiteKey = (string) (\App\Models\Setting::get('recaptcha_v3_site_key') ?: config('services.recaptcha.site_key', ''));
 @endphp
@@ -99,7 +96,7 @@
 
             <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
                 <div>
-                    <h2 class="text-3xl font-black text-gray-900 mb-8">Informações de Contato</h2>
+                    <h2 class="text-3xl font-black text-gray-900 mb-8">Informacoes de Contato</h2>
 
                     <div class="space-y-6">
                         <div class="bg-white rounded-2xl p-6 shadow-lg flex flex-col md:flex-row items-center md:items-start gap-4 text-center md:text-left">
@@ -119,7 +116,7 @@
                             <div>
                                 <h3 class="font-bold text-gray-900 mb-1">WhatsApp</h3>
                                 <p class="text-gray-600">{{ $companyPhone }}</p>
-                                <p class="text-sm text-gray-500">Seg-Sex, 9h às 18h</p>
+                                <p class="text-sm text-gray-500">Seg-Sex, 9h as 18h</p>
                             </div>
                         </div>
 
@@ -128,9 +125,9 @@
                                 <i class="fas fa-map-marker-alt text-white text-xl"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-gray-900 mb-1">Endereço</h3>
+                                <h3 class="font-bold text-gray-900 mb-1">Endereco</h3>
                                 <p class="text-gray-600">
-                                    {{ $companyAddress }}{{ $companyNumber ? ', ' . $companyNumber : '' }}@if($companyComplement) - {{ $companyComplement }}@endif
+                                    {{ $companyAddress }}{{ $companyNumber !== '' ? ', ' . $companyNumber : '' }}@if($companyComplement) - {{ $companyComplement }}@endif
                                 </p>
                                 <p class="text-gray-600">{{ $companyDistrict }}, {{ $companyCity }} - {{ $companyState }}</p>
                                 <p class="text-gray-600">CEP: {{ $companyZip }}</p>
@@ -194,9 +191,9 @@
                                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition"
                                 style="--tw-ring-color: var(--unn-azul-1)">
                                 <option value="">Selecione um assunto</option>
-                                <option value="duvidas" {{ old('subject') === 'duvidas' ? 'selected' : '' }}>Dúvidas sobre a plataforma</option>
+                                <option value="duvidas" {{ old('subject') === 'duvidas' ? 'selected' : '' }}>Duvidas sobre a plataforma</option>
                                 <option value="parcerias" {{ old('subject') === 'parcerias' ? 'selected' : '' }}>Propostas de parceria</option>
-                                <option value="suporte" {{ old('subject') === 'suporte' ? 'selected' : '' }}>Suporte técnico</option>
+                                <option value="suporte" {{ old('subject') === 'suporte' ? 'selected' : '' }}>Suporte tecnico</option>
                                 <option value="comercial" {{ old('subject') === 'comercial' ? 'selected' : '' }}>Departamento comercial</option>
                                 <option value="imprensa" {{ old('subject') === 'imprensa' ? 'selected' : '' }}>Assessoria de imprensa</option>
                                 <option value="outro" {{ old('subject') === 'outro' ? 'selected' : '' }}>Outro assunto</option>
@@ -204,14 +201,14 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Mensagem <span class="text-gray-400 font-normal">(mínimo 10 caracteres)</span></label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Mensagem <span class="text-gray-400 font-normal">(minimo 10 caracteres)</span></label>
                             <textarea name="message" id="contact-message" rows="5" required minlength="10" maxlength="4000"
                                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition resize-none"
                                 style="--tw-ring-color: var(--unn-azul-1)"
-                                placeholder="Como podemos ajudar? (mínimo 10 caracteres)">{{ old('message') }}</textarea>
+                                placeholder="Como podemos ajudar? (minimo 10 caracteres)">{{ old('message') }}</textarea>
                             <div class="flex justify-between mt-1 text-xs text-gray-500">
                                 <span id="char-counter" class="text-red-500">0/10 caracteres</span>
-                                <span id="char-max">Máximo: 4000</span>
+                                <span id="char-max">Maximo: 4000</span>
                             </div>
                         </div>
 
@@ -226,19 +223,21 @@
         </div>
     </section>
 
-    <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">Nossa Localização</h2>
-            <div class="rounded-3xl overflow-hidden shadow-2xl h-[400px]">
+    <section class="contact-map-section py-16 px-0 md:px-12 lg:px-24 bg-white">
+        <div class="w-full max-w-none md:max-w-7xl mx-auto">
+            <div class="px-6 md:px-0">
+                <h2 class="text-3xl font-black text-gray-900 mb-8 text-center">Nossa Localizacao</h2>
+            </div>
+            <div class="contact-map-shell overflow-hidden shadow-2xl h-[420px] md:h-[400px]">
                 <div id="contact-location-map"
                     class="w-full h-full"
                     data-address="{{ $fullAddress }}"
                     data-map-url="{{ $mapOpenUrl }}"
                     data-lat="{{ $mapCoordinates['lat'] ?? '' }}"
                     data-lng="{{ $mapCoordinates['lng'] ?? '' }}"
-                    aria-label="Localização UNN"></div>
+                    aria-label="Localizacao UNN"></div>
             </div>
-            <div class="mt-5 flex justify-center">
+            <div class="mt-5 flex justify-center px-6 md:px-0">
                 <a href="{{ $mapOpenUrl }}" target="_blank" rel="noopener"
                     class="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-white btn-primary shadow-lg hover:shadow-xl transition">
                     <i class="fas fa-location-arrow"></i>
@@ -252,10 +251,36 @@
 </div>
 
 <style>
+.contact-map-section {
+    padding-bottom: calc(4rem + var(--mobile-app-nav-height, 0px) + var(--mobile-app-nav-safe-area, 0px));
+}
+
+.contact-map-shell {
+    width: 100%;
+    border-radius: 0;
+    position: relative;
+    z-index: 0;
+}
+
 .leaflet-container {
     width: 100%;
     height: 100%;
     background: #e2e8f0;
+    position: relative;
+    z-index: 0;
+}
+
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom,
+.leaflet-control {
+    z-index: 10 !important;
+}
+
+.leaflet-popup-content {
+    max-width: 220px;
+    word-break: break-word;
+    white-space: normal;
 }
 
 .contact-map-fallback {
@@ -298,6 +323,16 @@
     .unn-title-max {
         font-size: 2.2rem !important;
         max-width: 95vw;
+    }
+}
+
+@media (min-width: 768px) {
+    .contact-map-section {
+        padding-bottom: 4rem;
+    }
+
+    .contact-map-shell {
+        border-radius: 1.5rem;
     }
 }
 </style>
@@ -360,12 +395,12 @@
         };
 
         if (!address || typeof L === 'undefined') {
-            renderFallback('Não foi possível carregar o mapa agora.');
+            renderFallback('Nao foi possivel carregar o mapa agora.');
             return;
         }
 
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-            renderFallback('Não foi possível localizar o endereço no mapa.');
+            renderFallback('Nao foi possivel localizar o endereco no mapa.');
             return;
         }
 
@@ -377,9 +412,11 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        L.marker([lat, lng]).addTo(map)
-            .bindPopup(address)
-            .openPopup();
+        const marker = L.marker([lat, lng]).addTo(map);
+
+        if (window.innerWidth >= 768) {
+            marker.bindPopup(address).openPopup();
+        }
 
         if (externalUrl) {
             mapEl.style.cursor = 'pointer';
@@ -387,6 +424,10 @@
                 window.open(externalUrl, '_blank', 'noopener');
             });
         }
+
+        setTimeout(function () {
+            map.invalidateSize();
+        }, 150);
     });
 </script>
 @if($recaptchaSiteKey !== '')
@@ -402,7 +443,7 @@
             }
 
             if (typeof grecaptcha === 'undefined') {
-                console.warn('reCAPTCHA não carregou, enviando sem token');
+                console.warn('reCAPTCHA nao carregou, enviando sem token');
                 return;
             }
 

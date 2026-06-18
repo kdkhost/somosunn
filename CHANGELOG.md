@@ -10,6 +10,7 @@
 - A geocodificação do endereço da empresa saiu do navegador e passou para o backend com cache, evitando bloqueio do Nominatim no front e respeitando o endereço salvo em `/admin/settings/general`.
 - O campo de telefone do formulário de contato passou a aplicar máscara brasileira em tempo real durante a digitação.
 - O número da empresa na página de contato passou a respeitar corretamente o valor `0`, sem cair no fallback padrão por avaliação booleana incorreta.
+- A seção do mapa da página de contato foi ajustada para mobile com largura total, espaço para o menu inferior do app e sem popup abrindo cortado em telas menores.
 
 ### Arquivos principais
 - `app/Services/ContactMapGeocodingService.php`
