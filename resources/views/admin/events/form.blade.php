@@ -1056,30 +1056,28 @@
         }
 
         #cert-canvas.cert-editor-no-bg {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+            background: #ffffff !important;
         }
 
         #cert-canvas.cert-editor-no-bg #cert-bg-placeholder {
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%) !important;
-            color: #334155 !important;
+            display: none !important;
         }
 
-        #cert-canvas.cert-editor-no-bg #cert-bg-placeholder h5,
-        #cert-canvas.cert-editor-no-bg #cert-bg-placeholder p,
-        #cert-canvas.cert-editor-no-bg #cert-bg-placeholder i {
-            color: inherit !important;
+        #cert-canvas.cert-editor-no-bg .cert-element:not(#el-platform_logo) {
+            color: #0f172a !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
         }
 
         #cert-canvas .cert-element.cert-editor-contrast {
-            color: #0f172a !important;
-            background: rgba(255, 255, 255, 0.78);
-            border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+            background: transparent !important;
+            box-shadow: none !important;
             text-shadow: none !important;
         }
 
         #cert-canvas .cert-element.cert-editor-contrast:hover {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(37, 99, 235, 0.08) !important;
             border-color: #2563eb !important;
         }
 
