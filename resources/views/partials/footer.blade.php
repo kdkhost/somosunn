@@ -101,8 +101,9 @@
             <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div class="flex flex-col gap-4">
                     <div class="flex items-center gap-4">
-                        <div class="flex h-14 min-w-[88px] max-w-[132px] shrink-0 items-center justify-center rounded-2xl border border-sky-100 bg-white px-3 shadow-sm overflow-hidden md:h-16 md:min-w-[104px] md:max-w-[148px]">
-                            <img src="{{ $logoSrc }}" alt="{{ $siteName }}" class="max-h-10 max-w-full w-auto object-contain md:max-h-11">
+                        <div class="inline-flex h-10 sm:h-12 md:h-16 w-auto items-center justify-center overflow-hidden shrink-0">
+                            <img src="{{ $logoSrc }}" alt="" class="h-full w-auto object-contain"
+                                onerror="this.style.display='none';">
                         </div>
 
                         <div class="min-w-0">
