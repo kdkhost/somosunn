@@ -2,6 +2,31 @@
 
 ---
 
+## [2026-06-18] - feat(admin): gestao superadmin de backups
+
+### Adicionado
+- Tela exclusiva do superadmin em `/admin/backups` para administrar arquivos de backup.
+- Listagem separada de backups de banco de dados e configuracoes, com origem do arquivo (`local` ou `s3`), tamanho e data de geracao.
+- Acoes de download, remocao manual e geracao sob demanda de backup do banco ou das configuracoes.
+- Formulario de configuracao para retencao de backups e notificacao de sucesso por e-mail.
+- Entrada `Backups` no menu do painel `/admin`, visivel apenas para superadmin.
+
+### Seguranca
+- Rotas protegidas por `auth`, middleware admin legado e verificacao explicita de `isSuperAdmin()`.
+- Download e remocao validam tipo, disco e prefixo do caminho para impedir acesso fora de `backups/db` e `backups/config`.
+
+### Observacao operacional
+- Esta entrega nao executa `migrate`, `seed`, `rollback`, `fresh`, `refresh` nem qualquer comando de escrita em banco de producao.
+
+### Arquivos principais
+- `app/Http/Controllers/Admin/BackupController.php`
+- `resources/views/admin/backups/index.blade.php`
+- `resources/views/admin/backups/partials/table.blade.php`
+- `resources/views/admin/partials/sidebar.blade.php`
+- `routes/web.php`
+
+---
+
 ## [2026-06-18] - fix(backup): fallback local e e-mails detalhados
 
 ### Corrigido

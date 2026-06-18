@@ -628,6 +628,12 @@
                                     <p>Sistema</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.backups.index') }}" class="nav-link {{ request()->routeIs('admin.backups.*') ? 'active' : '' }}">
+                                    <i class="fas fa-database nav-icon"></i>
+                                    <p>Backups</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 @endif
