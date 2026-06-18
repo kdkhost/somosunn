@@ -8,6 +8,7 @@
 - O rodape publico deixou de forcar a logo em um selo quadrado pequeno, o que estava encolhendo demais a arte horizontal da marca.
 - A area da marca agora usa container retangular com largura util maior, melhor contraste e altura suficiente para a logo ficar legivel.
 - A logo do rodape passou a seguir o mesmo visual limpo do navbar publico, sem borda, sem fundo e com `alt=""` por ser elemento decorativo ao lado do nome textual do site.
+- O nome do site e a frase institucional abaixo da logo foram removidos do rodape publico, deixando apenas a marca visual nessa area.
 
 ### Arquivos principais
 - `resources/views/partials/footer.blade.php`
