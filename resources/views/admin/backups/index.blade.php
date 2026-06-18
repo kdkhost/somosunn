@@ -4,8 +4,13 @@
 
 @push('styles')
 <style>
+    .backup-page-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1e293b;
+    }
     .backup-kpi {
-        border-radius: 10px;
+        border-radius: 8px;
         padding: 16px;
         color: #fff;
         min-height: 96px;
@@ -31,14 +36,16 @@
         margin-top: 6px;
     }
     .backup-card {
-        border: 0;
-        border-radius: 10px;
+        border-radius: 8px;
         box-shadow: 0 6px 22px rgba(15, 23, 42, .08);
+    }
+    .backup-card .card-header {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
     }
     .backup-table th {
         font-size: .78rem;
         text-transform: uppercase;
-        color: #64748b;
         white-space: nowrap;
     }
     .backup-table td {
@@ -59,24 +66,51 @@
     }
     .backup-empty {
         border: 1px dashed #cbd5e1;
-        border-radius: 10px;
+        border-radius: 8px;
         padding: 28px;
         text-align: center;
         color: #64748b;
     }
+    .backup-tabs {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .backup-tabs .nav-link {
+        border-radius: 8px 8px 0 0;
+    }
+    .dark-mode .backup-page-title,
+    body.dark-mode .backup-page-title {
+        color: #f8fafc !important;
+    }
     .dark-mode .backup-card,
     body.dark-mode .backup-card {
-        background: #1f2937;
-        color: #f8fafc;
+        box-shadow: none;
     }
-    .dark-mode .backup-table th,
-    body.dark-mode .backup-table th {
-        color: #cbd5e1;
+    .dark-mode .backup-card .text-muted,
+    body.dark-mode .backup-card .text-muted,
+    .dark-mode .backup-path.text-muted,
+    body.dark-mode .backup-path.text-muted {
+        color: #94a3b8 !important;
     }
     .dark-mode .backup-empty,
     body.dark-mode .backup-empty {
         border-color: #475569;
         color: #cbd5e1;
+    }
+    .dark-mode .backup-tabs,
+    body.dark-mode .backup-tabs {
+        border-color: #334155;
+    }
+    .dark-mode .backup-tabs .nav-link,
+    body.dark-mode .backup-tabs .nav-link {
+        color: #cbd5e1;
+        border-color: transparent;
+    }
+    .dark-mode .backup-tabs .nav-link.active,
+    body.dark-mode .backup-tabs .nav-link.active {
+        background-color: #1e293b;
+        border-color: #334155 #334155 #1e293b;
+        color: #ffffff;
     }
 </style>
 @endpush
@@ -86,7 +120,7 @@
     <div class="container-fluid">
         <div class="row align-items-center mb-2">
             <div class="col-sm-7">
-                <h1 class="m-0" style="font-size:1.5rem;font-weight:800;color:#1e293b;">
+                <h1 class="m-0 backup-page-title">
                     <i class="fas fa-database text-primary"></i> Backups do Sistema
                 </h1>
                 <small class="text-muted">Administracao exclusiva do superadmin em /admin</small>
@@ -155,7 +189,7 @@
             <div class="col-lg-8">
                 <div class="card backup-card">
                     <div class="card-header p-0 pt-2">
-                        <ul class="nav nav-tabs" role="tablist">
+                        <ul class="nav nav-tabs backup-tabs" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active" data-toggle="tab" href="#tab-db" role="tab">
                                     <i class="fas fa-database mr-1"></i> Banco de dados

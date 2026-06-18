@@ -2,6 +2,21 @@
 
 ---
 
+## [2026-06-18] - fix(admin): padronizar backups em dark/light e favicon
+
+### Corrigido
+- Tela `/admin/backups` passou a herdar corretamente as superficies, tabelas, abas e textos do tema dark/light do painel AdminLTE.
+- Removidas cores fixas que deixavam titulo, cards e tabelas incoerentes no tema escuro.
+- Layout admin agora declara o `type` correto do favicon conforme a extensao do arquivo.
+- Rota `/favicon.ico` voltou a priorizar `public/favicon.ico` antes do fallback para `img/logo.svg`.
+
+### Arquivos principais
+- `resources/views/admin/backups/index.blade.php`
+- `resources/views/admin/layouts/app.blade.php`
+- `routes/web.php`
+
+---
+
 ## [2026-06-18] - feat(admin): gestao superadmin de backups
 
 ### Adicionado

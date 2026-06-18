@@ -156,8 +156,15 @@ Route::get('/favicon.ico', function () {
     if ($custom && file_exists(public_path($custom))) {
         return response()->file(public_path($custom));
     }
+
+    $ico = public_path('favicon.ico');
+    if (file_exists($ico)) {
+        return response()->file($ico, ['Content-Type' => 'image/x-icon']);
+    }
+
     $default = public_path('img/logo.svg');
     abort_unless(file_exists($default), 404);
+
     return response()->file($default, ['Content-Type' => 'image/svg+xml']);
 });
 
