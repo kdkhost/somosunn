@@ -2,11 +2,11 @@
 
 ---
 
-## [2026-06-18] - fix(site): desbloquear mapa da pagina de contato
+## [2026-06-18] - fix(site): restaurar mapa da pagina de contato
 
 ### Corrigido
-- O bloco `Nossa Localização` da página pública `/contato` estava sendo bloqueado pelo navegador por conflito entre a URL do iframe e a `Content-Security-Policy` do sistema.
-- A URL do embed foi ajustada de `www.google.com` para `maps.google.com`, que já faz parte da allowlist de `frame-src` definida no middleware de segurança.
+- O bloco `Nossa Localização` da página pública `/contato` deixou de depender do iframe quebrado do Google Maps, que estava falhando no carregamento.
+- A seção agora usa OpenStreetMap com Leaflet e geocodificação do endereço da empresa, eliminando o bloqueio visual e mantendo o botão para abrir a rota no Google Maps.
 
 ### Arquivos principais
 - `resources/views/site/institucional/contato.blade.php`
