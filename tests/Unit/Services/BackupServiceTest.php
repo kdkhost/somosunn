@@ -143,8 +143,8 @@ class BackupServiceTest extends TestCase
         // Forca um driver nao-suportado para acionar o caminho de falha cedo
         // dentro de runMysqldumpToGzip(), sem invocar mysqldump real.
         config()->set('database.connections.backup_dummy', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
+            'driver' => 'backup_dummy',
+            'database' => 'dummy',
         ]);
         $original = (string) config('database.default');
         config()->set('database.default', 'backup_dummy');
@@ -224,7 +224,7 @@ class BackupServiceTest extends TestCase
 
         Bus::assertDispatched(SendGenericTemplateEmail::class, function (SendGenericTemplateEmail $job) use ($superadmin): bool {
             return $job->toEmail === $superadmin->email
-                && stripos($job->subject, 'Backup failed') !== false;
+                && stripos($job->subject, 'Backup falhou') !== false;
         });
     }
 

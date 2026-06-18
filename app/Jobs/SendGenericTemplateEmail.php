@@ -62,8 +62,8 @@ class SendGenericTemplateEmail implements ShouldQueue
         ], [
             'name' => 'Email Generico do Sistema',
             'category' => 'sistema',
-            'subject' => '{{message.subject}}',
-            'body' => '{!! $message[\'content\'] ?? \'\' !!}',
+            'subject' => '{message.subject}',
+            'body' => '{message.content}',
         ]);
     }
 }

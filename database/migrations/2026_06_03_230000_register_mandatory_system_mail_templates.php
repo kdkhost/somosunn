@@ -13,7 +13,7 @@ return new class extends Migration
         }
 
         $templates = [
-            ['generic_system_email', 'Email Generico do Sistema', 'sistema', '{{message.subject}}', '{!! $message[\'content\'] ?? \'\' !!}'],
+            ['generic_system_email', 'Email Generico do Sistema', 'sistema', '{message.subject}', '{message.content}'],
             ['payment_confirmed', 'Pagamento Confirmado', 'financeiro', 'Pagamento confirmado - Pedido #{{order.id}}', '<h2>Pagamento confirmado!</h2><p>Ola, {{user.name}}.</p><p>O pagamento do pedido <strong>#{{order.id}}</strong>, no valor de <strong>{{order.total}}</strong>, foi confirmado.</p>'],
             ['buyer_communication', 'Comunicacao com Compradores', 'marketing', '{{notification.subject}}', '<div>{!! $notification[\'message\'] ?? \'\' !!}</div><p><a href="{{notification.action_url}}">{{notification.action_label}}</a></p>'],
             ['feedback_request', 'Solicitacao de Avaliacao', 'marketing', 'Avalie sua experiencia: {{item.name}}', '<h2>Ola, {{user.name}}!</h2><p>Gostariamos de saber sua opiniao sobre <strong>{{item.name}}</strong>.</p><p><a href="{{feedback.url}}">Deixar avaliacao</a></p>'],

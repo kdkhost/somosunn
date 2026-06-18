@@ -61,6 +61,10 @@ class BackupService implements BackupInterface
     /** Subdiretorio dentro de storage/app para artefatos temporarios de backup. */
     private const TEMP_DIR = 'backup_temp';
 
+    /** Disco remoto preferencial e disco local de contingencia. */
+    private const PRIMARY_BACKUP_DISK = 's3';
+    private const FALLBACK_BACKUP_DISK = 'local';
+
     /** Defaults de retencao (usados como fallback quando settings indisponiveis). */
     private const DEFAULT_KEEP_DAILY = 30;
     private const DEFAULT_KEEP_WEEKLY = 12;
@@ -92,16 +96,19 @@ class BackupService implements BackupInterface
                 throw new \RuntimeException('mysqldump produziu arquivo vazio.');
             }
 
-            $this->uploadToS3($tempPath, $relativePath);
+            $diskName = $this->storeBackupFile($tempPath, $relativePath);
             $this->safeUnlink($tempPath);
 
             $duration = microtime(true) - $start;
 
             Log::info('backup.database.success', [
                 'path' => $relativePath,
+                'disk' => $diskName,
                 'size_bytes' => $sizeBytes,
                 'duration_seconds' => round($duration, 3),
             ]);
+
+            $this->notifySuperadminSuccess('database', $relativePath, $diskName, $sizeBytes, $duration);
 
             return new BackupResult(
                 success: true,
@@ -120,7 +127,7 @@ class BackupService implements BackupInterface
                 'exception' => $message,
             ]);
 
-            $this->notifySuperadminFailure('database', $message);
+            $this->notifySuperadminFailure('database', $message, $duration, $relativePath);
 
             return new BackupResult(
                 success: false,
@@ -148,7 +155,7 @@ class BackupService implements BackupInterface
                 throw new \RuntimeException('Empacotamento de configuracao produziu arquivo vazio.');
             }
 
-            $this->uploadToS3($tempPath, $relativePath);
+            $diskName = $this->storeBackupFile($tempPath, $relativePath);
             $this->safeUnlink($tempPath);
             $this->safeUnlink($tarPath);
 
@@ -156,9 +163,12 @@ class BackupService implements BackupInterface
 
             Log::info('backup.config.success', [
                 'path' => $relativePath,
+                'disk' => $diskName,
                 'size_bytes' => $sizeBytes,
                 'duration_seconds' => round($duration, 3),
             ]);
+
+            $this->notifySuperadminSuccess('config', $relativePath, $diskName, $sizeBytes, $duration);
 
             return new BackupResult(
                 success: true,
@@ -178,7 +188,7 @@ class BackupService implements BackupInterface
                 'exception' => $message,
             ]);
 
-            $this->notifySuperadminFailure('config', $message);
+            $this->notifySuperadminFailure('config', $message, $duration, $relativePath);
 
             return new BackupResult(
                 success: false,
@@ -196,50 +206,53 @@ class BackupService implements BackupInterface
             return [];
         }
 
-        try {
-            $disk = Storage::disk('s3');
-            $prefix = self::TYPE_TO_DIR[$type];
-            $paths = (array) $disk->files($prefix);
+        $prefix = self::TYPE_TO_DIR[$type];
+        $items = [];
 
-            $items = [];
-            foreach ($paths as $p) {
-                $path = (string) $p;
-                if ($path === '') {
-                    continue;
+        foreach ($this->backupStorageDisks() as $diskName) {
+            try {
+                $disk = Storage::disk($diskName);
+                $paths = (array) $disk->files($prefix);
+
+                foreach ($paths as $p) {
+                    $path = (string) $p;
+                    if ($path === '') {
+                        continue;
+                    }
+
+                    try {
+                        $size = (int) $disk->size($path);
+                    } catch (Throwable $e) {
+                        $size = 0;
+                    }
+
+                    try {
+                        $modified = (int) $disk->lastModified($path);
+                    } catch (Throwable $e) {
+                        $modified = 0;
+                    }
+
+                    $items[] = [
+                        'path' => $path,
+                        'disk' => $diskName,
+                        'size' => $size,
+                        'modified' => $modified,
+                    ];
                 }
-
-                try {
-                    $size = (int) $disk->size($path);
-                } catch (Throwable $e) {
-                    $size = 0;
-                }
-
-                try {
-                    $modified = (int) $disk->lastModified($path);
-                } catch (Throwable $e) {
-                    $modified = 0;
-                }
-
-                $items[] = [
-                    'path' => $path,
-                    'size' => $size,
-                    'modified' => $modified,
-                ];
+            } catch (Throwable $e) {
+                Log::warning('backup.list.disk_failed', [
+                    'type' => $type,
+                    'disk' => $diskName,
+                    'exception' => $e->getMessage(),
+                ]);
             }
-
-            usort($items, static function (array $a, array $b): int {
-                return ($b['modified'] ?? 0) <=> ($a['modified'] ?? 0);
-            });
-
-            return $items;
-        } catch (Throwable $e) {
-            Log::error('backup.list.failed', [
-                'type' => $type,
-                'exception' => $e->getMessage(),
-            ]);
-
-            return [];
         }
+
+        usort($items, static function (array $a, array $b): int {
+            return ($b['modified'] ?? 0) <=> ($a['modified'] ?? 0);
+        });
+
+        return $items;
     }
 
     public function deleteOldBackups(int $keepDaily = 30, int $keepWeekly = 12): int
@@ -262,18 +275,26 @@ class BackupService implements BackupInterface
 
     public function getBackupSize(string $path): int
     {
-        try {
-            $size = Storage::disk('s3')->size($path);
+        foreach ($this->backupStorageDisks() as $diskName) {
+            try {
+                $disk = Storage::disk($diskName);
+                if (!$disk->exists($path)) {
+                    continue;
+                }
 
-            return is_numeric($size) ? (int) $size : 0;
-        } catch (Throwable $e) {
-            Log::error('backup.size.failed', [
-                'path' => $path,
-                'exception' => $e->getMessage(),
-            ]);
+                $size = $disk->size($path);
 
-            return 0;
+                return is_numeric($size) ? (int) $size : 0;
+            } catch (Throwable $e) {
+                Log::warning('backup.size.disk_failed', [
+                    'path' => $path,
+                    'disk' => $diskName,
+                    'exception' => $e->getMessage(),
+                ]);
+            }
         }
+
+        return 0;
     }
 
     // ------------------------------------------------------------------
@@ -459,27 +480,58 @@ class BackupService implements BackupInterface
     }
 
     /**
-     * Sobe um arquivo local para o disco s3 no caminho relativo informado.
+     * Armazena o backup no disco remoto preferencial e usa local como contingencia.
      */
-    private function uploadToS3(string $localPath, string $relativePath): void
+    private function storeBackupFile(string $localPath, string $relativePath): string
     {
-        $disk = Storage::disk('s3');
+        try {
+            $this->putBackupFile(self::PRIMARY_BACKUP_DISK, $localPath, $relativePath);
+
+            return self::PRIMARY_BACKUP_DISK;
+        } catch (Throwable $e) {
+            Log::warning('backup.storage.primary_failed_using_local', [
+                'path' => $relativePath,
+                'primary_disk' => self::PRIMARY_BACKUP_DISK,
+                'fallback_disk' => self::FALLBACK_BACKUP_DISK,
+                'exception' => $e->getMessage(),
+            ]);
+        }
+
+        $this->putBackupFile(self::FALLBACK_BACKUP_DISK, $localPath, $relativePath);
+
+        return self::FALLBACK_BACKUP_DISK;
+    }
+
+    private function putBackupFile(string $diskName, string $localPath, string $relativePath): void
+    {
+        $disk = Storage::disk($diskName);
 
         $stream = @fopen($localPath, 'rb');
         if ($stream === false) {
-            throw new \RuntimeException('Nao foi possivel abrir arquivo local para upload: ' . $localPath);
+            throw new \RuntimeException('Nao foi possivel abrir arquivo local para armazenamento: ' . $localPath);
         }
 
         try {
             $ok = $disk->put($relativePath, $stream);
             if ($ok === false) {
-                throw new \RuntimeException('Upload para S3 retornou false em ' . $relativePath);
+                throw new \RuntimeException("Armazenamento no disco {$diskName} retornou false em {$relativePath}");
             }
         } finally {
             if (is_resource($stream)) {
                 @fclose($stream);
             }
         }
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function backupStorageDisks(): array
+    {
+        return [
+            self::PRIMARY_BACKUP_DISK,
+            self::FALLBACK_BACKUP_DISK,
+        ];
     }
 
     /**
@@ -498,7 +550,6 @@ class BackupService implements BackupInterface
         }
 
         $toDelete = array_slice($items, $keep);
-        $disk = Storage::disk('s3');
         $deleted = 0;
 
         foreach ($toDelete as $item) {
@@ -506,13 +557,16 @@ class BackupService implements BackupInterface
             if ($path === '') {
                 continue;
             }
+            $diskName = (string) ($item['disk'] ?? self::PRIMARY_BACKUP_DISK);
             try {
+                $disk = Storage::disk($diskName);
                 if ($disk->delete($path)) {
                     $deleted++;
                 }
             } catch (Throwable $e) {
                 Log::warning('backup.prune.delete_failed', [
                     'path' => $path,
+                    'disk' => $diskName,
                     'exception' => $e->getMessage(),
                 ]);
             }
@@ -527,44 +581,185 @@ class BackupService implements BackupInterface
         return $deleted;
     }
 
+    private function notifySuperadminSuccess(
+        string $type,
+        string $path,
+        string $diskName,
+        int $sizeBytes,
+        float $durationSeconds
+    ): void {
+        if (!$this->shouldNotifyBackupSuccess()) {
+            return;
+        }
+
+        $this->notifySuperadminBackup(
+            status: 'success',
+            type: $type,
+            path: $path,
+            diskName: $diskName,
+            sizeBytes: $sizeBytes,
+            durationSeconds: $durationSeconds,
+        );
+    }
+
     /**
      * Notifica o Superadmin sobre falha de backup, despachando um job na queue.
      * Se a propria notificacao falhar, registra log critical.
      */
-    private function notifySuperadminFailure(string $type, string $errorMessage): void
-    {
+    private function notifySuperadminFailure(
+        string $type,
+        string $errorMessage,
+        float $durationSeconds = 0.0,
+        ?string $path = null
+    ): void {
+        $this->notifySuperadminBackup(
+            status: 'failed',
+            type: $type,
+            path: $path,
+            diskName: null,
+            sizeBytes: 0,
+            durationSeconds: $durationSeconds,
+            errorMessage: $errorMessage,
+        );
+    }
+
+    private function notifySuperadminBackup(
+        string $status,
+        string $type,
+        ?string $path,
+        ?string $diskName,
+        int $sizeBytes,
+        float $durationSeconds,
+        ?string $errorMessage = null
+    ): void {
         try {
-            $superadmin = User::where('role', 'superadmin')
-                ->orWhere('level', 'superadmin')
+            $superadmin = User::query()
                 ->whereNotNull('email')
+                ->where(function ($query): void {
+                    $query->where('role', 'superadmin')
+                        ->orWhere('level', 'superadmin');
+                })
                 ->first();
 
             if (!$superadmin || empty($superadmin->email)) {
                 Log::warning('backup.notify.no_superadmin', [
                     'type' => $type,
+                    'status' => $status,
                 ]);
 
                 return;
             }
 
             $appName = (string) config('app.name', 'UNN');
-            $subject = 'Backup failed - ' . $appName;
-            $when = Carbon::now()->format('Y-m-d H:i:s');
+            $statusLabel = $this->backupStatusLabel($status);
+            $subject = ($status === 'success' ? 'Backup concluido - ' : 'Backup falhou - ') . $appName;
+            $when = Carbon::now()->format('d/m/Y H:i:s');
 
-            $html = '<p><strong>Falha em backup automatico.</strong></p>'
-                . '<p>Tipo: <code>' . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . '</code></p>'
-                . '<p>Quando: ' . htmlspecialchars($when, ENT_QUOTES, 'UTF-8') . '</p>'
-                . '<p>Mensagem: ' . htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8') . '</p>'
-                . '<p>Verifique os logs do canal <code>stack</code> para detalhes.</p>';
+            $html = '<h2 style="margin:0 0 12px;color:#111827;">Backup ' . $this->escape($statusLabel) . '</h2>'
+                . '<p style="margin:0 0 16px;color:#374151;">O sistema finalizou uma rotina de backup automatico. Veja os detalhes abaixo.</p>'
+                . '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
+                . $this->backupEmailRow('Status', $statusLabel)
+                . $this->backupEmailRow('Tipo', $this->backupTypeLabel($type))
+                . $this->backupEmailRow('Quando', $when)
+                . $this->backupEmailRow('Disco', $diskName ?: 'nao gravado')
+                . $this->backupEmailRow('Caminho', $path ?: 'nao gerado')
+                . $this->backupEmailRow('Tamanho', $sizeBytes > 0 ? $this->formatBytes($sizeBytes) : '0 B')
+                . $this->backupEmailRow('Duracao', number_format($durationSeconds, 2, ',', '.') . 's')
+                . '</table>';
+
+            if ($errorMessage !== null && $errorMessage !== '') {
+                $html .= '<p style="margin:16px 0 6px;color:#991b1b;"><strong>Mensagem do erro:</strong></p>'
+                    . '<pre style="white-space:pre-wrap;background:#fef2f2;color:#7f1d1d;border:1px solid #fecaca;border-radius:6px;padding:12px;">'
+                    . $this->escape($errorMessage)
+                    . '</pre>';
+            }
+
+            if ($status !== 'success') {
+                $html .= '<p style="margin:16px 0 0;color:#374151;">Verifique os logs do Laravel e a configuracao do armazenamento de backup.</p>';
+            }
 
             SendGenericTemplateEmail::dispatch((string) $superadmin->email, $subject, $html);
         } catch (Throwable $e) {
             Log::critical('backup.notify.failed', [
                 'type' => $type,
+                'status' => $status,
                 'original_error' => $errorMessage,
                 'notify_exception' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function backupEmailRow(string $label, string $value): string
+    {
+        return '<tr>'
+            . '<td style="padding:8px 10px;border:1px solid #e5e7eb;background:#f9fafb;color:#374151;font-weight:700;width:160px;">'
+            . $this->escape($label)
+            . '</td>'
+            . '<td style="padding:8px 10px;border:1px solid #e5e7eb;color:#111827;">'
+            . $this->escape($value)
+            . '</td>'
+            . '</tr>';
+    }
+
+    private function backupStatusLabel(string $status): string
+    {
+        return $status === 'success' ? 'sucesso' : 'falha';
+    }
+
+    private function backupTypeLabel(string $type): string
+    {
+        return match ($type) {
+            'database' => 'banco de dados',
+            'config' => 'configuracoes',
+            default => $type,
+        };
+    }
+
+    private function formatBytes(int $bytes): string
+    {
+        if ($bytes < 1024) {
+            return $bytes . ' B';
+        }
+
+        $units = ['KB', 'MB', 'GB', 'TB'];
+        $size = $bytes / 1024;
+
+        foreach ($units as $unit) {
+            if ($size < 1024 || $unit === 'TB') {
+                return number_format($size, 2, ',', '.') . ' ' . $unit;
+            }
+            $size /= 1024;
+        }
+
+        return $bytes . ' B';
+    }
+
+    private function shouldNotifyBackupSuccess(): bool
+    {
+        try {
+            $value = Setting::get('backup_notify_success', true);
+        } catch (Throwable $e) {
+            return true;
+        }
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_numeric($value)) {
+            return ((int) $value) === 1;
+        }
+
+        if (is_string($value)) {
+            return in_array(strtolower(trim($value)), ['1', 'true', 'sim', 'yes', 'on'], true);
+        }
+
+        return true;
+    }
+
+    private function escape(string $value): string
+    {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
 
     /**

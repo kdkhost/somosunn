@@ -91,16 +91,10 @@ class SystemMailTemplateService
         $subject = (string) ($template->subject ?? '');
         $body = (string) ($template->body ?? '');
 
-        try {
-            $subjectRendered = (string) Blade::render($subject, $data);
-            $bodyRendered = (string) Blade::render($body, $data);
-            return [$subjectRendered, $bodyRendered];
-        } catch (\Throwable $e) {
-            return [
-                $this->replacePlaceholders($subject, $data),
-                $this->replacePlaceholders($body, $data),
-            ];
-        }
+        return [
+            $this->renderTemplateString($subject, $data),
+            $this->renderTemplateString($body, $data),
+        ];
     }
 
     /**
@@ -117,13 +111,21 @@ class SystemMailTemplateService
                         continue;
                     }
                     $pattern = '/(?:\\{\\{|\\{)\\s*' . preg_quote((string) $key . '.' . (string) $subKey, '/') . '\\s*(?:\\}\\}|\\})/';
-                    $rendered = preg_replace($pattern, (string) $subValue, $rendered);
+                    $replacement = (string) $subValue;
+                    $rendered = preg_replace_callback($pattern, static fn (): string => $replacement, $rendered);
+                    $rendered = $this->replaceLegacyArrayAccessPlaceholder(
+                        (string) $rendered,
+                        (string) $key,
+                        (string) $subKey,
+                        (string) $subValue
+                    );
                 }
                 continue;
             }
 
             $pattern = '/(?:\\{\\{|\\{)\\s*' . preg_quote((string) $key, '/') . '\\s*(?:\\}\\}|\\})/';
-            $rendered = preg_replace($pattern, (string) $value, $rendered);
+            $replacement = (string) $value;
+            $rendered = preg_replace_callback($pattern, static fn (): string => $replacement, $rendered);
         }
 
         return (string) $rendered;
@@ -131,7 +133,7 @@ class SystemMailTemplateService
 
     public function sanitizeHtml(string $html): string
     {
-        $allowed = '<p><a><strong><em><ul><ol><li><br><img><table><tr><td><th><tbody><thead><h1><h2><h3><h4><h5><span><div><style><center>';
+        $allowed = '<p><a><strong><em><ul><ol><li><br><img><table><tr><td><th><tbody><thead><h1><h2><h3><h4><h5><span><div><style><center><code><pre><hr><small>';
         return strip_tags($html, $allowed);
     }
 
@@ -202,5 +204,51 @@ class SystemMailTemplateService
         ];
 
         return $data;
+    }
+
+    /**
+     * Renderiza placeholders simples do sistema e preserva compatibilidade
+     * com sintaxe Blade valida usada por templates antigos.
+     *
+     * @param array<string,mixed> $data
+     */
+    private function renderTemplateString(string $template, array $data): string
+    {
+        $prepared = $this->replacePlaceholders($template, $data);
+
+        try {
+            $rendered = (string) Blade::render($prepared, $data);
+        } catch (\Throwable $e) {
+            $rendered = $prepared;
+        }
+
+        return $this->replacePlaceholders($rendered, $data);
+    }
+
+    private function replaceLegacyArrayAccessPlaceholder(
+        string $text,
+        string $key,
+        string $subKey,
+        string $replacement
+    ): string {
+        $keyPattern = preg_quote($key, '/');
+        $subKeyPattern = preg_quote($subKey, '/');
+
+        $patterns = [
+            '/\{!!\s*\$' . $keyPattern . '\[\s*[\'"]' . $subKeyPattern . '[\'"]\s*\]\s*\?\?\s*[\'"]{2}\s*!!\}/',
+            '/\{\{\s*\$' . $keyPattern . '\[\s*[\'"]' . $subKeyPattern . '[\'"]\s*\]\s*\?\?\s*[\'"]{2}\s*\}\}/',
+            '/\{!!\s*\$' . $keyPattern . '\[\s*[\'"]' . $subKeyPattern . '[\'"]\s*\]\s*!!\}/',
+            '/\{\{\s*\$' . $keyPattern . '\[\s*[\'"]' . $subKeyPattern . '[\'"]\s*\]\s*\}\}/',
+        ];
+
+        foreach ($patterns as $pattern) {
+            $text = (string) preg_replace_callback(
+                $pattern,
+                static fn (): string => $replacement,
+                $text
+            );
+        }
+
+        return $text;
     }
 }

@@ -2,6 +2,30 @@
 
 ---
 
+## [2026-06-18] - fix(backup): fallback local e e-mails detalhados
+
+### Corrigido
+- Backup automatico agora tenta gravar no S3 primeiro e, se o disco remoto estiver indisponivel ou incompleto, grava o arquivo em `storage/app/backups/...` usando o disco local.
+- Listagem, calculo de tamanho e retencao de backups passaram a considerar tanto S3 quanto armazenamento local.
+- E-mail generico do sistema deixou de exibir o placeholder literal `{!! $message['content'] ?? '' !!}` quando o assunto usa placeholders simples.
+- Template padrao `generic_system_email` passou a usar `{message.subject}` e `{message.content}`, mantendo compatibilidade com templates antigos ja salvos.
+
+### Adicionado
+- E-mail de backup com detalhes de sucesso/falha: status, tipo, data/hora, disco, caminho, tamanho, duracao e mensagem do erro quando houver.
+- Teste unitario para garantir renderizacao do template generico antigo e novo.
+
+### Observacao operacional
+- Esta entrega nao executa `migrate`, `seed`, `rollback`, `fresh`, `refresh` nem qualquer comando de escrita em banco de producao.
+
+### Arquivos principais
+- `app/Services/BackupService.php`
+- `app/Services/Mail/SystemMailTemplateService.php`
+- `app/Jobs/SendGenericTemplateEmail.php`
+- `database/migrations/2026_06_03_230000_register_mandatory_system_mail_templates.php`
+- `tests/Unit/Services/SystemMailTemplateServiceTest.php`
+
+---
+
 ## [2026-06-18] - test(seguranca): rollback conservador e cobertura de rotas
 
 ### Corrigido
