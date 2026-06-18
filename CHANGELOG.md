@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-06-18] - fix(site): destravar aceite LGPD para novos membros
+
+### Corrigido
+- O modal de consentimento LGPD deixou de depender exclusivamente de `fetch` para registrar o aceite.
+- O fluxo agora usa um formulario real com `POST` para `lgpd.accept`, mantendo o AJAX apenas como melhoria progressiva.
+- Em navegadores com falha de JavaScript, o novo membro consegue concluir o aceite normalmente sem ficar preso na tela.
+- O botao `Aceitar e continuar` continua bloqueado visualmente ate a marcacao do checkbox quando o JavaScript esta ativo, mas sem impedir o fallback do formulario.
+
+### Arquivos principais
+- `resources/views/partials/lgpd-consent-modal.blade.php`
+
+---
+
 ## [2026-06-18] - fix(site): restaurar mapa da pagina de contato
 
 ### Corrigido

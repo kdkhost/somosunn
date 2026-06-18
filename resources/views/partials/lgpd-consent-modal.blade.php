@@ -45,15 +45,18 @@
                     @endforeach
                 </div>
 
-                <div class="mt-6 rounded-[1.4rem] border border-blue-100 bg-blue-50 p-4 text-sm text-slate-700">
+                <form id="lgpd-consent-form" action="{{ route('lgpd.accept') }}" method="POST"
+                    class="mt-6 rounded-[1.4rem] border border-blue-100 bg-blue-50 p-4 text-sm text-slate-700">
+                    @csrf
                     <label class="flex cursor-pointer items-start gap-3">
-                        <input id="lgpd-consent-checkbox" type="checkbox" class="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        <input id="lgpd-consent-checkbox" name="accept" value="1" type="checkbox" required
+                            class="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
                         <span>
                             Li e aceito os Termos de Uso, a Politica de Privacidade e o Consentimento LGPD, autorizando o tratamento dos meus dados conforme descrito nesses documentos.
                         </span>
                     </label>
                     <p id="lgpd-consent-error" class="mt-3 hidden text-sm font-semibold text-rose-600"></p>
-                </div>
+                </form>
             </div>
 
             <div class="border-t border-slate-200 bg-slate-50 px-6 py-4 sm:px-8">
@@ -66,9 +69,8 @@
                         </button>
                     </form>
 
-                    <button type="button" id="lgpd-consent-submit"
-                        class="inline-flex w-full items-center justify-center rounded-full bg-slate-300 px-6 py-3 text-sm font-bold text-white transition sm:w-auto"
-                        disabled>
+                    <button type="submit" form="lgpd-consent-form" id="lgpd-consent-submit"
+                        class="inline-flex w-full items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700 sm:w-auto">
                         Aceitar e continuar
                     </button>
                 </div>
@@ -79,12 +81,13 @@
     <script>
         (function () {
             const modal = document.getElementById('lgpd-consent-modal');
+            const form = document.getElementById('lgpd-consent-form');
             const checkbox = document.getElementById('lgpd-consent-checkbox');
             const submitButton = document.getElementById('lgpd-consent-submit');
             const error = document.getElementById('lgpd-consent-error');
             const csrf = document.querySelector('meta[name="csrf-token"]');
 
-            if (!modal || !checkbox || !submitButton || !csrf) {
+            if (!modal || !form || !checkbox || !submitButton || !csrf) {
                 return;
             }
 
@@ -118,18 +121,24 @@
                 syncButtonState();
             });
 
-            submitButton.addEventListener('click', async function () {
+            form.addEventListener('submit', async function (event) {
                 if (!checkbox.checked || submitButton.disabled) {
+                    event.preventDefault();
                     setError('Marque o aceite para continuar.');
                     return;
                 }
 
+                if (typeof window.fetch !== 'function') {
+                    return;
+                }
+
+                event.preventDefault();
                 submitButton.disabled = true;
                 submitButton.textContent = 'Registrando aceite...';
                 setError('');
 
                 try {
-                    const response = await fetch(@json(route('lgpd.accept')), {
+                    const response = await fetch(form.action, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
