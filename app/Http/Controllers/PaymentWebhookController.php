@@ -131,12 +131,25 @@ class PaymentWebhookController extends Controller
         // Validação de segurança: verificar headers obrigatórios do MercadoPago
         $requestId = $request->header('x-request-id');
         $signature = $request->header('x-signature');
+        $webhookSecurity = $this->validateMercadoPagoWebhookRequest($request);
+
+        if ($request->isMethod('POST') && !$webhookSecurity['valid'] && $webhookSecurity['reject']) {
+            Log::channel('security')->warning('Webhook MP rejeitado por autenticacao invalida', [
+                'reason' => $webhookSecurity['reason'],
+                'ip_hash' => hash('sha256', (string) $request->ip()),
+                'user_agent_hash' => hash('sha256', (string) $request->userAgent()),
+                'request_id' => $webhookSecurity['request_id'],
+                'data_id' => $webhookSecurity['data_id'],
+            ]);
+
+            return response('Unauthorized', 401);
+        }
 
         // Anomaly detection: registra o webhook MP. Considera valido apenas
         // quando os headers de autenticacao do MercadoPago estao presentes.
         // Spec: advanced-security-performance, Requirement 11.3
         try {
-            $isValid = !empty($requestId) && !empty($signature);
+            $isValid = (bool) $webhookSecurity['valid'];
             app(\App\Services\AnomalyDetectorService::class)->recordWebhook(
                 'mercadopago_' . (string) $request->ip(),
                 $isValid
@@ -145,9 +158,9 @@ class PaymentWebhookController extends Controller
 
         if ($request->isMethod('POST') && !$requestId && !$signature) {
             Log::channel('security')->warning('Webhook MP: requisição sem headers de autenticação', [
-                'ip'         => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'payload'    => array_slice($request->all(), 0, 5),
+                'ip_hash' => hash('sha256', (string) $request->ip()),
+                'user_agent_hash' => hash('sha256', (string) $request->userAgent()),
+                'payload_keys' => array_keys(array_slice($request->all(), 0, 5)),
             ]);
             // Não abortar — MercadoPago pode enviar sem headers em alguns cenários legados
             // Mas registrar para monitoramento
@@ -175,7 +188,7 @@ class PaymentWebhookController extends Controller
                 'request_id'  => $requestId,
                 'signature'   => $signature,
                 'status'      => $type,
-                'payload'     => $request->all(),
+                'payload'     => $this->sanitizedWebhookPayload($request),
                 'ip'          => $request->ip(),
             ]);
         } catch (\Throwable $e) {
@@ -205,7 +218,9 @@ class PaymentWebhookController extends Controller
         try {
             $paymentId = $request->input('data.id') ?? $request->input('id');
             if (!$paymentId) {
-                Log::warning('MP Webhook: missing payment id', ['payload' => $request->all()]);
+                Log::warning('MP Webhook: missing payment id', [
+                    'payload_keys' => array_keys(array_slice($request->all(), 0, 5)),
+                ]);
                 return response('OK', 200);
             }
 
@@ -269,6 +284,106 @@ class PaymentWebhookController extends Controller
         }
 
         return response('OK', 200);
+    }
+
+    private function validateMercadoPagoWebhookRequest(Request $request): array
+    {
+        $requestId = (string) $request->header('x-request-id', '');
+        $signature = (string) $request->header('x-signature', '');
+        $dataId = $this->mercadoPagoWebhookDataId($request);
+        $secret = trim((string) config('payments.mercadopago.webhook_secret', ''));
+        $signatureRequired = (bool) config('payments.mercadopago.webhook_signature_required', app()->environment('production'))
+            || $secret !== '';
+        $allowUnsigned = (bool) config('payments.mercadopago.allow_unsigned_webhooks', !app()->environment('production'));
+
+        $base = [
+            'valid' => false,
+            'reject' => false,
+            'reason' => 'unsigned_legacy_allowed',
+            'request_id' => $requestId,
+            'data_id' => $dataId,
+        ];
+
+        if (!$request->isMethod('POST')) {
+            return array_merge($base, ['valid' => true, 'reason' => 'non_post']);
+        }
+
+        if ($requestId === '' || $signature === '' || $dataId === '') {
+            return array_merge($base, [
+                'reason' => 'missing_signature_headers',
+                'reject' => $signatureRequired && !$allowUnsigned,
+            ]);
+        }
+
+        if ($secret === '') {
+            return array_merge($base, [
+                'reason' => 'missing_webhook_secret',
+                'reject' => $signatureRequired && !$allowUnsigned,
+            ]);
+        }
+
+        $parts = $this->parseMercadoPagoSignature($signature);
+        $timestamp = (string) ($parts['ts'] ?? '');
+        $receivedSignature = (string) ($parts['v1'] ?? '');
+
+        if ($timestamp === '' || $receivedSignature === '') {
+            return array_merge($base, [
+                'reason' => 'malformed_signature',
+                'reject' => true,
+            ]);
+        }
+
+        $manifest = "id:{$dataId};request-id:{$requestId};ts:{$timestamp};";
+        $expectedSignature = hash_hmac('sha256', $manifest, $secret);
+
+        if (!hash_equals($expectedSignature, $receivedSignature)) {
+            return array_merge($base, [
+                'reason' => 'invalid_signature',
+                'reject' => true,
+            ]);
+        }
+
+        return array_merge($base, [
+            'valid' => true,
+            'reason' => 'valid_signature',
+        ]);
+    }
+
+    private function mercadoPagoWebhookDataId(Request $request): string
+    {
+        return (string) (
+            $request->query->get('data.id')
+            ?: $request->query->get('data_id')
+            ?: $request->input('data.id')
+            ?: $request->input('data_id')
+            ?: $request->input('id')
+            ?: ''
+        );
+    }
+
+    private function parseMercadoPagoSignature(string $signature): array
+    {
+        $parts = [];
+        foreach (explode(',', $signature) as $piece) {
+            [$key, $value] = array_pad(explode('=', trim($piece), 2), 2, '');
+            if ($key !== '') {
+                $parts[$key] = $value;
+            }
+        }
+
+        return $parts;
+    }
+
+    private function sanitizedWebhookPayload(Request $request): array
+    {
+        return [
+            'type' => $request->input('type') ?? $request->input('topic'),
+            'action' => $request->input('action'),
+            'data_id' => $this->mercadoPagoWebhookDataId($request),
+            'id' => $request->input('id'),
+            'live_mode' => $request->input('live_mode'),
+            'api_version' => $request->input('api_version'),
+        ];
     }
 
     private function handleMPPreapproval(Request $request)

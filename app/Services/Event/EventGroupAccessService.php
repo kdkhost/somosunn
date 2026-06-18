@@ -28,7 +28,7 @@ class EventGroupAccessService
             $this->logDenied($event, $user, $request, 'group_link_unavailable');
 
             throw ValidationException::withMessages([
-                'group_link' => 'O grupo deste evento ainda não está disponível.',
+                'group_link' => 'O grupo deste evento ainda nao esta disponivel.',
             ]);
         }
 
@@ -37,7 +37,7 @@ class EventGroupAccessService
             $this->logDenied($event, $user, $request, 'registration_not_confirmed');
 
             throw ValidationException::withMessages([
-                'registration' => 'Confirme sua inscrição antes de acessar o grupo do evento.',
+                'registration' => 'Confirme sua inscricao antes de acessar o grupo do evento.',
             ]);
         }
 
@@ -61,12 +61,10 @@ class EventGroupAccessService
             ->where('event_id', (int) $event->id)
             ->where('user_id', (int) $user->id)
             ->whereIn('status', EventRegistration::COUNTED_STATUSES)
-            ->where(function ($query) {
-                $query->whereIn('payment_status', [
-                    EventRegistration::PAYMENT_PAID,
-                    EventRegistration::PAYMENT_FREE,
-                ])->orWhereNull('payment_status');
-            })
+            ->whereIn('payment_status', [
+                EventRegistration::PAYMENT_PAID,
+                EventRegistration::PAYMENT_FREE,
+            ])
             ->latest('id')
             ->first();
     }

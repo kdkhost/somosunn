@@ -4,6 +4,24 @@
 
 Data de atualização: 18/06/2026
 
+### Hardening aplicado em 18/06/2026
+
+- Mantido o bloqueio global `BlockSensitiveRoutesInProduction`; removido uso redundante do alias `sensitive.production` nas rotas de manutencao.
+- `routes/modules/maintenance.php` deixou de expor cache por GET e deixou de executar migracoes por HTTP.
+- `InstallController` passou a bloquear instalacao quando ja ha APP_KEY, tabelas principais ou `storage/app/installed.lock`; em producao tambem exige `INSTALLER_TOKEN`.
+- `config/payments.php` passou a iniciar SumUp desativado e adicionou controles de assinatura para webhook Mercado Pago.
+- Webhook Mercado Pago recebeu `throttle:webhook_mercadopago`, validacao de assinatura com `x-signature`, `x-request-id` e `data.id`, e log sanitizado.
+- `WhatsAppGroupLinkRule` passou a aceitar somente links de grupo `chat.whatsapp.com`.
+- `EventGroupAccessService` passou a exigir `payment_status` explicito `paid` ou `free`.
+- Criada migracao conservadora para sanear `event_registrations.payment_status` nulo sem rollback destrutivo.
+- Criado `EventCouponPermissionSeeder` idempotente para organizar permissoes do modulo.
+
+Pendencias estruturais ainda abertas:
+
+- Modularizar completamente `routes/web.php` em arquivos por dominio.
+- Refatorar `EventReservationController` para services menores de checkout, inscricao, gateway e pagamento gratuito/pago.
+- Ampliar testes feature reais dos dois paineis apos estabilizar banco de teste MariaDB do projeto.
+
 ### Regra permanente
 
 O sistema utiliza dois painéis administrativos distintos e integrados:

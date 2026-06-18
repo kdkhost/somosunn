@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\JsonResponse;
 use App\Models\User;
 
@@ -29,8 +31,13 @@ use App\Models\User;
  */
 class InstallController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($this->isApplicationInstalled()) {
+            return redirect('/')->with('error', 'Aplicacao ja instalada.');
+        }
+
+        $this->authorizeInstallerAccess($request);
         $this->ensureEnvFile();
 
         if(env('APP_INSTALLED')){
@@ -46,6 +53,9 @@ class InstallController extends Controller
 
     public function run(Request $request)
     {
+        abort_if($this->isApplicationInstalled(), 404);
+        $this->authorizeInstallerAccess($request);
+
         $request->validate([
             'name'=>'required',
             'email'=>'required|email',
@@ -172,6 +182,16 @@ class InstallController extends Controller
                 file_put_contents($envPath, $content);
             }
         }
+
+        $lockPath = (string) config('maintenance.installed_lock_path', storage_path('app/installed.lock'));
+        $lockDir = dirname($lockPath);
+        if (!is_dir($lockDir)) {
+            @mkdir($lockDir, 0755, true);
+        }
+
+        if (is_dir($lockDir) && is_writable($lockDir)) {
+            @file_put_contents($lockPath, 'installed_at=' . now()->toIso8601String() . PHP_EOL);
+        }
     }
 
     private function ensureEnvFile(): void
@@ -189,6 +209,9 @@ class InstallController extends Controller
 
     public function testConnection(Request $request): JsonResponse
     {
+        abort_if($this->isApplicationInstalled(), 404);
+        $this->authorizeInstallerAccess($request);
+
         $request->validate([
             'db_host' => 'required',
             'db_port' => 'required',
@@ -337,6 +360,77 @@ TXT;
             if ($base === 'DatabaseSeeder' && !class_exists('DatabaseSeeder', false) && class_exists($class, false)) {
                 class_alias($class, 'DatabaseSeeder');
             }
+        }
+    }
+
+    private function authorizeInstallerAccess(Request $request): void
+    {
+        if (!app()->environment('production')) {
+            return;
+        }
+
+        if (!(bool) config('maintenance.allow_installer', false)) {
+            $this->logBlockedInstallerAttempt($request, 'installer_disabled');
+            abort(404);
+        }
+
+        $expected = trim((string) config('maintenance.installer_token', ''));
+        if ($expected === '') {
+            $this->logBlockedInstallerAttempt($request, 'missing_installer_token');
+            abort(404);
+        }
+
+        $provided = trim((string) (
+            $request->header('X-Installer-Token')
+            ?: $request->input('installer_token')
+            ?: $request->query('token', '')
+        ));
+
+        if ($provided === '' || !hash_equals($expected, $provided)) {
+            $this->logBlockedInstallerAttempt($request, 'invalid_installer_token');
+            abort(404);
+        }
+    }
+
+    private function isApplicationInstalled(): bool
+    {
+        if ((bool) env('APP_INSTALLED', false)) {
+            return true;
+        }
+
+        $lockPath = (string) config('maintenance.installed_lock_path', storage_path('app/installed.lock'));
+        if ($lockPath !== '' && is_file($lockPath)) {
+            return true;
+        }
+
+        if (filled((string) config('app.key'))) {
+            return true;
+        }
+
+        try {
+            foreach (['users', 'settings', 'migrations'] as $table) {
+                if (Schema::hasTable($table)) {
+                    return true;
+                }
+            }
+        } catch (\Throwable) {
+            return false;
+        }
+
+        return false;
+    }
+
+    private function logBlockedInstallerAttempt(Request $request, string $reason): void
+    {
+        try {
+            Log::warning('Tentativa de instalador bloqueada', [
+                'reason' => $reason,
+                'path' => '/' . ltrim($request->path(), '/'),
+                'method' => $request->method(),
+                'ip_hash' => hash('sha256', (string) $request->ip()),
+            ]);
+        } catch (\Throwable) {
+            // Nao interrompe a resposta de bloqueio caso o log esteja indisponivel.
         }
     }
 }

@@ -52,9 +52,10 @@ Route::prefix('v1')->group(function () {
     });
 });
 
-// Webhooks (Public) - Removed throttle to allow gateway callbacks and easier testing
-Route::prefix('v1/webhooks')->withoutMiddleware([\Illuminate\Routing\Middleware\ThrottleRequests::class . ':api'])->group(function () {
+// Webhooks (Public)
+Route::prefix('v1/webhooks')->group(function () {
     Route::match(['get', 'post'], '/mercadopago', [App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])
+        ->middleware('throttle:webhook_mercadopago')
         ->defaults('seller_id', 'platform')
         ->name('api.webhooks.mercadopago');
     

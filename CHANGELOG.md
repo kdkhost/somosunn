@@ -2,6 +2,37 @@
 
 ---
 
+## [2026-06-18] - fix(seguranca): hardening de eventos, webhooks e manutencao
+
+### Corrigido
+- Rotas sensiveis de manutencao deixaram de executar migracoes por HTTP e a limpeza de cache saiu do metodo GET.
+- O instalador passou a exigir bloqueio por APP_KEY/tabelas/`storage/app/installed.lock` e token em producao quando `ALLOW_INSTALLER_ROUTES=true`.
+- SumUp deixou de ficar ativo por padrao quando o `.env` nao define `PAYMENT_SUMUP_ENABLED`.
+- Link de grupo do WhatsApp para eventos agora aceita apenas `chat.whatsapp.com` e `www.chat.whatsapp.com`.
+- Acesso ao grupo do evento deixou de aceitar `payment_status` nulo.
+- Webhook Mercado Pago recebeu rate limit proprio, validacao de assinatura quando configurada e rejeicao de POST invalido quando assinatura e obrigatoria.
+- Logs de webhook Mercado Pago deixam de salvar payload completo e passam a armazenar somente metadados essenciais.
+- Saneamento de inscricoes antigas preenche `event_registrations.payment_status` nulo com status financeiro explicito.
+
+### Adicionado
+- Seeder idempotente `EventCouponPermissionSeeder` para permissoes de cupons/grupo de eventos.
+- Testes unitarios para regra de link de grupo, `Event::hasWhatsappGroup()` e assinatura de webhook Mercado Pago.
+
+### Pendencias documentadas
+- Modularizacao total de `routes/web.php` continua pendente.
+- Refatoracao completa do `EventReservationController` para services continua pendente.
+
+### Arquivos principais
+- `routes/modules/maintenance.php`
+- `app/Http/Controllers/InstallController.php`
+- `app/Http/Controllers/PaymentWebhookController.php`
+- `app/Services/Event/EventGroupAccessService.php`
+- `app/Rules/WhatsAppGroupLinkRule.php`
+- `database/migrations/2026_06_18_090000_backfill_event_registration_payment_status.php`
+- `database/seeders/EventCouponPermissionSeeder.php`
+
+---
+
 ## [2026-06-18] - docs(projeto): regra permanente dos dois painéis
 
 ### Adicionado

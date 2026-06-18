@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             \Database\Seeders\PointsRulesSeeder::class,
             PermissionsSeeder::class,
+            EventCouponPermissionSeeder::class,
             PlansSeederUtf8::class,
             MailTemplateSeeder::class,
             ScheduledTasksSeeder::class,

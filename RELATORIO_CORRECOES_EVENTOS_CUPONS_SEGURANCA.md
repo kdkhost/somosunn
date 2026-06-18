@@ -4,6 +4,19 @@ Data: 17/06/2026
 
 Checkpoint de retorno: `checkpoint-2026-06-17-1915` / commit `0882cacb16ffa0f6383cdd3311fbce97e039fbfe`.
 
+## Atualizacao em 18/06/2026
+
+- SumUp agora fica desativado por padrao quando `PAYMENT_SUMUP_ENABLED` nao esta configurado.
+- Links de grupo de evento foram restringidos para `chat.whatsapp.com` e `www.chat.whatsapp.com`.
+- `Event::hasWhatsappGroup()` passou a validar a URL antes de exibir o botao.
+- `EventGroupAccessService` nao autoriza mais inscricao com `payment_status` nulo.
+- Criada migracao de saneamento para preencher `event_registrations.payment_status` nulo sem rollback destrutivo.
+- Rotas de manutencao foram endurecidas: `GET /limpar-cache` saiu, migracoes por HTTP retornam bloqueio 410 e demo/cache exigem ambiente local e confirmacao.
+- Instalador passou a exigir token em producao, bloqueio por APP_KEY/tabelas existentes e lock em `storage/app/installed.lock`.
+- Webhook Mercado Pago passou a ter rate limit dedicado, validacao de assinatura quando configurada e log sem payload completo.
+- Criado `EventCouponPermissionSeeder` idempotente.
+- Pendencias ainda abertas: modularizacao total de `routes/web.php` e extracao completa do `EventReservationController` para services.
+
 ## Escopo aplicado
 
 - Cupons de evento validados por `EventCouponRequest`, usado pelo painel antigo `/admin` e pelo painel novo.
@@ -24,7 +37,7 @@ Checkpoint de retorno: `checkpoint-2026-06-17-1915` / commit `0882cacb16ffa0f638
 - `ALLOW_INSTALLER_ROUTES=false`
 - `MARKETPLACE_REQUIRE_SELLER_ENABLED=false`
 - `PAYMENT_MERCADOPAGO_ENABLED=true`
-- `PAYMENT_SUMUP_ENABLED=true`
+- `PAYMENT_SUMUP_ENABLED=false`
 
 ## Observações
 

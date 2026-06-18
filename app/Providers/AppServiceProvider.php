@@ -148,6 +148,10 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perHour(100);
         });
 
+        RateLimiter::for('webhook_mercadopago', function ($request) {
+            return Limit::perMinute(120)->by((string) $request->ip());
+        });
+
         \App\Models\User::observe(\App\Observers\UserObserver::class);
 
         View::composer(['admin.partials.navbar', 'admin.partials.sidebar'], \App\Http\View\Composers\NavbarComposer::class);

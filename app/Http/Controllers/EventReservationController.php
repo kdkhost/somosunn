@@ -158,7 +158,7 @@ class EventReservationController extends Controller
                 }
 
                 if (!in_array($selectedGateway, $activeProviders, true)) {
-                    \Log::warning('EventReservation: gateway invÃ¡lido informado pelo cliente', [
+                    \Log::warning('EventReservation: gateway invalido informado pelo cliente', [
                         'order_id' => null,
                         'event_id' => $event->id,
                         'gateway_informado' => $selectedGateway,
@@ -178,10 +178,10 @@ class EventReservationController extends Controller
                 // Apenas 1 gateway ativo: usar diretamente sem exigir o campo no request
                 $gatewayProvider = $activeGateways[0]['provider'];
 
-                // Se o cliente informou um gateway, validar que Ã© o ativo
+                // Se o cliente informou um gateway, validar que e o ativo
                 $selectedGateway = $request->input('gateway');
                 if ($selectedGateway && !in_array($selectedGateway, $activeProviders, true)) {
-                    \Log::warning('EventReservation: gateway invÃ¡lido informado pelo cliente', [
+                    \Log::warning('EventReservation: gateway invalido informado pelo cliente', [
                         'order_id' => null,
                         'event_id' => $event->id,
                         'gateway_informado' => $selectedGateway,
@@ -207,7 +207,7 @@ class EventReservationController extends Controller
             $paymentsConfigured = $gatewayConfig !== null;
         }
 
-        // Manter compatibilidade com cÃ³digo existente
+        // Manter compatibilidade com codigo existente
         $gateways = [
             'mpEnabled' => $gatewayProvider === 'mercadopago' && $paymentsConfigured,
             'preferredGateway' => $gatewayProvider,

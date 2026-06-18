@@ -19,10 +19,6 @@ class WhatsAppGroupLinkRule implements ValidationRule
     private const ALLOWED_HOSTS = [
         'chat.whatsapp.com',
         'www.chat.whatsapp.com',
-        'whatsapp.com',
-        'www.whatsapp.com',
-        'wa.me',
-        'www.wa.me',
     ];
 
     public static function passes(?string $url): bool
@@ -56,7 +52,7 @@ class WhatsAppGroupLinkRule implements ValidationRule
         }
 
         if (!self::passes($url)) {
-            $fail('Use somente links oficiais do WhatsApp.');
+            $fail('Use somente links oficiais de grupo do WhatsApp.');
         }
     }
 }

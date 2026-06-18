@@ -7,6 +7,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Rules\WhatsAppGroupLinkRule;
 use App\Support\UploadStorage;
 use App\Models\EventExhibitorRegistration;
 use App\Services\EventExhibitorService;
@@ -663,7 +664,7 @@ class Event extends Model
 
     public function hasWhatsappGroup(): bool
     {
-        return filled($this->whatsapp_group_link);
+        return WhatsAppGroupLinkRule::passes($this->whatsapp_group_link);
     }
 
     public function exhibitorRegistrations()

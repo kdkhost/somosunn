@@ -12,6 +12,7 @@
 namespace Tests\Unit;
 
 use App\Models\EventCoupon;
+use App\Models\Event;
 use App\Rules\WhatsAppGroupLinkRule;
 use App\Services\EventCouponService;
 use Tests\TestCase;
@@ -21,9 +22,20 @@ class EventCouponAndWhatsAppRuleTest extends TestCase
     public function test_whatsapp_group_rule_accepts_only_official_hosts(): void
     {
         $this->assertTrue(WhatsAppGroupLinkRule::passes('https://chat.whatsapp.com/abc123'));
-        $this->assertTrue(WhatsAppGroupLinkRule::passes('https://wa.me/5521981325441'));
+        $this->assertTrue(WhatsAppGroupLinkRule::passes('https://www.chat.whatsapp.com/abc123'));
+        $this->assertFalse(WhatsAppGroupLinkRule::passes('https://wa.me/5521981325441'));
+        $this->assertFalse(WhatsAppGroupLinkRule::passes('https://whatsapp.com/channel/abc123'));
         $this->assertFalse(WhatsAppGroupLinkRule::passes('https://example.com/grupo'));
         $this->assertFalse(WhatsAppGroupLinkRule::passes('javascript:alert(1)'));
+    }
+
+    public function test_event_only_reports_whatsapp_group_when_group_link_is_valid(): void
+    {
+        $event = new Event(['whatsapp_group_link' => 'https://chat.whatsapp.com/abc123']);
+        $this->assertTrue($event->hasWhatsappGroup());
+
+        $event->whatsapp_group_link = 'https://wa.me/5521981325441';
+        $this->assertFalse($event->hasWhatsappGroup());
     }
 
     public function test_event_coupon_discount_and_limits_are_calculated_without_database(): void

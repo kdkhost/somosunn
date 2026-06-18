@@ -182,7 +182,9 @@ Route::get('/auth/callback/{provider}', [\App\Http\Controllers\Auth\SocialAuthCo
 Route::post('/upload', [\App\Http\Controllers\UploadController::class, 'upload'])->middleware('auth')->name('upload.file');
 
 // Webhook
-Route::post('/webhook/mercadopago', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])->defaults('seller_id', 'platform');
+Route::post('/webhook/mercadopago', [\App\Http\Controllers\PaymentWebhookController::class, 'mercadopago'])
+    ->middleware('throttle:webhook_mercadopago')
+    ->defaults('seller_id', 'platform');
 Route::post('/webhook/sumup/{orderId}/{token}', [\App\Http\Controllers\PaymentWebhookController::class, 'sumup'])->name('webhook.sumup');
 
 
