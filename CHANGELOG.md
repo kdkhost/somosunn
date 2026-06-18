@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-06-18] - fix(site): sincronizar planos de como-funciona com a base real
+
+### Corrigido
+- A página publica `/como-funciona` deixou de exibir cards de planos hardcoded com nomes, preços e benefícios desatualizados.
+- A seção de planos agora consome os planos ativos reais cadastrados no sistema, usando a mesma base de dados da página `/planos`.
+- Os botões passaram a respeitar o tipo do plano: plano gratuito aponta para cadastro e plano pago aponta para o checkout real da assinatura com o período disponível.
+
+### Arquivos principais
+- `app/Http/Controllers/InstitucionalController.php`
+- `resources/views/site/institucional/como-funciona.blade.php`
+
+---
+
 ## [2026-06-18] - fix(site): melhorar visibilidade da logo no footer
 
 ### Corrigido

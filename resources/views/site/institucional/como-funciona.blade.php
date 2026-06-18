@@ -4,7 +4,6 @@
 
 @section('content')
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
-        <!-- Hero Section -->
         <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
             <div class="max-w-7xl mx-auto text-center">
                 <h1
@@ -17,7 +16,6 @@
             </div>
         </section>
 
-        <!-- Steps -->
         <section class="py-16 px-6 md:px-12 lg:px-24">
             <div class="max-w-5xl mx-auto">
                 @php
@@ -52,7 +50,6 @@
             </div>
         </section>
 
-        <!-- Planos -->
         <section class="py-16 px-6 md:px-12 lg:px-24 bg-white">
             <div class="max-w-7xl mx-auto">
                 <h2 class="text-3xl font-black text-gray-900 mb-4 text-center">
@@ -61,95 +58,75 @@
                     {{ $page->get('plans_subtitle', 'Temos opções para todos os estágios da sua jornada empreendedora.') }}
                 </p>
 
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Free -->
-                    <div class="bg-slate-50 rounded-3xl p-6 md:p-8 text-center">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Gratuito</h3>
-                        <p class="text-4xl font-black text-gray-900 mb-4">R$ 0</p>
-                        <p class="text-gray-500 mb-6">Para começar</p>
-                        <ul class="text-left space-y-3 mb-8">
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Acesso à comunidade do Somos UNN
-                            </li>
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Participação nos eventos presenciais e gratuitos
-                            </li>
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Visualização do ranking de membros
-                            </li>
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Acesso aos cursos gratuitos
-                            </li>
-                        </ul>
-                        <a href="{{ route('register') }}"
-                            class="block w-full py-3 border-2 rounded-xl font-semibold transition hover:bg-gray-100"
-                            style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">
-                            Começar grátis
-                        </a>
-                    </div>
+                @php
+                    $plans = $plans ?? collect();
+                    $allPeriods = $allPeriods ?? ['mensal' => 'Mensal'];
+                    $defaultPeriod = $defaultPeriod ?? (array_key_first($allPeriods) ?: 'mensal');
+                    $planPriceData = $planPriceData ?? [];
+                @endphp
 
-                    <!-- Premium -->
-                    <div class="bg-white rounded-3xl p-6 md:p-8 text-center shadow-2xl ring-2 relative"
-                        style="--tw-ring-color: var(--unn-azul-1)">
-                        <span
-                            class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 btn-primary text-white text-sm font-bold rounded-full">
-                            POPULAR
-                        </span>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Premium</h3>
-                        <p class="text-4xl font-black mb-4" style="color: var(--unn-azul-1)">R$ 97<span
-                                class="text-lg text-gray-500">/mês</span></p>
-                        <p class="text-gray-500 mb-6">Para crescer</p>
-                        <ul class="text-left space-y-3 mb-8">
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Tudo do Gratuito
-                            </li>
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Conexões ilimitadas
-                            </li>
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Eventos exclusivos
-                            </li>
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Cursos e mentorias
-                            </li>
-                        </ul>
-                        <a href="{{ route('planos') }}"
-                            class="block w-full py-3 btn-primary text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition">
-                            Assinar Premium
-                        </a>
-                    </div>
+                <div class="grid md:grid-cols-{{ min(4, max(1, $plans->count())) }} gap-8 items-start">
+                    @forelse($plans as $plan)
+                        @php
+                            $periods = $planPriceData[$plan->id] ?? ['mensal' => (float) $plan->price];
+                            $initialPeriod = !$plan->isFreeAccessPlan() && array_key_exists($defaultPeriod, $periods)
+                                ? $defaultPeriod
+                                : (array_key_first($periods) ?: 'mensal');
+                            $initialPrice = $periods[$initialPeriod] ?? ((float) ($plan->price ?? 0));
+                            $benefits = method_exists($plan, 'resolvedBenefits')
+                                ? array_slice($plan->resolvedBenefits(), 0, 5)
+                                : [];
+                            $description = method_exists($plan, 'marketingDescription')
+                                ? $plan->marketingDescription()
+                                : (string) ($plan->description ?? '');
+                        @endphp
 
-                    <!-- Business -->
-                    <div class="bg-slate-50 rounded-3xl p-6 md:p-8 text-center">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Business</h3>
-                        <p class="text-4xl font-black text-gray-900 mb-4">R$ 297<span
-                                class="text-lg text-gray-500">/mês</span></p>
-                        <p class="text-gray-500 mb-6">Para empresas</p>
-                        <ul class="text-left space-y-3 mb-8">
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Tudo do Premium
-                            </li>
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> 5 usuários inclusos
-                            </li>
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Consultoria mensal
-                            </li>
-                            <li class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check text-green-500"></i> Suporte prioritário
-                            </li>
-                        </ul>
-                        <a href="{{ route('contato') }}"
-                            class="block w-full py-3 border-2 rounded-xl font-semibold transition hover:bg-gray-100"
-                            style="border-color: var(--unn-azul-1); color: var(--unn-azul-1)">
-                            Falar com vendas
-                        </a>
-                    </div>
+                        <div class="{{ $plan->highlight ? 'bg-white shadow-2xl ring-2 -mt-4 relative' : 'bg-slate-50' }} rounded-3xl p-6 md:p-8 text-center shadow-lg"
+                            style="{{ $plan->highlight ? '--tw-ring-color: var(--unn-azul-1)' : '' }}">
+                            @if($plan->highlight)
+                                <span class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 btn-primary text-white text-sm font-bold rounded-full whitespace-nowrap">
+                                    POPULAR
+                                </span>
+                            @endif
+
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $plan->name }}</h3>
+
+                            @if($plan->isFreeAccessPlan())
+                                <p class="text-4xl font-black text-gray-900 mb-4">R$ 0</p>
+                            @else
+                                <p class="text-4xl font-black mb-4" style="color: var(--unn-azul-1)">
+                                    R$ {{ number_format((float) $initialPrice, 2, ',', '.') }}<span
+                                        class="text-lg text-gray-500">/{{ strtolower($allPeriods[$initialPeriod] ?? $initialPeriod) }}</span>
+                                </p>
+                            @endif
+
+                            <p class="text-gray-500 mb-6 text-sm">
+                                {{ $description !== '' ? $description : 'Plano disponível no sistema.' }}
+                            </p>
+
+                            <ul class="text-left space-y-3 mb-8">
+                                @foreach($benefits as $benefit)
+                                    <li class="flex items-center gap-2 text-gray-600">
+                                        <i class="fas fa-check text-green-500"></i> {{ $benefit }}
+                                    </li>
+                                @endforeach
+                            </ul>
+
+                            <a href="{{ $plan->isFreeAccessPlan() ? route('register') : route('subscription.checkout', ['plan' => $plan->id, 'period' => $initialPeriod]) }}"
+                                class="block w-full py-3 rounded-xl font-semibold transition {{ $plan->highlight ? 'btn-primary text-white shadow-lg hover:shadow-xl' : 'border-2 hover:bg-gray-100' }}"
+                                style="{{ !$plan->highlight ? 'border-color: var(--unn-azul-1); color: var(--unn-azul-1)' : '' }}">
+                                {{ $plan->isFreeAccessPlan() ? 'Começar grátis' : 'Assinar ' . $plan->name }}
+                            </a>
+                        </div>
+                    @empty
+                        <div class="md:col-span-3 rounded-3xl bg-slate-50 p-8 text-center text-gray-500">
+                            Nenhum plano ativo disponível no momento.
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </section>
 
-        <!-- CTA -->
         <section class="py-16 px-6 md:px-12 lg:px-24"
             style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
             <div class="max-w-4xl mx-auto text-center text-white">
@@ -175,7 +152,6 @@
         }
     </style>
 
-    <!-- HERO TITLE -->
     <style>
         .unn-title-gradient {
             background: linear-gradient(90deg, #2E3192 0%, #0071BC 60%, #29ABE2 100%);
