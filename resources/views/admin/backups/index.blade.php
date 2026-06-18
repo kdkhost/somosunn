@@ -226,19 +226,19 @@
                             <div class="form-group">
                                 <label>Retencao banco de dados</label>
                                 <div class="input-group">
-                                    <input type="number" name="backup_keep_daily" class="form-control" min="1" max="365" value="{{ old('backup_keep_daily', $settings['backup_keep_daily']) }}" required>
+                                    <input type="number" name="backup_keep_daily" class="form-control" min="1" max="365" value="{{ old('backup_keep_daily', $backupSettings['backup_keep_daily']) }}" required>
                                     <div class="input-group-append"><span class="input-group-text">arquivos</span></div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label>Retencao configuracoes</label>
                                 <div class="input-group">
-                                    <input type="number" name="backup_keep_weekly" class="form-control" min="1" max="104" value="{{ old('backup_keep_weekly', $settings['backup_keep_weekly']) }}" required>
+                                    <input type="number" name="backup_keep_weekly" class="form-control" min="1" max="104" value="{{ old('backup_keep_weekly', $backupSettings['backup_keep_weekly']) }}" required>
                                     <div class="input-group-append"><span class="input-group-text">arquivos</span></div>
                                 </div>
                             </div>
                             <div class="custom-control custom-switch">
-                                <input type="checkbox" name="backup_notify_success" value="1" class="custom-control-input" id="backup_notify_success" {{ old('backup_notify_success', $settings['backup_notify_success']) ? 'checked' : '' }}>
+                                <input type="checkbox" name="backup_notify_success" value="1" class="custom-control-input" id="backup_notify_success" {{ old('backup_notify_success', $backupSettings['backup_notify_success']) ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="backup_notify_success">Enviar e-mail quando o backup concluir com sucesso</label>
                             </div>
                         </div>

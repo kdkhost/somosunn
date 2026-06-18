@@ -33,7 +33,7 @@ class BackupController extends Controller
             'dbBackups' => $dbBackups,
             'configBackups' => $configBackups,
             'stats' => $this->makeStats($dbBackups, $configBackups),
-            'settings' => [
+            'backupSettings' => [
                 'backup_keep_daily' => (int) Setting::get('backup_keep_daily', 30),
                 'backup_keep_weekly' => (int) Setting::get('backup_keep_weekly', 12),
                 'backup_notify_success' => $this->settingBool('backup_notify_success', true),

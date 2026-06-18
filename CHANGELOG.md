@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-06-18] - fix(admin): backups nao sobrescrevem settings globais
+
+### Corrigido
+- A tela `/admin/backups` deixou de enviar a variavel `$settings` propria da tela, que sobrescrevia as configuracoes globais usadas pelo layout admin.
+- O tema dark/light e o favicon voltam a ser resolvidos pelo layout com base nas configuracoes globais reais do sistema.
+
+### Arquivos principais
+- `app/Http/Controllers/Admin/BackupController.php`
+- `resources/views/admin/backups/index.blade.php`
+
+---
+
 ## [2026-06-18] - fix(admin): padronizar backups em dark/light e favicon
 
 ### Corrigido
