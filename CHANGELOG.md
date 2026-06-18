@@ -8,6 +8,7 @@
 - O preview do certificado no painel antigo deixou de ficar ilegivel quando o tema escuro esta ativo e ainda nao existe imagem de fundo.
 - O mesmo modo de contraste foi aplicado ao componente compartilhado do painel novo para manter o comportamento consistente.
 - O documento do certificado volta a permanecer branco no editor e o aviso de ausencia de fundo deixa de aparecer dentro da pagina do certificado.
+- A base do editor de certificado no painel antigo passa a seguir o tema dark/light com cards, controles, listas, inputs e toolbar coerentes.
 - O ajuste afeta somente a leitura no editor visual; as cores salvas e o PDF final nao sao alterados.
 
 ### Arquivos principais

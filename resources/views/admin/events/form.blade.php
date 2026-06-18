@@ -416,8 +416,8 @@
 
                              <div class="row">
                                 <div class="col-12">
-                                    <div class="card shadow-sm border-0">
-                                        <div class="card-header bg-secondary text-white small py-2">
+                                    <div class="card shadow-sm certificate-editor-card">
+                                        <div class="card-header certificate-editor-toolbar small py-2">
                                             <div class="d-flex flex-wrap align-items-center justify-content-between">
                                                 <span>Editor Visual (A4 Paisagem)</span>
                                                 <div class="d-flex align-items-center">
@@ -444,7 +444,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="card-body bg-dark d-flex justify-content-center align-items-center p-4"
+                                        <div class="card-body certificate-editor-stage d-flex justify-content-center align-items-center p-4"
                                             style="min-height: 600px; overflow: auto;">
                                             <div id="cert-canvas"
                                                 style="position: relative; width: 842px; height: 595px; background-color: white; box-shadow: 0 0 30px rgba(0,0,0,0.5); flex-shrink: 0; overflow: hidden;">
@@ -473,9 +473,9 @@
                                 </div>
 
                                 <div class="col-12 mt-3">
-                                    <div class="card shadow-sm border-0">
-                                        <div class="card-header bg-dark text-white font-weight-bold">Configurações</div>
-                                        <div class="card-body">
+                                    <div class="card shadow-sm certificate-settings-card">
+                                        <div class="card-header certificate-settings-header font-weight-bold">Configurações</div>
+                                        <div class="card-body certificate-settings-body">
                                             <div class="row">
                                                 <div class="col-12 col-xl-6">
                                             <div class="form-group custom-control custom-switch mb-4">
@@ -547,7 +547,7 @@
                                                 <label class="small text-muted text-uppercase font-weight-bold">Assinatura do
                                                     Organizador</label>
                                                 @if($event->instructor_signature)
-                                                    <div class="mb-2 text-center border p-2 bg-light rounded">
+                                                    <div class="mb-2 text-center border p-2 rounded certificate-signature-preview">
                                                         <img src="{{ asset($event->instructor_signature) }}"
                                                             style="max-height: 50px;" class="img-fluid">
                                                     </div>
@@ -562,7 +562,7 @@
                                             <hr>
 
                                             <h6 class="small text-muted text-uppercase font-weight-bold mb-2">Ferramentas</h6>
-                                            <div class="bg-light p-2 rounded border mb-3">
+                                            <div class="p-3 rounded border mb-3 cert-tool-box">
                                                 <div class="custom-control custom-switch mb-2">
                                                     <input type="checkbox" class="custom-control-input" id="cert-grid-enabled">
                                                     <label class="custom-control-label" for="cert-grid-enabled">Mostrar
@@ -685,10 +685,10 @@
                                             <div class="mt-4">
                                                 <label
                                                     class="small text-muted text-uppercase font-weight-bold mb-2">Visibilidade</label>
-                                                <div class="list-group list-group-flush border rounded overflow-hidden">
+                                                <div class="list-group list-group-flush border rounded overflow-hidden cert-visibility-list">
                                                     @foreach(['student_name' => 'Nome do Participante', 'course_name' => 'Nome do Evento', 'completion_date' => 'Data do Evento', 'certificate_code' => 'Cód. Validação', 'author_name' => 'Organizador', 'workload_hours' => 'Carga Horária', 'title' => 'Título do Certificado', 'presentation_text' => 'Texto de Apresentação', 'instructor_signature' => 'Assinatura do Organizador', 'platform_logo' => 'Logo UNN'] as $tag => $label)
                                                         <div
-                                                            class="list-group-item py-2 px-3 d-flex justify-content-between align-items-center bg-light">
+                                                            class="list-group-item py-2 px-3 d-flex justify-content-between align-items-center cert-visibility-item">
                                                             <span class="small font-weight-bold">{{ $label }}</span>
                                                             <div class="custom-control custom-switch">
                                                                 <input type="checkbox" class="custom-control-input cert-toggle"
@@ -1053,6 +1053,162 @@
             background: #162032 !important;
             border-color: #334155 !important;
             color: #f1f5f9 !important;
+        }
+
+        .certificate-editor-card,
+        .certificate-settings-card {
+            border: 1px solid #d8e1ef !important;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 16px 36px rgba(15, 23, 42, .08) !important;
+        }
+
+        .certificate-editor-toolbar,
+        .certificate-settings-header {
+            background: #f8fafc !important;
+            border-bottom: 1px solid #d8e1ef !important;
+            color: #0f172a !important;
+        }
+
+        .certificate-editor-toolbar .input-group-text,
+        .certificate-editor-toolbar .custom-select,
+        .certificate-editor-toolbar .btn {
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        .certificate-editor-toolbar .btn:hover,
+        .certificate-editor-toolbar .btn:focus {
+            background: #eaf2ff !important;
+            border-color: #2563eb !important;
+            color: #1d4ed8 !important;
+        }
+
+        .certificate-editor-stage {
+            background: #eef2f7 !important;
+        }
+
+        .certificate-settings-body {
+            background: #ffffff !important;
+            color: #0f172a !important;
+        }
+
+        .cert-tool-box,
+        .certificate-signature-preview,
+        .cert-visibility-list,
+        .cert-visibility-item {
+            background: #f8fafc !important;
+            border-color: #d8e1ef !important;
+            color: #0f172a !important;
+        }
+
+        .cert-visibility-item + .cert-visibility-item {
+            border-top-color: #e2e8f0 !important;
+        }
+
+        .certificate-settings-card label,
+        .certificate-settings-card h6,
+        .certificate-settings-card .small {
+            color: #334155;
+        }
+
+        .certificate-settings-card .text-muted {
+            color: #64748b !important;
+        }
+
+        .certificate-settings-card .form-control,
+        .certificate-settings-card .custom-select,
+        .certificate-settings-card .custom-file-label {
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        .certificate-settings-card .custom-file-label::after {
+            background: #eaf2ff !important;
+            border-left-color: #cbd5e1 !important;
+            color: #1d4ed8 !important;
+        }
+
+        .dark-mode .certificate-editor-card,
+        .dark-mode .certificate-settings-card {
+            background: #172033 !important;
+            border-color: #334155 !important;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, .28) !important;
+        }
+
+        .dark-mode .certificate-editor-toolbar,
+        .dark-mode .certificate-settings-header {
+            background: #0f172a !important;
+            border-bottom-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .certificate-editor-toolbar .input-group-text,
+        .dark-mode .certificate-editor-toolbar .custom-select,
+        .dark-mode .certificate-editor-toolbar .btn {
+            background: #111827 !important;
+            border-color: #475569 !important;
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .certificate-editor-toolbar .btn:hover,
+        .dark-mode .certificate-editor-toolbar .btn:focus {
+            background: #1d4ed8 !important;
+            border-color: #60a5fa !important;
+            color: #ffffff !important;
+        }
+
+        .dark-mode .certificate-editor-stage {
+            background: #111827 !important;
+        }
+
+        .dark-mode .certificate-settings-body {
+            background: #172033 !important;
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .cert-tool-box,
+        .dark-mode .certificate-signature-preview,
+        .dark-mode .cert-visibility-list,
+        .dark-mode .cert-visibility-item {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .cert-visibility-item + .cert-visibility-item {
+            border-top-color: #334155 !important;
+        }
+
+        .dark-mode .certificate-settings-card label,
+        .dark-mode .certificate-settings-card h6,
+        .dark-mode .certificate-settings-card .small {
+            color: #e2e8f0;
+        }
+
+        .dark-mode .certificate-settings-card .text-muted {
+            color: #a1b4cc !important;
+        }
+
+        .dark-mode .certificate-settings-card .form-control,
+        .dark-mode .certificate-settings-card .custom-select,
+        .dark-mode .certificate-settings-card .custom-file-label {
+            background: #0b1220 !important;
+            border-color: #475569 !important;
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .certificate-settings-card .custom-file-label::after {
+            background: #1e293b !important;
+            border-left-color: #475569 !important;
+            color: #bfdbfe !important;
+        }
+
+        .dark-mode .certificate-settings-card hr {
+            border-top-color: #334155;
         }
 
         #cert-canvas.cert-editor-no-bg {
