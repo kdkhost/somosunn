@@ -12,11 +12,18 @@
     $ticketExpired = $ticketState === 'expired';
     $hasQrTicket = (bool) $event?->is_ticket_enabled && filled($registration->ticket_code);
     $ticketCode = (string) ($registration->ticket_code ?: 'REG-' . str_pad((string) $registration->id, 6, '0', STR_PAD_LEFT));
+    $ticketNumber = str_pad((string) $registration->id, 4, '0', STR_PAD_LEFT);
     $quantity = max(1, (int) ($registration->quantity ?? 1));
     $locationLabel = $event?->location ?: ($event?->address ?: 'Local a confirmar');
     $addressLabel = $event?->address ?: $locationLabel;
+    $ticketImage = $event->image_url ?: asset('img/logo.svg');
     $ticketLabel = $ticketUsed ? 'Já utilizado' : ($ticketExpired ? 'Expirado' : ($hasQrTicket ? 'Ingresso válido' : 'Reserva confirmada'));
-    $ticketTone = $ticketUsed ? 'emerald' : ($ticketExpired ? 'red' : 'blue');
+    $ticketStatusClass = $ticketUsed ? 'ticket-status--used' : ($ticketExpired ? 'ticket-status--expired' : 'ticket-status--valid');
+    $weekdayLabel = $startAt ? $startAt->locale('pt_BR')->translatedFormat('l') : 'Evento';
+    $monthLabel = $startAt ? $startAt->locale('pt_BR')->translatedFormat('F') : 'A confirmar';
+    $dayLabel = $startAt ? $startAt->format('d') : '--';
+    $timeLabel = $startAt ? $startAt->format('H:i') : '--:--';
+    $batchLabel = trim((string) ($event->current_batch_label ?? 'Ingresso do evento'));
 @endphp
 
 @section('title', 'Ingresso - ' . $event->title)
@@ -30,147 +37,315 @@
 @push('styles')
     <style>
         .ticket-print-area {
-            color: #0f172a;
+            color: #111827;
         }
 
-        .event-ticket {
+        .ticket-scroll {
+            overflow-x: auto;
+            padding-bottom: 0.75rem;
+        }
+
+        .event-paper-ticket {
             position: relative;
             display: grid;
-            grid-template-columns: minmax(7rem, 0.72fr) minmax(0, 2.4fr) minmax(11rem, 0.9fr);
-            min-height: 22rem;
+            grid-template-columns: 158px minmax(0, 1fr) 210px;
+            min-width: 1040px;
+            min-height: 322px;
             overflow: hidden;
-            border-radius: 1.75rem;
+            border: 1px solid #a7b5c8;
+            border-radius: 10px;
             background: #f8fafc;
-            box-shadow: 0 24px 70px rgb(15 23 42 / 0.18);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+            font-family: Arial, Helvetica, sans-serif;
         }
 
-        .event-ticket::before,
-        .event-ticket::after {
+        .event-paper-ticket::before,
+        .event-paper-ticket::after {
             content: "";
             position: absolute;
             top: 50%;
-            z-index: 5;
-            width: 2.5rem;
-            height: 2.5rem;
+            z-index: 9;
+            width: 28px;
+            height: 28px;
             border-radius: 999px;
             background: rgb(15 23 42);
+            border: 1px solid rgba(255, 255, 255, 0.45);
             transform: translateY(-50%);
         }
 
-        .event-ticket::before {
-            left: calc(30% - 1.25rem);
+        .event-paper-ticket::before {
+            left: 144px;
         }
 
-        .event-ticket::after {
-            right: calc(24% - 1.25rem);
+        .event-paper-ticket::after {
+            right: 196px;
         }
 
-        .event-ticket-stub,
-        .event-ticket-qr {
+        .ticket-stub,
+        .ticket-qr-stub {
             position: relative;
             z-index: 1;
-            background: linear-gradient(180deg, #ffffff 0%, #eef6ff 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+            background:
+                repeating-linear-gradient(0deg, rgba(31, 94, 219, 0.06) 0 2px, transparent 2px 9px),
+                linear-gradient(180deg, #ffffff 0%, #edf6ff 100%);
+            padding: 16px 14px;
         }
 
-        .event-ticket-stub {
-            border-right: 2px dashed #94a3b8;
+        .ticket-stub {
+            border-right: 2px dashed #6b7280;
         }
 
-        .event-ticket-qr {
-            border-left: 2px dashed #94a3b8;
+        .ticket-qr-stub {
+            border-left: 2px dashed #6b7280;
         }
 
-        .event-ticket-main {
-            position: relative;
-            z-index: 1;
+        .ticket-stub-title {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            background: linear-gradient(135deg, rgb(30 64 175 / 0.95), rgb(14 116 144 / 0.94));
-            color: #ffffff;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.12;
+            text-transform: uppercase;
         }
 
-        .event-ticket-main::before {
+        .ticket-number {
+            border: 1px solid #94a3b8;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: "Courier New", monospace;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            line-height: 1;
+            padding: 8px 10px;
+            text-align: center;
+        }
+
+        .ticket-side-meta {
+            border-top: 1px solid #d1d5db;
+            border-bottom: 1px solid #d1d5db;
+            padding: 10px 0;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .ticket-main {
+            position: relative;
+            isolation: isolate;
+            min-height: 322px;
+            overflow: hidden;
+            background: #0f172a;
+        }
+
+        .ticket-main::before {
             content: "";
             position: absolute;
             inset: 0;
-            background:
-                linear-gradient(90deg, rgb(15 23 42 / 0.8), rgb(15 23 42 / 0.22)),
-                var(--event-ticket-bg);
+            z-index: -2;
+            background-image: var(--ticket-bg);
             background-position: center;
             background-size: cover;
-            opacity: var(--event-ticket-bg-opacity, 1);
+            filter: saturate(1.15) contrast(1.03);
         }
 
-        .event-ticket-main::after {
+        .ticket-main::after {
             content: "";
             position: absolute;
             inset: 0;
-            background-image: radial-gradient(circle at 20% 20%, rgb(255 255 255 / 0.22) 0, transparent 32%),
-                linear-gradient(135deg, rgb(37 99 235 / 0.3), rgb(6 182 212 / 0.18));
+            z-index: -1;
+            background:
+                linear-gradient(90deg, rgba(248, 250, 252, 0.92) 0%, rgba(248, 250, 252, 0.68) 34%, rgba(15, 23, 42, 0.18) 58%, rgba(15, 23, 42, 0.62) 100%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
         }
 
-        .event-ticket-main-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .ticket-side-label {
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-            letter-spacing: 0.16em;
-        }
-
-        .ticket-info-grid {
+        .ticket-main-inner {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.75rem;
+            grid-template-rows: auto 1fr auto;
+            min-height: 322px;
+            padding: 22px 26px 18px;
         }
 
-        .ticket-info-box {
-            border: 1px solid rgb(226 232 240);
-            background: rgb(255 255 255 / 0.86);
-            backdrop-filter: blur(10px);
+        .ticket-main-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 22px;
+        }
+
+        .ticket-date-block {
+            min-width: 166px;
+            border: 2px solid #0f172a;
+            background: rgba(255, 255, 255, 0.92);
+            color: #0f172a;
+            padding: 10px 14px;
+            text-align: center;
+            text-transform: uppercase;
+            box-shadow: 8px 8px 0 rgba(31, 94, 219, 0.9);
+        }
+
+        .ticket-date-block strong {
+            display: block;
+            font-size: 56px;
+            font-weight: 900;
+            line-height: 0.9;
+        }
+
+        .ticket-title-area {
+            max-width: 560px;
+            color: #0f172a;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+
+        .ticket-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(15, 23, 42, 0.18);
+            background: rgba(255, 255, 255, 0.78);
+            padding: 7px 12px;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .ticket-event-title {
+            margin-top: 14px;
+            font-size: clamp(28px, 4vw, 46px);
+            font-weight: 900;
+            line-height: 0.95;
+            text-transform: uppercase;
+        }
+
+        .ticket-event-subtitle {
+            margin-top: 12px;
+            max-width: 520px;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .ticket-ribbon {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border: 2px solid #ffffff;
+            background: linear-gradient(90deg, #1f5edb, #1539b4);
+            color: #ffffff;
+            padding: 10px 14px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.24);
+        }
+
+        .ticket-ribbon span {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+        }
+
+        .ticket-main-bottom {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: end;
+            gap: 18px;
+        }
+
+        .ticket-location-strip {
+            border: 1px solid rgba(15, 23, 42, 0.2);
+            background: rgba(255, 255, 255, 0.88);
+            color: #111827;
+            padding: 11px 14px;
+        }
+
+        .ticket-status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 142px;
+            border: 2px solid currentColor;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+            transform: rotate(-2deg);
+        }
+
+        .ticket-status--valid {
+            color: #047857;
+        }
+
+        .ticket-status--used {
+            color: #0369a1;
+        }
+
+        .ticket-status--expired {
+            color: #b91c1c;
+        }
+
+        .ticket-qr-box {
+            display: flex;
+            justify-content: center;
+        }
+
+        .ticket-qr-frame {
+            border: 1px solid #94a3b8;
+            background: #ffffff;
+            padding: 8px;
         }
 
         .qr-holder canvas,
         .qr-holder img {
-            width: 9rem !important;
-            height: 9rem !important;
+            width: 126px !important;
+            height: 126px !important;
+            display: block;
         }
 
-        @media (max-width: 1024px) {
-            .event-ticket {
-                grid-template-columns: 1fr;
-                min-height: auto;
+        .ticket-code {
+            word-break: break-all;
+            font-family: "Courier New", monospace;
+            font-size: 11px;
+            font-weight: 900;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .ticket-details-after {
+            color: inherit;
+        }
+
+        .ticket-info-box {
+            border: 1px solid rgb(226 232 240);
+            background: rgb(255 255 255 / 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .dark .ticket-info-box {
+            border-color: rgb(30 41 59);
+            background: rgb(15 23 42 / 0.9);
+        }
+
+        @media (max-width: 768px) {
+            .ticket-print-actions {
+                border-radius: 1.25rem;
             }
 
-            .event-ticket::before,
-            .event-ticket::after {
-                display: none;
-            }
-
-            .event-ticket-stub,
-            .event-ticket-qr {
-                border: 0;
-            }
-
-            .event-ticket-stub {
-                border-bottom: 2px dashed #94a3b8;
-            }
-
-            .event-ticket-qr {
-                border-top: 2px dashed #94a3b8;
-            }
-
-            .ticket-side-label {
-                writing-mode: initial;
-                transform: none;
+            .event-paper-ticket {
+                min-width: 960px;
             }
         }
 
         @media print {
             @page {
                 size: A4 landscape;
-                margin: 10mm;
+                margin: 8mm;
             }
 
             html,
@@ -195,24 +370,29 @@
                 margin: 0 !important;
             }
 
+            .ticket-scroll {
+                overflow: visible !important;
+                padding: 0 !important;
+            }
+
             .ticket-print-actions,
             .ticket-details-after {
                 display: none !important;
             }
 
-            .event-ticket {
+            .event-paper-ticket {
                 width: 100% !important;
-                min-height: 180mm !important;
+                min-width: 0 !important;
+                min-height: 178mm !important;
                 box-shadow: none !important;
-                border: 1px solid #cbd5e1 !important;
                 print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
             }
 
-            .event-ticket::before,
-            .event-ticket::after {
+            .event-paper-ticket::before,
+            .event-paper-ticket::after {
                 background: #ffffff !important;
-                border: 1px solid #cbd5e1;
+                border-color: #94a3b8;
             }
         }
     </style>
@@ -225,7 +405,7 @@
                 <div>
                     <p class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">INGRESSO DIGITAL</p>
                     <h1 class="mt-2 text-2xl font-black text-slate-900 dark:text-white md:text-3xl">{{ $event->title }}</h1>
-                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Confira os dados do ingresso antes de apresentar no evento.</p>
+                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Formato de ingresso para imprimir ou apresentar no check-in do evento.</p>
                 </div>
 
                 <div class="flex flex-col gap-3 sm:flex-row">
@@ -244,124 +424,126 @@
         </div>
 
         <section class="ticket-print-area">
-            <div class="event-ticket" style="--event-ticket-bg: url('{{ $event->image_url ?: asset('img/logo.svg') }}'); --event-ticket-bg-opacity: {{ $event->image_url ? '1' : '0.08' }};">
-                <aside class="event-ticket-stub flex flex-col justify-between gap-6 p-6">
-                    <div class="flex items-start justify-between gap-4">
-                        <img src="{{ $logo }}" alt="SOMOS UNN" class="h-12 max-w-[9rem] object-contain">
-                        <span class="rounded-full bg-blue-600 px-3 py-1 text-[0.65rem] font-black uppercase tracking-wide text-white">
-                            {{ $hasQrTicket ? 'QR Code' : 'Reserva' }}
-                        </span>
-                    </div>
-
-                    <div class="flex items-center gap-4 lg:flex-col lg:items-start">
-                        <p class="ticket-side-label text-xs font-black uppercase text-blue-700">Ingresso digital</p>
+            <div class="ticket-scroll">
+                <div class="event-paper-ticket" style="--ticket-bg: url('{{ $ticketImage }}');">
+                    <aside class="ticket-stub">
                         <div>
-                            <p class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Código</p>
-                            <p class="mt-1 break-all font-mono text-sm font-black text-slate-900">{{ $ticketCode }}</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1 text-sm">
-                        <p class="font-black text-slate-900">{{ $user?->name ?: 'Participante' }}</p>
-                        <p class="text-slate-500">{{ $user?->email }}</p>
-                        @if($quantity > 1)
-                            <p class="font-bold text-blue-700">{{ $quantity }} acessos vinculados</p>
-                        @endif
-                    </div>
-                </aside>
-
-                <main class="event-ticket-main p-6 md:p-8">
-                    <div class="event-ticket-main-content flex h-full flex-col justify-between gap-8">
-                        <div class="flex items-start justify-between gap-6">
-                            <div>
-                                <p class="text-xs font-black uppercase tracking-[0.35em] text-blue-100">SOMOS UNN</p>
-                                <h2 class="mt-4 max-w-2xl text-3xl font-black leading-tight md:text-5xl">{{ $event->title }}</h2>
-                            </div>
-                            <div class="hidden rounded-2xl bg-white/15 px-4 py-3 text-right backdrop-blur md:block">
-                                <p class="text-xs font-black uppercase tracking-wide text-white/70">Status</p>
-                                <p class="mt-1 text-sm font-black">{{ $ticketLabel }}</p>
-                            </div>
+                            <img src="{{ $logo }}" alt="SOMOS UNN" class="mb-3 h-10 max-w-full object-contain">
+                            <div class="ticket-stub-title">{{ $event->title }}</div>
                         </div>
 
-                        <div class="max-w-3xl rounded-3xl bg-white/15 p-5 backdrop-blur">
-                            <p class="text-sm font-bold leading-relaxed text-white/90">
-                                {{ \Illuminate\Support\Str::limit(trim(strip_tags((string) $event->description)), 220) ?: 'Apresente este ingresso no check-in do evento.' }}
-                            </p>
+                        <div class="ticket-side-meta">
+                            <p class="text-[11px] font-black tracking-wide text-slate-500">{{ $weekdayLabel }}</p>
+                            <p class="text-3xl font-black leading-none text-blue-700">{{ $dayLabel }}</p>
+                            <p class="text-xs font-black tracking-wide text-slate-900">{{ $monthLabel }}</p>
+                            <p class="mt-1 text-xs font-black text-slate-600">{{ $timeLabel }}</p>
                         </div>
 
-                        <div class="grid gap-4 md:grid-cols-3">
-                            <div class="rounded-2xl bg-white/15 p-4 backdrop-blur">
-                                <p class="text-xs font-black uppercase tracking-wide text-white/65">Data e hora</p>
-                                <p class="mt-1 text-lg font-black">{{ $startAt ? $startAt->format('d/m/Y H:i') : 'A confirmar' }}</p>
-                                @if($endAt)
-                                    <p class="text-xs font-bold text-white/70">até {{ $endAt->format('d/m/Y H:i') }}</p>
-                                @endif
+                        <div class="space-y-2">
+                            <div class="ticket-number">{{ $ticketNumber }}</div>
+                            <p class="text-center text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Canhoto</p>
+                            <p class="line-clamp-2 text-center text-[11px] font-bold text-slate-700">{{ $locationLabel }}</p>
+                        </div>
+                    </aside>
+
+                    <main class="ticket-main">
+                        <div class="ticket-main-inner">
+                            <div class="ticket-main-top">
+                                <div class="ticket-date-block">
+                                    <span class="text-xs font-black tracking-[0.16em]">{{ $weekdayLabel }}</span>
+                                    <strong>{{ $dayLabel }}</strong>
+                                    <span class="text-sm font-black tracking-[0.18em]">{{ $monthLabel }}</span>
+                                </div>
+
+                                <div class="ticket-title-area">
+                                    <div class="ticket-brand">
+                                        <img src="{{ $logo }}" alt="SOMOS UNN" class="h-8 max-w-[110px] object-contain">
+                                        <span>Universidade de Negócios e Networking</span>
+                                    </div>
+                                    <h2 class="ticket-event-title">{{ $event->title }}</h2>
+                                    <p class="ticket-event-subtitle">
+                                        {{ \Illuminate\Support\Str::limit(trim(strip_tags((string) $event->description)), 150) ?: 'Apresente este ingresso no check-in do evento.' }}
+                                    </p>
+                                </div>
                             </div>
-                            <div class="rounded-2xl bg-white/15 p-4 backdrop-blur md:col-span-2">
-                                <p class="text-xs font-black uppercase tracking-wide text-white/65">Local</p>
-                                <p class="mt-1 text-lg font-black">{{ $locationLabel }}</p>
-                                @if($addressLabel && $addressLabel !== $locationLabel)
-                                    <p class="text-xs font-bold text-white/70">{{ $addressLabel }}</p>
-                                @endif
+
+                            <div class="flex items-center justify-end">
+                                <div class="ticket-ribbon">
+                                    <span>{{ $batchLabel }}</span>
+                                    <span>{{ $hasQrTicket ? 'QR Code' : 'Reserva' }}</span>
+                                    <span>#{{ $ticketNumber }}</span>
+                                </div>
+                            </div>
+
+                            <div class="ticket-main-bottom">
+                                <div class="ticket-location-strip">
+                                    <p class="text-[11px] font-black uppercase tracking-[0.16em] text-blue-700">Local do evento</p>
+                                    <p class="mt-1 text-base font-black">{{ $locationLabel }}</p>
+                                    @if($addressLabel && $addressLabel !== $locationLabel)
+                                        <p class="mt-1 text-xs font-bold text-slate-700">{{ $addressLabel }}</p>
+                                    @endif
+                                </div>
+
+                                <div class="ticket-status {{ $ticketStatusClass }}">{{ $ticketLabel }}</div>
                             </div>
                         </div>
-                    </div>
-                </main>
+                    </main>
 
-                <aside class="event-ticket-qr flex flex-col justify-between gap-6 p-6">
-                    <div class="text-center">
-                        <p class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Acesso</p>
-                        <p class="mt-2 text-lg font-black text-slate-900">{{ $ticketLabel }}</p>
-                    </div>
+                    <aside class="ticket-qr-stub">
+                        <div>
+                            <div class="ticket-number">{{ $ticketNumber }}</div>
+                            <p class="mt-2 text-center text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Ingresso</p>
+                        </div>
 
-                    <div class="flex justify-center">
-                        @if($hasQrTicket)
-                            <div class="rounded-3xl border-4 border-dashed border-slate-200 bg-white p-4 shadow-inner">
-                                <div id="ticket-qrcode" class="qr-holder" data-code="{{ $ticketCode }}"></div>
-                            </div>
-                        @else
-                            <div class="flex h-44 w-44 flex-col items-center justify-center rounded-3xl border-4 border-dashed border-slate-200 bg-white p-4 text-center shadow-inner">
-                                <i class="fas fa-ticket-alt text-4xl text-blue-600"></i>
-                                <p class="mt-3 text-sm font-black text-slate-900">Reserva confirmada</p>
-                                <p class="mt-1 text-xs text-slate-500">Apresente seus dados no check-in.</p>
-                            </div>
-                        @endif
-                    </div>
+                        <div class="ticket-qr-box">
+                            @if($hasQrTicket)
+                                <div class="ticket-qr-frame">
+                                    <div id="ticket-qrcode" class="qr-holder" data-code="{{ $ticketCode }}"></div>
+                                </div>
+                            @else
+                                <div class="flex h-[144px] w-[144px] flex-col items-center justify-center border border-slate-300 bg-white p-3 text-center">
+                                    <i class="fas fa-ticket-alt text-3xl text-blue-600"></i>
+                                    <p class="mt-2 text-xs font-black text-slate-900">Reserva confirmada</p>
+                                    <p class="mt-1 text-[10px] text-slate-500">Check-in manual</p>
+                                </div>
+                            @endif
+                        </div>
 
-                    <div class="space-y-3 text-center">
-                        <p class="break-all rounded-2xl bg-slate-100 px-4 py-3 font-mono text-xs font-black tracking-wide text-slate-800">{{ $ticketCode }}</p>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div class="rounded-2xl bg-white/80 p-3">
-                                <p class="font-black uppercase text-slate-400">Pedido</p>
-                                <p class="mt-1 font-black text-slate-900">#{{ $order?->id ?: '-' }}</p>
-                            </div>
-                            <div class="rounded-2xl bg-white/80 p-3">
-                                <p class="font-black uppercase text-slate-400">Ingresso</p>
-                                <p class="mt-1 font-black text-slate-900">#{{ $registration->id }}</p>
+                        <div class="space-y-2">
+                            <p class="ticket-code">{{ $ticketCode }}</p>
+                            <div class="grid grid-cols-2 gap-2 text-center text-[10px] font-black uppercase text-slate-600">
+                                <div class="border border-slate-300 bg-white p-2">
+                                    <span class="block text-slate-400">Pedido</span>
+                                    #{{ $order?->id ?: '-' }}
+                                </div>
+                                <div class="border border-slate-300 bg-white p-2">
+                                    <span class="block text-slate-400">Qtd.</span>
+                                    {{ $quantity }}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </aside>
+                    </aside>
+                </div>
             </div>
         </section>
 
         <section class="ticket-details-after grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div class="ticket-info-box rounded-3xl p-5 dark:border-slate-800 dark:bg-slate-900">
+            <div class="ticket-info-box rounded-3xl p-5">
                 <p class="text-xs font-black uppercase tracking-wide text-slate-400">Participante</p>
                 <p class="mt-2 font-black text-slate-900 dark:text-white">{{ $user?->name ?: 'Participante' }}</p>
                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $user?->email }}</p>
             </div>
-            <div class="ticket-info-box rounded-3xl p-5 dark:border-slate-800 dark:bg-slate-900">
+            <div class="ticket-info-box rounded-3xl p-5">
                 <p class="text-xs font-black uppercase tracking-wide text-slate-400">Status do ingresso</p>
-                <p class="mt-2 font-black text-{{ $ticketTone }}-600 dark:text-{{ $ticketTone }}-300">{{ $ticketLabel }}</p>
+                <p class="mt-2 font-black text-slate-900 dark:text-white">{{ $ticketLabel }}</p>
                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $registration->ticketStatusMessage() }}</p>
             </div>
-            <div class="ticket-info-box rounded-3xl p-5 dark:border-slate-800 dark:bg-slate-900">
+            <div class="ticket-info-box rounded-3xl p-5">
                 <p class="text-xs font-black uppercase tracking-wide text-slate-400">Data do evento</p>
                 <p class="mt-2 font-black text-slate-900 dark:text-white">{{ $startAt ? $startAt->format('d/m/Y H:i') : 'A confirmar' }}</p>
                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $endAt ? 'Encerramento: ' . $endAt->format('d/m/Y H:i') : 'Horário de encerramento não informado' }}</p>
             </div>
-            <div class="ticket-info-box rounded-3xl p-5 dark:border-slate-800 dark:bg-slate-900">
+            <div class="ticket-info-box rounded-3xl p-5">
                 <p class="text-xs font-black uppercase tracking-wide text-slate-400">Local do evento</p>
                 <p class="mt-2 font-black text-slate-900 dark:text-white">{{ $locationLabel }}</p>
                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $addressLabel }}</p>
@@ -383,8 +565,8 @@
 
                 new QRCode(target, {
                     text: target.dataset.code,
-                    width: 144,
-                    height: 144,
+                    width: 126,
+                    height: 126,
                     colorDark: '#0f172a',
                     colorLight: '#ffffff',
                     correctLevel: QRCode.CorrectLevel.H

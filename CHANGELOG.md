@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-06-18] - fix(painel): visual do ingresso no modelo de bilhete
+
+### Corrigido
+- A página do ingresso digital foi redesenhada para ficar no formato de bilhete horizontal, com canhoto esquerdo, área central destacada, canhoto direito, número do ingresso e QR Code quando habilitado.
+- A listagem `Meus Ingressos` também passou a exibir cada item como um mini ingresso, com canhoto lateral e botão dedicado para abrir o ingresso.
+
+### Arquivos principais
+- `resources/views/panel/tickets.blade.php`
+- `resources/views/panel/tickets/show.blade.php`
+
+---
+
 ## [2026-06-18] - feat(painel): ingresso digital imprimível
 
 ### Adicionado

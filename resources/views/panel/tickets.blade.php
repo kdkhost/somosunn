@@ -10,18 +10,36 @@
     <style>
         .member-ticket-card {
             position: relative;
-            isolation: isolate;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 104px;
+            min-height: 245px;
             overflow: hidden;
+            border-radius: 18px;
+            background: #ffffff;
+            border: 1px solid rgb(226 232 240);
+            box-shadow: 0 18px 45px rgb(15 23 42 / 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dark .member-ticket-card {
+            background: rgb(15 23 42);
+            border-color: rgb(30 41 59);
+            box-shadow: 0 18px 45px rgb(0 0 0 / 0.18);
+        }
+
+        .member-ticket-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 24px 60px rgb(15 23 42 / 0.16);
         }
 
         .member-ticket-card::before,
         .member-ticket-card::after {
             content: "";
             position: absolute;
-            top: 10rem;
-            z-index: 2;
-            width: 1.5rem;
-            height: 1.5rem;
+            right: 92px;
+            z-index: 3;
+            width: 24px;
+            height: 24px;
             border-radius: 999px;
             background: rgb(248 250 252);
             border: 1px solid rgb(226 232 240);
@@ -34,20 +52,40 @@
         }
 
         .member-ticket-card::before {
-            left: -0.75rem;
+            top: -12px;
         }
 
         .member-ticket-card::after {
-            right: -0.75rem;
+            bottom: -12px;
         }
 
-        .member-ticket-image {
-            min-height: 10rem;
-            border-bottom: 1px dashed rgb(203 213 225);
+        .member-ticket-main {
+            min-width: 0;
         }
 
-        .dark .member-ticket-image {
-            border-bottom-color: rgb(51 65 85);
+        .member-ticket-cover {
+            position: relative;
+            height: 132px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1f5edb, #0f172a);
+        }
+
+        .member-ticket-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.45s ease;
+        }
+
+        .member-ticket-card:hover .member-ticket-cover img {
+            transform: scale(1.06);
+        }
+
+        .member-ticket-cover::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgb(15 23 42 / 0.12), rgb(15 23 42 / 0.72));
         }
 
         .member-ticket-title {
@@ -57,8 +95,58 @@
             overflow: hidden;
         }
 
-        .ticket-status-pill {
-            box-shadow: 0 0 0 1px rgb(255 255 255 / 0.18) inset;
+        .member-ticket-stub {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-left: 2px dashed rgb(148 163 184);
+            background:
+                repeating-linear-gradient(0deg, rgb(31 94 219 / 0.07) 0 2px, transparent 2px 9px),
+                linear-gradient(180deg, #ffffff, #eef6ff);
+            padding: 14px 10px;
+            color: #0f172a;
+            text-align: center;
+        }
+
+        .member-ticket-number {
+            width: 100%;
+            border: 1px solid rgb(148 163 184);
+            background: #ffffff;
+            padding: 7px 4px;
+            font-family: "Courier New", monospace;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+        }
+
+        .member-ticket-stub-label {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #1f5edb;
+        }
+
+        .member-ticket-status {
+            font-size: 10px;
+            font-weight: 900;
+            line-height: 1.1;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 420px) {
+            .member-ticket-card {
+                grid-template-columns: minmax(0, 1fr) 88px;
+            }
+
+            .member-ticket-card::before,
+            .member-ticket-card::after {
+                right: 76px;
+            }
         }
     </style>
 @endpush
@@ -96,7 +184,7 @@
                     </a>
                 </div>
             @else
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
                     @foreach($registrations as $reg)
                         @php
                             $event = $reg->event;
@@ -107,91 +195,78 @@
                             $hasQrTicket = (bool) ($event?->is_ticket_enabled) && filled($reg->ticket_code);
                             $quantity = max(1, (int) ($reg->quantity ?? 1));
                             $locationLabel = $event?->location ?: ($event?->address ?: 'Local a confirmar');
+                            $ticketNumber = str_pad((string) $reg->id, 4, '0', STR_PAD_LEFT);
+                            $statusLabel = $ticketUsed ? 'Já utilizado' : ($ticketExpired ? 'Expirado' : ($hasQrTicket ? 'QR disponível' : 'Confirmado'));
                         @endphp
 
                         @if(!$event)
                             @continue
                         @endif
 
-                        <article class="member-ticket-card group rounded-3xl border border-slate-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-900/10 dark:border-slate-800 dark:bg-slate-950 dark:hover:shadow-black/20">
-                            <div class="member-ticket-image relative overflow-hidden bg-slate-100 dark:bg-slate-800">
-                                @if($event->image_url)
-                                    <img src="{{ $event->image_url }}" alt="{{ $event->title }}" class="h-40 w-full object-cover transition duration-500 group-hover:scale-105">
-                                @else
-                                    <div class="flex h-40 w-full items-center justify-center bg-gradient-to-br from-blue-600 via-cyan-500 to-slate-900">
-                                        <i class="fas fa-ticket-alt text-5xl text-white/80"></i>
-                                    </div>
-                                @endif
-
-                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
-                                <div class="absolute left-4 top-4 flex items-center gap-2">
-                                    <span class="ticket-status-pill rounded-full bg-blue-600 px-3 py-1 text-[0.65rem] font-black uppercase tracking-wide text-white">
-                                        {{ $hasQrTicket ? 'Ingresso digital' : 'Reserva' }}
-                                    </span>
-                                    @if($quantity > 1)
-                                        <span class="rounded-full bg-white/90 px-3 py-1 text-[0.65rem] font-black uppercase tracking-wide text-slate-900">
-                                            {{ $quantity }} acessos
-                                        </span>
+                        <article class="member-ticket-card">
+                            <div class="member-ticket-main">
+                                <div class="member-ticket-cover">
+                                    @if($event->image_url)
+                                        <img src="{{ $event->image_url }}" alt="{{ $event->title }}">
+                                    @else
+                                        <div class="flex h-full w-full items-center justify-center">
+                                            <i class="fas fa-ticket-alt text-5xl text-white/80"></i>
+                                        </div>
                                     @endif
-                                </div>
-                                <div class="absolute bottom-4 left-4 right-4">
-                                    <p class="text-xs font-black uppercase tracking-[0.25em] text-white/70">SOMOS UNN</p>
-                                    <h2 class="member-ticket-title mt-1 text-xl font-black leading-tight text-white">{{ $event->title }}</h2>
-                                </div>
-                            </div>
 
-                            <div class="space-y-5 p-5">
-                                <div class="grid gap-3 text-sm text-slate-600 dark:text-slate-300">
-                                    <div class="flex items-start gap-3">
-                                        <i class="far fa-calendar-alt mt-1 text-blue-500"></i>
-                                        <span>{{ $startAt ? $startAt->format('d/m/Y - H:i') : 'Data a confirmar' }}</span>
-                                    </div>
-                                    <div class="flex items-start gap-3">
-                                        <i class="fas fa-map-marker-alt mt-1 text-rose-500"></i>
-                                        <span class="line-clamp-2">{{ $locationLabel }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center justify-between gap-4 border-t border-slate-100 pt-5 dark:border-slate-800">
-                                    <div class="min-w-0">
-                                        <span class="block text-[0.65rem] font-black uppercase tracking-wide text-slate-400">Status</span>
-                                        @if($ticketUsed)
-                                            <span class="mt-1 flex items-center gap-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
-                                                <i class="fas fa-check-double"></i>
-                                                Já utilizado
-                                            </span>
-                                        @elseif($ticketExpired)
-                                            <span class="mt-1 flex items-center gap-1 text-xs font-black text-red-600 dark:text-red-400">
-                                                <i class="fas fa-ban"></i>
-                                                Expirado
-                                            </span>
-                                        @elseif($hasQrTicket)
-                                            <span class="mt-1 flex items-center gap-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
-                                                <i class="fas fa-qrcode"></i>
-                                                QR disponível
-                                            </span>
-                                        @else
-                                            <span class="mt-1 flex items-center gap-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
-                                                <i class="fas fa-check-circle"></i>
-                                                Confirmado
+                                    <div class="absolute inset-x-4 top-4 z-[1] flex items-center justify-between gap-3">
+                                        <span class="rounded bg-blue-600 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-white">
+                                            {{ $hasQrTicket ? 'Ingresso digital' : 'Reserva' }}
+                                        </span>
+                                        @if($quantity > 1)
+                                            <span class="rounded bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-900">
+                                                {{ $quantity }} acessos
                                             </span>
                                         @endif
                                     </div>
 
-                                    <div class="flex shrink-0 items-center gap-2">
-                                        <a href="{{ route('panel.tickets.show', $reg) }}"
-                                            class="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-xs font-black text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700">
-                                            <i class="fas fa-ticket-alt"></i>
-                                            Ver ingresso
-                                        </a>
+                                    <div class="absolute bottom-4 left-4 right-4 z-[1]">
+                                        <p class="text-[10px] font-black uppercase tracking-[0.22em] text-white/75">SOMOS UNN</p>
+                                        <h2 class="member-ticket-title mt-1 text-lg font-black leading-tight text-white">{{ $event->title }}</h2>
                                     </div>
                                 </div>
 
-                                <a href="{{ route('events.show', $event) }}" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-300">
-                                    <i class="fas fa-calendar-check"></i>
-                                    Ver página do evento
-                                </a>
+                                <div class="space-y-4 p-4">
+                                    <div class="grid gap-2 text-sm text-slate-600 dark:text-slate-300">
+                                        <div class="flex items-start gap-3">
+                                            <i class="far fa-calendar-alt mt-1 text-blue-500"></i>
+                                            <span>{{ $startAt ? $startAt->format('d/m/Y - H:i') : 'Data a confirmar' }}</span>
+                                        </div>
+                                        <div class="flex items-start gap-3">
+                                            <i class="fas fa-map-marker-alt mt-1 text-rose-500"></i>
+                                            <span class="line-clamp-2">{{ $locationLabel }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+                                        <span class="text-xs font-black uppercase text-emerald-600 dark:text-emerald-400">
+                                            <i class="fas {{ $ticketExpired ? 'fa-ban' : ($ticketUsed ? 'fa-check-double' : 'fa-check-circle') }} mr-1"></i>
+                                            {{ $statusLabel }}
+                                        </span>
+                                        <a href="{{ route('events.show', $event) }}" class="text-xs font-bold text-slate-500 transition hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-300">
+                                            Ver evento
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
+
+                            <aside class="member-ticket-stub">
+                                <div class="member-ticket-number">{{ $ticketNumber }}</div>
+                                <div class="member-ticket-stub-label">Ingresso</div>
+                                <div>
+                                    <p class="member-ticket-status">{{ $statusLabel }}</p>
+                                    <a href="{{ route('panel.tickets.show', $reg) }}"
+                                        class="mt-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
+                                        title="Ver ingresso">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </a>
+                                </div>
+                            </aside>
                         </article>
                     @endforeach
                 </div>
