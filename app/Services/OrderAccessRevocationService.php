@@ -51,21 +51,24 @@ class OrderAccessRevocationService
     {
         if (
             !Schema::hasTable('event_registrations')
-            || !Schema::hasColumn('event_registrations', 'order_id')
+            || !Schema::hasColumn('event_registrations', 'event_id')
+            || !Schema::hasColumn('event_registrations', 'user_id')
             || !Schema::hasColumn('event_registrations', 'status')
         ) {
             return;
         }
 
-        $payload = ['status' => EventRegistration::STATUS_CANCELLED];
-        if (Schema::hasColumn('event_registrations', 'payment_status')) {
-            $payload['payment_status'] = EventRegistration::PAYMENT_CANCELLED;
+        $payload = $this->cancelledEventRegistrationPayload();
+        $updated = 0;
+
+        if (Schema::hasColumn('event_registrations', 'order_id')) {
+            $updated += EventRegistration::query()
+                ->where('order_id', (int) $order->id)
+                ->where('status', '!=', EventRegistration::STATUS_CANCELLED)
+                ->update($payload);
         }
 
-        $updated = EventRegistration::query()
-            ->where('order_id', (int) $order->id)
-            ->where('status', '!=', EventRegistration::STATUS_CANCELLED)
-            ->update($payload);
+        $updated += $this->revokeLegacyEventRegistrationsWithoutOrder($order, $payload);
 
         if ($updated > 0) {
             $revokedItems[] = [
@@ -75,6 +78,75 @@ class OrderAccessRevocationService
                 'count' => $updated,
             ];
         }
+    }
+
+    private function cancelledEventRegistrationPayload(): array
+    {
+        $payload = ['status' => EventRegistration::STATUS_CANCELLED];
+        if (Schema::hasColumn('event_registrations', 'payment_status')) {
+            $payload['payment_status'] = EventRegistration::PAYMENT_CANCELLED;
+        }
+
+        return $payload;
+    }
+
+    private function revokeLegacyEventRegistrationsWithoutOrder(Order $order, array $payload): int
+    {
+        $eventQuantities = [];
+        foreach ($order->items as $item) {
+            if (!in_array((string) $item->item_type, ['event', 'event_registration'], true)) {
+                continue;
+            }
+
+            $eventId = (int) $item->item_id;
+            if ($eventId <= 0) {
+                continue;
+            }
+
+            $eventQuantities[$eventId] = ($eventQuantities[$eventId] ?? 0) + max(1, (int) ($item->quantity ?? 1));
+        }
+
+        if ($eventQuantities === [] || !(int) $order->user_id) {
+            return 0;
+        }
+
+        $updated = 0;
+        foreach ($eventQuantities as $eventId => $quantityToRevoke) {
+            $query = EventRegistration::query()
+                ->where('event_id', $eventId)
+                ->where('user_id', (int) $order->user_id)
+                ->where('status', '!=', EventRegistration::STATUS_CANCELLED);
+
+            if (Schema::hasColumn('event_registrations', 'order_id')) {
+                $query->whereNull('order_id');
+            }
+
+            $legacyCount = (clone $query)->count();
+            if ($legacyCount <= 0) {
+                continue;
+            }
+
+            $protectedQuantity = $this->paidEventQuantityExcludingOrder($order, $eventId);
+            $limit = min((int) $quantityToRevoke, max(0, $legacyCount - $protectedQuantity));
+            if ($limit <= 0) {
+                continue;
+            }
+
+            $registrationIds = (clone $query)
+                ->latest('id')
+                ->limit($limit)
+                ->pluck('id');
+
+            if ($registrationIds->isEmpty()) {
+                continue;
+            }
+
+            $updated += EventRegistration::query()
+                ->whereIn('id', $registrationIds)
+                ->update($payload);
+        }
+
+        return $updated;
     }
 
     private function revokeEventExhibitorRegistrations(Order $order, string $reason, array &$revokedItems): void
@@ -310,6 +382,26 @@ class OrderAccessRevocationService
             'reason' => $reason,
             'items' => $restored,
         ];
+    }
+
+    private function paidEventQuantityExcludingOrder(Order $order, int $eventId): int
+    {
+        return (int) Order::query()
+            ->where('user_id', (int) $order->user_id)
+            ->where('id', '!=', (int) $order->id)
+            ->where('status', 'paid')
+            ->whereHas('items', function ($query) use ($eventId) {
+                $query->whereIn('item_type', ['event', 'event_registration'])
+                    ->where('item_id', $eventId);
+            })
+            ->with(['items' => function ($query) use ($eventId) {
+                $query->whereIn('item_type', ['event', 'event_registration'])
+                    ->where('item_id', $eventId);
+            }])
+            ->get()
+            ->sum(function (Order $paidOrder) {
+                return $paidOrder->items->sum(fn ($item) => max(1, (int) ($item->quantity ?? 1)));
+            });
     }
 
     private function hasAnotherPaidOrderForItem(Order $order, string $itemType, int $itemId): bool

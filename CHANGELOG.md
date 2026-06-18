@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-06-17] - fix(eventos): revogacao de ingressos legados
+
+### Corrigido
+- Pedidos de evento cancelados agora tambem revogam inscricoes antigas que ficaram sem `order_id` em `event_registrations`.
+- A revogacao preserva ingressos quando existe outro pedido pago do mesmo usuario para o mesmo evento.
+- Os cards de ingressos no painel do membro deixam de exibir evento como `Confirmado` depois do cancelamento da compra.
+
+### Arquivos principais
+- `app/Services/OrderAccessRevocationService.php`
+- `tests/Feature/OrderRefundTest.php`
+
+---
+
 ## [2026-06-17] - fix(admin): contraste no editor de certificado
 
 ### Corrigido

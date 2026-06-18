@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Event;
+use App\Models\EventRegistration;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\OrderCancellationService;
@@ -141,6 +143,67 @@ class OrderRefundTest extends TestCase
         $this->assertSame('paid_order_without_gateway_refund', data_get($order->metadata, 'cancellation.reason'));
         $this->assertSame('revoked', data_get($order->metadata, 'access_revocation.status'));
         $this->assertSame('revoked', data_get($order->items()->first()->data, 'access.status'));
+    }
+
+    public function test_cancel_free_event_order_revokes_legacy_registration_without_order_id(): void
+    {
+        $user = User::create([
+            'name' => 'Cliente Evento',
+            'email' => 'event' . rand(1, 100000) . '@test.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $event = Event::create([
+            'title' => 'Evento legado',
+            'start_at' => now()->addDays(7),
+            'price' => 37,
+            'published' => true,
+        ]);
+
+        $order = Order::create([
+            'user_id' => $user->id,
+            'status' => 'paid',
+            'total_amount' => 0,
+            'currency' => 'BRL',
+            'gateway' => 'free',
+            'payment_method' => 'free_coupon',
+            'paid_at' => now(),
+            'metadata' => [
+                'is_free_checkout' => true,
+                'event_coupon' => [
+                    'code' => 'GRATIS',
+                    'discount_amount' => 37.00,
+                ],
+            ],
+        ]);
+
+        OrderItem::create([
+            'order_id' => $order->id,
+            'item_type' => 'event',
+            'item_id' => $event->id,
+            'title' => $event->title,
+            'price' => 0,
+            'quantity' => 1,
+        ]);
+
+        $registration = EventRegistration::create([
+            'event_id' => $event->id,
+            'user_id' => $user->id,
+            'order_id' => null,
+            'status' => EventRegistration::STATUS_CONFIRMED,
+            'payment_status' => EventRegistration::PAYMENT_FREE,
+            'price' => 0,
+            'quantity' => 1,
+        ]);
+
+        app(OrderCancellationService::class)->cancel($order);
+
+        $registration->refresh();
+        $order->refresh();
+
+        $this->assertSame(EventRegistration::STATUS_CANCELLED, $registration->status);
+        $this->assertSame(EventRegistration::PAYMENT_CANCELLED, $registration->payment_status);
+        $this->assertSame('revoked', data_get($order->metadata, 'access_revocation.status'));
     }
 
     private function createPaidMercadoPagoOrder(float $amount): Order
