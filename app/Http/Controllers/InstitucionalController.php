@@ -32,7 +32,7 @@ class InstitucionalController extends Controller
     public function contato(ContactMapGeocodingService $contactMapGeocodingService): View
     {
         $companyAddress = (string) (Setting::get('company_address') ?: 'Av. Paulista, 1000');
-        $companyNumber = (string) (Setting::get('company_number') ?: '1001');
+        $companyNumber = (string) Setting::get('company_number', '1001');
         $companyComplement = Setting::get('company_complement') ?: null;
         $companyDistrict = (string) (Setting::get('company_district') ?: 'Bela Vista');
         $companyCity = (string) (Setting::get('company_city') ?: 'São Paulo');

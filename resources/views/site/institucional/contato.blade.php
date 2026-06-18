@@ -8,7 +8,7 @@
     $companyPhone = \App\Models\Setting::get('company_phone') ?: '(11) 99999-9999';
     $companyZip = \App\Models\Setting::get('company_zip') ?: '01310-100';
     $companyAddress = \App\Models\Setting::get('company_address') ?: 'Av. Paulista, 1000';
-    $companyNumber = \App\Models\Setting::get('company_number') ?: '1001';
+    $companyNumber = (string) \App\Models\Setting::get('company_number', '1001');
     $companyComplement = \App\Models\Setting::get('company_complement') ?: null;
     $companyDistrict = \App\Models\Setting::get('company_district') ?: 'Bela Vista';
     $companyCity = \App\Models\Setting::get('company_city') ?: 'São Paulo';

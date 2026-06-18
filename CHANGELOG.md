@@ -9,6 +9,7 @@
 - A seção agora usa OpenStreetMap com Leaflet e geocodificação do endereço da empresa, eliminando o bloqueio visual e mantendo o botão para abrir a rota no Google Maps.
 - A geocodificação do endereço da empresa saiu do navegador e passou para o backend com cache, evitando bloqueio do Nominatim no front e respeitando o endereço salvo em `/admin/settings/general`.
 - O campo de telefone do formulário de contato passou a aplicar máscara brasileira em tempo real durante a digitação.
+- O número da empresa na página de contato passou a respeitar corretamente o valor `0`, sem cair no fallback padrão por avaliação booleana incorreta.
 
 ### Arquivos principais
 - `app/Services/ContactMapGeocodingService.php`
