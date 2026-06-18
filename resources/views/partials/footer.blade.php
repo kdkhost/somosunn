@@ -100,11 +100,15 @@
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10">
             <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div class="flex flex-col gap-4">
-                    <div class="flex items-center">
+                    <div class="flex flex-col items-start gap-2">
                         <div class="inline-flex h-10 sm:h-12 md:h-16 w-auto items-center justify-center overflow-hidden shrink-0">
                             <img src="{{ $logoSrc }}" alt="" class="h-full w-auto object-contain"
                                 onerror="this.style.display='none';">
                         </div>
+
+                        <p class="text-sm leading-6 text-slate-600">
+                            Networking, cursos, mentorias, eventos e oportunidades em um unico ecossistema.
+                        </p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-x-4 gap-y-3 text-sm text-slate-600">
