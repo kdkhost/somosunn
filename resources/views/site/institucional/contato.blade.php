@@ -73,7 +73,7 @@
         'Brasil',
     ])));
     $mapQuery = $fullAddress !== '' ? rawurlencode($fullAddress) : rawurlencode('Sao Paulo, Brasil');
-    $mapEmbedUrl = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
+    $mapEmbedUrl = 'https://maps.google.com/maps?q=' . $mapQuery . '&output=embed';
     $recaptchaSiteKey = (string) (\App\Models\Setting::get('recaptcha_v3_site_key') ?: config('services.recaptcha.site_key', ''));
 @endphp
 <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">

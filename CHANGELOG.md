@@ -2,6 +2,17 @@
 
 ---
 
+## [2026-06-18] - fix(site): desbloquear mapa da pagina de contato
+
+### Corrigido
+- O bloco `Nossa Localização` da página pública `/contato` estava sendo bloqueado pelo navegador por conflito entre a URL do iframe e a `Content-Security-Policy` do sistema.
+- A URL do embed foi ajustada de `www.google.com` para `maps.google.com`, que já faz parte da allowlist de `frame-src` definida no middleware de segurança.
+
+### Arquivos principais
+- `resources/views/site/institucional/contato.blade.php`
+
+---
+
 ## [2026-06-18] - fix(site): sincronizar planos de como-funciona com a base real
 
 ### Corrigido
