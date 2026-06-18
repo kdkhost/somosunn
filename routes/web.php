@@ -71,7 +71,7 @@ Route::get('/consentimento-lgpd', [\App\Http\Controllers\InstitucionalController
 Route::post('/lgpd/aceite', [\App\Http\Controllers\LegalConsentController::class, 'store'])->middleware('auth')->name('lgpd.accept');
 Route::get('/embed/afiliado/{referralCode}', [\App\Http\Controllers\AffiliateEmbedController::class, 'widget'])->name('affiliate.embed.widget');
 Route::get('/embed/afiliado/{referralCode}/criativo/{preset}.svg', [\App\Http\Controllers\AffiliateEmbedController::class, 'graphic'])->name('affiliate.embed.graphic');
-Route::get('/contato', fn() => view('site.institucional.contato'))->name('contato');
+Route::get('/contato', [\App\Http\Controllers\InstitucionalController::class, 'contato'])->name('contato');
 Route::post('/contato', [ContactController::class, 'send'])->middleware('throttle:5,1')->name('contato.send');
 
 // Members

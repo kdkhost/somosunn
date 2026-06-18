@@ -234,6 +234,8 @@
                     class="w-full h-full"
                     data-address="{{ $fullAddress }}"
                     data-map-url="{{ $mapOpenUrl }}"
+                    data-lat="{{ $mapCoordinates['lat'] ?? '' }}"
+                    data-lng="{{ $mapCoordinates['lng'] ?? '' }}"
                     aria-label="Localização UNN"></div>
             </div>
             <div class="mt-5 flex justify-center">
@@ -345,6 +347,8 @@
 
         const address = (mapEl.dataset.address || '').trim();
         const externalUrl = (mapEl.dataset.mapUrl || '').trim();
+        const lat = parseFloat(mapEl.dataset.lat || '');
+        const lng = parseFloat(mapEl.dataset.lng || '');
 
         const renderFallback = function (message) {
             mapEl.innerHTML = `
@@ -360,53 +364,29 @@
             return;
         }
 
-        fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&q=' + encodeURIComponent(address), {
-            headers: {
-                'Accept-Language': 'pt-BR'
-            }
-        })
-            .then(function (response) {
-                if (!response.ok) {
-                    throw new Error('Falha ao consultar localização.');
-                }
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            renderFallback('Não foi possível localizar o endereço no mapa.');
+            return;
+        }
 
-                return response.json();
-            })
-            .then(function (results) {
-                if (!Array.isArray(results) || results.length === 0) {
-                    throw new Error('Endereço não localizado.');
-                }
+        const map = L.map(mapEl, {
+            scrollWheelZoom: false
+        }).setView([lat, lng], 15);
 
-                const first = results[0];
-                const lat = parseFloat(first.lat);
-                const lon = parseFloat(first.lon);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
-                if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-                    throw new Error('Coordenadas inválidas.');
-                }
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup(address)
+            .openPopup();
 
-                const map = L.map(mapEl, {
-                    scrollWheelZoom: false
-                }).setView([lat, lon], 15);
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; OpenStreetMap contributors'
-                }).addTo(map);
-
-                L.marker([lat, lon]).addTo(map)
-                    .bindPopup(address)
-                    .openPopup();
-
-                if (externalUrl) {
-                    mapEl.style.cursor = 'pointer';
-                    mapEl.addEventListener('click', function () {
-                        window.open(externalUrl, '_blank', 'noopener');
-                    });
-                }
-            })
-            .catch(function () {
-                renderFallback('Não foi possível localizar o endereço no mapa.');
+        if (externalUrl) {
+            mapEl.style.cursor = 'pointer';
+            mapEl.addEventListener('click', function () {
+                window.open(externalUrl, '_blank', 'noopener');
             });
+        }
     });
 </script>
 @if($recaptchaSiteKey !== '')

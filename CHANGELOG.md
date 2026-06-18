@@ -7,9 +7,13 @@
 ### Corrigido
 - O bloco `Nossa Localização` da página pública `/contato` deixou de depender do iframe quebrado do Google Maps, que estava falhando no carregamento.
 - A seção agora usa OpenStreetMap com Leaflet e geocodificação do endereço da empresa, eliminando o bloqueio visual e mantendo o botão para abrir a rota no Google Maps.
+- A geocodificação do endereço da empresa saiu do navegador e passou para o backend com cache, evitando bloqueio do Nominatim no front e respeitando o endereço salvo em `/admin/settings/general`.
 - O campo de telefone do formulário de contato passou a aplicar máscara brasileira em tempo real durante a digitação.
 
 ### Arquivos principais
+- `app/Services/ContactMapGeocodingService.php`
+- `app/Http/Controllers/InstitucionalController.php`
+- `routes/web.php`
 - `resources/views/site/institucional/contato.blade.php`
 
 ---

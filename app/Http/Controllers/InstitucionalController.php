@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Page;
 use App\Models\Plan;
+use App\Models\Setting;
+use App\Services\ContactMapGeocodingService;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
@@ -25,6 +27,30 @@ class InstitucionalController extends Controller
     {
         $page = Page::findBySlug('valores') ?? new Page();
         return view('site.institucional.valores', compact('page'));
+    }
+
+    public function contato(ContactMapGeocodingService $contactMapGeocodingService): View
+    {
+        $companyAddress = (string) (Setting::get('company_address') ?: 'Av. Paulista, 1000');
+        $companyNumber = (string) (Setting::get('company_number') ?: '1001');
+        $companyComplement = Setting::get('company_complement') ?: null;
+        $companyDistrict = (string) (Setting::get('company_district') ?: 'Bela Vista');
+        $companyCity = (string) (Setting::get('company_city') ?: 'São Paulo');
+        $companyState = (string) (Setting::get('company_state') ?: 'SP');
+        $companyZip = (string) (Setting::get('company_zip') ?: '01310-100');
+
+        $fullAddress = trim(implode(', ', array_filter([
+            $companyAddress . ($companyNumber !== '' ? ' ' . $companyNumber : ''),
+            $companyComplement,
+            $companyDistrict,
+            $companyCity . ' - ' . $companyState,
+            'CEP ' . $companyZip,
+            'Brasil',
+        ])));
+
+        $mapCoordinates = $contactMapGeocodingService->resolve($fullAddress);
+
+        return view('site.institucional.contato', compact('mapCoordinates'));
     }
 
     public function comoFunciona(): View
