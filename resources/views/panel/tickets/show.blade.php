@@ -168,29 +168,31 @@
             background: #ffffff;
         }
 
+        .ticket-watermark-image {
+            position: absolute;
+            inset: -0.18cm;
+            z-index: 0;
+            width: calc(100% + 0.36cm);
+            height: calc(100% + 0.36cm);
+            object-fit: cover;
+            opacity: 0.24;
+            filter: grayscale(0.1) saturate(0.85) contrast(1.05);
+            pointer-events: none;
+        }
+
         .ticket-main::before {
             content: "";
             position: absolute;
-            inset: -0.25cm;
-            z-index: -2;
-            background-image: var(--ticket-bg);
-            background-position: center;
-            background-size: cover;
-            opacity: 0.13;
-            filter: grayscale(0.1) saturate(0.85) contrast(1.05);
-        }
-
-        .ticket-main::after {
-            content: "";
-            position: absolute;
             inset: 0;
-            z-index: -1;
+            z-index: 1;
             background:
-                linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.78)),
-                radial-gradient(circle at 70% 24%, rgba(31, 94, 219, 0.14), transparent 42%);
+                linear-gradient(90deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.62)),
+                radial-gradient(circle at 70% 24%, rgba(31, 94, 219, 0.1), transparent 42%);
         }
 
         .ticket-main-inner {
+            position: relative;
+            z-index: 2;
             display: grid;
             grid-template-rows: auto 1fr auto;
             height: 100%;
@@ -382,30 +384,66 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 0.85cm 2cm;
+                margin: 0;
             }
 
             html,
             body {
                 width: 21cm;
                 min-height: 29.7cm;
+                margin: 0 !important;
                 background: #ffffff !important;
             }
 
-            body * {
-                visibility: hidden !important;
+            body > *:not(main):not(script):not(style) {
+                display: none !important;
             }
 
-            .ticket-print-area,
-            .ticket-print-area * {
-                visibility: visible !important;
+            main {
+                min-height: 0 !important;
+                padding: 0 !important;
+            }
+
+            .panel-theme-shell {
+                min-height: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+            }
+
+            .unn-panel-container {
+                width: 21cm !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .panel-theme-shell > .unn-panel-container > nav,
+            .panel-theme-shell > .unn-panel-container > .flex > aside,
+            .ticket-page-shell > :not(.ticket-print-area) {
+                display: none !important;
+            }
+
+            .panel-theme-shell > .unn-panel-container > .flex {
+                display: block !important;
+                margin: 0 !important;
+            }
+
+            .panel-theme-shell > .unn-panel-container > .flex > .flex-1 {
+                display: block !important;
+                width: 21cm !important;
+                min-width: 0 !important;
+            }
+
+            .ticket-page-shell {
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
             .ticket-print-area {
-                position: absolute !important;
-                inset: 0 auto auto 0 !important;
+                position: static !important;
                 width: 17cm !important;
-                margin: 0 !important;
+                margin: 0 auto !important;
                 padding: 0 !important;
                 overflow: visible !important;
             }
@@ -427,6 +465,10 @@
                 background: #ffffff !important;
                 break-inside: avoid !important;
                 page-break-inside: avoid !important;
+            }
+
+            .ticket-print-slot:nth-child(4n+1) {
+                margin-top: 0.85cm !important;
             }
 
             .ticket-print-slot:nth-child(4n) {
@@ -452,6 +494,12 @@
                 -webkit-print-color-adjust: exact;
             }
 
+            .ticket-watermark-image {
+                opacity: 0.22 !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
             .event-paper-ticket::before,
             .event-paper-ticket::after {
                 background: #ffffff !important;
@@ -461,7 +509,7 @@
 @endpush
 
 @section('panel_content')
-    <div class="space-y-6">
+    <div class="ticket-page-shell space-y-6">
         <div class="ticket-print-actions rounded-3xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-8">
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
@@ -511,7 +559,7 @@
                         @endphp
 
                         <div class="ticket-print-slot">
-                            <div class="event-paper-ticket" style="--ticket-bg: url('{{ $ticketImage }}');">
+                            <div class="event-paper-ticket">
                                 <aside class="ticket-stub">
                                     <div>
                                         <img src="{{ $logo }}" alt="SOMOS UNN" class="ticket-logo mb-1">
@@ -533,6 +581,7 @@
                                 </aside>
 
                                 <main class="ticket-main">
+                                    <img src="{{ $ticketImage }}" alt="" class="ticket-watermark-image" aria-hidden="true">
                                     <div class="ticket-main-inner">
                                         <div class="ticket-main-top">
                                             <div class="ticket-date-block">

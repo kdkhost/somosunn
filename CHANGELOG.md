@@ -9,6 +9,8 @@
 - A impressão foi ajustada para A4 em orientação retrato, com cada ingresso no tamanho final de 15 x 5 cm.
 - Cada slot de impressão respeita área máxima de 17 x 7 cm com borda de margem de erro para corte.
 - Quando o pedido possui mais de um ingresso, a página organiza até 4 ingressos por folha.
+- A marca d'água passou a ser renderizada como imagem real do evento, evitando falha de exibição em tela ou no preview de impressão.
+- A folha A4 passou a centralizar a área de 17 cm e remover sobras do layout do painel que podiam gerar página extra.
 
 ### Arquivos principais
 - `app/Http/Controllers/Panel/TicketController.php`
