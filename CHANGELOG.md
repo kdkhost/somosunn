@@ -2,6 +2,18 @@
 
 ---
 
+## [2026-06-18] - fix(admin): sincronizacao de tema e favicon nos backups
+
+### Corrigido
+- Layout admin passou a usar uma variavel interna para tema, preloader e favicon, evitando conflito com variaveis `$settings` de telas especificas.
+- Item `Backups` no menu do `/admin` passou a abrir com carregamento completo, sem PJAX, para garantir sincronizacao do `head`, favicon, estilos empilhados e classe `dark-mode`.
+
+### Arquivos principais
+- `resources/views/admin/layouts/app.blade.php`
+- `resources/views/admin/partials/sidebar.blade.php`
+
+---
+
 ## [2026-06-18] - fix(admin): backups nao sobrescrevem settings globais
 
 ### Corrigido

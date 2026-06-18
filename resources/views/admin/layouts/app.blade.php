@@ -4,14 +4,23 @@
 <head>
     @php
         use Illuminate\Support\Str;
-        if (!isset($settings)) {
-            try {
-                $settings = \App\Models\Setting::all()->pluck('value', 'key')->toArray();
-            } catch (\Throwable $e) {
-                $settings = [];
-            }
+
+        try {
+            $adminLayoutSettings = \App\Models\Setting::all()->pluck('value', 'key')->toArray();
+        } catch (\Throwable $e) {
+            $adminLayoutSettings = [];
         }
-        $siteTheme = $settings['site_theme'] ?? 'light';
+
+        if (isset($settings) && is_array($settings)) {
+            $adminLayoutSettings = array_replace($adminLayoutSettings, array_intersect_key($settings, array_flip([
+                'site_theme',
+                'preloader_image',
+                'preloader_enabled',
+                'favicon_image',
+            ])));
+        }
+
+        $siteTheme = $adminLayoutSettings['site_theme'] ?? 'light';
 
         $isAdmin = false;
         try {
@@ -63,9 +72,9 @@
             return null;
         };
 
-        $preloaderImage = $resolvePublicAsset($settings['preloader_image'] ?? null) ?? asset('img/logo.svg');
-        $preloaderEnabled = (bool) ($settings['preloader_enabled'] ?? 1);
-        $faviconUrl = $resolvePublicAsset($settings['favicon_image'] ?? null) ?? asset('favicon.ico');
+        $preloaderImage = $resolvePublicAsset($adminLayoutSettings['preloader_image'] ?? null) ?? asset('img/logo.svg');
+        $preloaderEnabled = (bool) ($adminLayoutSettings['preloader_enabled'] ?? 1);
+        $faviconUrl = $resolvePublicAsset($adminLayoutSettings['favicon_image'] ?? null) ?? asset('favicon.ico');
         $faviconPath = parse_url($faviconUrl, PHP_URL_PATH) ?: '';
         $faviconExtension = strtolower(pathinfo($faviconPath, PATHINFO_EXTENSION));
         $faviconType = match ($faviconExtension) {

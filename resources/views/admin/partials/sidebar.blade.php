@@ -629,7 +629,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.backups.index') }}" class="nav-link {{ request()->routeIs('admin.backups.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.backups.index') }}" class="nav-link {{ request()->routeIs('admin.backups.*') ? 'active' : '' }}" data-pjax="false">
                                     <i class="fas fa-database nav-icon"></i>
                                     <p>Backups</p>
                                 </a>
