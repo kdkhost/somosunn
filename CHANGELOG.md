@@ -11,6 +11,7 @@
 - Quando o pedido possui mais de um ingresso, a página organiza até 4 ingressos por folha.
 - A marca d'água passou a ser renderizada como imagem real do evento, evitando falha de exibição em tela ou no preview de impressão.
 - A folha A4 passou a centralizar a área de 17 cm e remover sobras do layout do painel que podiam gerar página extra.
+- A margem branca externa do slot de corte foi reduzida em aproximadamente 90%, mantendo o ingresso em 15 x 5 cm.
 
 ### Arquivos principais
 - `app/Http/Controllers/Panel/TicketController.php`

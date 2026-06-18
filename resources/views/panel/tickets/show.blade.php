@@ -37,22 +37,23 @@
 
         .ticket-print-sheet {
             display: grid;
-            grid-template-columns: 17cm;
+            grid-template-columns: 15.25cm;
             justify-content: center;
-            gap: 0.35cm;
-            min-width: 17cm;
+            gap: 0.18cm;
+            min-width: 15.25cm;
         }
 
         .ticket-print-slot {
+            box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 17cm;
-            height: 7cm;
+            width: 15.25cm;
+            height: 5.25cm;
             border: 0.03cm dashed #94a3b8;
-            border-radius: 0.18cm;
+            border-radius: 0.08cm;
             background: #f8fafc;
-            padding: 1cm;
+            padding: 0.08cm;
         }
 
         .event-paper-ticket {
@@ -442,7 +443,7 @@
 
             .ticket-print-area {
                 position: static !important;
-                width: 17cm !important;
+                width: 15.25cm !important;
                 margin: 0 auto !important;
                 padding: 0 !important;
                 overflow: visible !important;
@@ -450,16 +451,17 @@
 
             .ticket-print-sheet {
                 display: block !important;
-                width: 17cm !important;
-                min-width: 17cm !important;
+                width: 15.25cm !important;
+                min-width: 15.25cm !important;
                 gap: 0 !important;
             }
 
             .ticket-print-slot {
-                width: 17cm !important;
-                height: 7cm !important;
+                box-sizing: border-box !important;
+                width: 15.25cm !important;
+                height: 5.25cm !important;
                 margin: 0 !important;
-                padding: 1cm !important;
+                padding: 0.08cm !important;
                 border: 0.03cm dashed #94a3b8 !important;
                 border-radius: 0 !important;
                 background: #ffffff !important;
