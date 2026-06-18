@@ -1055,6 +1055,34 @@
             color: #f1f5f9 !important;
         }
 
+        #cert-canvas.cert-editor-no-bg {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+        }
+
+        #cert-canvas.cert-editor-no-bg #cert-bg-placeholder {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%) !important;
+            color: #334155 !important;
+        }
+
+        #cert-canvas.cert-editor-no-bg #cert-bg-placeholder h5,
+        #cert-canvas.cert-editor-no-bg #cert-bg-placeholder p,
+        #cert-canvas.cert-editor-no-bg #cert-bg-placeholder i {
+            color: inherit !important;
+        }
+
+        #cert-canvas .cert-element.cert-editor-contrast {
+            color: #0f172a !important;
+            background: rgba(255, 255, 255, 0.78);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+            text-shadow: none !important;
+        }
+
+        #cert-canvas .cert-element.cert-editor-contrast:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: #2563eb !important;
+        }
+
         .event-gallery-media-grid {
             margin-left: -10px;
             margin-right: -10px;
@@ -1736,6 +1764,40 @@ async function setAsCover(mediaId) {
                 $('#cert-bg-img').css('object-fit', fit);
             }
 
+            function hasCertificateBackground() {
+                return $('#cert-bg-img').length > 0 && $('#cert-bg-img').attr('src');
+            }
+
+            function isLightColor(color) {
+                if (!color) return false;
+                const value = String(color).trim().toLowerCase();
+                if (value === 'white' || value === '#fff' || value === '#ffffff') {
+                    return true;
+                }
+
+                const hexMatch = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+                if (!hexMatch) {
+                    return false;
+                }
+
+                let hex = hexMatch[1];
+                if (hex.length === 3) {
+                    hex = hex.split('').map(function (char) { return char + char; }).join('');
+                }
+
+                const r = parseInt(hex.slice(0, 2), 16);
+                const g = parseInt(hex.slice(2, 4), 16);
+                const b = parseInt(hex.slice(4, 6), 16);
+                const luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
+
+                return luminance >= 200;
+            }
+
+            function updateEditorContrastMode() {
+                const noBackground = !hasCertificateBackground();
+                $('#cert-canvas').toggleClass('cert-editor-no-bg', noBackground);
+            }
+
             $('#cert-bg-fit').val((certDoc.meta && certDoc.meta.backgroundFit) ? certDoc.meta.backgroundFit : 'cover');
             $('#cert-bg-fit').on('change', function () {
                 certDoc.meta.backgroundFit = $(this).val() || 'cover';
@@ -1837,6 +1899,7 @@ async function setAsCover(mediaId) {
 
             function renderElements() {
                 $canvas.empty();
+                updateEditorContrastMode();
 
                 $.each(certSettings, function (key, data) {
                     if (!data || typeof data !== 'object' || data.x === undefined || data.y === undefined) return;
@@ -1900,6 +1963,11 @@ async function setAsCover(mediaId) {
                         $el.text(url ? '' : 'Assinatura');
                     } else {
                         $el.text(data.text || '');
+                    }
+
+                    $el.removeClass('cert-editor-contrast');
+                    if (!hasCertificateBackground() && key !== 'platform_logo' && key !== 'instructor_signature' && isLightColor(data.color || '#000000')) {
+                        $el.addClass('cert-editor-contrast');
                     }
 
                     $el.on('mousedown', function (e) {
@@ -2293,6 +2361,8 @@ async function setAsCover(mediaId) {
 
                     const fit = ($('#cert-bg-fit').val() || 'cover') === 'stretch' ? 'fill' : 'cover';
                     $('#cert-bg-img').css('object-fit', fit);
+                    updateEditorContrastMode();
+                    renderElements();
                 }
                 reader.readAsDataURL(input.files[0]);
             }

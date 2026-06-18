@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Services\Payment\MercadoPagoService;
+use App\Services\Payment\SumUpService;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
@@ -14,7 +15,15 @@ class OrderCancellationService
     public function cancel(Order $order): Order
     {
         if ((string) $order->status === 'cancelled') {
-            throw new RuntimeException('Pedido já cancelado.');
+            app(OrderAccessRevocationService::class)->revoke($order, 'order_cancelled');
+
+            return $order->fresh(['user', 'items', 'invoice', 'manualApprover']);
+        }
+
+        if ((string) $order->status === 'refunded') {
+            app(OrderAccessRevocationService::class)->revoke($order, 'order_refunded');
+
+            return $order->fresh(['user', 'items', 'invoice', 'manualApprover']);
         }
 
         if ((string) $order->status === 'paid') {
@@ -62,15 +71,22 @@ class OrderCancellationService
 
     private function cancelPendingGatewayPayment(Order $order): void
     {
-        if ((string) $order->gateway !== 'mercadopago' || empty($order->transaction_id)) {
-            return;
-        }
-
         try {
-            app(MercadoPagoService::class)->cancelPayment($order);
+            if ((string) $order->gateway === 'mercadopago' && !empty($order->transaction_id)) {
+                app(MercadoPagoService::class)->cancelPayment($order);
+                return;
+            }
+
+            if ((string) $order->gateway === 'sumup') {
+                $checkoutId = data_get($order->metadata, 'sumup_checkout_id');
+                if ($checkoutId && method_exists(app(SumUpService::class), 'cancelCheckout')) {
+                    app(SumUpService::class)->cancelCheckout((string) $checkoutId);
+                }
+            }
         } catch (\Throwable $e) {
-            Log::error('Erro ao cancelar pagamento pendente no Mercado Pago: ' . $e->getMessage(), [
+            Log::error('Erro ao cancelar pagamento pendente no gateway: ' . $e->getMessage(), [
                 'order_id' => $order->id,
+                'gateway' => $order->gateway,
             ]);
         }
     }
@@ -91,6 +107,8 @@ class OrderCancellationService
             'cancelled_at' => now(),
             'metadata' => $metadata,
         ]);
+
+        app(OrderAccessRevocationService::class)->revoke($order, $reason);
 
         return $order->fresh(['user', 'items', 'invoice', 'manualApprover']);
     }

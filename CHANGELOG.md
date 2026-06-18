@@ -2,6 +2,38 @@
 
 ---
 
+## [2026-06-17] - fix(admin): contraste no editor de certificado
+
+### Corrigido
+- O preview do certificado no painel antigo deixou de ficar ilegivel quando o tema escuro esta ativo e ainda nao existe imagem de fundo.
+- O mesmo modo de contraste foi aplicado ao componente compartilhado do painel novo para manter o comportamento consistente.
+- O ajuste afeta somente a leitura no editor visual; as cores salvas e o PDF final nao sao alterados.
+
+### Arquivos principais
+- `resources/views/admin/events/form.blade.php`
+- `resources/views/panel/admin/partials/certificate-editor.blade.php`
+- `resources/views/panel/admin/partials/certificate-editor-script.blade.php`
+
+---
+
+## [2026-06-17] - fix(vendas): revogação imediata ao cancelar compra
+
+### Corrigido
+- O cancelamento de compra agora revoga imediatamente os acessos vinculados ao pedido.
+- Eventos, áreas de expositor, cursos, mentorias, planos/assinaturas e itens digitais passam a registrar status cancelado/revogado quando a compra é cancelada ou totalmente estornada.
+- Produtos físicos do marketplace têm o estoque restaurado quando a baixa de estoque já havia sido feita.
+- Certificados pendentes e emissão pelo aluno passam a considerar somente matrículas concluídas e não canceladas.
+
+### Arquivos principais
+- `app/Services/OrderAccessRevocationService.php`
+- `app/Services/OrderCancellationService.php`
+- `app/Services/OrderRefundService.php`
+- `app/Http/Controllers/Panel/MarketplacePurchaseController.php`
+- `app/Console/Commands/CancelUnpaidOrders.php`
+- `tests/Feature/OrderRefundTest.php`
+
+---
+
 ## [2026-06-17] - fix(admin): erro 500 ao cancelar pedido pago
 
 ### Corrigido

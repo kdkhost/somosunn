@@ -398,3 +398,36 @@
             <input type="hidden" name="certificate_settings" id="certificate_settings_input">
     </div>
 </div>
+
+@once
+    @push('styles')
+        <style>
+            #cert-canvas.cert-editor-no-bg {
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+            }
+
+            #cert-canvas.cert-editor-no-bg #cert-bg-placeholder {
+                background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%) !important;
+                color: #334155 !important;
+            }
+
+            #cert-canvas.cert-editor-no-bg #cert-bg-placeholder p,
+            #cert-canvas.cert-editor-no-bg #cert-bg-placeholder i {
+                color: inherit !important;
+            }
+
+            #cert-canvas .cert-element.cert-editor-contrast {
+                color: #0f172a !important;
+                background: rgba(255, 255, 255, 0.78);
+                border-radius: 8px;
+                box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+                text-shadow: none !important;
+            }
+
+            #cert-canvas .cert-element.cert-editor-contrast:hover {
+                background: rgba(255, 255, 255, 0.9);
+                border-color: #2563eb !important;
+            }
+        </style>
+    @endpush
+@endonce

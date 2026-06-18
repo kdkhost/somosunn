@@ -261,6 +261,7 @@ class PaymentWebhookController extends Controller
                     'metadata' => array_merge($order->metadata ?? [], ['webhook_data' => $data]),
                 ]);
                 app(EventExhibitorService::class)->markOrderRefunded($order, true);
+                app(\App\Services\OrderAccessRevocationService::class)->revoke($order->fresh(['items', 'user']), 'gateway_refunded');
             }
 
         } catch (\Throwable $e) {

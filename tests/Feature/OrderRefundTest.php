@@ -72,6 +72,8 @@ class OrderRefundTest extends TestCase
         $this->assertSame(100.00, (float) $order->refunded_amount);
         $this->assertSame(0.00, (float) $order->remaining_refundable_amount);
         $this->assertSame('full', data_get($order->metadata, 'refunds.history.0.type'));
+        $this->assertSame('revoked', data_get($order->metadata, 'access_revocation.status'));
+        $this->assertSame('revoked', data_get($order->items()->first()->data, 'access.status'));
     }
 
     public function test_cancel_paid_gateway_order_processes_full_refund(): void
@@ -92,6 +94,8 @@ class OrderRefundTest extends TestCase
         $this->assertSame('refunded', $order->status);
         $this->assertSame(100.00, (float) $order->refunded_amount);
         $this->assertSame('full', data_get($order->metadata, 'refunds.history.0.type'));
+        $this->assertSame('revoked', data_get($order->metadata, 'access_revocation.status'));
+        $this->assertSame('revoked', data_get($order->items()->first()->data, 'access.status'));
     }
 
     public function test_cancel_paid_free_order_marks_cancelled_without_gateway_refund(): void
@@ -120,12 +124,23 @@ class OrderRefundTest extends TestCase
             ],
         ]);
 
+        OrderItem::create([
+            'order_id' => $order->id,
+            'item_type' => 'event',
+            'item_id' => 1,
+            'title' => 'Evento gratuito por cupom',
+            'price' => 0,
+            'quantity' => 1,
+        ]);
+
         app(OrderCancellationService::class)->cancel($order);
 
         $order->refresh();
 
         $this->assertSame('cancelled', $order->status);
         $this->assertSame('paid_order_without_gateway_refund', data_get($order->metadata, 'cancellation.reason'));
+        $this->assertSame('revoked', data_get($order->metadata, 'access_revocation.status'));
+        $this->assertSame('revoked', data_get($order->items()->first()->data, 'access.status'));
     }
 
     private function createPaidMercadoPagoOrder(float $amount): Order

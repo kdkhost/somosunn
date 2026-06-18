@@ -293,6 +293,8 @@ class SumUpController extends Controller
             ])
         ]);
 
+        app(\App\Services\OrderAccessRevocationService::class)->revoke($order->fresh(['items', 'user']), 'gateway_cancelled');
+
         Log::info('SumUp order cancelled', ['order_id' => $order->id]);
     }
 

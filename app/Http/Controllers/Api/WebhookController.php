@@ -115,6 +115,10 @@ class WebhookController extends Controller
         }
         $order->save();
 
+        if ($internalStatus === 'refunded') {
+            app(\App\Services\OrderAccessRevocationService::class)->revoke($order->fresh(['items', 'user']), 'gateway_refunded');
+        }
+
         // Register/Update Payment Record
         Payment::create([
             'user_id' => $order->user_id,

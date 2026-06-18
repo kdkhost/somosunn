@@ -73,6 +73,9 @@ class OrderRefundService
             $order->save();
 
             app(EventExhibitorService::class)->markOrderRefunded($order, $isFullyRefunded);
+            if ($isFullyRefunded) {
+                app(OrderAccessRevocationService::class)->revoke($order, 'order_refunded');
+            }
 
             return $order->fresh(['user', 'items', 'invoice', 'manualApprover']);
         });

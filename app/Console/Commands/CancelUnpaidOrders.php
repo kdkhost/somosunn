@@ -137,6 +137,11 @@ class CancelUnpaidOrders extends Command
             ]),
         ]);
 
+        app(\App\Services\OrderAccessRevocationService::class)->revoke(
+            $order->fresh(['items', 'user']),
+            'payment_window_expired'
+        );
+
         Log::info("Order #{$order->id} auto-cancelled", [
             'gateway'        => $order->gateway,
             'payment_method' => $paymentMethod,

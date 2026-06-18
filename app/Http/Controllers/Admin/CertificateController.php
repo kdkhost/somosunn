@@ -30,6 +30,7 @@ class CertificateController extends Controller
         // 2. Pending Certificates (Enrollment completed but no Certificate)
         // We look for all completion types (Course, Mentorship, Event)
         $queryPending = Enrollment::with(['user', 'enrollable'])
+            ->where('status', 'completed')
             ->whereNotNull('completed_at')
             ->withoutCertificate();
 

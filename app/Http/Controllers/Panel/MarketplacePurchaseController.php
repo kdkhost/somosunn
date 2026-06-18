@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Setting;
+use App\Services\OrderCancellationService;
 use App\Services\Payment\MercadoPagoService;
-use App\Services\Payment\SumUpService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -169,25 +169,10 @@ class MarketplacePurchaseController extends Controller
 
     private function cancelExpiredOrder(Order $order): void
     {
-        try {
-            if ($order->gateway === 'mercadopago' && $order->transaction_id) {
-                app(MercadoPagoService::class)->cancelPayment($order);
-            } elseif ($order->gateway === 'sumup') {
-                $checkoutId = data_get($order->metadata, 'sumup_checkout_id');
-                if ($checkoutId) {
-                    $service = app(SumUpService::class);
-                    if (method_exists($service, 'cancelCheckout')) {
-                        $service->cancelCheckout($checkoutId);
-                    }
-                }
-            }
-        } catch (\Throwable $e) {
-            \Log::warning("Gateway cancel failed for expired Order #{$order->id}: " . $e->getMessage());
-        }
+        app(OrderCancellationService::class)->cancel($order);
 
+        $order->refresh();
         $order->update([
-            'status' => 'cancelled',
-            'cancelled_at' => now(),
             'metadata' => array_merge($order->metadata ?? [], [
                 'cancelled_reason' => 'Auto-cancel: payment window expired on retry',
             ]),

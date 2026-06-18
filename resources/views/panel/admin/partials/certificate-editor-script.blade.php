@@ -144,6 +144,40 @@
             $('#cert-bg-img').css('object-fit', mode);
         }
 
+        function hasCertificateBackground() {
+            return $('#cert-bg-img').length > 0 && !!$('#cert-bg-img').attr('src');
+        }
+
+        function isLightColor(color) {
+            if (!color) return false;
+            const value = String(color).trim().toLowerCase();
+            if (value === 'white' || value === '#fff' || value === '#ffffff') {
+                return true;
+            }
+
+            const hexMatch = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+            if (!hexMatch) {
+                return false;
+            }
+
+            let hex = hexMatch[1];
+            if (hex.length === 3) {
+                hex = hex.split('').map(function (char) { return char + char; }).join('');
+            }
+
+            const r = parseInt(hex.slice(0, 2), 16);
+            const g = parseInt(hex.slice(2, 4), 16);
+            const b = parseInt(hex.slice(4, 6), 16);
+            const luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
+
+            return luminance >= 200;
+        }
+
+        function updateEditorContrastMode() {
+            const noBackground = !hasCertificateBackground();
+            $('#cert-canvas').toggleClass('cert-editor-no-bg', noBackground);
+        }
+
         function updateGridOverlay() {
             const enabled = $('#cert-grid-enabled').is(':checked');
             const step = parseFloat($('#cert-grid-step').val()) || 5;
@@ -234,6 +268,7 @@
 
         function renderElements() {
             $canvas.empty();
+            updateEditorContrastMode();
 
             $.each(certSettings, function (key, data) {
                 if (!data || typeof data !== 'object' || data.x === undefined || data.y === undefined) {
@@ -296,6 +331,11 @@
                     }).text(url ? '' : 'Assinatura');
                 } else {
                     $element.text(data.text);
+                }
+
+                $element.removeClass('cert-editor-contrast');
+                if (!hasCertificateBackground() && key !== 'platform_logo' && key !== 'instructor_signature' && isLightColor(data.color || '#000000')) {
+                    $element.addClass('cert-editor-contrast');
                 }
 
                 $element.on('mousedown', function (event) {
@@ -512,6 +552,8 @@
                 $('#cert-bg-img').attr('src', event.target.result).removeClass('hidden');
                 $('#cert-bg-placeholder').addClass('hidden');
                 applyBackgroundFit();
+                updateEditorContrastMode();
+                renderElements();
             };
             reader.readAsDataURL(file);
         });

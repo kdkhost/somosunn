@@ -110,7 +110,16 @@ class SumUpWebhookProcessor
             'raw_response' => $payload,
         ]);
 
+        $order->update([
+            'status' => 'refunded',
+            'refunded_at' => now(),
+            'metadata' => array_merge($order->metadata ?? [], [
+                'sumup_refund_webhook_data' => $payload,
+            ]),
+        ]);
+
         app(EventExhibitorService::class)->markOrderRefunded($order, true);
+        app(\App\Services\OrderAccessRevocationService::class)->revoke($order->fresh(['items', 'user']), 'gateway_refunded');
 
         Log::info('SumUp payment.refunded', ['order_id' => $order->id]);
     }

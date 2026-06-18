@@ -58,6 +58,16 @@ class CertificateController extends Controller
             $type = 'course';
             $id = $data['course_id'];
             $product = \App\Models\Course::find($id);
+            $validEnrollment = $user->enrollments()
+                ->where('enrollable_type', \App\Models\Course::class)
+                ->where('enrollable_id', $id)
+                ->where('status', 'completed')
+                ->whereNotNull('completed_at')
+                ->exists();
+
+            if (!$validEnrollment) {
+                return redirect()->back()->with('error', 'Você precisa concluir o curso para gerar o certificado.');
+            }
 
             // Verify progress
             $progress = $user->progress($product); // Assuming User model has progress() or similar. 
@@ -77,6 +87,17 @@ class CertificateController extends Controller
             $type = 'mentorship';
             $id = $data['mentorship_id'];
             $product = \App\Models\Mentorship::find($id);
+            $validEnrollment = $user->enrollments()
+                ->where('enrollable_type', \App\Models\Mentorship::class)
+                ->where('enrollable_id', $id)
+                ->where('status', 'completed')
+                ->whereNotNull('completed_at')
+                ->exists();
+
+            if (!$validEnrollment) {
+                return redirect()->back()->with('error', 'Esta mentoria ainda não foi concluída.');
+            }
+
             // Mentorship completion logic (manual by mentor usually, or time based)
             // We check if there is a completed enrollment
             $enrollment = $user->enrollments()->where('enrollable_type', \App\Models\Mentorship::class)->where('enrollable_id', $id)->whereNotNull('completed_at')->first();
@@ -88,6 +109,17 @@ class CertificateController extends Controller
             $type = 'event';
             $id = $data['event_id'];
             $product = \App\Models\Event::find($id);
+            $validEnrollment = $user->enrollments()
+                ->where('enrollable_type', \App\Models\Event::class)
+                ->where('enrollable_id', $id)
+                ->where('status', 'completed')
+                ->whereNotNull('completed_at')
+                ->exists();
+
+            if (!$validEnrollment) {
+                return redirect()->back()->with('error', 'Participação no evento ainda não concluída.');
+            }
+
             // Event completion logic
             $enrollment = $user->enrollments()->where('enrollable_type', \App\Models\Event::class)->where('enrollable_id', $id)->whereNotNull('completed_at')->first();
             if (!$enrollment) {
