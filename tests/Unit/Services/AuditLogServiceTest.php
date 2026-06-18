@@ -132,7 +132,7 @@ class AuditLogServiceTest extends TestCase
     {
         // Substitui o Bus por um mock que ALWAYS lanca, forcando o
         // fallback sincrono via DB::table('audit_logs')->insert(...).
-        $this->app->instance(BusDispatcher::class, new ThrowingBusDispatcher());
+        $this->app->instance(BusDispatcher::class, new AuditLogThrowingBusDispatcher());
 
         // Garante que o fallback foi de fato disparado (warning no canal stack).
         Log::shouldReceive('channel')->with('stack')->andReturnSelf();
@@ -153,7 +153,7 @@ class AuditLogServiceTest extends TestCase
     public function test_log_swallows_exception_when_both_dispatch_and_sync_fail(): void
     {
         // Forca o dispatch a falhar.
-        $this->app->instance(BusDispatcher::class, new ThrowingBusDispatcher());
+        $this->app->instance(BusDispatcher::class, new AuditLogThrowingBusDispatcher());
 
         // Remove a tabela audit_logs para que o fallback sincrono
         // (DB::table('audit_logs')->insert) tambem falhe.
@@ -372,7 +372,7 @@ class AuditLogServiceTest extends TestCase
  * Bus dispatcher de testes que sempre lanca excecao no dispatch.
  * Usado para forcar o caminho de fallback do AuditLogService::log().
  */
-class ThrowingBusDispatcher implements BusDispatcher
+class AuditLogThrowingBusDispatcher implements BusDispatcher
 {
     public function dispatch($command)
     {

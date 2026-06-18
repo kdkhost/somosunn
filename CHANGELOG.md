@@ -2,6 +2,29 @@
 
 ---
 
+## [2026-06-18] - test(seguranca): rollback conservador e cobertura de rotas
+
+### Corrigido
+- O rollback da migration de cupons/grupo de eventos deixou de remover automaticamente tabela, colunas, links de grupo e permissoes ja em uso.
+- Corrigida colisao de classe auxiliar nos testes unitarios de auditoria, permitindo que a suite avance sem erro de redeclaracao.
+
+### Adicionado
+- Comando Artisan `php artisan test` como atalho para executar o PHPUnit local do projeto.
+- Testes feature de contrato para confirmar rotas de cupons de eventos nos dois paineis administrativos: `/admin` e `/painel/admin`.
+- Testes feature de contrato para rotas sensiveis de manutencao, installer, webhook Mercado Pago e entrada no grupo do evento.
+
+### Observacao operacional
+- Esta entrega nao executa `migrate`, `seed`, `rollback`, `fresh`, `refresh` nem qualquer comando de escrita em banco de producao.
+
+### Arquivos principais
+- `database/migrations/2026_06_17_100000_add_event_group_link_coupons_and_registration_fields.php`
+- `app/Console/Commands/RunTestsCommand.php`
+- `tests/Feature/EventCoupons/EventCouponPanelRoutesTest.php`
+- `tests/Feature/Security/SensitiveRouteCoverageTest.php`
+- `tests/Unit/Services/AuditLogServiceTest.php`
+
+---
+
 ## [2026-06-18] - fix(seguranca): hardening de eventos, webhooks e manutencao
 
 ### Corrigido

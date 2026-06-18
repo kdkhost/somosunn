@@ -17,43 +17,10 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (Schema::hasTable('event_registrations')) {
-            if (Schema::hasColumn('event_registrations', 'coupon_id')) {
-                try {
-                    Schema::table('event_registrations', function (Blueprint $table) {
-                        $table->dropForeign(['coupon_id']);
-                    });
-                } catch (Throwable $e) {
-                    // Constraint may not exist in old installs.
-                }
-            }
-
-            $columns = array_values(array_filter([
-                Schema::hasColumn('event_registrations', 'coupon_id') ? 'coupon_id' : null,
-                Schema::hasColumn('event_registrations', 'payment_status') ? 'payment_status' : null,
-                Schema::hasColumn('event_registrations', 'joined_group_at') ? 'joined_group_at' : null,
-            ]));
-
-            if ($columns !== []) {
-                Schema::table('event_registrations', function (Blueprint $table) use ($columns) {
-                    $table->dropColumn($columns);
-                });
-            }
-        }
-
-        Schema::dropIfExists('event_coupons');
-
-        if (Schema::hasTable('events') && Schema::hasColumn('events', 'whatsapp_group_link')) {
-            Schema::table('events', function (Blueprint $table) {
-                $table->dropColumn('whatsapp_group_link');
-            });
-        }
-
-        if (Schema::hasTable('permissions')) {
-            DB::table('permissions')
-                ->whereIn('name', $this->permissionNames())
-                ->delete();
-        }
+        // Rollback conservador: esta migration ja pode conter inscricoes,
+        // cupons, links de grupo e permissoes em uso financeiro/operacional.
+        // A remocao estrutural deve ser feita manualmente em uma janela
+        // controlada, com backup e analise dos dados existentes.
     }
 
     private function addEventGroupLink(): void
