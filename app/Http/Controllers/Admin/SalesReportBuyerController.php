@@ -43,11 +43,12 @@ class SalesReportBuyerController extends Controller
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
 
+        $html = PdfBranding::injectDefaultLogoWatermark($html);
+
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html, 'UTF-8');
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        PdfBranding::applyDefaultLogoWatermark($dompdf);
 
         $filename = 'compradores-item-' . (int) data_get($report, 'item.id') . '-' . now()->format('Ymd-His') . '.pdf';
 

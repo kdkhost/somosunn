@@ -5,33 +5,43 @@
     <meta charset="utf-8">
     <title>Relatorio Financeiro</title>
     <style>
+        @page {
+            size: A4 landscape;
+            margin: 9mm;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: DejaVu Sans, Arial, sans-serif;
             color: #0f172a;
-            font-size: 12px;
-            margin: 24px;
+            font-size: 9px;
+            margin: 0;
         }
 
         h1 {
             margin: 0 0 6px 0;
-            font-size: 24px;
+            font-size: 18px;
         }
 
         .meta {
             color: #475569;
-            margin: 0 0 18px 0;
+            margin: 0 0 10px 0;
+            line-height: 1.35;
         }
 
         .cards {
             display: table;
             width: 100%;
-            margin-bottom: 18px;
+            margin-bottom: 10px;
         }
 
         .card {
             display: table-cell;
             width: 33.33%;
-            padding: 10px;
+            padding: 7px;
             border: 1px solid #cbd5e1;
             background: #f8fafc;
         }
@@ -42,27 +52,31 @@
 
         .k {
             color: #475569;
-            font-size: 11px;
+            font-size: 8px;
             margin-bottom: 4px;
         }
 
         .v {
-            font-size: 18px;
+            font-size: 13px;
             font-weight: 700;
         }
 
         table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
-            margin-top: 12px;
+            margin-top: 8px;
+            font-size: 8px;
         }
 
         th,
         td {
             border: 1px solid #cbd5e1;
-            padding: 7px 8px;
+            padding: 4px 5px;
             text-align: left;
             vertical-align: top;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
 
         th {
@@ -70,11 +84,57 @@
             font-weight: 700;
         }
 
+        th:nth-child(1),
+        td:nth-child(1) {
+            width: 6%;
+        }
+
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: 9%;
+        }
+
+        th:nth-child(3),
+        td:nth-child(3) {
+            width: 24%;
+        }
+
+        th:nth-child(4),
+        td:nth-child(4) {
+            width: 10%;
+        }
+
+        th:nth-child(5),
+        td:nth-child(5) {
+            width: 10%;
+        }
+
+        th:nth-child(6),
+        td:nth-child(6),
+        th:nth-child(7),
+        td:nth-child(7),
+        th:nth-child(8),
+        td:nth-child(8),
+        th:nth-child(9),
+        td:nth-child(9) {
+            width: 7%;
+        }
+
+        th:nth-child(10),
+        td:nth-child(10) {
+            width: 6%;
+        }
+
+        th:nth-child(11),
+        td:nth-child(11) {
+            width: 7%;
+        }
+
         .badge {
             display: inline-block;
-            padding: 2px 7px;
+            padding: 2px 5px;
             border-radius: 999px;
-            font-size: 10px;
+            font-size: 7px;
             font-weight: 700;
         }
 

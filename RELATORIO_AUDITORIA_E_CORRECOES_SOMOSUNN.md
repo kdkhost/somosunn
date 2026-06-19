@@ -56,7 +56,8 @@ Pendencias estruturais ainda abertas:
 - Criado `app/Support/PdfBranding.php` para aplicar a logo do sistema como marca d'agua central e clara em PDFs gerados via Dompdf.
 - A resolucao da logo prioriza `logo_admin`, `logo_front`, `logo_image` e `logo_auth`, com fallback para `public/img/logo.svg`.
 - PDFs atualizados para usar o padrao: faturas, certificados, relatorio financeiro de pedidos e lista de compradores por item.
-- A regra foi aplicada depois do `render()` do Dompdf para evitar duplicar HTML, preservar os layouts existentes e reduzir risco visual entre `/admin`, `/painel/admin` e documentos publicos.
+- A regra injeta uma camada HTML fixa antes do conteudo, com 15% de opacidade, para manter a marca d'agua atras do texto.
+- O PDF do relatorio financeiro de pedidos foi ajustado para A4 paisagem, tabela compacta, colunas proporcionais e quebra de texto, evitando corte lateral de conteudo.
 - Validacoes previstas: `php -l` nos arquivos alterados, geracao isolada de PDF, `php artisan view:cache`, `php tools/check-no-bom.php`, `php tools/check-text-encoding.php` e `git diff --check`.
 
 ### Regra permanente

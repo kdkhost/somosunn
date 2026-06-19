@@ -283,11 +283,12 @@ class InvoiceService
         $options->set('isHtml5ParserEnabled', true);
         $options->set('defaultFont', $company['invoice_font_family'] ?? 'DejaVu Sans');
 
+        $html = PdfBranding::injectDefaultLogoWatermark($html);
+
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html, 'UTF-8');
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        PdfBranding::applyDefaultLogoWatermark($dompdf);
 
         return $dompdf->output();
     }

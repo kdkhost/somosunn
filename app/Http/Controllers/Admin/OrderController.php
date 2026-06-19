@@ -492,11 +492,12 @@ class OrderController extends Controller
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
 
+        $html = PdfBranding::injectDefaultLogoWatermark($html);
+
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html, 'UTF-8');
-        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-        PdfBranding::applyDefaultLogoWatermark($dompdf);
 
         return response($dompdf->output(), 200, [
             'Content-Type' => 'application/pdf',

@@ -84,10 +84,11 @@ class CertificateGenerator
             'isPreview' => false
         ])->render();
 
+        $html = PdfBranding::injectDefaultLogoWatermark($html);
+
         $dompdf->loadHtml($html, 'UTF-8');
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-        PdfBranding::applyDefaultLogoWatermark($dompdf);
 
         return $dompdf->output();
     }
