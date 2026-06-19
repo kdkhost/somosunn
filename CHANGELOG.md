@@ -7,6 +7,7 @@
 ### Corrigido
 - A tela `/painel/perfil` agora desativa o autofill do navegador durante acesso supervisionado para impedir que nome, e-mail, telefone e documento do supervisor sobrescrevam visualmente os dados da conta acessada.
 - O formulario passou a renderizar campos-isca ocultos e a travar temporariamente os inputs sensiveis ate a primeira interacao humana, reduzindo a chance de reidratacao automatica indevida no mesmo navegador.
+- Durante acesso supervisionado, a view do perfil agora reidrata explicitamente os campos com os dados originais da conta acessada logo apos o carregamento, neutralizando sobrescritas tardias do navegador.
 
 ### Adicionado
 - Teste de regressao cobrindo a protecao de autofill no perfil acessado por supervisor.

@@ -54,6 +54,7 @@ class SupervisedAccessIsolationTest extends TestCase
         $this->get(route('panel.profile.edit'))
             ->assertOk()
             ->assertSee('data-supervised-profile="1"', false)
+            ->assertSee('id="supervised-profile-payload"', false)
             ->assertSee('name="supervised_profile_fake_name"', false)
             ->assertSee('name="supervised_profile_fake_email"', false)
             ->assertSee('name="supervised_profile_fake_phone"', false)
@@ -62,6 +63,8 @@ class SupervisedAccessIsolationTest extends TestCase
             ->assertSee('type="email" name="email"', false)
             ->assertSee('value="' . $target->email . '"', false)
             ->assertSee('autocomplete="off"', false)
+            ->assertSee('"name":"' . $target->name . '"', false)
+            ->assertSee('"email":"' . $target->email . '"', false)
             ->assertSee('data-supervised-lock="1"', false);
     }
 

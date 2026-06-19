@@ -9,6 +9,50 @@
             && (int) session('impersonated_user_id') === (int) $user->id;
         $profileFormAutocomplete = $isSupervisedAccess ? 'off' : 'on';
         $sensitiveFieldAutocomplete = $isSupervisedAccess ? 'off' : null;
+        $segmentOptions = ['Tecnologia', 'Marketing', 'Vendas', 'Saude', 'Educacao', 'Direito', 'Engenharia', 'Financas', 'Imobiliario', 'Alimentacao', 'Consultoria', 'RH'];
+        $definedInterests = ['Networking', 'Mentorias', 'Cursos', 'Eventos', 'Parcerias', 'Investimentos', 'Vagas', 'Noticias'];
+        $userInterests = $user->interests ? array_values(array_filter(array_map('trim', explode(',', (string) $user->interests)))) : [];
+        $customInterests = array_values(array_filter(array_diff($userInterests, $definedInterests)));
+        $hasCustomInterest = !empty($customInterests);
+        $segmentValue = trim((string) ($user->segment ?? ''));
+        $segmentSelectValue = in_array($segmentValue, $segmentOptions, true) ? $segmentValue : ($segmentValue !== '' ? 'Outros' : '');
+        $segmentCustomValue = $segmentSelectValue === 'Outros' ? $segmentValue : '';
+        $personTypeValue = strlen((string) preg_replace('/\D/', '', (string) $user->doc)) > 11 ? 'J' : 'F';
+        $supervisedProfilePayload = [
+            'name' => (string) $user->name,
+            'email' => (string) $user->email,
+            'person_type' => $personTypeValue,
+            'gender' => (string) ($user->gender ?? ''),
+            'birth_date' => $user->birth_date ? $user->birth_date->format('Y-m-d') : '',
+            'phone' => (string) ($user->phone ?? ''),
+            'doc' => (string) ($user->doc ?? ''),
+            'occupation' => (string) ($user->occupation ?? ''),
+            'company' => (string) ($user->company ?? ''),
+            'segment_select' => $segmentSelectValue,
+            'segment_custom' => $segmentCustomValue,
+            'interests_list' => array_values(array_intersect($definedInterests, $userInterests)),
+            'interests_custom' => implode(', ', $customInterests),
+            'bio' => (string) ($user->bio ?? ''),
+            'pix_key' => (string) ($user->pix_key ?? ''),
+            'cep' => (string) ($user->cep ?? ''),
+            'street' => (string) ($user->street ?? ''),
+            'number' => (string) ($user->number ?? ''),
+            'complement' => (string) ($user->complement ?? ''),
+            'neighborhood' => (string) ($user->neighborhood ?? ''),
+            'city' => (string) ($user->city ?? ''),
+            'state' => (string) ($user->state ?? ''),
+            'website' => (string) ($user->website ?? ''),
+            'instagram' => (string) ($user->instagram ?? ''),
+            'facebook' => (string) ($user->facebook ?? ''),
+            'twitter' => (string) ($user->twitter ?? ''),
+            'linkedin' => (string) ($user->linkedin ?? ''),
+            'youtube' => (string) ($user->youtube ?? ''),
+            'show_email_public' => (bool) $user->show_email_public,
+            'show_phone_public' => (bool) $user->show_phone_public,
+            'show_address_public' => (bool) $user->show_address_public,
+            'hide_profile' => (bool) $user->hide_profile,
+            'theme_pref' => (string) ($user->theme_pref ?? 'light'),
+        ];
     @endphp
 
     @if($isMarketingManager)
@@ -127,6 +171,7 @@
         class="mt-6 space-y-6">
         @csrf
         @if($isSupervisedAccess)
+            <script id="supervised-profile-payload" type="application/json">@json($supervisedProfilePayload)</script>
             <input type="text" name="supervised_profile_fake_name" value="" autocomplete="name" tabindex="-1" aria-hidden="true" class="hidden">
             <input type="email" name="supervised_profile_fake_email" value="" autocomplete="email" tabindex="-1" aria-hidden="true" class="hidden">
             <input type="tel" name="supervised_profile_fake_phone" value="" autocomplete="tel" tabindex="-1" aria-hidden="true" class="hidden">
@@ -571,6 +616,100 @@
         })();
 
         // ── Crop & Auto-Upload para fotos de perfil ──
+        (function() {
+            function readPayload() {
+                var payloadNode = document.getElementById('supervised-profile-payload');
+                if (!payloadNode) return null;
+
+                try {
+                    return JSON.parse(payloadNode.textContent || '{}');
+                } catch (error) {
+                    return null;
+                }
+            }
+
+            function setFieldValue(form, name, value) {
+                var field = form.querySelector('[name="' + name + '"]');
+                if (!field) return;
+                field.value = value == null ? '' : String(value);
+            }
+
+            function setCheckbox(form, name, checked) {
+                var field = form.querySelector('[name="' + name + '"]');
+                if (!field) return;
+                field.checked = !!checked;
+            }
+
+            function setRadio(form, name, value) {
+                form.querySelectorAll('[name="' + name + '"]').forEach(function(field) {
+                    field.checked = field.value === String(value == null ? '' : value);
+                });
+            }
+
+            function setInterestCheckboxes(form, values) {
+                var selected = Array.isArray(values) ? values.map(String) : [];
+                form.querySelectorAll('input[name="interests_list[]"]').forEach(function(field) {
+                    field.checked = selected.indexOf(field.value) !== -1;
+                });
+            }
+
+            function toggleConditionalFields(form, payload) {
+                var segmentCustom = form.querySelector('#segment_custom');
+                if (segmentCustom) {
+                    var showSegmentCustom = payload.segment_select === 'Outros' && !!payload.segment_custom;
+                    segmentCustom.classList.toggle('hidden', !showSegmentCustom);
+                }
+
+                var interestsCustom = form.querySelector('#interests_custom');
+                var interestsOther = form.querySelector('#interests_other_cb');
+                var showInterestsCustom = !!payload.interests_custom;
+                if (interestsOther) interestsOther.checked = showInterestsCustom;
+                if (interestsCustom) interestsCustom.classList.toggle('hidden', !showInterestsCustom);
+            }
+
+            function hydrateSupervisedProfile() {
+                var form = document.querySelector('form[data-supervised-profile="1"]');
+                var payload = readPayload();
+                if (!form || !payload) return;
+
+                window.__supervisedProfilePayload = payload;
+
+                ['supervised_profile_fake_name', 'supervised_profile_fake_email', 'supervised_profile_fake_phone'].forEach(function(name) {
+                    setFieldValue(form, name, '');
+                });
+
+                [
+                    'name', 'email', 'person_type', 'gender', 'birth_date', 'phone', 'doc', 'occupation', 'company',
+                    'segment_select', 'segment_custom', 'bio', 'pix_key', 'cep', 'street', 'number', 'complement',
+                    'neighborhood', 'city', 'state', 'website', 'instagram', 'facebook', 'twitter', 'linkedin', 'youtube'
+                ].forEach(function(name) {
+                    setFieldValue(form, name, payload[name]);
+                });
+
+                setCheckbox(form, 'show_email_public', payload.show_email_public);
+                setCheckbox(form, 'show_phone_public', payload.show_phone_public);
+                setCheckbox(form, 'show_address_public', payload.show_address_public);
+                setCheckbox(form, 'hide_profile', payload.hide_profile);
+                setRadio(form, 'theme_pref', payload.theme_pref || 'light');
+                setInterestCheckboxes(form, payload.interests_list || []);
+                setFieldValue(form, 'interests_custom', payload.interests_custom || '');
+                toggleConditionalFields(form, payload);
+            }
+
+            function scheduleHydration() {
+                hydrateSupervisedProfile();
+                window.requestAnimationFrame(hydrateSupervisedProfile);
+                window.setTimeout(hydrateSupervisedProfile, 120);
+                window.setTimeout(hydrateSupervisedProfile, 400);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', scheduleHydration);
+            } else {
+                scheduleHydration();
+            }
+        })();
+
         (function() {
             var cropper = null;
             var currentType = '';
