@@ -37,6 +37,11 @@ class BackupController extends Controller
                 'backup_keep_daily' => (int) Setting::get('backup_keep_daily', 30),
                 'backup_keep_weekly' => (int) Setting::get('backup_keep_weekly', 12),
                 'backup_notify_success' => $this->settingBool('backup_notify_success', true),
+                'backup_database_enabled' => $this->settingBool('backup_database_enabled', true),
+                'backup_database_time' => $this->timeSetting('backup_database_time', '03:00'),
+                'backup_config_enabled' => $this->settingBool('backup_config_enabled', true),
+                'backup_config_weekday' => (int) Setting::get('backup_config_weekday', 0),
+                'backup_config_time' => $this->timeSetting('backup_config_time', '04:00'),
             ],
             's3Status' => $this->makeS3Status(),
         ]);
@@ -72,11 +77,21 @@ class BackupController extends Controller
             'backup_keep_daily' => 'required|integer|min:1|max:365',
             'backup_keep_weekly' => 'required|integer|min:1|max:104',
             'backup_notify_success' => 'nullable|boolean',
+            'backup_database_enabled' => 'nullable|boolean',
+            'backup_database_time' => 'required|date_format:H:i',
+            'backup_config_enabled' => 'nullable|boolean',
+            'backup_config_weekday' => 'required|integer|min:0|max:6',
+            'backup_config_time' => 'required|date_format:H:i',
         ]);
 
         Setting::set('backup_keep_daily', (string) $data['backup_keep_daily'], 'backup');
         Setting::set('backup_keep_weekly', (string) $data['backup_keep_weekly'], 'backup');
         Setting::set('backup_notify_success', $request->boolean('backup_notify_success') ? '1' : '0', 'backup');
+        Setting::set('backup_database_enabled', $request->boolean('backup_database_enabled') ? '1' : '0', 'backup');
+        Setting::set('backup_database_time', (string) $data['backup_database_time'], 'backup');
+        Setting::set('backup_config_enabled', $request->boolean('backup_config_enabled') ? '1' : '0', 'backup');
+        Setting::set('backup_config_weekday', (string) $data['backup_config_weekday'], 'backup');
+        Setting::set('backup_config_time', (string) $data['backup_config_time'], 'backup');
 
         return back()->with('success', 'Configuracoes de backup atualizadas.');
     }
@@ -231,6 +246,13 @@ class BackupController extends Controller
         }
 
         return in_array(strtolower(trim((string) $value)), ['1', 'true', 'sim', 'yes', 'on'], true);
+    }
+
+    private function timeSetting(string $key, string $default): string
+    {
+        $value = trim((string) Setting::get($key, $default));
+
+        return preg_match('/^\d{2}:\d{2}$/', $value) === 1 ? $value : $default;
     }
 
     private function formatBytes(int $bytes): string

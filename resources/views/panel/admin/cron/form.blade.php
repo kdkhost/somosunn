@@ -12,9 +12,12 @@
             'notifications:cleanup' => 'Limpeza de notificacoes',
             'auth:clear-resets' => 'Limpar tokens de senha',
             'sanctum:prune-expired' => 'Limpar tokens de API',
+            'orders:send-unpaid-reminders' => 'Lembretes de pedidos nao pagos',
             'orders:cancel-unpaid' => 'Cancelar pedidos nao pagos',
             'abandoned-cart:send' => 'Disparo de carrinho abandonado',
             'subscriptions:check-expired' => 'Expirar planos vencidos',
+            'backup:database' => 'Backup do banco de dados',
+            'backup:config' => 'Backup de configuracoes',
             'queue:work --stop-when-empty --tries=3' => 'Processar fila de jobs',
         ];
 

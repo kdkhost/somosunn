@@ -26,8 +26,13 @@ class ScheduledTasksSeeder extends Seeder
                 'active' => true,
             ],
             [
+                'command' => 'orders:send-unpaid-reminders',
+                'frequency' => '*/15 * * * *', // A cada 15 minutos
+                'active' => true,
+            ],
+            [
                 'command' => 'orders:cancel-unpaid',
-                'frequency' => '0 * * * *', // A cada hora
+                'frequency' => '*/5 * * * *', // A cada 5 minutos
                 'active' => true,
             ],
             [

@@ -22,6 +22,17 @@ Pendencias estruturais ainda abertas:
 - Refatorar `EventReservationController` para services menores de checkout, inscricao, gateway e pagamento gratuito/pago.
 - Ampliar testes feature reais dos dois paineis apos estabilizar banco de teste MariaDB do projeto.
 
+### Atualizacao aplicada em 19/06/2026 - crons, backups e pedidos pendentes
+
+- O cron automatico principal fica em `app/Console/Kernel.php` e deve ser acionado pelo cron real do servidor com `php artisan schedule:run` a cada minuto; o middleware `RunInternalCron` fica apenas como fallback desativado por padrao.
+- O painel principal de tarefas fica em `/admin/cron` e o painel moderno equivalente em `/painel/admin/cron`; ambos preservam a tabela compartilhada `scheduled_tasks`.
+- O gerenciamento operacional de backups fica em `/admin/backups`, usando `BackupController` e `BackupService`; os horarios automaticos passam a ser configurados por `backup_database_time`, `backup_config_time` e `backup_config_weekday`.
+- Adicionado o comando compartilhado `orders:send-unpaid-reminders`, agendado antes de `orders:cancel-unpaid`, para enviar lembretes de pedidos pendentes.
+- O cancelamento automatico de pedidos pendentes passou a usar `orders_unpaid_cancel_after_hours`, com padrao de 24 horas, em fuso `America/Sao_Paulo`.
+- Os e-mails `order_unpaid_payment_reminder` e `order_unpaid_auto_cancelled` usam `mail_templates`, sao editaveis no administrativo e enviam copia oculta para admin/superadmin.
+- A tela `/painel/compras` passou a calcular o prazo de expiracao com a mesma regra do cron, evitando divergencia visual.
+- Rotas preservadas: `admin.cron.*`, `panel.admin.cron.*`, `admin.backups.*`, `admin.orders.*`, `panel.admin.orders.*` e `panel.purchases.*`.
+
 ### Atualizacao aplicada em 19/06/2026 - tema e codificacao
 
 - Corrigida a alternancia dark/light do `/admin`: o navbar passou a usar o tema real resolvido por `resources/views/admin/layouts/app.blade.php`, sem depender de `$settings` especifico de cada tela.

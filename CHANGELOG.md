@@ -2,6 +2,32 @@
 
 ---
 
+## [2026-06-19] - fix(cron): automatizar backups e pedidos pendentes
+
+### Corrigido
+- O scheduler passou a resolver o fuso em `system_timezone`, com padrao `America/Sao_Paulo`, antes de registrar os crons.
+- O fallback de cron por visita deixou de vir ativo por padrao; a automacao real deve usar o cron do servidor com `php artisan schedule:run`.
+- O cancelamento de pedidos pendentes passou a usar `orders_unpaid_cancel_after_hours` com padrao de 24 horas.
+- A tela de compras do membro passou a exibir o mesmo prazo usado pelo cancelamento automatico.
+
+### Adicionado
+- Novo comando `orders:send-unpaid-reminders` para enviar lembretes personalizados antes do cancelamento.
+- Templates editaveis `order_unpaid_payment_reminder` e `order_unpaid_auto_cancelled`, com copia oculta para admin/superadmin.
+- Configuracao de horario dos backups automaticos em `/admin/backups`.
+- Comandos de backup e lembrete passaram a aparecer nas telas de cron dos dois paineis.
+
+### Arquivos principais
+- `app/Console/Kernel.php`
+- `app/Console/Commands/SendUnpaidOrderReminders.php`
+- `app/Console/Commands/CancelUnpaidOrders.php`
+- `app/Services/OrderPendingPaymentNotificationService.php`
+- `app/Http/Controllers/Admin/BackupController.php`
+- `resources/views/admin/backups/index.blade.php`
+- `resources/views/admin/cron/form.blade.php`
+- `resources/views/panel/admin/cron/form.blade.php`
+
+---
+
 ## [2026-06-19] - feat(pdf): padronizar marca d'agua com logo
 
 ### Adicionado

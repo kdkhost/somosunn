@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Services\EventExhibitorService;
+use App\Services\OrderPendingPaymentNotificationService;
 use App\Services\Payment\MercadoPagoService;
 use App\Services\Payment\SumUpService;
 use Carbon\Carbon;
@@ -14,33 +15,30 @@ use Illuminate\Support\Facades\Log;
 class CancelUnpaidOrders extends Command
 {
     protected $signature = 'orders:cancel-unpaid';
-    protected $description = 'Cancels unpaid orders based on payment method deadlines (PIX = 24h, card = 48h)';
+    protected $description = 'Cancela pedidos nao pagos apos o prazo configurado e notifica o cliente';
 
     public function handle()
     {
+        if ((int) Setting::get('cron_orders_cancel_enabled', 1) !== 1) {
+            $this->info('Cron de cancelamento de pedidos nao pagos desativado.');
+
+            return self::SUCCESS;
+        }
+
         $this->info('Starting checks for unpaid orders...');
 
-        // Deadlines configuraveis via Settings (em horas)
-        $pixCancelHours  = (int) (Setting::get('pix_cancel_hours', 24));
-        $cardCancelHours = (int) (Setting::get('card_cancel_hours', 48));
-        $defaultHours    = 48;
-
-        // Otimizacao: so buscar pedidos pendentes criados ha mais de X horas (minimo possivel)
-        $minHours = min($pixCancelHours, $cardCancelHours);
-        $maxAge   = Carbon::now()->subHours($minHours);
+        $cancelAfterHours = $this->cancelAfterHours();
+        $maxAge = Carbon::now($this->timezone())->subHours($cancelAfterHours);
 
         $count = 0;
 
         Order::where('status', 'pending')
-            ->where('created_at', '<', $maxAge)
-            ->with('items')
-            ->chunkById(100, function ($orders) use ($pixCancelHours, $cardCancelHours, $defaultHours, &$count) {
+            ->where('created_at', '<=', $maxAge)
+            ->with(['items', 'user'])
+            ->chunkById(100, function ($orders) use ($cancelAfterHours, &$count) {
                 foreach ($orders as $order) {
-                    $deadline = $this->computeDeadline($order, $pixCancelHours, $cardCancelHours, $defaultHours);
-
-                    if ($order->created_at->lt($deadline)) {
-                        $hours = $this->getHoursForMethod($order, $pixCancelHours, $cardCancelHours, $defaultHours);
-                        $this->cancelOrder($order, $hours);
+                    if ($order->created_at && $order->created_at->lte(Carbon::now($this->timezone())->subHours($cancelAfterHours))) {
+                        $this->cancelOrder($order, $cancelAfterHours);
                         $count++;
                     }
                 }
@@ -49,44 +47,6 @@ class CancelUnpaidOrders extends Command
         $this->info("Processed $count orders.");
 
         return self::SUCCESS;
-    }
-
-    /**
-     * Calcula o deadline para o pedido considerando metodo de pagamento.
-     * Retorna o timestamp limite: se created_at < deadline, o pedido expirou.
-     */
-    private function computeDeadline(Order $order, int $pixHours, int $cardHours, int $defaultHours): Carbon
-    {
-        $hours = $this->getHoursForMethod($order, $pixHours, $cardHours, $defaultHours);
-        return Carbon::now()->subHours($hours);
-    }
-
-    /**
-     * Retorna a quantidade de horas de tolerancia para o metodo de pagamento.
-     */
-    private function getHoursForMethod(Order $order, int $pixHours, int $cardHours, int $defaultHours): int
-    {
-        $paymentMethod = (string) ($order->payment_method ?? '');
-
-        // PIX: usa pix_cancel_hours
-        if (stripos($paymentMethod, 'pix') !== false) {
-            return $pixHours;
-        }
-
-        // Cartao: usa card_cancel_hours
-        if (stripos($paymentMethod, 'card') !== false
-            || stripos($paymentMethod, 'credit') !== false
-            || stripos($paymentMethod, 'debit') !== false) {
-            return $cardHours;
-        }
-
-        // Boleto (ticket): 72h (3 dias)
-        if (stripos($paymentMethod, 'ticket') !== false || stripos($paymentMethod, 'boleto') !== false) {
-            return 72;
-        }
-
-        // Default: 48h
-        return $defaultHours;
     }
 
     private function cancelOrder(Order $order, int $hours): void
@@ -142,6 +102,22 @@ class CancelUnpaidOrders extends Command
             'payment_window_expired'
         );
 
+        $freshOrder = $order->fresh(['items', 'user']);
+        if ($freshOrder) {
+            $sent = app(OrderPendingPaymentNotificationService::class)
+                ->sendAutoCancellation($freshOrder, $hours, $cancelReason);
+
+            if ($sent) {
+                $metadata = is_array($freshOrder->metadata) ? $freshOrder->metadata : [];
+                $notifications = is_array($metadata['notifications'] ?? null) ? $metadata['notifications'] : [];
+                $notifications['unpaid_auto_cancelled'] = [
+                    'sent_at' => now($this->timezone())->toIso8601String(),
+                ];
+                $metadata['notifications'] = $notifications;
+                $freshOrder->update(['metadata' => $metadata]);
+            }
+        }
+
         Log::info("Order #{$order->id} auto-cancelled", [
             'gateway'        => $order->gateway,
             'payment_method' => $paymentMethod,
@@ -184,5 +160,19 @@ class CancelUnpaidOrders extends Command
     {
         $method = strtolower(trim($paymentMethod)) ?: 'unknown';
         return "Auto-cancel: payment window expired ({$method}, {$hours}h)";
+    }
+
+    private function cancelAfterHours(): int
+    {
+        $hours = (int) Setting::get('orders_unpaid_cancel_after_hours', 24);
+
+        return max(1, min(720, $hours));
+    }
+
+    private function timezone(): string
+    {
+        $timezone = trim((string) Setting::get('system_timezone', config('app.timezone', 'America/Sao_Paulo')));
+
+        return $timezone !== '' ? $timezone : 'America/Sao_Paulo';
     }
 }

@@ -38,10 +38,14 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule): void
     {
+        $timezone = $this->schedulerTimezone();
+        date_default_timezone_set($timezone);
+        config(['app.timezone' => $timezone]);
+
         // Heartbeat para monitoramento no painel
         $schedule->call(function () {
             \Illuminate\Support\Facades\Cache::put('cron_heartbeat', now(), 120);
-        })->everyMinute();
+        })->everyMinute()->timezone($timezone);
 
         // Processamento de fila de e-mails (configuravel no painel SMTP)
         try {
@@ -139,10 +143,17 @@ class Kernel extends ConsoleKernel
             \Log::warning('Falha ao configurar reconciliacao SumUp: ' . $e->getMessage());
         }
 
-        // Cancela pedidos não pagos após expiração do prazo (PIX, cartão, boleto)
+        // Lembra e cancela pedidos nao pagos conforme prazo configurado.
         try {
+            $schedule->command('orders:send-unpaid-reminders --limit=200')
+                ->everyFifteenMinutes()
+                ->timezone($timezone)
+                ->withoutOverlapping()
+                ->name('orders-send-unpaid-reminders');
+
             $schedule->command('orders:cancel-unpaid')
                 ->everyFiveMinutes()
+                ->timezone($timezone)
                 ->withoutOverlapping()
                 ->name('orders-cancel-unpaid');
         } catch (\Throwable $e) {
@@ -290,23 +301,34 @@ class Kernel extends ConsoleKernel
 
         // Backup automatico (advanced-security-performance, Requirement 7.5)
         try {
-            $schedule->command('backup:database')
-                ->dailyAt('03:00')
-                ->withoutOverlapping()
-                ->onOneServer()
-                ->runInBackground()
-                ->onFailure(function () {
-                    \Illuminate\Support\Facades\Log::channel('security')->error(
-                        'Scheduled backup:database falhou durante execucao.',
-                        ['command' => 'backup:database', 'scheduled_at' => '03:00']
-                    );
-                });
+            if ($this->settingBool('backup_database_enabled', true)) {
+                $backupDatabaseTime = $this->timeSetting('backup_database_time', '03:00');
 
-            $schedule->command('backup:config')
-                ->weeklyOn(0, '04:00')  // Sunday at 4am
-                ->withoutOverlapping()
-                ->onOneServer()
-                ->runInBackground();
+                $schedule->command('backup:database')
+                    ->dailyAt($backupDatabaseTime)
+                    ->timezone($timezone)
+                    ->withoutOverlapping()
+                    ->onOneServer()
+                    ->runInBackground()
+                    ->onFailure(function () use ($backupDatabaseTime) {
+                        \Illuminate\Support\Facades\Log::channel('security')->error(
+                            'Scheduled backup:database falhou durante execucao.',
+                            ['command' => 'backup:database', 'scheduled_at' => $backupDatabaseTime]
+                        );
+                    });
+            }
+
+            if ($this->settingBool('backup_config_enabled', true)) {
+                $backupConfigTime = $this->timeSetting('backup_config_time', '04:00');
+                $backupConfigWeekday = $this->intSetting('backup_config_weekday', 0, 0, 6);
+
+                $schedule->command('backup:config')
+                    ->weeklyOn($backupConfigWeekday, $backupConfigTime)
+                    ->timezone($timezone)
+                    ->withoutOverlapping()
+                    ->onOneServer()
+                    ->runInBackground();
+            }
         } catch (\Throwable $e) {
             \Log::warning('Falha ao configurar agendamento de backups: ' . $e->getMessage());
         }
@@ -335,6 +357,7 @@ class Kernel extends ConsoleKernel
                 foreach ($tasks as $task) {
                     $schedule->command($task->command)
                         ->cron($task->frequency)
+                        ->timezone($timezone)
                         ->withoutOverlapping()
                         ->after(function () use ($task) {
                             try {
@@ -362,5 +385,66 @@ class Kernel extends ConsoleKernel
     {
         $this->load(__DIR__ . '/Commands');
         require base_path('routes/console.php');
+    }
+
+    private function schedulerTimezone(): string
+    {
+        try {
+            if (\Schema::hasTable('settings')) {
+                $timezone = trim((string) \App\Models\Setting::get('system_timezone', ''));
+                if ($timezone !== '') {
+                    return $timezone;
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao resolver timezone do scheduler: ' . $e->getMessage());
+        }
+
+        return config('app.timezone', 'America/Sao_Paulo') ?: 'America/Sao_Paulo';
+    }
+
+    private function settingBool(string $key, bool $default): bool
+    {
+        try {
+            if (!\Schema::hasTable('settings')) {
+                return $default;
+            }
+
+            $value = \App\Models\Setting::get($key, $default ? '1' : '0');
+
+            return in_array(strtolower(trim((string) $value)), ['1', 'true', 'sim', 'yes', 'on'], true);
+        } catch (\Throwable $e) {
+            return $default;
+        }
+    }
+
+    private function timeSetting(string $key, string $default): string
+    {
+        try {
+            if (!\Schema::hasTable('settings')) {
+                return $default;
+            }
+
+            $value = trim((string) \App\Models\Setting::get($key, $default));
+
+            return preg_match('/^\d{2}:\d{2}$/', $value) === 1 ? $value : $default;
+        } catch (\Throwable $e) {
+            return $default;
+        }
+    }
+
+    private function intSetting(string $key, int $default, int $min, int $max): int
+    {
+        try {
+            if (!\Schema::hasTable('settings')) {
+                return $default;
+            }
+
+            $value = (int) \App\Models\Setting::get($key, (string) $default);
+
+            return max($min, min($max, $value));
+        } catch (\Throwable $e) {
+            return $default;
+        }
     }
 }

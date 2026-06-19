@@ -143,28 +143,9 @@ class MarketplacePurchaseController extends Controller
             return null;
         }
 
-        $paymentMethod = (string) ($order->payment_method ?? '');
-        $gateway = (string) ($order->gateway ?? '');
+        $hours = (int) Setting::get('orders_unpaid_cancel_after_hours', 24);
 
-        if (stripos($paymentMethod, 'pix') !== false) {
-            $minutes = $gateway === 'sumup'
-                ? (int) (Setting::get('sumup_pix_expiration_minutes') ?? 10)
-                : (int) (Setting::get('mercadopago_pix_expiration_minutes') ?? Setting::get('pix_expiration_minutes') ?? 10);
-            return $order->created_at->copy()->addMinutes(max(1, $minutes));
-        }
-
-        if (stripos($paymentMethod, 'card') !== false
-            || stripos($paymentMethod, 'credit') !== false
-            || stripos($paymentMethod, 'debit') !== false) {
-            return $order->created_at->copy()->addHours(24);
-        }
-
-        if (stripos($paymentMethod, 'ticket') !== false || stripos($paymentMethod, 'boleto') !== false) {
-            return $order->created_at->copy()->addDays(3);
-        }
-
-        // Default 48h
-        return $order->created_at->copy()->addHours(48);
+        return $order->created_at->copy()->addHours(max(1, min(720, $hours)));
     }
 
     private function cancelExpiredOrder(Order $order): void

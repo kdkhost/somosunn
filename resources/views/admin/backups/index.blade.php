@@ -237,6 +237,31 @@
                                     <div class="input-group-append"><span class="input-group-text">arquivos</span></div>
                                 </div>
                             </div>
+                            <div class="custom-control custom-switch mb-3">
+                                <input type="checkbox" name="backup_database_enabled" value="1" class="custom-control-input" id="backup_database_enabled" {{ old('backup_database_enabled', $backupSettings['backup_database_enabled']) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="backup_database_enabled">Backup automatico do banco</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Horario do backup do banco</label>
+                                <input type="time" name="backup_database_time" class="form-control" value="{{ old('backup_database_time', $backupSettings['backup_database_time']) }}" required>
+                                <small class="text-muted">Executado no fuso America/Sao_Paulo.</small>
+                            </div>
+                            <div class="custom-control custom-switch mb-3">
+                                <input type="checkbox" name="backup_config_enabled" value="1" class="custom-control-input" id="backup_config_enabled" {{ old('backup_config_enabled', $backupSettings['backup_config_enabled']) ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="backup_config_enabled">Backup automatico de configuracoes</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Dia do backup de configuracoes</label>
+                                <select name="backup_config_weekday" class="form-control">
+                                    @foreach([0 => 'Domingo', 1 => 'Segunda', 2 => 'Terca', 3 => 'Quarta', 4 => 'Quinta', 5 => 'Sexta', 6 => 'Sabado'] as $weekday => $label)
+                                        <option value="{{ $weekday }}" {{ (int) old('backup_config_weekday', $backupSettings['backup_config_weekday']) === $weekday ? 'selected' : '' }}>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Horario do backup de configuracoes</label>
+                                <input type="time" name="backup_config_time" class="form-control" value="{{ old('backup_config_time', $backupSettings['backup_config_time']) }}" required>
+                            </div>
                             <div class="custom-control custom-switch">
                                 <input type="checkbox" name="backup_notify_success" value="1" class="custom-control-input" id="backup_notify_success" {{ old('backup_notify_success', $backupSettings['backup_notify_success']) ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="backup_notify_success">Enviar e-mail quando o backup concluir com sucesso</label>
