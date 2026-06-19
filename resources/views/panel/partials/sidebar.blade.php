@@ -606,7 +606,7 @@
         @endif
 
         <div class="mt-8 px-4">
-            <button onclick="toggleTheme(this)"
+            <button type="button" onclick="toggleTheme(this)"
                 class="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 group">
                 <div class="flex items-center gap-3">
                     <i
@@ -624,39 +624,71 @@
 </div>
 
 <script>
-    function toggleTheme(btn) {
-        const isDark = document.documentElement.classList.contains('dark');
-        const newTheme = isDark ? 'light' : 'dark';
+    let panelThemeSaving = false;
 
-        if (newTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-            if (btn) {
-                const icon = btn.querySelector('i.fas');
-                if (icon) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
-                const span = btn.querySelector('span');
-                if (span) span.innerText = 'Modo Claro';
-                const knob = btn.querySelector('.absolute.top-1');
-                if (knob) { knob.classList.remove('left-1'); knob.classList.add('right-1'); }
-            }
-        } else {
-            document.documentElement.classList.remove('dark');
-            if (btn) {
-                const icon = btn.querySelector('i.fas');
-                if (icon) { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
-                const span = btn.querySelector('span');
-                if (span) span.innerText = 'Modo Escuro';
-                const knob = btn.querySelector('.absolute.top-1');
-                if (knob) { knob.classList.remove('right-1'); knob.classList.add('left-1'); }
-            }
+    function applyPanelTheme(theme, btn) {
+        const isDark = theme === 'dark';
+        document.documentElement.classList.toggle('dark', isDark);
+
+        if (!btn) {
+            return;
         }
+
+        const icon = btn.querySelector('i.fas');
+        const span = btn.querySelector('span');
+        const knob = btn.querySelector('.absolute.top-1');
+
+        if (icon) {
+            icon.classList.toggle('fa-moon', !isDark);
+            icon.classList.toggle('fa-sun', isDark);
+        }
+        if (span) {
+            span.innerText = isDark ? 'Modo Claro' : 'Modo Escuro';
+        }
+        if (knob) {
+            knob.classList.toggle('left-1', !isDark);
+            knob.classList.toggle('right-1', isDark);
+        }
+    }
+
+    function toggleTheme(btn) {
+        if (panelThemeSaving) {
+            return;
+        }
+
+        const previousTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        const newTheme = previousTheme === 'dark' ? 'light' : 'dark';
+
+        applyPanelTheme(newTheme, btn);
+        panelThemeSaving = true;
 
         fetch('{{ route("theme.toggle") }}', {
             method: 'POST',
             headers: {
+                'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest'
             },
+            credentials: 'same-origin',
             body: JSON.stringify({ theme: newTheme })
-        }).catch(() => {});
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('theme-save-failed');
+                }
+                return response.json().catch(function () {
+                    return {};
+                });
+            })
+            .catch(function () {
+                applyPanelTheme(previousTheme, btn);
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('Nao foi possivel salvar o tema. Tente novamente.');
+                }
+            })
+            .finally(function () {
+                panelThemeSaving = false;
+            });
     }
 </script>

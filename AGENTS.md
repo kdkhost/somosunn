@@ -23,6 +23,7 @@
 ## Checagem antes de commitar
 
 - Rode: `php tools/check-no-bom.php`
+- Rode tambem: `php tools/check-text-encoding.php`
 - Se houver BOM, re-salve os arquivos como UTF-8 sem BOM e repita a checagem.
 
 ## Deploy

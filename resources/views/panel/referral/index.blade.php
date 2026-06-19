@@ -169,7 +169,7 @@
                                         @endphp
                                         <tr>
                                             <td class="px-5 py-4">
-                                                <p class="font-semibold text-slate-900 dark:text-white">{{ $visit->first_visited_at?->format('d/m/Y H:i') ?? 'â€”' }}</p>
+                                                <p class="font-semibold text-slate-900 dark:text-white">{{ $visit->first_visited_at?->format('d/m/Y H:i') ?? '-' }}</p>
                                                 <p class="text-xs text-slate-500 dark:text-slate-400">
                                                     {{ number_format($visit->clicks_count) }} clique(s) · {{ number_format($visit->pageviews_count) }} página(s)
                                                 </p>
@@ -498,7 +498,7 @@
                                     @elseif($referred->plan_id)
                                         <span class="text-xs text-yellow-600 dark:text-yellow-500 font-medium whitespace-nowrap">Aguardando</span>
                                     @else
-                                        <span class="text-slate-400 dark:text-slate-600 text-xs">â€”</span>
+                                        <span class="text-slate-400 dark:text-slate-600 text-xs">-</span>
                                     @endif
                                 </td>
                             </tr>
@@ -542,17 +542,17 @@
                         @php $meta = json_decode($log->meta ?? '{}', true); @endphp
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                             <td class="px-3 py-3 sm:px-6 sm:py-4 max-w-[40vw] sm:max-w-none">
-                                <p class="font-semibold text-slate-900 dark:text-white truncate text-xs sm:text-sm">{{ $meta['new_user_name'] ?? 'â€”' }}</p>
+                                <p class="font-semibold text-slate-900 dark:text-white truncate text-xs sm:text-sm">{{ $meta['new_user_name'] ?? '-' }}</p>
                                 <p class="text-xs text-slate-400 sm:hidden">{{ optional($log->created_at)->format('d/m/Y') }}</p>
                             </td>
                             <td class="px-3 py-3 sm:px-6 sm:py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell text-xs">
-                                {{ $meta['plan_name'] ?? 'â€”' }}
+                                {{ $meta['plan_name'] ?? '-' }}
                             </td>
                             <td class="px-3 py-3 sm:px-6 sm:py-4 hidden lg:table-cell">
                                 @if(isset($meta['order_id']))
                                     <code class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs px-2 py-0.5 rounded">#{{ $meta['order_id'] }}</code>
                                 @else
-                                    <span class="text-slate-400">â€”</span>
+                                    <span class="text-slate-400">-</span>
                                 @endif
                             </td>
                             <td class="px-3 py-3 sm:px-6 sm:py-4 text-slate-500 dark:text-slate-400 hidden sm:table-cell">

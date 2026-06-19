@@ -2,6 +2,24 @@
 
 ---
 
+## [2026-06-19] - fix(admin): corrigir tema e codificacao
+
+### Corrigido
+- O botao de alternancia dark/light do AdminLTE passou a usar o tema real resolvido pelo layout, evitando divergencia quando uma tela define sua propria variavel `$settings`.
+- O toggle de tema do painel moderno passou a validar o salvamento no servidor e reverter a interface quando o POST falhar.
+- Corrigidos textos com mojibake em menu administrativo e na tela de indicacoes.
+- Adicionada checagem `php tools/check-text-encoding.php` para barrar BOM e sequencias comuns de acentuacao quebrada.
+
+### Arquivos principais
+- `resources/views/admin/partials/navbar.blade.php`
+- `resources/views/panel/partials/sidebar.blade.php`
+- `resources/views/admin/partials/sidebar.blade.php`
+- `resources/views/panel/referral/index.blade.php`
+- `tools/check-text-encoding.php`
+- `AGENTS.md`
+
+---
+
 ## [2026-06-19] - refactor(vendas): reorganizar detalhe da venda nos dois paineis
 
 ### Corrigido

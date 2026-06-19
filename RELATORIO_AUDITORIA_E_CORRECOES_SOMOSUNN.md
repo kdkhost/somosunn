@@ -22,6 +22,14 @@ Pendencias estruturais ainda abertas:
 - Refatorar `EventReservationController` para services menores de checkout, inscricao, gateway e pagamento gratuito/pago.
 - Ampliar testes feature reais dos dois paineis apos estabilizar banco de teste MariaDB do projeto.
 
+### Atualizacao aplicada em 19/06/2026 - tema e codificacao
+
+- Corrigida a alternancia dark/light do `/admin`: o navbar passou a usar o tema real resolvido por `resources/views/admin/layouts/app.blade.php`, sem depender de `$settings` especifico de cada tela.
+- Reforcada a alternancia dark/light do `/painel`: o botao do painel moderno agora valida a resposta de `theme.toggle`, bloqueia clique concorrente e reverte a interface se o salvamento falhar.
+- Mantida a separacao de regra por painel: `/admin` usa a configuracao global `site_theme`; `/painel` usa a preferencia do usuario em `theme_pref`.
+- Corrigidos textos com acentuacao quebrada no menu administrativo e na tela de indicacoes.
+- Adicionada a validacao `php tools/check-text-encoding.php` para barrar UTF-8 BOM e sequencias comuns de mojibake antes de novas entregas.
+
 ### Atualizacao aplicada em 19/06/2026 - detalhe de vendas
 
 - Reorganizada a tela de detalhe da venda no painel principal em `/admin/orders/{order}`, mantendo o controller `app/Http/Controllers/Admin/OrderController.php` e a view `resources/views/admin/orders/show.blade.php`.

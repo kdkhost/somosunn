@@ -178,14 +178,15 @@
             </a>
         </li>
 
+        @php($adminCurrentTheme = ($siteTheme ?? ($adminLayoutSettings['site_theme'] ?? 'light')) === 'dark' ? 'dark' : 'light')
         <li class="nav-item mr-2 d-flex align-items-center">
             <form method="POST" action="{{ route('admin.settings.update') }}" id="themeToggleForm" class="m-0 p-0">
                 @csrf
                 <input type="hidden" name="current_group" value="appearance">
                 <input type="hidden" name="site_theme" id="site_theme_input"
-                    value="{{ $settings['site_theme'] ?? 'light' }}">
+                    value="{{ $adminCurrentTheme }}">
                 <a class="nav-link" href="#" id="themeToggleBtn" role="button" title="Alternar tema">
-                    <i class="fas {{ ($settings['site_theme'] ?? 'light') === 'dark' ? 'fa-sun text-warning' : 'fa-moon' }}"></i>
+                    <i class="fas {{ $adminCurrentTheme === 'dark' ? 'fa-sun text-warning' : 'fa-moon' }}"></i>
                 </a>
             </form>
         </li>
