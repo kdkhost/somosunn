@@ -60,6 +60,7 @@
             <label class="space-y-2">
                 <span class="text-xs font-black uppercase tracking-widest text-slate-500">Expira em</span>
                 <input type="text" name="expires_at" value="{{ old('expires_at', $coupon->expires_at ? $coupon->expires_at->format('Y-m-d H:i') : '') }}" data-datetime-picker placeholder="DD/MM/AAAA HH:MM" autocomplete="off" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                <span class="block text-xs font-semibold text-slate-500">Se deixar em branco, o cupom vale ate o encerramento do evento.</span>
                 @error('expires_at')<span class="text-xs font-bold text-red-600">{{ $message }}</span>@enderror
             </label>
         </div>

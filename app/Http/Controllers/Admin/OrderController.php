@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Services\OrderCancellationService;
 use App\Services\OrderRefundService;
 use App\Services\OrderSettlementService;
+use App\Services\SalesAnalyticsService;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Database\Eloquent\Builder;
@@ -87,6 +88,30 @@ class OrderController extends Controller
         $canManualApprove = $this->canCurrentUserApproveManually();
 
         return view('admin.orders.show', compact('order', 'canManualApprove'));
+    }
+
+    public function salesReport(Request $request, SalesAnalyticsService $salesAnalyticsService)
+    {
+        $search = trim((string) $request->input('search', ''));
+        $saleType = trim((string) $request->input('sale_type', ''));
+        $period = $this->resolvePeriod($request);
+
+        $report = $salesAnalyticsService->productSalesReport(
+            $search,
+            $saleType,
+            $period['from'],
+            $period['to'],
+            20
+        );
+
+        return view('admin.orders.sales_report', [
+            'rows' => $report['rows'],
+            'summary' => $report['summary'],
+            'search' => $search,
+            'saleType' => $saleType,
+            'saleTypeLabels' => Order::SALE_TYPE_LABELS,
+            'period' => $period,
+        ]);
     }
 
     public function refund(Request $request, Order $order, OrderRefundService $orderRefundService)

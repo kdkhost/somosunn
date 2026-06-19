@@ -222,19 +222,19 @@ class Event extends Model
 
     public function currentPriceFor(?User $user = null): float
     {
-
         $now = now();
+        for ($number = 1; $number <= 3; $number++) {
+            $price = round((float) ($this->getAttribute("batch_{$number}_price") ?? 0), 2);
+            if ($price <= 0) {
+                continue;
+            }
 
-        if ($this->batch_1_price && (!$this->batch_1_deadline || $now->lte($this->batch_1_deadline))) {
-            return round((float) $this->batch_1_price, 2);
-        }
+            $deadline = $this->getAttribute("batch_{$number}_deadline");
+            if ($deadline && $now->gt($deadline)) {
+                continue;
+            }
 
-        if ($this->batch_2_price && (!$this->batch_2_deadline || $now->lte($this->batch_2_deadline))) {
-            return round((float) $this->batch_2_price, 2);
-        }
-
-        if ($this->batch_3_price) {
-            return round((float) $this->batch_3_price, 2);
+            return $price;
         }
 
         return round((float) ($this->price ?? 0), 2);
@@ -268,15 +268,20 @@ class Event extends Model
         return 'Entrada';
     }
 
-    public function isActuallyFreeForPublic(): bool
+    public function hasPaidValueConfigured(): bool
     {
         foreach (['price', 'batch_1_price', 'batch_2_price', 'batch_3_price', 'flash_sale_price'] as $field) {
             if (round((float) ($this->{$field} ?? 0), 2) > 0) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
+    }
+
+    public function isActuallyFreeForPublic(): bool
+    {
+        return !$this->hasPaidValueConfigured();
     }
 
     public function scopeActuallyFreeForPublic(Builder $query): Builder

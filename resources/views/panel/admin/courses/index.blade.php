@@ -42,7 +42,7 @@
                             <th class="px-6 py-4">Curso</th>
                             <th class="px-6 py-4">Instrutor</th>
                             <th class="px-6 py-4">Preço</th>
-                            <th class="px-6 py-4">Aulas/Alunos</th>
+                            <th class="px-6 py-4">Aulas / Vendas / Inscritos</th>
                             <th class="px-6 py-4">Status</th>
                             <th class="px-6 py-4 text-right">Ações</th>
                         </tr>
@@ -98,8 +98,12 @@
                                             <span>{{ $course->lessons_count }} aulas</span>
                                         </div>
                                         <div class="flex items-center gap-1.5 text-xs text-slate-500">
+                                            <i class="fas fa-shopping-cart text-emerald-400"></i>
+                                            <span>{{ (int) ($course->sales_count ?? 0) }} vendas</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 text-xs text-slate-500">
                                             <i class="fas fa-users text-purple-400"></i>
-                                            <span>{{ $course->enrollments_count }} alunos</span>
+                                            <span>{{ $course->enrollments_count }} inscritos</span>
                                         </div>
                                     </div>
                                 </td>

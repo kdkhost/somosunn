@@ -179,6 +179,15 @@
                             </div>
                         </div>
 
+                        @if($isPaid)
+                            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                                <label for="exhibitor_coupon_code" class="{{ $fieldLabelClasses }}">Cupom do evento</label>
+                                <input id="exhibitor_coupon_code" name="coupon_code" type="text" value="{{ old('coupon_code') }}" placeholder="Ex: EXPOSITOR100" class="{{ $fieldInputClasses }}{{ $errors->has('coupon_code') ? $fieldErrorClasses : '' }}">
+                                @error('coupon_code')<p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+                                <p class="mt-2 text-xs font-semibold text-slate-500">Opcional. O desconto sera validado ao continuar e respeita o encerramento das vendas do evento.</p>
+                            </div>
+                        @endif
+
                         @guest
                             <div class="grid gap-4 border-t border-slate-100 pt-6 md:grid-cols-2">
                                 <div>

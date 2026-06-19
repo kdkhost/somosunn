@@ -376,6 +376,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('admin.orders.sales-report') }}" class="nav-link {{ $is('admin.orders.sales-report') }}">
+                                    <i class="fas fa-chart-bar nav-icon"></i>
+                                    <p>RelatÃ³rio por item</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('admin.invoices.index') }}"
                                     class="nav-link {{ $is('admin.invoices.*') }}">
                                     <i class="fas fa-file-invoice nav-icon"></i>

@@ -9,6 +9,7 @@
     $canEditCoupon = $adminUser && $adminUser->hasPermission('admin.events.coupons.edit');
     $canDeleteCoupon = $adminUser && $adminUser->hasPermission('admin.events.coupons.delete');
     $canToggleCoupon = $adminUser && $adminUser->hasPermission('admin.events.coupons.toggle');
+    $eventDeadline = $event->publicDeadlineAt();
 @endphp
 <div class="container-fluid">
     <div class="card card-outline card-primary shadow-sm">
@@ -35,16 +36,22 @@
                 <table class="table table-hover mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th>Código</th>
+                            <th>Codigo</th>
                             <th>Tipo</th>
                             <th>Usos</th>
                             <th>Validade</th>
                             <th>Status</th>
-                            <th class="text-right">Ações</th>
+                            <th class="text-right">Acoes</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($coupons as $coupon)
+                            @php
+                                $effectiveExpiresAt = $coupon->expires_at;
+                                if ($eventDeadline && (!$effectiveExpiresAt || $eventDeadline->lt($effectiveExpiresAt))) {
+                                    $effectiveExpiresAt = $eventDeadline;
+                                }
+                            @endphp
                             <tr>
                                 <td><span class="badge badge-dark px-3 py-2">{{ $coupon->code }}</span></td>
                                 <td>
@@ -62,8 +69,8 @@
                                 </td>
                                 <td class="small text-muted">
                                     @if($coupon->starts_at)<div>Inicio: {{ $coupon->starts_at->format('d/m/Y H:i') }}</div>@endif
-                                    @if($coupon->expires_at)<div>Fim: {{ $coupon->expires_at->format('d/m/Y H:i') }}</div>@endif
-                                    @if(!$coupon->starts_at && !$coupon->expires_at)<span>Sem período definido</span>@endif
+                                    @if($effectiveExpiresAt)<div>Fim efetivo: {{ $effectiveExpiresAt->format('d/m/Y H:i') }}</div>@endif
+                                    @if(!$coupon->starts_at && !$effectiveExpiresAt)<span>Sem periodo definido</span>@endif
                                 </td>
                                 <td>
                                     <span class="badge badge-{{ $coupon->active ? 'success' : 'secondary' }}">

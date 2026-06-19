@@ -335,21 +335,25 @@
                     @foreach($promotionalEvents as $event)
                         @php
                             $isEventClosed = method_exists($event, 'isClosedForPublic') && $event->isClosedForPublic();
-                            $eventPrice = (float) (
-                                $event->current_price
-                                ?: $event->price
-                                ?: $event->batch_1_price
-                                ?: $event->batch_2_price
-                                ?: $event->batch_3_price
-                                ?: $event->flash_sale_price
-                                ?: 0
-                            );
+                            $eventPrice = method_exists($event, 'effectivePriceFor')
+                                ? (float) $event->effectivePriceFor()
+                                : (float) ($event->price ?? 0);
+                            $eventBatchLabel = 'Ingresso';
+                            $now = now();
+
+                            if ((float) ($event->batch_1_price ?? 0) > 0 && (!$event->batch_1_deadline || $now->lte($event->batch_1_deadline))) {
+                                $eventBatchLabel = '1o Lote';
+                            } elseif ((float) ($event->batch_2_price ?? 0) > 0 && (!$event->batch_2_deadline || $now->lte($event->batch_2_deadline))) {
+                                $eventBatchLabel = '2o Lote';
+                            } elseif ((float) ($event->batch_3_price ?? 0) > 0 && (!$event->batch_3_deadline || $now->lte($event->batch_3_deadline))) {
+                                $eventBatchLabel = '3o Lote';
+                            }
                         @endphp
                         <article class="home-selling-card bg-slate-50 rounded-3xl p-8 border border-blue-100 shadow-sm h-full flex flex-col transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                             <div class="home-selling-body">
                                 <div class="flex flex-wrap items-center gap-2 mb-4">
                                     <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
-                                        {{ $event->current_batch_label ?: 'Ingresso' }}
+                                        {{ $eventBatchLabel ?: 'Ingresso' }}
                                     </span>
                                     <span class="inline-block px-3 py-1 rounded-full text-xs font-black text-white"
                                         style="background: var(--unn-azul-1)">

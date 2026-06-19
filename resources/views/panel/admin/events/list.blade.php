@@ -59,6 +59,7 @@
                             @if(!(isset($type) && $type === 'album'))
                             <th class="px-6 py-5">Data/Hora</th>
                             <th class="px-6 py-5">Local</th>
+                            <th class="px-6 py-5 text-center">Vendas</th>
                             @endif
                             <th class="px-6 py-5 text-center">Visível</th>
                             <th class="px-6 py-5 text-center">Galeria</th>
@@ -109,6 +110,17 @@
                                     <div class="text-sm font-bold text-slate-600 dark:text-slate-400 transition-colors rounded-xl bg-slate-100/50 dark:bg-slate-800/50 px-3 py-1.5 inline-flex items-center gap-2">
                                         <i class="fas fa-map-marker-alt text-blue-500"></i>
                                         {{ $event->location ?: 'Online' }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-center">
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-base font-black text-slate-900 dark:text-white">{{ (int) ($event->total_sales_count ?? 0) }}</span>
+                                        <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500">
+                                            Ing.: {{ (int) ($event->tickets_sold_count ?? 0) }}
+                                            @if((int) ($event->exhibitor_sales_count ?? 0) > 0)
+                                                | Exp.: {{ (int) ($event->exhibitor_sales_count ?? 0) }}
+                                            @endif
+                                        </span>
                                     </div>
                                 </td>
                                 @endif
@@ -187,7 +199,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-20 text-center">
+                                <td colspan="{{ (isset($type) && $type === 'album') ? 4 : 7 }}" class="px-6 py-20 text-center">
                                     <div class="w-24 h-24 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors duration-500">
                                         <i class="fas fa-folder-open text-slate-300 dark:text-slate-600 text-3xl"></i>
                                     </div>

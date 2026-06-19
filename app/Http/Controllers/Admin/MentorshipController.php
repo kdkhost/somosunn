@@ -7,6 +7,7 @@ use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Mentorship;
 use App\Models\User;
 use App\Services\Content\SoldContentGuard;
+use App\Services\SalesAnalyticsService;
 use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +37,7 @@ class MentorshipController extends Controller
         }
 
         $items = $query->paginate(20)->withQueryString();
+        app(SalesAnalyticsService::class)->decorateMentorships($items);
 
         return view('admin.mentorships.index', compact('items', 'search'));
     }

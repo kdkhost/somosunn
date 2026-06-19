@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SellerProduct;
 use App\Models\SellerStore;
+use App\Services\SalesAnalyticsService;
 use Illuminate\Http\Request;
 
 class SellerProductController extends Controller
@@ -34,6 +35,8 @@ class SellerProductController extends Controller
             ->latest('id')
             ->paginate(20)
             ->withQueryString();
+
+        app(SalesAnalyticsService::class)->decorateSellerProducts($products);
 
         return view('panel.admin.marketplace.products.index', compact('products', 'search'));
     }

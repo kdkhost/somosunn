@@ -51,6 +51,12 @@
         </div>
     </div>
 
+    <div class="mb-3 text-right">
+        <a href="{{ route('admin.orders.sales-report', request()->query()) }}" class="btn btn-outline-primary rounded-pill px-4">
+            <i class="fas fa-chart-bar mr-1"></i> Relatorio por item
+        </a>
+    </div>
+
     {{-- Filtro --}}
     <div class="card card-outline card-primary shadow-sm mb-4">
         <div class="card-header border-0 py-2">

@@ -85,6 +85,7 @@
                         <div class="form-group mb-0">
                             <label>Expira em</label>
                             <input type="text" name="expires_at" value="{{ old('expires_at', $coupon->expires_at ? $coupon->expires_at->format('Y-m-d H:i') : '') }}" class="form-control" data-datetime-picker placeholder="DD/MM/AAAA HH:MM" autocomplete="off">
+                            <small class="text-muted">Se deixar em branco, o cupom vale ate o encerramento do evento.</small>
                             @error('expires_at')<small class="text-danger">{{ $message }}</small>@enderror
                         </div>
                     </div>

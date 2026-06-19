@@ -87,6 +87,7 @@
                                     @if(!(isset($type) && $type === 'album'))
                                     <th><i class="fas fa-clock text-muted mr-1"></i>Data/Hora</th>
                                     <th><i class="fas fa-map-marker-alt text-muted mr-1"></i>Local</th>
+                                    <th class="text-center"><i class="fas fa-chart-line text-muted mr-1"></i>Vendas</th>
                                     @endif
                                     <th class="text-center"><i class="fas fa-eye text-muted mr-1"></i>Visível</th>
                                     <th class="text-center"><i class="fas fa-images text-muted mr-1"></i>Galeria</th>
@@ -131,6 +132,17 @@
                                         <td>
                                             <i class="fas fa-map-marker-alt mr-1 text-danger"></i>
                                             {{ $event->location ?: 'Online' }}
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex flex-column">
+                                                <span class="font-weight-bold">{{ (int) ($event->total_sales_count ?? 0) }}</span>
+                                                <small class="text-muted">
+                                                    Ing.: {{ (int) ($event->tickets_sold_count ?? 0) }}
+                                                    @if((int) ($event->exhibitor_sales_count ?? 0) > 0)
+                                                        | Exp.: {{ (int) ($event->exhibitor_sales_count ?? 0) }}
+                                                    @endif
+                                                </small>
+                                            </div>
                                         </td>
                                         @endif
                                         <td class="text-center">

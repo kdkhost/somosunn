@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\SellerProduct;
 use App\Models\SellerStore;
+use App\Services\SalesAnalyticsService;
 use App\Support\MarketplaceFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -177,6 +178,8 @@ class MarketplaceController extends Controller
             ->latest('id')
             ->paginate(20)
             ->withQueryString();
+
+        app(SalesAnalyticsService::class)->decorateSellerProducts($products);
 
         return view('admin.marketplace.catalog.index', compact('products', 'search'));
     }

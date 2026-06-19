@@ -83,6 +83,7 @@
                             <th>Loja</th>
                             <th>Tipo</th>
                             <th>Status</th>
+                            <th class="text-center">Vendas</th>
                             <th class="text-right">Acao</th>
                         </tr>
                     </thead>
@@ -109,6 +110,12 @@
                                     @endphp
                                     <span class="badge {{ $statusBadge }}"><i class="fas {{ $statusIcon }} mr-1"></i>{{ strtoupper($product->status) }}</span>
                                 </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column">
+                                        <span class="font-weight-bold">{{ (int) ($product->sales_count ?? 0) }}</span>
+                                        <small class="text-muted">{{ (int) ($product->buyers_count ?? 0) }} clientes</small>
+                                    </div>
+                                </td>
                                 <td class="text-right">
                                     <form action="{{ route('admin.marketplace.catalog.toggle', $product) }}" method="POST" class="form-inline justify-content-end">
                                         @csrf
@@ -123,7 +130,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center py-5">
+                                <td colspan="6" class="text-center py-5">
                                     <div class="text-muted">
                                         <i class="fas fa-box-open mb-3" style="font-size: 3rem;"></i>
                                         <h5 class="font-weight-bold">Nenhum produto encontrado</h5>

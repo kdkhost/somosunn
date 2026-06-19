@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\Plan;
 use App\Rules\WhatsAppGroupLinkRule;
 use App\Services\Content\SoldContentGuard;
+use App\Services\SalesAnalyticsService;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use Illuminate\Http\Request;
@@ -54,6 +55,7 @@ class EventController extends Controller
         }
 
         $events = $query->get();
+        app(SalesAnalyticsService::class)->decorateEvents($events);
 
         return view('panel.admin.events.list', compact('events', 'search', 'type'));
     }

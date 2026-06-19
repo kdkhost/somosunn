@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Plan;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\EventCouponService;
 use App\Services\EventExhibitorService;
 use App\Services\OrderSettlementService;
 use App\Services\Payment\MercadoPagoService;
@@ -40,6 +41,7 @@ class EventExhibitorCheckoutController extends Controller
     public function checkout(
         EventExhibitorCheckoutRequest $request,
         Event $event,
+        EventCouponService $eventCouponService,
         MercadoPagoService $mpService,
         SumUpService $sumUpService,
         OrderSettlementService $settlementService
@@ -49,6 +51,21 @@ class EventExhibitorCheckoutController extends Controller
         $user = $this->resolveBuyer($request);
         $activeGateways = $this->activeGateways($event);
         $gatewayProvider = $this->resolveGatewayProvider($request, $activeGateways);
+        $validatedPayload = $request->validated();
+
+        $couponData = null;
+        $quantity = max(1, min(20, (int) ($validatedPayload['quantity'] ?? 1)));
+        $couponCode = $eventCouponService->normalizeCode($validatedPayload['coupon_code'] ?? null);
+        $currentBatch = $this->exhibitorService->currentBatch($event);
+        $grossSubtotal = round((float) (($currentBatch['price'] ?? 0) * $quantity), 2);
+
+        if ($couponCode !== '' && $grossSubtotal > 0) {
+            try {
+                $couponData = $eventCouponService->validateCouponLocked($event, $couponCode, $grossSubtotal, $quantity);
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['coupon_code' => $e->getMessage()]);
+            }
+        }
 
         if ($gatewayProvider === null && (float) ($event->currentExhibitorPriceFor() ?? 0) > 0) {
             return back()
@@ -60,8 +77,9 @@ class EventExhibitorCheckoutController extends Controller
             $reservation = $this->exhibitorService->createReservation(
                 $event,
                 $user,
-                $request->validated(),
-                $gatewayProvider
+                $validatedPayload,
+                $gatewayProvider,
+                $couponData
             );
         } catch (\Throwable $e) {
             return back()->withInput()->with('error', $e->getMessage());
@@ -71,13 +89,15 @@ class EventExhibitorCheckoutController extends Controller
         $order = $reservation['order'];
 
         if ((float) $order->total_amount <= 0) {
+            $couponCode = trim((string) data_get($order->metadata, 'event_coupon.code', ''));
             $settlementService->settleAsPaid($order, [
                 'transaction_id' => 'FREE-EXHIBITOR-' . $order->id . '-' . now()->format('YmdHis'),
-                'payment_method' => 'free_checkout',
+                'payment_method' => $couponCode !== '' ? 'free_coupon' : 'free_checkout',
                 'queue_invoice_email' => false,
                 'send_notifications' => false,
                 'gateway_data' => [
                     'source' => 'free_event_exhibitor_checkout',
+                    'coupon_code' => $couponCode !== '' ? $couponCode : null,
                     'automatic' => true,
                 ],
             ]);

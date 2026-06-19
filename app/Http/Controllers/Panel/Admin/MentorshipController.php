@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Mentorship;
 use App\Models\User;
 use App\Services\Content\SoldContentGuard;
+use App\Services\SalesAnalyticsService;
 use App\Services\WatermarkService;
 use App\Support\UploadStorage;
 use App\Services\PointsService;
@@ -36,6 +37,7 @@ class MentorshipController extends Controller
         }
 
         $mentorships = $query->paginate(12);
+        app(SalesAnalyticsService::class)->decorateMentorships($mentorships);
         $mentorships->appends($request->all());
 
         return view('panel.admin.mentorships.index', compact('mentorships', 'search'));

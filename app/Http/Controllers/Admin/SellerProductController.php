@@ -7,6 +7,7 @@ use App\Models\SellerProduct;
 use App\Models\SellerProductMedia;
 use App\Models\SellerStore;
 use App\Services\Content\SoldContentGuard;
+use App\Services\SalesAnalyticsService;
 use App\Services\Marketplace\SellerProductChannelSyncService;
 use App\Services\Marketplace\SellerStoreService;
 use App\Services\PointsExchangeService;
@@ -33,6 +34,8 @@ class SellerProductController extends Controller
             ->with(['media', 'redeemableItem'])
             ->latest('id')
             ->paginate(10);
+
+        app(SalesAnalyticsService::class)->decorateSellerProducts($products);
 
         return view('admin.marketplace.products.index', compact('store', 'products'));
     }

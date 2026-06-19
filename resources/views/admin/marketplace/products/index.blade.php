@@ -73,6 +73,7 @@
                                 <th class="border-0 text-right">Preço</th>
                                 <th class="border-0 text-center">Canal</th>
                                 <th class="border-0 text-center">Status</th>
+                                <th class="border-0 text-center">Vendas</th>
                                 <th class="border-0 text-center" style="width:100px;">Ações</th>
                             </tr>
                         </thead>
@@ -124,6 +125,12 @@
                                         <span class="badge {{ $statusBadge }}" style="font-size:10px;">
                                             <i class="fas {{ $statusIcon }} mr-1"></i>{{ $statusLabel }}
                                         </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex flex-column">
+                                            <span class="font-weight-bold">{{ (int) ($product->sales_count ?? 0) }}</span>
+                                            <small class="text-muted">{{ (int) ($product->buyers_count ?? 0) }} clientes</small>
+                                        </div>
                                     </td>
                                     <td class="text-center">
                                         <div class="d-inline-flex" style="gap:4px;">

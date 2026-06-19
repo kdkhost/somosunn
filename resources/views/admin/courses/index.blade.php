@@ -75,6 +75,7 @@
                             <th class="border-0 pl-4" style="width:80px;">Capa</th>
                             <th class="border-0">Título</th>
                             <th class="border-0 text-right">Preço</th>
+                            <th class="border-0 text-center">Vendas / Inscritos</th>
                             <th class="border-0 text-center">Status</th>
                             <th class="border-0 text-center" style="width:150px;">Ações</th>
                         </tr>
@@ -98,6 +99,12 @@
                                 </td>
                                 <td class="text-right">
                                     <span class="font-weight-bold" style="font-size:14px;">R$ {{ number_format($c->price, 2, ',', '.') }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column">
+                                        <span class="font-weight-bold">{{ (int) ($c->sales_count ?? 0) }} venda(s)</span>
+                                        <small class="text-muted">{{ (int) ($c->enrollments_count ?? 0) }} inscrito(s)</small>
+                                    </div>
                                 </td>
                                 <td class="text-center">
                                     @if($c->status === 'published')
@@ -134,7 +141,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center py-5">
+                                <td colspan="6" class="text-center py-5">
                                     <div class="mb-3">
                                         <i class="fas fa-graduation-cap fa-3x text-muted"></i>
                                     </div>

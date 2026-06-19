@@ -30,17 +30,20 @@ class HomeController extends Controller
                     'events'
                 )->publicUpcoming();
 
-                $freeEvents = $eventBaseQuery()
-                    ->actuallyFreeForPublic()
+                $upcomingEvents = $eventBaseQuery()
                     ->orderBy('start_at')
-                    ->limit(6)
+                    ->limit(24)
                     ->get();
 
-                $promotionalEvents = $eventBaseQuery()
-                    ->paidForPublic()
-                    ->orderBy('start_at')
-                    ->limit(6)
-                    ->get();
+                $freeEvents = $upcomingEvents
+                    ->filter(fn (Event $event) => $event->isActuallyFreeForPublic())
+                    ->take(6)
+                    ->values();
+
+                $promotionalEvents = $upcomingEvents
+                    ->filter(fn (Event $event) => !$event->isActuallyFreeForPublic())
+                    ->take(6)
+                    ->values();
 
                 $paidMentorings = ContentVisibility::applyPublicFilter(
                     Mentorship::query()->where('slots', '>', 0),

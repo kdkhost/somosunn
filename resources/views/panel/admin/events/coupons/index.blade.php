@@ -3,6 +3,9 @@
 @section('title', 'Cupons do Evento')
 
 @section('panel_content')
+@php
+    $eventDeadline = $event->publicDeadlineAt();
+@endphp
 <div class="space-y-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -24,16 +27,22 @@
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-100 bg-slate-50 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:border-slate-800 dark:bg-slate-950">
                     <tr>
-                        <th class="px-5 py-4">Código</th>
+                        <th class="px-5 py-4">Codigo</th>
                         <th class="px-5 py-4">Tipo</th>
                         <th class="px-5 py-4">Usos</th>
                         <th class="px-5 py-4">Validade</th>
                         <th class="px-5 py-4">Status</th>
-                        <th class="px-5 py-4 text-right">Ações</th>
+                        <th class="px-5 py-4 text-right">Acoes</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                     @forelse($coupons as $coupon)
+                        @php
+                            $effectiveExpiresAt = $coupon->expires_at;
+                            if ($eventDeadline && (!$effectiveExpiresAt || $eventDeadline->lt($effectiveExpiresAt))) {
+                                $effectiveExpiresAt = $eventDeadline;
+                            }
+                        @endphp
                         <tr>
                             <td class="px-5 py-4"><span class="rounded-lg bg-slate-900 px-3 py-1 font-mono text-xs font-black text-white">{{ $coupon->code }}</span></td>
                             <td class="px-5 py-4">
@@ -48,8 +57,8 @@
                             <td class="px-5 py-4 font-bold text-slate-700 dark:text-slate-200">{{ (int) $coupon->used_count }} / {{ $coupon->max_uses ? (int) $coupon->max_uses : 'ilimitado' }}</td>
                             <td class="px-5 py-4 text-xs font-semibold text-slate-500">
                                 @if($coupon->starts_at)<div>Inicio: {{ $coupon->starts_at->format('d/m/Y H:i') }}</div>@endif
-                                @if($coupon->expires_at)<div>Fim: {{ $coupon->expires_at->format('d/m/Y H:i') }}</div>@endif
-                                @if(!$coupon->starts_at && !$coupon->expires_at)<span>Sem período definido</span>@endif
+                                @if($effectiveExpiresAt)<div>Fim efetivo: {{ $effectiveExpiresAt->format('d/m/Y H:i') }}</div>@endif
+                                @if(!$coupon->starts_at && !$effectiveExpiresAt)<span>Sem periodo definido</span>@endif
                             </td>
                             <td class="px-5 py-4">
                                 <span class="rounded-full px-3 py-1 text-xs font-black {{ $coupon->active ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' }}">
@@ -111,7 +120,7 @@
 
                     Swal.fire({
                         icon: 'question',
-                        title: form.dataset.confirmTitle || 'Confirmar ação',
+                        title: form.dataset.confirmTitle || 'Confirmar acao',
                         text: form.dataset.confirmText || 'Deseja continuar?',
                         showCancelButton: true,
                         confirmButtonText: form.dataset.confirmButton || 'Confirmar',

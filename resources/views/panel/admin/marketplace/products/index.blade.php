@@ -21,6 +21,7 @@
                         <th class="px-4 py-3 text-left">Loja</th>
                         <th class="px-4 py-3 text-left">Tipo</th>
                         <th class="px-4 py-3 text-left">Status</th>
+                        <th class="px-4 py-3 text-center">Vendas</th>
                         <th class="px-4 py-3 text-right">Acao</th>
                     </tr>
                 </thead>
@@ -31,6 +32,12 @@
                             <td class="px-4 py-4 text-slate-600 dark:text-slate-300">{{ $product->store->brand_name ?? '-' }}</td>
                             <td class="px-4 py-4 text-slate-600 dark:text-slate-300">{{ strtoupper($product->type) }}</td>
                             <td class="px-4 py-4 text-slate-600 dark:text-slate-300">{{ strtoupper($product->status) }}</td>
+                            <td class="px-4 py-4 text-center">
+                                <div class="flex flex-col items-center">
+                                    <span class="font-black text-slate-900 dark:text-white">{{ (int) ($product->sales_count ?? 0) }}</span>
+                                    <span class="text-xs text-slate-500 dark:text-slate-400">{{ (int) ($product->buyers_count ?? 0) }} clientes</span>
+                                </div>
+                            </td>
                             <td class="px-4 py-4 text-right">
                                 <form action="{{ route('panel.admin.marketplace.products.toggle', $product) }}" method="POST" class="inline-flex gap-2">
                                     @csrf
@@ -44,7 +51,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="px-4 py-10 text-center text-slate-500 dark:text-slate-400">Nenhum produto encontrado.</td></tr>
+                        <tr><td colspan="6" class="px-4 py-10 text-center text-slate-500 dark:text-slate-400">Nenhum produto encontrado.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -2,6 +2,42 @@
 
 ---
 
+## [2026-06-19] - feat(vendas): relatorios por item e ajustes em eventos/cupons
+
+### Adicionado
+- Relatorio de vendas por item em ambos os paineis administrativos:
+  - `/admin/orders/sales-report`
+  - `/painel/admin/orders/sales-report`
+- Atalhos do relatorio nas telas de vendas dos dois paineis.
+- Novo servico `SalesAnalyticsService` para consolidar unidades vendidas, pedidos, compradores e faturamento por item pago.
+
+### Corrigido
+- Listagens administrativas de eventos, cursos, mentorias e produtos passaram a exibir quantidade de vendas e/ou inscritos por item, reaproveitando a mesma regra nos dois paineis.
+- Eventos com valor base, promocional ou lote pago deixaram de ser classificados como gratuitos na home publica quando os lotes estao vazios.
+- A vitrine publica de eventos pagos passou a usar o preco efetivo do evento, evitando sinalizacao incorreta de gratuidade.
+- Checkout de areas para expositores passou a aceitar cupom do proprio evento, inclusive para desconto integral, com consumo controlado do cupom.
+- Cupons de evento agora respeitam automaticamente o encerramento publico do evento como limite efetivo de uso, mesmo quando a expiracao do cupom estiver em branco ou maior que o prazo do evento.
+- Listagens de cupons nos dois paineis passaram a exibir o fim efetivo de validade do cupom.
+- Tabela de produtos proprios no admin legado foi reorganizada para manter colunas de canal, status e vendas alinhadas.
+
+### Arquivos principais
+- `app/Services/SalesAnalyticsService.php`
+- `app/Http/Controllers/Admin/OrderController.php`
+- `app/Http/Controllers/Panel/Admin/OrderController.php`
+- `app/Http/Controllers/HomeController.php`
+- `app/Http/Controllers/EventExhibitorCheckoutController.php`
+- `app/Services/EventCouponService.php`
+- `app/Services/EventExhibitorService.php`
+- `resources/views/admin/orders/sales_report.blade.php`
+- `resources/views/panel/admin/orders/sales_report.blade.php`
+- `resources/views/admin/events/list.blade.php`
+- `resources/views/panel/admin/events/list.blade.php`
+- `resources/views/admin/events/coupons/index.blade.php`
+- `resources/views/panel/admin/events/coupons/index.blade.php`
+- `routes/web.php`
+
+---
+
 ## [2026-06-18] - fix(site): destravar aceite LGPD para novos membros
 
 ### Corrigido

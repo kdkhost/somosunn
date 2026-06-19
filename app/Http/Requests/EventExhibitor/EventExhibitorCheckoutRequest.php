@@ -30,6 +30,7 @@ class EventExhibitorCheckoutRequest extends FormRequest
             'company_document' => 'nullable|string|max:30',
             'brand_name' => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',
+            'coupon_code' => 'nullable|string|max:40',
             'quantity' => 'required|integer|min:1|max:20',
             'terms' => 'accepted',
             'gateway' => 'nullable|string|in:mercadopago,sumup',

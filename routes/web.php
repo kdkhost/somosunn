@@ -438,6 +438,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::resource('users', \App\Http\Controllers\Panel\Admin\UserController::class);
         Route::post('plans/{plan}/toggle-active', [\App\Http\Controllers\Panel\Admin\PlanController::class, 'toggleActive'])->name('plans.toggle-active');
         Route::resource('plans', \App\Http\Controllers\Panel\Admin\PlanController::class);
+        Route::get('orders/sales-report', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'salesReport'])->name('orders.sales-report');
         Route::resource('orders', \App\Http\Controllers\Panel\Admin\OrderController::class)->only(['index', 'show']);
         Route::post('orders/{order}/refund', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'refund'])->name('orders.refund');
         Route::post('orders/{order}/cancel', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'cancel'])->name('orders.cancel');
@@ -595,6 +596,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::get('/balance', [\App\Http\Controllers\Admin\DashboardController::class, 'getMpBalance'])->name('dashboard.balance');
     Route::get('/system-health', [\App\Http\Controllers\Admin\DashboardController::class, 'systemHealth'])->name('dashboard.system-health');
     Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/sales-report', [\App\Http\Controllers\Admin\OrderController::class, 'salesReport'])->name('orders.sales-report');
     Route::get('/orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/refund', [\App\Http\Controllers\Admin\OrderController::class, 'refund'])->name('orders.refund');
     Route::post('/orders/{order}/invoice', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'issueForOrder'])->name('orders.invoice');

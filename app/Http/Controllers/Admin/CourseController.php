@@ -7,6 +7,7 @@ use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Models\Enrollment;
 use App\Models\OrderItem;
 use App\Services\Content\SoldContentGuard;
+use App\Services\SalesAnalyticsService;
 use App\Services\WatermarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -65,13 +66,14 @@ class CourseController extends Controller
     {
         $this->ensurePermission('courses.view');
 
-        $query = Course::query()->latest();
+        $query = Course::query()->withCount('enrollments')->latest();
 
         if (!auth()->user()->isAdmin()) {
             $query->where('user_id', auth()->id());
         }
 
         $courses = $query->get();
+        app(SalesAnalyticsService::class)->decorateCourses($courses);
         return view('admin.courses.index', compact('courses'));
     }
 

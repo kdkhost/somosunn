@@ -145,11 +145,17 @@ class EventExhibitorService
     /**
      * @return array{order:Order,registration:EventExhibitorRegistration,batch:array}
      */
-    public function createReservation(Event $event, \App\Models\User $user, array $payload, ?string $gatewayProvider): array
+    public function createReservation(
+        Event $event,
+        \App\Models\User $user,
+        array $payload,
+        ?string $gatewayProvider,
+        ?array $couponData = null
+    ): array
     {
         $quantity = max(1, min(20, (int) ($payload['quantity'] ?? 1)));
 
-        return DB::transaction(function () use ($event, $user, $payload, $gatewayProvider, $quantity) {
+        return DB::transaction(function () use ($event, $user, $payload, $gatewayProvider, $quantity, $couponData) {
             $lockedEvent = Event::query()->whereKey($event->id)->lockForUpdate()->firstOrFail();
             $this->expireInvalidReservations($lockedEvent);
 
@@ -164,20 +170,32 @@ class EventExhibitorService
 
             $unitPrice = round((float) $batch['price'], 2);
             $totalPrice = round($unitPrice * $quantity, 2);
+            $discountAmount = round(min($totalPrice, (float) data_get($couponData, 'discount_amount', 0)), 2);
+            $payableTotal = round(max(0, $totalPrice - $discountAmount), 2);
+            $netUnitPrice = $quantity > 0 ? round($payableTotal / $quantity, 2) : $payableTotal;
             $sellerId = (int) ($lockedEvent->user_id ?? 0);
             $platformFeePercent = MarketplaceFee::deductionPercent($sellerId > 0 ? $sellerId : null);
-            $platformFeeAmount = MarketplaceFee::deductionAmount($totalPrice, $sellerId > 0 ? $sellerId : null);
+            $platformFeeAmount = MarketplaceFee::deductionAmount($payableTotal, $sellerId > 0 ? $sellerId : null);
             $reserveExpiresAt = now()->addMinutes($this->reserveMinutes());
+            $coupon = data_get($couponData, 'coupon');
+            $couponPayload = $coupon ? [
+                'id' => (int) $coupon->id,
+                'code' => (string) $coupon->code,
+                'type' => (string) $coupon->type,
+                'discount_value' => (float) $coupon->discount_value,
+                'discount_amount' => $discountAmount,
+                'uses' => $quantity,
+            ] : null;
 
             $order = Order::create([
                 'user_id' => (int) $user->id,
                 'seller_id' => $sellerId > 0 ? $sellerId : null,
                 'status' => 'pending',
-                'total_amount' => $totalPrice,
+                'total_amount' => $payableTotal,
                 'fee_amount' => 0,
                 'platform_fee_amount' => $platformFeeAmount,
                 'currency' => 'BRL',
-                'gateway' => $totalPrice <= 0 ? 'free' : $gatewayProvider,
+                'gateway' => $payableTotal <= 0 ? 'free' : $gatewayProvider,
                 'gateway_account_id' => null,
                 'metadata' => [
                     'context' => self::ORDER_CONTEXT,
@@ -186,7 +204,10 @@ class EventExhibitorService
                     'event_id' => (int) $lockedEvent->id,
                     'platform_fee_percent' => $platformFeePercent,
                     'reserve_expires_at' => $reserveExpiresAt->toIso8601String(),
-                    'is_free_checkout' => $totalPrice <= 0,
+                    'is_free_checkout' => $payableTotal <= 0,
+                    'original_total_amount' => $totalPrice,
+                    'discount_amount' => $discountAmount,
+                    'event_coupon' => $couponPayload,
                 ],
             ]);
 
@@ -213,6 +234,10 @@ class EventExhibitorService
                     'includes_ticket' => (bool) $lockedEvent->exhibitor_includes_ticket,
                     'show_publicly' => (bool) ($lockedEvent->exhibitor_show_publicly ?? true),
                     'ip' => request()?->ip(),
+                    'original_total_amount' => $totalPrice,
+                    'payable_total_amount' => $payableTotal,
+                    'discount_amount' => $discountAmount,
+                    'event_coupon' => $couponPayload,
                 ],
             ]);
 
@@ -221,16 +246,20 @@ class EventExhibitorService
                 'item_type' => self::ORDER_ITEM_TYPE,
                 'item_id' => (int) $lockedEvent->id,
                 'title' => 'Area para expositor - ' . $lockedEvent->title,
-                'price' => $unitPrice,
+                'price' => $netUnitPrice,
                 'quantity' => $quantity,
                 'data' => [
                     'event_id' => (int) $lockedEvent->id,
                     'registration_id' => (int) $registration->id,
                     'batch_label' => (string) $batch['label'],
-                    'unit_price' => $unitPrice,
-                    'total_price' => $totalPrice,
+                    'unit_price' => $netUnitPrice,
+                    'total_price' => $payableTotal,
+                    'original_unit_price' => $unitPrice,
+                    'original_total_price' => $totalPrice,
+                    'discount_amount' => $discountAmount,
                     'gateway_reference' => $reference,
                     'includes_ticket' => (bool) $lockedEvent->exhibitor_includes_ticket,
+                    'event_coupon' => $couponPayload,
                 ],
             ]);
 
@@ -240,6 +269,10 @@ class EventExhibitorService
                 'exhibitor_batch_label' => (string) $batch['label'],
             ]);
             $order->save();
+
+            if ($coupon) {
+                app(EventCouponService::class)->consumeLocked($coupon, $quantity);
+            }
 
             return [
                 'order' => $order->fresh(['items', 'user']),

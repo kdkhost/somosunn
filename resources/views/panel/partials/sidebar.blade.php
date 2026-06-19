@@ -328,7 +328,8 @@
     $adminManagementItems = array_values(array_filter([
         ['label' => 'Usuários', 'route' => route('panel.admin.users.index'), 'icon' => 'fas fa-users-cog', 'active' => request()->routeIs('panel.admin.users.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Planos e pacotes', 'route' => route('panel.admin.plans.index'), 'icon' => 'fas fa-gem', 'active' => request()->routeIs('panel.admin.plans.*'), 'visible' => $user->isAdmin()],
-        ['label' => 'Vendas', 'route' => route('panel.admin.orders.index'), 'icon' => 'fas fa-shopping-cart', 'active' => request()->routeIs('panel.admin.orders.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Vendas', 'route' => route('panel.admin.orders.index'), 'icon' => 'fas fa-shopping-cart', 'active' => request()->routeIs('panel.admin.orders.index') || request()->routeIs('panel.admin.orders.show'), 'visible' => $user->isAdmin()],
+        ['label' => 'Relatorio de vendas', 'route' => route('panel.admin.orders.sales-report'), 'icon' => 'fas fa-chart-bar', 'active' => request()->routeIs('panel.admin.orders.sales-report'), 'visible' => $user->isAdmin()],
         ['label' => 'Contabilidade de Rateios', 'route' => route('panel.admin.splits.index'), 'icon' => 'fas fa-money-bill-wave', 'active' => request()->routeIs('panel.admin.splits.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Faturas', 'route' => route('panel.admin.invoices.index'), 'icon' => 'fas fa-file-invoice', 'active' => request()->routeIs('panel.admin.invoices.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Editor de Faturas', 'route' => route('panel.admin.invoices.editor'), 'icon' => 'fas fa-paint-brush', 'active' => request()->routeIs('panel.admin.invoices.editor*'), 'visible' => $user->isAdmin()],

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\OrderCancellationService;
 use App\Services\OrderRefundService;
+use App\Services\SalesAnalyticsService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -48,6 +50,35 @@ class OrderController extends Controller
         $order->load(['user', 'items', 'invoice']);
 
         return view('panel.admin.orders.show', compact('order'));
+    }
+
+    public function salesReport(Request $request, SalesAnalyticsService $salesAnalyticsService)
+    {
+        $search = trim((string) $request->input('search', ''));
+        $saleType = trim((string) $request->input('sale_type', ''));
+        $dateFrom = trim((string) $request->input('date_from', ''));
+        $dateTo = trim((string) $request->input('date_to', ''));
+
+        $from = $dateFrom !== '' ? Carbon::parse($dateFrom) : now()->startOfMonth();
+        $to = $dateTo !== '' ? Carbon::parse($dateTo) : now()->endOfMonth();
+
+        $report = $salesAnalyticsService->productSalesReport(
+            $search,
+            $saleType,
+            $from,
+            $to,
+            20
+        );
+
+        return view('panel.admin.orders.sales_report', [
+            'rows' => $report['rows'],
+            'summary' => $report['summary'],
+            'search' => $search,
+            'saleType' => $saleType,
+            'saleTypeLabels' => Order::SALE_TYPE_LABELS,
+            'dateFrom' => $from->format('Y-m-d'),
+            'dateTo' => $to->format('Y-m-d'),
+        ]);
     }
 
     public function refund(Request $request, Order $order, OrderRefundService $orderRefundService)

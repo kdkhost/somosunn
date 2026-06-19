@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Panel\Admin;
 use App\Http\Controllers\Panel\Admin\Concerns\ManagesContentVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Services\SalesAnalyticsService;
 use App\Services\Content\SoldContentGuard;
 use App\Services\WatermarkService;
 use App\Models\User;
@@ -50,6 +51,7 @@ class CourseController extends Controller
         }
 
         $courses = $query->paginate(6);
+        app(SalesAnalyticsService::class)->decorateCourses($courses);
         $courses->appends($request->all());
 
         return view('panel.admin.courses.index', compact('courses', 'search'));

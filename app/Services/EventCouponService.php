@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Event;
 use App\Models\EventCoupon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -17,7 +18,7 @@ class EventCouponService
     public function findPotentialFreeCoupon(Event $event, ?string $code, float $subtotal): ?EventCoupon
     {
         $code = $this->normalizeCode($code);
-        if ($code === '') {
+        if ($code === '' || $event->isClosedForPublic()) {
             return null;
         }
 
@@ -26,7 +27,7 @@ class EventCouponService
             ->where('code', $code)
             ->first();
 
-        if (!$coupon) {
+        if (!$coupon || !$this->isCurrentlyAvailable($event, $coupon)) {
             return null;
         }
 
@@ -44,7 +45,7 @@ class EventCouponService
 
         if ($result['discount_amount'] < max(0, $subtotal) - 0.009) {
             throw ValidationException::withMessages([
-                'coupon_code' => 'Este cupom não libera gratuidade integral para o evento.',
+                'coupon_code' => 'Este cupom nao libera gratuidade integral para o evento.',
             ]);
         }
 
@@ -56,9 +57,15 @@ class EventCouponService
      */
     public function validateCouponLocked(Event $event, string $code, float $subtotal, int $uses = 1): array
     {
+        if ($event->isClosedForPublic()) {
+            throw ValidationException::withMessages([
+                'coupon_code' => 'As vendas deste evento ja foram encerradas.',
+            ]);
+        }
+
         $code = $this->normalizeCode($code);
         if ($code === '') {
-            throw ValidationException::withMessages(['coupon_code' => 'Informe um cupom válido.']);
+            throw ValidationException::withMessages(['coupon_code' => 'Informe um cupom valido.']);
         }
 
         $coupon = EventCoupon::query()
@@ -68,7 +75,7 @@ class EventCouponService
             ->first();
 
         if (!$coupon) {
-            throw ValidationException::withMessages(['coupon_code' => 'Cupom inválido para este evento.']);
+            throw ValidationException::withMessages(['coupon_code' => 'Cupom invalido para este evento.']);
         }
 
         if (!$coupon->active) {
@@ -76,10 +83,11 @@ class EventCouponService
         }
 
         if ($coupon->starts_at && now()->lt($coupon->starts_at)) {
-            throw ValidationException::withMessages(['coupon_code' => 'Este cupom ainda não está ativo.']);
+            throw ValidationException::withMessages(['coupon_code' => 'Este cupom ainda nao esta ativo.']);
         }
 
-        if ($coupon->expires_at && now()->gt($coupon->expires_at)) {
+        $effectiveExpiresAt = $this->effectiveExpiresAt($event, $coupon);
+        if ($effectiveExpiresAt && now()->gt($effectiveExpiresAt)) {
             throw ValidationException::withMessages(['coupon_code' => 'Este cupom expirou.']);
         }
 
@@ -123,7 +131,7 @@ class EventCouponService
         $uses = max(1, (int) $uses);
 
         if (!$this->canUse($coupon, $uses)) {
-            throw ValidationException::withMessages(['coupon_code' => 'Cupom esgotado ou indisponível.']);
+            throw ValidationException::withMessages(['coupon_code' => 'Cupom esgotado ou indisponivel.']);
         }
 
         $coupon->increment('used_count', $uses);
@@ -151,5 +159,40 @@ class EventCouponService
         }
 
         return round(min($subtotal, max(0, $value)), 2);
+    }
+
+    public function effectiveExpiresAt(Event $event, EventCoupon $coupon): ?CarbonInterface
+    {
+        $eventDeadline = $event->publicDeadlineAt();
+        $couponDeadline = $coupon->expires_at;
+
+        if ($eventDeadline && $couponDeadline) {
+            return $eventDeadline->lte($couponDeadline) ? $eventDeadline : $couponDeadline;
+        }
+
+        return $couponDeadline ?: $eventDeadline;
+    }
+
+    private function isCurrentlyAvailable(Event $event, EventCoupon $coupon): bool
+    {
+        if (!$coupon->active) {
+            return false;
+        }
+
+        $now = now();
+        if ($coupon->starts_at && $now->lt($coupon->starts_at)) {
+            return false;
+        }
+
+        $effectiveExpiresAt = $this->effectiveExpiresAt($event, $coupon);
+        if ($effectiveExpiresAt && $now->gt($effectiveExpiresAt)) {
+            return false;
+        }
+
+        if ($coupon->max_uses !== null && (int) $coupon->used_count >= (int) $coupon->max_uses) {
+            return false;
+        }
+
+        return true;
     }
 }

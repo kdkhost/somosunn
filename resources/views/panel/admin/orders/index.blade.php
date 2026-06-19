@@ -17,6 +17,12 @@
             </div>
 
             <div class="flex items-center gap-2">
+                <a href="{{ route('panel.admin.orders.sales-report', request()->query()) }}"
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">
+                    <i class="fas fa-chart-bar text-slate-400 dark:text-slate-500"></i>
+                    <span>Relatorio por item</span>
+                </a>
+
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open" @click.away="open = false"
                         class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm">
