@@ -2,6 +2,23 @@
 
 ---
 
+## [2026-06-19] - refactor(vendas): reorganizar detalhe da venda nos dois paineis
+
+### Corrigido
+- A tela de detalhe da venda no admin legado (`/admin/orders/{id}`) foi refeita para ficar mais coerente com o padrao visual do painel, com blocos separados de cliente, resumo, fatura, acoes e itens.
+- A tela equivalente no painel administrativo moderno (`/painel/admin/orders/{id}`) foi reestruturada com a mesma hierarquia de informacoes e a mesma regra de negocio, evitando divergencia entre os dois fluxos.
+- O detalhamento passou a destacar de forma organizada valor bruto, total liquido, desconto, saldo reembolsavel, cupom aplicado, gateway, metodo, transacao, situacao da fatura e itens da venda.
+- Os estados de reembolso parcial, reembolso total, cancelamento e pedido pendente passaram a ter comunicacao visual mais clara, sem blocos soltos ou acoes desalinhadas.
+- As acoes disponiveis agora respeitam melhor as rotas reais de cada painel, evitando mostrar operacoes inexistentes no painel moderno.
+- A tela publica de erro passou a reutilizar a assinatura visual da marca com a logo limpa, sem moldura, e com o texto auxiliar abaixo da imagem, alinhando o bloco lateral ao mesmo padrao do footer do site.
+
+### Arquivos principais
+- `resources/views/admin/orders/show.blade.php`
+- `resources/views/panel/admin/orders/show.blade.php`
+- `resources/views/errors/layout.blade.php`
+
+---
+
 ## [2026-06-19] - feat(vendas): relatorios por item e ajustes em eventos/cupons
 
 ### Adicionado

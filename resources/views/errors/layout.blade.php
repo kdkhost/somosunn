@@ -190,32 +190,32 @@
 
         .error-side-brand {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
             margin-bottom: 16px;
         }
 
-        .error-side-brand img {
-            width: 46px;
-            height: 46px;
-            object-fit: contain;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.14);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            padding: 7px;
+        .error-side-logo {
+            display: inline-flex;
+            height: 52px;
+            width: auto;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
-        .error-side-title {
-            margin: 0;
-            font-size: .92rem;
-            font-weight: 800;
-            letter-spacing: .05em;
-            text-transform: uppercase;
+        .error-side-logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
         }
 
         .error-side-subtitle {
-            margin: 3px 0 0;
-            font-size: .78rem;
+            margin: 0;
+            font-size: .84rem;
+            line-height: 1.5;
             opacity: .82;
         }
 
@@ -308,11 +308,10 @@
 
                 <aside class="error-side">
                     <div class="error-side-brand">
-                        <img src="{{ $logoUrl }}" alt="Logo {{ $appName }}">
-                        <div>
-                            <p class="error-side-title">{{ $appName }}</p>
-                            <p class="error-side-subtitle">Central de status do sistema</p>
+                        <div class="error-side-logo">
+                            <img src="{{ $logoUrl }}" alt="" onerror="this.style.display='none';">
                         </div>
+                        <p class="error-side-subtitle">Central de status do sistema</p>
                     </div>
 
                     <div class="error-metas">
