@@ -23,6 +23,7 @@ class EventCouponAndWhatsAppRuleTest extends TestCase
     {
         $this->assertTrue(WhatsAppGroupLinkRule::passes('https://chat.whatsapp.com/abc123'));
         $this->assertTrue(WhatsAppGroupLinkRule::passes('https://www.chat.whatsapp.com/abc123'));
+        $this->assertFalse(WhatsAppGroupLinkRule::passes('http://chat.whatsapp.com/abc123'));
         $this->assertFalse(WhatsAppGroupLinkRule::passes('https://wa.me/5521981325441'));
         $this->assertFalse(WhatsAppGroupLinkRule::passes('https://whatsapp.com/channel/abc123'));
         $this->assertFalse(WhatsAppGroupLinkRule::passes('https://example.com/grupo'));

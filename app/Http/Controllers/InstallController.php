@@ -223,7 +223,16 @@ class InstallController extends Controller
             $this->attemptConnection($request);
             return $this->jsonSuccess('Conexão bem sucedida.');
         } catch (\Throwable $e) {
-            return $this->jsonError('Falha ao conectar: '.$e->getMessage(), $e);
+            Log::warning('install.database_connection_failed', [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
+
+            $message = app()->isProduction()
+                ? 'Não foi possível conectar ao banco de dados. Revise host, porta, banco, usuário e senha.'
+                : 'Falha ao conectar: ' . $e->getMessage();
+
+            return $this->jsonError($message, $e);
         }
     }
 

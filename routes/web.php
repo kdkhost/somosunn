@@ -120,11 +120,11 @@ Route::middleware(['auth'])->prefix('meu-parceiro')->name('member.partner.')->gr
 
 // Eventos (Public)
 Route::get('/eventos', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
-Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
 Route::middleware(['auth', 'check.feature:events_create'])->group(function () {
     Route::get('/eventos/create', [\App\Http\Controllers\EventController::class, 'create'])->name('events.create');
     Route::post('/eventos', [\App\Http\Controllers\EventController::class, 'store'])->name('events.store');
 });
+Route::get('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
 Route::middleware(['auth', 'check.feature:events_edit'])->group(function () {
     Route::get('/eventos/{event}/edit', [\App\Http\Controllers\EventController::class, 'edit'])->name('events.edit');
     Route::put('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'update'])->name('events.update');
@@ -133,7 +133,7 @@ Route::middleware(['auth', 'check.feature:events_delete'])->group(function () {
     Route::delete('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'destroy'])->name('events.destroy');
 });
 Route::get('/eventos/{event}/checkout', [\App\Http\Controllers\EventReservationController::class, 'checkout'])->name('events.checkout');
-Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservationController::class, 'reserve'])->name('events.reserve');
+Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservationController::class, 'reserve'])->middleware('throttle:event_reservations')->name('events.reserve');
 Route::post('/eventos/{event}/entrar-no-grupo', [\App\Http\Controllers\EventGroupController::class, 'join'])->middleware(['auth', 'throttle:10,1'])->name('events.group.join');
 Route::get('/eventos/{event}/expositor', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'show'])->name('events.exhibitor.show');
 Route::post('/eventos/{event}/expositor/checkout', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'checkout'])->middleware('throttle:6,1')->name('events.exhibitor.checkout');

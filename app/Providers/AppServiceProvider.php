@@ -98,6 +98,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->blockDestructiveDatabaseCommandsInProduction();
+
         Model::preventLazyLoading(!App::isProduction());
         Model::handleLazyLoadingViolationUsing(function (Model $model, string $relation): void {
             Log::warning('Carregamento N+1 detectado', [
@@ -150,6 +152,28 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('webhook_mercadopago', function ($request) {
             return Limit::perMinute(120)->by((string) $request->ip());
+        });
+
+        RateLimiter::for('event_reservations', function ($request) {
+            $event = $request->route('event');
+            $eventKey = is_object($event) && method_exists($event, 'getRouteKey')
+                ? (string) $event->getRouteKey()
+                : (string) $event;
+
+            $identity = trim((string) (
+                $request->input('email')
+                ?: $request->input('cpf')
+                ?: $request->input('document')
+                ?: 'guest'
+            ));
+            $identity = strtolower((string) preg_replace('/[^a-z0-9@._-]+/i', '', $identity));
+            $identity = $identity !== '' ? $identity : 'guest';
+            $ip = (string) $request->ip();
+
+            return [
+                Limit::perMinute(6)->by('event-reservation:' . sha1($eventKey . '|' . $identity . '|' . $ip)),
+                Limit::perMinute(30)->by('event-reservation-ip:' . sha1($eventKey . '|' . $ip)),
+            ];
         });
 
         \App\Models\User::observe(\App\Observers\UserObserver::class);
@@ -435,5 +459,40 @@ class AppServiceProvider extends ServiceProvider
             View::share('unnDbAvailable', false);
             UploadStorage::applyRuntimeConfig();
         }
+    }
+
+    private function blockDestructiveDatabaseCommandsInProduction(): void
+    {
+        if (!App::runningInConsole() || !App::isProduction()) {
+            return;
+        }
+
+        $command = (string) ($_SERVER['argv'][1] ?? '');
+        $blockedCommands = [
+            'migrate:rollback',
+            'migrate:reset',
+            'migrate:fresh',
+            'db:wipe',
+        ];
+
+        if (!in_array($command, $blockedCommands, true)) {
+            return;
+        }
+
+        if ((string) env('ALLOW_PRODUCTION_DESTRUCTIVE_DB_COMMANDS') === 'SOMOS_UNN_CONFIRMAR_DESTRUICAO') {
+            Log::critical('Comando destrutivo de banco liberado em producao por confirmacao explicita.', [
+                'command' => $command,
+            ]);
+
+            return;
+        }
+
+        Log::critical('Comando destrutivo de banco bloqueado em producao.', [
+            'command' => $command,
+        ]);
+
+        throw new \RuntimeException(
+            'Comando bloqueado em producao. Defina ALLOW_PRODUCTION_DESTRUCTIVE_DB_COMMANDS=SOMOS_UNN_CONFIRMAR_DESTRUICAO apenas se tiver backup validado.'
+        );
     }
 }

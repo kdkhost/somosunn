@@ -2,6 +2,29 @@
 
 ---
 
+## [2026-06-19] - fix(seguranca): hardening inicial da auditoria atual
+
+### Corrigido
+- A reserva publica de eventos (`events.reserve`) passou a usar o limiter nomeado `event_reservations`, combinando evento, IP e e-mail/CPF/documento quando informados.
+- A rota fixa `/eventos/create` passou a ser declarada antes da rota dinamica `/eventos/{event}`, evitando conflito de precedencia.
+- Links de grupo do WhatsApp agora exigem HTTPS em `WhatsAppGroupLinkRule`.
+- O instalador deixou de retornar a mensagem bruta da excecao de banco em producao no teste de conexao.
+- Comandos destrutivos de banco (`migrate:rollback`, `migrate:reset`, `migrate:fresh`, `db:wipe`) passaram a ser bloqueados em producao sem confirmacao explicita por ambiente.
+
+### Adicionado
+- Testes para precedencia de rotas de eventos, middleware de rate limit da reserva publica e rejeicao de link HTTP do WhatsApp.
+
+### Arquivos principais
+- `routes/web.php`
+- `app/Providers/AppServiceProvider.php`
+- `app/Rules/WhatsAppGroupLinkRule.php`
+- `app/Http/Controllers/InstallController.php`
+- `.env.example`
+- `tests/Feature/EventCheckoutHardeningTest.php`
+- `tests/Unit/EventCouponAndWhatsAppRuleTest.php`
+
+---
+
 ## [2026-06-19] - perf(cron): paginar painel de tarefas com DataTables
 
 ### Corrigido

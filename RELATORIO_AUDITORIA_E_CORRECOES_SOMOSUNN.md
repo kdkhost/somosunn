@@ -4,6 +4,17 @@
 
 Data de atualização: 18/06/2026
 
+### Atualização aplicada em 19/06/2026 - hardening da auditoria atual
+
+- A rota publica `events.reserve` (`POST /eventos/{event}/reservar`) recebeu o rate limiter nomeado `event_reservations`, com chaves por evento, IP e e-mail/CPF/documento quando informados.
+- A ordem das rotas publicas de eventos foi ajustada para declarar `/eventos/create` antes de `/eventos/{event}`.
+- `WhatsAppGroupLinkRule` passou a aceitar somente `https://chat.whatsapp.com` e `https://www.chat.whatsapp.com`.
+- `InstallController@testConnection` passou a retornar mensagem generica em producao, mantendo o detalhe tecnico apenas no log interno e em ambientes nao produtivos.
+- Comandos destrutivos de banco em producao (`migrate:rollback`, `migrate:reset`, `migrate:fresh`, `db:wipe`) foram bloqueados sem a confirmacao explicita `ALLOW_PRODUCTION_DESTRUCTIVE_DB_COMMANDS=SOMOS_UNN_CONFIRMAR_DESTRUICAO`.
+- Adicionados testes de precedencia de rotas de eventos, middleware de rate limit da reserva publica e rejeicao de link HTTP do WhatsApp.
+- `composer audit` foi executado e ainda aponta vulnerabilidades em dependencias; a atualizacao de pacotes deve ser tratada em entrega separada com suite completa.
+- Pendencias planejadas: CAPTCHA invisivel no checkout publico de eventos, refatoracao gradual do `EventReservationController` em services, atualizacao de dependencias vulneraveis e modularizacao progressiva de `routes/web.php`.
+
 ### Atualização aplicada em 19/06/2026 - paginação do painel de cron
 
 - A tela principal `/admin/cron` passou a usar DataTables com carregamento AJAX server-side, paginação, busca e ordenação.
