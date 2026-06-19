@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Setting;
 use App\Support\EmailQueueSettings;
+use App\Support\PdfBranding;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\DB;
@@ -286,6 +287,7 @@ class InvoiceService
         $dompdf->loadHtml($html, 'UTF-8');
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
+        PdfBranding::applyDefaultLogoWatermark($dompdf);
 
         return $dompdf->output();
     }

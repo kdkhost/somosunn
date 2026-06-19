@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\SalesAnalyticsService;
+use App\Support\PdfBranding;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
@@ -46,6 +47,7 @@ class SalesReportBuyerController extends Controller
         $dompdf->loadHtml($html, 'UTF-8');
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
+        PdfBranding::applyDefaultLogoWatermark($dompdf);
 
         $filename = 'compradores-item-' . (int) data_get($report, 'item.id') . '-' . now()->format('Ymd-His') . '.pdf';
 

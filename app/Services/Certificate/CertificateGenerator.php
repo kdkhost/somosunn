@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Course;
 use App\Models\Mentorship;
 use App\Models\Event;
+use App\Support\PdfBranding;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\View;
@@ -86,6 +87,7 @@ class CertificateGenerator
         $dompdf->loadHtml($html, 'UTF-8');
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
+        PdfBranding::applyDefaultLogoWatermark($dompdf);
 
         return $dompdf->output();
     }

@@ -2,6 +2,24 @@
 
 ---
 
+## [2026-06-19] - feat(pdf): padronizar marca d'agua com logo
+
+### Adicionado
+- Todos os PDFs gerados via Dompdf passam a receber a logo do sistema como marca d'agua central, bem clara, aplicada de forma padrao apos o render.
+- Criado `PdfBranding` para centralizar a resolucao da logo cadastrada e aplicar a marca sem alterar o layout HTML de cada documento.
+
+### Atualizado
+- PDFs de faturas, certificados, relatorio financeiro de pedidos e lista de compradores por item agora passam pelo mesmo aplicador de marca.
+
+### Arquivos principais
+- `app/Support/PdfBranding.php`
+- `app/Services/InvoiceService.php`
+- `app/Services/Certificate/CertificateGenerator.php`
+- `app/Http/Controllers/Admin/OrderController.php`
+- `app/Http/Controllers/Admin/SalesReportBuyerController.php`
+
+---
+
 ## [2026-06-19] - feat(vendas): listar compradores por item no relatorio
 
 ### Adicionado

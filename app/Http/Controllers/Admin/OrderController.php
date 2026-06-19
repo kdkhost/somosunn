@@ -8,6 +8,7 @@ use App\Services\OrderCancellationService;
 use App\Services\OrderRefundService;
 use App\Services\OrderSettlementService;
 use App\Services\SalesAnalyticsService;
+use App\Support\PdfBranding;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Database\Eloquent\Builder;
@@ -495,6 +496,7 @@ class OrderController extends Controller
         $dompdf->loadHtml($html, 'UTF-8');
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
+        PdfBranding::applyDefaultLogoWatermark($dompdf);
 
         return response($dompdf->output(), 200, [
             'Content-Type' => 'application/pdf',

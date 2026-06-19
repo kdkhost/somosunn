@@ -51,6 +51,14 @@ Pendencias estruturais ainda abertas:
 - Diferencas visuais mantidas: `/admin` usa modal Bootstrap/AdminLTE; `/painel/admin` usa modal Tailwind/vanilla JS; ambos consomem a mesma consulta de negocio.
 - Validacoes previstas: `php artisan route:list --path=orders`, `php artisan view:cache`, `php tools/check-no-bom.php`, `php tools/check-text-encoding.php` e `git diff --check`.
 
+### Atualizacao aplicada em 19/06/2026 - marca padrao em PDFs
+
+- Criado `app/Support/PdfBranding.php` para aplicar a logo do sistema como marca d'agua central e clara em PDFs gerados via Dompdf.
+- A resolucao da logo prioriza `logo_admin`, `logo_front`, `logo_image` e `logo_auth`, com fallback para `public/img/logo.svg`.
+- PDFs atualizados para usar o padrao: faturas, certificados, relatorio financeiro de pedidos e lista de compradores por item.
+- A regra foi aplicada depois do `render()` do Dompdf para evitar duplicar HTML, preservar os layouts existentes e reduzir risco visual entre `/admin`, `/painel/admin` e documentos publicos.
+- Validacoes previstas: `php -l` nos arquivos alterados, geracao isolada de PDF, `php artisan view:cache`, `php tools/check-no-bom.php`, `php tools/check-text-encoding.php` e `git diff --check`.
+
 ### Regra permanente
 
 O sistema utiliza dois painéis administrativos distintos e integrados:
