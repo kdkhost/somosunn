@@ -15,6 +15,19 @@
 
 ---
 
+## [2026-06-19] - fix(revistas): corrigir acentuação do importador
+
+### Corrigido
+- Textos, mensagens e metadados do importador da Revista Manchete passaram a usar acentuação correta em português brasileiro.
+- Títulos de edições, meses e localidades foram normalizados sem alterar os slugs e as URLs existentes.
+- Mensagens do model de revistas foram normalizadas em UTF-8 sem BOM.
+
+### Arquivos principais
+- `app/Console/Commands/ImportManchetePdfs.php`
+- `app/Models/Magazine.php`
+
+---
+
 ## [2026-06-19] - fix(producao): impedir erro 500 em sessao supervisionada expirada
 
 ### Corrigido

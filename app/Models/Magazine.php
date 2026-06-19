@@ -77,7 +77,7 @@ class Magazine extends Model
             }
         }
 
-        throw new \RuntimeException('Nao foi possivel gerar um slug unico para a revista.');
+        throw new \RuntimeException('Não foi possível gerar um slug único para a revista.');
     }
 
     public function creator()
@@ -112,7 +112,7 @@ class Magazine extends Model
     }
 
     /**
-     * Scope: revistas visiveis ao usuario baseado em visibility + interesse "Noticias".
+     * Scope: revistas visíveis ao usuário com base na visibilidade e no interesse "Notícias".
      */
     public function scopeVisibleTo($query, ?User $user)
     {
@@ -137,7 +137,7 @@ class Magazine extends Model
     }
 
     /**
-     * Verifica se o usuario marcou "Noticias" como interesse no perfil.
+     * Verifica se o usuário marcou "Notícias" como interesse no perfil.
      */
     public static function userHasNewsInterest(?User $user): bool
     {

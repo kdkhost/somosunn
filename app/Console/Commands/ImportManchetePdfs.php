@@ -10,12 +10,12 @@ use Illuminate\Support\Str;
 
 class ImportManchetePdfs extends Command
 {
-    protected $signature = 'magazines:import-manchete {--force : Re-importa revistas ja cadastradas}';
-    protected $description = 'Importa todas as edicoes da Revista Manchete (patrocinadora) para o modulo de revistas';
+    protected $signature = 'magazines:import-manchete {--force : Reimporta revistas já cadastradas}';
+    protected $description = 'Importa todas as edições da Revista Manchete (patrocinadora) para o módulo de revistas';
 
     /**
-     * Lista completa das edicoes da Revista Manchete (fornecida oficialmente).
-     * Cada entrada: [url_revista, titulo, edicao, categoria, published_at]
+     * Lista completa das edições da Revista Manchete (fornecida oficialmente).
+     * Cada entrada: [url_revista, título, edição, categoria, published_at]
      */
     protected array $sources = [
         [
@@ -28,8 +28,8 @@ class ImportManchetePdfs extends Command
         ],
         [
             'url'       => 'https://revistamanchete.com.br/revistas/revista-manchete-edicao-7-marco-2026/',
-            'title'     => 'Revista Manchete - 7a Edicao',
-            'edition'   => '#7 - Marco/2026',
+            'title'     => 'Revista Manchete - 7ª Edição',
+            'edition'   => '#7 - Março/2026',
             'category'  => 'Manchetes',
             'published' => '2026-03-01',
         ],
@@ -49,14 +49,14 @@ class ImportManchetePdfs extends Command
         ],
         [
             'url'       => 'https://revistamanchete.com.br/revistas/revista-manchete-turismo-buzios/',
-            'title'     => 'Revista Manchete Turismo - Buzios',
+            'title'     => 'Revista Manchete Turismo - Búzios',
             'edition'   => 'Especial',
             'category'  => 'Turismo',
             'published' => '2026-01-10',
         ],
         [
             'url'       => 'https://revistamanchete.com.br/capa-revista-manchete-edicao-6-janeiro-2026-zica-assis/',
-            'title'     => 'Revista Manchete - 6a Edicao',
+            'title'     => 'Revista Manchete - 6ª Edição',
             'edition'   => '#6 - Janeiro/2026',
             'category'  => 'Manchetes',
             'published' => '2026-01-01',
@@ -70,7 +70,7 @@ class ImportManchetePdfs extends Command
         ],
         [
             'url'       => 'https://revistamanchete.com.br/revista-manchete-edicao-5-novembro-2025/',
-            'title'     => 'Revista Manchete - 5a Edicao',
+            'title'     => 'Revista Manchete - 5ª Edição',
             'edition'   => '#5 - Novembro/2025',
             'category'  => 'Manchetes',
             'published' => '2025-11-01',
@@ -91,7 +91,7 @@ class ImportManchetePdfs extends Command
         ],
         [
             'url'       => 'https://revistamanchete.com.br/revista-manchete-edicao-4-setembro-2025/',
-            'title'     => 'Revista Manchete - 4a Edicao',
+            'title'     => 'Revista Manchete - 4ª Edição',
             'edition'   => '#4 - Setembro/2025',
             'category'  => 'Manchetes',
             'published' => '2025-09-01',
@@ -105,22 +105,22 @@ class ImportManchetePdfs extends Command
         ],
         [
             'url'       => 'https://revistamanchete.com.br/revistas/revista-manchete-edicao-3-julho-2025/',
-            'title'     => 'Revista Manchete - 3a Edicao',
+            'title'     => 'Revista Manchete - 3ª Edição',
             'edition'   => '#3 - Julho/2025',
             'category'  => 'Manchetes',
             'published' => '2025-07-01',
         ],
         [
             'url'       => 'https://revistamanchete.com.br/revistas/revista-manchete-edicao-2-maio-2025/',
-            'title'     => 'Revista Manchete - 2a Edicao',
+            'title'     => 'Revista Manchete - 2ª Edição',
             'edition'   => '#2 - Maio/2025',
             'category'  => 'Manchetes',
             'published' => '2025-05-01',
         ],
         [
             'url'       => 'https://revistamanchete.com.br/revistas/revista-manchete-edicao-1-marco-2025/',
-            'title'     => 'Revista Manchete - 1a Edicao',
-            'edition'   => '#1 - Marco/2025',
+            'title'     => 'Revista Manchete - 1ª Edição',
+            'edition'   => '#1 - Março/2025',
             'category'  => 'Manchetes',
             'published' => '2025-03-01',
         ],
@@ -131,11 +131,11 @@ class ImportManchetePdfs extends Command
         $force = (bool) $this->option('force');
         $admin = User::whereIn('role', ['admin', 'superadmin'])->orderBy('id')->first();
         if (!$admin) {
-            $this->error('Nenhum admin/superadmin encontrado no sistema.');
+            $this->error('Nenhum administrador ou superadministrador encontrado no sistema.');
             return self::FAILURE;
         }
 
-        $this->info('Importando ' . count($this->sources) . ' revistas (Revista Manchete)...');
+        $this->info('Importando ' . count($this->sources) . ' revistas da Revista Manchete...');
         $this->info('Owner: ' . $admin->name . ' (id=' . $admin->id . ')');
         $this->newLine();
 
@@ -149,10 +149,10 @@ class ImportManchetePdfs extends Command
 
             $slug = Str::slug($src['title']);
 
-            // Ja existe?
+            // Já existe?
             $existing = Magazine::where('slug', $slug)->first();
             if ($existing && !$force) {
-                $this->warn('  > Ja cadastrada (use --force para reimportar). Pulando.');
+                $this->warn('  > Já cadastrada (use --force para reimportar). Pulando.');
                 $skipped++;
                 continue;
             }
@@ -173,7 +173,7 @@ class ImportManchetePdfs extends Command
             }
 
             if (!$assets['pdf_url']) {
-                $this->error('  > PDF nao encontrado na pagina.');
+                $this->error('  > PDF não encontrado na página.');
                 $failed++;
                 continue;
             }
@@ -182,7 +182,7 @@ class ImportManchetePdfs extends Command
             $this->info('  > Baixando PDF: ' . $assets['pdf_url']);
             $pdfPath = $this->downloadFile($assets['pdf_url'], 'magazines/pdfs', 'magazine-pdf-' . $slug . '.pdf');
             if (!$pdfPath) {
-                $this->error('  > Falha ao baixar PDF.');
+                $this->error('  > Falha ao baixar o PDF.');
                 $failed++;
                 continue;
             }
@@ -196,7 +196,7 @@ class ImportManchetePdfs extends Command
                 $thumbPath = $this->downloadFile($assets['thumb_url'], 'magazines/thumbs', 'magazine-thumb-' . $slug . '.' . $ext);
             }
             if (!$thumbPath) {
-                $this->info('  > Gerando capa pela primeira pagina do PDF.');
+                $this->info('  > Gerando capa pela primeira página do PDF.');
                 $thumbPath = $this->generateThumbnailFromPdf($pdfPath, $slug);
             }
 
@@ -208,11 +208,11 @@ class ImportManchetePdfs extends Command
                 'category'          => $src['category'],
                 'edition'           => $src['edition'],
                 'published_at'      => $src['published'],
-                'short_description' => 'Edicao oficial da Revista Manchete, patrocinadora da plataforma.',
+                'short_description' => 'Edição oficial da Revista Manchete, patrocinadora da plataforma.',
                 'thumbnail'         => $thumbPath,
                 'pdf_file'          => $pdfPath,
                 'file_size_kb'      => $pdfSizeKb,
-                'is_featured'       => str_contains(strtolower($src['edition']), 'edicao') ? true : false,
+                'is_featured'       => str_contains(Str::ascii(mb_strtolower($src['edition'])), 'edicao'),
                 'allow_download'    => true,
                 'enable_sound'      => true,
                 'status'            => 'published',
@@ -240,7 +240,7 @@ class ImportManchetePdfs extends Command
     }
 
     /**
-     * Extrai URL do PDF e da imagem de capa da pagina da revista.
+     * Extrai a URL do PDF e da imagem de capa da página da revista.
      */
     protected function extractAssets(string $url): array
     {
@@ -290,7 +290,7 @@ class ImportManchetePdfs extends Command
                 return null;
             }
 
-            // Sanitiza filename
+            // Sanitiza o nome do arquivo.
             $filename = preg_replace('/[^A-Za-z0-9_\-\.]/', '_', $filename);
             $fullPath = $targetDir . '/' . $filename;
 
@@ -306,7 +306,7 @@ class ImportManchetePdfs extends Command
     protected function generateThumbnailFromPdf(string $pdfPath, string $slug): ?string
     {
         if (!extension_loaded('imagick')) {
-            $this->warn('      Extensao Imagick indisponivel; capa nao gerada.');
+            $this->warn('      Extensão Imagick indisponível; capa não gerada.');
             return null;
         }
 
@@ -334,7 +334,7 @@ class ImportManchetePdfs extends Command
 
             return 'magazines/thumbs/' . basename($targetPath);
         } catch (\Throwable $e) {
-            $this->warn('      Nao foi possivel gerar a capa: ' . $e->getMessage());
+            $this->warn('      Não foi possível gerar a capa: ' . $e->getMessage());
             return null;
         }
     }
