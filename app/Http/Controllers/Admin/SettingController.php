@@ -1241,20 +1241,6 @@ class SettingController extends Controller
         \Config::set('mail.from.name', $request->smtp_from_name ?? config('app.name'));
 
         try {
-            // Find or create the template
-            $template = \App\Models\MailTemplate::firstOrCreate(
-                ['slug' => 'smtp_test'],
-                [
-                    'name' => 'Teste de Configuração SMTP',
-                    'category' => 'sistema',
-                    'subject' => 'Teste de Envio SMTP - {{site.name}}',
-                    'body' => '<h1>Olá, {{user.name}}!</h1><p>Este é um e-mail de teste para validar as configurações de SMTP do sistema <strong>{{site.name}}</strong>.</p><p>Se você recebeu esta mensagem, significa que seu servidor de e-mail está configurado corretamente.</p><br><p>Atenciosamente,<br>Equipe {{site.name}}</p>',
-                    'is_active' => true,
-                    'locale' => 'pt-BR'
-                ]
-            );
-
-            // Prioritize Admin Logo (Sidebar/Header) for Emails
             $logo = Setting::where('key', 'logo_admin')->value('value');
             if (!$logo)
                 $logo = Setting::where('key', 'logo_front')->value('value');
@@ -1280,54 +1266,13 @@ class SettingController extends Controller
                 ],
             ];
 
-            // Render logic simple for test
-            $rendered = $template->body;
-            $subject = $template->subject ?? 'Teste SMTP';
-
-            foreach ($data as $key => $values) {
-                foreach ($values as $k => $v) {
-                    $pattern = '/\{\{\s*' . $key . '\.' . $k . '\s*\}\}/';
-                    $rendered = preg_replace($pattern, $v, $rendered);
-                    $subject = preg_replace($pattern, $v, $subject);
-                }
-            }
-
-            // System Colors
-            $primaryColor = Setting::where('key', 'site_color_primary')->value('value') ?? '#007bff';
-            $secondaryColor = Setting::where('key', 'site_color_secondary')->value('value') ?? '#6c757d';
-
-            // Wrap with layout
-            $layout = '
-            <div style="background-color: #f4f6f9; padding: 20px; font-family: sans-serif; min-height: 100%;">
-                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                        <td align="center">
-                            <div style="background-color: #ffffff; max-width: 600px; padding: 0px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
-                                <!-- Header -->
-                                <div style="background: linear-gradient(135deg, ' . $primaryColor . ' 0%, ' . $secondaryColor . ' 100%); padding: 30px 20px; text-align: center;">
-                                    <img src="' . $logoUrl . '" alt="' . $data['site']['name'] . '" style="max-height: 60px; max-width: 200px;">
-                                </div>
-                                
-                                <!-- Body -->
-                                <div style="padding: 30px; color: #333333; line-height: 1.6;">
-                                    ' . $rendered . '
-                                </div>
-                                
-                                <!-- Footer -->
-                                <div style="background-color: #f8f9fa; padding: 20px; text-align: center; color: #777777; font-size: 12px; border-top: 1px solid #eeeeee;">
-                                    <p>&copy; ' . date('Y') . ' ' . $data['site']['name'] . '. Todos os direitos reservados.</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </div>';
-
             app(\App\Services\Mail\SystemMailTemplateService::class)->send('smtp_test', $request->smtp_test_email, $data, [
-                'name' => 'Teste de Configuracao SMTP',
+                'name' => 'Teste de Configuração SMTP',
                 'category' => 'sistema',
                 'subject' => 'Teste de Envio SMTP - {{site.name}}',
-                'body' => '<h1>Ola, {{user.name}}!</h1><p>Este e um email de teste para validar as configuracoes SMTP de <strong>{{site.name}}</strong>.</p>',
+                'body' => '<h1>Olá, {{user.name}}!</h1><p>Este é um e-mail de teste para validar as configurações SMTP de <strong>{{site.name}}</strong>.</p>',
+                'is_active' => true,
+                'locale' => 'pt-BR',
             ]);
 
             return response()->json(['success' => true, 'message' => 'E-mail de teste enviado com sucesso!']);

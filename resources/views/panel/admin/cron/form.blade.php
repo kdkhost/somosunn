@@ -8,22 +8,14 @@
 
 @section('panel_content')
     @php
-        $commonCommands = [
-            'notifications:cleanup' => 'Limpeza de notificacoes',
-            'auth:clear-resets' => 'Limpar tokens de senha',
-            'sanctum:prune-expired' => 'Limpar tokens de API',
-            'orders:send-unpaid-reminders' => 'Lembretes de pedidos nao pagos',
-            'orders:cancel-unpaid' => 'Cancelar pedidos nao pagos',
-            'abandoned-cart:send' => 'Disparo de carrinho abandonado',
-            'subscriptions:check-expired' => 'Expirar planos vencidos',
-            'backup:database' => 'Backup do banco de dados',
-            'backup:config' => 'Backup de configuracoes',
-            'queue:work --stop-when-empty --tries=3' => 'Processar fila de jobs',
-        ];
-
+        $commandGroups = (array) config('cron-panel.commands', []);
+        $firstGroup = $commandGroups ? reset($commandGroups) : [];
+        $firstCommand = is_array($firstGroup) ? array_key_first($firstGroup) : null;
+        $commonCommands = collect($commandGroups)->flatMap(fn ($commands) => array_keys((array) $commands))->values()->all();
         $commandValue = old('real_command', $task->command);
+        $commandValue = $commandValue ?: $firstCommand;
         $frequencyValue = old('real_frequency', $task->frequency ?: '* * * * *');
-        $isCustomCommand = $commandValue && !array_key_exists($commandValue, $commonCommands);
+        $isCustomCommand = $commandValue && !in_array($commandValue, $commonCommands, true);
     @endphp
 
     <div class="max-w-4xl space-y-6">
@@ -60,10 +52,14 @@
                 </label>
                 <select id="command_select"
                     class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
-                    @foreach($commonCommands as $command => $label)
-                        <option value="{{ $command }}" @selected($commandValue === $command)>
-                            {{ $label }} ({{ $command }})
-                        </option>
+                    @foreach($commandGroups as $groupLabel => $commands)
+                        <optgroup label="{{ $groupLabel }}">
+                            @foreach($commands as $command => $label)
+                                <option value="{{ $command }}" @selected($commandValue === $command)>
+                                    {{ $label }} ({{ $command }})
+                                </option>
+                            @endforeach
+                        </optgroup>
                     @endforeach
                     <option value="custom" @selected($isCustomCommand)>Personalizado</option>
                 </select>

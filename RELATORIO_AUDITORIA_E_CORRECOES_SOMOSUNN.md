@@ -33,6 +33,16 @@ Pendencias estruturais ainda abertas:
 - A tela `/painel/compras` passou a calcular o prazo de expiracao com a mesma regra do cron, evitando divergencia visual.
 - Rotas preservadas: `admin.cron.*`, `panel.admin.cron.*`, `admin.backups.*`, `admin.orders.*`, `panel.admin.orders.*` e `panel.purchases.*`.
 
+### Atualizacao aplicada em 19/06/2026 - centralizacao total de crons e e-mails por template
+
+- O `app/Console/Kernel.php` passou a carregar somente tarefas ativas de `scheduled_tasks`, mantendo `/admin/cron` como fonte operacional dos crons.
+- O catalogo de comandos/frequencias padrao foi centralizado em `config/cron-panel.php`, usado por `/admin/cron/create`, `/painel/admin/cron/create`, seeders e migrations.
+- Adicionados os comandos `cron:heartbeat` e `emails:process-queue`, incluindo o monitoramento do scheduler e a fila de e-mails no painel de cron.
+- Todos os crons operacionais padrao foram inseridos/alinhados na tabela `scheduled_tasks`: filas, backups, pedidos, WAF, notificacoes, faturas, assinaturas, reputacao, carrinhos, eventos, videos e dashboards.
+- `/admin/backups` continua sendo a tela operacional de backup, mas ao salvar configuracoes ela sincroniza os registros `backup:database` e `backup:config` no painel `/admin/cron`.
+- A tela `/admin/mailtest` foi convertida para disparo por `mail_templates`, sem assunto/mensagem livres enviados diretamente por PHPMailer.
+- Envios existentes por Mailables continuam passando por `UsesMailTemplate`; envios de servicos/controllers usam `SystemMailTemplateService` ou notifications baseadas em templates.
+
 ### Atualizacao aplicada em 19/06/2026 - tema e codificacao
 
 - Corrigida a alternancia dark/light do `/admin`: o navbar passou a usar o tema real resolvido por `resources/views/admin/layouts/app.blade.php`, sem depender de `$settings` especifico de cada tela.

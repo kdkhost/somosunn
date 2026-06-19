@@ -2,6 +2,33 @@
 
 ---
 
+## [2026-06-19] - refactor(cron): centralizar tarefas no painel
+
+### Corrigido
+- O `Kernel` deixou de manter agendamentos operacionais fixos e passou a carregar as tarefas ativas da tabela `scheduled_tasks`, exibida em `/admin/cron`.
+- O cron de fila de e-mails passou a ser o comando `emails:process-queue`, visivel e executavel pelo painel de cron.
+- O heartbeat do scheduler passou a ser o comando `cron:heartbeat`, tambem centralizado no painel.
+- Configuracoes de backup em `/admin/backups` agora sincronizam os registros `backup:database` e `backup:config` em `/admin/cron`.
+- A tela antiga `/admin/mailtest` deixou de enviar assunto/mensagem livres por PHPMailer e passou a disparar templates de e-mail personalizados.
+
+### Adicionado
+- Catalogo unico `config/cron-panel.php` com comandos e frequencias padrao dos crons do sistema.
+- Migrations para popular e alinhar todos os crons no painel administrativo.
+
+### Arquivos principais
+- `config/cron-panel.php`
+- `app/Console/Kernel.php`
+- `app/Console/Commands/CronHeartbeat.php`
+- `app/Console/Commands/ProcessEmailQueue.php`
+- `database/migrations/2026_06_19_130000_centralize_scheduler_tasks_in_cron_panel.php`
+- `database/migrations/2026_06_19_131000_align_cron_panel_default_frequencies.php`
+- `resources/views/admin/cron/form.blade.php`
+- `resources/views/panel/admin/cron/form.blade.php`
+- `app/Http/Controllers/MailTestController.php`
+- `resources/views/admin/mail_test.blade.php`
+
+---
+
 ## [2026-06-19] - fix(cron): automatizar backups e pedidos pendentes
 
 ### Corrigido

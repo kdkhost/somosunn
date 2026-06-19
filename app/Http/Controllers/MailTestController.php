@@ -2,76 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MailTemplate;
+use App\Services\Mail\SystemMailLayoutData;
+use App\Services\Mail\SystemMailTemplateService;
 use Illuminate\Http\Request;
 
 class MailTestController extends Controller
 {
     public function showForm()
     {
-        return view('admin.mail_test');
+        $templates = MailTemplate::query()
+            ->where('is_active', true)
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get(['name', 'slug', 'category']);
+
+        return view('admin.mail_test', compact('templates'));
     }
 
     public function sendTest(Request $request)
     {
-        $request->validate(['to' => 'required|email','subject' => 'required','body' => 'required']);
-        \Log::info('Mail test requested', $request->all());
+        $data = $request->validate([
+            'to' => 'required|email',
+            'template_slug' => 'nullable|string|max:120',
+        ]);
 
-        if (class_exists('\\PHPMailer\\PHPMailer\\PHPMailer') || class_exists('\PHPMailer\PHPMailer\PHPMailer')) {
-            try {
-                $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-                $mail->isSMTP();
-                $mail->Host = env('MAIL_HOST');
-                $mail->SMTPAuth = true;
-                $mail->Username = env('MAIL_USERNAME');
-                $mail->Password = env('MAIL_PASSWORD');
-                $mail->SMTPSecure = env('MAIL_ENCRYPTION') ?: '';
-                $mail->Port = env('MAIL_PORT');
+        $slug = trim((string) ($data['template_slug'] ?? '')) ?: 'smtp_test';
+        $layout = app(SystemMailLayoutData::class)->make();
 
-                $mail->setFrom(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                $mail->addAddress($request->input('to'));
+        $sent = app(SystemMailTemplateService::class)->send($slug, $data['to'], [
+            'user' => [
+                'name' => 'Teste SMTP',
+                'email' => $data['to'],
+            ],
+            'site' => [
+                'name' => $layout['siteName'],
+                'logo' => $layout['logoUrl'],
+                'primary_color' => $layout['primaryColor'],
+                'secondary_color' => $layout['secondaryColor'],
+                'url' => url('/'),
+            ],
+            'test' => [
+                'sent_at' => now()->format('d/m/Y H:i:s'),
+            ],
+        ], [
+            'name' => 'Teste SMTP',
+            'category' => 'sistema',
+            'locale' => 'pt-BR',
+            'subject' => 'Teste SMTP - {{site.name}}',
+            'body' => '<h1>Ola, {{user.name}}!</h1><p>Este e um e-mail de teste enviado por template personalizado em {{test.sent_at}}.</p>',
+            'is_active' => true,
+        ]);
 
-                $mail->isHTML(true);
-                $mail->Subject = $request->input('subject');
-                $mail->Body = $request->input('body');
-
-                $mail->send();
-                return redirect()->route('admin.mailtest')->with('success', 'E-mail enviado com sucesso.');
-            } catch (\Exception $e) {
-                \Log::error('PHPMailer error: '.$e->getMessage());
-                return redirect()->route('admin.mailtest')->with('error', 'Erro ao enviar: '.$e->getMessage());
-            }
-        }
-
-        return redirect()->route('admin.mailtest')->with('error', 'PHPMailer não instalado. Instale `phpmailer/phpmailer`.');
-    }
-
-    public function sendRaw($to, $subject, $html)
-    {
-        if (class_exists('\PHPMailer\PHPMailer\PHPMailer')) {
-            try {
-                $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-                $mail->isSMTP();
-                $mail->Host = env('MAIL_HOST');
-                $mail->SMTPAuth = true;
-                $mail->Username = env('MAIL_USERNAME');
-                $mail->Password = env('MAIL_PASSWORD');
-                $mail->SMTPSecure = env('MAIL_ENCRYPTION') ?: null;
-                $mail->Port = env('MAIL_PORT');
-
-                $mail->setFrom(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                $mail->addAddress($to);
-
-                $mail->isHTML(true);
-                $mail->Subject = $subject;
-                $mail->Body = $html;
-
-                $mail->send();
-                return response()->json(['message' => 'Enviado']);
-            } catch (\Exception $e) {
-                \Log::error('PHPMailer error: '.$e->getMessage());
-                return response()->json(['error' => 'Erro ao enviar: '.$e->getMessage()], 500);
-            }
-        }
-        return response()->json(['error' => 'PHPMailer não instalado.'], 500);
+        return redirect()
+            ->route('admin.mailtest.index')
+            ->with($sent ? 'success' : 'error', $sent ? 'E-mail de teste enviado por template.' : 'Nao foi possivel enviar o e-mail de teste.');
     }
 }

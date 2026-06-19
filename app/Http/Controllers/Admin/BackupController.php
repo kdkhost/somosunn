@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ScheduledTask;
 use App\Models\Setting;
 use App\Services\BackupService;
 use Illuminate\Http\RedirectResponse;
@@ -92,6 +93,8 @@ class BackupController extends Controller
         Setting::set('backup_config_enabled', $request->boolean('backup_config_enabled') ? '1' : '0', 'backup');
         Setting::set('backup_config_weekday', (string) $data['backup_config_weekday'], 'backup');
         Setting::set('backup_config_time', (string) $data['backup_config_time'], 'backup');
+
+        $this->syncBackupCronTasks($data, $request);
 
         return back()->with('success', 'Configuracoes de backup atualizadas.');
     }
@@ -277,5 +280,44 @@ class BackupController extends Controller
     private function contentTypeFor(string $type): string
     {
         return $type === 'db' ? 'application/gzip' : 'application/gzip';
+    }
+
+    /**
+     * @param array<string,mixed> $data
+     */
+    private function syncBackupCronTasks(array $data, Request $request): void
+    {
+        ScheduledTask::updateOrCreate(
+            ['command' => 'backup:database'],
+            [
+                'frequency' => $this->dailyCronFromTime((string) $data['backup_database_time']),
+                'active' => $request->boolean('backup_database_enabled'),
+            ]
+        );
+
+        ScheduledTask::updateOrCreate(
+            ['command' => 'backup:config'],
+            [
+                'frequency' => $this->weeklyCronFromTime(
+                    (string) $data['backup_config_time'],
+                    (int) $data['backup_config_weekday']
+                ),
+                'active' => $request->boolean('backup_config_enabled'),
+            ]
+        );
+    }
+
+    private function dailyCronFromTime(string $time): string
+    {
+        [$hour, $minute] = array_pad(explode(':', $time, 2), 2, '0');
+
+        return ((int) $minute) . ' ' . ((int) $hour) . ' * * *';
+    }
+
+    private function weeklyCronFromTime(string $time, int $weekday): string
+    {
+        [$hour, $minute] = array_pad(explode(':', $time, 2), 2, '0');
+
+        return ((int) $minute) . ' ' . ((int) $hour) . ' * * ' . max(0, min(6, $weekday));
     }
 }
