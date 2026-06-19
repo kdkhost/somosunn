@@ -2,6 +2,7 @@
 // Rotas de gerenciamento de cron (admin/superadmin)
 Route::middleware(['auth', 'admin'])->prefix('admin/cron')->name('admin.cron.')->group(function () {
     Route::get('/', [\App\Http\Controllers\Admin\CronController::class, 'index'])->name('index');
+    Route::get('/data', [\App\Http\Controllers\Admin\CronController::class, 'data'])->name('data');
     Route::get('/create', [\App\Http\Controllers\Admin\CronController::class, 'create'])->name('create');
     Route::post('/', [\App\Http\Controllers\Admin\CronController::class, 'store'])->name('store');
     Route::get('/{task}/edit', [\App\Http\Controllers\Admin\CronController::class, 'edit'])->name('edit');

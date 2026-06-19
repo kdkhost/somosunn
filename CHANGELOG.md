@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-06-19] - perf(cron): paginar painel de tarefas com DataTables
+
+### Corrigido
+- A tela `/admin/cron` deixou de renderizar todos os crons diretamente no Blade e passou a usar DataTables com paginação, busca e ordenação.
+- A listagem agora consome o endpoint AJAX `admin.cron.data`, carregando apenas a página atual para melhorar organização e performance.
+
+### Arquivos principais
+- `app/Http/Controllers/Admin/CronController.php`
+- `resources/views/admin/cron/index.blade.php`
+- `routes/web.php`
+
+---
+
 ## [2026-06-19] - refactor(cron): centralizar tarefas no painel
 
 ### Corrigido

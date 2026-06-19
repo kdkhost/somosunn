@@ -4,6 +4,14 @@
 
 Data de atualização: 18/06/2026
 
+### Atualização aplicada em 19/06/2026 - paginação do painel de cron
+
+- A tela principal `/admin/cron` passou a usar DataTables com carregamento AJAX server-side, paginação, busca e ordenação.
+- O novo endpoint `admin.cron.data` retorna somente a página solicitada da tabela `scheduled_tasks`, mantendo as ações de executar, editar, logs e excluir por linha.
+- Os contadores do topo agora usam consultas agregadas no controller, sem carregar toda a coleção de tarefas para renderizar a página.
+- O painel moderno `/painel/admin/cron` foi preservado sem alteração visual nesta entrega.
+- Rotas preservadas/adicionadas: `admin.cron.index`, `admin.cron.data`, `admin.cron.create`, `admin.cron.edit`, `admin.cron.logs`, `admin.cron.run`, `admin.cron.run-all`, `admin.cron.destroy` e `panel.admin.cron.*`.
+
 ### Hardening aplicado em 18/06/2026
 
 - Mantido o bloqueio global `BlockSensitiveRoutesInProduction`; removido uso redundante do alias `sensitive.production` nas rotas de manutencao.

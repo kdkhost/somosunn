@@ -7,12 +7,43 @@
 @endsection
 
 @push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
     <style>
         .blink_me {
             animation: blinker 2s linear infinite;
         }
         @keyframes blinker {
             50% { opacity: 0.6; }
+        }
+        #cron-tasks-table_wrapper .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        #cron-tasks-table_wrapper .dataTables_length,
+        #cron-tasks-table_wrapper .dataTables_filter {
+            padding: 1rem 1rem 0;
+        }
+        #cron-tasks-table_wrapper .dataTables_info,
+        #cron-tasks-table_wrapper .dataTables_paginate {
+            padding: 1rem;
+        }
+        #cron-tasks-table_wrapper .dataTables_filter input,
+        #cron-tasks-table_wrapper .dataTables_length select {
+            border-radius: .5rem;
+        }
+        #cron-tasks-table td,
+        #cron-tasks-table th {
+            vertical-align: middle;
+        }
+        #cron-tasks-table .cron-command {
+            display: inline-block;
+            max-width: 420px;
+            white-space: normal;
+            word-break: break-word;
+        }
+        #cron-tasks-table tbody td:last-child {
+            white-space: nowrap;
         }
     </style>
 @endpush
@@ -28,8 +59,6 @@
             }
         }
         $isRunning = $lastHeartbeat && $lastHeartbeat->diffInMinutes(now()) < 5;
-        $activeCount = $tasks->where('active', true)->count();
-        $inactiveCount = $tasks->where('active', false)->count();
     @endphp
 
     {{-- KPI Cards --}}
@@ -39,7 +68,7 @@
                 <span class="info-box-icon"><i class="fas fa-clock"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Total Tarefas</span>
-                    <span class="info-box-number">{{ $tasks->count() }}</span>
+                    <span class="info-box-number">{{ $totalCount }}</span>
                 </div>
             </div>
         </div>
@@ -103,133 +132,103 @@
             </div>
         </div>
         <div class="card-body p-0">
-            @if($tasks->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th style="width:50px">ID</th>
-                                <th>Comando</th>
-                                <th>Frequencia</th>
-                                <th class="text-center">Status</th>
-                                <th>Ultima Execucao</th>
-                                <th>Proxima Execucao</th>
-                                <th class="text-right">Acoes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($tasks as $task)
-                                <tr>
-                                    <td><span class="badge badge-light border">{{ $task->id }}</span></td>
-                                    <td><code class="text-dark">{{ $task->command }}</code></td>
-                                    <td><span class="badge badge-info"><i class="fas fa-redo mr-1"></i>{{ $task->frequency }}</span></td>
-                                    <td class="text-center">
-                                        @if($task->active)
-                                            <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Ativa</span>
-                                        @else
-                                            <span class="badge badge-secondary"><i class="fas fa-pause mr-1"></i>Inativa</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($task->last_run_at)
-                                            <small><i class="fas fa-calendar-check text-muted mr-1"></i>{{ $task->last_run_at->format('d/m/Y H:i') }}</small>
-                                        @else
-                                            <small class="text-muted">Nunca executada</small>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @php
-                                            try {
-                                                $cron = new \Cron\CronExpression($task->frequency);
-                                                $nextRun = \Illuminate\Support\Carbon::instance($cron->getNextRunDate());
-                                                echo '<small><i class="fas fa-clock text-muted mr-1"></i>' . $nextRun->format('d/m/Y H:i') . '</small>';
-                                            } catch (\Exception $e) {
-                                                echo '<span class="badge badge-danger"><i class="fas fa-exclamation-triangle mr-1"></i>Invalido</span>';
-                                            }
-                                        @endphp
-                                    </td>
-                                    <td class="text-right" style="white-space:nowrap">
-                                        <form action="{{ route('admin.cron.run', $task) }}" method="POST"
-                                            class="d-inline run-cron-form">
-                                            @csrf
-                                            <button type="button" class="btn btn-sm btn-outline-success rounded-pill btn-run-cron"
-                                                title="Executar Agora">
-                                                <i class="fas fa-play"></i>
-                                            </button>
-                                        </form>
-                                        <a href="{{ route('admin.cron.edit', $task) }}" class="btn btn-sm btn-outline-primary rounded-pill"
-                                            title="Editar"><i class="fas fa-edit"></i></a>
-                                        <a href="{{ route('admin.cron.logs', $task) }}" class="btn btn-sm btn-outline-info rounded-pill"
-                                            title="Logs"><i class="fas fa-list"></i></a>
-                                        <form action="{{ route('admin.cron.destroy', $task) }}" method="POST"
-                                            class="d-inline delete-cron-form">
-                                            @csrf @method('DELETE')
-                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill btn-delete-cron"
-                                                title="Excluir"><i class="fas fa-trash"></i></button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <div class="text-center py-5">
-                    <i class="fas fa-clock fa-3x text-muted mb-3"></i>
-                    <p class="text-muted mb-1">Nenhuma tarefa cadastrada.</p>
-                    <a href="{{ route('admin.cron.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1 mt-2">
-                        <i class="fas fa-plus mr-1"></i> Criar primeira tarefa
-                    </a>
-                </div>
-            @endif
+            <div class="table-responsive">
+                <table id="cron-tasks-table" class="table table-hover table-striped align-middle mb-0 w-100">
+                    <thead class="bg-light">
+                        <tr>
+                            <th style="width:50px">ID</th>
+                            <th>Comando</th>
+                            <th>Frequência</th>
+                            <th class="text-center">Status</th>
+                            <th>Última Execução</th>
+                            <th>Próxima Execução</th>
+                            <th class="text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Run Button
-            document.querySelectorAll('.btn-run-cron').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const form = this.closest('form');
-                    Swal.fire({
-                        title: 'Executar agora?',
-                        text: "Isso vai forcar a execucao imediata deste comando. Pode levar alguns segundos.",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Sim, executar!',
-                        cancelButtonText: 'Cancelar',
-                        reverseButtons: true
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
+        $(function () {
+            const table = $('#cron-tasks-table').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                autoWidth: false,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                order: [[0, 'desc']],
+                ajax: {
+                    url: '{{ route('admin.cron.data') }}',
+                    type: 'GET'
+                },
+                columns: [
+                    { data: 'id', name: 'id' },
+                    { data: 'command', name: 'command' },
+                    { data: 'frequency', name: 'frequency' },
+                    { data: 'status', name: 'active', className: 'text-center' },
+                    { data: 'last_run_at', name: 'last_run_at' },
+                    { data: 'next_run_at', name: 'next_run_at', orderable: false, searchable: false },
+                    { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-right' }
+                ],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json',
+                    emptyTable: `
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-clock fa-3x mb-3 d-block"></i>
+                            <p class="mb-2">Nenhuma tarefa cadastrada.</p>
+                            <a href="{{ route('admin.cron.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
+                                <i class="fas fa-plus mr-1"></i> Criar primeira tarefa
+                            </a>
+                        </div>
+                    `
+                }
+            });
+
+            $('#cron-tasks-table').on('click', '.btn-run-cron', function () {
+                const form = this.closest('form');
+                Swal.fire({
+                    title: 'Executar agora?',
+                    text: 'Isso vai forçar a execução imediata deste comando. Pode levar alguns segundos.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sim, executar!',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
                 });
             });
 
-            // Delete Button
-            document.querySelectorAll('.btn-delete-cron').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const form = this.closest('form');
-                    Swal.fire({
-                        title: 'Tem certeza?',
-                        text: "Voce nao podera reverter isso!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Sim, excluir!',
-                        cancelButtonText: 'Cancelar',
-                        reverseButtons: true
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
+            $('#cron-tasks-table').on('click', '.btn-delete-cron', function () {
+                const form = this.closest('form');
+                Swal.fire({
+                    title: 'Tem certeza?',
+                    text: 'Você não poderá reverter isso!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sim, excluir!',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
                 });
             });
         });
