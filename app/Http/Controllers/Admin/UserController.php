@@ -23,6 +23,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $search = trim((string) $request->input('search', ''));
+        $registered = trim((string) $request->input('registered', ''));
+        $createdAt = trim((string) $request->input('created_at', ''));
         $query = User::latest();
 
         if ($search !== '') {
@@ -31,6 +33,12 @@ class UserController extends Controller
                   ->orWhere('email', 'LIKE', "%{$search}%")
                   ->orWhere('id', $search);
             });
+        }
+
+        if ($registered === 'today') {
+            $query->whereDate('created_at', today());
+        } elseif ($createdAt !== '') {
+            $query->whereDate('created_at', $createdAt);
         }
 
         if (!$this->isSuperadmin()) {
@@ -52,7 +60,15 @@ class UserController extends Controller
             }
         ])->get();
 
-        return view('admin.users.index', compact('users', 'search', 'totalUsers', 'totalAdmins', 'totalMembers'));
+        return view('admin.users.index', compact(
+            'users',
+            'search',
+            'registered',
+            'createdAt',
+            'totalUsers',
+            'totalAdmins',
+            'totalMembers'
+        ));
     }
 
     public function create()

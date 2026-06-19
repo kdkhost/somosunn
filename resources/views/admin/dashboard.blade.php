@@ -3,6 +3,9 @@
 @section('page_title', 'Dashboard')
 
 @section('content')
+    @php
+        $newUsersTodayUrl = route('admin.users.index', ['registered' => 'today']);
+    @endphp
     <div class="row">
         {{-- WELCOME SECTION (ALL USERS) --}}
         <div class="col-12 mb-4">
@@ -58,7 +61,7 @@
                             <div class="icon">
                                 <i class="fas fa-wallet"></i>
                             </div>
-                            <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Ver Vendas <i
+                            <a href="{{ route('admin.orders.index') }}" class="small-box-footer">Abrir Pedidos e Vendas <i
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
@@ -71,7 +74,7 @@
                             <div class="icon">
                                 <i class="fas fa-chart-line"></i>
                             </div>
-                            <a href="{{ route('admin.orders.index', ['date' => now()->format('Y-m-d')]) }}" class="small-box-footer">Ver Hoje <i
+                            <a href="{{ route('admin.orders.index', ['date' => now()->format('Y-m-d')]) }}" class="small-box-footer">Ver Faturamento de Hoje <i
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
@@ -84,7 +87,7 @@
                             <div class="icon">
                                 <i class="fas fa-users"></i>
                             </div>
-                            <a href="{{ route('admin.users.index') }}" class="small-box-footer">Gerenciar Usuários <i
+                            <a href="{{ route('admin.users.index') }}" class="small-box-footer">Abrir Lista de Usuarios <i
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
@@ -97,7 +100,7 @@
                             <div class="icon">
                                 <i class="fas fa-user-plus"></i>
                             </div>
-                            <a href="{{ route('admin.users.index', ['created_at' => now()->format('Y-m-d')]) }}" class="small-box-footer">Ver Novos <i
+                            <a href="{{ $newUsersTodayUrl }}" class="small-box-footer">Listar Novos Cadastros <i
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
@@ -119,6 +122,9 @@
                                 </a>
                                 <a href="{{ route('admin.users.create') }}" class="btn btn-outline-warning btn-sm rounded-pill px-3 m-1">
                                     <i class="fas fa-user-plus mr-1"></i> Novo Usuário
+                                </a>
+                                <a href="{{ $newUsersTodayUrl }}" class="btn btn-outline-info btn-sm rounded-pill px-3 m-1">
+                                    <i class="fas fa-user-clock mr-1"></i> Novos Cadastros
                                 </a>
                                 <a href="{{ route('admin.settings') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 m-1">
                                     <i class="fas fa-cog mr-1"></i> Configurações

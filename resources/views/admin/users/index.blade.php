@@ -7,6 +7,8 @@
     @php
         $marketingUserId = (int) \App\Models\Setting::get('platform_marketing_user_id', 0);
         $marketingUser = $marketingUserId > 0 ? \App\Models\User::find($marketingUserId) : null;
+        $isNewUsersTodayView = ($registered ?? '') === 'today';
+        $createdAtLabel = !empty($createdAt) ? \Carbon\Carbon::parse($createdAt)->format('d/m/Y') : null;
     @endphp
 
     {{-- KPI Cards --}}
@@ -70,6 +72,22 @@
             @endif
         </div>
     </div>
+
+    @if($isNewUsersTodayView || $createdAtLabel)
+        <div class="alert alert-primary shadow-sm d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div class="pr-3">
+                <strong><i class="fas fa-user-clock mr-2"></i>Filtro ativo:</strong>
+                @if($isNewUsersTodayView)
+                    exibindo apenas os novos usuários cadastrados hoje.
+                @else
+                    exibindo apenas os usuários cadastrados em {{ $createdAtLabel }}.
+                @endif
+            </div>
+            <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                <i class="fas fa-times mr-1"></i> Limpar filtro
+            </a>
+        </div>
+    @endif
 
     {{-- Tabela principal --}}
     <div class="card card-outline card-primary shadow-sm">

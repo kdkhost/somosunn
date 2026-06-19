@@ -2,6 +2,21 @@
 
 ---
 
+## [2026-06-19] - feat(dashboard): atalhos mais claros para novos usuarios
+
+### Corrigido
+- Os cards principais do dashboard legado `/admin` agora exibem links mais descritivos para vendas, faturamento do dia, lista de usuarios e novos cadastros.
+- O card `Novos Hoje` passou a abrir a listagem de usuarios ja filtrada para os cadastros do dia.
+- A listagem administrativa de usuarios passou a aceitar os filtros `registered=today` e `created_at=YYYY-MM-DD`, exibindo aviso visual com opcao de limpar o filtro.
+- A faixa de acoes rapidas do dashboard ganhou um atalho direto para `Novos Cadastros`, facilitando a consulta dos registros recentes.
+
+### Arquivos principais
+- `resources/views/admin/dashboard.blade.php`
+- `app/Http/Controllers/Admin/UserController.php`
+- `resources/views/admin/users/index.blade.php`
+
+---
+
 ## [2026-06-19] - fix(acesso supervisionado): preservar dados reais no perfil do cliente
 
 ### Corrigido
