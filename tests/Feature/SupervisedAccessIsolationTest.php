@@ -54,6 +54,7 @@ class SupervisedAccessIsolationTest extends TestCase
         $this->get(route('panel.profile.edit'))
             ->assertOk()
             ->assertSee('data-supervised-profile="1"', false)
+            ->assertSee('data-autosave="false"', false)
             ->assertSee('id="supervised-profile-payload"', false)
             ->assertSee('name="supervised_profile_fake_name"', false)
             ->assertSee('name="supervised_profile_fake_email"', false)

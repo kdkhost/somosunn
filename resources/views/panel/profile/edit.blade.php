@@ -168,6 +168,7 @@
 
     <form method="POST" action="{{ route('panel.profile.update') }}" enctype="multipart/form-data"
         autocomplete="{{ $profileFormAutocomplete }}" data-supervised-profile="{{ $isSupervisedAccess ? '1' : '0' }}"
+        @if($isSupervisedAccess) data-autosave="false" @endif
         class="mt-6 space-y-6">
         @csrf
         @if($isSupervisedAccess)
@@ -703,9 +704,26 @@
                 window.setTimeout(hydrateSupervisedProfile, 400);
             }
 
+            function clearDraftAutosave() {
+                var form = document.querySelector('form[data-supervised-profile="1"]');
+                if (!form || !window.localStorage) return;
+
+                var formId = form.id || form.getAttribute('name') || form.getAttribute('action') || 'form-0';
+                var key = ['unn-form-draft', window.location.pathname, formId].join('::');
+
+                try {
+                    window.localStorage.removeItem(key);
+                } catch (error) {
+                }
+            }
+
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', scheduleHydration);
+                document.addEventListener('DOMContentLoaded', function() {
+                    clearDraftAutosave();
+                    scheduleHydration();
+                });
             } else {
+                clearDraftAutosave();
                 scheduleHydration();
             }
         })();
