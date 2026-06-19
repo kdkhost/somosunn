@@ -171,9 +171,11 @@
                             </li>
                         @endif
                         @if($transactionId !== '')
-                            <li class="list-group-item">
-                                <span class="d-block text-muted small mb-1">Transacao</span>
-                                <code class="d-block text-break">{{ $transactionId }}</code>
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <span>Transacao</span>
+                                <strong class="d-block ml-3 text-right text-info text-break" style="max-width:68%; overflow-wrap:anywhere;">
+                                    {{ $transactionId }}
+                                </strong>
                             </li>
                         @endif
                     </ul>

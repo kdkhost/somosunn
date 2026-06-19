@@ -140,9 +140,11 @@
                             </div>
                         @endif
                         @if($transactionId !== '')
-                            <div>
-                                <dt class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Transacao</dt>
-                                <dd class="mt-2 break-all rounded-2xl bg-slate-50 dark:bg-slate-950 px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-300">{{ $transactionId }}</dd>
+                            <div class="flex items-start justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+                                <dt class="text-sm text-slate-500 dark:text-slate-400">Transacao</dt>
+                                <dd class="min-w-0 text-right text-sm font-bold text-blue-700 dark:text-blue-300" style="max-width:68%; overflow-wrap:anywhere;">
+                                    {{ $transactionId }}
+                                </dd>
                             </div>
                         @endif
                     </dl>

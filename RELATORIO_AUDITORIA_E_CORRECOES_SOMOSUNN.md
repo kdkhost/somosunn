@@ -27,6 +27,7 @@ Pendencias estruturais ainda abertas:
 - Reorganizada a tela de detalhe da venda no painel principal em `/admin/orders/{order}`, mantendo o controller `app/Http/Controllers/Admin/OrderController.php` e a view `resources/views/admin/orders/show.blade.php`.
 - Reorganizada a tela equivalente do painel moderno em `/painel/admin/orders/{order}`, mantendo o controller `app/Http/Controllers/Panel/Admin/OrderController.php` e a view `resources/views/panel/admin/orders/show.blade.php`.
 - As duas telas preservam a mesma regra de negocio do model `Order`, incluindo valor bruto, total liquido, desconto, saldo reembolsavel, cupom, gateway, metodo, transacao, fatura, itens e acoes de cancelamento/estorno.
+- O ID da transacao passou a ser renderizado como texto alinhado aos demais campos do resumo, sem bloco de codigo escuro ou aparencia de input.
 - Rotas preservadas: `admin.orders.show`, `admin.orders.cancel`, `admin.orders.refund`, `admin.orders.invoice`, `panel.admin.orders.show`, `panel.admin.orders.cancel`, `panel.admin.orders.refund` e `panel.admin.orders.invoice`.
 - Diferencas visuais mantidas: `/admin` continua usando AdminLTE e `/painel/admin` continua usando o layout Tailwind moderno, sem reutilizar view de um painel no outro.
 - Validacoes executadas: `php artisan route:list --path=orders`, `php -l` nas duas views, `php tools/check-no-bom.php` e compilacao remota com `php artisan view:cache`.
