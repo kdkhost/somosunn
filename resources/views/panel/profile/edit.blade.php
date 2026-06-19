@@ -5,6 +5,10 @@
 @section('panel_content')
     @php
         $isMarketingManager = (int) \App\Models\Setting::get('platform_marketing_user_id', 0) === (int) $user->id;
+        $isSupervisedAccess = session()->has('impersonator_id')
+            && (int) session('impersonated_user_id') === (int) $user->id;
+        $profileFormAutocomplete = $isSupervisedAccess ? 'off' : 'on';
+        $sensitiveFieldAutocomplete = $isSupervisedAccess ? 'off' : null;
     @endphp
 
     @if($isMarketingManager)
@@ -118,8 +122,15 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('panel.profile.update') }}" enctype="multipart/form-data" class="mt-6 space-y-6">
+    <form method="POST" action="{{ route('panel.profile.update') }}" enctype="multipart/form-data"
+        autocomplete="{{ $profileFormAutocomplete }}" data-supervised-profile="{{ $isSupervisedAccess ? '1' : '0' }}"
+        class="mt-6 space-y-6">
         @csrf
+        @if($isSupervisedAccess)
+            <input type="text" name="supervised_profile_fake_name" value="" autocomplete="name" tabindex="-1" aria-hidden="true" class="hidden">
+            <input type="email" name="supervised_profile_fake_email" value="" autocomplete="email" tabindex="-1" aria-hidden="true" class="hidden">
+            <input type="tel" name="supervised_profile_fake_phone" value="" autocomplete="tel" tabindex="-1" aria-hidden="true" class="hidden">
+        @endif
 
         {{-- DADOS PESSOAIS --}}
         <div
@@ -132,6 +143,7 @@
                 <div>
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Nome completo *</label>
                     <input name="name" value="{{ old('name', $user->name) }}" required maxlength="80"
+                        autocomplete="{{ $sensitiveFieldAutocomplete ?? 'name' }}" @if($isSupervisedAccess) data-supervised-lock="1" @endif
                         placeholder="Digite seu nome completo"
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
                 </div>
@@ -182,6 +194,7 @@
                         @endif
                     </label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}" required maxlength="120"
+                        autocomplete="{{ $sensitiveFieldAutocomplete ?? 'email' }}" @if($isSupervisedAccess) data-supervised-lock="1" @endif
                         placeholder="exemplo@email.com"
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
                     
@@ -202,14 +215,16 @@
                 <div>
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Telefone</label>
                     <input name="phone" value="{{ old('phone', $user->phone) }}" maxlength="20" inputmode="tel"
-                        autocomplete="tel" data-mask-phone placeholder="(99) 99999-9999"
+                        autocomplete="{{ $sensitiveFieldAutocomplete ?? 'tel' }}" data-mask-phone placeholder="(99) 99999-9999"
+                        @if($isSupervisedAccess) data-supervised-lock="1" @endif
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300" id="doc_label">Documento
                         (CPF)</label>
                     <input name="doc" id="profile_doc" value="{{ old('doc', $user->doc) }}" maxlength="18"
-                        inputmode="numeric" autocomplete="off" data-mask-doc placeholder="000.000.000-00"
+                        inputmode="numeric" autocomplete="{{ $sensitiveFieldAutocomplete ?? 'off' }}" data-mask-doc placeholder="000.000.000-00"
+                        @if($isSupervisedAccess) data-supervised-lock="1" @endif
                         class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm dark:bg-slate-950 dark:text-white focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
@@ -531,6 +546,30 @@
     @push('scripts')
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
         <script>
+        (function() {
+            function lockSupervisedProfileFields() {
+                var form = document.querySelector('form[data-supervised-profile="1"]');
+                if (!form) return;
+
+                form.querySelectorAll('[data-supervised-lock="1"]').forEach(function(field) {
+                    field.setAttribute('readonly', 'readonly');
+
+                    var unlock = function() {
+                        field.removeAttribute('readonly');
+                    };
+
+                    field.addEventListener('focus', unlock, { once: true });
+                    field.addEventListener('pointerdown', unlock, { once: true });
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', lockSupervisedProfileFields);
+            } else {
+                lockSupervisedProfileFields();
+            }
+        })();
+
         // ── Crop & Auto-Upload para fotos de perfil ──
         (function() {
             var cropper = null;

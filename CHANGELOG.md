@@ -2,6 +2,21 @@
 
 ---
 
+## [2026-06-19] - fix(acesso supervisionado): preservar dados reais no perfil do cliente
+
+### Corrigido
+- A tela `/painel/perfil` agora desativa o autofill do navegador durante acesso supervisionado para impedir que nome, e-mail, telefone e documento do supervisor sobrescrevam visualmente os dados da conta acessada.
+- O formulario passou a renderizar campos-isca ocultos e a travar temporariamente os inputs sensiveis ate a primeira interacao humana, reduzindo a chance de reidratacao automatica indevida no mesmo navegador.
+
+### Adicionado
+- Teste de regressao cobrindo a protecao de autofill no perfil acessado por supervisor.
+
+### Arquivos principais
+- `resources/views/panel/profile/edit.blade.php`
+- `tests/Feature/SupervisedAccessIsolationTest.php`
+
+---
+
 ## [2026-06-19] - fix(seguranca): hardening inicial da auditoria atual
 
 ### Corrigido

@@ -42,6 +42,29 @@ class SupervisedAccessIsolationTest extends TestCase
             ->assertSee('Conta: ' . $target->name);
     }
 
+    public function test_supervised_access_profile_disables_browser_autofill_for_sensitive_fields(): void
+    {
+        $supervisor = $this->user('Supervisor Autofill', 'supervisor-autofill@test.com', 'superadmin');
+        $target = $this->user('Cliente Original', 'cliente-original@test.com', 'member');
+
+        $this->actingAs($supervisor)
+            ->get(route('admin.users.impersonate', $target))
+            ->assertRedirect(route('panel.dashboard'));
+
+        $this->get(route('panel.profile.edit'))
+            ->assertOk()
+            ->assertSee('data-supervised-profile="1"', false)
+            ->assertSee('name="supervised_profile_fake_name"', false)
+            ->assertSee('name="supervised_profile_fake_email"', false)
+            ->assertSee('name="supervised_profile_fake_phone"', false)
+            ->assertSee('name="name"', false)
+            ->assertSee('value="' . $target->name . '"', false)
+            ->assertSee('type="email" name="email"', false)
+            ->assertSee('value="' . $target->email . '"', false)
+            ->assertSee('autocomplete="off"', false)
+            ->assertSee('data-supervised-lock="1"', false);
+    }
+
     public function test_stopping_supervised_access_restores_supervisor_with_a_clean_session(): void
     {
         $supervisor = $this->user('Supervisor Principal', 'supervisor-stop@test.com', 'superadmin');
