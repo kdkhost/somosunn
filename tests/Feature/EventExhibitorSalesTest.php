@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Event;
+use App\Models\EventCoupon;
 use App\Models\EventExhibitorRegistration;
+use App\Models\EventRegistration;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\EventCouponService;
 use App\Services\EventExhibitorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
@@ -186,6 +189,111 @@ class EventExhibitorSalesTest extends TestCase
         ]);
 
         $this->assertSame(1, app(EventExhibitorService::class)->remainingSlots($event->fresh()));
+    }
+
+    public function test_exhibitor_coupon_is_single_use_and_issues_exhibitor_ticket(): void
+    {
+        $seller = $this->user();
+        $buyer = $this->user();
+        $event = $this->event($seller, [
+            'price' => 180,
+            'is_ticket_enabled' => true,
+            'exhibitor_sales_enabled' => true,
+            'exhibitor_includes_ticket' => false,
+            'exhibitor_total_slots' => 2,
+            'exhibitor_batch_1_price' => 180,
+            'exhibitor_batch_1_deadline' => now()->addDays(10),
+        ]);
+
+        $coupon = EventCoupon::create([
+            'event_id' => $event->id,
+            'code' => 'EXPOSITOR100',
+            'type' => EventCoupon::TYPE_FREE,
+            'applies_to' => EventCoupon::APPLIES_EXHIBITOR,
+            'discount_value' => 100,
+            'active' => true,
+        ]);
+
+        $couponService = app(EventCouponService::class);
+
+        $this->expectExceptionMessage('Este cupom e exclusivo para expositor.');
+        try {
+            $couponService->validateFreeCouponLocked($event, 'EXPOSITOR100', 180, 1);
+        } catch (\Throwable $e) {
+            $this->assertSame(0, EventRegistration::count());
+            throw $e;
+        }
+    }
+
+    public function test_confirmed_exhibitor_coupon_creates_ticket_and_blocks_reuse(): void
+    {
+        $seller = $this->user();
+        $buyer = $this->user();
+        $event = $this->event($seller, [
+            'price' => 180,
+            'is_ticket_enabled' => true,
+            'exhibitor_sales_enabled' => true,
+            'exhibitor_includes_ticket' => false,
+            'exhibitor_total_slots' => 2,
+            'exhibitor_batch_1_price' => 180,
+            'exhibitor_batch_1_deadline' => now()->addDays(10),
+        ]);
+
+        $coupon = EventCoupon::create([
+            'event_id' => $event->id,
+            'code' => 'EXPOSITOR100',
+            'type' => EventCoupon::TYPE_FREE,
+            'applies_to' => EventCoupon::APPLIES_EXHIBITOR,
+            'discount_value' => 100,
+            'active' => true,
+        ]);
+
+        $couponData = app(EventCouponService::class)->validateCouponLocked(
+            $event,
+            $coupon->code,
+            180,
+            1,
+            EventCoupon::APPLIES_EXHIBITOR,
+            (int) $buyer->id
+        );
+
+        $reservation = app(EventExhibitorService::class)->createReservation(
+            $event,
+            $buyer,
+            $this->payload(),
+            null,
+            $couponData
+        );
+
+        app(EventExhibitorService::class)->confirmPaidOrder($reservation['order']);
+
+        $this->assertDatabaseHas('event_exhibitor_registrations', [
+            'id' => $reservation['registration']->id,
+            'status' => EventExhibitorRegistration::STATUS_PAID,
+            'payment_status' => EventExhibitorRegistration::PAYMENT_PAID,
+        ]);
+
+        $this->assertDatabaseHas('event_registrations', [
+            'event_id' => $event->id,
+            'user_id' => $buyer->id,
+            'order_id' => $reservation['order']->id,
+            'coupon_id' => $coupon->id,
+            'status' => EventRegistration::STATUS_PAID,
+            'payment_status' => EventRegistration::PAYMENT_PAID,
+            'quantity' => 1,
+        ]);
+
+        $this->assertNotEmpty(EventRegistration::first()->ticket_code);
+
+        $this->expectExceptionMessage('Este cupom de expositor ja foi usado por este usuario.');
+        app(EventCouponService::class)->validateCouponLocked(
+            $event,
+            $coupon->code,
+            180,
+            1,
+            EventCoupon::APPLIES_EXHIBITOR,
+            (int) $buyer->id
+        );
     }
 
     private function user(array $attributes = []): User

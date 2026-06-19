@@ -30,6 +30,17 @@
                 @error('type')<span class="text-xs font-bold text-red-600">{{ $message }}</span>@enderror
             </label>
 
+            <label class="space-y-2 md:col-span-2">
+                <span class="text-xs font-black uppercase tracking-widest text-slate-500">Uso permitido</span>
+                <select name="applies_to" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                    <option value="attendee" {{ old('applies_to', $coupon->applies_to ?: 'attendee') === 'attendee' ? 'selected' : '' }}>Somente ingresso normal</option>
+                    <option value="exhibitor" {{ old('applies_to', $coupon->applies_to) === 'exhibitor' ? 'selected' : '' }}>Somente expositor</option>
+                    <option value="both" {{ old('applies_to', $coupon->applies_to) === 'both' ? 'selected' : '' }}>Ingresso normal e expositor</option>
+                </select>
+                <span class="block text-xs font-semibold text-slate-500">Cupom de expositor nao libera ingresso normal, exceto quando estiver marcado como ambos.</span>
+                @error('applies_to')<span class="text-xs font-bold text-red-600">{{ $message }}</span>@enderror
+            </label>
+
             <label class="space-y-2">
                 <span class="text-xs font-black uppercase tracking-widest text-slate-500">Valor do desconto</span>
                 <input name="discount_value" value="{{ old('discount_value', $coupon->discount_value ? number_format((float) $coupon->discount_value, 2, ',', '.') : '100,00') }}" class="mask-money w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white">

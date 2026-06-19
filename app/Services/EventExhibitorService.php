@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Event;
+use App\Models\EventCoupon;
 use App\Models\EventExhibitorRegistration;
+use App\Models\EventRegistration;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Support\MarketplaceFee;
@@ -178,10 +180,21 @@ class EventExhibitorService
             $platformFeeAmount = MarketplaceFee::deductionAmount($payableTotal, $sellerId > 0 ? $sellerId : null);
             $reserveExpiresAt = now()->addMinutes($this->reserveMinutes());
             $coupon = data_get($couponData, 'coupon');
+
+            if ($coupon instanceof EventCoupon) {
+                app(EventCouponService::class)->assertCouponAvailableForContext(
+                    $lockedEvent,
+                    $coupon,
+                    EventCoupon::APPLIES_EXHIBITOR,
+                    (int) $user->id
+                );
+            }
+
             $couponPayload = $coupon ? [
                 'id' => (int) $coupon->id,
                 'code' => (string) $coupon->code,
                 'type' => (string) $coupon->type,
+                'applies_to' => (string) ($coupon->applies_to ?: EventCoupon::APPLIES_ATTENDEE),
                 'discount_value' => (float) $coupon->discount_value,
                 'discount_amount' => $discountAmount,
                 'uses' => $quantity,
@@ -336,6 +349,10 @@ class EventExhibitorService
                     'payment_status' => EventExhibitorRegistration::PAYMENT_PAID,
                     'paid_at' => $registration->paid_at ?: now(),
                 ]);
+
+                if ($this->shouldIssueIncludedTicket($event, $registration)) {
+                    $this->issueIncludedTicket($event, $registration, $order);
+                }
             }
 
             if ($needsManualRefund) {
@@ -476,6 +493,52 @@ class EventExhibitorService
         }
 
         return (string) ($registration->order?->status ?? '') === 'pending';
+    }
+
+    private function shouldIssueIncludedTicket(Event $event, EventExhibitorRegistration $registration): bool
+    {
+        if ((bool) $event->exhibitor_includes_ticket) {
+            return true;
+        }
+
+        $couponScope = (string) data_get($registration->metadata, 'event_coupon.applies_to', '');
+
+        return in_array($couponScope, [EventCoupon::APPLIES_EXHIBITOR, EventCoupon::APPLIES_BOTH], true);
+    }
+
+    private function issueIncludedTicket(Event $event, EventExhibitorRegistration $registration, Order $order): void
+    {
+        $payload = [
+            'event_id' => (int) $event->id,
+            'user_id' => (int) $registration->user_id,
+            'order_id' => (int) $order->id,
+            'coupon_id' => (int) data_get($registration->metadata, 'event_coupon.id') ?: null,
+            'status' => EventRegistration::STATUS_PAID,
+            'payment_status' => EventRegistration::PAYMENT_PAID,
+            'price' => 0,
+            'quantity' => 1,
+            'ticket_code' => $event->is_ticket_enabled ? Str::uuid()->toString() : null,
+        ];
+
+        $existing = EventRegistration::query()
+            ->where('event_id', (int) $event->id)
+            ->where('user_id', (int) $registration->user_id)
+            ->where('order_id', (int) $order->id)
+            ->lockForUpdate()
+            ->first();
+
+        if ($existing) {
+            if ($event->is_ticket_enabled && !$existing->ticket_code) {
+                $payload['ticket_code'] = Str::uuid()->toString();
+            } else {
+                unset($payload['ticket_code']);
+            }
+
+            $existing->update($payload);
+            return;
+        }
+
+        EventRegistration::create($payload);
     }
 
     private function remainingSlotsIgnoringRegistration(Event $event, EventExhibitorRegistration $ignored): int

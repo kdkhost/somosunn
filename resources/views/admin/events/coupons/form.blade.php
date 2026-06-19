@@ -47,6 +47,21 @@
                 </div>
 
                 <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Uso permitido</label>
+                            <select name="applies_to" class="form-control">
+                                <option value="attendee" {{ old('applies_to', $coupon->applies_to ?: 'attendee') === 'attendee' ? 'selected' : '' }}>Somente ingresso normal</option>
+                                <option value="exhibitor" {{ old('applies_to', $coupon->applies_to) === 'exhibitor' ? 'selected' : '' }}>Somente expositor</option>
+                                <option value="both" {{ old('applies_to', $coupon->applies_to) === 'both' ? 'selected' : '' }}>Ingresso normal e expositor</option>
+                            </select>
+                            <small class="text-muted">Cupom de expositor nao libera ingresso normal, exceto quando estiver marcado como ambos.</small>
+                            @error('applies_to')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-group js-discount-value-wrap">
                             <label>Valor do desconto</label>

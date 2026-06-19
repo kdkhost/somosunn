@@ -28,6 +28,7 @@ class EventCouponRequest extends FormRequest
     {
         $this->merge([
             'code' => EventCoupon::normalizeCodeValue($this->input('code')),
+            'applies_to' => $this->input('applies_to') ?: EventCoupon::APPLIES_ATTENDEE,
             'discount_value' => $this->normalizeMoney($this->input('discount_value')),
             'starts_at' => $this->normalizeDateTime($this->input('starts_at')),
             'expires_at' => $this->normalizeDateTime($this->input('expires_at')),
@@ -55,6 +56,11 @@ class EventCouponRequest extends FormRequest
                 $uniqueCodeRule,
             ],
             'type' => ['required', Rule::in([EventCoupon::TYPE_FREE, EventCoupon::TYPE_PERCENT, EventCoupon::TYPE_FIXED])],
+            'applies_to' => ['required', Rule::in([
+                EventCoupon::APPLIES_ATTENDEE,
+                EventCoupon::APPLIES_EXHIBITOR,
+                EventCoupon::APPLIES_BOTH,
+            ])],
             'discount_value' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
             'max_uses' => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'starts_at' => ['nullable', 'date'],

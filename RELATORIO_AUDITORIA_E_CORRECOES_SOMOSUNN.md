@@ -4,6 +4,16 @@
 
 Data de atualização: 18/06/2026
 
+### Atualizacao aplicada em 19/06/2026 - cupom de expositor e ingresso marcado
+
+- Cupons de evento receberam o campo `applies_to`, com opcoes `attendee`, `exhibitor` e `both`, para separar cupom de ingresso normal, cupom de expositor e cupom compartilhado.
+- A regra de negocio foi centralizada em `app/Services/EventCouponService.php`, consumida pelo checkout normal de evento e pelo checkout de expositor.
+- O checkout de expositor (`/eventos/{event}/expositor/checkout`) valida cupom com escopo de expositor e bloqueia reuso do mesmo cupom pelo mesmo usuario.
+- Cupons exclusivos de expositor nao liberam ingresso normal; cupons exclusivos de ingresso normal nao liberam area de expositor. Apenas `both` atende aos dois fluxos.
+- `EventExhibitorService` emite automaticamente um `EventRegistration` pago para o membro quando a compra/reserva de expositor com cupom de expositor e confirmada.
+- O ingresso do membro em `/painel/ingressos` e `/painel/ingressos/{registration}` exibe carimbo visual `Expositor` quando o pedido vem do contexto `event_exhibitor`.
+- As telas de cupons foram atualizadas nos dois paineis: `/admin/events/{event}/coupons` e `/painel/admin/events/{event}/coupons`.
+
 ### Atualização aplicada em 19/06/2026 - hardening da auditoria atual
 
 - A rota publica `events.reserve` (`POST /eventos/{event}/reservar`) recebeu o rate limiter nomeado `event_reservations`, com chaves por evento, IP e e-mail/CPF/documento quando informados.

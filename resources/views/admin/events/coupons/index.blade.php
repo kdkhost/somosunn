@@ -38,6 +38,7 @@
                         <tr>
                             <th>Codigo</th>
                             <th>Tipo</th>
+                            <th>Uso</th>
                             <th>Usos</th>
                             <th>Validade</th>
                             <th>Status</th>
@@ -62,6 +63,9 @@
                                     @else
                                         <span class="badge badge-warning">R$ {{ number_format((float) $coupon->discount_value, 2, ',', '.') }}</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <span class="badge badge-primary">{{ $coupon->appliesToLabel() }}</span>
                                 </td>
                                 <td>
                                     <strong>{{ (int) $coupon->used_count }}</strong>
@@ -106,7 +110,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-5 text-muted">
+                                <td colspan="7" class="text-center py-5 text-muted">
                                     <i class="fas fa-ticket-alt fa-2x d-block mb-2"></i>
                                     Nenhum cupom cadastrado para este evento.
                                     @if($canCreateCoupon)

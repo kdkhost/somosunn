@@ -2,6 +2,26 @@
 
 ---
 
+## [2026-06-19] - feat(eventos): restringir cupom de expositor e emitir ingresso marcado
+
+### Corrigido
+- Cupons de evento agora possuem escopo de uso: ingresso normal, expositor ou ambos.
+- Cupom exclusivo de expositor nao pode liberar ingresso normal; cupom de ingresso normal nao pode liberar area de expositor.
+- Cupom de expositor so pode ser usado quando o evento esta ativo e somente uma vez por usuario.
+- Ao confirmar uma compra/reserva de expositor com cupom de expositor, o sistema cria automaticamente um ingresso do evento para o membro.
+- O ingresso emitido por expositor recebe carimbo visual `Expositor` na lista e no ingresso A4/QR Code.
+
+### Arquivos principais
+- `app/Services/EventCouponService.php`
+- `app/Services/EventExhibitorService.php`
+- `app/Http/Controllers/EventExhibitorCheckoutController.php`
+- `resources/views/admin/events/coupons/*`
+- `resources/views/panel/admin/events/coupons/*`
+- `resources/views/panel/tickets*.blade.php`
+- `database/migrations/2026_06_19_160000_add_applies_to_to_event_coupons.php`
+
+---
+
 ## [2026-06-19] - feat(dashboard): atalhos mais claros para novos usuarios
 
 ### Corrigido

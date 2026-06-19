@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Event;
 use App\Models\EventCoupon;
+use App\Models\EventExhibitorRegistration;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -27,7 +28,7 @@ class EventCouponService
             ->where('code', $code)
             ->first();
 
-        if (!$coupon || !$this->isCurrentlyAvailable($event, $coupon)) {
+        if (!$coupon || !$coupon->appliesToAttendee() || !$this->isCurrentlyAvailable($event, $coupon)) {
             return null;
         }
 
@@ -55,11 +56,18 @@ class EventCouponService
     /**
      * @return array{coupon: EventCoupon, discount_amount: float}
      */
-    public function validateCouponLocked(Event $event, string $code, float $subtotal, int $uses = 1): array
+    public function validateCouponLocked(
+        Event $event,
+        string $code,
+        float $subtotal,
+        int $uses = 1,
+        string $appliesTo = EventCoupon::APPLIES_ATTENDEE,
+        ?int $userId = null
+    ): array
     {
-        if ($event->isClosedForPublic()) {
+        if (!$event->published || $event->isClosedForPublic()) {
             throw ValidationException::withMessages([
-                'coupon_code' => 'As vendas deste evento ja foram encerradas.',
+                'coupon_code' => 'Este evento nao esta ativo para uso de cupom.',
             ]);
         }
 
@@ -78,6 +86,8 @@ class EventCouponService
             throw ValidationException::withMessages(['coupon_code' => 'Cupom invalido para este evento.']);
         }
 
+        $this->assertCouponAppliesTo($coupon, $appliesTo);
+
         if (!$coupon->active) {
             throw ValidationException::withMessages(['coupon_code' => 'Cupom inativo.']);
         }
@@ -94,6 +104,10 @@ class EventCouponService
         $uses = max(1, (int) $uses);
         if ($coupon->max_uses !== null && ((int) $coupon->used_count + $uses) > (int) $coupon->max_uses) {
             throw ValidationException::withMessages(['coupon_code' => 'Cupom esgotado.']);
+        }
+
+        if ($appliesTo === EventCoupon::APPLIES_EXHIBITOR && $userId) {
+            $this->assertExhibitorCouponAvailableForUser($event, $coupon, $userId);
         }
 
         return [
@@ -173,6 +187,27 @@ class EventCouponService
         return $couponDeadline ?: $eventDeadline;
     }
 
+    public function assertCouponAvailableForContext(Event $event, EventCoupon $coupon, string $appliesTo, ?int $userId = null): void
+    {
+        if (!$event->published || $event->isClosedForPublic()) {
+            throw ValidationException::withMessages([
+                'coupon_code' => 'Este evento nao esta ativo para uso de cupom.',
+            ]);
+        }
+
+        if (!$this->isCurrentlyAvailable($event, $coupon)) {
+            throw ValidationException::withMessages([
+                'coupon_code' => 'Cupom esgotado ou indisponivel.',
+            ]);
+        }
+
+        $this->assertCouponAppliesTo($coupon, $appliesTo);
+
+        if ($appliesTo === EventCoupon::APPLIES_EXHIBITOR && $userId) {
+            $this->assertExhibitorCouponAvailableForUser($event, $coupon, $userId);
+        }
+    }
+
     private function isCurrentlyAvailable(Event $event, EventCoupon $coupon): bool
     {
         if (!$coupon->active) {
@@ -194,5 +229,43 @@ class EventCouponService
         }
 
         return true;
+    }
+
+    private function assertCouponAppliesTo(EventCoupon $coupon, string $appliesTo): void
+    {
+        if ($appliesTo === EventCoupon::APPLIES_EXHIBITOR && !$coupon->appliesToExhibitor()) {
+            throw ValidationException::withMessages([
+                'coupon_code' => 'Este cupom nao libera area de expositor.',
+            ]);
+        }
+
+        if ($appliesTo === EventCoupon::APPLIES_ATTENDEE && !$coupon->appliesToAttendee()) {
+            throw ValidationException::withMessages([
+                'coupon_code' => 'Este cupom e exclusivo para expositor.',
+            ]);
+        }
+    }
+
+    private function assertExhibitorCouponAvailableForUser(Event $event, EventCoupon $coupon, int $userId): void
+    {
+        $registrations = EventExhibitorRegistration::query()
+            ->where('event_id', (int) $event->id)
+            ->where('user_id', $userId)
+            ->whereNotIn('status', [
+                EventExhibitorRegistration::STATUS_CANCELLED,
+                EventExhibitorRegistration::STATUS_REFUNDED,
+                EventExhibitorRegistration::STATUS_EXPIRED,
+            ])
+            ->get();
+
+        $alreadyUsed = $registrations->contains(function (EventExhibitorRegistration $registration) use ($coupon) {
+            return (int) data_get($registration->metadata, 'event_coupon.id') === (int) $coupon->id;
+        });
+
+        if ($alreadyUsed) {
+            throw ValidationException::withMessages([
+                'coupon_code' => 'Este cupom de expositor ja foi usado por este usuario.',
+            ]);
+        }
     }
 }

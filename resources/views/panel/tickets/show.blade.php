@@ -336,6 +336,22 @@
             color: #b91c1c;
         }
 
+        .ticket-exhibitor-stamp {
+            position: absolute;
+            right: 0.42cm;
+            top: 0.32cm;
+            z-index: 5;
+            border: 0.045cm solid #b45309;
+            color: #92400e;
+            background: rgba(255, 251, 235, 0.82);
+            padding: 0.08cm 0.18cm;
+            font-size: 0.26cm;
+            font-weight: 900;
+            letter-spacing: 0.04cm;
+            text-transform: uppercase;
+            transform: rotate(-8deg);
+        }
+
         .ticket-qr-box {
             display: flex;
             justify-content: center;
@@ -547,6 +563,7 @@
                         $itemUsed = $itemState === 'used';
                         $itemExpired = $itemState === 'expired';
                         $itemHasQrTicket = (bool) $event?->is_ticket_enabled && filled($ticketRegistration->ticket_code);
+                        $itemIsExhibitorTicket = data_get($ticketRegistration->order?->metadata, 'context') === 'event_exhibitor';
                         $itemTicketCode = (string) ($ticketRegistration->ticket_code ?: 'REG-' . str_pad((string) $ticketRegistration->id, 6, '0', STR_PAD_LEFT));
                         $itemTicketLabel = $itemUsed ? 'Já utilizado' : ($itemExpired ? 'Expirado' : ($itemHasQrTicket ? 'Ingresso válido' : 'Reserva confirmada'));
                         $itemTicketStatusClass = $itemUsed ? 'ticket-status--used' : ($itemExpired ? 'ticket-status--expired' : 'ticket-status--valid');
@@ -584,6 +601,9 @@
 
                                 <main class="ticket-main">
                                     <img src="{{ $ticketImage }}" alt="" class="ticket-watermark-image" aria-hidden="true">
+                                    @if($itemIsExhibitorTicket)
+                                        <div class="ticket-exhibitor-stamp">Expositor</div>
+                                    @endif
                                     <div class="ticket-main-inner">
                                         <div class="ticket-main-top">
                                             <div class="ticket-date-block">
@@ -606,7 +626,7 @@
 
                                         <div class="flex items-center justify-end">
                                             <div class="ticket-ribbon">
-                                                <span>{{ $batchLabel }}</span>
+                                                <span>{{ $itemIsExhibitorTicket ? 'Expositor' : $batchLabel }}</span>
                                                 <span>{{ $itemHasQrTicket ? 'QR Code' : 'Reserva' }}</span>
                                                 <span>#{{ $ticketNumber }}</span>
                                             </div>

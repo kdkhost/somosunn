@@ -193,6 +193,7 @@
                             $ticketUsed = $ticketState === 'used';
                             $ticketExpired = $ticketState === 'expired';
                             $hasQrTicket = (bool) ($event?->is_ticket_enabled) && filled($reg->ticket_code);
+                            $isExhibitorTicket = data_get($reg->order?->metadata, 'context') === 'event_exhibitor';
                             $quantity = max(1, (int) ($reg->quantity ?? 1));
                             $locationLabel = $event?->location ?: ($event?->address ?: 'Local a confirmar');
                             $ticketNumber = str_pad((string) $reg->id, 4, '0', STR_PAD_LEFT);
@@ -216,7 +217,7 @@
 
                                     <div class="absolute inset-x-4 top-4 z-[1] flex items-center justify-between gap-3">
                                         <span class="rounded bg-blue-600 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-white">
-                                            {{ $hasQrTicket ? 'Ingresso digital' : 'Reserva' }}
+                                            {{ $isExhibitorTicket ? 'Expositor' : ($hasQrTicket ? 'Ingresso digital' : 'Reserva') }}
                                         </span>
                                         @if($quantity > 1)
                                             <span class="rounded bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-900">

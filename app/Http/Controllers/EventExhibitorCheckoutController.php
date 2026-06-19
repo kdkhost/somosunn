@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EventExhibitor\EventExhibitorCheckoutRequest;
 use App\Models\Event;
+use App\Models\EventCoupon;
 use App\Models\EventExhibitorRegistration;
 use App\Models\GatewayAccount;
 use App\Models\Order;
@@ -61,7 +62,14 @@ class EventExhibitorCheckoutController extends Controller
 
         if ($couponCode !== '' && $grossSubtotal > 0) {
             try {
-                $couponData = $eventCouponService->validateCouponLocked($event, $couponCode, $grossSubtotal, $quantity);
+                $couponData = $eventCouponService->validateCouponLocked(
+                    $event,
+                    $couponCode,
+                    $grossSubtotal,
+                    $quantity,
+                    EventCoupon::APPLIES_EXHIBITOR,
+                    (int) $user->id
+                );
             } catch (\Throwable $e) {
                 return back()->withInput()->withErrors(['coupon_code' => $e->getMessage()]);
             }

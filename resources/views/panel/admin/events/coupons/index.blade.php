@@ -29,6 +29,7 @@
                     <tr>
                         <th class="px-5 py-4">Codigo</th>
                         <th class="px-5 py-4">Tipo</th>
+                        <th class="px-5 py-4">Uso</th>
                         <th class="px-5 py-4">Usos</th>
                         <th class="px-5 py-4">Validade</th>
                         <th class="px-5 py-4">Status</th>
@@ -53,6 +54,9 @@
                                 @else
                                     <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-black text-yellow-900 dark:bg-yellow-500/15 dark:text-yellow-100">R$ {{ number_format((float) $coupon->discount_value, 2, ',', '.') }}</span>
                                 @endif
+                            </td>
+                            <td class="px-5 py-4">
+                                <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-black text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-200">{{ $coupon->appliesToLabel() }}</span>
                             </td>
                             <td class="px-5 py-4 font-bold text-slate-700 dark:text-slate-200">{{ (int) $coupon->used_count }} / {{ $coupon->max_uses ? (int) $coupon->max_uses : 'ilimitado' }}</td>
                             <td class="px-5 py-4 text-xs font-semibold text-slate-500">
@@ -90,7 +94,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-5 py-12 text-center text-slate-500">Nenhum cupom cadastrado para este evento.</td>
+                            <td colspan="7" class="px-5 py-12 text-center text-slate-500">Nenhum cupom cadastrado para este evento.</td>
                         </tr>
                     @endforelse
                 </tbody>

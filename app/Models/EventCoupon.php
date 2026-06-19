@@ -13,10 +13,15 @@ class EventCoupon extends Model
     public const TYPE_PERCENT = 'percent';
     public const TYPE_FIXED = 'fixed';
 
+    public const APPLIES_ATTENDEE = 'attendee';
+    public const APPLIES_EXHIBITOR = 'exhibitor';
+    public const APPLIES_BOTH = 'both';
+
     protected $fillable = [
         'event_id',
         'code',
         'type',
+        'applies_to',
         'discount_value',
         'max_uses',
         'used_count',
@@ -70,5 +75,30 @@ class EventCoupon extends Model
         }
 
         return max(0, (int) $this->max_uses - (int) $this->used_count);
+    }
+
+    public function appliesToAttendee(): bool
+    {
+        return in_array((string) ($this->applies_to ?: self::APPLIES_ATTENDEE), [
+            self::APPLIES_ATTENDEE,
+            self::APPLIES_BOTH,
+        ], true);
+    }
+
+    public function appliesToExhibitor(): bool
+    {
+        return in_array((string) ($this->applies_to ?: self::APPLIES_ATTENDEE), [
+            self::APPLIES_EXHIBITOR,
+            self::APPLIES_BOTH,
+        ], true);
+    }
+
+    public function appliesToLabel(): string
+    {
+        return match ((string) ($this->applies_to ?: self::APPLIES_ATTENDEE)) {
+            self::APPLIES_EXHIBITOR => 'Expositor',
+            self::APPLIES_BOTH => 'Ingresso e expositor',
+            default => 'Ingresso normal',
+        };
     }
 }
