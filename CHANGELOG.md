@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-06-19] - feat(revistas): publicar edição especial do Judiciário
+
+### Adicionado
+- A Revista Manchete Judiciário foi publicada com PDF e capa própria na banca digital.
+- O importador oficial passou a aceitar fontes que apontam diretamente para um PDF.
+- Quando a fonte não fornecer uma imagem, o importador gera automaticamente a capa pela primeira página do PDF usando Imagick.
+
+### Arquivos principais
+- `app/Console/Commands/ImportManchetePdfs.php`
+- `CHANGELOG.md`
+
+---
+
 ## [2026-06-19] - fix(producao): impedir erro 500 em sessao supervisionada expirada
 
 ### Corrigido

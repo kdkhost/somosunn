@@ -19,6 +19,14 @@ class ImportManchetePdfs extends Command
      */
     protected array $sources = [
         [
+            'url'       => 'https://revistamanchete.com.br/wp-content/themes/odin/assets/pdf/Revista-Manchete-Judiciario.pdf',
+            'pdf_url'   => 'https://revistamanchete.com.br/wp-content/themes/odin/assets/pdf/Revista-Manchete-Judiciario.pdf',
+            'title'     => 'Revista Manchete Judiciário',
+            'edition'   => 'Especial Judiciário',
+            'category'  => 'Judiciário',
+            'published' => '2026-06-19',
+        ],
+        [
             'url'       => 'https://revistamanchete.com.br/revistas/revista-manchete-edicao-7-marco-2026/',
             'title'     => 'Revista Manchete - 7a Edicao',
             'edition'   => '#7 - Marco/2026',
@@ -152,7 +160,12 @@ class ImportManchetePdfs extends Command
             // Extrair URLs do PDF e capa
             $this->info('  > Buscando PDF + capa em ' . $src['url']);
             try {
-                $assets = $this->extractAssets($src['url']);
+                $assets = !empty($src['pdf_url'])
+                    ? [
+                        'pdf_url' => $src['pdf_url'],
+                        'thumb_url' => $src['thumb_url'] ?? null,
+                    ]
+                    : $this->extractAssets($src['url']);
             } catch (\Throwable $e) {
                 $this->error('  > Erro ao buscar assets: ' . $e->getMessage());
                 $failed++;
@@ -181,6 +194,10 @@ class ImportManchetePdfs extends Command
                 $this->info('  > Baixando capa: ' . $assets['thumb_url']);
                 $ext = strtolower(pathinfo(parse_url($assets['thumb_url'], PHP_URL_PATH), PATHINFO_EXTENSION)) ?: 'jpg';
                 $thumbPath = $this->downloadFile($assets['thumb_url'], 'magazines/thumbs', 'magazine-thumb-' . $slug . '.' . $ext);
+            }
+            if (!$thumbPath) {
+                $this->info('  > Gerando capa pela primeira pagina do PDF.');
+                $thumbPath = $this->generateThumbnailFromPdf($pdfPath, $slug);
             }
 
             // Persistir
@@ -282,6 +299,42 @@ class ImportManchetePdfs extends Command
             return trim($directory, '/') . '/' . $filename;
         } catch (\Throwable $e) {
             $this->error('      Erro download: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    protected function generateThumbnailFromPdf(string $pdfPath, string $slug): ?string
+    {
+        if (!extension_loaded('imagick')) {
+            $this->warn('      Extensao Imagick indisponivel; capa nao gerada.');
+            return null;
+        }
+
+        $targetDir = public_path('storage/magazines/thumbs');
+        if (!is_dir($targetDir) && !@mkdir($targetDir, 0755, true)) {
+            return null;
+        }
+
+        $targetPath = $targetDir . '/magazine-thumb-' . $slug . '.jpg';
+
+        try {
+            $image = new \Imagick();
+            $image->setResolution(144, 144);
+            $image->readImage(public_path('storage/' . $pdfPath) . '[0]');
+            $image->setIteratorIndex(0);
+            $image->setImageBackgroundColor('white');
+            $image = $image->mergeImageLayers(\Imagick::LAYERMETHOD_FLATTEN);
+            $image->setImageFormat('jpeg');
+            $image->setImageCompressionQuality(88);
+            $image->thumbnailImage(1200, 0);
+            $image->stripImage();
+            $image->writeImage($targetPath);
+            $image->clear();
+            $image->destroy();
+
+            return 'magazines/thumbs/' . basename($targetPath);
+        } catch (\Throwable $e) {
+            $this->warn('      Nao foi possivel gerar a capa: ' . $e->getMessage());
             return null;
         }
     }
