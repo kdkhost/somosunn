@@ -1298,7 +1298,7 @@
             <i class="fas fa-user-secret mr-2"></i>
             <span class="text-truncate mr-2">
                 Supervisor: {{ session('impersonator_name', 'Administrador') }}<br>
-                Conta: {{ session('impersonated_user_name', auth()->user()->name) }}
+                Conta: {{ session('impersonated_user_name', auth()->user()?->name ?? 'Conta supervisionada') }}
             </span>
             <a href="{{ route('admin.impersonate.stop') }}" class="btn btn-xs btn-danger">Sair</a>
             <button onclick="document.getElementById('impersonation-badge').style.display='none'"

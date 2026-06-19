@@ -889,7 +889,7 @@
             <i class="fas fa-user-secret"></i>
             <span class="truncate">
                 Supervisor: {{ session('impersonator_name', 'Administrador') }}<br>
-                Conta: {{ session('impersonated_user_name', auth()->user()->name) }}
+                Conta: {{ session('impersonated_user_name', auth()->user()?->name ?? 'Conta supervisionada') }}
             </span>
             <a href="{{ route('admin.impersonate.stop') }}"
                 class="bg-yellow-900 text-yellow-100 px-2 py-1 rounded hover:bg-yellow-800 transition whitespace-nowrap">

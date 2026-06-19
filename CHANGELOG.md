@@ -2,6 +2,20 @@
 
 ---
 
+## [2026-06-19] - fix(producao): impedir erro 500 em sessao supervisionada expirada
+
+### Corrigido
+- Os layouts publico/painel e administrativo deixaram de acessar diretamente o nome de um usuario inexistente quando restar uma sessao de acesso supervisionado expirada.
+- O badge de supervisao agora usa um texto seguro quando a conta autenticada nao puder mais ser recuperada, permitindo que a pagina e a tela de erro sejam renderizadas normalmente.
+- A migration do escopo de cupons de evento foi aplicada isoladamente em producao, evitando conflito com migrations legadas pendentes.
+
+### Arquivos principais
+- `resources/views/layouts/app.blade.php`
+- `resources/views/admin/layouts/app.blade.php`
+- `database/migrations/2026_06_19_160000_add_applies_to_to_event_coupons.php`
+
+---
+
 ## [2026-06-19] - feat(eventos): restringir cupom de expositor e emitir ingresso marcado
 
 ### Corrigido
