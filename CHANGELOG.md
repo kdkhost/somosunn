@@ -2,6 +2,26 @@
 
 ---
 
+## [2026-06-19] - feat(vendas): listar compradores por item no relatorio
+
+### Adicionado
+- A tela `/admin/orders/sales-report` passou a ter um botao por item vendido para abrir a lista alfabetica de compradores.
+- A tela equivalente `/painel/admin/orders/sales-report` recebeu o mesmo recurso, com modal proprio do layout moderno.
+- A lista mostra nome do membro, valor do item, data de compra, quantidade adquirida, tipo de compra e numero do pedido.
+- Adicionadas opcoes de impressao A4 e download em PDF da lista de compradores por item.
+- A consulta detalhada reutiliza `SalesAnalyticsService`, somando quantidade e valor por pedido para evitar duplicidade quando um pedido gera mais de uma linha de item.
+
+### Arquivos principais
+- `app/Services/SalesAnalyticsService.php`
+- `app/Http/Controllers/Admin/SalesReportBuyerController.php`
+- `resources/views/admin/orders/sales_report.blade.php`
+- `resources/views/panel/admin/orders/sales_report.blade.php`
+- `resources/views/admin/orders/partials/sales_report_buyers_table.blade.php`
+- `resources/views/admin/orders/sales_report_buyers_print.blade.php`
+- `routes/web.php`
+
+---
+
 ## [2026-06-19] - fix(admin): corrigir tema e codificacao
 
 ### Corrigido

@@ -40,6 +40,17 @@ Pendencias estruturais ainda abertas:
 - Diferencas visuais mantidas: `/admin` continua usando AdminLTE e `/painel/admin` continua usando o layout Tailwind moderno, sem reutilizar view de um painel no outro.
 - Validacoes executadas: `php artisan route:list --path=orders`, `php -l` nas duas views, `php tools/check-no-bom.php` e compilacao remota com `php artisan view:cache`.
 
+### Atualizacao aplicada em 19/06/2026 - compradores por item no relatorio
+
+- Adicionada a lista alfabetica de compradores por item vendido em `/admin/orders/sales-report`, acionada por botao na linha do item.
+- Adicionada a mesma lista em `/painel/admin/orders/sales-report`, preservando o layout Tailwind do painel moderno.
+- A regra compartilhada fica em `app/Services/SalesAnalyticsService.php`, que consolida por pedido os campos nome do membro, valor do item, data da compra, quantidade adquirida e tipo da compra.
+- O endpoint compartilhado `app/Http/Controllers/Admin/SalesReportBuyerController.php` serve HTML para modal, pagina de impressao A4 e PDF via Dompdf.
+- Rotas adicionadas/preservadas no painel principal: `admin.orders.sales-report.buyers`, `admin.orders.sales-report.buyers.print` e `admin.orders.sales-report.buyers.pdf`.
+- Rotas adicionadas/preservadas no painel moderno: `panel.admin.orders.sales-report.buyers`, `panel.admin.orders.sales-report.buyers.print` e `panel.admin.orders.sales-report.buyers.pdf`.
+- Diferencas visuais mantidas: `/admin` usa modal Bootstrap/AdminLTE; `/painel/admin` usa modal Tailwind/vanilla JS; ambos consomem a mesma consulta de negocio.
+- Validacoes previstas: `php artisan route:list --path=orders`, `php artisan view:cache`, `php tools/check-no-bom.php`, `php tools/check-text-encoding.php` e `git diff --check`.
+
 ### Regra permanente
 
 O sistema utiliza dois painéis administrativos distintos e integrados:

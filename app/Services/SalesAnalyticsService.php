@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use Carbon\CarbonInterface;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -193,6 +194,118 @@ class SalesAnalyticsService
                 'total_revenue' => round((float) ($summary->total_revenue ?? 0), 2),
             ],
         ];
+    }
+
+    /**
+     * @return array{
+     *     item: array{type:string,id:int,title:string,type_label:string,purchase_type_label:string},
+     *     rows: Collection<int, object>,
+     *     summary: array{buyers_count:int,orders_count:int,quantity:int,total_amount:float}
+     * }
+     */
+    public function paidItemBuyersReport(
+        string $itemType,
+        int $itemId,
+        ?CarbonInterface $from = null,
+        ?CarbonInterface $to = null
+    ): array {
+        $baseQuery = DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->leftJoin('users', 'users.id', '=', 'orders.user_id')
+            ->where('orders.status', 'paid')
+            ->where('order_items.item_type', $itemType)
+            ->where('order_items.item_id', $itemId);
+
+        $this->applyPeriodFilter($baseQuery, $from, $to);
+
+        $rows = (clone $baseQuery)
+            ->selectRaw("
+                orders.id as order_id,
+                order_items.item_type,
+                order_items.item_id,
+                MAX(order_items.title) as item_title,
+                users.id as buyer_user_id,
+                COALESCE(NULLIF(users.name, ''), CONCAT('Pedido #', orders.id)) as buyer_name,
+                COALESCE(NULLIF(users.email, ''), '') as buyer_email,
+                COALESCE(NULLIF(users.phone, ''), '') as buyer_phone,
+                COALESCE(orders.paid_at, orders.manual_approved_at, orders.created_at) as purchased_at,
+                COALESCE(NULLIF(orders.payment_method, ''), NULLIF(orders.gateway, ''), '-') as payment_method,
+                orders.transaction_id,
+                SUM(order_items.quantity) as quantity,
+                SUM(order_items.price * order_items.quantity) as total_amount
+            ")
+            ->groupBy(
+                'orders.id',
+                'order_items.item_type',
+                'order_items.item_id',
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.phone',
+                'orders.paid_at',
+                'orders.manual_approved_at',
+                'orders.created_at',
+                'orders.payment_method',
+                'orders.gateway',
+                'orders.transaction_id'
+            )
+            ->orderByRaw("LOWER(COALESCE(NULLIF(users.name, ''), CONCAT('Pedido #', orders.id))) ASC")
+            ->orderBy('orders.id')
+            ->get()
+            ->map(function ($row) use ($itemType) {
+                $row->buyer_user_id = $row->buyer_user_id !== null ? (int) $row->buyer_user_id : null;
+                $row->quantity = (int) $row->quantity;
+                $row->total_amount = round((float) $row->total_amount, 2);
+                $row->purchase_type_label = $this->purchaseTypeLabel($itemType);
+                $row->purchased_at = $row->purchased_at ? Carbon::parse($row->purchased_at) : null;
+
+                return $row;
+            });
+
+        $itemTitle = (string) optional($rows->first())->item_title;
+        if ($itemTitle === '') {
+            $itemTitle = 'Item #' . $itemId;
+        }
+
+        return [
+            'item' => [
+                'type' => $itemType,
+                'id' => $itemId,
+                'title' => $itemTitle,
+                'type_label' => Order::SALE_TYPE_LABELS[$itemType] ?? ucfirst(str_replace('_', ' ', $itemType)),
+                'purchase_type_label' => $this->purchaseTypeLabel($itemType),
+            ],
+            'rows' => $rows,
+            'summary' => [
+                'buyers_count' => $rows->map(function ($row) {
+                    if ($row->buyer_user_id) {
+                        return 'user:' . $row->buyer_user_id;
+                    }
+
+                    if ((string) $row->buyer_email !== '') {
+                        return 'email:' . strtolower((string) $row->buyer_email);
+                    }
+
+                    return 'order:' . $row->order_id;
+                })->unique()->count(),
+                'orders_count' => $rows->count(),
+                'quantity' => (int) $rows->sum('quantity'),
+                'total_amount' => round((float) $rows->sum('total_amount'), 2),
+            ],
+        ];
+    }
+
+    private function purchaseTypeLabel(string $itemType): string
+    {
+        return match ($itemType) {
+            'event' => 'Ingresso',
+            'event_exhibitor_area' => 'Expositor',
+            'course' => 'Curso',
+            'mentorship' => 'Mentoria',
+            'seller_product' => 'Marketplace',
+            'plan' => 'Plano/Assinatura',
+            default => Order::SALE_TYPE_LABELS[$itemType] ?? 'Outro',
+        };
     }
 
     private function applyPeriodFilter(mixed $query, ?CarbonInterface $from, ?CarbonInterface $to): void

@@ -7,6 +7,102 @@
     <li class="breadcrumb-item active">Relatorio por item</li>
 @endsection
 
+@push('styles')
+    <style>
+        .sales-buyers-modal .modal-dialog {
+            max-width: min(1120px, calc(100vw - 2rem));
+        }
+
+        .sales-buyers-panel {
+            color: #0f172a;
+        }
+
+        .sales-buyers-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .sales-buyers-k {
+            color: #64748b;
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        .sales-buyers-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .sales-buyers-meta {
+            color: #64748b;
+            font-size: .85rem;
+            margin-top: .2rem;
+        }
+
+        .sales-buyers-summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: .75rem;
+            margin-bottom: 1rem;
+        }
+
+        .sales-buyers-summary > div {
+            border: 1px solid #dbe3ef;
+            border-radius: .65rem;
+            background: #f8fafc;
+            padding: .75rem;
+        }
+
+        .sales-buyers-summary span,
+        .sales-buyers-table small {
+            display: block;
+            color: #64748b;
+            font-size: .75rem;
+        }
+
+        .sales-buyers-summary strong {
+            display: block;
+            font-size: 1rem;
+        }
+
+        .sales-buyers-table thead th {
+            white-space: nowrap;
+        }
+
+        .sales-buyers-empty {
+            color: #64748b;
+            padding: 2rem !important;
+        }
+
+        body.dark-mode .sales-buyers-panel {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .sales-buyers-meta,
+        body.dark-mode .sales-buyers-k,
+        body.dark-mode .sales-buyers-summary span,
+        body.dark-mode .sales-buyers-table small,
+        body.dark-mode .sales-buyers-empty {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .sales-buyers-summary > div {
+            background: #111827;
+            border-color: #334155;
+        }
+
+        @media (max-width: 768px) {
+            .sales-buyers-summary {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+@endpush
+
 @section('content')
     @php
         $periodValue = $period['period'] ?? request('period', 'monthly');
@@ -120,10 +216,17 @@
                             <th class="text-center">Pedidos</th>
                             <th class="text-center">Compradores</th>
                             <th class="text-right">Faturamento liquido</th>
+                            <th class="text-right">Acoes</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($rows as $row)
+                            @php
+                                $buyerRouteParams = array_merge(request()->query(), [
+                                    'item_type' => (string) $row->item_type,
+                                    'item_id' => (int) $row->item_id,
+                                ]);
+                            @endphp
                             <tr>
                                 <td>
                                     <div class="font-weight-bold">{{ $row->title }}</div>
@@ -134,10 +237,19 @@
                                 <td class="text-center">{{ (int) $row->orders_count }}</td>
                                 <td class="text-center">{{ (int) $row->buyers_count }}</td>
                                 <td class="text-right font-weight-bold">R$ {{ number_format((float) $row->net_revenue, 2, ',', '.') }}</td>
+                                <td class="text-right">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary rounded-pill js-sales-report-buyers"
+                                            data-url="{{ route('admin.orders.sales-report.buyers', $buyerRouteParams) }}"
+                                            data-print-url="{{ route('admin.orders.sales-report.buyers.print', $buyerRouteParams) }}"
+                                            data-pdf-url="{{ route('admin.orders.sales-report.buyers.pdf', $buyerRouteParams) }}">
+                                        <i class="fas fa-users mr-1"></i> Lista
+                                    </button>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-5 text-muted">
+                                <td colspan="7" class="text-center py-5 text-muted">
                                     Nenhuma venda encontrada para os filtros informados.
                                 </td>
                             </tr>
@@ -150,4 +262,66 @@
             <div class="card-footer">{{ $rows->links() }}</div>
         @endif
     </div>
+
+    <div class="modal fade sales-buyers-modal" id="salesReportBuyersModal" tabindex="-1" role="dialog" aria-labelledby="salesReportBuyersModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title font-weight-bold" id="salesReportBuyersModalLabel">
+                        <i class="fas fa-users mr-2 text-primary"></i>Compradores do item
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="salesReportBuyersBody">
+                    <div class="text-center text-muted py-4">Carregando...</div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" target="_blank" rel="noopener" class="btn btn-outline-secondary rounded-pill disabled" id="salesReportBuyersPrint" data-no-ajax="true">
+                        <i class="fas fa-print mr-1"></i> Imprimir A4
+                    </a>
+                    <a href="#" target="_blank" rel="noopener" class="btn btn-primary rounded-pill disabled" id="salesReportBuyersPdf" data-no-ajax="true">
+                        <i class="fas fa-file-pdf mr-1"></i> PDF
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (function () {
+            if (!window.jQuery) {
+                return;
+            }
+
+            $('.js-sales-report-buyers').on('click', function () {
+                var button = $(this);
+                var modal = $('#salesReportBuyersModal');
+                var body = $('#salesReportBuyersBody');
+                var printLink = $('#salesReportBuyersPrint');
+                var pdfLink = $('#salesReportBuyersPdf');
+
+                body.html('<div class="text-center text-muted py-4">Carregando...</div>');
+                printLink.attr('href', button.data('print-url')).removeClass('disabled');
+                pdfLink.attr('href', button.data('pdf-url')).removeClass('disabled');
+                modal.modal('show');
+
+                $.ajax({
+                    url: button.data('url'),
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }).done(function (html) {
+                    body.html(html);
+                }).fail(function () {
+                    body.html('<div class="alert alert-danger mb-0">Nao foi possivel carregar a lista de compradores.</div>');
+                });
+            });
+        })();
+    </script>
+@endpush
