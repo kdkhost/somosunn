@@ -402,7 +402,7 @@
             <i class="fas fa-newspaper"></i> Banca Digital
         </div>
         <h1>Revistas &amp; <span class="accent">Manchetes</span></h1>
-        <p>Folheie edicoes completas com efeito de pagina real, som imersivo e leitura em tela cheia.</p>
+        <p>Folheie edições completas com efeito de página real, som imersivo e leitura em tela cheia.</p>
     </div>
 </div>
 
@@ -410,7 +410,7 @@
     <div class="mag-interest-notice">
         <i class="fas fa-info-circle"></i>
         <div>
-            Para receber notificacoes de novas edicoes, marque <strong>Noticias</strong> como interesse no seu perfil.
+            Para receber notificações de novas edições, marque <strong>Notícias</strong> como interesse no seu perfil.
             <a href="{{ route('panel.profile.edit') }}">Editar perfil</a>
         </div>
     </div>
@@ -419,7 +419,7 @@
 <form method="GET" class="mag-filters">
     <div class="mag-filter-input">
         <i class="fas fa-search"></i>
-        <input type="text" name="q" value="{{ $q }}" placeholder="Buscar por titulo ou edicao...">
+        <input type="text" name="q" value="{{ $q }}" placeholder="Buscar por título ou edição...">
     </div>
     @if($categories->count())
         <select name="category" onchange="this.form.submit()" class="mag-category-select">
@@ -451,7 +451,7 @@
                         <div class="mag-card-title">{{ $m->title }}</div>
                         <div class="mag-card-edition">
                             {{ $m->edition }}
-                            @if($m->published_at) &middot; {{ $m->published_at->format('M/Y') }} @endif
+                            @if($m->published_at) &middot; {{ $m->published_at->locale('pt_BR')->translatedFormat('M/Y') }} @endif
                         </div>
                     </div>
                     <div class="mag-card-action">
@@ -483,7 +483,7 @@
                                     <div class="mag-card-title">{{ $m->title }}</div>
                                     <div class="mag-card-edition">
                                         {{ $m->edition }}
-                                        @if($m->published_at) &middot; {{ $m->published_at->format('M/Y') }} @endif
+                                        @if($m->published_at) &middot; {{ $m->published_at->locale('pt_BR')->translatedFormat('M/Y') }} @endif
                                     </div>
                                 </div>
                             </div>
@@ -523,8 +523,8 @@
 @else
     <div class="mag-empty">
         <i class="fas fa-book-open"></i>
-        <h3>Nenhuma revista disponivel ainda</h3>
-        <p>Em breve novas edicoes serao publicadas aqui.</p>
+        <h3>Nenhuma revista disponível ainda</h3>
+        <p>Em breve, novas edições serão publicadas aqui.</p>
     </div>
 @endif
 @endsection

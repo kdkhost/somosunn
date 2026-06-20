@@ -43,7 +43,7 @@ class MagazineController extends Controller
     {
         $this->ensureCanCreate();
 
-        // Uploads grandes (ate 100 MB) precisam de mais tempo/memoria
+        // Envios grandes (até 100 MB) precisam de mais tempo e memória.
         @ini_set('memory_limit', '512M');
         @set_time_limit(300);
 
@@ -51,7 +51,7 @@ class MagazineController extends Controller
 
         $data['user_id'] = Auth::id();
 
-        // Thumbnail
+        // Capa
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = UploadStorage::storeUploadedFile(
                 $request->file('thumbnail'),
@@ -130,7 +130,7 @@ class MagazineController extends Controller
     {
         $this->ensureCanManage($magazine);
 
-        $magazine->delete(); // soft delete — mantem arquivos
+        $magazine->delete(); // Exclusão lógica: mantém os arquivos.
 
         return redirect()->back()->with('success', 'Revista removida.');
     }
@@ -189,7 +189,7 @@ class MagazineController extends Controller
         $user = Auth::user();
         if (!$user) abort(403);
 
-        // Admin, Superadmin, ou usuario com feature "magazines.publish" (Editor de Revistas)
+        // Administrador, superadministrador ou usuário com permissão de editor de revistas.
         if ($user->isAdmin()) {
             return;
         }
@@ -200,7 +200,7 @@ class MagazineController extends Controller
             return;
         }
 
-        abort(403, 'Voce precisa ter a permissao "Publicar revistas (Editor)" ativa para publicar revistas.');
+        abort(403, 'Você precisa ter a permissão "Publicar revistas (Editor)" ativa para publicar revistas.');
     }
 
     protected function ensureCanManage(Magazine $magazine): void
@@ -217,7 +217,7 @@ class MagazineController extends Controller
     {
         if (empty($path)) return;
         try {
-            // Tenta disco public; se nao existir, ignora
+            // Tenta o disco público; se não existir, ignora.
             if (Storage::disk('public')->exists($path)) {
                 Storage::disk('public')->delete($path);
                 return;

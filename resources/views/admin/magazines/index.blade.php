@@ -36,7 +36,7 @@
         <div class="info-box bg-gradient-info elevation-1">
             <span class="info-box-icon"><i class="fas fa-eye"></i></span>
             <div class="info-box-content">
-                <span class="info-box-text">Visualizacoes</span>
+                <span class="info-box-text">Visualizações</span>
                 <span class="info-box-number">{{ number_format(\App\Models\Magazine::sum('views_count'), 0, ',', '.') }}</span>
             </div>
         </div>
@@ -58,7 +58,7 @@
 
         <form method="GET" class="form-inline mb-3">
             <div class="input-group" style="width: 320px;">
-                <input type="text" name="q" value="{{ $q }}" placeholder="Buscar por titulo ou edicao..." class="form-control">
+                <input type="text" name="q" value="{{ $q }}" placeholder="Buscar por título ou edição..." class="form-control">
                 <div class="input-group-append">
                     <button class="btn btn-default"><i class="fas fa-search"></i></button>
                 </div>
@@ -70,12 +70,12 @@
                 <thead>
                     <tr>
                         <th style="width: 70px;">Capa</th>
-                        <th>Titulo</th>
+                        <th>Título</th>
                         <th>Categoria</th>
                         <th>Status</th>
                         <th>Visibilidade</th>
-                        <th>Views</th>
-                        <th class="text-right">Acoes</th>
+                        <th>Visualizações</th>
+                        <th class="text-right">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,7 +112,7 @@
                             </td>
                             <td>
                                 @if($m->visibility === 'public')
-                                    <span class="text-success"><i class="fas fa-globe mr-1"></i>Publico</span>
+                                    <span class="text-success"><i class="fas fa-globe mr-1"></i>Público</span>
                                 @elseif($m->visibility === 'members')
                                     <span class="text-info"><i class="fas fa-users mr-1"></i>Membros</span>
                                 @else
@@ -142,7 +142,7 @@
                                 <i class="fas fa-book-open fa-3x mb-2 opacity-25 d-block"></i>
                                 Nenhuma revista cadastrada ainda.<br>
                                 <a href="{{ route('admin.magazines.create') }}" class="btn btn-primary btn-sm mt-2">
-                                    <i class="fas fa-plus mr-1"></i> Publicar a primeira edicao
+                                    <i class="fas fa-plus mr-1"></i> Publicar a primeira edição
                                 </a>
                             </td>
                         </tr>

@@ -2,7 +2,16 @@
 
 ## Painéis Administrativos
 
-Data de atualização: 18/06/2026
+Data de atualização: 19/06/2026
+
+### Atualização aplicada em 19/06/2026 - revistas em português brasileiro
+
+- A banca digital pública passou a formatar meses com localização `pt_BR`, eliminando abreviações em inglês como `Feb`.
+- Os leitores DearFlip e StPageFlip receberam rótulos, mensagens, acessibilidade e controles em português brasileiro.
+- As rotas administrativas preservadas são `admin.magazines.*` em `/admin/magazines` e `panel.admin.magazines.*` em `/painel/admin/magazines`.
+- Os dois painéis continuam compartilhando `Admin\MagazineController` e o model `Magazine`, mantendo views distintas para AdminLTE e Tailwind.
+- Formulários, listagens, estados, visibilidade, ações e contadores foram revisados nos dois painéis sem alterar regras de permissão.
+- Validações previstas: compilação das views, sintaxe PHP, rotas dos dois painéis, UTF-8 sem BOM, verificação de mojibake e `git diff --check`.
 
 ### Atualizacao aplicada em 19/06/2026 - cupom de expositor e ingresso marcado
 

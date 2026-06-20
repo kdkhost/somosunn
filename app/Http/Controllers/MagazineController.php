@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 class MagazineController extends Controller
 {
     /**
-     * Listagem publica/membro de revistas.
+     * Listagem pública de revistas para visitantes e membros.
      */
     public function index(Request $request)
     {
@@ -57,7 +57,7 @@ class MagazineController extends Controller
     }
 
     /**
-     * Visualiza uma revista especifica com o flipbook.
+     * Visualiza uma revista específica no leitor interativo.
      */
     public function show(Magazine $magazine)
     {
@@ -65,7 +65,7 @@ class MagazineController extends Controller
 
         // Visibilidade
         if (!$this->canView($magazine, $user)) {
-            abort(403, 'Voce precisa ter "Noticias" marcado como interesse no seu perfil para acessar esta revista.');
+            abort(403, 'Você precisa marcar "Notícias" como interesse no seu perfil para acessar esta revista.');
         }
 
         $magazine->increment('views_count');
@@ -78,7 +78,7 @@ class MagazineController extends Controller
             ->limit(4)
             ->get();
 
-        // Escolher engine de flipbook conforme configuracao do admin
+        // Escolhe o leitor interativo conforme a configuração administrativa.
         $engine = \App\Models\Setting::get('magazine_flipbook_engine', 'dearflip');
         $viewName = $engine === 'stpageflip' ? 'magazines.show-stpageflip' : 'magazines.show';
 

@@ -16,7 +16,7 @@
                 <i class="fas fa-book-open text-purple-500"></i>
                 {{ $isEdit ? 'Editar Revista' : 'Nova Revista' }}
             </h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Publique edicoes em PDF com visualizacao flipbook</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Publique edições em PDF com visualização interativa</p>
         </div>
         <a href="{{ route('panel.admin.magazines.index') }}"
             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold text-sm">
@@ -49,9 +49,9 @@
 
                     <div class="space-y-4">
                         <div>
-                            <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Titulo *</label>
+                            <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Título *</label>
                             <input type="text" name="title" required value="{{ old('title', $magazine->title) }}"
-                                placeholder="Ex: Revista Manchete - Edicao 7"
+                                placeholder="Ex.: Revista Manchete - Edição 7"
                                 class="w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-white dark:bg-slate-950 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition">
                         </div>
 
@@ -63,13 +63,13 @@
                                     class="w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-white dark:bg-slate-950 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Edicao / Numero</label>
+                                <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Edição / Número</label>
                                 <input type="text" name="edition" value="{{ old('edition', $magazine->edition) }}"
-                                    placeholder="Ex: #01 - Jan/2026"
+                                    placeholder="Ex.: nº 01 - jan./2026"
                                     class="w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-white dark:bg-slate-950 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition">
                             </div>
                             <div class="md:col-span-1">
-                                <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Data pub.</label>
+                                <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Data de publicação</label>
                                 <input type="date" name="published_at" value="{{ old('published_at', optional($magazine->published_at)->format('Y-m-d')) }}"
                                     class="w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-white dark:bg-slate-950 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition">
                             </div>
@@ -78,14 +78,14 @@
                         <div>
                             <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Resumo curto</label>
                             <textarea name="short_description" rows="2" maxlength="500"
-                                placeholder="Paragrafo que aparece na vitrine"
+                                placeholder="Parágrafo exibido na vitrine"
                                 class="w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-white dark:bg-slate-950 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition">{{ old('short_description', $magazine->short_description) }}</textarea>
                         </div>
 
                         <div>
-                            <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Descricao completa</label>
+                            <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Descrição completa</label>
                             <textarea name="full_description" rows="5"
-                                placeholder="Descricao detalhada exibida na pagina da revista"
+                                placeholder="Descrição detalhada exibida na página da revista"
                                 class="w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-white dark:bg-slate-950 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition">{{ old('full_description', $magazine->full_description) }}</textarea>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
                         <div>
                             <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">
                                 Capa da revista
-                                <span class="text-xs font-medium text-slate-400 ml-1">(proporcao 3:4)</span>
+                                <span class="text-xs font-medium text-slate-400 ml-1">(proporção 3:4)</span>
                             </label>
                             <x-unn-dropzone
                                 name="thumbnail"
@@ -119,7 +119,7 @@
                         <div>
                             <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">
                                 Arquivo PDF {{ $isEdit ? '' : '*' }}
-                                <span class="text-xs font-medium text-slate-400 ml-1">(ate 100 MB)</span>
+                                <span class="text-xs font-medium text-slate-400 ml-1">(até 100 MB)</span>
                             </label>
                             <x-unn-dropzone
                                 name="pdf_file"
@@ -139,11 +139,11 @@
 
             {{-- Coluna lateral --}}
             <div class="lg:col-span-1 space-y-6">
-                {{-- Publicacao --}}
+                {{-- Publicação --}}
                 <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
                     <h3 class="text-xs uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-2">
                         <span class="w-1 h-4 bg-green-500 rounded-full"></span>
-                        Publicacao
+                        Publicação
                     </h3>
 
                     <div class="space-y-4">
@@ -159,14 +159,14 @@
                         <div>
                             <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Visibilidade *</label>
                             <select name="visibility" required class="w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-white dark:bg-slate-950 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
-                                <option value="interest" @selected(old('visibility', $magazine->visibility ?: 'interest') === 'interest')>So interessados em "Noticias"</option>
+                                <option value="interest" @selected(old('visibility', $magazine->visibility ?: 'interest') === 'interest')>Somente interessados em "Notícias"</option>
                                 <option value="members" @selected(old('visibility', $magazine->visibility) === 'members')>Todos os membros</option>
-                                <option value="public" @selected(old('visibility', $magazine->visibility) === 'public')>Publico (visitantes)</option>
+                                <option value="public" @selected(old('visibility', $magazine->visibility) === 'public')>Público (visitantes)</option>
                             </select>
                         </div>
 
                         <div>
-                            <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Numero de paginas</label>
+                            <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Número de páginas</label>
                             <input type="number" name="pages_count" min="1" max="2000" value="{{ old('pages_count', $magazine->pages_count) }}"
                                 placeholder="Opcional"
                                 class="w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-white dark:bg-slate-950 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
@@ -174,11 +174,11 @@
                     </div>
                 </div>
 
-                {{-- Opcoes --}}
+                {{-- Opções --}}
                 <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
                     <h3 class="text-xs uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-2">
                         <span class="w-1 h-4 bg-amber-500 rounded-full"></span>
-                        Opcoes
+                        Opções
                     </h3>
 
                     <div class="space-y-3">
@@ -190,17 +190,17 @@
                         <label class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                             <input type="hidden" name="allow_download" value="0">
                             <input type="checkbox" name="allow_download" value="1" @checked(old('allow_download', $magazine->exists ? $magazine->allow_download : true)) class="rounded text-purple-600 focus:ring-purple-500">
-                            <span class="flex-1 text-sm font-bold text-slate-700 dark:text-slate-300"><i class="fas fa-download text-blue-500 mr-1"></i>Permitir download</span>
+                            <span class="flex-1 text-sm font-bold text-slate-700 dark:text-slate-300"><i class="fas fa-download text-blue-500 mr-1"></i>Permitir baixar o PDF</span>
                         </label>
                         <label class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                             <input type="hidden" name="enable_sound" value="0">
                             <input type="checkbox" name="enable_sound" value="1" @checked(old('enable_sound', $magazine->exists ? $magazine->enable_sound : true)) class="rounded text-purple-600 focus:ring-purple-500">
-                            <span class="flex-1 text-sm font-bold text-slate-700 dark:text-slate-300"><i class="fas fa-volume-high text-green-500 mr-1"></i>Som de virar pagina</span>
+                            <span class="flex-1 text-sm font-bold text-slate-700 dark:text-slate-300"><i class="fas fa-volume-high text-green-500 mr-1"></i>Som de virar página</span>
                         </label>
                     </div>
                 </div>
 
-                {{-- Acoes --}}
+                {{-- Ações --}}
                 <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
                     <button type="submit" class="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black shadow-lg shadow-purple-500/30 transition">
                         <i class="fas fa-save mr-1"></i> Salvar Revista

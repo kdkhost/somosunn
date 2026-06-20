@@ -20,7 +20,7 @@
 
     <div class="row">
         <div class="col-lg-8">
-            {{-- Dados basicos --}}
+            {{-- Dados básicos --}}
             <div class="card card-outline card-primary">
                 <div class="card-header">
                     <h3 class="card-title mb-0"><i class="fas fa-book-open mr-2"></i>{{ $isEdit ? 'Editar Revista' : 'Nova Revista' }}</h3>
@@ -34,10 +34,10 @@
                     @endif
 
                     <div class="form-group">
-                        <label>Titulo <span class="text-danger">*</span></label>
+                        <label>Título <span class="text-danger">*</span></label>
                         <input type="text" name="title" required class="form-control"
                             value="{{ old('title', $magazine->title) }}"
-                            placeholder="Ex: Revista Manchete - Edicao 7">
+                            placeholder="Ex.: Revista Manchete - Edição 7">
                     </div>
 
                     <div class="form-row">
@@ -48,13 +48,13 @@
                                 placeholder="Ex: Moda, Manchetes, Tecnologia">
                         </div>
                         <div class="form-group col-md-4">
-                            <label>Edicao / Numero</label>
+                            <label>Edição / Número</label>
                             <input type="text" name="edition" class="form-control"
                                 value="{{ old('edition', $magazine->edition) }}"
-                                placeholder="Ex: #01 - Jan/2026">
+                                placeholder="Ex.: nº 01 - jan./2026">
                         </div>
                         <div class="form-group col-md-2">
-                            <label>Data pub.</label>
+                            <label>Data de publicação</label>
                             <input type="date" name="published_at" class="form-control"
                                 value="{{ old('published_at', optional($magazine->published_at)->format('Y-m-d')) }}">
                         </div>
@@ -63,13 +63,13 @@
                     <div class="form-group">
                         <label>Resumo curto</label>
                         <textarea name="short_description" rows="2" maxlength="500" class="form-control"
-                            placeholder="Paragrafo que aparece na vitrine">{{ old('short_description', $magazine->short_description) }}</textarea>
+                            placeholder="Parágrafo exibido na vitrine">{{ old('short_description', $magazine->short_description) }}</textarea>
                     </div>
 
                     <div class="form-group">
-                        <label>Descricao completa</label>
+                        <label>Descrição completa</label>
                         <textarea name="full_description" rows="5" class="form-control"
-                            placeholder="Descricao detalhada exibida na pagina da revista">{{ old('full_description', $magazine->full_description) }}</textarea>
+                            placeholder="Descrição detalhada exibida na página da revista">{{ old('full_description', $magazine->full_description) }}</textarea>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                 <div class="card-body">
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label>Capa da revista <small class="text-muted">(proporcao 3:4 recomendada)</small></label>
+                            <label>Capa da revista <small class="text-muted">(proporção 3:4 recomendada)</small></label>
                             <x-unn-dropzone
                                 name="thumbnail"
                                 accept="image/jpeg,image/png,image/webp"
@@ -97,7 +97,7 @@
                             />
                         </div>
                         <div class="form-group col-md-6">
-                            <label>Arquivo PDF {{ $isEdit ? '' : '*' }} <small class="text-muted">(ate 100 MB)</small></label>
+                            <label>Arquivo PDF {{ $isEdit ? '' : '*' }} <small class="text-muted">(até 100 MB)</small></label>
                             <x-unn-dropzone
                                 name="pdf_file"
                                 accept="application/pdf"
@@ -117,10 +117,10 @@
         </div>
 
         <div class="col-lg-4">
-            {{-- Publicacao --}}
+            {{-- Publicação --}}
             <div class="card card-outline card-success">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-rocket mr-2"></i>Publicacao</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-rocket mr-2"></i>Publicação</h3>
                 </div>
                 <div class="card-body">
                     <div class="form-group">
@@ -135,14 +135,14 @@
                     <div class="form-group">
                         <label>Visibilidade <span class="text-danger">*</span></label>
                         <select name="visibility" class="form-control" required>
-                            <option value="interest" @selected(old('visibility', $magazine->visibility ?: 'interest') === 'interest')>So interessados em "Noticias"</option>
+                            <option value="interest" @selected(old('visibility', $magazine->visibility ?: 'interest') === 'interest')>Somente interessados em "Notícias"</option>
                             <option value="members" @selected(old('visibility', $magazine->visibility) === 'members')>Todos os membros autenticados</option>
-                            <option value="public" @selected(old('visibility', $magazine->visibility) === 'public')>Publico (visitantes)</option>
+                            <option value="public" @selected(old('visibility', $magazine->visibility) === 'public')>Público (visitantes)</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>Numero de paginas</label>
+                        <label>Número de páginas</label>
                         <input type="number" name="pages_count" min="1" max="2000" class="form-control"
                             value="{{ old('pages_count', $magazine->pages_count) }}"
                             placeholder="Opcional">
@@ -150,10 +150,10 @@
                 </div>
             </div>
 
-            {{-- Opcoes --}}
+            {{-- Opções --}}
             <div class="card card-outline card-secondary">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-cog mr-2"></i>Opcoes</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-cog mr-2"></i>Opções</h3>
                 </div>
                 <div class="card-body">
                     <div class="custom-control custom-switch mb-3">
@@ -164,17 +164,17 @@
                     <div class="custom-control custom-switch mb-3">
                         <input type="hidden" name="allow_download" value="0">
                         <input type="checkbox" class="custom-control-input" id="sw-download" name="allow_download" value="1" @checked(old('allow_download', $magazine->exists ? $magazine->allow_download : true))>
-                        <label class="custom-control-label" for="sw-download"><i class="fas fa-download text-info mr-1"></i>Permitir download do PDF</label>
+                        <label class="custom-control-label" for="sw-download"><i class="fas fa-download text-info mr-1"></i>Permitir baixar o PDF</label>
                     </div>
                     <div class="custom-control custom-switch">
                         <input type="hidden" name="enable_sound" value="0">
                         <input type="checkbox" class="custom-control-input" id="sw-sound" name="enable_sound" value="1" @checked(old('enable_sound', $magazine->exists ? $magazine->enable_sound : true))>
-                        <label class="custom-control-label" for="sw-sound"><i class="fas fa-volume-high text-success mr-1"></i>Som de virar pagina</label>
+                        <label class="custom-control-label" for="sw-sound"><i class="fas fa-volume-high text-success mr-1"></i>Som de virar página</label>
                     </div>
                 </div>
             </div>
 
-            {{-- Acoes --}}
+            {{-- Ações --}}
             <div class="card">
                 <div class="card-body">
                     <button type="submit" class="btn btn-primary btn-lg btn-block">

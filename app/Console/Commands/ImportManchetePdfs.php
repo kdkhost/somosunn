@@ -136,7 +136,7 @@ class ImportManchetePdfs extends Command
         }
 
         $this->info('Importando ' . count($this->sources) . ' revistas da Revista Manchete...');
-        $this->info('Owner: ' . $admin->name . ' (id=' . $admin->id . ')');
+        $this->info('Responsável: ' . $admin->name . ' (id=' . $admin->id . ')');
         $this->newLine();
 
         $imported = 0;
@@ -267,7 +267,7 @@ class ImportManchetePdfs extends Command
             $result['pdf_url'] = html_entity_decode($m[0]);
         }
 
-        // Thumbnail: og:image, featured image, ou primeira imagem jpg/png do dominio
+        // Capa: og:image, imagem destacada ou primeira imagem JPG/PNG do domínio.
         if (preg_match('~<meta[^>]+property="og:image"[^>]+content="([^"]+)"~i', $html, $m)) {
             $result['thumb_url'] = html_entity_decode($m[1]);
         } elseif (preg_match('~<img[^>]+src="(https?://revistamanchete\.com\.br/[^"]+\.(?:jpg|jpeg|png|webp))"~i', $html, $m)) {
@@ -305,7 +305,7 @@ class ImportManchetePdfs extends Command
 
             return trim($directory, '/') . '/' . $filename;
         } catch (\Throwable $e) {
-            $this->error('      Erro download: ' . $e->getMessage());
+            $this->error('      Erro ao baixar: ' . $e->getMessage());
             return null;
         }
     }

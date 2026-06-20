@@ -9,7 +9,7 @@
                 <i class="fas fa-book-open text-purple-500"></i>
                 Revistas digitais
             </h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manchetes, moda, noticias e edicoes em PDF com flipbook</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manchetes, moda, notícias e edições em PDF com revista interativa</p>
         </div>
         <a href="{{ route('panel.admin.magazines.create') }}"
             class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-sm shadow-lg shadow-purple-500/30 hover:-translate-y-0.5 transition-all">
@@ -38,7 +38,7 @@
             <div class="text-2xl font-black text-slate-900 dark:text-white mt-1">{{ $draftMag }}</div>
         </div>
         <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-4">
-            <div class="text-[11px] uppercase tracking-wider font-black text-blue-500">Visualizacoes</div>
+            <div class="text-[11px] uppercase tracking-wider font-black text-blue-500">Visualizações</div>
             <div class="text-2xl font-black text-slate-900 dark:text-white mt-1">{{ number_format($viewsTotal, 0, ',', '.') }}</div>
         </div>
     </div>
@@ -53,7 +53,7 @@
         <form method="GET" class="mb-5 flex gap-2">
             <div class="relative flex-1">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" name="q" value="{{ $q }}" placeholder="Buscar por titulo ou edicao..."
+                <input type="text" name="q" value="{{ $q }}" placeholder="Buscar por título ou edição..."
                     class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 dark:text-white">
             </div>
             <button class="px-5 py-3 rounded-xl bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white text-sm font-bold">Buscar</button>
@@ -64,12 +64,12 @@
                 <thead class="bg-slate-50 dark:bg-slate-800/50">
                     <tr class="text-left text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
                         <th class="px-4 py-3">Capa</th>
-                        <th class="px-4 py-3">Titulo</th>
+                        <th class="px-4 py-3">Título</th>
                         <th class="px-4 py-3">Categoria</th>
                         <th class="px-4 py-3">Status</th>
                         <th class="px-4 py-3">Visibilidade</th>
-                        <th class="px-4 py-3">Views</th>
-                        <th class="px-4 py-3 text-right">Acoes</th>
+                        <th class="px-4 py-3">Visualizações</th>
+                        <th class="px-4 py-3 text-right">Ações</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -103,7 +103,7 @@
                             </td>
                             <td class="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
                                 @if($m->visibility === 'public')
-                                    <i class="fas fa-globe text-green-500 mr-1"></i> Publico
+                                    <i class="fas fa-globe text-green-500 mr-1"></i> Público
                                 @elseif($m->visibility === 'members')
                                     <i class="fas fa-users text-blue-500 mr-1"></i> Membros
                                 @else
@@ -133,7 +133,7 @@
                                     <i class="fas fa-book-open text-5xl opacity-40"></i>
                                     <div class="text-base font-bold text-slate-600 dark:text-slate-400">Nenhuma revista cadastrada ainda</div>
                                     <a href="{{ route('panel.admin.magazines.create') }}" class="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm">
-                                        <i class="fas fa-plus"></i> Publicar a primeira edicao
+                                        <i class="fas fa-plus"></i> Publicar a primeira edição
                                     </a>
                                 </div>
                             </td>

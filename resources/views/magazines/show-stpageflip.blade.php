@@ -352,33 +352,33 @@
         <div id="mag-flipbook-container" style="display:none;"></div>
         <div class="mag-error" id="mag-error" style="display:none;">
             <i class="fas fa-exclamation-triangle"></i>
-            <h3 style="color:#fff;margin-bottom:0.5rem;font-weight:900;">Nao foi possivel carregar</h3>
+            <h3 style="color:#fff;margin-bottom:0.5rem;font-weight:900;">Não foi possível carregar</h3>
             <p id="mag-error-msg" style="font-size:0.85rem;opacity:0.7;"></p>
         </div>
     </div>
 
     {{-- Side arrows --}}
-    <button type="button" class="mag-arrow" id="mag-arrow-prev" aria-label="Pagina anterior" style="display:none;">
+    <button type="button" class="mag-arrow" id="mag-arrow-prev" aria-label="Página anterior" style="display:none;">
         <i class="fas fa-chevron-left"></i>
     </button>
-    <button type="button" class="mag-arrow" id="mag-arrow-next" aria-label="Proxima pagina" style="display:none;">
+    <button type="button" class="mag-arrow" id="mag-arrow-next" aria-label="Próxima página" style="display:none;">
         <i class="fas fa-chevron-right"></i>
     </button>
 
     {{-- Toolbar --}}
     <div class="mag-toolbar" id="mag-toolbar" style="display:none;">
-        <button id="mag-first" class="mag-btn" title="Primeira pagina"><i class="fas fa-angles-left"></i></button>
-        <button id="mag-prev" class="mag-btn" title="Pagina anterior"><i class="fas fa-chevron-left"></i></button>
+        <button id="mag-first" class="mag-btn" title="Primeira página"><i class="fas fa-angles-left"></i></button>
+        <button id="mag-prev" class="mag-btn" title="Página anterior"><i class="fas fa-chevron-left"></i></button>
 
         <div class="mag-pages"><strong id="mag-current">1</strong> / <span id="mag-total">?</span></div>
 
-        <button id="mag-next" class="mag-btn" title="Proxima pagina"><i class="fas fa-chevron-right"></i></button>
-        <button id="mag-last" class="mag-btn" title="Ultima pagina"><i class="fas fa-angles-right"></i></button>
+        <button id="mag-next" class="mag-btn" title="Próxima página"><i class="fas fa-chevron-right"></i></button>
+        <button id="mag-last" class="mag-btn" title="Última página"><i class="fas fa-angles-right"></i></button>
 
         <div class="mag-divider"></div>
 
-        <button id="mag-sound" class="mag-btn is-active" title="Som de pagina virando"><i id="mag-sound-icon" class="fas fa-volume-high"></i></button>
-        <button id="mag-zoom" class="mag-btn" title="Ampliar pagina"><i id="mag-zoom-icon" class="fas fa-magnifying-glass-plus"></i></button>
+        <button id="mag-sound" class="mag-btn is-active" title="Som de página virando"><i id="mag-sound-icon" class="fas fa-volume-high"></i></button>
+        <button id="mag-zoom" class="mag-btn" title="Ampliar página"><i id="mag-zoom-icon" class="fas fa-magnifying-glass-plus"></i></button>
         @if($magazine->allow_download)
             <a href="{{ $magazine->pdf_url }}" download class="mag-btn" title="Baixar PDF"><i class="fas fa-download"></i></a>
         @endif
@@ -634,7 +634,7 @@
             var pdf = await loadingTask.promise;
 
             // Analyze all pages to detect spreads
-            progressEl.textContent = 'Analisando paginas...';
+            progressEl.textContent = 'Analisando páginas...';
             barFill.style.width = '90%';
             var pageMap = await analyzePdfPages(pdf);
             var totalPages = pageMap.length; // may differ from pdf.numPages if there are spreads
@@ -655,7 +655,7 @@
             var pageW = sizes.width;
             var pageH = sizes.height;
 
-            progressEl.textContent = 'Preparando paginas...';
+            progressEl.textContent = 'Preparando páginas...';
             barFill.style.width = '95%';
 
             // Build placeholders for all (flipbook) pages

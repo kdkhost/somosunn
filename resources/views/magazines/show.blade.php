@@ -207,10 +207,10 @@
     </div>
 
     {{-- Setas customizadas (posicionadas via JS junto ao livro) --}}
-    <button type="button" class="mag-custom-arrow" id="mag-arrow-prev" aria-label="Pagina anterior">
+    <button type="button" class="mag-custom-arrow" id="mag-arrow-prev" aria-label="Página anterior">
         <i class="fas fa-chevron-left"></i>
     </button>
-    <button type="button" class="mag-custom-arrow" id="mag-arrow-next" aria-label="Proxima pagina">
+    <button type="button" class="mag-custom-arrow" id="mag-arrow-next" aria-label="Próxima página">
         <i class="fas fa-chevron-right"></i>
     </button>
 </div>
@@ -251,13 +251,20 @@
         text: {
             toggleSound: 'Som',
             toggleThumbnails: 'Miniaturas',
-            toggleOutline: 'Indice',
+            toggleOutline: 'Índice',
             previousPage: 'Anterior',
-            nextPage: 'Proxima',
+            nextPage: 'Próxima',
             toggleFullscreen: 'Tela cheia',
             zoomIn: 'Ampliar',
             zoomOut: 'Reduzir',
             share: 'Compartilhar',
+            downloadPDF: 'Baixar PDF',
+            more: 'Mais opções',
+            startPage: 'Primeira página',
+            endPage: 'Última página',
+            pageMode: 'Modo de página',
+            singlePageMode: 'Página única',
+            doublePageMode: 'Página dupla',
         }
     };
 </script>

@@ -2,6 +2,23 @@
 
 ---
 
+## [2026-06-19] - fix(revistas): padronizar módulo em português brasileiro
+
+### Corrigido
+- Meses abreviados na banca digital agora usam a localização `pt_BR`, exibindo `fev.` em vez de `Feb`, por exemplo.
+- Textos públicos, mensagens de acesso e controles dos dois leitores de revista foram revisados em português brasileiro.
+- Os painéis `/admin/magazines` e `/painel/admin/magazines` deixaram de exibir termos em inglês como `Views` e passaram a usar rótulos acentuados.
+- Formulários dos dois painéis foram padronizados com `Título`, `Edição`, `Número`, `Publicação`, `Opções`, `Público` e `Notícias`.
+
+### Arquivos principais
+- `resources/views/magazines/*`
+- `resources/views/admin/magazines/*`
+- `resources/views/panel/admin/magazines/*`
+- `app/Http/Controllers/MagazineController.php`
+- `app/Http/Controllers/Admin/MagazineController.php`
+
+---
+
 ## [2026-06-19] - feat(revistas): publicar edição especial do Judiciário
 
 ### Adicionado
