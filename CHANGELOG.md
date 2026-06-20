@@ -2,6 +2,49 @@
 
 ---
 
+## [2026-06-20] - feat(empresas, patrocinadores): criar ecossistema empresarial integrado
+
+### Adicionado
+- Criadas as bases incrementais para `companies`, `company_users`, `sponsor_plans`, `sponsors`, `sponsor_banners`, `event_sponsors`, `sponsor_leads`, `crm_scores` e `business_matches`.
+- Nova pagina publica `/empresa/{slug}` com perfil institucional, equipe vinculada, patrocinio ativo e conexao com a vitrine ja existente da loja.
+- Novos CRUDs administrativos em `/admin` e `/painel/admin` para empresas, patrocinadores, planos de patrocinio e banners patrocinados.
+- Nova area `/painel/patrocinador` com dashboard, leads, financeiro, campanhas e relatorios.
+- Seeders idempotentes para permissoes do patrocinador e planos comerciais Bronze, Prata, Ouro e Diamante.
+- Services compartilhados para empresa, patrocinio, banners, leads, CRM e business match, evitando duplicidade entre os dois paineis.
+
+### Alterado
+- `User` passou a expor relacionamentos empresariais, score de CRM, leads e compatibilidade de acesso ao painel do patrocinador.
+- `Event` passou a expor patrocinadores vinculados para renderizacao publica e administrativa.
+- `Plan::FEATURE_LABELS` e `Plan::FEATURE_GROUPS` receberam o novo conjunto de capacidades do patrocinador.
+- `AuthServiceProvider` passou a registrar `CompanyPolicy` e `SponsorPolicy`.
+- Sidebars de `/admin` e `/painel` receberam atalhos claros para os novos modulos.
+
+### Arquivos principais
+- `app/Models/Company.php`
+- `app/Models/Sponsor.php`
+- `app/Services/CompanyService.php`
+- `app/Services/SponsorService.php`
+- `app/Http/Controllers/CompanyProfileController.php`
+- `app/Http/Controllers/Admin/CompanyController.php`
+- `app/Http/Controllers/Admin/SponsorController.php`
+- `app/Http/Controllers/Panel/Admin/CompanyController.php`
+- `app/Http/Controllers/Panel/Admin/SponsorController.php`
+- `app/Http/Controllers/Panel/SponsorDashboardController.php`
+- `resources/views/companies/show.blade.php`
+- `resources/views/admin/companies/*`
+- `resources/views/admin/sponsors/*`
+- `resources/views/panel/admin/companies/*`
+- `resources/views/panel/admin/sponsors/*`
+- `resources/views/panel/sponsor/*`
+- `database/migrations/2026_06_20_170000_create_companies_table.php`
+- `database/seeders/SponsorPermissionSeeder.php`
+- `database/seeders/SponsorPlanSeeder.php`
+- `tests/Feature/*Sponsor*`
+- `tests/Unit/CrmScoreServiceTest.php`
+- `tests/Unit/BusinessMatchServiceTest.php`
+
+---
+
 ## [2026-06-20] - feat(taxas): isentar perfis internos e dar controle so ao superadmin
 
 ### Alterado

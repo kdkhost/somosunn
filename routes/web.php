@@ -95,6 +95,7 @@ Route::get('/cadastro-curriculo', fn() => redirect()->to(route('jobs.public.inde
 // ── Parceiros ────────────────────────────────────────────────────────────────
 Route::get('/parceiros', [\App\Http\Controllers\PublicPartnerController::class, 'index'])->name('partners.index');
 Route::get('/parceiros/{partner:slug}', [\App\Http\Controllers\PublicPartnerController::class, 'show'])->name('partners.show');
+Route::get('/empresa/{slug}', [\App\Http\Controllers\CompanyProfileController::class, 'show'])->name('companies.show');
 
 Route::middleware(['auth', 'admin'])->prefix('admin/partners')->name('admin.partners.')->group(function () {
     Route::get('/', [\App\Http\Controllers\Admin\PartnerController::class, 'index'])->name('index');
@@ -116,6 +117,42 @@ Route::middleware(['auth'])->prefix('meu-parceiro')->name('member.partner.')->gr
     Route::post('/cupons', [\App\Http\Controllers\MemberPartnerController::class, 'store'])->name('coupons.store');
     Route::put('/cupons/{coupon}', [\App\Http\Controllers\MemberPartnerController::class, 'update'])->name('coupons.update');
     Route::delete('/cupons/{coupon}', [\App\Http\Controllers\MemberPartnerController::class, 'destroy'])->name('coupons.destroy');
+});
+
+Route::middleware(['auth', 'admin'])->prefix('admin/companies')->name('admin.companies.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\CompanyController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\Admin\CompanyController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\Admin\CompanyController::class, 'store'])->name('store');
+    Route::get('/{company}/edit', [\App\Http\Controllers\Admin\CompanyController::class, 'edit'])->name('edit');
+    Route::put('/{company}', [\App\Http\Controllers\Admin\CompanyController::class, 'update'])->name('update');
+    Route::delete('/{company}', [\App\Http\Controllers\Admin\CompanyController::class, 'destroy'])->name('destroy');
+});
+
+Route::middleware(['auth', 'admin'])->prefix('admin/sponsors')->name('admin.sponsors.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\SponsorController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\Admin\SponsorController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\Admin\SponsorController::class, 'store'])->name('store');
+    Route::get('/{sponsor}/edit', [\App\Http\Controllers\Admin\SponsorController::class, 'edit'])->name('edit');
+    Route::put('/{sponsor}', [\App\Http\Controllers\Admin\SponsorController::class, 'update'])->name('update');
+    Route::delete('/{sponsor}', [\App\Http\Controllers\Admin\SponsorController::class, 'destroy'])->name('destroy');
+});
+
+Route::middleware(['auth', 'admin'])->prefix('admin/sponsor-plans')->name('admin.sponsor-plans.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\SponsorPlanController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\Admin\SponsorPlanController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\Admin\SponsorPlanController::class, 'store'])->name('store');
+    Route::get('/{sponsorPlan}/edit', [\App\Http\Controllers\Admin\SponsorPlanController::class, 'edit'])->name('edit');
+    Route::put('/{sponsorPlan}', [\App\Http\Controllers\Admin\SponsorPlanController::class, 'update'])->name('update');
+    Route::delete('/{sponsorPlan}', [\App\Http\Controllers\Admin\SponsorPlanController::class, 'destroy'])->name('destroy');
+});
+
+Route::middleware(['auth', 'admin'])->prefix('admin/sponsor-banners')->name('admin.sponsor-banners.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\SponsorBannerController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\Admin\SponsorBannerController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\Admin\SponsorBannerController::class, 'store'])->name('store');
+    Route::get('/{sponsorBanner}/edit', [\App\Http\Controllers\Admin\SponsorBannerController::class, 'edit'])->name('edit');
+    Route::put('/{sponsorBanner}', [\App\Http\Controllers\Admin\SponsorBannerController::class, 'update'])->name('update');
+    Route::delete('/{sponsorBanner}', [\App\Http\Controllers\Admin\SponsorBannerController::class, 'destroy'])->name('destroy');
 });
 
 // Eventos (Public)
@@ -319,6 +356,14 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
     Route::get('/ingressos/{registration}', [\App\Http\Controllers\Panel\TicketController::class, 'show'])->name('tickets.show');
     Route::get('/recebimentos', [\App\Http\Controllers\Panel\SplitController::class, 'index'])->name('splits.index');
     Route::get('/marketing', [\App\Http\Controllers\Panel\MarketingController::class, 'index'])->name('marketing.index');
+    Route::prefix('patrocinador')->name('sponsor.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Panel\SponsorDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/leads', [\App\Http\Controllers\Panel\SponsorLeadController::class, 'index'])->name('leads.index');
+        Route::post('/leads', [\App\Http\Controllers\Panel\SponsorLeadController::class, 'store'])->name('leads.store');
+        Route::get('/financeiro', [\App\Http\Controllers\Panel\SponsorBillingController::class, 'index'])->name('finance.index');
+        Route::get('/campanhas', [\App\Http\Controllers\Panel\SponsorCampaignController::class, 'index'])->name('campaigns.index');
+        Route::get('/relatorios', [\App\Http\Controllers\Panel\SponsorReportController::class, 'index'])->name('reports.index');
+    });
     Route::get('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/perfil', [\App\Http\Controllers\Panel\ProfileController::class, 'update'])->name('profile.update');
     Route::post('/perfil/upload-photo', [\App\Http\Controllers\Panel\ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
@@ -438,6 +483,10 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::post('users/{user}/marketing-manager', [\App\Http\Controllers\Admin\UserController::class, 'setMarketingManager'])->name('users.marketing-manager');
         Route::post('users/{user}/verify-email', [\App\Http\Controllers\Panel\Admin\UserController::class, 'verifyEmail'])->name('users.verify-email');
         Route::resource('users', \App\Http\Controllers\Panel\Admin\UserController::class);
+        Route::resource('companies', \App\Http\Controllers\Panel\Admin\CompanyController::class)->except(['show']);
+        Route::resource('sponsors', \App\Http\Controllers\Panel\Admin\SponsorController::class)->except(['show']);
+        Route::resource('sponsor-plans', \App\Http\Controllers\Panel\Admin\SponsorPlanController::class)->parameters(['sponsor-plans' => 'sponsorPlan'])->except(['show']);
+        Route::resource('sponsor-banners', \App\Http\Controllers\Panel\Admin\SponsorBannerController::class)->parameters(['sponsor-banners' => 'sponsorBanner'])->except(['show']);
         Route::post('plans/{plan}/toggle-active', [\App\Http\Controllers\Panel\Admin\PlanController::class, 'toggleActive'])->name('plans.toggle-active');
         Route::resource('plans', \App\Http\Controllers\Panel\Admin\PlanController::class);
         Route::get('orders/sales-report', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'salesReport'])->name('orders.sales-report');

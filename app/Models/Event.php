@@ -113,6 +113,11 @@ class Event extends Model
 
     protected $appends = ['start', 'end', 'image_url', 'thumbnail_url', 'gallery_cover_url', 'exhibitor_area_image_url', 'is_ready_to_publish'];
 
+    public function sponsors()
+    {
+        return $this->hasMany(EventSponsor::class)->with(['sponsor.company', 'sponsor.plan']);
+    }
+
     public function getImageUrlAttribute(): ?string
     {
         return UploadStorage::url($this->image);

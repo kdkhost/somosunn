@@ -4,6 +4,17 @@
 
 Data de atualização: 20/06/2026
 
+### Atualização aplicada em 20/06/2026 - ecossistema empresarial e patrocinadores
+
+- Novos recursos globais adicionados em `/admin/companies`, `/admin/sponsors`, `/admin/sponsor-plans` e `/admin/sponsor-banners`.
+- Equivalencia administrativa preservada no painel moderno com `/painel/admin/companies`, `/painel/admin/sponsors`, `/painel/admin/sponsor-plans` e `/painel/admin/sponsor-banners`.
+- Nova area dedicada ao patrocinador em `/painel/patrocinador`, com dashboard, leads, financeiro, campanhas e relatorios.
+- Regra de negocio compartilhada centralizada em `CompanyService`, `SponsorService`, `SponsorBannerService`, `SponsorLeadService`, `CrmScoreService` e `BusinessMatchService`.
+- Rotas publicas preservadas e ampliadas com `GET /empresa/{slug}` sem alterar URLs legadas de parceiros ou loja.
+- Permissoes granulares novas: `sponsor.dashboard`, `sponsor.leads`, `sponsor.billing`, `sponsor.reports`, `sponsor.events`, `sponsor.campaigns`, alem do conjunto administrativo de empresas, patrocinadores, planos e banners.
+- Diferencas visuais mantidas: AdminLTE em `/admin`, Tailwind em `/painel/admin` e `/painel/patrocinador`, com a mesma camada de negocio por tras.
+- Testes de cobertura adicionados para rotas, request de consentimento, CRM e business match, sem executar automacao nesta entrega.
+
 ### Atualização aplicada em 20/06/2026 - cópias ocultas de controle das vendas
 
 - Criado o job idempotente `SendOrderControlCopyEmailJob`, integrado à fila de e-mails configurada no painel de cron.

@@ -71,6 +71,7 @@ use App\Models\Traits\HasRoles;
 use App\Services\ProfilePhotoService;
 use Illuminate\Support\Facades\Schema;
 use App\Models\EventRegistration;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -150,6 +151,20 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return in_array($this->role, ['admin', 'superadmin'], true)
             || $this->isMarketingManager();
+    }
+
+    public function canAccessSponsorPanel(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->hasPermission('sponsor.dashboard')
+            || $this->hasPermission('sponsor.leads')
+            || $this->hasPermission('sponsor.billing')
+            || $this->hasPermission('sponsor.reports')
+            || $this->hasPermission('sponsor.campaigns')
+            || $this->hasPermission('sponsor.events');
     }
 
     public function canSellOnMarketplace(): bool
@@ -321,6 +336,34 @@ class User extends Authenticatable implements MustVerifyEmail
         'lgpd_accepted_at' => 'datetime',
         'platform_fee_enabled' => 'boolean',
     ];
+
+    public function companies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class, 'company_users')
+            ->using(CompanyUser::class)
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function companyMemberships()
+    {
+        return $this->hasMany(CompanyUser::class);
+    }
+
+    public function crmScore()
+    {
+        return $this->hasOne(CrmScore::class);
+    }
+
+    public function sponsorLeads()
+    {
+        return $this->hasMany(SponsorLead::class);
+    }
+
+    public function businessMatches()
+    {
+        return $this->hasMany(BusinessMatch::class);
+    }
 
     protected $appends = ['profile_photo_url'];
 

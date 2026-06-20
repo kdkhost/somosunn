@@ -1117,6 +1117,61 @@
             </div>
         </section>
 
+        @php
+            $eventSponsorsByTier = collect($eventSponsors ?? [])
+                ->groupBy('type')
+                ->sortBy(fn($items, $tier) => array_search($tier, ['master', 'diamond', 'gold', 'silver', 'bronze'], true));
+        @endphp
+
+        @if($eventSponsorsByTier->isNotEmpty())
+            <section class="px-6 pb-16 md:px-12 lg:px-24">
+                <div class="mx-auto max-w-7xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+                    <div class="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                        <div>
+                            <p class="text-sm font-black uppercase tracking-[0.18em] text-blue-700">Patrocinio oficial</p>
+                            <h2 class="mt-2 text-3xl font-black text-gray-900 md:text-4xl">Patrocinadores do evento</h2>
+                        </div>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-2 text-sm font-black text-amber-700">
+                            <i class="fas fa-award"></i> Faixas comerciais
+                        </span>
+                    </div>
+
+                    <div class="space-y-8">
+                        @foreach($eventSponsorsByTier as $tier => $items)
+                            <div>
+                                <h3 class="mb-4 text-xl font-black text-slate-900">Patrocinadores {{ ucfirst($tier) }}</h3>
+                                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                                    @foreach($items as $eventSponsor)
+                                        @php($company = $eventSponsor->sponsor?->company)
+                                        @continue(!$company)
+                                        <a href="{{ route('companies.show', $company->slug) }}" class="rounded-3xl border border-slate-200 bg-slate-50 p-5 transition hover:-translate-y-1 hover:shadow-lg">
+                                            <div class="flex items-center gap-4">
+                                                <div class="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-sm">
+                                                    @if($company->logo_url)
+                                                        <img src="{{ $company->logo_url }}" alt="{{ $company->name }}" class="h-full w-full object-contain">
+                                                    @else
+                                                        <i class="fas fa-building text-2xl text-slate-400"></i>
+                                                    @endif
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="text-xs font-black uppercase tracking-[0.18em] text-amber-600">{{ strtoupper($tier) }}</div>
+                                                    <div class="mt-2 truncate text-lg font-black text-slate-900">{{ $company->name }}</div>
+                                                    <div class="mt-1 text-sm text-slate-500">{{ $company->city ?: 'Empresa patrocinadora' }}</div>
+                                                    @if((float) $eventSponsor->amount > 0)
+                                                        <div class="mt-2 text-sm font-bold text-slate-700">Cota: R$ {{ number_format((float) $eventSponsor->amount, 2, ',', '.') }}</div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+        @endif
+
         <!-- Event Details -->
         <section class="event-details-section px-6 pb-16 md:px-12 lg:px-24">
             <div class="event-details-card mx-auto max-w-5xl p-6 md:p-10">

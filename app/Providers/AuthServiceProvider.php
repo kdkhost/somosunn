@@ -10,6 +10,8 @@ class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
         \App\Models\Certificate::class => \App\Policies\CertificatePolicy::class,
+        \App\Models\Company::class => \App\Policies\CompanyPolicy::class,
+        \App\Models\Sponsor::class => \App\Policies\SponsorPolicy::class,
     ];
 
     public function boot(): void

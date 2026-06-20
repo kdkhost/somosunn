@@ -333,6 +333,10 @@
 
                         $contentPatterns = [
                             'admin.partners.*',
+                            'admin.companies.*',
+                            'admin.sponsors.*',
+                            'admin.sponsor-plans.*',
+                            'admin.sponsor-banners.*',
                             'admin.jobs.*',
                             'admin.fonts.*',
                             'admin.faqs.*',
@@ -430,6 +434,34 @@
                                     class="nav-link {{ $is('admin.partners.*') }}">
                                     <i class="fas fa-handshake nav-icon"></i>
                                     <p>Parceiros</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.companies.index') }}"
+                                    class="nav-link {{ $is('admin.companies.*') }}">
+                                    <i class="fas fa-building nav-icon"></i>
+                                    <p>Empresas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.sponsors.index') }}"
+                                    class="nav-link {{ $is('admin.sponsors.*') }}">
+                                    <i class="fas fa-bullhorn nav-icon"></i>
+                                    <p>Patrocinadores</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.sponsor-plans.index') }}"
+                                    class="nav-link {{ $is('admin.sponsor-plans.*') }}">
+                                    <i class="fas fa-medal nav-icon"></i>
+                                    <p>Planos de patrocinio</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.sponsor-banners.index') }}"
+                                    class="nav-link {{ $is('admin.sponsor-banners.*') }}">
+                                    <i class="fas fa-image nav-icon"></i>
+                                    <p>Banners patrocinados</p>
                                 </a>
                             </li>
                             <li class="nav-item">

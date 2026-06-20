@@ -68,6 +68,15 @@ class EventController extends Controller
             abort(404);
         }
 
+        $eventSponsors = collect();
+
+        if (\App\Models\EventSponsor::tableAvailable()
+            && \App\Models\Sponsor::tableAvailable()
+            && \App\Models\Company::tableAvailable()) {
+            $event->loadMissing(['sponsors.sponsor.company', 'sponsors.sponsor.plan']);
+            $eventSponsors = $event->sponsors;
+        }
+
         $userRegistration = null;
         if (auth()->check()) {
             $userRegistration = \App\Models\EventRegistration::where('event_id', $event->id)
@@ -77,6 +86,6 @@ class EventController extends Controller
                 ->first();
         }
 
-        return view('events.show', compact('event', 'userRegistration'));
+        return view('events.show', compact('event', 'userRegistration', 'eventSponsors'));
     }
 }

@@ -251,6 +251,44 @@
         ],
     ] : [];
 
+    $sponsorItems = array_values(array_filter([
+        [
+            'label' => 'Painel do patrocinador',
+            'route' => route('panel.sponsor.dashboard'),
+            'icon' => 'fas fa-bullhorn',
+            'active' => request()->routeIs('panel.sponsor.dashboard'),
+            'visible' => $user->canAccessSponsorPanel(),
+        ],
+        [
+            'label' => 'Leads',
+            'route' => route('panel.sponsor.leads.index'),
+            'icon' => 'fas fa-address-card',
+            'active' => request()->routeIs('panel.sponsor.leads.*'),
+            'visible' => $user->canAccessSponsorPanel(),
+        ],
+        [
+            'label' => 'Financeiro',
+            'route' => route('panel.sponsor.finance.index'),
+            'icon' => 'fas fa-wallet',
+            'active' => request()->routeIs('panel.sponsor.finance.*'),
+            'visible' => $user->canAccessSponsorPanel(),
+        ],
+        [
+            'label' => 'Campanhas',
+            'route' => route('panel.sponsor.campaigns.index'),
+            'icon' => 'fas fa-bullseye',
+            'active' => request()->routeIs('panel.sponsor.campaigns.*'),
+            'visible' => $user->canAccessSponsorPanel(),
+        ],
+        [
+            'label' => 'Relatorios',
+            'route' => route('panel.sponsor.reports.index'),
+            'icon' => 'fas fa-chart-line',
+            'active' => request()->routeIs('panel.sponsor.reports.*'),
+            'visible' => $user->canAccessSponsorPanel(),
+        ],
+    ], fn(array $item) => $item['visible']));
+
     $instructorItems = array_values(array_filter([
         [
             'label' => 'Central do instrutor',
@@ -336,6 +374,10 @@
         ['label' => 'Cupons', 'route' => route('panel.admin.coupons.index'), 'icon' => 'fas fa-ticket-alt', 'active' => request()->routeIs('panel.admin.coupons.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Afiliados', 'route' => route('panel.admin.referrals.index'), 'icon' => 'fas fa-bullhorn', 'active' => request()->routeIs('panel.admin.referrals.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Comunicação com compradores', 'route' => route('panel.admin.buyer-communication.index'), 'icon' => 'fas fa-envelope-open-text', 'active' => request()->routeIs('panel.admin.buyer-communication.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Empresas', 'route' => route('panel.admin.companies.index'), 'icon' => 'fas fa-building', 'active' => request()->routeIs('panel.admin.companies.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Patrocinadores', 'route' => route('panel.admin.sponsors.index'), 'icon' => 'fas fa-bullhorn', 'active' => request()->routeIs('panel.admin.sponsors.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Planos patrocinio', 'route' => route('panel.admin.sponsor-plans.index'), 'icon' => 'fas fa-medal', 'active' => request()->routeIs('panel.admin.sponsor-plans.*'), 'visible' => $user->isAdmin()],
+        ['label' => 'Banners patrocinados', 'route' => route('panel.admin.sponsor-banners.index'), 'icon' => 'fas fa-image', 'active' => request()->routeIs('panel.admin.sponsor-banners.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Lojas marketplace', 'route' => route('panel.admin.marketplace.stores.index'), 'icon' => 'fas fa-store-alt', 'active' => request()->routeIs('panel.admin.marketplace.stores.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Produtos marketplace', 'route' => route('panel.admin.marketplace.products.index'), 'icon' => 'fas fa-boxes-stacked', 'active' => request()->routeIs('panel.admin.marketplace.products.*'), 'visible' => $user->isAdmin()],
         ['label' => 'Regras de pontos', 'route' => route('panel.admin.points-rules.index'), 'icon' => 'fas fa-star', 'active' => request()->routeIs('panel.admin.points-rules.*'), 'visible' => $user->isAdmin()],
@@ -376,6 +418,7 @@
     $vendorOpen = $hasActiveItem($vendorItems);
     $instructorOpen = $hasActiveItem($instructorItems);
     $marketingOpen = $hasActiveItem($marketingItems);
+    $sponsorOpen = $hasActiveItem($sponsorItems);
     $adminManagementOpen = $hasActiveItem($adminManagementItems);
     $adminContentOpen = $hasActiveItem($adminContentItems);
     $adminSettingsOpen = $hasActiveItem($adminSettingsItems);
@@ -523,6 +566,26 @@
                 </summary>
                 <div class="mt-2 ml-4 pl-3 border-l border-purple-100 dark:border-purple-900/50 space-y-1">
                     @foreach($marketingItems as $item)
+                        <a href="{{ $item['route'] }}" class="{{ $submenuItemClass($item['active']) }}">
+                            <i class="{{ $item['icon'] }} w-4 opacity-80"></i>
+                            <span>{{ $item['label'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </details>
+        @endif
+
+        @if(count($sponsorItems))
+            <details name="sidebar-menu" {{ $sponsorOpen ? 'open' : '' }}>
+                <summary class="{{ $submenuToggleClass($sponsorOpen) }}">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-bullhorn w-5 opacity-80 text-amber-500"></i>
+                        <span>Patrocinador</span>
+                    </div>
+                    <i class="fas fa-chevron-down submenu-chevron text-[10px] transition-transform"></i>
+                </summary>
+                <div class="mt-2 ml-4 pl-3 border-l border-amber-100 dark:border-amber-900/50 space-y-1">
+                    @foreach($sponsorItems as $item)
                         <a href="{{ $item['route'] }}" class="{{ $submenuItemClass($item['active']) }}">
                             <i class="{{ $item['icon'] }} w-4 opacity-80"></i>
                             <span>{{ $item['label'] }}</span>

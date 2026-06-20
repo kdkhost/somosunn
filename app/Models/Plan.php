@@ -169,6 +169,12 @@ class Plan extends Model
         'admin.panel' => 'Acesso ao painel admin',
         'magazines.access' => 'Acessar revistas digitais',
         'magazines.publish' => 'Publicar revistas (Editor)',
+        'sponsor.dashboard' => 'Painel do patrocinador',
+        'sponsor.leads' => 'Leads do patrocinador',
+        'sponsor.billing' => 'Financeiro do patrocinador',
+        'sponsor.reports' => 'Relatorios do patrocinador',
+        'sponsor.events' => 'Eventos patrocinados',
+        'sponsor.campaigns' => 'Campanhas do patrocinador',
     ];
 
     public const FEATURE_GROUPS = [
@@ -226,6 +232,14 @@ class Plan extends Model
             'support.priority',
             'early.access',
             'admin.panel',
+        ],
+        'Patrocinadores' => [
+            'sponsor.dashboard',
+            'sponsor.leads',
+            'sponsor.billing',
+            'sponsor.reports',
+            'sponsor.events',
+            'sponsor.campaigns',
         ],
     ];
 
