@@ -24,11 +24,13 @@ class CronPanelDataTablesTest extends TestCase
         $view = file_get_contents(resource_path('views/admin/cron/index.blade.php'));
         $sidebar = file_get_contents(resource_path('views/admin/partials/sidebar.blade.php'));
         $layout = file_get_contents(resource_path('views/admin/layouts/app.blade.php'));
+        $htaccess = file_get_contents(base_path('.htaccess'));
 
         $this->assertStringContainsString("asset('assets/admin/datatables/jquery.dataTables.min.js')", $view);
         $this->assertStringContainsString("asset('assets/admin/datatables/pt-BR.json')", $view);
         $this->assertStringNotContainsString('cdn.datatables.net', $view);
         $this->assertStringContainsString('data-no-pjax="true"', $sidebar);
         $this->assertStringContainsString("'/admin/cron'", $layout);
+        $this->assertStringContainsString('assets/admin/datatables/(.*)$ public/assets/admin/datatables/$1', $htaccess);
     }
 }
