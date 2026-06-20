@@ -27,9 +27,9 @@ class PdfBranding
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 240px;
-        margin-top: -52px;
-        margin-left: -120px;
+        width: 170px;
+        margin-top: -37px;
+        margin-left: -85px;
         text-align: center;
     }
 
@@ -37,7 +37,7 @@ class PdfBranding
         display: block;
         width: 100%;
         height: auto;
-        max-height: 104px;
+        max-height: 74px;
         object-fit: contain;
     }
 

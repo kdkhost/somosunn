@@ -28,6 +28,7 @@
 - A logo da SOMOS UNN agora e embutida como data URI, centralizada e com opacidade fixa de 15%, atras do conteudo.
 - O ajuste passa a valer para os PDFs que usam PdfBranding, incluindo faturas, relatorios e certificados.
 
+- A marca d'agua foi reduzida para ocupar apenas a area central do PDF, sem cobrir a pagina inteira.
 ### Arquivos principais
 - app/Support/PdfBranding.php
 - tests/Unit/Support/PdfBrandingTest.php
