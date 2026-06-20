@@ -4,6 +4,18 @@
 
 Data de atualização: 19/06/2026
 
+### Atualização aplicada em 19/06/2026 - elegibilidade de compra e revistas na home
+
+- Criado o middleware compartilhado `purchase.eligible`, que exige autenticação, verificação do e-mail e aceite da versão atual dos documentos legais antes de abrir ou processar compras.
+- Rotas protegidas: assinaturas, cursos, eventos, expositor, mentorias, marketplace e checkout SumUp autenticado da API.
+- O cadastro público e o cadastro pela API exigem aceite expresso e usam `ValidEmailAddress` para validar formato e domínio do e-mail.
+- Alterações de e-mail nos perfis `/admin` e `/painel`, bem como na gestão global de usuários dos dois painéis, anulam a verificação anterior e solicitam nova confirmação.
+- Os dois painéis continuam usando controllers e models compartilhados para usuários; suas views e fluxos visuais permanecem distintos.
+- A home pública passou a carregar revistas `published` e `is_featured` e exibir suas capas em carrossel abaixo do Ranking do networking.
+- A rota pública de leitura permite acesso direto somente a revistas publicadas e destacadas; os demais registros continuam respeitando `public`, `members` e `interest`.
+- Testes adicionados em `PurchaseEligibilityTest`, `ValidEmailAddressTest` e `FeaturedMagazineAccessTest`: 11 testes e 50 asserções aprovados para compra, e-mail e acesso direto às revistas destacadas.
+- Rotas administrativas preservadas: `admin.users.*`, `panel.admin.users.*`, `admin.magazines.*` e `panel.admin.magazines.*`.
+
 ### Atualização aplicada em 19/06/2026 - revistas em português brasileiro
 
 - A banca digital pública passou a formatar meses com localização `pt_BR`, eliminando abreviações em inglês como `Feb`.

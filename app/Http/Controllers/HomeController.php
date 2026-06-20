@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Mentorship;
+use App\Models\Magazine;
 use App\Models\Page;
 use App\Models\Ranking;
 use App\Models\User;
@@ -20,6 +21,7 @@ class HomeController extends Controller
         $freeEvents = collect();
         $promotionalEvents = collect();
         $paidMentorings = collect();
+        $featuredMagazines = collect();
 
         if (view()->shared('unnDbAvailable')) {
             try {
@@ -55,6 +57,16 @@ class HomeController extends Controller
                     ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
                     ->take(3)
                     ->values();
+
+                $featuredMagazines = Magazine::query()
+                    ->where('status', 'published')
+                    ->where('is_featured', true)
+                    ->whereNotNull('thumbnail')
+                    ->where('thumbnail', '!=', '')
+                    ->orderByDesc('published_at')
+                    ->orderByDesc('id')
+                    ->limit(12)
+                    ->get();
             } catch (\Throwable $e) {
                 Log::warning('Falha ao carregar eventos/mentorias: ' . $e->getMessage());
             }
@@ -99,6 +111,7 @@ class HomeController extends Controller
             'freeEvents' => $freeEvents,
             'promotionalEvents' => $promotionalEvents,
             'paidMentorings' => $paidMentorings,
+            'featuredMagazines' => $featuredMagazines,
             'levelSummary' => $levelSummary,
             'topRankings' => $topRankings,
             'showNoRankingMsg' => $showNoRankingMsg,

@@ -6,6 +6,7 @@ use App\Mail\WelcomeMail;
 use App\Models\Order;
 use App\Models\Plan;
 use App\Models\User;
+use App\Rules\ValidEmailAddress;
 use App\Services\AffiliateTrackingService;
 use App\Services\Payment\MercadoPagoService;
 use Illuminate\Http\Request;
@@ -103,6 +104,9 @@ class SubscriptionController extends Controller
 
     public function process(Request $request, Plan $plan, AffiliateTrackingService $tracking)
     {
+        if ($request->filled('email')) {
+            $request->merge(['email' => mb_strtolower(trim((string) $request->input('email')))]);
+        }
         // Proteção contra double-submit
         if ($this->isDoubleSubmit("subscription:{$plan->id}", 15)) {
             return back()->with('error', 'Processando seu pagamento. Aguarde...');
@@ -154,7 +158,7 @@ class SubscriptionController extends Controller
             'gateway_provider' => 'nullable|string|in:mercadopago,sumup',
             'period' => 'nullable|string|in:mensal,trimestral,semestral,anual',
             'name' => Auth::check() ? 'nullable' : 'required|string|max:255',
-            'email' => Auth::check() ? 'nullable' : 'required|email|unique:users,email',
+            'email' => Auth::check() ? ['nullable'] : ['required', new ValidEmailAddress(), 'unique:users,email'],
             'cpf' => (Auth::check() && Auth::user()?->doc) ? 'nullable|string' : 'required|string',
             'password' => Auth::check() ? 'nullable' : 'required|min:8|confirmed',
             'token' => $requireMpCard ? 'required' : 'nullable',

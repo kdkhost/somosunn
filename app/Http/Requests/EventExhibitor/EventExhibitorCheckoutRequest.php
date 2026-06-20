@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\EventExhibitor;
 
+use App\Rules\ValidEmailAddress;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,7 +21,7 @@ class EventExhibitorCheckoutRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => [
                 'required',
-                'email',
+                new ValidEmailAddress(),
                 'max:255',
                 $guest ? Rule::unique('users', 'email') : 'nullable',
             ],
@@ -40,6 +41,10 @@ class EventExhibitorCheckoutRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        if ($this->filled('email')) {
+            $this->merge(['email' => mb_strtolower(trim((string) $this->input('email')))]);
+        }
+
         foreach (['phone', 'document', 'company_document'] as $field) {
             if ($this->has($field)) {
                 $this->merge([$field => trim((string) $this->input($field))]);

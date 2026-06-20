@@ -28,9 +28,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin/fonts')->name('admin.fonts.'
     Route::delete('/{font}', [\App\Http\Controllers\Admin\CustomFontController::class, 'destroy'])->name('destroy');
 });
 // Rota para checkout de assinatura (compatível com premium.blade.php) — sempre no início para garantir visibilidade
-Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('subscription.checkout');
-Route::post('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'process'])->name('subscription.process');
-Route::post('/assinar/{plan}/prepare-sumup', [\App\Http\Controllers\SubscriptionController::class, 'prepareSumUp'])->name('subscription.prepare-sumup')->middleware('auth');
+Route::get('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->middleware('purchase.eligible')->name('subscription.checkout');
+Route::post('/assinar/{plan}', [\App\Http\Controllers\SubscriptionController::class, 'process'])->middleware('purchase.eligible')->name('subscription.process');
+Route::post('/assinar/{plan}/prepare-sumup', [\App\Http\Controllers\SubscriptionController::class, 'prepareSumUp'])->middleware('purchase.eligible')->name('subscription.prepare-sumup');
 Route::get('/assinatura/sucesso/{order}', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
 
 use Illuminate\Support\Facades\Route;
@@ -132,11 +132,11 @@ Route::middleware(['auth', 'check.feature:events_edit'])->group(function () {
 Route::middleware(['auth', 'check.feature:events_delete'])->group(function () {
     Route::delete('/eventos/{event}', [\App\Http\Controllers\EventController::class, 'destroy'])->name('events.destroy');
 });
-Route::get('/eventos/{event}/checkout', [\App\Http\Controllers\EventReservationController::class, 'checkout'])->name('events.checkout');
-Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservationController::class, 'reserve'])->middleware('throttle:event_reservations')->name('events.reserve');
+Route::get('/eventos/{event}/checkout', [\App\Http\Controllers\EventReservationController::class, 'checkout'])->middleware('purchase.eligible')->name('events.checkout');
+Route::post('/eventos/{event}/reservar', [\App\Http\Controllers\EventReservationController::class, 'reserve'])->middleware(['throttle:event_reservations', 'purchase.eligible'])->name('events.reserve');
 Route::post('/eventos/{event}/entrar-no-grupo', [\App\Http\Controllers\EventGroupController::class, 'join'])->middleware(['auth', 'throttle:10,1'])->name('events.group.join');
-Route::get('/eventos/{event}/expositor', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'show'])->name('events.exhibitor.show');
-Route::post('/eventos/{event}/expositor/checkout', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'checkout'])->middleware('throttle:6,1')->name('events.exhibitor.checkout');
+Route::get('/eventos/{event}/expositor', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'show'])->middleware('purchase.eligible')->name('events.exhibitor.show');
+Route::post('/eventos/{event}/expositor/checkout', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'checkout'])->middleware(['throttle:6,1', 'purchase.eligible'])->name('events.exhibitor.checkout');
 Route::get('/eventos/{event}/expositor/sucesso/{order}', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'success'])->name('events.exhibitor.success');
 Route::get('/eventos/{event}/expositor/pendente/{order}', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'pending'])->name('events.exhibitor.pending');
 Route::get('/eventos/{event}/expositor/falha/{order}', [\App\Http\Controllers\EventExhibitorCheckoutController::class, 'failure'])->name('events.exhibitor.failure');
@@ -144,7 +144,7 @@ Route::get('/eventos/pagamento/sucesso/{order}', [\App\Http\Controllers\EventRes
 Route::get('/eventos/pagamento/pendente/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentPending'])->name('events.payment.pending');
 Route::get('/eventos/pagamento/falha/{order}', [\App\Http\Controllers\EventReservationController::class, 'paymentFailure'])->name('events.payment.failure');
 Route::get('/eventos/pagamento/selecionar-gateway/{order}', [\App\Http\Controllers\EventReservationController::class, 'selectGateway'])->name('events.payment.select-gateway');
-Route::post('/eventos/pagamento/processar-gateway/{order}', [\App\Http\Controllers\EventReservationController::class, 'processGateway'])->name('events.payment.process-gateway');
+Route::post('/eventos/pagamento/processar-gateway/{order}', [\App\Http\Controllers\EventReservationController::class, 'processGateway'])->middleware('purchase.eligible')->name('events.payment.process-gateway');
 
 // PWA & Utils
 Route::get('/service-worker.js', function () {
@@ -217,15 +217,15 @@ Route::post('courses/{course}/complete', [\App\Http\Controllers\CourseController
 // Mentorships (Public)
 Route::get('mentorships', [\App\Http\Controllers\MentorshipController::class, 'index'])->name('mentorships.index');
 Route::get('mentorships/{mentorship}', [\App\Http\Controllers\MentorshipController::class, 'show'])->name('mentorships.show');
-Route::get('mentorships/{mentorship}/checkout', [\App\Http\Controllers\MentorshipCheckoutController::class, 'show'])->name('mentorships.checkout.show');
-Route::post('mentorships/{mentorship}/checkout', [\App\Http\Controllers\MentorshipCheckoutController::class, 'process'])->name('mentorships.checkout.process');
+Route::get('mentorships/{mentorship}/checkout', [\App\Http\Controllers\MentorshipCheckoutController::class, 'show'])->middleware('purchase.eligible')->name('mentorships.checkout.show');
+Route::post('mentorships/{mentorship}/checkout', [\App\Http\Controllers\MentorshipCheckoutController::class, 'process'])->middleware('purchase.eligible')->name('mentorships.checkout.process');
 
 // Revistas (Public/Members) — flipbook viewer
-// Autenticacao exigida para leitura; a proteção de visibilidade ocorre no controller
+// Destaques publicados podem ser lidos publicamente; demais acessos seguem a visibilidade do controller.
 Route::middleware(['auth'])->group(function () {
     Route::get('revistas', [\App\Http\Controllers\MagazineController::class, 'index'])->name('magazines.index');
-    Route::get('revistas/{magazine:slug}', [\App\Http\Controllers\MagazineController::class, 'show'])->name('magazines.show');
 });
+Route::get('revistas/{magazine:slug}', [\App\Http\Controllers\MagazineController::class, 'show'])->name('magazines.show');
 
 // Reviews
 Route::post('courses/{course}/reviews', [\App\Http\Controllers\ItemReviewController::class, 'storeCourse'])->middleware(['auth', 'check.feature:courses_review'])->name('courses.reviews.store');
@@ -567,8 +567,8 @@ Route::get('/loja/carrinho', [\App\Http\Controllers\SellerProductCartController:
 Route::post('/loja/produtos/{product}/carrinho', [\App\Http\Controllers\SellerProductCartController::class, 'store'])->name('seller-products.cart.add');
 Route::post('/loja/carrinho', [\App\Http\Controllers\SellerProductCartController::class, 'update'])->name('seller-products.cart.update');
 Route::post('/loja/carrinho/limpar', [\App\Http\Controllers\SellerProductCartController::class, 'clear'])->name('seller-products.cart.clear');
-Route::get('/loja/checkout', [\App\Http\Controllers\SellerProductCheckoutController::class, 'show'])->name('seller-products.checkout.show');
-Route::post('/loja/checkout', [\App\Http\Controllers\SellerProductCheckoutController::class, 'process'])->name('seller-products.checkout.process');
+Route::get('/loja/checkout', [\App\Http\Controllers\SellerProductCheckoutController::class, 'show'])->middleware('purchase.eligible')->name('seller-products.checkout.show');
+Route::post('/loja/checkout', [\App\Http\Controllers\SellerProductCheckoutController::class, 'process'])->middleware('purchase.eligible')->name('seller-products.checkout.process');
 Route::get('/loja/{storeSlug}', [\App\Http\Controllers\SellerStorefrontController::class, 'show'])->name('seller-stores.show');
 Route::get('/loja/{storeSlug}/p/{productSlug}', [\App\Http\Controllers\SellerStorefrontController::class, 'product'])->name('seller-stores.products.show');
 
@@ -789,12 +789,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
 });
 
 // Checkout process
-Route::post('/checkout/process-payment', [\App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('checkout.process_payment');
-Route::post('/checkout/sumup/pix', [\App\Http\Controllers\CheckoutController::class, 'sumupPix'])->name('checkout.sumup.pix');
+Route::post('/checkout/process-payment', [\App\Http\Controllers\CheckoutController::class, 'processPayment'])->middleware('purchase.eligible')->name('checkout.process_payment');
+Route::post('/checkout/sumup/pix', [\App\Http\Controllers\CheckoutController::class, 'sumupPix'])->middleware('purchase.eligible')->name('checkout.sumup.pix');
 Route::get('/checkout/sumup/status', [\App\Http\Controllers\CheckoutController::class, 'sumupStatus'])->name('checkout.sumup.status');
-Route::post('/checkout/sumup/recreate', [\App\Http\Controllers\CheckoutController::class, 'sumupRecreateCheckout'])->name('checkout.sumup.recreate');
-Route::post('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
-Route::get('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
+Route::post('/checkout/sumup/recreate', [\App\Http\Controllers\CheckoutController::class, 'sumupRecreateCheckout'])->middleware('purchase.eligible')->name('checkout.sumup.recreate');
+Route::post('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'process'])->middleware('purchase.eligible')->name('checkout.process');
+Route::get('/checkout/{course}', [\App\Http\Controllers\CheckoutController::class, 'show'])->middleware('purchase.eligible')->name('checkout.show');
 Route::get('/checkout/sucesso/{order}', [\App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/pendente/{order}', [\App\Http\Controllers\CheckoutController::class, 'pending'])->name('checkout.pending');
 Route::get('/checkout/falha/{order}', [\App\Http\Controllers\CheckoutController::class, 'failure'])->name('checkout.failure');

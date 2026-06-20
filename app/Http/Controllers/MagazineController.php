@@ -98,6 +98,10 @@ class MagazineController extends Controller
             return true;
         }
 
+        if ($magazine->is_featured) {
+            return true;
+        }
+
         if (!$user) {
             return false;
         }

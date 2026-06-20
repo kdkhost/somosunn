@@ -9,18 +9,18 @@
             <div class="border-b border-slate-200 bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 px-6 py-5 text-white sm:px-8">
                 <div class="flex items-start justify-between gap-4">
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-blue-100">Consentimento obrigatorio</p>
+                        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-blue-100">Consentimento obrigatório</p>
                         <h2 class="mt-2 text-2xl font-black leading-tight">Aceite os termos de LGPD para continuar usando a plataforma</h2>
                     </div>
                     <span class="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-blue-50">
-                        versao {{ substr((string) ($lgpdConsent['version'] ?? ''), 0, 12) }}
+                        versão {{ substr((string) ($lgpdConsent['version'] ?? ''), 0, 12) }}
                     </span>
                 </div>
             </div>
 
             <div class="max-h-[70vh] overflow-y-auto px-6 py-6 sm:px-8">
                 <p class="text-sm leading-6 text-slate-600">
-                    Antes de prosseguir, confirme que voce leu e concorda com os documentos juridicos abaixo. O acesso continua bloqueado ate o registro do aceite.
+                    Antes de prosseguir, confirme que você leu e concorda com os documentos jurídicos abaixo. O acesso continua bloqueado até o registro do aceite.
                 </p>
 
                 <div class="mt-6 space-y-4">
@@ -52,7 +52,7 @@
                         <input id="lgpd-consent-checkbox" name="accept" value="1" type="checkbox" required
                             class="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
                         <span>
-                            Li e aceito os Termos de Uso, a Politica de Privacidade e o Consentimento LGPD, autorizando o tratamento dos meus dados conforme descrito nesses documentos.
+                            Li e aceito os Termos de Uso, a Política de Privacidade e o Consentimento LGPD, autorizando o tratamento dos meus dados conforme descrito nesses documentos.
                         </span>
                     </label>
                     <p id="lgpd-consent-error" class="mt-3 hidden text-sm font-semibold text-rose-600"></p>

@@ -641,6 +641,38 @@
         </section>
         @endif
 
+        @if(($featuredMagazines ?? collect())->isNotEmpty())
+        <section class="home-magazines py-16 w-full overflow-hidden" aria-labelledby="home-magazines-title">
+            <div class="unn-container">
+                <div class="mb-8 flex items-end justify-between gap-4">
+                    <div>
+                        <h2 id="home-magazines-title" class="text-3xl font-black text-gray-900">Revistas em destaque</h2>
+                        <p class="mt-2 text-gray-500">Selecione uma capa para abrir a revista.</p>
+                    </div>
+                    <div class="hidden items-center gap-2 sm:flex">
+                        <button type="button" class="home-magazines-arrow" data-magazines-direction="previous" aria-label="Capas anteriores" title="Capas anteriores">
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="home-magazines-arrow" data-magazines-direction="next" aria-label="Próximas capas" title="Próximas capas">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="home-magazines-carousel" class="home-magazines-track" tabindex="0" aria-label="Revistas em destaque">
+                    @foreach($featuredMagazines as $magazine)
+                        <a href="{{ route('magazines.show', $magazine->slug) }}"
+                            class="home-magazines-cover"
+                            aria-label="Ler {{ $magazine->title }}"
+                            title="Ler {{ $magazine->title }}">
+                            <img src="{{ $magazine->thumbnail_url }}" alt="Capa da revista {{ $magazine->title }}" loading="lazy">
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+        @endif
+
         <!-- Depoimentos -->
         @if($homePage->get('testimonials_enabled', true))
         <section class="py-16 w-full overflow-x-hidden">
@@ -827,6 +859,72 @@
             background: #ffffff;
         }
 
+        .home-magazines {
+            background: #f8fafc;
+        }
+
+        .home-magazines-track {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: clamp(150px, 18vw, 220px);
+            gap: 1rem;
+            overflow-x: auto;
+            overscroll-behavior-inline: contain;
+            scroll-behavior: smooth;
+            scroll-snap-type: inline mandatory;
+            scrollbar-width: none;
+            padding: 0.25rem 0.25rem 1rem;
+        }
+
+        .home-magazines-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        .home-magazines-cover {
+            aspect-ratio: 3 / 4;
+            display: block;
+            overflow: hidden;
+            border-radius: 6px;
+            background: #e2e8f0;
+            box-shadow: 0 12px 30px -12px rgba(15, 23, 42, 0.38);
+            scroll-snap-align: start;
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+
+        .home-magazines-cover:hover,
+        .home-magazines-cover:focus-visible {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 36px -14px rgba(15, 23, 42, 0.48);
+            outline: 3px solid rgba(31, 94, 219, 0.3);
+            outline-offset: 3px;
+        }
+
+        .home-magazines-cover img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .home-magazines-arrow {
+            width: 2.75rem;
+            height: 2.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 50%;
+            background: #fff;
+            color: #1e293b;
+            transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+        }
+
+        .home-magazines-arrow:hover {
+            border-color: var(--unn-azul-1);
+            color: var(--unn-azul-1);
+            background: #eff6ff;
+        }
+
         @media (max-width: 767.98px) {
             .home-selling-header,
             .home-selling-title,
@@ -836,4 +934,20 @@
             }
         }
     </style>
+
+    @if(($featuredMagazines ?? collect())->isNotEmpty())
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const carousel = document.getElementById('home-magazines-carousel');
+            if (!carousel) return;
+
+            document.querySelectorAll('[data-magazines-direction]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const direction = button.dataset.magazinesDirection === 'previous' ? -1 : 1;
+                    carousel.scrollBy({ left: direction * Math.max(240, carousel.clientWidth * 0.8), behavior: 'smooth' });
+                });
+            });
+        });
+    </script>
+    @endif
 @endsection

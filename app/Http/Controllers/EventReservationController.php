@@ -10,6 +10,7 @@ use App\Models\CouponRedemption;
 use App\Models\Plan;
 use App\Models\SumUpTransaction;
 use App\Models\User;
+use App\Rules\ValidEmailAddress;
 use App\Services\CouponService;
 use App\Services\EventCouponService;
 use App\Services\OrderSettlementService;
@@ -81,6 +82,9 @@ class EventReservationController extends Controller
 
     public function reserve(Request $request, Event $event, CouponService $couponService, EventCouponService $eventCouponService, \App\Services\Payment\MercadoPagoService $mpService, \App\Services\Payment\SumUpService $sumUpService, OrderSettlementService $orderSettlementService)
     {
+        if ($request->filled('email')) {
+            $request->merge(['email' => mb_strtolower(trim((string) $request->input('email')))]);
+        }
         $this->abortIfDisabledOrUnpublished($event);
 
         // Verificar suspensao de eventos (punicao por nao-entrega de resgate)
@@ -232,7 +236,7 @@ class EventReservationController extends Controller
         if (!$user) {
             $request->validate([
                 'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
+                'email' => ['required', new ValidEmailAddress(), 'unique:users,email'],
                 'cpf' => $requiresPayment ? 'required|string' : 'nullable|string',
                 'phone' => 'nullable|string|max:50',
                 'password' => 'required|min:8|confirmed',

@@ -26,7 +26,7 @@ class EnsureLgpdConsent
             return $next($request);
         }
 
-        $message = 'Voce precisa aceitar os termos de LGPD antes de continuar.';
+        $message = 'Você precisa aceitar os termos de LGPD antes de continuar.';
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([

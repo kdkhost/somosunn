@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\SumUpService;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Rules\ValidEmailAddress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -24,12 +25,16 @@ class SumUpController extends Controller
     public function createCheckout(Request $request)
     {
         try {
+            if ($request->filled('customer_email')) {
+                $request->merge(['customer_email' => mb_strtolower(trim((string) $request->input('customer_email')))]);
+            }
+
             $data = $request->validate([
                 'amount' => 'required|numeric|min:0.01',
                 'description' => 'required|string|max:255',
                 'reference' => 'required|string|max:100',
                 'return_url' => 'nullable|url',
-                'customer_email' => 'nullable|email',
+                'customer_email' => ['nullable', new ValidEmailAddress()],
                 'product_type' => 'nullable|string',
                 'user_type' => 'nullable|string',
             ]);

@@ -66,7 +66,7 @@ Route::prefix('v1/webhooks')->group(function () {
 // SumUp API Routes
 Route::prefix('v1/sumup')->group(function () {
     Route::post('/checkout', [App\Http\Controllers\SumUpController::class, 'createCheckout'])
-        ->middleware(['auth:sanctum', 'check.sumup.permissions'])
+        ->middleware(['auth:sanctum', 'purchase.eligible', 'check.sumup.permissions'])
         ->name('api.sumup.checkout');
     
     Route::get('/checkout/{checkoutId}', [App\Http\Controllers\SumUpController::class, 'getCheckout'])

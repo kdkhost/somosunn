@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PointsLog;
+use App\Rules\ValidEmailAddress;
 use App\Services\WatermarkService;
 use App\Services\PointsService;
 use Illuminate\Http\Request;
@@ -22,10 +23,11 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
         $wasProfileComplete = method_exists($user, 'isProfileComplete') ? $user->isProfileComplete() : false;
+        $request->merge(['email' => mb_strtolower(trim((string) $request->input('email')))]);
 
         $data = $request->validate([
             'name' => 'required|string|max:120',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => ['required', new ValidEmailAddress(), 'unique:users,email,' . $user->id],
             'password' => 'nullable|min:6|confirmed',
             'phone' => 'nullable|string|max:20',
             'doc' => 'nullable|string|max:20',
@@ -121,12 +123,25 @@ class ProfileController extends Controller
             unset($data['password']);
         }
 
+        $emailChanged = mb_strtolower((string) $user->email) !== $data['email'];
+
         // Salva os dados
         $user->fill($data);
+        if ($emailChanged) {
+            $user->forceFill(['email_verified_at' => null]);
+        }
         $saved = $user->save();
 
         // Força refresh do modelo
         $user->refresh();
+
+        if ($emailChanged) {
+            try {
+                $user->sendEmailVerificationNotification();
+            } catch (\Throwable $e) {
+                \Log::error('Falha ao enviar verificação do novo e-mail: ' . $e->getMessage());
+            }
+        }
 
         // Gamificação: pontuar completar perfil (apenas 1x)
         try {
@@ -148,7 +163,9 @@ class ProfileController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Perfil atualizado com sucesso!',
+                'message' => $emailChanged
+                    ? 'Perfil atualizado. Valide o novo e-mail antes de realizar compras.'
+                    : 'Perfil atualizado com sucesso!',
                 'photo_url' => $user->photo ? asset($user->photo) : null,
                 'cover_url' => $user->cover_photo ? asset($user->cover_photo) : null,
                 'debug' => [
@@ -161,6 +178,9 @@ class ProfileController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.profile.edit')->with('success', 'Perfil atualizado com sucesso!');
+        return redirect()->route('admin.profile.edit')->with(
+            'success',
+            $emailChanged ? 'Perfil atualizado. Valide o novo e-mail antes de realizar compras.' : 'Perfil atualizado com sucesso!'
+        );
     }
 }

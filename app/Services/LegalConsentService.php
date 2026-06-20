@@ -15,19 +15,19 @@ class LegalConsentService
             'slug' => 'termos-de-uso',
             'route' => 'site.termos',
             'title' => 'Termos de Uso',
-            'summary' => 'Regras de uso da plataforma, responsabilidades e condicoes aplicaveis ao acesso.',
+            'summary' => 'Regras de uso da plataforma, responsabilidades e condições aplicáveis ao acesso.',
         ],
         [
             'slug' => 'politica-de-privacidade',
             'route' => 'site.privacidade',
-            'title' => 'Politica de Privacidade',
-            'summary' => 'Como os dados pessoais sao coletados, tratados, armazenados e protegidos.',
+            'title' => 'Política de Privacidade',
+            'summary' => 'Como os dados pessoais são coletados, tratados, armazenados e protegidos.',
         ],
         [
             'slug' => 'consentimento-lgpd',
             'route' => 'site.lgpd',
             'title' => 'Consentimento LGPD',
-            'summary' => 'Direitos do titular e bases de consentimento conforme a legislacao brasileira.',
+            'summary' => 'Direitos do titular e bases de consentimento conforme a legislação brasileira.',
         ],
     ];
 

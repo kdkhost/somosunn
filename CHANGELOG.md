@@ -2,6 +2,35 @@
 
 ---
 
+## [2026-06-19] - feat(compras): exigir e-mail validado, consentimento e destacar revistas na home
+
+### Segurança e consentimento
+- Novos cadastros validam formato e existência do domínio do e-mail antes de criar a conta.
+- O cadastro público e a API exigem aceite dos Termos de Uso, da Política de Privacidade e do Consentimento LGPD, registrando a versão aceita.
+- Toda abertura ou processamento de compra exige conta autenticada, e-mail verificado e aceite da versão atual dos documentos legais.
+- A proteção compartilhada cobre assinaturas, cursos, eventos, expositor, mentorias, marketplace e criação de checkout SumUp pela API.
+- Ao alterar o e-mail no perfil ou na gestão de usuários, a verificação anterior é removida e uma nova confirmação é solicitada.
+
+### Home e revistas
+- Revistas publicadas e marcadas como destaque passaram a ser carregadas na home.
+- Um carrossel responsivo de capas foi adicionado logo abaixo do Ranking do networking e antes dos depoimentos.
+- O carrossel exibe somente as capas; cada capa abre diretamente o leitor da respectiva revista.
+- A leitura de revistas publicadas e destacadas foi liberada diretamente pela home; revistas não destacadas preservam as regras de visibilidade existentes.
+
+### Arquivos principais
+- `app/Rules/ValidEmailAddress.php`
+- `app/Http/Middleware/EnsurePurchaseEligibility.php`
+- `app/Http/Controllers/Auth/RegisterController.php`
+- `app/Http/Controllers/HomeController.php`
+- `resources/views/auth/register.blade.php`
+- `resources/views/site/index.blade.php`
+- `routes/web.php`
+- `routes/api.php`
+- `tests/Feature/PurchaseEligibilityTest.php`
+- `tests/Unit/ValidEmailAddressTest.php`
+
+---
+
 ## [2026-06-19] - fix(revistas): padronizar módulo em português brasileiro
 
 ### Corrigido
