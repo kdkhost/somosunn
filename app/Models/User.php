@@ -129,7 +129,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function canManageReceivingPixKey(): bool
     {
-        return $this->isAdmin() || $this->isMarketingManager();
+        return in_array($this->role, ['admin', 'superadmin'], true)
+            || $this->isMarketingManager();
     }
 
     public function canSellOnMarketplace(): bool

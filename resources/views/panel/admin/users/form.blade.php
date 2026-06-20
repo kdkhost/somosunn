@@ -238,6 +238,21 @@
     var doc = document.getElementById('panel-admin-user-doc');
     var personType = document.getElementById('panel-admin-user-person-type');
     var cep = document.getElementById('panel-admin-user-cep');
+    var role = document.querySelector('[name="role"]');
+    var pixContainer = document.getElementById('panel-admin-user-pix-container');
+    var pixKey = document.getElementById('panel-admin-user-pix-key');
+    function updatePixVisibility() {
+        if (!pixContainer || !pixKey) return;
+        var selectedRole = role ? role.value : pixContainer.dataset.currentRole;
+        var canReceive = pixContainer.dataset.marketingManager === '1'
+            || selectedRole === 'admin'
+            || selectedRole === 'superadmin';
+        pixContainer.classList.toggle('hidden', !canReceive);
+        pixKey.disabled = !canReceive;
+        pixKey.required = canReceive;
+    }
+    updatePixVisibility();
+    if (role) role.addEventListener('change', updatePixVisibility);
     if (phone) {
         phone.value = maskPhone(phone.value);
         phone.addEventListener('input', function () { phone.value = maskPhone(phone.value); });

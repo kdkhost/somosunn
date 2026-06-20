@@ -32,6 +32,9 @@ class UserRequest extends FormRequest
         $user = $this->route('user');
         $isCreating = !$user instanceof User;
         $featureKeys = array_keys(\App\Models\Plan::siteFeatureLabels());
+        $role = (string) ($this->input('role') ?: $user?->role ?: 'member');
+        $requiresPixKey = in_array($role, ['admin', 'superadmin'], true)
+            || ($user instanceof User && $user->isMarketingManager());
 
         return [
             'name' => ['required', 'string', 'max:120'],
@@ -65,7 +68,9 @@ class UserRequest extends FormRequest
             'twitter' => ['nullable', 'string', 'max:255'],
             'linkedin' => ['nullable', 'url', 'max:255'],
             'youtube' => ['nullable', 'url', 'max:255'],
-            'pix_key' => ['nullable', 'string', 'max:255'],
+            'pix_key' => $requiresPixKey
+                ? ['required', 'string', 'max:255']
+                : ['exclude'],
             'show_email_public' => ['required', 'boolean'],
             'show_phone_public' => ['required', 'boolean'],
             'show_address_public' => ['required', 'boolean'],

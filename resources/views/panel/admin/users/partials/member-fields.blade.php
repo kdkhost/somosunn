@@ -3,6 +3,9 @@
     $labelClass = 'block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2';
     $documentDigits = preg_replace('/\D/', '', (string) old('doc', $user->doc));
     $personType = old('person_type', strlen($documentDigits) > 11 ? 'J' : 'F');
+    $selectedRole = old('role', $user->role ?? 'member');
+    $isMarketingManager = $user->exists && $user->isMarketingManager();
+    $showPixKey = in_array($selectedRole, ['admin', 'superadmin'], true) || $isMarketingManager;
 @endphp
 
 <section class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 p-8 space-y-6">
@@ -60,9 +63,13 @@
             <label class="{{ $labelClass }}">Biografia</label>
             <textarea name="bio" rows="3" maxlength="500" class="{{ $inputClass }}">{{ old('bio', $user->bio) }}</textarea>
         </div>
-        <div class="md:col-span-2">
+        <div class="md:col-span-2 {{ $showPixKey ? '' : 'hidden' }}" id="panel-admin-user-pix-container"
+            data-marketing-manager="{{ $isMarketingManager ? '1' : '0' }}"
+            data-current-role="{{ $selectedRole }}">
             <label class="{{ $labelClass }}">Chave PIX para recebimentos</label>
-            <input name="pix_key" class="{{ $inputClass }}" value="{{ old('pix_key', $user->pix_key) }}">
+            <input name="pix_key" id="panel-admin-user-pix-key" class="{{ $inputClass }}" value="{{ old('pix_key', $user->pix_key) }}"
+                {{ $showPixKey ? 'required' : 'disabled' }}>
+            <small class="text-xs text-slate-400">Obrigatória para Super Admin, Administrador e responsável de marketing.</small>
         </div>
     </div>
 </section>

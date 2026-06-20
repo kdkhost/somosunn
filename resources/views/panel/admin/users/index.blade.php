@@ -268,6 +268,7 @@
                                             title="{{ $marketingUserId === $u->id ? 'Remover como Responsável de Marketing' : 'Definir como Responsável de Marketing' }}"
                                             data-url="{{ route('panel.admin.users.marketing-manager', $u) }}"
                                             data-action="{{ $marketingUserId === $u->id ? 'unset' : 'set' }}"
+                                            data-has-pix="{{ filled($u->pix_key) ? '1' : '0' }}"
                                             data-name="{{ $u->name }}">
                                             <i class="fas fa-bullhorn"></i>
                                         </button>
@@ -389,7 +390,8 @@ document.addEventListener('click', async function (event) {
     if (!button) return;
 
     const assigning = button.dataset.action === 'set';
-    const confirmed = await Swal.fire({
+    const requiresPix = assigning && button.dataset.hasPix !== '1';
+    const options = {
         icon: 'question',
         title: assigning ? 'Definir responsável de marketing?' : 'Remover responsável de marketing?',
         text: assigning
@@ -398,7 +400,15 @@ document.addEventListener('click', async function (event) {
         showCancelButton: true,
         confirmButtonText: assigning ? 'Definir' : 'Remover',
         cancelButtonText: 'Cancelar'
-    });
+    };
+    if (requiresPix) {
+        options.input = 'text';
+        options.inputLabel = 'Chave PIX obrigatória para recebimentos';
+        options.inputPlaceholder = 'E-mail, CPF, telefone ou chave aleatória';
+        options.inputValidator = value => value && value.trim() ? null : 'Informe a chave PIX.';
+    }
+
+    const confirmed = await Swal.fire(options);
 
     if (!confirmed.isConfirmed) return;
 
@@ -409,7 +419,10 @@ document.addEventListener('click', async function (event) {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         },
-        body: JSON.stringify({ action: button.dataset.action })
+        body: JSON.stringify({
+            action: button.dataset.action,
+            pix_key: confirmed.value || ''
+        })
     });
     const data = await response.json();
 

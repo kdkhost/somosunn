@@ -27,6 +27,8 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
         $firstMarketing = $this->user('member', 'marketing-1@unn.test', 'pix-marketing-antigo');
         $secondMarketing = $this->user('member', 'marketing-2@unn.test', null);
         $member = $this->user('member', 'member@unn.test', 'pix-legado');
+        $successfulMember = $this->user('member', 'successful-member@unn.test', null);
+        $successfulMember->update(['level' => 'sucesso']);
 
         Setting::set('platform_marketing_user_id', (string) $firstMarketing->id);
 
@@ -35,6 +37,7 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
         $this->assertTrue($firstMarketing->canManageReceivingPixKey());
         $this->assertFalse($secondMarketing->canManageReceivingPixKey());
         $this->assertFalse($member->canManageReceivingPixKey());
+        $this->assertFalse($successfulMember->canManageReceivingPixKey());
 
         Setting::set('platform_marketing_user_id', (string) $secondMarketing->id);
 
@@ -221,6 +224,19 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
             ->get(route('panel.profile.edit'))
             ->assertOk()
             ->assertSee('name="pix_key"', false);
+    }
+
+    public function test_authorized_profile_requires_pix_key(): void
+    {
+        $admin = $this->user('admin', 'admin-required-pix@unn.test');
+
+        $this->withoutMiddleware()
+            ->actingAs($admin)
+            ->post(route('panel.profile.update'), [
+                'name' => $admin->name,
+                'email' => $admin->email,
+            ])
+            ->assertSessionHasErrors('pix_key');
     }
 
     private function assertSplit(Order $order, string $type, User $receiver, string $pixKey, float $amount, float $percentage, string $status): void

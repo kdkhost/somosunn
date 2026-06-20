@@ -166,6 +166,7 @@
                                                 title="{{ $marketingUserId === $user->id ? 'Remover como Responsavel de Marketing' : 'Definir como Responsavel de Marketing' }}"
                                                 data-url="{{ route('admin.users.marketing-manager', $user) }}"
                                                 data-user-name="{{ $user->name }}"
+                                                data-has-pix="{{ filled($user->pix_key) ? '1' : '0' }}"
                                                 data-is-current="{{ $marketingUserId === $user->id ? '1' : '0' }}">
                                                 <i class="fas fa-bullhorn"></i>
                                             </button>
@@ -271,13 +272,14 @@
                 var userName = btn.data('user-name');
                 var isCurrent = btn.data('is-current') === 1 || btn.data('is-current') === '1';
                 var action = isCurrent ? 'unset' : 'set';
+                var requiresPix = !isCurrent && String(btn.data('has-pix')) !== '1';
 
                 var confirmText = isCurrent
                     ? 'Remover ' + userName + ' como Responsavel de Marketing?'
                     : 'Definir ' + userName + ' como Responsavel de Marketing? Um email e uma notificacao serao enviados.';
 
                 if (typeof Swal !== 'undefined') {
-                    Swal.fire({
+                    var options = {
                         title: isCurrent ? 'Remover Responsavel?' : 'Definir Responsavel?',
                         text: confirmText,
                         icon: 'question',
@@ -285,21 +287,33 @@
                         confirmButtonText: isCurrent ? 'Sim, remover' : 'Sim, definir',
                         cancelButtonText: 'Cancelar',
                         confirmButtonColor: isCurrent ? '#dc3545' : '#17a2b8',
-                    }).then(function (result) {
+                    };
+                    if (requiresPix) {
+                        options.input = 'text';
+                        options.inputLabel = 'Chave PIX obrigatória para recebimentos';
+                        options.inputPlaceholder = 'E-mail, CPF, telefone ou chave aleatória';
+                        options.inputValidator = function (value) {
+                            return value && value.trim() ? null : 'Informe a chave PIX.';
+                        };
+                    }
+                    Swal.fire(options).then(function (result) {
                         if (!result.isConfirmed) return;
-                        performToggle();
+                        performToggle(result.value || '');
                     });
                 } else if (confirm(confirmText)) {
-                    performToggle();
+                    var pixKey = requiresPix ? prompt('Informe a chave PIX obrigatória:') : '';
+                    if (requiresPix && (!pixKey || !pixKey.trim())) return;
+                    performToggle(pixKey || '');
                 }
 
-                function performToggle() {
+                function performToggle(pixKey) {
                     $.ajax({
                         url: url,
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
                             action: action,
+                            pix_key: pixKey,
                         },
                     }).done(function (resp) {
                         if (typeof toastr !== 'undefined') {

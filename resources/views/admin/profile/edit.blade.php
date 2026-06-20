@@ -217,8 +217,8 @@
                                         (Split)</label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control border-primary" id="inputPix" name="pix_key"
-                                            value="{{ $user->pix_key }}" placeholder="E-mail, CPF, Celular ou Aleatória">
-                                        <small class="text-muted">Chave PIX utilizada nos splits destinados ao seu perfil.</small>
+                                            value="{{ $user->pix_key }}" placeholder="E-mail, CPF, Celular ou Aleatória" required>
+                                        <small class="text-muted">Campo obrigatório. Chave PIX utilizada nos splits destinados ao seu perfil.</small>
                                     </div>
                                 </div>
                                 @endif

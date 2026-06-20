@@ -2,6 +2,30 @@
 
 ---
 
+## [2026-06-20] - fix(usuários): restringir e exigir chave PIX de recebimentos
+
+### Corrigido
+- O campo de chave PIX deixou de ser exibido para membros comuns nos cadastros administrativos e perfis.
+- Somente contas com papel `admin`, `superadmin` ou o usuário atualmente definido como responsável de marketing podem visualizar e alterar a chave.
+- A chave PIX passou a ser obrigatória para esses três destinatários de repasses, com validação também no servidor.
+- A nomeação de um responsável de marketing sem chave PIX agora solicita o preenchimento antes de concluir a atribuição.
+- Níveis de gamificação, inclusive `sucesso`, não concedem mais acesso ao campo PIX.
+
+### Arquivos principais
+- `app/Models/User.php`
+- `app/Http/Requests/Admin/UserRequest.php`
+- `app/Http/Controllers/Admin/UserController.php`
+- `app/Http/Controllers/Admin/ProfileController.php`
+- `app/Http/Controllers/Panel/ProfileController.php`
+- `resources/views/admin/users/*`
+- `resources/views/panel/admin/users/*`
+- `resources/views/admin/profile/edit.blade.php`
+- `resources/views/panel/profile/edit.blade.php`
+- `tests/Feature/ReceivingPixKeyAndSplitsTest.php`
+- `tests/Feature/AdminUserManagementTest.php`
+
+---
+
 ## [2026-06-19] - feat(usuários): cadastro administrativo completo e validação de e-mail
 
 ### Adicionado

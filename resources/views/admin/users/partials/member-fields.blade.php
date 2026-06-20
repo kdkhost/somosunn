@@ -1,6 +1,9 @@
 @php
     $documentDigits = preg_replace('/\D/', '', (string) old('doc', $user->doc));
     $personType = old('person_type', strlen($documentDigits) > 11 ? 'J' : 'F');
+    $selectedRole = old('role', $user->role ?? 'member');
+    $isMarketingManager = $user->exists && $user->isMarketingManager();
+    $showPixKey = in_array($selectedRole, ['admin', 'superadmin'], true) || $isMarketingManager;
 @endphp
 
 <hr class="my-4">
@@ -55,9 +58,14 @@
         <input name="interests" class="form-control" value="{{ old('interests', $user->interests) }}"
             placeholder="Networking, cursos, eventos">
     </div>
-    <div class="form-group col-md-6">
+    <div class="form-group col-md-6" id="admin-user-pix-container"
+        data-marketing-manager="{{ $isMarketingManager ? '1' : '0' }}"
+        data-current-role="{{ $selectedRole }}"
+        style="{{ $showPixKey ? '' : 'display:none;' }}">
         <label>Chave PIX para recebimentos</label>
-        <input name="pix_key" class="form-control" value="{{ old('pix_key', $user->pix_key) }}">
+        <input name="pix_key" id="admin-user-pix-key" class="form-control" value="{{ old('pix_key', $user->pix_key) }}"
+            {{ $showPixKey ? 'required' : 'disabled' }}>
+        <small class="form-text text-muted">Obrigatória para Super Admin, Administrador e responsável de marketing.</small>
     </div>
     <div class="form-group col-12">
         <label>Biografia</label>

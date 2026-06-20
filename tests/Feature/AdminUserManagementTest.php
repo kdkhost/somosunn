@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -64,5 +65,64 @@ class AdminUserManagementTest extends TestCase
 
         $response->assertRedirect();
         $this->assertNotNull($member->fresh()->email_verified_at);
+    }
+
+    public function test_pix_key_is_hidden_for_member_and_visible_for_authorized_recipients(): void
+    {
+        $operator = User::factory()->create(['role' => 'superadmin']);
+        $member = User::factory()->create(['role' => 'member']);
+        $admin = User::factory()->create(['role' => 'admin']);
+        $marketing = User::factory()->create(['role' => 'member']);
+        Setting::set('platform_marketing_user_id', (string) $marketing->id);
+
+        $this->actingAs($operator)
+            ->get(route('admin.users.edit', $member))
+            ->assertOk()
+            ->assertSee('id="admin-user-pix-container"', false)
+            ->assertSee('style="display:none;"', false)
+            ->assertSee('disabled', false);
+
+        $this->get(route('admin.users.edit', $admin))
+            ->assertOk()
+            ->assertSee('name="pix_key"', false)
+            ->assertSee('required', false);
+
+        $this->get(route('panel.admin.users.edit', $marketing))
+            ->assertOk()
+            ->assertSee('name="pix_key"', false)
+            ->assertSee('required', false);
+    }
+
+    public function test_admin_or_superadmin_registration_requires_pix_key(): void
+    {
+        $operator = User::factory()->create(['role' => 'superadmin']);
+
+        $this->actingAs($operator)->postJson(route('admin.users.store'), [
+            'name' => 'Administrador sem PIX',
+            'email' => 'admin-sem-pix@example.com',
+            'password' => 'senha-segura',
+            'password_confirmation' => 'senha-segura',
+            'email_verified' => true,
+            'role' => 'admin',
+            'level' => 'iniciante',
+        ])->assertUnprocessable()->assertJsonValidationErrors('pix_key');
+    }
+
+    public function test_marketing_manager_assignment_requires_and_stores_pix_key(): void
+    {
+        $operator = User::factory()->create(['role' => 'superadmin']);
+        $member = User::factory()->create(['role' => 'member', 'pix_key' => null]);
+
+        $this->actingAs($operator)->postJson(route('admin.users.marketing-manager', $member), [
+            'action' => 'set',
+        ])->assertUnprocessable()->assertJsonValidationErrors('pix_key');
+
+        $this->postJson(route('admin.users.marketing-manager', $member), [
+            'action' => 'set',
+            'pix_key' => 'pix-marketing-obrigatorio',
+        ])->assertOk();
+
+        $this->assertSame('pix-marketing-obrigatorio', $member->fresh()->pix_key);
+        $this->assertSame((string) $member->id, Setting::get('platform_marketing_user_id'));
     }
 }

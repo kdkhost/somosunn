@@ -207,6 +207,16 @@ class UserController extends Controller
             ]);
         }
 
+        if (blank($user->pix_key)) {
+            $validated = $request->validate([
+                'pix_key' => ['required', 'string', 'max:255'],
+            ], [
+                'pix_key.required' => 'Informe a chave PIX antes de definir o responsável de marketing.',
+            ]);
+
+            $user->forceFill(['pix_key' => trim($validated['pix_key'])])->save();
+        }
+
         // Remover do anterior se houver (respeitando plano)
         if ($currentId > 0 && $currentId !== $user->id) {
             $previousUser = User::find($currentId);

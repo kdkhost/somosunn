@@ -63,8 +63,9 @@
                         PIX (Para recebimento de Split)</label>
                     <input id="profile_pix_key" name="pix_key" value="{{ old('pix_key', $user->pix_key) }}"
                         placeholder="E-mail, CPF, Celular ou Chave Aleatória"
+                        required
                         class="mt-1 w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
-                    <small class="text-slate-500 dark:text-slate-400 mt-1 block">Esta chave será utilizada nos splits destinados ao seu perfil.</small>
+                    <small class="text-slate-500 dark:text-slate-400 mt-1 block">Campo obrigatório. Esta chave será utilizada nos splits destinados ao seu perfil.</small>
                 </div>
                 @endif
                 <div class="md:col-span-2">

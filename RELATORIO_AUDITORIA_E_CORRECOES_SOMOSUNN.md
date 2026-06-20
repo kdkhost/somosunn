@@ -2,7 +2,17 @@
 
 ## Painéis Administrativos
 
-Data de atualização: 19/06/2026
+Data de atualização: 20/06/2026
+
+### Atualização aplicada em 20/06/2026 - restrição da chave PIX de recebimentos
+
+- A regra compartilhada `User::canManageReceivingPixKey()` passou a considerar exclusivamente os papéis `admin`, `superadmin` e o usuário configurado em `platform_marketing_user_id`.
+- Níveis de gamificação não concedem acesso à chave PIX.
+- Os formulários `/admin/users/*` e `/painel/admin/users/*` ocultam e desabilitam o campo para membros comuns, exibindo-o dinamicamente apenas quando o papel selecionado exige recebimentos.
+- `Admin\UserRequest`, `Admin\ProfileController` e `Panel\ProfileController` exigem a chave para destinatários autorizados e descartam o campo quando enviado por membro comum.
+- A definição do responsável de marketing nos dois painéis exige e grava uma chave PIX antes de ativar a responsabilidade.
+- As interfaces AdminLTE e Tailwind permanecem distintas e compartilham a mesma regra do model e a mesma validação administrativa.
+- Nenhuma rota, permissão existente ou estrutura de banco foi alterada.
 
 ### Atualização aplicada em 19/06/2026 - cadastro administrativo completo de membros
 
