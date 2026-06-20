@@ -8,7 +8,7 @@ Data de atualização: 19/06/2026
 
 - A implementação server-side existente estava publicada, mas a entrada pelo menu usava PJAX e não carregava os assets declarados em `@push('styles')` e `@push('scripts')`.
 - O link do menu e o prefixo `/admin/cron` agora exigem carregamento completo da página.
-- DataTables, Bootstrap 4 Responsive e idioma PT-BR foram internalizados em `public/vendor/datatables` para eliminar dependência de CDN e bloqueadores do navegador.
+- DataTables, Bootstrap 4 Responsive e idioma PT-BR foram internalizados em `public/assets/admin/datatables` para eliminar dependência de CDN, bloqueadores do navegador e o bloqueio HTTP reservado ao caminho `/vendor`.
 - Preservados o controller compartilhado de tarefas, o endpoint `admin.cron.data`, as permissões administrativas e todas as rotas `admin.cron.*`.
 - O painel moderno `/painel/admin/cron` permanece funcional com sua interface Tailwind própria; a paginação DataTables é exclusiva da listagem AdminLTE em `/admin/cron`.
 

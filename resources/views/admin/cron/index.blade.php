@@ -7,8 +7,8 @@
 @endsection
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('vendor/datatables/responsive.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/datatables/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/datatables/responsive.bootstrap4.min.css') }}">
     <style>
         .blink_me {
             animation: blinker 2s linear infinite;
@@ -153,10 +153,10 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables/dataTables.responsive.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables/responsive.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/datatables/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/datatables/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/datatables/responsive.bootstrap4.min.js') }}"></script>
     <script>
         $(function () {
             const table = $('#cron-tasks-table').DataTable({
@@ -192,7 +192,7 @@
                     { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-right' }
                 ],
                 language: {
-                    url: '{{ asset('vendor/datatables/pt-BR.json') }}',
+                    url: '{{ asset('assets/admin/datatables/pt-BR.json') }}',
                     emptyTable: `
                         <div class="text-center py-5 text-muted">
                             <i class="fas fa-clock fa-3x mb-3 d-block"></i>

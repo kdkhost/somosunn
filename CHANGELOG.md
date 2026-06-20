@@ -6,7 +6,7 @@
 
 ### Corrigido
 - `/admin/cron` deixou de ser aberto por PJAX, pois a navegação parcial descartava os scripts e estilos empilhados do DataTables.
-- Os arquivos do DataTables, integração Bootstrap 4, responsividade e tradução PT-BR passaram a ser servidos localmente em `public/vendor/datatables`, sem dependência do CDN no navegador.
+- Os arquivos do DataTables, integração Bootstrap 4, responsividade e tradução PT-BR passaram a ser servidos localmente em `public/assets/admin/datatables`, sem dependência do CDN no navegador e sem conflito com o bloqueio HTTP de `/vendor`.
 - A tabela continua usando processamento server-side pelo endpoint `admin.cron.data`, com paginação, busca, ordenação e seletor de quantidade.
 - Adicionada mensagem visível quando a consulta AJAX falhar, em vez de deixar a tabela vazia.
 - Criado teste de contrato para preservar rota, assets locais e bloqueio de PJAX.
@@ -15,7 +15,7 @@
 - `resources/views/admin/cron/index.blade.php`
 - `resources/views/admin/partials/sidebar.blade.php`
 - `resources/views/admin/layouts/app.blade.php`
-- `public/vendor/datatables/*`
+- `public/assets/admin/datatables/*`
 - `tests/Feature/CronPanelDataTablesTest.php`
 
 ---
