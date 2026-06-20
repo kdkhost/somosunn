@@ -102,12 +102,18 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
 
         app(OrderSplitService::class)->syncForPaidOrder($order);
 
-        $this->assertSame(3, OrderSplit::where('order_id', $order->id)->count());
-        $this->assertSplit($order, 'seller', $adminSeller, 'pix-admin-seller', 80, 80, 'paid');
-        $this->assertSplit($order, 'traffic', $marketing, 'pix-marketing', 10, 10, 'pending');
-        $this->assertSplit($order, 'superadmin', $superadmin, 'pix-superadmin', 10, 10, 'pending');
-        $this->assertSame('20.00', $order->fresh()->platform_fee_amount);
-        $this->assertSame(20.0, (float) data_get($order->fresh()->metadata, 'platform_fee_percent'));
+        $this->assertSame(1, OrderSplit::where('order_id', $order->id)->count());
+        $this->assertSplit($order, 'seller', $adminSeller, 'pix-admin-seller', 100, 100, 'paid');
+        $this->assertDatabaseMissing('order_splits', [
+            'order_id' => $order->id,
+            'receiver_type' => 'traffic',
+        ]);
+        $this->assertDatabaseMissing('order_splits', [
+            'order_id' => $order->id,
+            'receiver_type' => 'superadmin',
+        ]);
+        $this->assertSame('0.00', $order->fresh()->platform_fee_amount);
+        $this->assertSame(0.0, (float) data_get($order->fresh()->metadata, 'platform_fee_percent'));
     }
 
     public function test_superadmin_seller_keeps_superadmin_share_and_only_deducts_external_shares(): void
@@ -130,11 +136,18 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
 
         app(OrderSplitService::class)->syncForPaidOrder($order);
 
-        $this->assertSame(3, OrderSplit::where('order_id', $order->id)->count());
-        $this->assertSplit($order, 'seller', $superadminSeller, 'pix-superadmin-seller', 80, 80, 'paid');
-        $this->assertSplit($order, 'platform', $admin, 'pix-admin', 10, 10, 'pending');
-        $this->assertSplit($order, 'traffic', $marketing, 'pix-marketing', 10, 10, 'pending');
-        $this->assertSame('20.00', $order->fresh()->platform_fee_amount);
+        $this->assertSame(1, OrderSplit::where('order_id', $order->id)->count());
+        $this->assertSplit($order, 'seller', $superadminSeller, 'pix-superadmin-seller', 100, 100, 'paid');
+        $this->assertDatabaseMissing('order_splits', [
+            'order_id' => $order->id,
+            'receiver_type' => 'platform',
+        ]);
+        $this->assertDatabaseMissing('order_splits', [
+            'order_id' => $order->id,
+            'receiver_type' => 'traffic',
+        ]);
+        $this->assertSame('0.00', $order->fresh()->platform_fee_amount);
+        $this->assertSame(0.0, (float) data_get($order->fresh()->metadata, 'platform_fee_percent'));
     }
 
     public function test_marketing_manager_seller_keeps_traffic_share_and_only_deducts_external_shares(): void
@@ -157,11 +170,46 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
 
         app(OrderSplitService::class)->syncForPaidOrder($order);
 
-        $this->assertSame(3, OrderSplit::where('order_id', $order->id)->count());
-        $this->assertSplit($order, 'seller', $sellerMarketing, 'pix-seller-marketing', 80, 80, 'paid');
-        $this->assertSplit($order, 'platform', $admin, 'pix-admin', 10, 10, 'pending');
-        $this->assertSplit($order, 'superadmin', $superadmin, 'pix-superadmin', 10, 10, 'pending');
-        $this->assertSame('20.00', $order->fresh()->platform_fee_amount);
+        $this->assertSame(1, OrderSplit::where('order_id', $order->id)->count());
+        $this->assertSplit($order, 'seller', $sellerMarketing, 'pix-seller-marketing', 100, 100, 'paid');
+        $this->assertDatabaseMissing('order_splits', [
+            'order_id' => $order->id,
+            'receiver_type' => 'platform',
+        ]);
+        $this->assertDatabaseMissing('order_splits', [
+            'order_id' => $order->id,
+            'receiver_type' => 'superadmin',
+        ]);
+        $this->assertSame('0.00', $order->fresh()->platform_fee_amount);
+        $this->assertSame(0.0, (float) data_get($order->fresh()->metadata, 'platform_fee_percent'));
+    }
+
+    public function test_member_with_platform_fee_disabled_keeps_full_sale_value(): void
+    {
+        $buyer = $this->user('member', 'buyer-fee-disabled@unn.test');
+        $seller = $this->user('member', 'seller-fee-disabled@unn.test', 'pix-seller');
+        $this->user('admin', 'admin-fee-disabled@unn.test', 'pix-admin');
+        $this->user('superadmin', 'superadmin-fee-disabled@unn.test', 'pix-superadmin');
+        $marketing = $this->user('member', 'marketing-fee-disabled@unn.test', 'pix-marketing');
+
+        $seller->forceFill(['platform_fee_enabled' => false])->save();
+        Setting::set('platform_marketing_user_id', (string) $marketing->id);
+
+        $order = Order::create([
+            'user_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'status' => 'paid',
+            'total_amount' => 250,
+            'currency' => 'BRL',
+            'gateway' => 'sumup',
+        ]);
+
+        app(OrderSplitService::class)->syncForPaidOrder($order);
+
+        $this->assertSame(1, OrderSplit::where('order_id', $order->id)->count());
+        $this->assertSplit($order, 'seller', $seller, 'pix-seller', 250, 100, 'paid');
+        $this->assertSame('0.00', $order->fresh()->platform_fee_amount);
+        $this->assertSame(0.0, (float) data_get($order->fresh()->metadata, 'platform_fee_percent'));
     }
 
     public function test_free_paid_order_has_no_splits_and_updates_effective_percentage(): void
@@ -188,7 +236,7 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
 
         $this->assertSame(0, OrderSplit::where('order_id', $order->id)->count());
         $this->assertSame('0.00', $order->fresh()->platform_fee_amount);
-        $this->assertSame(20.0, (float) data_get($order->fresh()->metadata, 'platform_fee_percent'));
+        $this->assertSame(0.0, (float) data_get($order->fresh()->metadata, 'platform_fee_percent'));
     }
 
     public function test_regular_member_cannot_change_pix_key_through_profile_endpoint(): void
@@ -261,6 +309,7 @@ class ReceivingPixKeyAndSplitsTest extends TestCase
             'role' => $role,
             'level' => $role === 'superadmin' ? 'superadmin' : 'iniciante',
             'pix_key' => $pixKey,
+            'platform_fee_enabled' => true,
         ]);
     }
 }

@@ -4,6 +4,9 @@
     $selectedRole = old('role', $user->role ?? 'member');
     $isMarketingManager = $user->exists && $user->isMarketingManager();
     $showPixKey = in_array($selectedRole, ['admin', 'superadmin'], true) || $isMarketingManager;
+    $canManagePlatformFee = auth()->user()?->role === 'superadmin';
+    $platformFeeExemptRole = in_array($selectedRole, ['admin', 'superadmin'], true) || $isMarketingManager;
+    $platformFeeEnabled = old('platform_fee_enabled', $user->platform_fee_enabled ?? true);
 @endphp
 
 <hr class="my-4">
@@ -67,6 +70,24 @@
             {{ $showPixKey ? 'required' : 'disabled' }}>
         <small class="form-text text-muted">Obrigatória para Super Admin, Administrador e responsável de marketing.</small>
     </div>
+    @if($canManagePlatformFee)
+        <div class="form-group col-md-6" id="admin-user-platform-fee-container"
+            data-current-role="{{ $selectedRole }}"
+            data-marketing-manager="{{ $isMarketingManager ? '1' : '0' }}"
+            style="{{ $platformFeeExemptRole ? 'display:none;' : '' }}">
+            <input type="hidden" name="platform_fee_enabled" value="0">
+            <div class="custom-control custom-switch border rounded p-3 pl-5 bg-light">
+                <input type="checkbox" class="custom-control-input" id="admin-user-platform-fee-enabled"
+                    name="platform_fee_enabled" value="1" {{ $platformFeeEnabled ? 'checked' : '' }}>
+                <label class="custom-control-label font-weight-bold" for="admin-user-platform-fee-enabled">
+                    Cobrar taxa da plataforma deste membro
+                </label>
+                <small class="d-block text-muted mt-1">
+                    Admin, Super Admin e responsável de marketing ficam isentos por padrão e não exibem este controle.
+                </small>
+            </div>
+        </div>
+    @endif
     <div class="form-group col-12">
         <label>Biografia</label>
         <textarea name="bio" class="form-control" rows="3" maxlength="500">{{ old('bio', $user->bio) }}</textarea>

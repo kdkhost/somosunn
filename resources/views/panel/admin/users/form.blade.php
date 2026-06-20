@@ -241,6 +241,7 @@
     var role = document.querySelector('[name="role"]');
     var pixContainer = document.getElementById('panel-admin-user-pix-container');
     var pixKey = document.getElementById('panel-admin-user-pix-key');
+    var platformFeeContainer = document.getElementById('panel-admin-user-platform-fee-container');
     function updatePixVisibility() {
         if (!pixContainer || !pixKey) return;
         var selectedRole = role ? role.value : pixContainer.dataset.currentRole;
@@ -250,6 +251,12 @@
         pixContainer.classList.toggle('hidden', !canReceive);
         pixKey.disabled = !canReceive;
         pixKey.required = canReceive;
+        if (platformFeeContainer) {
+            var feeExempt = platformFeeContainer.dataset.marketingManager === '1'
+                || selectedRole === 'admin'
+                || selectedRole === 'superadmin';
+            platformFeeContainer.classList.toggle('hidden', feeExempt);
+        }
     }
     updatePixVisibility();
     if (role) role.addEventListener('change', updatePixVisibility);

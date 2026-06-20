@@ -49,16 +49,8 @@ final class MarketplaceFee
             return min(100, $percent);
         }
 
-        if ($seller->isAdmin() && !$seller->isSuperAdmin()) {
-            $percent -= static::splitPercent('marketplace_split_platform_percent', 10);
-        }
-
-        if ($seller->isSuperAdmin()) {
-            $percent -= static::splitPercent('marketplace_split_superadmin_percent', 10);
-        }
-
-        if ($seller->isMarketingManager()) {
-            $percent -= static::splitPercent('marketplace_split_traffic_percent', 10);
+        if (!$seller->shouldChargePlatformFee()) {
+            return 0.0;
         }
 
         return min(100, max(0, $percent));

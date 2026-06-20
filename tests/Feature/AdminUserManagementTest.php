@@ -51,6 +51,7 @@ class AdminUserManagementTest extends TestCase
         $this->assertSame('12345678900', $member->doc);
         $this->assertSame('Empresa Exemplo', $member->company);
         $this->assertSame('Rio de Janeiro', $member->city);
+        $this->assertTrue((bool) $member->platform_fee_enabled);
     }
 
     public function test_admin_can_verify_member_email_manually_in_modern_panel(): void
@@ -80,12 +81,14 @@ class AdminUserManagementTest extends TestCase
             ->assertOk()
             ->assertSee('id="admin-user-pix-container"', false)
             ->assertSee('style="display:none;"', false)
-            ->assertSee('disabled', false);
+            ->assertSee('disabled', false)
+            ->assertSee('name="platform_fee_enabled"', false);
 
         $this->get(route('admin.users.edit', $admin))
             ->assertOk()
             ->assertSee('name="pix_key"', false)
-            ->assertSee('required', false);
+            ->assertSee('required', false)
+            ->assertDontSee('Cobrar taxa da plataforma deste membro', false);
 
         $this->get(route('panel.admin.users.edit', $marketing))
             ->assertOk()
@@ -124,5 +127,73 @@ class AdminUserManagementTest extends TestCase
 
         $this->assertSame('pix-marketing-obrigatorio', $member->fresh()->pix_key);
         $this->assertSame((string) $member->id, Setting::get('platform_marketing_user_id'));
+        $this->assertFalse((bool) $member->fresh()->platform_fee_enabled);
+    }
+
+    public function test_superadmin_can_toggle_platform_fee_for_regular_member_only(): void
+    {
+        $operator = User::factory()->create(['role' => 'superadmin']);
+        $member = User::factory()->create(['role' => 'member', 'platform_fee_enabled' => true]);
+
+        $this->actingAs($operator)->putJson(route('admin.users.update', $member), [
+            'name' => $member->name,
+            'email' => $member->email,
+            'email_verified' => true,
+            'role' => 'member',
+            'level' => 'iniciante',
+            'platform_fee_enabled' => false,
+            'show_email_public' => false,
+            'show_phone_public' => false,
+            'show_address_public' => false,
+            'hide_profile' => false,
+        ])->assertOk();
+
+        $this->assertFalse((bool) $member->fresh()->platform_fee_enabled);
+    }
+
+    public function test_non_superadmin_cannot_disable_platform_fee_for_member(): void
+    {
+        $operator = User::factory()->create(['role' => 'admin']);
+        $member = User::factory()->create(['role' => 'member', 'platform_fee_enabled' => true]);
+
+        $this->actingAs($operator)->putJson(route('admin.users.update', $member), [
+            'name' => $member->name,
+            'email' => $member->email,
+            'email_verified' => true,
+            'role' => 'member',
+            'level' => 'iniciante',
+            'platform_fee_enabled' => false,
+            'show_email_public' => false,
+            'show_phone_public' => false,
+            'show_address_public' => false,
+            'hide_profile' => false,
+        ])->assertOk();
+
+        $this->assertTrue((bool) $member->fresh()->platform_fee_enabled);
+    }
+
+    public function test_admin_and_superadmin_are_saved_without_platform_fee(): void
+    {
+        $operator = User::factory()->create(['role' => 'superadmin']);
+
+        $this->actingAs($operator)->postJson(route('admin.users.store'), [
+            'name' => 'Admin Isento',
+            'email' => 'admin-isento@example.com',
+            'password' => 'senha-segura',
+            'password_confirmation' => 'senha-segura',
+            'email_verified' => true,
+            'role' => 'admin',
+            'level' => 'iniciante',
+            'pix_key' => 'pix-admin-isento',
+            'platform_fee_enabled' => true,
+            'show_email_public' => false,
+            'show_phone_public' => false,
+            'show_address_public' => false,
+            'hide_profile' => false,
+        ])->assertOk();
+
+        $admin = User::where('email', 'admin-isento@example.com')->firstOrFail();
+
+        $this->assertFalse((bool) $admin->platform_fee_enabled);
     }
 }

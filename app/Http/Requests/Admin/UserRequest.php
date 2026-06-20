@@ -20,6 +20,7 @@ class UserRequest extends FormRequest
             'email' => mb_strtolower(trim((string) $this->input('email'))),
             'doc' => preg_replace('/\D/', '', (string) $this->input('doc')) ?: null,
             'email_verified' => $this->boolean('email_verified'),
+            'platform_fee_enabled' => $this->boolean('platform_fee_enabled'),
             'show_email_public' => $this->boolean('show_email_public'),
             'show_phone_public' => $this->boolean('show_phone_public'),
             'show_address_public' => $this->boolean('show_address_public'),
@@ -35,6 +36,7 @@ class UserRequest extends FormRequest
         $role = (string) ($this->input('role') ?: $user?->role ?: 'member');
         $requiresPixKey = in_array($role, ['admin', 'superadmin'], true)
             || ($user instanceof User && $user->isMarketingManager());
+        $isSuperadminOperator = (string) $this->user()?->role === 'superadmin';
 
         return [
             'name' => ['required', 'string', 'max:120'],
@@ -71,6 +73,9 @@ class UserRequest extends FormRequest
             'pix_key' => $requiresPixKey
                 ? ['required', 'string', 'max:255']
                 : ['exclude'],
+            'platform_fee_enabled' => $isSuperadminOperator
+                ? ['nullable', 'boolean']
+                : ['exclude'],
             'show_email_public' => ['required', 'boolean'],
             'show_phone_public' => ['required', 'boolean'],
             'show_address_public' => ['required', 'boolean'],
@@ -93,6 +98,7 @@ class UserRequest extends FormRequest
             'email' => 'e-mail',
             'password' => 'senha',
             'email_verified' => 'validação do e-mail',
+            'platform_fee_enabled' => 'cobrança de taxa da plataforma',
             'birth_date' => 'data de nascimento',
             'doc' => 'CPF/CNPJ',
             'phone' => 'telefone',

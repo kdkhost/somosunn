@@ -127,6 +127,25 @@ class User extends Authenticatable implements MustVerifyEmail
         return (int) Setting::get('platform_marketing_user_id', 0) === (int) $this->id;
     }
 
+    public function hasPlatformFeeRoleExemption(): bool
+    {
+        return in_array($this->role, ['admin', 'superadmin'], true)
+            || $this->isMarketingManager();
+    }
+
+    public function shouldChargePlatformFee(): bool
+    {
+        if ($this->hasPlatformFeeRoleExemption()) {
+            return false;
+        }
+
+        if (!Schema::hasColumn($this->getTable(), 'platform_fee_enabled')) {
+            return true;
+        }
+
+        return (bool) $this->platform_fee_enabled;
+    }
+
     public function canManageReceivingPixKey(): bool
     {
         return in_array($this->role, ['admin', 'superadmin'], true)
@@ -279,6 +298,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'linkedin_id',
         'avatar',
         'pix_key',
+        'platform_fee_enabled',
         // Sistema de indicação e aniversário
         'referral_code',
         'referred_by',
@@ -299,6 +319,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'hide_profile' => 'boolean',
         'birth_date' => 'date',
         'lgpd_accepted_at' => 'datetime',
+        'platform_fee_enabled' => 'boolean',
     ];
 
     protected $appends = ['profile_photo_url'];

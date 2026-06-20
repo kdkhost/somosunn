@@ -84,6 +84,18 @@ class OrderSplitService
     {
         $total = (float) $order->total_amount;
         $seller = $order->seller;
+
+        if ($seller && !$seller->shouldChargePlatformFee()) {
+            return [[
+                'receiver_id' => $seller->id,
+                'receiver_type' => 'seller',
+                'percentage' => 100.0,
+                'amount' => round($total, 2),
+                'pix_key' => $seller->pix_key,
+                'auto_paid' => true,
+            ]];
+        }
+
         $platformOwner = $seller?->isAdmin() && !$seller->isSuperAdmin() ? $seller : $this->platformOwner();
         $superadmin = $this->superadmin();
         $revenueOwner = $seller ?? $platformOwner;

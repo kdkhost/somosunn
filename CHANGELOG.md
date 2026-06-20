@@ -2,6 +2,32 @@
 
 ---
 
+## [2026-06-20] - feat(taxas): isentar perfis internos e dar controle so ao superadmin
+
+### Alterado
+- Administrador, Super Admin e responsavel de marketing passaram a ficar isentos da taxa de vendas da plataforma por padrao.
+- Vendas desses perfis agora geram rateio integral para o proprio vendedor, sem criar repasses externos nem descontar taxa no pedido.
+- Membros comuns continuam com taxa ativa por padrao, mas o Super Admin ganhou um controle direto no cadastro para ativar ou desativar a cobranca individualmente.
+- O cadastro de usuario nos dois paineis passou a ocultar esse controle para operadores que nao sao Super Admin.
+- Ao definir ou remover o responsavel de marketing, o sistema sincroniza automaticamente a isencao da taxa para o usuario afetado.
+
+### Arquivos principais
+- app/Models/User.php
+- app/Support/MarketplaceFee.php
+- app/Services/OrderSplitService.php
+- app/Services/AdminUserService.php
+- app/Http/Requests/Admin/UserRequest.php
+- app/Http/Controllers/Admin/UserController.php
+- resources/views/admin/users/form.blade.php
+- resources/views/admin/users/partials/member-fields.blade.php
+- resources/views/panel/admin/users/form.blade.php
+- resources/views/panel/admin/users/partials/member-fields.blade.php
+- database/migrations/2026_06_20_150000_add_platform_fee_enabled_to_users_table.php
+- tests/Feature/AdminUserManagementTest.php
+- tests/Feature/ReceivingPixKeyAndSplitsTest.php
+
+---
+
 ## [2026-06-20] - feat(financeiro): separar rateio de repasse financeiro
 
 ### Adicionado

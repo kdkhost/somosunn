@@ -197,6 +197,9 @@ class UserController extends Controller
                 $currentUser = User::find($currentId);
                 if ($currentUser) {
                     $this->revokeMarketingFeatures($currentUser, $marketingFeatures);
+                    if (!in_array($currentUser->role, ['admin', 'superadmin'], true)) {
+                        $currentUser->forceFill(['platform_fee_enabled' => true])->save();
+                    }
                 }
             }
 
@@ -222,6 +225,9 @@ class UserController extends Controller
             $previousUser = User::find($currentId);
             if ($previousUser) {
                 $this->revokeMarketingFeatures($previousUser, $marketingFeatures);
+                if (!in_array($previousUser->role, ['admin', 'superadmin'], true)) {
+                    $previousUser->forceFill(['platform_fee_enabled' => true])->save();
+                }
             }
         }
 
@@ -230,7 +236,10 @@ class UserController extends Controller
         // Conceder features de vendedor/instrutor/certificado ao novo marketing manager
         $extra = $user->extra_features ?? [];
         $extra = array_unique(array_merge($extra, $marketingFeatures));
-        $user->update(['extra_features' => array_values($extra)]);
+        $user->update([
+            'extra_features' => array_values($extra),
+            'platform_fee_enabled' => false,
+        ]);
 
         try {
             $user->notify(new \App\Notifications\MarketingManagerAssigned());

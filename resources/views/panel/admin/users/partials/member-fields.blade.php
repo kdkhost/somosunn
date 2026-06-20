@@ -6,6 +6,9 @@
     $selectedRole = old('role', $user->role ?? 'member');
     $isMarketingManager = $user->exists && $user->isMarketingManager();
     $showPixKey = in_array($selectedRole, ['admin', 'superadmin'], true) || $isMarketingManager;
+    $canManagePlatformFee = auth()->user()?->role === 'superadmin';
+    $platformFeeExemptRole = in_array($selectedRole, ['admin', 'superadmin'], true) || $isMarketingManager;
+    $platformFeeEnabled = old('platform_fee_enabled', $user->platform_fee_enabled ?? true);
 @endphp
 
 <section class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 p-8 space-y-6">
@@ -71,6 +74,22 @@
                 {{ $showPixKey ? 'required' : 'disabled' }}>
             <small class="text-xs text-slate-400">Obrigatória para Super Admin, Administrador e responsável de marketing.</small>
         </div>
+        @if($canManagePlatformFee)
+            <div class="md:col-span-2 {{ $platformFeeExemptRole ? 'hidden' : '' }}" id="panel-admin-user-platform-fee-container"
+                data-current-role="{{ $selectedRole }}"
+                data-marketing-manager="{{ $isMarketingManager ? '1' : '0' }}">
+                <input type="hidden" name="platform_fee_enabled" value="0">
+                <label class="flex items-start gap-4 p-4 rounded-2xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-900/10 cursor-pointer">
+                    <input type="checkbox" id="panel-admin-user-platform-fee-enabled" name="platform_fee_enabled" value="1"
+                        {{ $platformFeeEnabled ? 'checked' : '' }}
+                        class="w-5 h-5 mt-0.5 text-amber-600 border-slate-300 rounded focus:ring-amber-500 dark:bg-slate-950">
+                    <span>
+                        <strong class="block text-sm text-slate-800 dark:text-white">Cobrar taxa da plataforma deste membro</strong>
+                        <small class="text-slate-500 dark:text-slate-400">Admin, Super Admin e responsável de marketing ficam isentos por padrão e não exibem este controle.</small>
+                    </span>
+                </label>
+            </div>
+        @endif
     </div>
 </section>
 

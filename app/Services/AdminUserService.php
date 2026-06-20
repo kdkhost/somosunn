@@ -18,6 +18,7 @@ class AdminUserService
 
         $data['password'] = Hash::make($data['password']);
         $data['extra_features'] = $data['extra_features'] ?? [];
+        $data = $this->normalizePlatformFeeFlag($data);
 
         $user = new User();
         $user->fill($data);
@@ -43,6 +44,7 @@ class AdminUserService
         }
 
         $data['extra_features'] = $data['extra_features'] ?? [];
+        $data = $this->normalizePlatformFeeFlag($data, $user);
         $emailChanged = mb_strtolower((string) $user->email) !== $data['email'];
 
         $user->fill($data);
@@ -97,5 +99,25 @@ class AdminUserService
                 'error' => $exception->getMessage(),
             ]);
         }
+    }
+
+    private function normalizePlatformFeeFlag(array $data, ?User $user = null): array
+    {
+        $role = (string) ($data['role'] ?? $user?->role ?? 'member');
+        $isSuperadmin = $role === 'superadmin' || ($data['level'] ?? $user?->level) === 'superadmin';
+        $isAdmin = $role === 'admin';
+        $isMarketingManager = $user?->isMarketingManager() ?? false;
+
+        if ($isSuperadmin || $isAdmin || $isMarketingManager) {
+            $data['platform_fee_enabled'] = false;
+
+            return $data;
+        }
+
+        $data['platform_fee_enabled'] = array_key_exists('platform_fee_enabled', $data)
+            ? (bool) $data['platform_fee_enabled']
+            : (bool) ($user?->platform_fee_enabled ?? true);
+
+        return $data;
     }
 }
