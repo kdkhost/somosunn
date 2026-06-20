@@ -28,11 +28,9 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         // Primeiro gate de segurança — ver spec waf-e-auditoria-seguranca.
         // Curto-circuita quando WAF_ENABLED=false (padrão em Fase 0).
-        \App\Http\Middleware\WafMiddleware::class,
         // Rate limiting avançado por IP/UA — spec advanced-security-performance.
         // Posicionado após o WAF e antes do bloqueio de rotas sensíveis para
         // permitir bloqueio precoce de scanners e flood antes do roteamento.
-        \App\Http\Middleware\AdvancedRateLimitMiddleware::class,
         // Bloqueia rotas sensíveis (install, migrations, debug) em produção
         \App\Http\Middleware\BlockSensitiveRoutesInProduction::class,
         \App\Http\Middleware\TrackServiceVisit::class,
@@ -43,6 +41,8 @@ class Kernel extends HttpKernel
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \App\Http\Middleware\ProtectSupervisedAccess::class,
+            \App\Http\Middleware\WafMiddleware::class,
+            \App\Http\Middleware\AdvancedRateLimitMiddleware::class,
             \App\Http\Middleware\ApplyCustomMaintenanceMode::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
@@ -50,13 +50,14 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\SecurityHeadersMiddleware::class,
             \App\Http\Middleware\TrackReferralLink::class,
             \App\Http\Middleware\TrackVisitor::class,
-            \App\Http\Middleware\RunInternalCron::class,
             \App\Http\Middleware\LogUserActivity::class,
             \App\Http\Middleware\EnsureLgpdConsent::class,
             // Pass-through observador para o AnomalyDetectorService.
             \App\Http\Middleware\AnomalyDetectorMiddleware::class,
         ],
         'api' => [
+            \App\Http\Middleware\WafMiddleware::class,
+            \App\Http\Middleware\AdvancedRateLimitMiddleware::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],

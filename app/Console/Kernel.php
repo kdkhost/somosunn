@@ -30,6 +30,16 @@ class Kernel extends ConsoleKernel
                 ->orderBy('id')
                 ->get()
                 ->each(function (ScheduledTask $task) use ($schedule, $timezone): void {
+                    if (!ScheduledTask::isAllowedForScheduler($task->command)) {
+                        $this->recordScheduledTaskRun(
+                            (int) $task->id,
+                            false,
+                            'Comando bloqueado por seguranca. O scheduler ignora tarefas destrutivas ou fora da lista permitida.'
+                        );
+
+                        return;
+                    }
+
                     $frequency = trim((string) $task->frequency);
                     if (!CronExpression::isValidExpression($frequency)) {
                         $this->recordScheduledTaskRun(

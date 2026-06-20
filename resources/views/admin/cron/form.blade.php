@@ -16,7 +16,7 @@
     $knownCommands = collect($commandGroups)->flatMap(fn ($commands) => array_keys((array) $commands))->values()->all();
     $commandValue = old('real_command', $task->command ?: $firstCommand);
     $frequencyValue = old('real_frequency', $task->frequency ?: '* * * * *');
-    $isCustomCommand = $commandValue && !in_array($commandValue, $knownCommands, true);
+    $isCustomCommand = false;
 @endphp
 
 <div class="card card-primary">
@@ -53,21 +53,9 @@
                             @endforeach
                         </optgroup>
                     @endforeach
-                    <option value="custom" {{ $isCustomCommand ? 'selected' : '' }}>Outro (Personalizado)</option>
                 </select>
                 <input type="hidden" name="real_command" id="real_command" value="{{ $commandValue }}">
-            </div>
-
-            <div id="custom_command_div" class="form-group {{ $isCustomCommand ? '' : 'd-none' }}">
-                <label for="command_custom">Comando Personalizado</label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">php artisan</span>
-                    </div>
-                    <input type="text" id="command_custom" class="form-control"
-                        value="{{ $isCustomCommand ? $commandValue : '' }}" placeholder="Ex: cache:clear">
-                </div>
-                <small class="text-muted">Digite apenas o comando e argumentos, sem "php artisan".</small>
+                <small class="text-muted">Somente comandos seguros e homologados podem ser agendados.</small>
             </div>
 
             <div class="form-group">
@@ -111,24 +99,14 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const select = document.getElementById('command_select');
-    const customDiv = document.getElementById('custom_command_div');
-    const customInput = document.getElementById('command_custom');
     const realInput = document.getElementById('real_command');
     const frequencyInput = document.getElementById('real_frequency');
 
     function syncCommand() {
-        if (select.value === 'custom') {
-            customDiv.classList.remove('d-none');
-            realInput.value = customInput.value;
-            return;
-        }
-
-        customDiv.classList.add('d-none');
         realInput.value = select.value;
     }
 
     select.addEventListener('change', syncCommand);
-    customInput.addEventListener('input', syncCommand);
 
     document.querySelectorAll('.cron-preset').forEach(function (button) {
         button.addEventListener('click', function () {

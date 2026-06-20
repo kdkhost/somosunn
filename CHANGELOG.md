@@ -2,6 +2,25 @@
 
 ---
 
+## [2026-06-20] - fix(seguranca, cron): destravar rotas e blindar scheduler
+
+### Corrigido
+- O WAF e o rate limit deixaram de rodar como middleware global e passaram a executar depois da sessao no grupo web, evitando bloqueios falsos no /admin.
+- O grupo api continua protegido por WAF e rate limit sem depender de visita a paginas.
+- O disparo de cron por visita de pagina foi removido da pipeline web; a execucao automatica permanece concentrada no scheduler da tabela scheduled_tasks.
+- A central /admin/cron e /painel/admin/cron agora aceita somente comandos homologados em config/cron-panel.php.
+- O scheduler automatico e a execucao manual passaram a bloquear comandos destrutivos ou de restauracao de banco.
+
+### Arquivos principais
+- app/Http/Kernel.php
+- app/Console/Kernel.php
+- app/Models/ScheduledTask.php
+- app/Http/Controllers/Admin/CronController.php
+- app/Http/Controllers/Panel/Admin/CronController.php
+- resources/views/admin/cron/form.blade.php
+- resources/views/panel/admin/cron/form.blade.php
+
+---
 ## [2026-06-20] - feat(vendas): enviar cópias ocultas de controle
 
 ### Adicionado

@@ -15,7 +15,7 @@
         $commandValue = old('real_command', $task->command);
         $commandValue = $commandValue ?: $firstCommand;
         $frequencyValue = old('real_frequency', $task->frequency ?: '* * * * *');
-        $isCustomCommand = $commandValue && !in_array($commandValue, $commonCommands, true);
+        $isCustomCommand = false;
     @endphp
 
     <div class="max-w-4xl space-y-6">
@@ -61,24 +61,11 @@
                             @endforeach
                         </optgroup>
                     @endforeach
-                    <option value="custom" @selected($isCustomCommand)>Personalizado</option>
                 </select>
                 <input type="hidden" name="real_command" id="real_command" value="{{ $commandValue }}">
-            </div>
-
-            <div id="custom-command-wrap" class="{{ $isCustomCommand ? '' : 'hidden' }} space-y-2">
-                <label for="command_custom" class="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                    Comando personalizado
-                </label>
-                <div
-                    class="flex items-center overflow-hidden rounded-xl border border-slate-300 bg-slate-50 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                    <span class="border-r border-slate-300 px-3 py-2 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                        php artisan
-                    </span>
-                    <input type="text" id="command_custom" value="{{ $isCustomCommand ? $commandValue : '' }}"
-                        placeholder="Ex: cache:clear"
-                        class="w-full bg-transparent px-3 py-2 text-sm text-slate-900 focus:outline-none dark:text-slate-100">
-                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    Somente comandos seguros e homologados podem ser agendados.
+                </p>
             </div>
 
             <div class="space-y-3">
@@ -145,24 +132,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const commandSelect = document.getElementById('command_select');
-            const customWrap = document.getElementById('custom-command-wrap');
-            const customInput = document.getElementById('command_custom');
             const realCommand = document.getElementById('real_command');
             const frequencyInput = document.getElementById('real_frequency');
 
             function syncCommandValue() {
-                if (commandSelect.value === 'custom') {
-                    customWrap.classList.remove('hidden');
-                    realCommand.value = customInput.value.trim();
-                    return;
-                }
-
-                customWrap.classList.add('hidden');
                 realCommand.value = commandSelect.value;
             }
 
             commandSelect.addEventListener('change', syncCommandValue);
-            customInput.addEventListener('input', syncCommandValue);
 
             document.querySelectorAll('.cron-preset').forEach((button) => {
                 button.addEventListener('click', () => {

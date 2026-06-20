@@ -95,9 +95,7 @@ class CronController extends Controller
         ]);
 
         $data = $request->validate([
-            'command' => 'required|string',
-            'frequency' => 'required|string',
-            'active' => 'boolean',
+            ...ScheduledTask::schedulerValidationRules(),
         ]);
         $data['active'] = $request->has('active');
 
@@ -120,9 +118,7 @@ class CronController extends Controller
         ]);
 
         $data = $request->validate([
-            'command' => 'required|string',
-            'frequency' => 'required|string',
-            'active' => 'boolean',
+            ...ScheduledTask::schedulerValidationRules(),
         ]);
         $data['active'] = $request->has('active');
 
@@ -147,6 +143,10 @@ class CronController extends Controller
     {
         if (!$task->active) {
             return back()->with('error', 'Tarefa inativa.');
+        }
+
+        if (!ScheduledTask::isAllowedForScheduler($task->command)) {
+            return back()->with('error', 'Comando bloqueado por seguranca. A central de cron nao executa tarefas destrutivas ou fora da lista permitida.');
         }
 
         $output = '';
@@ -185,6 +185,18 @@ class CronController extends Controller
         $failed = 0;
 
         foreach ($tasks as $task) {
+            if (!ScheduledTask::isAllowedForScheduler($task->command)) {
+                ScheduledTaskLog::create([
+                    'scheduled_task_id' => $task->id,
+                    'executed_at' => now(),
+                    'output' => 'Comando bloqueado por seguranca. A central de cron nao executa tarefas destrutivas ou fora da lista permitida.',
+                    'success' => false,
+                ]);
+
+                $failed++;
+                continue;
+            }
+
             $output = '';
             $success = true;
 
