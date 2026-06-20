@@ -152,7 +152,14 @@ class ImportManchetePdfs extends Command
             // Já existe?
             $existing = Magazine::where('slug', $slug)->first();
             if ($existing && !$force) {
-                $this->warn('  > Já cadastrada (use --force para reimportar). Pulando.');
+                $existing->update([
+                    'title' => $src['title'],
+                    'category' => $src['category'],
+                    'edition' => $src['edition'],
+                    'published_at' => $src['published'],
+                    'short_description' => 'Edição oficial da Revista Manchete, patrocinadora da plataforma.',
+                ]);
+                $this->warn('  > Já cadastrada; metadados em português sincronizados.');
                 $skipped++;
                 continue;
             }

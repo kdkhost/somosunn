@@ -21,10 +21,13 @@
 - Textos, mensagens e metadados do importador da Revista Manchete passaram a usar acentuação correta em português brasileiro.
 - Títulos de edições, meses e localidades foram normalizados sem alterar os slugs e as URLs existentes.
 - Mensagens do model de revistas foram normalizadas em UTF-8 sem BOM.
+- Registros já publicados agora têm seus metadados sincronizados sem baixar novamente o PDF ou substituir a capa.
+- A verificação de encoding deixou de percorrer uploads e arquivos públicos gerados, mantendo a análise focada no código-fonte.
 
 ### Arquivos principais
 - `app/Console/Commands/ImportManchetePdfs.php`
 - `app/Models/Magazine.php`
+- `tools/check-text-encoding.php`
 
 ---
 

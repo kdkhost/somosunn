@@ -23,6 +23,8 @@ $skipDirs = [
     'graphify-out',
     'node_modules',
     'public' . DIRECTORY_SEPARATOR . 'build',
+    'public' . DIRECTORY_SEPARATOR . 'storage',
+    'public' . DIRECTORY_SEPARATOR . 'uploads',
 ];
 
 $textExtensions = [
