@@ -86,6 +86,11 @@ class Order extends Model
         return $this->hasMany(OrderSplit::class);
     }
 
+    public function splitPayouts()
+    {
+        return $this->hasManyThrough(OrderSplitPayout::class, OrderSplit::class, 'order_id', 'order_split_id');
+    }
+
     public function exhibitorRegistrations()
     {
         return $this->hasMany(EventExhibitorRegistration::class);

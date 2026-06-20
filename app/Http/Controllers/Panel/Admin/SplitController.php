@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Panel\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\OrderSplit;
+use App\Services\OrderSplitPayoutService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -11,11 +12,11 @@ class SplitController extends Controller
 {
     public function index(Request $request)
     {
-        $query = OrderSplit::query()->with(['order', 'receiver'])->latest();
+        $query = OrderSplit::query()->with(['order', 'receiver', 'payout'])->latest();
 
         $status = trim((string) $request->query('status', ''));
-        if (in_array($status, ['pending', 'paid', 'rejected'], true)) {
-            $query->where('status', $status);
+        if (in_array($status, ['pending', 'paid', 'failed'], true)) {
+            $query->whereHas('payout', fn ($builder) => $builder->where('status', $status));
         }
 
         $receiverType = trim((string) $request->query('receiver_type', ''));
@@ -39,9 +40,11 @@ class SplitController extends Controller
 
         $summary = [
             'total' => (float) (clone $query)->sum('amount'),
-            'paid' => (float) (clone $query)->where('status', 'paid')->sum('amount'),
-            'pending' => (float) (clone $query)->where('status', 'pending')->sum('amount'),
-            'pending_count' => (int) (clone $query)->where('status', 'pending')->count(),
+            'paid' => (float) (clone $query)->whereHas('payout', fn ($builder) => $builder->where('status', 'paid'))->sum('amount'),
+            'pending' => (float) (clone $query)->whereHas('payout', fn ($builder) => $builder->where('status', 'pending'))->sum('amount'),
+            'failed' => (float) (clone $query)->whereHas('payout', fn ($builder) => $builder->where('status', 'failed'))->sum('amount'),
+            'pending_count' => (int) (clone $query)->whereHas('payout', fn ($builder) => $builder->where('status', 'pending'))->count(),
+            'failed_count' => (int) (clone $query)->whereHas('payout', fn ($builder) => $builder->where('status', 'failed'))->count(),
         ];
 
         $splits = $query->paginate(20)->withQueryString();
@@ -49,27 +52,37 @@ class SplitController extends Controller
         return view('panel.admin.splits.index', compact('splits', 'summary', 'status', 'receiverType', 'search'));
     }
 
-    public function pay(OrderSplit $split): JsonResponse
+    public function pay(OrderSplit $split, OrderSplitPayoutService $payoutService): JsonResponse
     {
-        if ($split->status === 'paid') {
+        try {
+            $payoutService->confirmManualPayout($split);
+        } catch (\RuntimeException $exception) {
             return response()->json([
                 'success' => false,
-                'message' => 'Este rateio ja foi liquidado anteriormente.',
+                'message' => $exception->getMessage(),
             ], 422);
         }
-
-        if (empty($split->pix_key)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cadastre a chave PIX do destinatario antes de liquidar este rateio.',
-            ], 422);
-        }
-
-        $split->update(['status' => 'paid']);
 
         return response()->json([
             'success' => true,
-            'message' => 'Rateio liquidado com sucesso.',
+            'message' => 'Repasse confirmado e conciliado com sucesso.',
+        ]);
+    }
+
+    public function fail(Request $request, OrderSplit $split, OrderSplitPayoutService $payoutService): JsonResponse
+    {
+        try {
+            $payoutService->registerFailure($split, (string) $request->input('message', ''));
+        } catch (\RuntimeException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Falha do repasse registrada com sucesso.',
         ]);
     }
 }

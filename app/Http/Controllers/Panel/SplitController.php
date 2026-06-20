@@ -13,7 +13,7 @@ class SplitController extends Controller
         $user = auth()->user();
         $splits = OrderSplit::where('receiver_type', 'seller')
             ->where('receiver_id', $user->id)
-            ->with(['order'])
+            ->with(['order', 'payout'])
             ->latest()
             ->paginate(15);
 

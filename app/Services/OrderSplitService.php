@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class OrderSplitService
 {
+    public function __construct(
+        private readonly OrderSplitPayoutService $payoutService
+    ) {
+    }
+
     public function syncForPaidOrder(Order $order): void
     {
         if ((string) $order->status !== 'paid') {
@@ -66,6 +71,9 @@ class OrderSplitService
                 'platform_fee_percent' => MarketplaceFee::deductionPercent($order->seller),
             ]);
             $order->save();
+
+            $order->load('splits.payout');
+            $this->payoutService->syncForOrder($order);
         });
     }
 

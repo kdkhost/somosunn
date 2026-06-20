@@ -2,6 +2,29 @@
 
 ---
 
+## [2026-06-20] - feat(financeiro): separar rateio de repasse financeiro
+
+### Adicionado
+- Criada a tabela `order_split_payouts` para controlar o repasse financeiro de cada rateio com provedor, status, tentativas, ultimo erro e conciliacao.
+- A migration faz backfill automatico dos `order_splits` ja existentes, sem apagar registros atuais do banco.
+- O novo servico `OrderSplitPayoutService` passou a sincronizar os repasses a partir dos splits confirmados, distinguindo liquidacao interna e repasse manual.
+- As telas `/admin/splits`, `/painel/admin/splits` e `/painel/recebimentos` agora exibem o status real do repasse em vez de depender apenas do status bruto do split.
+- Adicionadas acoes administrativas para confirmar repasse manual e registrar falha de repasse nos dois paineis.
+
+### Arquivos principais
+- app/Services/OrderSplitPayoutService.php
+- app/Models/OrderSplitPayout.php
+- app/Services/OrderSplitService.php
+- app/Http/Controllers/Admin/SplitController.php
+- app/Http/Controllers/Panel/Admin/SplitController.php
+- resources/views/admin/splits/index.blade.php
+- resources/views/panel/admin/splits/index.blade.php
+- resources/views/panel/splits/index.blade.php
+- database/migrations/2026_06_20_113000_create_order_split_payouts_table.php
+- tests/Feature/OrderSplitPayoutsTest.php
+
+---
+
 ## [2026-06-20] - fix(seguranca, cron): destravar rotas e blindar scheduler
 
 ### Corrigido

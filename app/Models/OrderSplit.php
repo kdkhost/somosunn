@@ -33,4 +33,9 @@ class OrderSplit extends Model
     {
         return $this->belongsTo(User::class, 'receiver_id');
     }
+
+    public function payout()
+    {
+        return $this->hasOne(OrderSplitPayout::class);
+    }
 }
