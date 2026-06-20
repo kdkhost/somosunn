@@ -445,6 +445,7 @@ class PaymentWebhookController extends Controller
         $this->fulfillDigitalItemsForOrder($order);
         app(SellerProductFulfillmentService::class)->fulfillPaidOrder($order);
         app(InvoiceService::class)->issueAndQueueForOrder($order);
+        app(\App\Services\OrderControlCopyDispatcher::class)->dispatch($order);
 
         if (!$wasPaid || !data_get($order->metadata, 'emails.marketplace_paid_sent_at')) {
             EmailQueueSettings::dispatch(new SendMarketplaceOrderPaidEmailsJob((int) $order->id));

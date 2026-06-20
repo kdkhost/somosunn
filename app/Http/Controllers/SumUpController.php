@@ -263,6 +263,8 @@ class SumUpController extends Controller
             'transaction_id' => $data['transaction_id'] ?? $data['checkout_id']
         ]);
 
+        app(\App\Services\OrderControlCopyDispatcher::class)->dispatch($order);
+
         // Disparar eventos de pagamento aprovado
         // event(new OrderPaid($order));
     }

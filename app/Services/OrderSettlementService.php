@@ -103,6 +103,8 @@ class OrderSettlementService
             $this->notifyUsers($order);
         }
 
+        app(OrderControlCopyDispatcher::class)->dispatch($order);
+
         return $order->fresh(['user', 'seller', 'items', 'invoice']);
     }
 

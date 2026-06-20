@@ -150,6 +150,10 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perHour(100);
         });
 
+        RateLimiter::for('order_control_email', function ($job) {
+            return Limit::perMinute(60)->by('order-control-email');
+        });
+
         RateLimiter::for('webhook_mercadopago', function ($request) {
             return Limit::perMinute(120)->by((string) $request->ip());
         });

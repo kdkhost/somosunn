@@ -4,6 +4,16 @@
 
 Data de atualização: 20/06/2026
 
+### Atualização aplicada em 20/06/2026 - cópias ocultas de controle das vendas
+
+- Criado o job idempotente `SendOrderControlCopyEmailJob`, integrado à fila de e-mails configurada no painel de cron.
+- Todas as liquidações pelo `OrderSettlementService` e os fluxos legados de Mercado Pago, API e SumUp disparam a cópia de controle quando o pedido fica pago.
+- As mensagens são enviadas exclusivamente por CCO ao Administrador principal e ao Super Administrador, sem destinatários visíveis e sem endereços fixos no código.
+- `OrderControlCopyRecipientService` respeita `platform_admin_user_id` e `platform_owner_id`, usando fallback conservador para as contas com papel administrativo.
+- O template personalizável `order_sale_control_copy` reúne dados operacionais e financeiros da venda sem expor payload bruto ou dados sensíveis de cartão.
+- O metadata registra reivindicação, data de envio e quantidade de destinatários para evitar duplicidade em webhooks repetidos.
+- A implementação é compartilhada entre os dois painéis e não exige rota, permissão ou migration nova.
+
 ### Atualização aplicada em 20/06/2026 - restrição da chave PIX de recebimentos
 
 - A regra compartilhada `User::canManageReceivingPixKey()` passou a considerar exclusivamente os papéis `admin`, `superadmin` e o usuário configurado em `platform_marketing_user_id`.

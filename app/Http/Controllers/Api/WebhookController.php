@@ -208,6 +208,8 @@ class WebhookController extends Controller
                 'number' => 'FAT-' . date('Y') . '-' . str_pad($order->id, 6, '0', STR_PAD_LEFT)
             ]);
         }
+
+        app(\App\Services\OrderControlCopyDispatcher::class)->dispatch($order);
     }
 
     private function getPlanDurationInMonths($plan, ?string $period = null)

@@ -2,6 +2,29 @@
 
 ---
 
+## [2026-06-20] - feat(vendas): enviar cópias ocultas de controle
+
+### Adicionado
+- Cada pedido confirmado como pago envia uma mensagem de controle por CCO ao Administrador principal e ao Super Administrador.
+- O destinatário Administrador é resolvido pelas configurações `platform_admin_user_id` ou `platform_owner_id`, com fallback para a conta Admin mais antiga; nenhum e-mail foi fixado no código.
+- A cópia contém comprador, vendedor, itens, tipos, quantidades, valores, desconto, taxas, gateway, forma de pagamento, transação, cupom, fatura e datas da venda.
+- O template `order_sale_control_copy` é criado automaticamente e permanece personalizável no módulo de templates de e-mail.
+- A entrega usa a fila de e-mails configurada no sistema e possui controle idempotente no metadata do pedido para impedir cópias duplicadas.
+- Foram cobertos marketplace, cursos, mentorias, eventos, expositores, planos, aprovações manuais e webhooks legados.
+
+### Arquivos principais
+- `app/Jobs/SendOrderControlCopyEmailJob.php`
+- `app/Mail/OrderControlCopyMail.php`
+- `app/Services/OrderControlCopyDispatcher.php`
+- `app/Services/OrderControlCopyRecipientService.php`
+- `app/Services/OrderSettlementService.php`
+- `app/Http/Controllers/PaymentWebhookController.php`
+- `app/Http/Controllers/Api/WebhookController.php`
+- `app/Http/Controllers/SumUpController.php`
+- `tests/Feature/OrderControlCopyEmailTest.php`
+
+---
+
 ## [2026-06-20] - fix(usuários): restringir e exigir chave PIX de recebimentos
 
 ### Corrigido
