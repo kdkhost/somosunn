@@ -10,14 +10,13 @@
                 \App\Models\EventRegistration::PAYMENT_PAID,
                 \App\Models\EventRegistration::PAYMENT_FREE,
             ], true)
-            || $registration->payment_status === null
         )
         && method_exists($event, 'hasWhatsappGroup')
         && $event->hasWhatsappGroup();
 @endphp
 
 @if($canShowGroupButton)
-    <form method="POST" action="{{ route('events.group.join', $event) }}" class="{{ $wrapClass }}">
+    <form method="POST" action="{{ route('events.group.join', $event) }}" class="{{ $wrapClass }}" data-native-submit="true">
         @csrf
         <button type="submit" class="{{ $buttonClass }}">
             <i class="fab fa-whatsapp mr-2"></i>Entrar no grupo do evento

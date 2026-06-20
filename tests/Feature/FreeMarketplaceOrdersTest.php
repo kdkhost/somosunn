@@ -487,6 +487,7 @@ class FreeMarketplaceOrdersTest extends TestCase
 
         $html = view('events.payment.success', compact('order', 'event', 'registration'))->render();
         $this->assertStringContainsString('Entrar no grupo do evento', $html);
+        $this->assertStringContainsString('data-native-submit="true"', $html);
 
         $response = $this
             ->actingAs($user)

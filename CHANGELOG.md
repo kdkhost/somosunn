@@ -2,6 +2,19 @@
 
 ---
 
+## [2026-06-19] - fix(eventos): abrir grupo do WhatsApp sem interceptação AJAX
+
+### Corrigido
+- O botão "Entrar no grupo do evento" agora usa envio nativo do navegador, permitindo o redirecionamento externo para `chat.whatsapp.com` sem bloqueio de CORS pelo AJAX global.
+- O botão somente é exibido para inscrições confirmadas com pagamento identificado como pago ou gratuito, alinhando a interface à mesma regra aplicada pelo serviço de acesso.
+- A correção compartilhada atende a página do evento e a confirmação de pagamento.
+
+### Arquivos principais
+- `resources/views/events/partials/group-access.blade.php`
+- `tests/Feature/FreeMarketplaceOrdersTest.php`
+
+---
+
 ## [2026-06-19] - feat(compras): exigir e-mail validado, consentimento e destacar revistas na home
 
 ### Segurança e consentimento
