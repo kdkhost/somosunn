@@ -1758,7 +1758,7 @@
 
             function shouldDisablePjax(href) {
                 if (!href) return false;
-                const fullReloadPrefixes = ['/admin/events', '/admin/courses', '/admin/marketplace'];
+                const fullReloadPrefixes = ['/admin/events', '/admin/courses', '/admin/marketplace', '/admin/cron'];
                 try {
                     const url = new URL(href, window.location.origin);
                     return fullReloadPrefixes.some(function (prefix) {

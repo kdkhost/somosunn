@@ -7,8 +7,8 @@
 @endsection
 
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/datatables/responsive.bootstrap4.min.css') }}">
     <style>
         .blink_me {
             animation: blinker 2s linear infinite;
@@ -153,10 +153,10 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables/responsive.bootstrap4.min.js') }}"></script>
     <script>
         $(function () {
             const table = $('#cron-tasks-table').DataTable({
@@ -169,7 +169,18 @@
                 order: [[0, 'desc']],
                 ajax: {
                     url: '{{ route('admin.cron.data') }}',
-                    type: 'GET'
+                    type: 'GET',
+                    error: function () {
+                        $('#cron-tasks-table tbody').html(`
+                            <tr>
+                                <td colspan="7" class="py-5 text-center text-danger">
+                                    <i class="fas fa-exclamation-triangle fa-2x mb-3 d-block"></i>
+                                    Não foi possível carregar as tarefas. Atualize a página e tente novamente.
+                                </td>
+                            </tr>
+                        `);
+                        toastr.error('Não foi possível carregar a lista de tarefas agendadas.');
+                    }
                 },
                 columns: [
                     { data: 'id', name: 'id' },
@@ -181,7 +192,7 @@
                     { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-right' }
                 ],
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json',
+                    url: '{{ asset('vendor/datatables/pt-BR.json') }}',
                     emptyTable: `
                         <div class="text-center py-5 text-muted">
                             <i class="fas fa-clock fa-3x mb-3 d-block"></i>

@@ -508,7 +508,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.cron.index') }}" class="nav-link {{ $is('admin.cron.*') }}">
+                                <a href="{{ route('admin.cron.index') }}" class="nav-link no-pjax {{ $is('admin.cron.*') }}" data-no-pjax="true">
                                     <i class="fas fa-clock nav-icon"></i>
                                     <p>Cron Jobs</p>
                                 </a>

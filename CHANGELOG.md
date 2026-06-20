@@ -2,6 +2,24 @@
 
 ---
 
+## [2026-06-19] - fix(cron): restaurar DataTables e paginação no painel
+
+### Corrigido
+- `/admin/cron` deixou de ser aberto por PJAX, pois a navegação parcial descartava os scripts e estilos empilhados do DataTables.
+- Os arquivos do DataTables, integração Bootstrap 4, responsividade e tradução PT-BR passaram a ser servidos localmente em `public/vendor/datatables`, sem dependência do CDN no navegador.
+- A tabela continua usando processamento server-side pelo endpoint `admin.cron.data`, com paginação, busca, ordenação e seletor de quantidade.
+- Adicionada mensagem visível quando a consulta AJAX falhar, em vez de deixar a tabela vazia.
+- Criado teste de contrato para preservar rota, assets locais e bloqueio de PJAX.
+
+### Arquivos principais
+- `resources/views/admin/cron/index.blade.php`
+- `resources/views/admin/partials/sidebar.blade.php`
+- `resources/views/admin/layouts/app.blade.php`
+- `public/vendor/datatables/*`
+- `tests/Feature/CronPanelDataTablesTest.php`
+
+---
+
 ## [2026-06-19] - fix(eventos): corrigir cupons e configurar limite por usuário
 
 ### Corrigido
