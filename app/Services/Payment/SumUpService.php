@@ -57,8 +57,9 @@ class SumUpService
             'metadata'     => array_merge($order->metadata ?? [], $metaUpdates),
         ])->save();
 
+        $checkoutReference = $this->checkoutReference($order, $options);
         $payload = [
-            'checkout_reference' => $this->checkoutReference($order, $options),
+            'checkout_reference' => $checkoutReference,
             'amount'             => $breakdown['charge_amount'],
             'currency'           => $order->currency ?? 'BRL',
             'merchant_code'      => $config['merchant_code'],
@@ -68,6 +69,31 @@ class SumUpService
 
         $response = $this->post('/v0.1/checkouts', $payload, $config['api_key']);
 
+        $reusedCheckout = false;
+        if (($response['error_code'] ?? null) === 'DUPLICATED_CHECKOUT') {
+            $existingCheckout = $this->findCheckoutByReference(
+                $checkoutReference,
+                $config['api_key'],
+                (float) $breakdown['charge_amount'],
+                (string) ($order->currency ?? 'BRL')
+            );
+
+            if ($existingCheckout) {
+                $response = $existingCheckout;
+                $reusedCheckout = true;
+
+                Log::warning('SumUp checkout duplicado recuperado', [
+                    'order_id' => $order->id,
+                    'checkout_id' => $response['id'],
+                    'checkout_reference' => $checkoutReference,
+                ]);
+            } else {
+                $payload['checkout_reference'] = $checkoutReference
+                    . '-R-' . now()->format('YmdHis') . '-' . Str::random(6);
+                $response = $this->post('/v0.1/checkouts', $payload, $config['api_key']);
+            }
+        }
+
         if (empty($response['id'])) {
             throw new RuntimeException('SumUp: falha ao criar checkout. ' . json_encode($response));
         }
@@ -76,15 +102,18 @@ class SumUpService
         $order->forceFill([
             'metadata' => array_merge($order->metadata ?? [], [
                 'sumup_checkout_id' => $response['id'],
+                'sumup_checkout_reference' => $payload['checkout_reference'],
+                'sumup_checkout_reused' => $reusedCheckout,
             ]),
         ])->save();
 
         $this->registerWebhook($order, $webhookToken, $config['api_key']);
 
         // Persiste a transação
-        SumUpTransaction::create([
+        SumUpTransaction::updateOrCreate([
             'order_id'      => $order->id,
             'checkout_id'   => $response['id'],
+        ], [
             'status'        => 'PENDING',
             'payment_type'  => strtoupper($options['payment_type'] ?? 'CARD'),
             'amount'        => $breakdown['charge_amount'],
@@ -101,8 +130,41 @@ class SumUpService
             'base_amount'   => $breakdown['base_amount'],
             'fee_amount'    => $breakdown['total_extra'],
             'installments'  => $installments,
+            'reused_checkout' => $reusedCheckout,
             'raw'           => $response,
         ];
+    }
+
+    public function findCheckoutByReference(
+        string $reference,
+        string $apiKey,
+        float $expectedAmount,
+        string $expectedCurrency = 'BRL'
+    ): ?array {
+        $response = $this->get(
+            '/v0.1/checkouts?checkout_reference=' . rawurlencode($reference),
+            $apiKey
+        );
+
+        $checkouts = array_is_list($response)
+            ? $response
+            : (array) ($response['items'] ?? []);
+
+        foreach ($checkouts as $checkout) {
+            if (!is_array($checkout) || (string) ($checkout['checkout_reference'] ?? '') !== $reference) {
+                continue;
+            }
+
+            $amountMatches = abs((float) ($checkout['amount'] ?? 0) - round($expectedAmount, 2)) < 0.01;
+            $currencyMatches = strtoupper((string) ($checkout['currency'] ?? '')) === strtoupper($expectedCurrency);
+            $status = strtoupper((string) ($checkout['status'] ?? ''));
+
+            if ($amountMatches && $currencyMatches && !in_array($status, ['FAILED', 'CANCELLED', 'CANCELED', 'EXPIRED'], true)) {
+                return $checkout;
+            }
+        }
+
+        return null;
     }
 
     /**

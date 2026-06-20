@@ -4,6 +4,13 @@
 
 Data de atualização: 19/06/2026
 
+### Atualização aplicada em 19/06/2026 - recuperação de checkout duplicado SumUp
+
+- Confirmada em produção a resposta `DUPLICATED_CHECKOUT` para `ORDER-220`, cujo checkout remoto permanecia pendente e não estava registrado localmente.
+- `Payment\SumUpService` passou a recuperar checkout remoto por referência, validando valor, moeda e status antes da reutilização.
+- A correção fica centralizada para todos os fluxos que usam o serviço compartilhado, sem alterar pedidos, usuários ou registros financeiros existentes.
+- Checkout incompatível ou encerrado não é reutilizado; nesse caso o serviço gera referência exclusiva para uma nova tentativa.
+
 ### Atualização aplicada em 19/06/2026 - restauração visual do DataTables em `/admin/cron`
 
 - A implementação server-side existente estava publicada, mas a entrada pelo menu usava PJAX e não carregava os assets declarados em `@push('styles')` e `@push('scripts')`.

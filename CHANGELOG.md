@@ -2,6 +2,21 @@
 
 ---
 
+## [2026-06-19] - fix(sumup): recuperar checkout duplicado
+
+### Corrigido
+- Respostas `409 DUPLICATED_CHECKOUT` da SumUp deixaram de interromper o pagamento com mensagem genérica.
+- O serviço consulta a SumUp pela referência e reutiliza o checkout existente quando valor, moeda e status forem compatíveis.
+- Quando não existir checkout reutilizável, uma nova referência exclusiva é criada automaticamente.
+- A transação local passou a usar gravação idempotente por pedido e checkout, evitando registros duplicados.
+- O pedido registra a referência efetiva e se o checkout foi recuperado.
+
+### Arquivos principais
+- `app/Services/Payment/SumUpService.php`
+- `tests/Unit/SumUpDuplicateCheckoutRecoveryTest.php`
+
+---
+
 ## [2026-06-19] - fix(cron): restaurar DataTables e paginação no painel
 
 ### Corrigido
