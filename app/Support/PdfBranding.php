@@ -17,18 +17,28 @@ class PdfBranding
 <style>
     .pdf-brand-watermark {
         position: fixed;
-        left: 0;
-        top: 40%;
-        width: 100%;
-        text-align: center;
+        inset: 0;
         opacity: 0.15;
         z-index: 0;
         pointer-events: none;
     }
 
+    .pdf-brand-watermark-inner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 240px;
+        margin-top: -52px;
+        margin-left: -120px;
+        text-align: center;
+    }
+
     .pdf-brand-watermark img {
-        width: 42%;
-        max-height: 190px;
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 104px;
+        object-fit: contain;
     }
 
     .pdf-brand-content {
@@ -44,7 +54,7 @@ HTML;
             $html = $style . "\n" . $html;
         }
 
-        $watermark = '<div class="pdf-brand-watermark"><img src="' . htmlspecialchars($logoSource, ENT_QUOTES, 'UTF-8') . '" alt=""></div><div class="pdf-brand-content">';
+        $watermark = '<div class="pdf-brand-watermark"><div class="pdf-brand-watermark-inner"><img src="' . htmlspecialchars($logoSource, ENT_QUOTES, 'UTF-8') . '" alt=""></div></div><div class="pdf-brand-content">';
 
         if (stripos($html, '<body') !== false) {
             $html = preg_replace('/(<body\b[^>]*>)/i', '$1' . $watermark, $html, 1) ?? $html;
@@ -63,7 +73,28 @@ HTML;
             return null;
         }
 
-        return str_replace('\\', '/', $logoPath);
+        try {
+            $contents = file_get_contents($logoPath);
+            if ($contents === false || $contents === '') {
+                return null;
+            }
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        $extension = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
+        $mimeType = match ($extension) {
+            'svg' => 'image/svg+xml',
+            'png' => 'image/png',
+            'jpg', 'jpeg' => 'image/jpeg',
+            default => null,
+        };
+
+        if ($mimeType === null) {
+            return null;
+        }
+
+        return 'data:' . $mimeType . ';base64,' . base64_encode($contents);
     }
 
     private static function resolveLogoPath(): ?string

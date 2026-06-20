@@ -21,6 +21,18 @@
 - resources/views/panel/admin/cron/form.blade.php
 
 ---
+## [2026-06-20] - fix(pdf): corrigir marca d'agua padrao com a logo SOMOS UNN
+
+### Corrigido
+- A marca d'agua padrao dos PDFs deixou de usar caminho bruto de arquivo, evitando placeholder cinza e imagem quebrada no Dompdf.
+- A logo da SOMOS UNN agora e embutida como data URI, centralizada e com opacidade fixa de 15%, atras do conteudo.
+- O ajuste passa a valer para os PDFs que usam PdfBranding, incluindo faturas, relatorios e certificados.
+
+### Arquivos principais
+- app/Support/PdfBranding.php
+- tests/Unit/Support/PdfBrandingTest.php
+
+---
 ## [2026-06-20] - feat(vendas): enviar cópias ocultas de controle
 
 ### Adicionado
