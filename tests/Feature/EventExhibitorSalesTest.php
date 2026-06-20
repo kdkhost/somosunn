@@ -285,7 +285,60 @@ class EventExhibitorSalesTest extends TestCase
 
         $this->assertNotEmpty(EventRegistration::first()->ticket_code);
 
-        $this->expectExceptionMessage('Este cupom de expositor ja foi usado por este usuario.');
+        $this->expectExceptionMessage('Este cupom atingiu o limite de uso por usuário.');
+        app(EventCouponService::class)->validateCouponLocked(
+            $event,
+            $coupon->code,
+            180,
+            1,
+            EventCoupon::APPLIES_EXHIBITOR,
+            (int) $buyer->id
+        );
+    }
+
+    public function test_exhibitor_coupon_respects_configured_limit_per_user(): void
+    {
+        $seller = $this->user();
+        $buyer = $this->user();
+        $event = $this->event($seller, [
+            'exhibitor_sales_enabled' => true,
+            'exhibitor_total_slots' => 3,
+            'exhibitor_batch_1_price' => 180,
+            'exhibitor_batch_1_deadline' => now()->addDays(10),
+        ]);
+
+        $coupon = EventCoupon::create([
+            'event_id' => $event->id,
+            'code' => 'EXPOSITOR2',
+            'type' => EventCoupon::TYPE_FREE,
+            'applies_to' => EventCoupon::APPLIES_EXHIBITOR,
+            'discount_value' => 100,
+            'max_uses_per_user' => 2,
+            'active' => true,
+        ]);
+
+        for ($usage = 1; $usage <= 2; $usage++) {
+            $couponData = app(EventCouponService::class)->validateCouponLocked(
+                $event,
+                $coupon->code,
+                180,
+                1,
+                EventCoupon::APPLIES_EXHIBITOR,
+                (int) $buyer->id
+            );
+
+            app(EventExhibitorService::class)->createReservation(
+                $event,
+                $buyer,
+                $this->payload(),
+                null,
+                $couponData
+            );
+        }
+
+        $this->assertSame(2, EventExhibitorRegistration::where('user_id', $buyer->id)->count());
+
+        $this->expectExceptionMessage('Este cupom atingiu o limite de uso por usuário.');
         app(EventCouponService::class)->validateCouponLocked(
             $event,
             $coupon->code,

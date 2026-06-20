@@ -2,6 +2,29 @@
 
 ---
 
+## [2026-06-19] - fix(eventos): corrigir cupons e configurar limite por usuário
+
+### Corrigido
+- Corrigido o erro 500 ao cadastrar cupom de evento causado pela coluna `applies_to` ainda não aplicada no banco de produção.
+- Adicionada migration conservadora para `max_uses_per_user` em `event_coupons`.
+- O formulário agora diferencia visualmente percentual (`%`), valor fixo (`R$`) e gratuidade total, sem aplicar máscara monetária ao percentual.
+- Descontos percentuais passaram a aceitar somente valores entre 0 e 100.
+- Cupons de expositor ou de uso misto receberam configuração de usos por usuário, com padrão de uma utilização.
+- O limite por usuário é validado de forma compartilhada nos checkouts de ingresso e expositor, sem contar duas vezes o ingresso emitido junto da reserva de expositor.
+
+### Painéis
+- Formulários e listagens atualizados em `/admin/events/{event}/coupons` e `/painel/admin/events/{event}/coupons`.
+
+### Arquivos principais
+- `database/migrations/2026_06_19_220000_add_per_user_limit_to_event_coupons.php`
+- `app/Http/Requests/Admin/EventCouponRequest.php`
+- `app/Services/EventCouponService.php`
+- `resources/views/admin/events/coupons/*`
+- `resources/views/panel/admin/events/coupons/*`
+- `tests/Feature/EventExhibitorSalesTest.php`
+
+---
+
 ## [2026-06-19] - fix(eventos): abrir grupo do WhatsApp sem interceptação AJAX
 
 ### Corrigido

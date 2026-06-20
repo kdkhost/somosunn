@@ -58,7 +58,12 @@
                             <td class="px-5 py-4">
                                 <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-black text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-200">{{ $coupon->appliesToLabel() }}</span>
                             </td>
-                            <td class="px-5 py-4 font-bold text-slate-700 dark:text-slate-200">{{ (int) $coupon->used_count }} / {{ $coupon->max_uses ? (int) $coupon->max_uses : 'ilimitado' }}</td>
+                            <td class="px-5 py-4 font-bold text-slate-700 dark:text-slate-200">
+                                <div>{{ (int) $coupon->used_count }} / {{ $coupon->max_uses ? (int) $coupon->max_uses : 'ilimitado' }}</div>
+                                @if($coupon->max_uses_per_user)
+                                    <div class="text-xs font-semibold text-slate-500">Até {{ (int) $coupon->max_uses_per_user }} por usuário</div>
+                                @endif
+                            </td>
                             <td class="px-5 py-4 text-xs font-semibold text-slate-500">
                                 @if($coupon->starts_at)<div>Inicio: {{ $coupon->starts_at->format('d/m/Y H:i') }}</div>@endif
                                 @if($effectiveExpiresAt)<div>Fim efetivo: {{ $effectiveExpiresAt->format('d/m/Y H:i') }}</div>@endif

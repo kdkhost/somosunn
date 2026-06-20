@@ -70,6 +70,9 @@
                                 <td>
                                     <strong>{{ (int) $coupon->used_count }}</strong>
                                     <span class="text-muted">/ {{ $coupon->max_uses ? (int) $coupon->max_uses : 'ilimitado' }}</span>
+                                    @if($coupon->max_uses_per_user)
+                                        <div class="small text-muted">Até {{ (int) $coupon->max_uses_per_user }} por usuário</div>
+                                    @endif
                                 </td>
                                 <td class="small text-muted">
                                     @if($coupon->starts_at)<div>Inicio: {{ $coupon->starts_at->format('d/m/Y H:i') }}</div>@endif

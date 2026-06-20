@@ -40,9 +40,22 @@ class EventCouponService
     /**
      * @return array{coupon: EventCoupon, discount_amount: float}
      */
-    public function validateFreeCouponLocked(Event $event, string $code, float $subtotal, int $uses = 1): array
+    public function validateFreeCouponLocked(
+        Event $event,
+        string $code,
+        float $subtotal,
+        int $uses = 1,
+        ?int $userId = null
+    ): array
     {
-        $result = $this->validateCouponLocked($event, $code, $subtotal, $uses);
+        $result = $this->validateCouponLocked(
+            $event,
+            $code,
+            $subtotal,
+            $uses,
+            EventCoupon::APPLIES_ATTENDEE,
+            $userId
+        );
 
         if ($result['discount_amount'] < max(0, $subtotal) - 0.009) {
             throw ValidationException::withMessages([
@@ -106,8 +119,8 @@ class EventCouponService
             throw ValidationException::withMessages(['coupon_code' => 'Cupom esgotado.']);
         }
 
-        if ($appliesTo === EventCoupon::APPLIES_EXHIBITOR && $userId) {
-            $this->assertExhibitorCouponAvailableForUser($event, $coupon, $userId);
+        if ($userId) {
+            $this->assertCouponAvailableForUser($event, $coupon, $userId, $uses);
         }
 
         return [
@@ -187,7 +200,13 @@ class EventCouponService
         return $couponDeadline ?: $eventDeadline;
     }
 
-    public function assertCouponAvailableForContext(Event $event, EventCoupon $coupon, string $appliesTo, ?int $userId = null): void
+    public function assertCouponAvailableForContext(
+        Event $event,
+        EventCoupon $coupon,
+        string $appliesTo,
+        ?int $userId = null,
+        int $uses = 1
+    ): void
     {
         if (!$event->published || $event->isClosedForPublic()) {
             throw ValidationException::withMessages([
@@ -203,8 +222,8 @@ class EventCouponService
 
         $this->assertCouponAppliesTo($coupon, $appliesTo);
 
-        if ($appliesTo === EventCoupon::APPLIES_EXHIBITOR && $userId) {
-            $this->assertExhibitorCouponAvailableForUser($event, $coupon, $userId);
+        if ($userId) {
+            $this->assertCouponAvailableForUser($event, $coupon, $userId, $uses);
         }
     }
 
@@ -246,9 +265,23 @@ class EventCouponService
         }
     }
 
-    private function assertExhibitorCouponAvailableForUser(Event $event, EventCoupon $coupon, int $userId): void
+    private function assertCouponAvailableForUser(
+        Event $event,
+        EventCoupon $coupon,
+        int $userId,
+        int $requestedUses = 1
+    ): void
     {
-        $registrations = EventExhibitorRegistration::query()
+        $limit = $coupon->max_uses_per_user;
+        if ($limit === null && $coupon->appliesToExhibitor()) {
+            $limit = 1;
+        }
+
+        if ($limit === null) {
+            return;
+        }
+
+        $exhibitorRegistrations = EventExhibitorRegistration::query()
             ->where('event_id', (int) $event->id)
             ->where('user_id', $userId)
             ->whereNotIn('status', [
@@ -258,13 +291,35 @@ class EventCouponService
             ])
             ->get();
 
-        $alreadyUsed = $registrations->contains(function (EventExhibitorRegistration $registration) use ($coupon) {
+        $matchingExhibitorRegistrations = $exhibitorRegistrations->filter(function (EventExhibitorRegistration $registration) use ($coupon) {
             return (int) data_get($registration->metadata, 'event_coupon.id') === (int) $coupon->id;
         });
 
-        if ($alreadyUsed) {
+        $exhibitorOrderIds = $matchingExhibitorRegistrations
+            ->pluck('order_id')
+            ->filter()
+            ->map(fn ($orderId) => (int) $orderId)
+            ->values();
+
+        $usedByExhibitor = (int) $matchingExhibitorRegistrations->sum(
+            fn (EventExhibitorRegistration $registration) => max(1, (int) $registration->quantity)
+        );
+
+        $attendeeQuery = $coupon->registrations()
+            ->where('event_id', (int) $event->id)
+            ->where('user_id', $userId)
+            ->where('status', '!=', 'cancelled');
+
+        if ($exhibitorOrderIds->isNotEmpty()) {
+            $attendeeQuery->whereNotIn('order_id', $exhibitorOrderIds->all());
+        }
+
+        $usedByAttendee = (int) $attendeeQuery->sum('quantity');
+        $requestedUses = max(1, $requestedUses);
+
+        if (($usedByExhibitor + $usedByAttendee + $requestedUses) > (int) $limit) {
             throw ValidationException::withMessages([
-                'coupon_code' => 'Este cupom de expositor ja foi usado por este usuario.',
+                'coupon_code' => 'Este cupom atingiu o limite de uso por usuário.',
             ]);
         }
     }

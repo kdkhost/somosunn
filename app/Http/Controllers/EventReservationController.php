@@ -340,7 +340,8 @@ class EventReservationController extends Controller
                         $event,
                         $couponCode,
                         round($currentPrice * $quantity, 2),
-                        $quantity
+                        $quantity,
+                        (int) $user->id
                     );
                     $freeEventCoupon = $freeCouponResult['coupon'];
                     $freeCouponDiscountAmount = (float) $freeCouponResult['discount_amount'];

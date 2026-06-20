@@ -13,6 +13,7 @@ namespace Tests\Unit;
 
 use App\Models\EventCoupon;
 use App\Models\Event;
+use App\Http\Requests\Admin\EventCouponRequest;
 use App\Rules\WhatsAppGroupLinkRule;
 use App\Services\EventCouponService;
 use Tests\TestCase;
@@ -72,5 +73,20 @@ class EventCouponAndWhatsAppRuleTest extends TestCase
         $this->assertSame(10.0, $service->discountAmount($limited, 37));
         $this->assertTrue($service->canUse($limited));
         $this->assertFalse($service->canUse($limited, 2));
+    }
+
+    public function test_percent_coupon_validation_is_limited_to_one_hundred(): void
+    {
+        $request = EventCouponRequest::create('/', 'POST', ['type' => EventCoupon::TYPE_PERCENT]);
+        $rules = $request->rules();
+
+        $this->assertContains('max:100', $rules['discount_value']);
+    }
+
+    public function test_event_coupon_casts_limit_per_user_as_integer(): void
+    {
+        $coupon = new EventCoupon(['max_uses_per_user' => '2']);
+
+        $this->assertSame(2, $coupon->max_uses_per_user);
     }
 }

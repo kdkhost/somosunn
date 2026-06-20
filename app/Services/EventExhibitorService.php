@@ -182,11 +182,17 @@ class EventExhibitorService
             $coupon = data_get($couponData, 'coupon');
 
             if ($coupon instanceof EventCoupon) {
+                $coupon = EventCoupon::query()
+                    ->whereKey($coupon->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
                 app(EventCouponService::class)->assertCouponAvailableForContext(
                     $lockedEvent,
                     $coupon,
                     EventCoupon::APPLIES_EXHIBITOR,
-                    (int) $user->id
+                    (int) $user->id,
+                    $quantity
                 );
             }
 

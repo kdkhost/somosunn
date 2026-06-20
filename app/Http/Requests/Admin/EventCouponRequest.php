@@ -48,6 +48,8 @@ class EventCouponRequest extends FormRequest
             $uniqueCodeRule->ignore($couponId);
         }
 
+        $discountMaximum = $this->input('type') === EventCoupon::TYPE_PERCENT ? 100 : 999999.99;
+
         return [
             'code' => [
                 'required',
@@ -61,8 +63,9 @@ class EventCouponRequest extends FormRequest
                 EventCoupon::APPLIES_EXHIBITOR,
                 EventCoupon::APPLIES_BOTH,
             ])],
-            'discount_value' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'discount_value' => ['nullable', 'numeric', 'min:0', 'max:' . $discountMaximum],
             'max_uses' => ['nullable', 'integer', 'min:1', 'max:1000000'],
+            'max_uses_per_user' => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'starts_at' => ['nullable', 'date'],
             'expires_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
             'active' => ['nullable', 'boolean'],
@@ -76,6 +79,8 @@ class EventCouponRequest extends FormRequest
             'code.unique' => 'Já existe um cupom com este código para este evento.',
             'type.required' => 'Informe o tipo de desconto.',
             'discount_value.numeric' => 'Informe um valor de desconto válido.',
+            'discount_value.max' => 'O desconto percentual não pode ultrapassar 100%.',
+            'max_uses_per_user.integer' => 'Informe um limite por usuário válido.',
             'expires_at.after_or_equal' => 'A data de expiração deve ser igual ou posterior ao início.',
         ];
     }
@@ -87,6 +92,12 @@ class EventCouponRequest extends FormRequest
         $data['discount_value'] = (float) (($data['type'] ?? null) === EventCoupon::TYPE_FREE
             ? 100
             : ($data['discount_value'] ?? 0));
+
+        if (in_array($data['applies_to'] ?? null, [EventCoupon::APPLIES_EXHIBITOR, EventCoupon::APPLIES_BOTH], true)) {
+            $data['max_uses_per_user'] = (int) ($data['max_uses_per_user'] ?? 1);
+        } else {
+            $data['max_uses_per_user'] = null;
+        }
 
         return $data;
     }

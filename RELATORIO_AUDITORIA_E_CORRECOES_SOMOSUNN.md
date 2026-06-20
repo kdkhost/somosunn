@@ -4,6 +4,15 @@
 
 Data de atualização: 19/06/2026
 
+### Atualização aplicada em 19/06/2026 - cupons de evento e limite por usuário
+
+- Confirmado em produção que o erro de cadastro era causado pela ausência da coluna `event_coupons.applies_to`; a migration pendente deve ser aplicada no deploy.
+- Criada migration idempotente para `event_coupons.max_uses_per_user`, sem rollback destrutivo.
+- A regra compartilhada em `EventCouponService` controla o limite por usuário para ingresso e expositor e preserva o padrão de uma utilização para cupom de expositor.
+- `/admin/events/{event}/coupons` e `/painel/admin/events/{event}/coupons` continuam usando o mesmo request, model, service e controller-base, mantendo apenas as views AdminLTE e Tailwind distintas.
+- Os dois formulários agora exibem `%` para desconto percentual, `R$` para valor fixo e campo de usos por usuário para escopos `exhibitor` e `both`.
+- Rotas e permissões preservadas: `admin.events.coupons.*`, `panel.admin.events.coupons.*` e permissões granulares `admin.events.coupons.*`.
+
 ### Atualização aplicada em 19/06/2026 - elegibilidade de compra e revistas na home
 
 - Criado o middleware compartilhado `purchase.eligible`, que exige autenticação, verificação do e-mail e aceite da versão atual dos documentos legais antes de abrir ou processar compras.

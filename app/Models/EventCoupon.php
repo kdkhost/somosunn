@@ -24,6 +24,7 @@ class EventCoupon extends Model
         'applies_to',
         'discount_value',
         'max_uses',
+        'max_uses_per_user',
         'used_count',
         'starts_at',
         'expires_at',
@@ -34,6 +35,7 @@ class EventCoupon extends Model
     protected $casts = [
         'discount_value' => 'decimal:2',
         'max_uses' => 'integer',
+        'max_uses_per_user' => 'integer',
         'used_count' => 'integer',
         'starts_at' => 'datetime',
         'expires_at' => 'datetime',
