@@ -22,7 +22,24 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label>Senha @if($user->exists)<small class="text-muted">(deixe em branco para não alterar)</small>@endif</label>
-                        <input name="password" type="password" class="form-control">
+                        <input name="password" type="password" class="form-control" {{ $user->exists ? '' : 'required' }}>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Confirmar senha</label>
+                        <input name="password_confirmation" type="password" class="form-control" {{ $user->exists ? '' : 'required' }}>
+                    </div>
+
+                    <div class="form-group col-12">
+                        <div class="custom-control custom-switch border rounded p-3 pl-5 bg-light">
+                            <input type="checkbox" class="custom-control-input" id="admin-user-email-verified"
+                                name="email_verified" value="1" {{ old('email_verified', $user->hasVerifiedEmail()) ? 'checked' : '' }}>
+                            <label class="custom-control-label font-weight-bold" for="admin-user-email-verified">
+                                Criar ou manter este cadastro com o e-mail validado
+                            </label>
+                            <small class="d-block text-muted mt-1">
+                                Desmarcado: o membro precisará confirmar o endereço pelo e-mail enviado pelo sistema.
+                            </small>
+                        </div>
                     </div>
                     
                     @if(auth()->id() !== $user->id)
@@ -57,7 +74,7 @@
                         </div>
                     @endif
                 </div>
-        </div>
+                @include('admin.users.partials.member-fields')
 
         @if(auth()->user()->isAdmin())
             <div class="card mt-4 border-info">
@@ -150,3 +167,64 @@
     </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    function digits(value) { return String(value || '').replace(/\D/g, ''); }
+    function maskPhone(value) {
+        var number = digits(value).slice(0, 11);
+        if (number.length <= 10) return number.replace(/^(\d{0,2})(\d{0,4})(\d{0,4}).*/, function (_, ddd, first, last) {
+            return (ddd ? '(' + ddd + (ddd.length === 2 ? ') ' : '') : '') + first + (last ? '-' + last : '');
+        });
+        return number.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+    }
+    function maskDocument(value, type) {
+        var number = digits(value).slice(0, type === 'J' ? 14 : 11);
+        return type === 'J'
+            ? number.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2}).*/, '$1.$2.$3/$4-$5').replace(/[.\/-]+$/, '')
+            : number.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, '$1.$2.$3-$4').replace(/[.-]+$/, '');
+    }
+    var phone = document.getElementById('admin-user-phone');
+    var doc = document.getElementById('admin-user-doc');
+    var personType = document.getElementById('admin-user-person-type');
+    var cep = document.getElementById('admin-user-cep');
+    if (phone) {
+        phone.value = maskPhone(phone.value);
+        phone.addEventListener('input', function () { phone.value = maskPhone(phone.value); });
+    }
+    if (doc && personType) {
+        var updateDocument = function () { doc.value = maskDocument(doc.value, personType.value); };
+        updateDocument();
+        doc.addEventListener('input', updateDocument);
+        personType.addEventListener('change', updateDocument);
+    }
+    if (cep) {
+        var formatCep = function () {
+            var value = digits(cep.value).slice(0, 8);
+            cep.value = value.replace(/^(\d{5})(\d{0,3}).*/, '$1-$2').replace(/-$/, '');
+        };
+        formatCep();
+        cep.addEventListener('input', formatCep);
+        cep.addEventListener('blur', function () {
+            var value = digits(cep.value);
+            if (value.length !== 8) return;
+            var status = document.getElementById('admin-user-cep-status');
+            status.textContent = 'Consultando CEP...';
+            fetch('https://viacep.com.br/ws/' + value + '/json/')
+                .then(function (response) { return response.json(); })
+                .then(function (address) {
+                    if (address.erro) throw new Error('CEP não encontrado');
+                    document.getElementById('admin-user-street').value = address.logradouro || '';
+                    document.getElementById('admin-user-neighborhood').value = address.bairro || '';
+                    document.getElementById('admin-user-city').value = address.localidade || '';
+                    document.getElementById('admin-user-state').value = address.uf || '';
+                    status.textContent = 'Endereço preenchido pelo ViaCEP.';
+                    document.getElementById('admin-user-number').focus();
+                })
+                .catch(function () { status.textContent = 'Não foi possível consultar este CEP.'; });
+        });
+    }
+})();
+</script>
+@endpush

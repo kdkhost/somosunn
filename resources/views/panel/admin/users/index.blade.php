@@ -160,7 +160,7 @@
                 $roles = [
                     'admin' => 'Administradores',
                     'instrutor' => 'Instrutores',
-                    'membro' => 'Membros'
+                    'member' => 'Membros'
                 ];
             @endphp
             @foreach($roles as $key => $label)
@@ -203,6 +203,10 @@
                                         <div>
                                             <div class="font-bold text-slate-800 dark:text-white transition-colors">{{ $u->name }}</div>
                                             <div class="text-xs text-slate-500 dark:text-slate-400 transition-colors">{{ $u->email }}</div>
+                                            <div class="text-[10px] mt-1 font-bold {{ $u->hasVerifiedEmail() ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' }}">
+                                                <i class="fas {{ $u->hasVerifiedEmail() ? 'fa-check-circle' : 'fa-exclamation-circle' }} mr-1"></i>
+                                                {{ $u->hasVerifiedEmail() ? 'E-mail validado' : 'E-mail pendente' }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -213,7 +217,7 @@
                                                ($u->role == 'admin' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : 
                                                ($u->role == 'instrutor' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' : 
                                                'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400')) }}">
-                                            {{ ucfirst($u->role ?? 'Membro') }}
+                                            {{ ['member' => 'Membro', 'membro' => 'Membro', 'instrutor' => 'Instrutor', 'admin' => 'Administrador', 'superadmin' => 'Super Admin'][$u->role] ?? 'Membro' }}
                                         </span>
                                         @if($u->level)
                                             <span class="text-xs text-slate-400 dark:text-slate-500 capitalize">Nível: {{ $u->level }}</span>
@@ -267,6 +271,17 @@
                                             data-name="{{ $u->name }}">
                                             <i class="fas fa-bullhorn"></i>
                                         </button>
+
+                                        @if(!$u->hasVerifiedEmail())
+                                            <form action="{{ route('panel.admin.users.verify-email', $u) }}" method="POST"
+                                                onsubmit="return confirm('Validar manualmente o e-mail deste membro?');">
+                                                @csrf
+                                                <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition"
+                                                    title="Validar e-mail manualmente">
+                                                    <i class="fas fa-envelope-circle-check"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                         
                                         <a href="{{ route('panel.admin.users.edit', $u) }}" 
                                            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition" title="Editar">

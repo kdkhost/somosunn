@@ -4,6 +4,16 @@
 
 Data de atualização: 19/06/2026
 
+### Atualização aplicada em 19/06/2026 - cadastro administrativo completo de membros
+
+- `/admin/users/create` e `/painel/admin/users/create` passaram a oferecer cadastro completo com dados pessoais, profissionais, endereço, redes sociais, privacidade, plano e recursos individuais.
+- Os dois painéis mantêm suas interfaces próprias, AdminLTE e Tailwind, mas compartilham `Admin\UserRequest` e `AdminUserService` para validação, criação, edição e estado do e-mail.
+- Rotas adicionadas e preservadas: `admin.users.verify-email`, `panel.admin.users.verify-email` e todos os recursos existentes `admin.users.*` e `panel.admin.users.*`.
+- Administradores podem criar o cadastro com `email_verified_at` preenchido ou validar manualmente um endereço pendente nas listagens.
+- E-mail alterado somente permanece validado quando o administrador confirmar explicitamente essa opção; caso contrário, o template personalizado de verificação continua sendo enviado.
+- Permissões de Super Admin continuam protegidas nos dois controllers; membros não recebem acesso administrativo.
+- Validações previstas: rotas equivalentes, compilação Blade, sintaxe PHP, teste de criação completa, teste de validação manual, BOM e codificação textual.
+
 ### Atualização aplicada em 19/06/2026 - recuperação de checkout duplicado SumUp
 
 - Confirmada em produção a resposta `DUPLICATED_CHECKOUT` para `ORDER-220`, cujo checkout remoto permanecia pendente e não estava registrado localmente.

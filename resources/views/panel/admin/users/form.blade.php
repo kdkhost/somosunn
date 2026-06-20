@@ -72,7 +72,7 @@
                                 <input type="email" name="email" value="{{ old('email', $user->email) }}" required placeholder="email@exemplo.com"
                                        class="w-full px-5 py-3.5 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-semibold text-slate-800 dark:text-white placeholder:text-slate-400">
                             </div>
-                            <div class="md:col-span-2">
+                            <div>
                                 <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 transition-colors">
                                     Nova Senha 
                                     @if($user->id) <span class="text-[10px] font-medium text-slate-400 normal-case ml-2 italic tracking-normal">(deixe em branco se não quiser alterar)</span> @endif
@@ -85,8 +85,23 @@
                                            class="w-full pl-12 pr-5 py-3.5 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-semibold text-slate-800 dark:text-white placeholder:text-slate-400">
                                 </div>
                             </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Confirmar senha</label>
+                                <input type="password" name="password_confirmation" {{ !$user->id ? 'required' : '' }}
+                                    class="w-full px-5 py-3.5 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-semibold text-slate-800 dark:text-white">
+                            </div>
+                            <label class="md:col-span-2 flex items-start gap-4 p-4 rounded-2xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-900/10 cursor-pointer">
+                                <input type="checkbox" name="email_verified" value="1" {{ old('email_verified', $user->hasVerifiedEmail()) ? 'checked' : '' }}
+                                    class="w-5 h-5 mt-0.5 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500 dark:bg-slate-950">
+                                <span>
+                                    <strong class="block text-sm text-slate-800 dark:text-white">Criar ou manter o e-mail validado</strong>
+                                    <small class="text-slate-500 dark:text-slate-400">Desmarcado: o membro precisará confirmar o e-mail antes de realizar compras.</small>
+                                </span>
+                            </label>
                         </div>
                     </div>
+
+                    @include('panel.admin.users.partials.member-fields')
 
                     <!-- Permissions / Features -->
                     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 p-8 space-y-8 transition-all hover:shadow-md">
@@ -142,7 +157,7 @@
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-colors">Papel (Role)</label>
                                 <select name="role" class="w-full px-5 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-bold text-slate-800 dark:text-white">
-                                    <option value="membro" {{ old('role', $user->role) == 'membro' ? 'selected' : '' }}>Membro</option>
+                                    <option value="member" {{ in_array(old('role', $user->role), ['member', 'membro'], true) ? 'selected' : '' }}>Membro</option>
                                     <option value="instrutor" {{ old('role', $user->role) == 'instrutor' ? 'selected' : '' }}>Instrutor</option>
                                     <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Administrador</option>
                                     @if($canSetSuperadmin)
@@ -201,3 +216,64 @@
         </div>
     </form>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    function digits(value) { return String(value || '').replace(/\D/g, ''); }
+    function maskPhone(value) {
+        var number = digits(value).slice(0, 11);
+        if (number.length <= 10) return number.replace(/^(\d{0,2})(\d{0,4})(\d{0,4}).*/, function (_, ddd, first, last) {
+            return (ddd ? '(' + ddd + (ddd.length === 2 ? ') ' : '') : '') + first + (last ? '-' + last : '');
+        });
+        return number.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+    }
+    function maskDocument(value, type) {
+        var number = digits(value).slice(0, type === 'J' ? 14 : 11);
+        return type === 'J'
+            ? number.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2}).*/, '$1.$2.$3/$4-$5').replace(/[.\/-]+$/, '')
+            : number.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, '$1.$2.$3-$4').replace(/[.-]+$/, '');
+    }
+    var phone = document.getElementById('panel-admin-user-phone');
+    var doc = document.getElementById('panel-admin-user-doc');
+    var personType = document.getElementById('panel-admin-user-person-type');
+    var cep = document.getElementById('panel-admin-user-cep');
+    if (phone) {
+        phone.value = maskPhone(phone.value);
+        phone.addEventListener('input', function () { phone.value = maskPhone(phone.value); });
+    }
+    if (doc && personType) {
+        var updateDocument = function () { doc.value = maskDocument(doc.value, personType.value); };
+        updateDocument();
+        doc.addEventListener('input', updateDocument);
+        personType.addEventListener('change', updateDocument);
+    }
+    if (cep) {
+        var formatCep = function () {
+            var value = digits(cep.value).slice(0, 8);
+            cep.value = value.replace(/^(\d{5})(\d{0,3}).*/, '$1-$2').replace(/-$/, '');
+        };
+        formatCep();
+        cep.addEventListener('input', formatCep);
+        cep.addEventListener('blur', function () {
+            var value = digits(cep.value);
+            if (value.length !== 8) return;
+            var status = document.getElementById('panel-admin-user-cep-status');
+            status.textContent = 'Consultando CEP...';
+            fetch('https://viacep.com.br/ws/' + value + '/json/')
+                .then(function (response) { return response.json(); })
+                .then(function (address) {
+                    if (address.erro) throw new Error('CEP não encontrado');
+                    document.getElementById('panel-admin-user-street').value = address.logradouro || '';
+                    document.getElementById('panel-admin-user-neighborhood').value = address.bairro || '';
+                    document.getElementById('panel-admin-user-city').value = address.localidade || '';
+                    document.getElementById('panel-admin-user-state').value = address.uf || '';
+                    status.textContent = 'Endereço preenchido pelo ViaCEP.';
+                    document.getElementById('panel-admin-user-number').focus();
+                })
+                .catch(function () { status.textContent = 'Não foi possível consultar este CEP.'; });
+        });
+    }
+})();
+</script>
+@endpush

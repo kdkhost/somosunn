@@ -436,6 +436,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         });
 
         Route::post('users/{user}/marketing-manager', [\App\Http\Controllers\Admin\UserController::class, 'setMarketingManager'])->name('users.marketing-manager');
+        Route::post('users/{user}/verify-email', [\App\Http\Controllers\Panel\Admin\UserController::class, 'verifyEmail'])->name('users.verify-email');
         Route::resource('users', \App\Http\Controllers\Panel\Admin\UserController::class);
         Route::post('plans/{plan}/toggle-active', [\App\Http\Controllers\Panel\Admin\PlanController::class, 'toggleActive'])->name('plans.toggle-active');
         Route::resource('plans', \App\Http\Controllers\Panel\Admin\PlanController::class);
@@ -720,6 +721,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
 
     // Traditional Admin Resources
     Route::post('users/{user}/marketing-manager', [\App\Http\Controllers\Admin\UserController::class, 'setMarketingManager'])->name('users.marketing-manager');
+    Route::post('users/{user}/verify-email', [\App\Http\Controllers\Admin\UserController::class, 'verifyEmail'])->name('users.verify-email');
     Route::post('users/{user}/suspend', [\App\Http\Controllers\Admin\UserController::class, 'suspend'])->name('users.suspend');
     Route::post('users/{user}/unsuspend', [\App\Http\Controllers\Admin\UserController::class, 'unsuspend'])->name('users.unsuspend');
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);

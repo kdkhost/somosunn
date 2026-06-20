@@ -2,6 +2,30 @@
 
 ---
 
+## [2026-06-19] - feat(usuários): cadastro administrativo completo e validação de e-mail
+
+### Adicionado
+- Os cadastros de membros em `/admin/users` e `/painel/admin/users` agora incluem dados pessoais, profissionais, documento, telefone, endereço, redes sociais e privacidade.
+- Máscaras de CPF/CNPJ, telefone e CEP são aplicadas em tempo real, com preenchimento automático do endereço pelo ViaCEP.
+- O administrador pode criar ou editar o membro com e-mail já validado.
+- As duas listagens exibem o status do e-mail e permitem validá-lo manualmente por uma ação rápida.
+
+### Decisões técnicas
+- Validação e persistência foram centralizadas em `Admin\UserRequest` e `AdminUserService` para manter os dois painéis consistentes.
+- A troca de e-mail preserva a exigência de nova verificação quando o administrador não marcar o endereço como validado.
+- Nenhuma migration ou operação destrutiva de banco foi necessária.
+
+### Arquivos principais
+- `app/Http/Requests/Admin/UserRequest.php`
+- `app/Services/AdminUserService.php`
+- `app/Http/Controllers/Admin/UserController.php`
+- `app/Http/Controllers/Panel/Admin/UserController.php`
+- `resources/views/admin/users/*`
+- `resources/views/panel/admin/users/*`
+- `tests/Feature/AdminUserManagementTest.php`
+
+---
+
 ## [2026-06-19] - fix(sumup): recuperar checkout duplicado
 
 ### Corrigido

@@ -123,6 +123,10 @@
                                 </td>
                                 <td>
                                     <span class="text-muted text-sm">{{ $user->email }}</span>
+                                    <span class="badge d-block mt-1 {{ $user->hasVerifiedEmail() ? 'badge-success' : 'badge-warning' }}" style="width:max-content;">
+                                        <i class="fas {{ $user->hasVerifiedEmail() ? 'fa-check-circle' : 'fa-exclamation-circle' }} mr-1"></i>
+                                        {{ $user->hasVerifiedEmail() ? 'E-mail validado' : 'E-mail pendente' }}
+                                    </span>
                                 </td>
                                 <td class="text-center">
                                     @if($user->role === 'superadmin')
@@ -164,6 +168,14 @@
                                                 data-user-name="{{ $user->name }}"
                                                 data-is-current="{{ $marketingUserId === $user->id ? '1' : '0' }}">
                                                 <i class="fas fa-bullhorn"></i>
+                                            </button>
+                                        @endif
+                                        @if(!$user->hasVerifiedEmail())
+                                            <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-2 btn-verify-email"
+                                                title="Validar e-mail manualmente"
+                                                data-url="{{ route('admin.users.verify-email', $user) }}"
+                                                data-name="{{ $user->name }}">
+                                                <i class="fas fa-envelope-circle-check"></i>
                                             </button>
                                         @endif
                                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary rounded-pill px-2" title="Editar"
@@ -300,6 +312,38 @@
                         else alert(msg);
                     });
                 }
+            });
+
+            $(document).on('click', '.btn-verify-email', function () {
+                var button = $(this);
+                var execute = function () {
+                    $.post(button.data('url'), { _token: '{{ csrf_token() }}' })
+                        .done(function (response) {
+                            if (typeof toastr !== 'undefined') toastr.success(response.message);
+                            setTimeout(function () { window.location.reload(); }, 500);
+                        })
+                        .fail(function (xhr) {
+                            var message = xhr.responseJSON && xhr.responseJSON.message
+                                ? xhr.responseJSON.message
+                                : 'Não foi possível validar o e-mail.';
+                            if (typeof toastr !== 'undefined') toastr.error(message);
+                            else alert(message);
+                        });
+                };
+
+                if (typeof Swal === 'undefined') {
+                    if (confirm('Validar manualmente o e-mail de ' + button.data('name') + '?')) execute();
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Validar e-mail?',
+                    text: 'O membro poderá realizar compras sem abrir o link de confirmação.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, validar',
+                    cancelButtonText: 'Cancelar'
+                }).then(function (result) { if (result.isConfirmed) execute(); });
             });
         });
     </script>

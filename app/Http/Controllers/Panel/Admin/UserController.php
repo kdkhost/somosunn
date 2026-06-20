@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\Panel\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UserRequest;
 use App\Models\Plan;
 use App\Models\User;
-use App\Rules\ValidEmailAddress;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
+use App\Services\AdminUserService;
 
 class UserController extends Controller
 {
@@ -36,7 +33,12 @@ class UserController extends Controller
         }
 
         if (request()->has('role') && request('role') !== 'todos') {
-            $query->where('role', request('role'));
+            $role = request('role');
+            if (in_array($role, ['member', 'membro'], true)) {
+                $query->whereIn('role', ['member', 'membro']);
+            } else {
+                $query->where('role', $role);
+            }
         }
 
         if (!$this->isSuperadmin()) {
@@ -68,22 +70,9 @@ class UserController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(UserRequest $request, AdminUserService $userService)
     {
-        $request->merge(['email' => mb_strtolower(trim((string) $request->input('email')))]);
-        $featureKeys = array_keys($this->userFeatures());
-
-        $data = $request->validate([
-            'name' => 'required|string|max:120',
-            'email' => ['required', new ValidEmailAddress(), Rule::unique('users', 'email')],
-            'password' => 'required|min:6',
-            'role' => 'nullable|string',
-            'level' => 'nullable|string',
-            'plan_id' => 'nullable|exists:plans,id',
-            'plan_expires_at' => 'nullable|date',
-            'extra_features' => 'nullable|array',
-            'extra_features.*' => 'string|in:' . implode(',', $featureKeys),
-        ]);
+        $data = $request->validated();
 
         if (!$this->isSuperadmin()) {
             if (($data['role'] ?? '') === 'superadmin') {
@@ -95,17 +84,9 @@ class UserController extends Controller
             }
         }
 
-        $data['password'] = Hash::make($data['password']);
-        $data['extra_features'] = $data['extra_features'] ?? [];
+        $userService->create($data);
 
-        $user = User::create($data);
-        try {
-            event(new Registered($user));
-        } catch (\Throwable $e) {
-            \Log::error('Falha ao enviar verificação de e-mail ao novo usuário: ' . $e->getMessage());
-        }
-
-        return redirect()->route('panel.admin.users.index')->with('success', 'Usuario criado com sucesso.');
+        return redirect()->route('panel.admin.users.index')->with('success', 'Usuário criado com sucesso.');
     }
 
     public function edit(User $user)
@@ -124,26 +105,13 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(Request $request, User $user)
+    public function update(UserRequest $request, User $user, AdminUserService $userService)
     {
         if (!$this->isSuperadmin() && $user->role === 'superadmin') {
             return redirect()->route('panel.admin.users.index')->with('error', 'Voce nao tem permissao para editar este usuario.');
         }
 
-        $request->merge(['email' => mb_strtolower(trim((string) $request->input('email')))]);
-        $featureKeys = array_keys($this->userFeatures());
-
-        $data = $request->validate([
-            'name' => 'required|string|max:120',
-            'email' => ['required', new ValidEmailAddress(), Rule::unique('users')->ignore($user->id)],
-            'password' => 'nullable|min:6',
-            'role' => 'nullable|string',
-            'level' => 'nullable|string',
-            'plan_id' => 'nullable|exists:plans,id',
-            'plan_expires_at' => 'nullable|date',
-            'extra_features' => 'nullable|array',
-            'extra_features.*' => 'string|in:' . implode(',', $featureKeys),
-        ]);
+        $data = $request->validated();
 
         if (!$this->isSuperadmin()) {
             if (($data['role'] ?? '') === 'superadmin') {
@@ -155,30 +123,23 @@ class UserController extends Controller
             }
         }
 
-        if (!empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        } else {
-            unset($data['password']);
+        $userService->update($user, $data);
+
+        return redirect()->route('panel.admin.users.index')->with('success', 'Usuário atualizado com sucesso.');
+    }
+
+    public function verifyEmail(User $user, AdminUserService $userService)
+    {
+        if (!$this->isSuperadmin() && $user->role === 'superadmin') {
+            return redirect()->back()->with('error', 'Você não tem permissão para alterar este usuário.');
         }
 
-        $data['extra_features'] = $data['extra_features'] ?? [];
+        $verified = $userService->verifyEmail($user);
 
-        $emailChanged = mb_strtolower((string) $user->email) !== $data['email'];
-        $user->fill($data);
-        if ($emailChanged) {
-            $user->forceFill(['email_verified_at' => null]);
-        }
-        $user->save();
-
-        if ($emailChanged) {
-            try {
-                $user->sendEmailVerificationNotification();
-            } catch (\Throwable $e) {
-                \Log::error('Falha ao enviar verificação do novo e-mail: ' . $e->getMessage());
-            }
-        }
-
-        return redirect()->route('panel.admin.users.index')->with('success', 'Usuario atualizado com sucesso.');
+        return redirect()->back()->with(
+            'success',
+            $verified ? 'E-mail validado manualmente.' : 'O e-mail já estava validado.'
+        );
     }
 
     public function destroy(User $user)
