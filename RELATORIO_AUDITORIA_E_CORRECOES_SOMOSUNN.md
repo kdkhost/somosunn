@@ -4,6 +4,15 @@
 
 Data de atualização: 20/06/2026
 
+### Atualização aplicada em 24/08/2026 - publicação de depoimentos aprovados
+
+- Preservadas as rotas `admin.testimonials.*` e `panel.admin.testimonials.*`, sem alteração de URLs ou permissões.
+- A aprovação em `/painel/admin` agora define `is_active = true`, mantendo a mesma regra já aplicada em `/admin`.
+- A regra pública compartilhada `Testimonial::forSite()` passou a ser usada na home, na página de planos e na API de depoimentos.
+- A home passou a distinguir corretamente o campo `content` do model e o campo legado `text` do CMS, exibindo integralmente o que o membro escreveu.
+- Interfaces AdminLTE e Tailwind permanecem visualmente distintas; model, estado de publicação e regra de consulta continuam compartilhados.
+- Adicionados testes para depoimento de membro e para o formato legado configurado pelo CMS.
+
 ### Atualização aplicada em 20/06/2026 - ecossistema empresarial e patrocinadores
 
 - Novos recursos globais adicionados em `/admin/companies`, `/admin/sponsors`, `/admin/sponsor-plans` e `/admin/sponsor-banners`.

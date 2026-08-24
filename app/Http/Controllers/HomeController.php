@@ -249,7 +249,7 @@ class HomeController extends Controller
         $testimonials = collect();
         if (view()->shared('unnDbAvailable')) {
             try {
-                $testimonials = \App\Models\Testimonial::where('status', 'approved')
+                $testimonials = \App\Models\Testimonial::forSite()
                     ->orderByDesc('is_featured')
                     ->orderByDesc('created_at')
                     ->limit(6)

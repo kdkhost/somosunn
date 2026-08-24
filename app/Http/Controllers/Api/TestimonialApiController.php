@@ -15,7 +15,7 @@ class TestimonialApiController extends Controller
         $perPage = max(1, min($perPage, 100));
 
         $testimonials = Testimonial::query()
-            ->where('status', 'approved')
+            ->forSite()
             ->orderByDesc('is_featured')
             ->orderByDesc('created_at')
             ->paginate($perPage);

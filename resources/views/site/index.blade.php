@@ -693,10 +693,17 @@
                 <div class="grid md:grid-cols-3 gap-8">
                     @foreach($siteTestimonials as $testimonial)
                         @php
-                            $tName   = method_exists($testimonial,'offsetGet') ? ($testimonial['name'] ?? $testimonial->display_name ?? 'Anônimo') : ($testimonial->display_name ?? 'Anônimo');
-                            $tRole   = method_exists($testimonial,'offsetGet') ? ($testimonial['role'] ?? '') : ($testimonial->author_title ?? '');
-                            $tText   = method_exists($testimonial,'offsetGet') ? ($testimonial['text'] ?? '') : ($testimonial->content ?? '');
-                            $tRating = method_exists($testimonial,'offsetGet') ? ($testimonial['rating'] ?? 5) : ($testimonial->rating ?? 5);
+                            $tName   = data_get($testimonial, 'display_name')
+                                ?? data_get($testimonial, 'author_name')
+                                ?? data_get($testimonial, 'name')
+                                ?? 'Anônimo';
+                            $tRole   = data_get($testimonial, 'author_title')
+                                ?? data_get($testimonial, 'role')
+                                ?? '';
+                            $tText   = data_get($testimonial, 'content')
+                                ?? data_get($testimonial, 'text')
+                                ?? '';
+                            $tRating = data_get($testimonial, 'rating', 5) ?? 5;
                             $tAvatar = is_object($testimonial) && isset($testimonial->resolved_avatar) ? $testimonial->resolved_avatar : null;
                         @endphp
                         <div class="bg-white rounded-3xl p-8 shadow-lg">

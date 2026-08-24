@@ -66,6 +66,7 @@ class TestimonialController extends Controller
 
         $testimonial->update([
             'status' => 'approved',
+            'is_active' => true,
             'moderated_by' => Auth::id(),
             'moderated_at' => now(),
             'moderation_notes' => null,

@@ -2,6 +2,22 @@
 
 ---
 
+## [2026-08-24] - fix(depoimentos): exibir texto aprovado no site
+
+### Corrigido
+- A home publica passou a ler corretamente `content` dos depoimentos cadastrados por membros, preservando o formato `text` usado pelos depoimentos configurados no CMS.
+- A aprovacao pelo painel moderno agora tambem ativa o depoimento, igualando o comportamento de `/painel/admin` ao painel principal `/admin`.
+- Home, pagina de planos e API publica passaram a usar a mesma regra de visibilidade: depoimento aprovado e ativo.
+
+### Arquivos principais
+- `resources/views/site/index.blade.php`
+- `app/Http/Controllers/HomeController.php`
+- `app/Http/Controllers/Api/TestimonialApiController.php`
+- `app/Http/Controllers/Panel/Admin/TestimonialController.php`
+- `tests/Feature/PublicTestimonialRenderingTest.php`
+
+---
+
 ## [2026-06-20] - feat(empresas, patrocinadores): criar ecossistema empresarial integrado
 
 ### Adicionado
