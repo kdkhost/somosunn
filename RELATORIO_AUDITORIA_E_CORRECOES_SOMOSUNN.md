@@ -2,6 +2,12 @@
 
 ## Painéis Administrativos
 
+### Atualização aplicada em 24/08/2026 - integridade visual das capas de eventos
+
+- A restauração do banco recuperou caminhos de capas, mas sete arquivos binários não estavam presentes no storage nem nos backups de arquivos disponíveis.
+- `Event::image_url` agora retorna somente arquivos acessíveis e reutiliza mídia válida da galeria quando a capa cadastrada está ausente.
+- A listagem `/painel/admin/events` antecipa os relacionamentos de mídia, evitando N+1 durante o fallback; eventos sem arquivo recuperável exibem placeholder em vez de imagem quebrada.
+
 ### Atualização aplicada em 24/08/2026 - responsividade da listagem de revistas
 
 - As listagens em `/admin/magazines` e `/painel/admin/magazines` deixaram de usar rolagem horizontal.

@@ -120,7 +120,30 @@ class Event extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return UploadStorage::url($this->image);
+        $image = trim((string) $this->image);
+        if ($image !== '' && (preg_match('/^https?:\/\//i', $image) || UploadStorage::exists($image))) {
+            return UploadStorage::url($image);
+        }
+
+        $coverMedia = $this->relationLoaded('galleryCoverMedia')
+            ? $this->galleryCoverMedia
+            : ($this->gallery_cover_media_id ? $this->galleryCoverMedia()->first() : null);
+
+        if ($coverMedia?->file_path && UploadStorage::exists($coverMedia->file_path)) {
+            return UploadStorage::url($coverMedia->file_path);
+        }
+
+        $media = $this->relationLoaded('media')
+            ? $this->media
+            : $this->media()->where('type', 'image')->oldest('created_at')->get();
+
+        $fallbackMedia = $media
+            ->where('type', 'image')
+            ->first(fn (EventMedia $item) => $item->file_path && UploadStorage::exists($item->file_path));
+
+        return $fallbackMedia?->file_path
+            ? UploadStorage::url($fallbackMedia->file_path)
+            : null;
     }
 
     /**

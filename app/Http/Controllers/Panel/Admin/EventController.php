@@ -37,7 +37,9 @@ class EventController extends Controller
     {
         $this->ensurePermission('events.view');
 
-        $query = Event::query()->latest();
+        $query = Event::query()
+            ->with(['galleryCoverMedia', 'media'])
+            ->latest();
 
         // Filtro por tipo (Evento ou Álbum) vindo da rota ou query string
         $type = $request->route('type') ?? $request->query('type');

@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - fix(eventos): capas ausentes sem imagens quebradas
+
+- O accessor público de imagem do evento passou a confirmar a existência física do arquivo antes de gerar a URL.
+- Quando a capa original não existe, o sistema usa a capa da galeria ou a primeira imagem válida do álbum; sem alternativa, apresenta o placeholder da view.
+- A listagem administrativa carrega capa e mídias antecipadamente para evitar consultas repetidas durante a resolução do fallback.
+
 ## [2026-08-24] - fix(revistas): listagens sem rolagem horizontal
 
 - As tabelas de revistas dos dois painéis passaram a respeitar integralmente a largura disponível, sem barra de rolagem horizontal.
