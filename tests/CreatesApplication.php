@@ -17,7 +17,15 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
+        $connection = (string) config('database.default');
+        $database = (string) config("database.connections.{$connection}.database");
+
+        if (!$app->environment('testing') || $database !== 'testing') {
+            throw new \RuntimeException(
+                "Testes bloqueados: ambiente ou banco inseguro (env={$app->environment()}, database={$database})."
+            );
+        }
+
         return $app;
     }
 }
-

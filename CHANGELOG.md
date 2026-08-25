@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - fix(segurança): isolamento obrigatório do banco de testes
+
+- O PHPUnit passou a usar um caminho próprio de cache de configuração, impedindo o carregamento acidental do cache da aplicação em produção.
+- A inicialização dos testes agora aborta antes de `RefreshDatabase` quando o ambiente não é `testing` ou o banco efetivo não se chama exatamente `testing`.
+- O banco de produção foi restaurado a partir do backup íntegro de 24/08/2026 às 22:13 e validado por contagens independentes.
+
 ## [2026-08-24] - feat(somos-unicas): depoimentos na página pública
 
 - A página `/somos-unicas` passou a exibir até seis depoimentos aprovados e ativos, priorizando os destacados e mais recentes.

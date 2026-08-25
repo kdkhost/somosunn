@@ -2,6 +2,13 @@
 
 ## Painéis Administrativos
 
+### Atualização aplicada em 24/08/2026 - proteção do banco contra testes
+
+- Foi identificado que o cache local de configuração podia prevalecer sobre `DB_DATABASE=testing` durante PHPUnit e direcionar `RefreshDatabase` ao banco incorreto.
+- `APP_CONFIG_CACHE=bootstrap/cache/config-testing.php` isola a configuração usada pela suíte.
+- `tests/CreatesApplication.php` interrompe a execução antes dos traits de banco se o ambiente não for `testing` ou se o database efetivo não for exatamente `testing`.
+- O banco de produção foi restaurado pelo backup íntegro `2026-08-24_221343.sql.gz`; a validação confirmou usuários, conteúdos, configurações, revistas, depoimentos e tarefas agendadas.
+
 ### Atualização aplicada em 24/08/2026 - depoimentos em Somos Únicas
 
 - A página pública `/somos-unicas` passou a consumir o mesmo modelo e scope `Testimonial::forSite()` usado na exposição pública dos depoimentos.
