@@ -59,7 +59,7 @@ class HomeController extends Controller
                     ->values();
 
                 $featuredMagazines = Magazine::query()
-                    ->where('status', 'published')
+                    ->visibleTo(auth()->user())
                     ->where('is_featured', true)
                     ->whereNotNull('thumbnail')
                     ->where('thumbnail', '!=', '')

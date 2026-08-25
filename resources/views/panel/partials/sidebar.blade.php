@@ -7,9 +7,6 @@
     $canManageEventExhibitors = (method_exists($user, 'canManageEventExhibitors') && $user->canManageEventExhibitors());
     $hasPartnerProfile = false;
 
-    // Interesse em Noticias (exibe modulo Revistas)
-    $hasNewsInterest = \App\Models\Magazine::userHasNewsInterest($user);
-
     // Contagem de usuarios bloqueados
     $blockedCount = \App\Models\Connection::where('status', 'blocked')
         ->where(function ($q) use ($user) {
@@ -91,7 +88,7 @@
             'route' => route('magazines.index'),
             'icon' => 'fas fa-book-open',
             'active' => request()->routeIs('magazines.*'),
-            'visible' => $user->isAdmin() || $hasNewsInterest,
+            'visible' => true,
         ],
         [
             'label' => 'Portal',

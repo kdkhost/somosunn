@@ -4,6 +4,14 @@
 
 Data de atualização: 20/06/2026
 
+### Atualização aplicada em 24/08/2026 - acesso e descrição das revistas
+
+- A banca pública foi incluída no menu Comunidade para visitantes e no menu móvel correspondente.
+- A sidebar do painel moderno exibe Revistas para todos os membros, enquanto os links administrativos continuam restritos pelas permissões existentes.
+- O destaque público da home passou a apresentar título, edição/categoria e `short_description`, preservando o layout de capas.
+- A consulta compartilhada usa `Magazine::visibleTo()`, impedindo a exposição na home de revistas configuradas como `members` para visitantes.
+- Rotas existentes `magazines.*`, `admin.magazines.*` e `panel.admin.magazines.*` foram preservadas.
+
 ### Atualização aplicada em 24/08/2026 - sincronização oficial de revistas
 
 - A regra de importação permanece única no comando `magazines:import-manchete` e atende às revistas exibidas e gerenciadas pelos dois painéis.

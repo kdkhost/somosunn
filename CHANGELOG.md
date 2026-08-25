@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - fix(revistas): menu público e descrição nos destaques
+
+- O link Revistas passou a aparecer para visitantes no menu Comunidade, tanto no desktop quanto no menu móvel.
+- A sidebar do painel passou a mostrar a banca para todos os membros, pois revistas públicas não dependem do interesse Notícias.
+- Os destaques da home agora exibem edição/categoria, título e descrição curta cadastrada abaixo da capa.
+- A consulta da home respeita `visibility`: visitantes não recebem destaques marcados como `members`.
+
 ## [2026-08-24] - feat(revistas): sincronização automática do catálogo Manchete
 
 - O comando `magazines:import-manchete` agora consulta o catálogo oficial e inclui automaticamente novas edições públicas.

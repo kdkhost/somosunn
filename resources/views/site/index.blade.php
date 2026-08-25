@@ -661,12 +661,19 @@
 
                 <div id="home-magazines-carousel" class="home-magazines-track" tabindex="0" aria-label="Revistas em destaque">
                     @foreach($featuredMagazines as $magazine)
-                        <a href="{{ route('magazines.show', $magazine->slug) }}"
-                            class="home-magazines-cover"
-                            aria-label="Ler {{ $magazine->title }}"
-                            title="Ler {{ $magazine->title }}">
-                            <img src="{{ $magazine->thumbnail_url }}" alt="Capa da revista {{ $magazine->title }}" loading="lazy">
-                        </a>
+                        <article class="home-magazines-card">
+                            <a href="{{ route('magazines.show', $magazine->slug) }}"
+                                class="home-magazines-cover"
+                                aria-label="Ler {{ $magazine->title }}"
+                                title="Ler {{ $magazine->title }}">
+                                <img src="{{ $magazine->thumbnail_url }}" alt="Capa da revista {{ $magazine->title }}" loading="lazy">
+                            </a>
+                            <div class="home-magazines-copy">
+                                <p class="home-magazines-meta">{{ $magazine->edition ?: $magazine->category }}</p>
+                                <h3>{{ $magazine->title }}</h3>
+                                <p>{{ \Illuminate\Support\Str::limit(strip_tags((string) ($magazine->short_description ?: 'Edição digital disponível para leitura.')), 130) }}</p>
+                            </div>
+                        </article>
                     @endforeach
                 </div>
             </div>
@@ -896,6 +903,39 @@
             box-shadow: 0 12px 30px -12px rgba(15, 23, 42, 0.38);
             scroll-snap-align: start;
             transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+
+        .home-magazines-card {
+            min-width: 0;
+            scroll-snap-align: start;
+        }
+
+        .home-magazines-copy {
+            padding-top: 0.9rem;
+        }
+
+        .home-magazines-meta {
+            margin: 0 0 0.3rem;
+            color: var(--unn-azul-1);
+            font-size: 0.72rem;
+            font-weight: 800;
+            line-height: 1.25;
+            text-transform: uppercase;
+        }
+
+        .home-magazines-copy h3 {
+            margin: 0;
+            color: #0f172a;
+            font-size: 1rem;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .home-magazines-copy > p:last-child {
+            margin: 0.45rem 0 0;
+            color: #64748b;
+            font-size: 0.82rem;
+            line-height: 1.45;
         }
 
         .home-magazines-cover:hover,
