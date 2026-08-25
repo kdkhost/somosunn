@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - fix(upload): dropzone coerente com AdminLTE dark
+
+- O componente `x-unn-dropzone` passou a reconhecer `.dark-mode`, classe usada pelo painel AdminLTE.
+- Fundo, borda, textos, ícones, botão, preview e estados de arrastar/erro agora usam a paleta azul-grafite do tema escuro.
+- O painel Tailwind continua usando o comportamento existente por `.dark`, sem alteração visual.
+
 ## [2026-08-24] - feat(revistas): destaque rápido nas listagens
 
 - As listagens `/admin/magazines` e `/painel/admin/magazines` receberam um botão de estrela para ativar ou remover o destaque.

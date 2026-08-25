@@ -34,7 +34,7 @@
             <div class="unn-dz-label">{!! $label !!}</div>
             <div class="unn-dz-hint">{{ $hint }}</div>
             <div class="unn-dz-browse">Selecionar arquivo</div>
-            <div class="unn-dz-meta">Tamanho maximo: {{ $maxSizeMb }} MB</div>
+            <div class="unn-dz-meta">Tamanho máximo: {{ $maxSizeMb }} MB</div>
         </div>
 
         <div class="unn-dz-preview" hidden>
@@ -63,7 +63,7 @@
             <a href="{{ $currentUrl }}" target="_blank" class="unn-dz-current-link">
                 {{ $currentLabel ?? 'Arquivo atual' }}
             </a>
-            <small>(sera substituido se voce enviar um novo)</small>
+            <small>(será substituído se você enviar um novo)</small>
         </div>
     @endif
 </div>
@@ -241,6 +241,67 @@
     .unn-dz--lte {
         border-radius: .5rem;
         min-height: 150px;
+    }
+
+    .dark-mode .unn-dz--lte {
+        background: #162032;
+        border-color: #475569;
+        color: #cbd5e1;
+        box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .04);
+    }
+    .dark-mode .unn-dz--lte:hover,
+    .dark-mode .unn-dz--lte:focus-visible {
+        background: #1b2940;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .16);
+    }
+    .dark-mode .unn-dz--lte.is-dragover {
+        background: #1e3150;
+        border-color: #60a5fa;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, .18);
+    }
+    .dark-mode .unn-dz--lte.has-file {
+        background: #162032;
+        border-style: solid;
+        border-color: #3b82f6;
+    }
+    .dark-mode .unn-dz--lte.has-error {
+        background: rgba(127, 29, 29, .2);
+        border-color: #ef4444;
+    }
+    .dark-mode .unn-dz--lte .unn-dz-icon {
+        color: #60a5fa;
+    }
+    .dark-mode .unn-dz--lte .unn-dz-label,
+    .dark-mode .unn-dz--lte .unn-dz-filename {
+        color: #f8fafc;
+    }
+    .dark-mode .unn-dz--lte .unn-dz-hint,
+    .dark-mode .unn-dz--lte .unn-dz-filesize,
+    .dark-mode .unn-dz--lte .unn-dz-meta {
+        color: #94a3b8;
+    }
+    .dark-mode .unn-dz--lte .unn-dz-browse {
+        background: #2563eb;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, .3);
+    }
+    .dark-mode .unn-dz--lte .unn-dz-file-icon {
+        background: #273449;
+        color: #f87171;
+        box-shadow: none;
+    }
+    .dark-mode .unn-dz--lte .unn-dz-remove {
+        background: #3b2633;
+        color: #fca5a5;
+    }
+    .dark-mode .unn-dz--lte .unn-dz-remove:hover {
+        background: #5c2635;
+    }
+    .dark-mode .unn-dz-current {
+        color: #94a3b8;
+    }
+    .dark-mode .unn-dz-current-link {
+        color: #60a5fa;
     }
 </style>
 @endpush

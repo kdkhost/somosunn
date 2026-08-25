@@ -4,6 +4,13 @@
 
 Data de atualização: 20/06/2026
 
+### Atualização aplicada em 24/08/2026 - dropzone no tema escuro
+
+- O componente compartilhado `x-unn-dropzone` ganhou tratamento específico para `.dark-mode`, usado pelo AdminLTE em `/admin`.
+- Estados vazio, hover, foco, arrastar, arquivo selecionado e erro mantêm contraste compatível com os cards azul-grafite do painel.
+- O seletor `.dark` do painel Tailwind foi preservado, mantendo a mesma implementação funcional nos dois painéis e diferenças visuais coerentes.
+- Nenhuma rota, permissão, validação ou regra de upload foi alterada.
+
 ### Atualização aplicada em 24/08/2026 - destaque rápido de revistas
 
 - `/admin/magazines` e `/painel/admin/magazines` exibem a mesma ação de estrela para alternar `is_featured` com salvamento AJAX imediato.
