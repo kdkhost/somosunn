@@ -190,7 +190,7 @@
 <div class="mag-viewer" id="mag-viewer">
     {{-- Header --}}
     <div class="mag-header">
-        <a href="{{ route('magazines.index') }}" class="mag-back">
+        <a href="{{ route('magazines.index') }}" class="mag-back js-magazine-back">
             <i class="fas fa-arrow-left"></i> Voltar
         </a>
         <div class="mag-info">
@@ -218,6 +218,13 @@
 
 @push('scripts')
 <script>
+    document.querySelector('.js-magazine-back')?.addEventListener('click', function (event) {
+        if (window.history.length > 1 && document.referrer) {
+            event.preventDefault();
+            window.history.back();
+        }
+    });
+
     // DearFlip location (local assets: images, sound, etc.)
     var dFlipLocation = "{{ asset('assets-dflip') }}/";
 

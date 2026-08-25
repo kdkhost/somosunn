@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - fix(revistas): voltar sem redirecionar ao login
+
+- O botao Voltar dos dois leitores de PDF retorna ao historico real do navegador e usa a banca como fallback.
+- A banca `/revistas` passou a aceitar visitantes; o controller continua filtrando revistas conforme visibilidade publica, destaque, membro e interesse.
+- O ajuste evita a falsa impressao de logout ao sair de uma revista publica.
+
 ## [2026-08-24] - fix(depoimentos): sincronizar aprovacao no painel
 
 - Aprovacao e recusa via AJAX agora recarregam a listagem administrativa apos a confirmacao.

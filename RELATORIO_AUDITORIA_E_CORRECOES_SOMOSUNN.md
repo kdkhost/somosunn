@@ -339,6 +339,12 @@ As permissões administrativas mantêm o namespace `admin.events.*` mesmo quando
 
 - `/admin`: usa views `admin.*`, layout AdminLTE, sidebar administrativa e componentes legados.
 
+### Atualizacao aplicada em 24/08/2026 - retorno do leitor de revistas
+
+- Os leitores DearFlip e PDF.js/StPageFlip voltam para a pagina anterior pelo historico do navegador.
+- A rota `/revistas` funciona como fallback publico e continua respeitando a visibilidade calculada pelo `MagazineController`.
+- A alteracao nao modifica rotas administrativas nem permissoes dos dois paineis.
+
 ### Atualizacao aplicada em 24/08/2026 - sincronizacao de depoimentos
 
 - No painel `/admin`, aprovacao e recusa por AJAX atualizam imediatamente a tabela e os indicadores.

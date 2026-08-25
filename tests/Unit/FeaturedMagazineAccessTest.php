@@ -45,4 +45,12 @@ class FeaturedMagazineAccessTest extends TestCase
         $this->assertNotNull($route);
         $this->assertNotContains('auth', $route->gatherMiddleware());
     }
+
+    public function test_magazine_index_route_is_available_as_safe_public_fallback(): void
+    {
+        $route = Route::getRoutes()->getByName('magazines.index');
+
+        $this->assertNotNull($route);
+        $this->assertNotContains('auth', $route->gatherMiddleware());
+    }
 }

@@ -259,9 +259,7 @@ Route::post('mentorships/{mentorship}/checkout', [\App\Http\Controllers\Mentorsh
 
 // Revistas (Public/Members) — flipbook viewer
 // Destaques publicados podem ser lidos publicamente; demais acessos seguem a visibilidade do controller.
-Route::middleware(['auth'])->group(function () {
-    Route::get('revistas', [\App\Http\Controllers\MagazineController::class, 'index'])->name('magazines.index');
-});
+Route::get('revistas', [\App\Http\Controllers\MagazineController::class, 'index'])->name('magazines.index');
 Route::get('revistas/{magazine:slug}', [\App\Http\Controllers\MagazineController::class, 'show'])->name('magazines.show');
 
 // Reviews
