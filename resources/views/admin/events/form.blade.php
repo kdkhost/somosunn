@@ -228,7 +228,7 @@
                             <label id="coverImageLabel">{{ (!isset($event) || $event->type !== 'album' ? (request('type') !== 'album' ? 'Imagem Principal (Capa do Evento)' : 'Imagem Principal (Capa do Álbum)') : 'Imagem Principal (Capa do Álbum)') }}</label>
                             <input type="hidden" name="remove_image" value="0">
                             <div class="upload-box" data-max-size="5242880"
-                                data-existing-url="{{ $event->image ? asset('storage/' . $event->image) : '' }}"
+                                data-existing-url="{{ $event->image_url ?? '' }}"
                                 data-remove-input="[name='remove_image']">
                                 <input type="file" name="image" accept="image/*" class="d-none">
                                 <div class="upload-preview mb-2"></div>

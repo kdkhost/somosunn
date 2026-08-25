@@ -204,7 +204,7 @@ class AffiliateShareKitService
                     'id' => $event->id,
                     'title' => $event->title,
                     'subtitle' => $this->cleanText($event->description, 140),
-                    'image_url' => $this->resolveMediaUrl($event->image),
+                    'image_url' => $event->image_url,
                     'price_label' => 'R$ ' . number_format((float) $event->effective_price, 2, ',', '.'),
                     'cta_label' => 'Reservar vaga',
                     'public_url' => route('events.show', $event),

@@ -48,7 +48,7 @@ class ShareController extends Controller
             $label = 'Evento';
             $title = (string) $event->title;
             $description = (string) ($event->description ?? '');
-            $imagePath = (string) ($event->image ?? '');
+            $imagePath = (string) ($event->image_url ?? '');
             $targetUrl = route('events.show', $event);
             $sellerName = (string) (optional($event->user)->name ?? '');
         } else {

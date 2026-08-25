@@ -278,7 +278,7 @@
                             <div id="drag-drop-area" class="group relative w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl p-8 transition-all duration-300 ease-out cursor-pointer overflow-hidden bg-slate-50 dark:bg-slate-900/50 hover:border-blue-500 hover:bg-blue-50/50 dark:hover:border-blue-500 dark:hover:bg-blue-900/20" style="min-height: 240px;">
                                 
                                 <!-- Estado Inicial / Vazio -->
-                                <div id="upload-prompt" class="flex flex-col items-center justify-center pointer-events-none transition-opacity duration-300 z-10 {{ $event->image ? 'opacity-0' : '' }}">
+                                <div id="upload-prompt" class="flex flex-col items-center justify-center pointer-events-none transition-opacity duration-300 z-10 {{ $event->image_url ? 'opacity-0' : '' }}">
                                     <div class="w-16 h-16 mb-4 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300">
                                         <i class="fas fa-cloud-upload-alt text-2xl"></i>
                                     </div>
@@ -289,8 +289,8 @@
                                 </div>
 
                                 <!-- Preview ativo -->
-                                <div id="upload-preview-container" class="absolute inset-x-2 inset-y-2 pointer-events-none transition-opacity duration-300 z-0 flex flex-col items-center justify-center rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 {{ $event->image ? 'opacity-100' : 'opacity-0' }}">
-                                    <img id="upload-preview-image" class="w-full h-full object-cover transition-transform duration-700" src="{{ $event->image ? asset('storage/' . $event->image) : '' }}" alt="Preview da Capa">
+                                <div id="upload-preview-container" class="absolute inset-x-2 inset-y-2 pointer-events-none transition-opacity duration-300 z-0 flex flex-col items-center justify-center rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 {{ $event->image_url ? 'opacity-100' : 'opacity-0' }}">
+                                    <img id="upload-preview-image" class="w-full h-full object-cover transition-transform duration-700" src="{{ $event->image_url ?? '' }}" alt="Preview da Capa">
                                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
                                     
                                     <!-- Barra de Progresso Simulação -->
@@ -313,7 +313,7 @@
                                 </div>
                             </div>
                             
-                            <div id="upload-actions" class="{{ $event->image ? 'flex' : 'hidden' }} items-center justify-between gap-3 px-2 mt-3 w-full">
+                            <div id="upload-actions" class="{{ $event->image_url ? 'flex' : 'hidden' }} items-center justify-between gap-3 px-2 mt-3 w-full">
                                 <span class="text-xs font-mono font-medium text-slate-500 truncate min-w-0" id="upload-filename" title="{{ $event->image ? basename($event->image) : '' }}">
                                     {{ $event->image ? basename($event->image) : '' }}
                                 </span>

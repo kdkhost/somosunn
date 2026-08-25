@@ -99,7 +99,7 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                @if($event->image)
+                                                @if($event->image_url)
                                                     <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
                                                         class="img-rounded mr-3 shadow-sm"
                                                         style="object-fit: cover; width: 50px; height: 35px; border-radius: 4px;">

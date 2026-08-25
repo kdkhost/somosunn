@@ -8,6 +8,7 @@
 - `Event::image_url` agora retorna somente arquivos acessíveis e reutiliza mídia válida da galeria quando a capa cadastrada está ausente.
 - A listagem `/painel/admin/events` antecipa os relacionamentos de mídia, evitando N+1 durante o fallback; eventos sem arquivo recuperável exibem placeholder em vez de imagem quebrada.
 - Os fluxos equivalentes do painel AdminLTE e as vitrines públicas de Eventos, Marketplace e Somos ÚNICAS também foram alinhados ao mesmo resolvedor de imagem.
+- Prévias de edição e os dados de compartilhamento também deixam de expor caminhos sem arquivo físico correspondente.
 
 ### Atualização aplicada em 24/08/2026 - responsividade da listagem de revistas
 

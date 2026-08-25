@@ -60,8 +60,8 @@
             <div>
                 <label class="block text-sm font-semibold mb-1">Imagem</label>
                 <input type="file" name="image" accept="image/*" class="w-full border rounded px-3 py-2">
-                @if(!empty($event->image))
-                    <img src="/{{ $event->image }}" alt="Imagem" class="h-20 mt-2">
+                @if($event->image_url)
+                    <img src="{{ $event->image_url }}" alt="Imagem" class="h-20 mt-2">
                 @endif
             </div>
             <div class="flex justify-end gap-2">
