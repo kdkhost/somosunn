@@ -135,6 +135,21 @@ class MagazineController extends Controller
         return redirect()->back()->with('success', 'Revista removida.');
     }
 
+    public function toggleFeatured(Magazine $magazine)
+    {
+        $this->ensureCanManage($magazine);
+
+        $magazine->update(['is_featured' => !$magazine->is_featured]);
+
+        return response()->json([
+            'success' => true,
+            'is_featured' => $magazine->is_featured,
+            'message' => $magazine->is_featured
+                ? 'Revista adicionada aos destaques.'
+                : 'Revista removida dos destaques.',
+        ]);
+    }
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------

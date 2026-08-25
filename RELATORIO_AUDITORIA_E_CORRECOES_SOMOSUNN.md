@@ -4,6 +4,14 @@
 
 Data de atualização: 20/06/2026
 
+### Atualização aplicada em 24/08/2026 - destaque rápido de revistas
+
+- `/admin/magazines` e `/painel/admin/magazines` exibem a mesma ação de estrela para alternar `is_featured` com salvamento AJAX imediato.
+- A regra compartilhada permanece em `Admin\MagazineController::toggleFeatured()` e reutiliza `ensureCanManage()` para administradores, superadministradores, editores e proprietários autorizados.
+- As interfaces mantêm seus estilos próprios, exibem carregamento durante a requisição e notificam o resultado por Toastify, com fallback de erro.
+- Rotas POST com CSRF preservado: `admin.magazines.toggle-featured` e `panel.admin.magazines.toggle-featured`.
+- Testes validam a existência, URI e método das rotas nos dois painéis.
+
 ### Atualização aplicada em 24/08/2026 - acesso e descrição das revistas
 
 - A banca pública foi incluída no menu Comunidade para visitantes e no menu móvel correspondente.

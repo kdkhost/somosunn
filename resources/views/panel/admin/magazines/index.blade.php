@@ -69,6 +69,7 @@
                         <th class="px-4 py-3">Status</th>
                         <th class="px-4 py-3">Visibilidade</th>
                         <th class="px-4 py-3">Visualizações</th>
+                        <th class="px-4 py-3 text-center">Destaque</th>
                         <th class="px-4 py-3 text-right">Ações</th>
                     </tr>
                 </thead>
@@ -111,6 +112,19 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ number_format($m->views_count, 0, ',', '.') }}</td>
+                            <td class="px-4 py-3 text-center">
+                                <button type="button"
+                                    class="js-toggle-magazine-featured inline-flex items-center justify-center w-9 h-9 rounded-lg border transition {{ $m->is_featured ? 'bg-amber-100 border-amber-300 text-amber-600 dark:bg-amber-900/40 dark:border-amber-700' : 'bg-slate-100 border-slate-200 text-slate-400 dark:bg-slate-800 dark:border-slate-700' }}"
+                                    data-url="{{ route('panel.admin.magazines.toggle-featured', $m) }}"
+                                    data-featured="{{ $m->is_featured ? '1' : '0' }}"
+                                    data-active-classes="bg-amber-100 border-amber-300 text-amber-600 dark:bg-amber-900/40 dark:border-amber-700"
+                                    data-inactive-classes="bg-slate-100 border-slate-200 text-slate-400 dark:bg-slate-800 dark:border-slate-700"
+                                    aria-pressed="{{ $m->is_featured ? 'true' : 'false' }}"
+                                    title="{{ $m->is_featured ? 'Remover dos destaques' : 'Adicionar aos destaques' }}">
+                                    <i class="{{ $m->is_featured ? 'fas' : 'far' }} fa-star" aria-hidden="true"></i>
+                                    <span class="sr-only">Alterar destaque</span>
+                                </button>
+                            </td>
                             <td class="px-4 py-3 text-right whitespace-nowrap">
                                 <a href="{{ route('magazines.show', $m->slug) }}" target="_blank"
                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition"
@@ -128,7 +142,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-4 py-16 text-center">
+                            <td colspan="8" class="px-4 py-16 text-center">
                                 <div class="flex flex-col items-center gap-3 text-slate-400">
                                     <i class="fas fa-book-open text-5xl opacity-40"></i>
                                     <div class="text-base font-bold text-slate-600 dark:text-slate-400">Nenhuma revista cadastrada ainda</div>
@@ -146,3 +160,7 @@
         <div class="mt-5">{{ $magazines->links() }}</div>
     </div>
 @endsection
+
+@push('scripts')
+    @include('admin.magazines._featured-toggle-script')
+@endpush

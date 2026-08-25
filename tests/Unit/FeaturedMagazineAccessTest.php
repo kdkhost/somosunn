@@ -68,4 +68,17 @@ class FeaturedMagazineAccessTest extends TestCase
         $this->assertNotNull($route);
         $this->assertNotContains('auth', $route->gatherMiddleware());
     }
+
+    public function test_featured_toggle_routes_exist_in_both_admin_panels(): void
+    {
+        $legacy = Route::getRoutes()->getByName('admin.magazines.toggle-featured');
+        $panel = Route::getRoutes()->getByName('panel.admin.magazines.toggle-featured');
+
+        $this->assertNotNull($legacy);
+        $this->assertNotNull($panel);
+        $this->assertSame('admin/magazines/{magazine}/toggle-featured', $legacy->uri());
+        $this->assertSame('painel/admin/magazines/{magazine}/toggle-featured', $panel->uri());
+        $this->assertContains('POST', $legacy->methods());
+        $this->assertContains('POST', $panel->methods());
+    }
 }

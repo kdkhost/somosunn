@@ -75,6 +75,7 @@
                         <th>Status</th>
                         <th>Visibilidade</th>
                         <th>Visualizações</th>
+                        <th class="text-center">Destaque</th>
                         <th class="text-right">Ações</th>
                     </tr>
                 </thead>
@@ -120,6 +121,19 @@
                                 @endif
                             </td>
                             <td>{{ number_format($m->views_count, 0, ',', '.') }}</td>
+                            <td class="text-center">
+                                <button type="button"
+                                    class="btn btn-sm js-toggle-magazine-featured {{ $m->is_featured ? 'btn-warning' : 'btn-outline-secondary' }}"
+                                    data-url="{{ route('admin.magazines.toggle-featured', $m) }}"
+                                    data-featured="{{ $m->is_featured ? '1' : '0' }}"
+                                    data-active-classes="btn-warning"
+                                    data-inactive-classes="btn-outline-secondary"
+                                    aria-pressed="{{ $m->is_featured ? 'true' : 'false' }}"
+                                    title="{{ $m->is_featured ? 'Remover dos destaques' : 'Adicionar aos destaques' }}">
+                                    <i class="{{ $m->is_featured ? 'fas' : 'far' }} fa-star" aria-hidden="true"></i>
+                                    <span class="sr-only">Alterar destaque</span>
+                                </button>
+                            </td>
                             <td class="text-right text-nowrap">
                                 <a href="{{ route('magazines.show', $m->slug) }}" target="_blank" class="btn btn-sm btn-default" title="Visualizar">
                                     <i class="fas fa-eye"></i>
@@ -138,7 +152,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-5">
+                            <td colspan="8" class="text-center text-muted py-5">
                                 <i class="fas fa-book-open fa-3x mb-2 opacity-25 d-block"></i>
                                 Nenhuma revista cadastrada ainda.<br>
                                 <a href="{{ route('admin.magazines.create') }}" class="btn btn-primary btn-sm mt-2">
@@ -155,3 +169,7 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    @include('admin.magazines._featured-toggle-script')
+@endpush

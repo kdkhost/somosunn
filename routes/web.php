@@ -570,6 +570,7 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::delete('mentorships/{mentorship}/media/{media}', [\App\Http\Controllers\Panel\MentorshipMediaController::class, 'destroy'])->name('mentorships.media.destroy');
 
         // Revistas (digitais — flipbook)
+        Route::post('magazines/{magazine}/toggle-featured', [\App\Http\Controllers\Admin\MagazineController::class, 'toggleFeatured'])->name('magazines.toggle-featured');
         Route::resource('magazines', \App\Http\Controllers\Admin\MagazineController::class)->except(['show']);
 
         // Certificates
@@ -784,6 +785,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::delete('courses/{course}/lessons/{lesson}', [\App\Http\Controllers\LessonController::class, 'destroy'])->name('courses.lessons.destroy');
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
     Route::resource('mentorships', \App\Http\Controllers\Admin\MentorshipController::class);
+    Route::post('magazines/{magazine}/toggle-featured', [\App\Http\Controllers\Admin\MagazineController::class, 'toggleFeatured'])->name('magazines.toggle-featured');
     Route::resource('magazines', \App\Http\Controllers\Admin\MagazineController::class)->except(['show']);
     Route::get('invoices/editor', [\App\Http\Controllers\Admin\InvoiceEditorController::class, 'index'])->name('invoices.editor');
     Route::post('invoices/editor/save', [\App\Http\Controllers\Admin\InvoiceEditorController::class, 'save'])->name('invoices.editor.save');

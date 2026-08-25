@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - feat(revistas): destaque rápido nas listagens
+
+- As listagens `/admin/magazines` e `/painel/admin/magazines` receberam um botão de estrela para ativar ou remover o destaque.
+- O clique salva imediatamente por AJAX, sem recarregar a página, com indicador de processamento, Toastify e restauração visual em caso de erro.
+- Os dois painéis usam o mesmo método protegido por autorização no `Admin\MagazineController`.
+- Rotas adicionadas: `admin.magazines.toggle-featured` e `panel.admin.magazines.toggle-featured`.
+
 ## [2026-08-24] - fix(revistas): menu público e descrição nos destaques
 
 - O link Revistas passou a aparecer para visitantes no menu Comunidade, tanto no desktop quanto no menu móvel.
