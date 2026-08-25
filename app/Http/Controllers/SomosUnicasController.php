@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Mentorship;
 use App\Models\Testimonial;
 use App\Support\ContentVisibility;
+use Illuminate\Support\Facades\Log;
 
 class SomosUnicasController extends Controller
 {
@@ -46,12 +47,17 @@ class SomosUnicasController extends Controller
 
         $pageData = \App\Models\Page::dataBySlug('somos-unicas');
 
-        $testimonials = Testimonial::forSite()
-            ->with('user')
-            ->orderByDesc('is_featured')
-            ->orderByDesc('created_at')
-            ->limit(6)
-            ->get();
+        $testimonials = collect();
+        try {
+            $testimonials = Testimonial::forSite()
+                ->with('user')
+                ->orderByDesc('is_featured')
+                ->orderByDesc('created_at')
+                ->limit(6)
+                ->get();
+        } catch (\Throwable $exception) {
+            Log::warning('Falha ao carregar depoimentos em Somos Únicas: ' . $exception->getMessage());
+        }
 
         return view('site.somos-unicas', compact('courses', 'events', 'mentorships', 'testimonials', 'pageData'));
     }
