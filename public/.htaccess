@@ -7,6 +7,9 @@ AddDefaultCharset UTF-8
 
     RewriteEngine On
 
+    # Curriculos contem dados pessoais e so podem ser baixados por rota autenticada.
+    RewriteRule ^storage/resumes(?:/|$) - [R=404,L,NC]
+
     # === SECURITY: Block access to sensitive files and directories ===
     # Block .env files
     RewriteRule ^\.env - [F,L]

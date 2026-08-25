@@ -38,6 +38,10 @@ class PublicStorageProxyController extends Controller
         // Double-decode para prevenir bypass com %252e%252e etc.
         $decodedPath = urldecode(urldecode($path));
 
+        if (preg_match('#^(?:uploads/)?resumes(?:/|$)#i', ltrim(str_replace('\\', '/', $decodedPath), '/')) === 1) {
+            abort(404);
+        }
+
         // Bloquear padrões perigosos
         $blockedPatterns = [
             '..',

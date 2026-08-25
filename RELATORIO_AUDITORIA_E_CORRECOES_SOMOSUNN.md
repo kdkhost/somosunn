@@ -6,6 +6,8 @@ Data de atualização: 20/06/2026
 
 ### Atualização aplicada em 24/08/2026 - segurança, desempenho e PDFs
 
+- **Dados pessoais em currículos:** acesso anônimo a `storage/resumes` bloqueado no Apache e no proxy Laravel; novos arquivos são privados e o download permanece restrito ao responsável autenticado pela vaga.
+
 - O middleware compartilhado de segurança passou a proteger também a API e a impedir cache de respostas privadas em `/admin`, `/painel`, autenticação e rotas autenticadas.
 - A criptografia de sessão foi ativada por padrão, com flags de cookie controladas pelo ambiente e valores seguros no arquivo de exemplo.
 - Nenhuma rota ou permissão dos dois painéis foi removida; AdminLTE e Tailwind continuam usando a mesma camada global de proteção.

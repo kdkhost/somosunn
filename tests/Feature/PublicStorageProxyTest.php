@@ -80,6 +80,14 @@ class PublicStorageProxyTest extends TestCase
         $response->assertHeader('Content-Range', 'bytes */10');
     }
 
+    public function test_storage_route_never_exposes_resumes(): void
+    {
+        $path = public_path('storage/resumes/private-candidate.pdf');
+        $this->putTestFile($path, 'personal-data');
+
+        $this->get('/storage/resumes/private-candidate.pdf')->assertNotFound();
+    }
+
     private function putTestFile(string $path, string $contents): void
     {
         File::ensureDirectoryExists(dirname($path));

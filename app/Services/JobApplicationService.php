@@ -68,7 +68,7 @@ class JobApplicationService
             }
 
             $path = 'resumes/' . Str::uuid() . '.' . $ext;
-            Storage::disk('public')->put($path, $decoded);
+            Storage::disk('local')->put($path, $decoded);
 
             $application = JobApplication::create([
                 'job_vacancy_id' => $job->id,

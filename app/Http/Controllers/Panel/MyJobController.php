@@ -152,7 +152,9 @@ class MyJobController extends Controller
             abort(404);
         }
 
-        $path = storage_path('app/public/' . $application->resume_path);
+        $privatePath = storage_path('app/' . $application->resume_path);
+        $legacyPath = storage_path('app/public/' . $application->resume_path);
+        $path = file_exists($privatePath) ? $privatePath : $legacyPath;
 
         if (!file_exists($path)) {
             abort(404, 'Curriculo nao encontrado.');

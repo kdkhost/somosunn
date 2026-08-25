@@ -4,6 +4,10 @@
 
 ## [2026-08-24] - feat(seguranca, desempenho): proteger dados e acelerar PDFs
 
+### Correção crítica adicional - currículos privados
+- Bloqueado o acesso público direto a `storage/resumes`, inclusive quando o arquivo existe no link público do storage.
+- Novos currículos passam a ser gravados no disco privado; o download autenticado mantém compatibilidade com arquivos legados sem removê-los.
+
 ### Segurança e privacidade
 - Sessões passaram a usar criptografia em repouso por padrão, mantendo cookies `Secure`, `HttpOnly` e `SameSite` configuráveis por ambiente.
 - Respostas autenticadas e rotas administrativas, de autenticação e API passaram a impedir armazenamento em cache por navegador ou proxy compartilhado.
