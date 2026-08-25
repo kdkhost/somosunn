@@ -62,7 +62,7 @@ class MarketplaceController extends Controller
 
         $eventsQuery = ContentVisibility::applyPublicFilter(
             Event::query()
-                ->with('user')
+                ->with(['user', 'galleryCoverMedia', 'media'])
                 ->where('published', true),
             'events'
         )

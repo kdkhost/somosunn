@@ -23,6 +23,7 @@ class EventController extends Controller
 
         $events = ContentVisibility::applyPublicFilter(
             Event::query()
+                ->with(['galleryCoverMedia', 'media'])
                 ->where('published', true)
                 ->where('type', 'event')
                 ->whereNotNull('start_at'),
@@ -37,6 +38,7 @@ class EventController extends Controller
 
         $pastEvents = ContentVisibility::applyPublicFilter(
             Event::query()
+                ->with(['galleryCoverMedia', 'media'])
                 ->where('published', true)
                 ->where('type', 'event')
                 ->whereNotNull('start_at'),

@@ -54,7 +54,9 @@ class EventController extends Controller
             return response()->json(['message' => 'Intervalo inválido para o feed de eventos.'], 422);
         }
 
-        $query = Event::where(function ($query) use ($start, $end) {
+        $query = Event::query()
+            ->with(['galleryCoverMedia', 'media'])
+            ->where(function ($query) use ($start, $end) {
             $query->where('start_at', '<', $end)
                 ->where(function ($q) use ($start) {
                     $q->where(function ($rangeQuery) use ($start) {
@@ -89,7 +91,7 @@ class EventController extends Controller
                 'allDay' => (bool) $event->all_day,
                 'extendedProps' => [
                     'description' => $event->description,
-                    'image_url' => $event->image ? asset('storage/' . $event->image) : null,
+                    'image_url' => $event->image_url,
                     'address' => $event->address,
                     'location' => $event->location,
                     'capacity' => $event->capacity,
@@ -813,7 +815,9 @@ class EventController extends Controller
     {
         $this->ensurePermission('events.view');
 
-        $query = Event::query()->latest();
+        $query = Event::query()
+            ->with(['galleryCoverMedia', 'media'])
+            ->latest();
 
         // Filtro por tipo (Evento ou Álbum) vindo da rota ou query string
         $type = $request->route('type') ?? $request->query('type');

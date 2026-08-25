@@ -5,6 +5,7 @@
 - O accessor público de imagem do evento passou a confirmar a existência física do arquivo antes de gerar a URL.
 - Quando a capa original não existe, o sistema usa a capa da galeria ou a primeira imagem válida do álbum; sem alternativa, apresenta o placeholder da view.
 - A listagem administrativa carrega capa e mídias antecipadamente para evitar consultas repetidas durante a resolução do fallback.
+- Calendário administrativo, Marketplace, Eventos e Somos ÚNICAS agora usam o mesmo resolvedor de imagem validado, sem montar links diretos para arquivos inexistentes.
 
 ## [2026-08-24] - fix(revistas): listagens sem rolagem horizontal
 

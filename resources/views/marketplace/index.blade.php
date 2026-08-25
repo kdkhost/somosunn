@@ -1148,7 +1148,7 @@
                         'icon' => 'fas fa-calendar-alt',
                         'title' => (string) $e->title,
                         'url' => route('events.show', $e),
-                        'image_url' => $resolveAssetUrl($e->image ?? ''),
+                        'image_url' => $e->image_url,
                         'original' => $regular,
                         'sale' => (float) ($e->effective_price ?? $regular),
                         'ends_at_ms' => (int) $e->flash_sale_ends_at->timestamp * 1000,
@@ -1680,8 +1680,7 @@
                             $flashEndsAtMs = ($flashActive && $event->flash_sale_ends_at) ? ((int) $event->flash_sale_ends_at->timestamp * 1000) : 0;
                             $isEventClosed = method_exists($event, 'isClosedForPublic') && $event->isClosedForPublic();
                             $dateLabel = $event->start_at ? (is_string($event->start_at) ? \Carbon\Carbon::parse($event->start_at) : $event->start_at)->format('d/m/Y') : null;
-                            $image = trim((string) ($event->image ?? ''));
-                            $imageUrl = $resolveAssetUrl($image);
+                            $imageUrl = $event->image_url;
                             $sellerPaymentsEnabled = $sellerHasPayments($sellerId);
                             $buyEnabled = $price <= 0 ? true : ($canBuy && $sellerPaymentsEnabled && $sellerCanSell($sellerId));
                             $disabledBuyLabel = !$sellerCanSell($sellerId)
@@ -1963,7 +1962,7 @@
                     'title' => (string) $event->title,
                     'date' => $date,
                     'url' => route('events.show', $event),
-                    'image_url' => $resolveAssetUrl($event->image ?? ''),
+                    'image_url' => $event->image_url,
                 ];
             })
             ->values();

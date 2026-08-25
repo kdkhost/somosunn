@@ -124,13 +124,14 @@
                                     <p class="text-xs font-bold text-pink-600 uppercase">{{ $eventDate ? $eventDate->translatedFormat('M') : '--' }}</p>
                                     <p class="text-xl font-black text-gray-900 leading-none">{{ $eventDate ? $eventDate->format('d') : '--' }}</p>
                                 </div>
-                                @php
-                                    $eventImage = $event->image 
-                                        ? (Str::startsWith($event->image, ['http://', 'https://']) ? $event->image : asset('storage/'.$event->image)) 
-                                        : asset('img/placeholder-event.jpg');
-                                @endphp
-                                <img src="{{ $eventImage }}" alt="{{ $event->title }}"
-                                    class="unicas-selling-media w-full h-36 object-cover rounded-xl mb-4">
+                                @if($event->image_url)
+                                    <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
+                                        class="unicas-selling-media w-full h-36 object-cover rounded-xl mb-4">
+                                @else
+                                    <div class="unicas-selling-media w-full h-36 rounded-xl mb-4 flex items-center justify-center bg-pink-50 text-pink-300" aria-label="Evento sem imagem">
+                                        <i class="fas fa-image text-3xl" aria-hidden="true"></i>
+                                    </div>
+                                @endif
                                 <h3 class="unicas-selling-title text-lg font-bold text-gray-900 mb-1 line-clamp-2">{{ $event->title }}</h3>
                                 <p class="unicas-selling-eyebrow text-xs text-pink-500 font-semibold mb-2"><i class="fas fa-microphone-alt mr-1"></i>
                                     {{ $event->speaker ?? $event->author_name ?? 'Palestrante UNN' }}</p>

@@ -28,6 +28,7 @@ class SomosUnicasController extends Controller
 
         $events = ContentVisibility::applySomosUnicasFilter(
             Event::query()
+                ->with(['galleryCoverMedia', 'media'])
                 ->whereNotNull('start_at')
                 ->where('published', true),
             'events'
