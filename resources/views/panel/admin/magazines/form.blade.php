@@ -159,9 +159,8 @@
                         <div>
                             <label class="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Visibilidade *</label>
                             <select name="visibility" required class="w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm bg-white dark:bg-slate-950 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
-                                <option value="interest" @selected(old('visibility', $magazine->visibility ?: 'interest') === 'interest')>Somente interessados em "Notícias"</option>
                                 <option value="members" @selected(old('visibility', $magazine->visibility) === 'members')>Todos os membros</option>
-                                <option value="public" @selected(old('visibility', $magazine->visibility) === 'public')>Público (visitantes)</option>
+                                <option value="public" @selected(old('visibility', $magazine->visibility ?: 'public') === 'public')>Público (visitantes)</option>
                             </select>
                         </div>
 

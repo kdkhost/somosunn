@@ -180,7 +180,7 @@ class MagazineController extends Controller
             'allow_download'    => 'nullable|boolean',
             'enable_sound'      => 'nullable|boolean',
             'status'            => 'required|in:draft,published,archived',
-            'visibility'        => 'required|in:public,members,interest',
+            'visibility'        => 'required|in:public,members',
         ]);
     }
 

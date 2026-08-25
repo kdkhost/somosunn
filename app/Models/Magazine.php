@@ -119,21 +119,10 @@ class Magazine extends Model
         $query->where('status', 'published');
 
         if (!$user) {
-            return $query->where('visibility', 'public');
+            return $query->where('visibility', '!=', 'members');
         }
 
-        if ($user->isAdmin()) {
-            return $query;
-        }
-
-        return $query->where(function ($q) use ($user) {
-            $q->where('visibility', 'public')
-              ->orWhere('visibility', 'members');
-
-            if (static::userHasNewsInterest($user)) {
-                $q->orWhere('visibility', 'interest');
-            }
-        });
+        return $query;
     }
 
     /**

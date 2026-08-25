@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Http\Controllers\MagazineController;
 use App\Models\Magazine;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use ReflectionMethod;
 use Tests\TestCase;
@@ -24,7 +25,7 @@ class FeaturedMagazineAccessTest extends TestCase
         $this->assertTrue($method->invoke(new MagazineController(), $magazine, null));
     }
 
-    public function test_non_featured_interest_magazine_still_requires_user_access(): void
+    public function test_legacy_interest_magazine_is_publicly_readable(): void
     {
         $magazine = new Magazine([
             'status' => 'published',
@@ -35,7 +36,21 @@ class FeaturedMagazineAccessTest extends TestCase
         $method = new ReflectionMethod(MagazineController::class, 'canView');
         $method->setAccessible(true);
 
+        $this->assertTrue($method->invoke(new MagazineController(), $magazine, null));
+    }
+
+    public function test_members_magazine_requires_authentication(): void
+    {
+        $magazine = new Magazine([
+            'status' => 'published',
+            'visibility' => 'members',
+        ]);
+
+        $method = new ReflectionMethod(MagazineController::class, 'canView');
+        $method->setAccessible(true);
+
         $this->assertFalse($method->invoke(new MagazineController(), $magazine, null));
+        $this->assertTrue($method->invoke(new MagazineController(), $magazine, new User(['role' => 'member'])));
     }
 
     public function test_magazine_reader_route_is_not_globally_restricted_to_authentication(): void

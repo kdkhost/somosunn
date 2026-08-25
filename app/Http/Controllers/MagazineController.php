@@ -94,11 +94,7 @@ class MagazineController extends Controller
             return false;
         }
 
-        if ($magazine->visibility === 'public') {
-            return true;
-        }
-
-        if ($magazine->is_featured) {
+        if ($magazine->visibility !== 'members') {
             return true;
         }
 
@@ -110,11 +106,6 @@ class MagazineController extends Controller
             return true;
         }
 
-        if ($magazine->visibility === 'members') {
-            return true;
-        }
-
-        // visibility = interest
-        return Magazine::userHasNewsInterest($user);
+        return true;
     }
 }

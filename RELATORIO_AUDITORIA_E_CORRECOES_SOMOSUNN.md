@@ -339,6 +339,12 @@ As permissões administrativas mantêm o namespace `admin.events.*` mesmo quando
 
 - `/admin`: usa views `admin.*`, layout AdminLTE, sidebar administrativa e componentes legados.
 
+### Atualizacao aplicada em 24/08/2026 - visibilidade das revistas
+
+- Revistas publicadas sao acessiveis sem login, salvo quando o administrador seleciona explicitamente `members`.
+- `/admin` e `/painel/admin` usam as mesmas duas opcoes de visibilidade: Publico e Todos os membros.
+- A regra compartilhada permanece no model e no controller publico, sem duplicacao entre os paineis.
+
 ### Atualizacao aplicada em 24/08/2026 - retorno do leitor de revistas
 
 - Os leitores DearFlip e PDF.js/StPageFlip voltam para a pagina anterior pelo historico do navegador.

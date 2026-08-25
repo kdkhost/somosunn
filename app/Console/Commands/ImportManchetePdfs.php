@@ -223,7 +223,7 @@ class ImportManchetePdfs extends Command
                 'allow_download'    => true,
                 'enable_sound'      => true,
                 'status'            => 'published',
-                'visibility'        => 'interest',
+                'visibility'        => 'public',
             ];
 
             if ($existing) {

@@ -135,9 +135,8 @@
                     <div class="form-group">
                         <label>Visibilidade <span class="text-danger">*</span></label>
                         <select name="visibility" class="form-control" required>
-                            <option value="interest" @selected(old('visibility', $magazine->visibility ?: 'interest') === 'interest')>Somente interessados em "Notícias"</option>
                             <option value="members" @selected(old('visibility', $magazine->visibility) === 'members')>Todos os membros autenticados</option>
-                            <option value="public" @selected(old('visibility', $magazine->visibility) === 'public')>Público (visitantes)</option>
+                            <option value="public" @selected(old('visibility', $magazine->visibility ?: 'public') === 'public')>Público (visitantes)</option>
                         </select>
                     </div>
 

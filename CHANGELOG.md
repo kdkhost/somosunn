@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - fix(revistas): publico por padrao e membros por opcao
+
+- Revistas publicadas sao publicas por padrao; somente registros marcados como `members` exigem autenticacao.
+- Os dois paineis administrativos agora oferecem apenas as opcoes Publico e Todos os membros, com Publico como padrao.
+- Registros legados `interest` sao convertidos para `public`, e novas importacoes entram como publicas.
+- A 6a e a 7a edicoes permanecem cadastradas, mas seus PDFs originais nao foram encontrados no storage, lixeira ou Git e precisam ser reenviados pelo painel.
+
 ## [2026-08-24] - fix(revistas): voltar sem redirecionar ao login
 
 - O botao Voltar dos dois leitores de PDF retorna ao historico real do navegador e usa a banca como fallback.
