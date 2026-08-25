@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - feat(somos-unicas): depoimentos na página pública
+
+- A página `/somos-unicas` passou a exibir até seis depoimentos aprovados e ativos, priorizando os destacados e mais recentes.
+- A nova seção segue a identidade visual da área e apresenta avaliação, texto, foto ou inicial, nome e função da integrante.
+- Depoimentos pendentes, recusados ou inativos permanecem ocultos pelo scope público compartilhado.
+
 ## [2026-08-24] - fix(revistas): destaque da home igual a banca
 
 - Os cards de revistas em destaque na home passaram a usar a mesma sobreposição visual da página pública de revistas.

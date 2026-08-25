@@ -2,6 +2,13 @@
 
 ## Painéis Administrativos
 
+### Atualização aplicada em 24/08/2026 - depoimentos em Somos Únicas
+
+- A página pública `/somos-unicas` passou a consumir o mesmo modelo e scope `Testimonial::forSite()` usado na exposição pública dos depoimentos.
+- A consulta carrega o usuário vinculado antecipadamente, limita o resultado a seis registros e prioriza destaques e registros recentes.
+- Somente depoimentos aprovados e ativos são exibidos; a gestão e as permissões existentes em `/admin` e `/painel/admin` foram preservadas.
+- Foi adicionada cobertura para impedir a exposição de depoimentos pendentes e inativos.
+
 ### Atualização aplicada em 24/08/2026 - apresentação dos destaques de revistas
 
 - A home pública passou a reproduzir o card da banca de revistas: categoria, título, edição e data sobre a capa, selo de destaque e ação de abertura.

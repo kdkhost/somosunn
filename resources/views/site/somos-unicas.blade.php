@@ -219,6 +219,51 @@
             </section>
         @endif
 
+        @if(isset($testimonials) && $testimonials->isNotEmpty())
+            <section class="py-12 px-4 md:px-12 lg:px-24 bg-white/50" aria-labelledby="unicas-testimonials-title">
+                <div class="max-w-7xl mx-auto">
+                    <div class="text-center mb-8">
+                        <h2 id="unicas-testimonials-title" class="text-2xl md:text-3xl font-black unicas-title-gradient">O que dizem nossas integrantes</h2>
+                        <p class="mt-2 text-gray-500">Experiências reais de mulheres que fazem parte da nossa comunidade.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($testimonials as $testimonial)
+                            @php
+                                $testimonialName = $testimonial->display_name;
+                                $testimonialAvatar = $testimonial->resolved_avatar;
+                            @endphp
+                            <article class="bg-white rounded-2xl p-6 border border-pink-100 shadow-sm flex flex-col">
+                                <div class="flex gap-1 mb-4" aria-label="Avaliação: {{ $testimonial->rating }} de 5 estrelas">
+                                    @for($star = 1; $star <= 5; $star++)
+                                        <i class="fas fa-star {{ $star <= $testimonial->rating ? 'text-yellow-500' : 'text-gray-200' }}" aria-hidden="true"></i>
+                                    @endfor
+                                </div>
+                                <blockquote class="text-gray-600 italic leading-relaxed mb-6 flex-1">“{{ $testimonial->content }}”</blockquote>
+                                <div class="flex items-center gap-4">
+                                    @if($testimonialAvatar)
+                                        <img src="{{ $testimonialAvatar }}" alt="{{ $testimonialName }}"
+                                            class="w-12 h-12 rounded-full object-cover flex-shrink-0" loading="lazy">
+                                    @else
+                                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
+                                            style="background: var(--unicas-rosa-forte);" aria-hidden="true">
+                                            {{ mb_strtoupper(mb_substr($testimonialName, 0, 1)) }}
+                                        </div>
+                                    @endif
+                                    <div class="min-w-0">
+                                        <p class="font-bold text-gray-900 truncate">{{ $testimonialName }}</p>
+                                        @if($testimonial->author_title)
+                                            <p class="text-sm text-gray-500 truncate">{{ $testimonial->author_title }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+        @endif
+
         @if((!isset($courses) || $courses->isEmpty()) && (!isset($events) || $events->isEmpty()) && (!isset($mentorships) || $mentorships->isEmpty()))
             <section class="py-20 px-6 text-center">
                 <div class="w-24 h-24 mx-auto bg-pink-50 rounded-full flex items-center justify-center mb-6">

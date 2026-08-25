@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Event;
 use App\Models\Mentorship;
+use App\Models\Testimonial;
 use App\Support\ContentVisibility;
 
 class SomosUnicasController extends Controller
@@ -45,6 +46,13 @@ class SomosUnicasController extends Controller
 
         $pageData = \App\Models\Page::dataBySlug('somos-unicas');
 
-        return view('site.somos-unicas', compact('courses', 'events', 'mentorships', 'pageData'));
+        $testimonials = Testimonial::forSite()
+            ->with('user')
+            ->orderByDesc('is_featured')
+            ->orderByDesc('created_at')
+            ->limit(6)
+            ->get();
+
+        return view('site.somos-unicas', compact('courses', 'events', 'mentorships', 'testimonials', 'pageData'));
     }
 }
