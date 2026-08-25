@@ -9,6 +9,7 @@ Data de atualização: 20/06/2026
 - A regra de importação permanece única no comando `magazines:import-manchete` e atende às revistas exibidas e gerenciadas pelos dois painéis.
 - O catálogo oficial é consultado diariamente pela central interna de cron, com descoberta de novas edições e publicação pública por padrão.
 - Registros existentes são preservados; quando o PDF cadastrado desapareceu do storage, o comando recupera o arquivo e atualiza o mesmo registro.
+- Títulos legados de edições numeradas são associados ao registro original e a visibilidade administrativa `public` ou `members` não é sobrescrita.
 - Downloads usam streaming, arquivo temporário, limite de tamanho, validação `%PDF-`, troca atômica e lista restrita de domínios HTTPS oficiais.
 - A tarefa `magazines:import-manchete` foi incluída na lista permitida e agendada para `30 2 * * *` sem alterar rotas ou permissões de `/admin` e `/painel/admin`.
 - Validações: parser do catálogo, distinção entre edições Judiciário, proteção contra URL externa, sintaxe PHP, rotas, views, BOM e codificação.

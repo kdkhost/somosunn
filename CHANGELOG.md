@@ -4,6 +4,8 @@
 
 - O comando `magazines:import-manchete` agora consulta o catálogo oficial e inclui automaticamente novas edições públicas.
 - PDFs cadastrados mas ausentes no storage são recuperados sem excluir ou recriar os registros existentes.
+- Edições numeradas legadas são reconhecidas mesmo com outro padrão de título/slug, evitando registros duplicados.
+- A visibilidade escolhida pelo administrador é preservada nas sincronizações seguintes; somente revistas novas entram públicas.
 - Downloads grandes usam streaming em arquivo temporário, limite de tamanho, validação da assinatura PDF e publicação atômica.
 - Somente URLs HTTPS dos domínios oficiais da Revista Manchete são aceitas.
 - A central interna de cron executa a sincronização diariamente às 02:30; a migration adiciona apenas essa tarefa por `updateOrInsert`.

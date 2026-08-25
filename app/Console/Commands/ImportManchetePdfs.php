@@ -151,7 +151,7 @@ class ImportManchetePdfs extends Command
             $slug = Str::slug($src['title']);
 
             // Já existe?
-            $existing = Magazine::where('slug', $slug)->first();
+            $existing = $this->findExistingMagazine($src, $slug);
             if ($existing && !$force && $this->storedPdfExists($existing)) {
                 $existing->update([
                     'title' => $src['title'],
@@ -159,8 +159,6 @@ class ImportManchetePdfs extends Command
                     'edition' => $src['edition'],
                     'published_at' => $src['published'],
                     'short_description' => 'Edição oficial da Revista Manchete, patrocinadora da plataforma.',
-                    'status' => 'published',
-                    'visibility' => 'public',
                 ]);
                 $this->warn('  > Já cadastrada; metadados em português sincronizados.');
                 $skipped++;
@@ -230,6 +228,7 @@ class ImportManchetePdfs extends Command
             ];
 
             if ($existing) {
+                $data['visibility'] = $existing->visibility ?: 'public';
                 $existing->update($data);
                 $this->info('  > Atualizada (id=' . $existing->id . ')');
             } else {
@@ -362,6 +361,24 @@ class ImportManchetePdfs extends Command
         $path = ltrim((string) $magazine->pdf_file, '/');
 
         return $path !== '' && (is_file(public_path('storage/' . $path)) || is_file(storage_path('app/public/' . $path)));
+    }
+
+    protected function findExistingMagazine(array $source, string $slug): ?Magazine
+    {
+        $existing = Magazine::where('slug', $slug)->first();
+        if ($existing || !preg_match('/#(\d{1,2})/', (string) ($source['edition'] ?? ''), $match)) {
+            return $existing;
+        }
+
+        $number = (int) $match[1];
+
+        return Magazine::query()
+            ->where(function ($query) use ($number) {
+                $query->where('title', 'like', "%Edição {$number}%")
+                    ->orWhere('title', 'like', "%{$number}ª Edição%");
+            })
+            ->orderBy('id')
+            ->first();
     }
 
     /**
