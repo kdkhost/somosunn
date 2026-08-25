@@ -6,6 +6,8 @@
     @php
         // Helper: $homePage->get() tem prioridade; cai para SiteContent e Settings como legado
         $p = fn(string $key, string $fallback = '') => (string) ($homePage->get($key) ?: $fallback);
+        $magazineOverlayOpacity = (int) \App\Models\Setting::get('magazines_overlay_opacity', 70);
+        $magazineOverlayAlpha = round($magazineOverlayOpacity / 100, 2);
 
         $heroTitle = $p('hero_title',
             (string) (\App\Models\SiteContent::getValue('home', 'hero_title')
@@ -666,13 +668,26 @@
                                 class="home-magazines-cover"
                                 aria-label="Ler {{ $magazine->title }}"
                                 title="Ler {{ $magazine->title }}">
-                                <img src="{{ $magazine->thumbnail_url }}" alt="Capa da revista {{ $magazine->title }}" loading="lazy">
+                                @if($magazine->is_featured)
+                                    <div class="home-magazines-featured"><i class="fas fa-star" aria-hidden="true"></i> Destaque</div>
+                                @endif
+                                @if($magazine->thumbnail_url)
+                                    <img src="{{ $magazine->thumbnail_url }}" alt="Capa da revista {{ $magazine->title }}" loading="lazy">
+                                @else
+                                    <div class="home-magazines-placeholder"><i class="fas fa-book-open" aria-hidden="true"></i></div>
+                                @endif
+                                <div class="home-magazines-overlay">
+                                    <div class="home-magazines-category">{{ $magazine->category ?: 'Revista' }}</div>
+                                    <div class="home-magazines-title">{{ $magazine->title }}</div>
+                                    <div class="home-magazines-edition">
+                                        {{ $magazine->edition }}
+                                        @if($magazine->published_at) &middot; {{ $magazine->published_at->locale('pt_BR')->translatedFormat('M/Y') }} @endif
+                                    </div>
+                                </div>
+                                <div class="home-magazines-action">
+                                    <i class="fas fa-book-open" aria-hidden="true"></i> Abrir revista
+                                </div>
                             </a>
-                            <div class="home-magazines-copy">
-                                <p class="home-magazines-meta">{{ $magazine->edition ?: $magazine->category }}</p>
-                                <h3>{{ $magazine->title }}</h3>
-                                <p>{{ \Illuminate\Support\Str::limit(strip_tags((string) ($magazine->short_description ?: 'Edição digital disponível para leitura.')), 130) }}</p>
-                            </div>
                         </article>
                     @endforeach
                 </div>
@@ -897,6 +912,7 @@
         .home-magazines-cover {
             aspect-ratio: 3 / 4;
             display: block;
+            position: relative;
             overflow: hidden;
             border-radius: 6px;
             background: #e2e8f0;
@@ -908,39 +924,93 @@
         .home-magazines-card {
             min-width: 0;
             scroll-snap-align: start;
+            transition: transform 180ms ease;
         }
 
-        .home-magazines-copy {
-            padding-top: 0.9rem;
-        }
-
-        .home-magazines-meta {
-            margin: 0 0 0.3rem;
-            color: var(--unn-azul-1);
-            font-size: 0.72rem;
-            font-weight: 800;
-            line-height: 1.25;
-            text-transform: uppercase;
-        }
-
-        .home-magazines-copy h3 {
-            margin: 0;
-            color: #0f172a;
-            font-size: 1rem;
-            font-weight: 800;
-            line-height: 1.3;
-        }
-
-        .home-magazines-copy > p:last-child {
-            margin: 0.45rem 0 0;
-            color: #64748b;
-            font-size: 0.82rem;
-            line-height: 1.45;
-        }
-
-        .home-magazines-cover:hover,
-        .home-magazines-cover:focus-visible {
+        .home-magazines-card:hover {
             transform: translateY(-4px);
+        }
+
+        .home-magazines-overlay {
+            position: absolute;
+            inset: auto 0 0 0;
+            padding: 0.75rem 1rem;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background: rgba(0, 0, 0, {{ $magazineOverlayAlpha }});
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        .home-magazines-category {
+            margin-bottom: 0.25rem;
+            color: #60a5fa;
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .home-magazines-title {
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+            font-weight: 900;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .home-magazines-edition {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.7rem;
+        }
+
+        .home-magazines-featured {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            z-index: 2;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .home-magazines-action {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            color: #1F5EDB;
+            font-size: 0.85rem;
+            font-weight: 900;
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -50%) scale(0.8);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .home-magazines-card:hover .home-magazines-action,
+        .home-magazines-cover:focus-visible .home-magazines-action {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .home-magazines-cover:focus-visible {
             box-shadow: 0 20px 36px -14px rgba(15, 23, 42, 0.48);
             outline: 3px solid rgba(31, 94, 219, 0.3);
             outline-offset: 3px;
@@ -951,6 +1021,21 @@
             height: 100%;
             display: block;
             object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .home-magazines-card:hover .home-magazines-cover img {
+            transform: scale(1.05);
+        }
+
+        .home-magazines-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 3rem;
         }
 
         .home-magazines-arrow {

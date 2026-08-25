@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - fix(revistas): destaque da home igual a banca
+
+- Os cards de revistas em destaque na home passaram a usar a mesma sobreposição visual da página pública de revistas.
+- Categoria, título, edição e data agora aparecem sobre a capa, com o mesmo selo de destaque e ação "Abrir revista".
+- A opacidade da faixa informativa respeita a mesma configuração administrativa usada pela banca.
+
 ## [2026-08-24] - fix(upload): dropzone coerente com AdminLTE dark
 
 - O componente `x-unn-dropzone` passou a reconhecer `.dark-mode`, classe usada pelo painel AdminLTE.

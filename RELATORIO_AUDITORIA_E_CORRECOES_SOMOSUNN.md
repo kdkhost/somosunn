@@ -2,6 +2,13 @@
 
 ## Painéis Administrativos
 
+### Atualização aplicada em 24/08/2026 - apresentação dos destaques de revistas
+
+- A home pública passou a reproduzir o card da banca de revistas: categoria, título, edição e data sobre a capa, selo de destaque e ação de abertura.
+- A faixa informativa usa `magazines_overlay_opacity`, mantendo a configuração visual compartilhada com a página pública de revistas e com os dois fluxos administrativos.
+- Não houve alteração de rotas, permissões, controllers, banco de dados ou comportamento dos painéis `/admin` e `/painel/admin`.
+- Validações previstas: compilação Blade, UTF-8 sem BOM, codificação textual e `git diff --check`.
+
 Data de atualização: 20/06/2026
 
 ### Atualização aplicada em 24/08/2026 - dropzone no tema escuro
