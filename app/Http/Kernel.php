@@ -60,6 +60,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\AdvancedRateLimitMiddleware::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\SecurityHeadersMiddleware::class,
         ],
     ];
 

@@ -168,6 +168,12 @@ class SecurityHeadersMiddleware
         $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
         $response->headers->set('Cross-Origin-Resource-Policy', 'cross-origin');
 
+        if ($this->containsPrivateData($request)) {
+            $response->headers->set('Cache-Control', 'no-store, private, max-age=0');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
+        }
+
         // HSTS (apenas em HTTPS)
         if ($request->isSecure()) {
             $response->headers->set(
@@ -188,6 +194,17 @@ class SecurityHeadersMiddleware
         $response->headers->remove('Server');
 
         return $response;
+    }
+
+    private function containsPrivateData(Request $request): bool
+    {
+        if ($request->user() !== null) {
+            return true;
+        }
+
+        $path = '/' . ltrim($request->path(), '/');
+
+        return preg_match('#^/(?:admin|painel|login|register|password|api)(?:/|$)#i', $path) === 1;
     }
 
     private function isEmbedRoute(Request $request): bool

@@ -439,6 +439,19 @@ class SecurityHeadersMiddlewareTest extends TestCase
         );
     }
 
+    public function test_private_routes_disable_browser_and_proxy_cache(): void
+    {
+        $middleware = new SecurityHeadersMiddleware();
+        $response = $middleware->handle(
+            Request::create('/painel/perfil', 'GET'),
+            $this->htmlNext()
+        );
+
+        $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
+        $this->assertStringContainsString('private', (string) $response->headers->get('Cache-Control'));
+        $this->assertSame('no-cache', $response->headers->get('Pragma'));
+    }
+
     /* ---------------------------------------------------------------- */
     /* 9. Fallback CSP minima segura                                     */
     /* ---------------------------------------------------------------- */

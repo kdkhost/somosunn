@@ -2,6 +2,36 @@
 
 ---
 
+## [2026-08-24] - feat(seguranca, desempenho): proteger dados e acelerar PDFs
+
+### Segurança e privacidade
+- Sessões passaram a usar criptografia em repouso por padrão, mantendo cookies `Secure`, `HttpOnly` e `SameSite` configuráveis por ambiente.
+- Respostas autenticadas e rotas administrativas, de autenticação e API passaram a impedir armazenamento em cache por navegador ou proxy compartilhado.
+- Os cabeçalhos de segurança existentes agora também cobrem o grupo de rotas da API.
+- O `.env.example` passou a usar `APP_DEBUG=false` como padrão seguro.
+- Dependências vulneráveis foram atualizadas, incluindo Dompdf 3.1.6, CommonMark 2.10, JMESPath 2.9.2, phpseclib 3.0.56 e componentes Symfony 6.4.44.
+
+### Banco de dados
+- Adicionados índices compostos idempotentes para as consultas públicas mais frequentes de eventos, depoimentos e revistas.
+- A migration é apenas aditiva e não altera nem remove registros existentes.
+
+### PDFs
+- A entrega local de arquivos passou a aceitar HTTP Range, ETag, `Last-Modified` e respostas `206 Partial Content`, permitindo que leitores solicitem somente os trechos necessários do PDF.
+- O leitor StPageFlip passou a analisar metadados de páginas em lotes paralelos, reduzindo o tempo inicial sem remover a detecção de páginas duplas.
+
+### Arquivos principais
+- `app/Http/Middleware/SecurityHeadersMiddleware.php`
+- `app/Support/UploadStorage.php`
+- `composer.json`
+- `composer.lock`
+- `config/session.php`
+- `database/migrations/2026_08_24_210000_add_public_query_performance_indexes.php`
+- `resources/views/magazines/show-stpageflip.blade.php`
+- `tests/Feature/PublicStorageProxyTest.php`
+- `tests/Unit/Middleware/SecurityHeadersMiddlewareTest.php`
+
+---
+
 ## [2026-08-24] - fix(depoimentos): exibir texto aprovado no site
 
 ### Corrigido

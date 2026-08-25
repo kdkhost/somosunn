@@ -783,25 +783,70 @@ class UploadStorage
         if (self::isLocal()) {
             foreach (self::publicCandidates($normalized) as $candidate) {
                 if (is_file($candidate)) {
+                    $size = @filesize($candidate);
+                    $lastModified = @filemtime($candidate);
                     $headers = [
                         'Content-Type' => self::mimeTypeFromPath($candidate),
-                        'Cache-Control' => 'public, max-age=31536000',
+                        'Cache-Control' => 'public, max-age=86400, stale-while-revalidate=604800',
+                        'Accept-Ranges' => 'bytes',
                     ];
 
-                    $size = @filesize($candidate);
-                    if (is_int($size) && $size > 0) {
-                        $headers['Content-Length'] = (string) $size;
+                    if (is_int($lastModified) && $lastModified > 0) {
+                        $headers['Last-Modified'] = gmdate('D, d M Y H:i:s', $lastModified) . ' GMT';
                     }
 
-                    return response()->stream(function () use ($candidate) {
+                    if (!is_int($size) || $size < 1) {
+                        return response()->stream(function () use ($candidate) {
+                            $handle = fopen($candidate, 'rb');
+                            if ($handle !== false) {
+                                fpassthru($handle);
+                                fclose($handle);
+                            }
+                        }, 200, $headers);
+                    }
+
+                    $etag = '"' . sha1($normalized . '|' . $size . '|' . (int) $lastModified) . '"';
+                    $headers['ETag'] = $etag;
+
+                    if (trim((string) request()->header('If-None-Match')) === $etag) {
+                        return response('', 304, $headers);
+                    }
+
+                    $range = self::requestedByteRange($size);
+                    if ($range === false) {
+                        return response('', 416, $headers + ['Content-Range' => 'bytes */' . $size]);
+                    }
+
+                    [$start, $end] = $range ?? [0, $size - 1];
+                    $length = $end - $start + 1;
+                    $status = $range === null ? 200 : 206;
+                    $headers['Content-Length'] = (string) $length;
+
+                    if ($status === 206) {
+                        $headers['Content-Range'] = "bytes {$start}-{$end}/{$size}";
+                    }
+
+                    return response()->stream(function () use ($candidate, $start, $length) {
                         $handle = fopen($candidate, 'rb');
                         if ($handle === false) {
                             return;
                         }
 
-                        fpassthru($handle);
+                        if ($start > 0) {
+                            fseek($handle, $start);
+                        }
+
+                        $remaining = $length;
+                        while ($remaining > 0 && !feof($handle)) {
+                            $chunk = fread($handle, min(1024 * 1024, $remaining));
+                            if ($chunk === false || $chunk === '') {
+                                break;
+                            }
+                            echo $chunk;
+                            $remaining -= strlen($chunk);
+                        }
                         fclose($handle);
-                    }, 200, $headers);
+                    }, $status, $headers);
                 }
             }
         }
@@ -832,6 +877,41 @@ class UploadStorage
                 fclose($stream);
             }
         }, 200, $headers);
+    }
+
+    /** @return array{0:int,1:int}|null|false */
+    private static function requestedByteRange(int $size): array|null|false
+    {
+        $header = trim((string) request()->header('Range', ''));
+        if ($header === '') {
+            return null;
+        }
+
+        if (preg_match('/^bytes=(\d*)-(\d*)$/', $header, $matches) !== 1) {
+            return false;
+        }
+
+        if ($matches[1] === '' && $matches[2] === '') {
+            return false;
+        }
+
+        if ($matches[1] === '') {
+            $suffixLength = (int) $matches[2];
+            if ($suffixLength < 1) {
+                return false;
+            }
+
+            return [max(0, $size - $suffixLength), $size - 1];
+        }
+
+        $start = (int) $matches[1];
+        $end = $matches[2] === '' ? $size - 1 : (int) $matches[2];
+
+        if ($start >= $size || $end < $start) {
+            return false;
+        }
+
+        return [$start, min($end, $size - 1)];
     }
 
     public static function localPublicDiskConfig(): array

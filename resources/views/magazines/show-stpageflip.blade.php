@@ -572,19 +572,33 @@
 
     // Detect which PDF pages are spreads (landscape aspect > 1.15)
     async function analyzePdfPages(pdf) {
-        var map = []; // each entry: { pdfPage: N, half: 'full'|'left'|'right' }
-        for (var p = 1; p <= pdf.numPages; p++) {
-            var page = await pdf.getPage(p);
-            var vp = page.getViewport({ scale: 1 });
-            var aspectRatio = vp.width / vp.height;
+        var map = [];
+        var concurrency = 8;
 
-            if (aspectRatio > 1.15) {
-                // Spread page — split in two
-                map.push({ pdfPage: p, half: 'left' });
-                map.push({ pdfPage: p, half: 'right' });
-            } else {
-                map.push({ pdfPage: p, half: 'full' });
+        for (var start = 1; start <= pdf.numPages; start += concurrency) {
+            var pageNumbers = [];
+            for (var p = start; p < Math.min(start + concurrency, pdf.numPages + 1); p++) {
+                pageNumbers.push(p);
             }
+
+            var batch = await Promise.all(pageNumbers.map(async function(pageNumber) {
+                var page = await pdf.getPage(pageNumber);
+                var vp = page.getViewport({ scale: 1 });
+                return { pageNumber: pageNumber, isSpread: (vp.width / vp.height) > 1.15 };
+            }));
+
+            batch.forEach(function(entry) {
+                if (entry.isSpread) {
+                    map.push({ pdfPage: entry.pageNumber, half: 'left' });
+                    map.push({ pdfPage: entry.pageNumber, half: 'right' });
+                } else {
+                    map.push({ pdfPage: entry.pageNumber, half: 'full' });
+                }
+            });
+
+            var analyzed = Math.min(start + concurrency - 1, pdf.numPages);
+            progressEl.textContent = 'Analisando páginas... ' + analyzed + '/' + pdf.numPages;
+            barFill.style.width = (85 + Math.round((analyzed / pdf.numPages) * 10)) + '%';
         }
         return map;
     }

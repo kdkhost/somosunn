@@ -4,6 +4,16 @@
 
 Data de atualização: 20/06/2026
 
+### Atualização aplicada em 24/08/2026 - segurança, desempenho e PDFs
+
+- O middleware compartilhado de segurança passou a proteger também a API e a impedir cache de respostas privadas em `/admin`, `/painel`, autenticação e rotas autenticadas.
+- A criptografia de sessão foi ativada por padrão, com flags de cookie controladas pelo ambiente e valores seguros no arquivo de exemplo.
+- Nenhuma rota ou permissão dos dois painéis foi removida; AdminLTE e Tailwind continuam usando a mesma camada global de proteção.
+- Índices compostos aditivos aceleram listagens públicas de eventos, revistas e depoimentos sem modificar dados existentes.
+- PDFs locais passaram a suportar requisições parciais, cache revalidável e streaming limitado ao intervalo solicitado.
+- O leitor StPageFlip preserva o layout e a detecção de páginas duplas, mas analisa páginas em lotes paralelos para abrir mais rapidamente.
+- Validações previstas: sintaxe PHP, Blade, rotas, testes de Range/cache, migration aditiva, BOM, encoding e `git diff --check`.
+
 ### Atualização aplicada em 24/08/2026 - publicação de depoimentos aprovados
 
 - Preservadas as rotas `admin.testimonials.*` e `panel.admin.testimonials.*`, sem alteração de URLs ou permissões.
