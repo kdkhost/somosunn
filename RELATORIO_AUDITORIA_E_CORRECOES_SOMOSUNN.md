@@ -338,5 +338,11 @@ As permissões administrativas mantêm o namespace `admin.events.*` mesmo quando
 ### Diferenças visuais mantidas
 
 - `/admin`: usa views `admin.*`, layout AdminLTE, sidebar administrativa e componentes legados.
+
+### Atualizacao aplicada em 24/08/2026 - sincronizacao de depoimentos
+
+- No painel `/admin`, aprovacao e recusa por AJAX atualizam imediatamente a tabela e os indicadores.
+- Os indicadores usam agregacao no banco e permanecem corretos com filtros e paginacao.
+- O painel `/painel/admin` mantem o fluxo proprio com redirecionamento apos a moderacao, compartilhando o mesmo model e as mesmas regras publicas.
 - `/painel/admin`: usa views `panel.admin.*`, layout moderno, sidebar/navegação do painel e componentes Tailwind.
 - Views de um painel não devem ser reutilizadas diretamente no outro sem validação de layout, seções, scripts, sidebar e compatibilidade visual.

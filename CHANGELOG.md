@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - fix(depoimentos): sincronizar aprovacao no painel
+
+- Aprovacao e recusa via AJAX agora recarregam a listagem administrativa apos a confirmacao.
+- Contadores de total, aprovados, pendentes e recusados passaram a consultar totais reais do banco, sem depender da pagina atual.
+- Arquivos principais: `app/Http/Controllers/Admin/TestimonialController.php` e `resources/views/admin/testimonials/index.blade.php`.
+
 ---
 
 ## [2026-08-24] - feat(seguranca, desempenho): proteger dados e acelerar PDFs

@@ -41,7 +41,12 @@ class TestimonialController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('admin.testimonials.index', compact('testimonials', 'status', 'source', 'active', 'q'));
+        $statusCounts = Testimonial::query()
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        return view('admin.testimonials.index', compact('testimonials', 'statusCounts', 'status', 'source', 'active', 'q'));
     }
 
     // ─── Criar (admin cria manualmente) ──────────────────────────────────────
@@ -152,7 +157,11 @@ class TestimonialController extends Controller
             'moderation_notes' => null,
         ]);
 
-        return response()->json(['ok' => true, 'message' => 'Depoimento aprovado.']);
+        return response()->json([
+            'ok' => true,
+            'reload' => true,
+            'message' => 'Depoimento aprovado.',
+        ]);
     }
 
     public function reject(Request $request, Testimonial $testimonial)
@@ -171,7 +180,11 @@ class TestimonialController extends Controller
             'moderation_notes' => $data['moderation_notes'] ?? null,
         ]);
 
-        return response()->json(['ok' => true, 'message' => 'Depoimento recusado.']);
+        return response()->json([
+            'ok' => true,
+            'reload' => true,
+            'message' => 'Depoimento recusado.',
+        ]);
     }
 
     // ─── Excluir ──────────────────────────────────────────────────────────────
@@ -295,4 +308,3 @@ class TestimonialController extends Controller
         }
     }
 }
-

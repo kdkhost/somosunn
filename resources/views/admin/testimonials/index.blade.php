@@ -37,7 +37,7 @@
                 <span class="info-box-icon"><i class="fas fa-comments"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Total</span>
-                    <span class="info-box-number">{{ $testimonials->total() }}</span>
+                    <span class="info-box-number">{{ $statusCounts->sum() }}</span>
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
                 <span class="info-box-icon"><i class="fas fa-check-circle"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Aprovados</span>
-                    <span class="info-box-number">{{ $testimonials->where('status', 'approved')->count() }}</span>
+                    <span class="info-box-number">{{ $statusCounts->get('approved', 0) }}</span>
                 </div>
             </div>
         </div>
@@ -55,7 +55,7 @@
                 <span class="info-box-icon"><i class="fas fa-clock"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Pendentes</span>
-                    <span class="info-box-number">{{ $testimonials->where('status', 'pending')->count() }}</span>
+                    <span class="info-box-number">{{ $statusCounts->get('pending', 0) }}</span>
                 </div>
             </div>
         </div>
@@ -64,7 +64,7 @@
                 <span class="info-box-icon"><i class="fas fa-times-circle"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Recusados</span>
-                    <span class="info-box-number">{{ $testimonials->where('status', 'rejected')->count() }}</span>
+                    <span class="info-box-number">{{ $statusCounts->get('rejected', 0) }}</span>
                 </div>
             </div>
         </div>
