@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - fix(revistas): listagens sem rolagem horizontal
+
+- As tabelas de revistas dos dois painéis passaram a respeitar integralmente a largura disponível, sem barra de rolagem horizontal.
+- Colunas secundárias são ocultadas progressivamente em telas menores, preservando título, status, destaque e ações.
+- Títulos longos agora quebram linha dentro da célula sem ampliar a página.
+
 ## [2026-08-24] - fix(revistas): confirmações e notificações administrativas
 
 - O destaque e a exclusão de revistas nos dois painéis passaram a usar SweetAlert2, sem `alert()` ou `confirm()` do navegador.

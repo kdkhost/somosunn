@@ -59,24 +59,34 @@
             <button class="px-5 py-3 rounded-xl bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white text-sm font-bold">Buscar</button>
         </form>
 
-        <div class="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
-            <table class="w-full text-sm">
+        <div class="w-full overflow-x-clip rounded-2xl border border-slate-100 dark:border-slate-800">
+            <table class="w-full table-fixed text-sm">
+                <colgroup>
+                    <col class="hidden sm:table-column" style="width:64px">
+                    <col>
+                    <col class="hidden xl:table-column" style="width:12%">
+                    <col style="width:9%">
+                    <col class="hidden lg:table-column" style="width:12%">
+                    <col class="hidden xl:table-column" style="width:9%">
+                    <col style="width:64px">
+                    <col style="width:116px">
+                </colgroup>
                 <thead class="bg-slate-50 dark:bg-slate-800/50">
                     <tr class="text-left text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        <th class="px-4 py-3">Capa</th>
+                        <th class="hidden sm:table-cell px-2 py-3">Capa</th>
                         <th class="px-4 py-3">Título</th>
-                        <th class="px-4 py-3">Categoria</th>
+                        <th class="hidden xl:table-cell px-3 py-3">Categoria</th>
                         <th class="px-4 py-3">Status</th>
-                        <th class="px-4 py-3">Visibilidade</th>
-                        <th class="px-4 py-3">Visualizações</th>
-                        <th class="px-4 py-3 text-center">Destaque</th>
-                        <th class="px-4 py-3 text-right">Ações</th>
+                        <th class="hidden lg:table-cell px-3 py-3">Visibilidade</th>
+                        <th class="hidden xl:table-cell px-3 py-3">Visualizações</th>
+                        <th class="px-2 py-3 text-center">Destaque</th>
+                        <th class="px-2 py-3 text-right">Ações</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                     @forelse($magazines as $m)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
-                            <td class="px-4 py-3">
+                            <td class="hidden sm:table-cell px-2 py-3">
                                 @if($m->thumbnail_url)
                                     <img src="{{ $m->thumbnail_url }}" alt="" class="w-12 h-16 object-cover rounded-md shadow">
                                 @else
@@ -85,14 +95,14 @@
                                     </div>
                                 @endif
                             </td>
-                            <td class="px-4 py-3">
-                                <div class="font-bold text-slate-900 dark:text-white">{{ $m->title }}</div>
+                            <td class="min-w-0 px-3 py-3">
+                                <div class="font-bold text-slate-900 dark:text-white break-words">{{ $m->title }}</div>
                                 <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                     {{ $m->edition }}
                                     @if($m->published_at) &middot; {{ $m->published_at->format('d/m/Y') }} @endif
                                 </div>
                             </td>
-                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ $m->category ?: '-' }}</td>
+                            <td class="hidden xl:table-cell px-3 py-3 text-slate-600 dark:text-slate-300">{{ $m->category ?: '-' }}</td>
                             <td class="px-4 py-3">
                                 @if($m->status === 'published')
                                     <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-bold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">Publicada</span>
@@ -102,7 +112,7 @@
                                     <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300">Arquivada</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+                            <td class="hidden lg:table-cell px-3 py-3 text-xs text-slate-500 dark:text-slate-400">
                                 @if($m->visibility === 'public')
                                     <i class="fas fa-globe text-green-500 mr-1"></i> Público
                                 @elseif($m->visibility === 'members')
@@ -111,8 +121,8 @@
                                     <i class="fas fa-newspaper text-purple-500 mr-1"></i> Interessados
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ number_format($m->views_count, 0, ',', '.') }}</td>
-                            <td class="px-4 py-3 text-center">
+                            <td class="hidden xl:table-cell px-3 py-3 text-slate-600 dark:text-slate-300">{{ number_format($m->views_count, 0, ',', '.') }}</td>
+                            <td class="px-2 py-3 text-center">
                                 <button type="button"
                                     class="js-toggle-magazine-featured inline-flex items-center justify-center w-9 h-9 rounded-lg border transition {{ $m->is_featured ? 'bg-amber-100 border-amber-300 text-amber-600 dark:bg-amber-900/40 dark:border-amber-700' : 'bg-slate-100 border-slate-200 text-slate-400 dark:bg-slate-800 dark:border-slate-700' }}"
                                     data-url="{{ route('panel.admin.magazines.toggle-featured', $m) }}"
@@ -125,7 +135,7 @@
                                     <span class="sr-only">Alterar destaque</span>
                                 </button>
                             </td>
-                            <td class="px-4 py-3 text-right whitespace-nowrap">
+                            <td class="px-2 py-3 text-right whitespace-nowrap">
                                 <a href="{{ route('magazines.show', $m->slug) }}" target="_blank"
                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition"
                                     title="Visualizar"><i class="fas fa-eye text-xs"></i></a>

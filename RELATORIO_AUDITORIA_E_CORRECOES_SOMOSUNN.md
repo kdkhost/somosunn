@@ -2,6 +2,12 @@
 
 ## Painéis Administrativos
 
+### Atualização aplicada em 24/08/2026 - responsividade da listagem de revistas
+
+- As listagens em `/admin/magazines` e `/painel/admin/magazines` deixaram de usar rolagem horizontal.
+- A tabela usa layout fixo e quebra segura de títulos; categoria, visualizações, capa e visibilidade são ocultadas progressivamente conforme a largura.
+- Destaque e ações permanecem acessíveis em todas as larguras, preservando o fluxo operacional dos dois painéis.
+
 ### Atualização aplicada em 24/08/2026 - feedback das ações de revistas
 
 - `/admin/magazines` e `/painel/admin/magazines` compartilham confirmação SweetAlert2 para destaque e exclusão.

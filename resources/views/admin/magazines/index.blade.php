@@ -3,6 +3,63 @@
 @section('page_title','Revistas digitais')
 @section('breadcrumb')<li class="breadcrumb-item active">Revistas</li>@endsection
 
+@push('styles')
+<style>
+    .magazines-table-wrap {
+        width: 100%;
+        overflow-x: clip;
+    }
+
+    .magazines-table {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .magazines-table th,
+    .magazines-table td {
+        min-width: 0;
+        vertical-align: middle;
+    }
+
+    .magazines-table-title {
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+
+    .magazines-table-actions {
+        white-space: nowrap;
+    }
+
+    @media (max-width: 1399.98px) {
+        .magazines-column-category {
+            display: none;
+        }
+    }
+
+    @media (max-width: 1199.98px) {
+        .magazines-column-views {
+            display: none;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .magazines-column-cover,
+        .magazines-column-visibility {
+            display: none;
+        }
+
+        .magazines-table th,
+        .magazines-table td {
+            padding: .6rem .35rem;
+        }
+
+        .magazines-table-actions .btn {
+            margin-bottom: .2rem;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="row mb-3">
     <div class="col-lg-3 col-md-6">
@@ -65,16 +122,26 @@
             </div>
         </form>
 
-        <div class="table-responsive">
-            <table class="table table-hover table-striped">
+        <div class="magazines-table-wrap">
+            <table class="table table-hover table-striped magazines-table">
+                <colgroup>
+                    <col class="magazines-column-cover" style="width:64px">
+                    <col>
+                    <col class="magazines-column-category" style="width:12%">
+                    <col style="width:9%">
+                    <col class="magazines-column-visibility" style="width:12%">
+                    <col class="magazines-column-views" style="width:9%">
+                    <col style="width:76px">
+                    <col style="width:126px">
+                </colgroup>
                 <thead>
                     <tr>
-                        <th style="width: 70px;">Capa</th>
+                        <th class="magazines-column-cover">Capa</th>
                         <th>Título</th>
-                        <th>Categoria</th>
+                        <th class="magazines-column-category">Categoria</th>
                         <th>Status</th>
-                        <th>Visibilidade</th>
-                        <th>Visualizações</th>
+                        <th class="magazines-column-visibility">Visibilidade</th>
+                        <th class="magazines-column-views">Visualizações</th>
                         <th class="text-center">Destaque</th>
                         <th class="text-right">Ações</th>
                     </tr>
@@ -82,7 +149,7 @@
                 <tbody>
                     @forelse($magazines as $m)
                         <tr>
-                            <td>
+                            <td class="magazines-column-cover">
                                 @if($m->thumbnail_url)
                                     <img src="{{ $m->thumbnail_url }}" alt=""
                                         style="width: 46px; height: 62px; object-fit: cover; border-radius: 4px;"
@@ -94,15 +161,15 @@
                                     </div>
                                 @endif
                             </td>
-                            <td>
+                            <td class="magazines-table-title">
                                 <strong class="text-dark">{{ $m->title }}</strong><br>
                                 <small class="text-muted">
                                     {{ $m->edition }}
                                     @if($m->published_at) &middot; {{ $m->published_at->format('d/m/Y') }} @endif
                                 </small>
                             </td>
-                            <td>{{ $m->category ?: '-' }}</td>
-                            <td>
+                            <td class="magazines-column-category">{{ $m->category ?: '-' }}</td>
+                            <td class="magazines-column-visibility">
                                 @if($m->status === 'published')
                                     <span class="badge badge-success">Publicada</span>
                                 @elseif($m->status === 'draft')
@@ -120,7 +187,7 @@
                                     <span class="text-purple"><i class="fas fa-newspaper mr-1"></i>Interessados</span>
                                 @endif
                             </td>
-                            <td>{{ number_format($m->views_count, 0, ',', '.') }}</td>
+                            <td class="magazines-column-views">{{ number_format($m->views_count, 0, ',', '.') }}</td>
                             <td class="text-center">
                                 <button type="button"
                                     class="btn btn-sm js-toggle-magazine-featured {{ $m->is_featured ? 'btn-warning' : 'btn-outline-secondary' }}"
@@ -134,7 +201,7 @@
                                     <span class="sr-only">Alterar destaque</span>
                                 </button>
                             </td>
-                            <td class="text-right text-nowrap">
+                            <td class="text-right magazines-table-actions">
                                 <a href="{{ route('magazines.show', $m->slug) }}" target="_blank" class="btn btn-sm btn-default" title="Visualizar">
                                     <i class="fas fa-eye"></i>
                                 </a>
