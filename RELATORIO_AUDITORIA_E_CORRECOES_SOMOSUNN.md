@@ -2,6 +2,13 @@
 
 ## Painéis Administrativos
 
+### Atualização aplicada em 24/08/2026 - feedback das ações de revistas
+
+- `/admin/magazines` e `/painel/admin/magazines` compartilham confirmação SweetAlert2 para destaque e exclusão.
+- Respostas do backend são apresentadas por Toastr; não há fallback para diálogos nativos do navegador.
+- O fluxo AJAX trata token CSRF ausente, sessão expirada, resposta não JSON e falha de rede sem acessar propriedades nulas.
+- A regra de negócio permanece no controller compartilhado `Admin\\MagazineController` e as rotas existentes foram preservadas.
+
 ### Atualização aplicada em 24/08/2026 - proteção do banco contra testes
 
 - Foi identificado que o cache local de configuração podia prevalecer sobre `DB_DATABASE=testing` durante PHPUnit e direcionar `RefreshDatabase` ao banco incorreto.

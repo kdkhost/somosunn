@@ -132,7 +132,7 @@
                                 <a href="{{ route('panel.admin.magazines.edit', $m) }}"
                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 transition"
                                     title="Editar"><i class="fas fa-edit text-xs"></i></a>
-                                <form action="{{ route('panel.admin.magazines.destroy', $m) }}" method="POST" class="inline" onsubmit="return confirm('Remover esta revista?')">
+                                <form action="{{ route('panel.admin.magazines.destroy', $m) }}" method="POST" class="inline js-confirm-magazine-delete">
                                     @csrf @method('DELETE')
                                     <button type="submit"
                                         class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-900/40 dark:text-red-300 transition"

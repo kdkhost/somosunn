@@ -141,8 +141,7 @@
                                 <a href="{{ route('admin.magazines.edit', $m) }}" class="btn btn-sm btn-primary" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('admin.magazines.destroy', $m) }}" method="POST" class="d-inline"
-                                    onsubmit="return confirm('Remover esta revista?')">
+                                <form action="{{ route('admin.magazines.destroy', $m) }}" method="POST" class="d-inline js-confirm-magazine-delete">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" title="Remover">
                                         <i class="fas fa-trash"></i>

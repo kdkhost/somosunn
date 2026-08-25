@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - fix(revistas): confirmações e notificações administrativas
+
+- O destaque e a exclusão de revistas nos dois painéis passaram a usar SweetAlert2, sem `alert()` ou `confirm()` do navegador.
+- Retornos de sucesso, validação, sessão expirada e falhas do backend agora são exibidos pelo Toastr.
+- O AJAX passou a validar o token CSRF e o tipo da resposta antes de ler JSON, evitando o erro `Cannot read properties of null`.
+- O layout AdminLTE passou a publicar a meta `csrf-token`, mantendo o mesmo contrato do painel moderno.
+
 ## [2026-08-24] - fix(segurança): isolamento obrigatório do banco de testes
 
 - O PHPUnit passou a usar um caminho próprio de cache de configuração, impedindo o carregamento acidental do cache da aplicação em produção.
