@@ -17,6 +17,9 @@ AddDefaultCharset UTF-8
     RewriteEngine On
     RewriteBase /
 
+    # Curriculos contem dados pessoais e so podem ser baixados por rota autenticada.
+    RewriteRule ^storage/resumes(?:/|$) - [R=404,L,NC]
+
     # IMPORTANTE: Permitir acesso a public/vendor (assets CSS/JS)
     # ANTES de bloquear vendor do composer
     RewriteRule ^vendor/(.*)$ public/vendor/$1 [L,NC]
