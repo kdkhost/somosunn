@@ -1,5 +1,14 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-08-24] - feat(revistas): sincronização automática do catálogo Manchete
+
+- O comando `magazines:import-manchete` agora consulta o catálogo oficial e inclui automaticamente novas edições públicas.
+- PDFs cadastrados mas ausentes no storage são recuperados sem excluir ou recriar os registros existentes.
+- Downloads grandes usam streaming em arquivo temporário, limite de tamanho, validação da assinatura PDF e publicação atômica.
+- Somente URLs HTTPS dos domínios oficiais da Revista Manchete são aceitas.
+- A central interna de cron executa a sincronização diariamente às 02:30; a migration adiciona apenas essa tarefa por `updateOrInsert`.
+- Arquivos principais: `app/Console/Commands/ImportManchetePdfs.php`, `config/cron-panel.php`, migration de agendamento e teste unitário do importador.
+
 ## [2026-08-24] - fix(revistas): publico por padrao e membros por opcao
 
 - Revistas publicadas sao publicas por padrao; somente registros marcados como `members` exigem autenticacao.

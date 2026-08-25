@@ -129,13 +129,14 @@ class ImportManchetePdfs extends Command
     public function handle(): int
     {
         $force = (bool) $this->option('force');
+        $sources = $this->catalogSources();
         $admin = User::whereIn('role', ['admin', 'superadmin'])->orderBy('id')->first();
         if (!$admin) {
             $this->error('Nenhum administrador ou superadministrador encontrado no sistema.');
             return self::FAILURE;
         }
 
-        $this->info('Importando ' . count($this->sources) . ' revistas da Revista Manchete...');
+        $this->info('Sincronizando ' . count($sources) . ' revistas da Revista Manchete...');
         $this->info('Responsável: ' . $admin->name . ' (id=' . $admin->id . ')');
         $this->newLine();
 
@@ -143,21 +144,23 @@ class ImportManchetePdfs extends Command
         $skipped = 0;
         $failed = 0;
 
-        foreach ($this->sources as $i => $src) {
+        foreach ($sources as $i => $src) {
             $n = $i + 1;
-            $this->info(sprintf('[%d/%d] %s', $n, count($this->sources), $src['title']));
+            $this->info(sprintf('[%d/%d] %s', $n, count($sources), $src['title']));
 
             $slug = Str::slug($src['title']);
 
             // Já existe?
             $existing = Magazine::where('slug', $slug)->first();
-            if ($existing && !$force) {
+            if ($existing && !$force && $this->storedPdfExists($existing)) {
                 $existing->update([
                     'title' => $src['title'],
                     'category' => $src['category'],
                     'edition' => $src['edition'],
                     'published_at' => $src['published'],
                     'short_description' => 'Edição oficial da Revista Manchete, patrocinadora da plataforma.',
+                    'status' => 'published',
+                    'visibility' => 'public',
                 ]);
                 $this->warn('  > Já cadastrada; metadados em português sincronizados.');
                 $skipped++;
@@ -243,7 +246,122 @@ class ImportManchetePdfs extends Command
         $this->info('Puladas: ' . $skipped);
         $this->info('Falhas: ' . $failed);
 
-        return self::SUCCESS;
+        return $failed === 0 ? self::SUCCESS : self::FAILURE;
+    }
+
+    /**
+     * Combina a lista histórica com as edições encontradas no catálogo oficial.
+     * A lista local mantém os metadados editoriais conhecidos e o catálogo acrescenta novidades.
+     */
+    protected function catalogSources(): array
+    {
+        $sources = collect($this->sources)->keyBy(fn (array $source) => rtrim($source['url'], '/'));
+
+        try {
+            $response = Http::timeout(30)->retry(2, 500)->withHeaders($this->requestHeaders())
+                ->get('https://revistamanchete.com.br/revistas/');
+
+            if (!$response->successful()) {
+                throw new \RuntimeException('HTTP ' . $response->status());
+            }
+
+            foreach ($this->parseCatalog($response->body()) as $source) {
+                $key = rtrim($source['url'], '/');
+                $sources->put($key, array_merge($source, $sources->get($key, [])));
+            }
+        } catch (\Throwable $e) {
+            $this->warn('Não foi possível consultar o catálogo; usando a lista local: ' . $e->getMessage());
+        }
+
+        return $sources->values()
+            ->unique(fn (array $source) => Str::slug($source['title']))
+            ->values()
+            ->all();
+    }
+
+    protected function parseCatalog(string $html): array
+    {
+        $dom = new \DOMDocument();
+        $previous = libxml_use_internal_errors(true);
+        $loaded = $dom->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_NOWARNING | LIBXML_NOERROR);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        if (!$loaded) {
+            return [];
+        }
+
+        $xpath = new \DOMXPath($dom);
+        $items = $xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' revista-item ')]");
+        $sources = [];
+
+        foreach ($items ?: [] as $item) {
+            $link = $xpath->query('.//a[@href]', $item)?->item(0);
+            $labelNode = $xpath->query(".//*[contains(concat(' ', normalize-space(@class), ' '), ' revista-edicao ')]", $item)?->item(0);
+            $image = $xpath->query('.//img[@src or @data-src]', $item)?->item(0);
+            $url = trim((string) $link?->getAttribute('href'));
+            $label = trim(preg_replace('/\s+/u', ' ', (string) $labelNode?->textContent));
+
+            if (!$url || !$this->isOfficialUrl($url)) {
+                continue;
+            }
+
+            $metadata = $this->metadataFromCatalog($url, $label);
+            $thumb = $image ? trim($image->getAttribute('data-src') ?: $image->getAttribute('src')) : null;
+            if ($thumb && $this->isOfficialUrl($thumb)) {
+                $metadata['thumb_url'] = $thumb;
+            }
+
+            $sources[] = $metadata;
+        }
+
+        return $sources;
+    }
+
+    protected function metadataFromCatalog(string $url, string $label): array
+    {
+        $path = trim((string) parse_url($url, PHP_URL_PATH), '/');
+        $name = $label ?: Str::headline(basename($path));
+        $ascii = mb_strtolower(Str::ascii($name . ' ' . $path));
+        preg_match('/(?:edicao[- ]|^)(\d{1,2})/i', $ascii, $editionMatch);
+        preg_match('/(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)(?:[- ](20\d{2}))?/i', $ascii, $dateMatch);
+
+        $months = ['janeiro' => 1, 'fevereiro' => 2, 'marco' => 3, 'abril' => 4, 'maio' => 5, 'junho' => 6,
+            'julho' => 7, 'agosto' => 8, 'setembro' => 9, 'outubro' => 10, 'novembro' => 11, 'dezembro' => 12];
+        $knownPublished = [
+            'revistas/revista-manchete-judiciario-julho' => '2026-07-01',
+            'revistas/edicao-especial-energia' => '2026-08-01',
+        ];
+        $published = $knownPublished[$path] ?? (!empty($dateMatch)
+            ? sprintf('%d-%02d-01', (int) ($dateMatch[2] ?? now()->year), $months[$dateMatch[1]])
+            : now()->startOfMonth()->toDateString());
+
+        $category = str_contains($ascii, 'judiciario') ? 'Judiciário'
+            : (str_contains($ascii, 'energia') ? 'Energia' : (str_contains($ascii, 'turismo') ? 'Turismo' : 'Manchetes'));
+        if (!empty($editionMatch)) {
+            $title = sprintf('Revista Manchete - %dª Edição', (int) $editionMatch[1]);
+        } elseif (str_contains($ascii, 'judiciario-julho')) {
+            $title = 'Revista Manchete Judiciário - Julho ' . substr($published, 0, 4);
+        } elseif (str_starts_with(Str::ascii($name), 'Manchete')) {
+            $title = 'Revista ' . $name;
+        } else {
+            $title = str_starts_with(Str::ascii($name), 'Revista Manchete') ? $name : 'Revista Manchete - ' . $name;
+        }
+
+        return [
+            'url' => $url,
+            'title' => $title,
+            'edition' => !empty($editionMatch) ? '#' . (int) $editionMatch[1] : $name,
+            'category' => $category,
+            'published' => $published,
+        ];
+    }
+
+    protected function storedPdfExists(Magazine $magazine): bool
+    {
+        $path = ltrim((string) $magazine->pdf_file, '/');
+
+        return $path !== '' && (is_file(public_path('storage/' . $path)) || is_file(storage_path('app/public/' . $path)));
     }
 
     /**
@@ -251,9 +369,11 @@ class ImportManchetePdfs extends Command
      */
     protected function extractAssets(string $url): array
     {
-        $response = Http::timeout(30)->withHeaders([
-            'User-Agent' => 'Mozilla/5.0 (SomosUNN-ImportBot/1.0)',
-        ])->get($url);
+        if (!$this->isOfficialUrl($url)) {
+            throw new \RuntimeException('Origem externa não permitida.');
+        }
+
+        $response = Http::timeout(30)->retry(2, 500)->withHeaders($this->requestHeaders())->get($url);
 
         if (!$response->successful()) {
             throw new \RuntimeException('HTTP ' . $response->status());
@@ -263,7 +383,7 @@ class ImportManchetePdfs extends Command
         $result = ['pdf_url' => null, 'thumb_url' => null];
 
         // PDF: procura link .pdf no WordPress
-        if (preg_match('~https?://[^"\'\s]+\.pdf~i', $html, $m)) {
+        if (preg_match('~https?://[^"\'\s]+\.pdf(?:\?[^"\'\s]*)?~i', $html, $m)) {
             $result['pdf_url'] = html_entity_decode($m[0]);
         }
 
@@ -283,15 +403,13 @@ class ImportManchetePdfs extends Command
      */
     protected function downloadFile(string $url, string $directory, string $filename): ?string
     {
+        if (!$this->isOfficialUrl($url)) {
+            $this->error('      Origem externa não permitida.');
+            return null;
+        }
+
+        $temporary = null;
         try {
-            $response = Http::timeout(120)->withHeaders([
-                'User-Agent' => 'Mozilla/5.0 (SomosUNN-ImportBot/1.0)',
-            ])->get($url);
-
-            if (!$response->successful()) {
-                return null;
-            }
-
             $targetDir = public_path('storage/' . trim($directory, '/'));
             if (!is_dir($targetDir) && !@mkdir($targetDir, 0755, true)) {
                 return null;
@@ -300,14 +418,66 @@ class ImportManchetePdfs extends Command
             // Sanitiza o nome do arquivo.
             $filename = preg_replace('/[^A-Za-z0-9_\-\.]/', '_', $filename);
             $fullPath = $targetDir . '/' . $filename;
+            $temporary = $fullPath . '.part-' . bin2hex(random_bytes(6));
 
-            file_put_contents($fullPath, $response->body());
+            $response = Http::timeout(900)->connectTimeout(30)->retry(2, 1000)
+                ->withHeaders($this->requestHeaders())
+                ->withOptions(['sink' => $temporary])
+                ->get($url);
+
+            if (!$response->successful() || !is_file($temporary)) {
+                return null;
+            }
+
+            $size = filesize($temporary);
+            $isPdf = str_ends_with(strtolower($filename), '.pdf');
+            $maximum = $isPdf ? 600 * 1024 * 1024 : 20 * 1024 * 1024;
+            if ($size === false || $size < 1 || $size > $maximum) {
+                throw new \RuntimeException('Arquivo vazio ou acima do limite permitido.');
+            }
+
+            if ($isPdf) {
+                $handle = fopen($temporary, 'rb');
+                $signature = $handle ? fread($handle, 5) : '';
+                if ($handle) {
+                    fclose($handle);
+                }
+                if ($signature !== '%PDF-') {
+                    throw new \RuntimeException('A resposta não contém um PDF válido.');
+                }
+            }
+
+            if (!@rename($temporary, $fullPath)) {
+                throw new \RuntimeException('Não foi possível concluir a gravação do arquivo.');
+            }
+            $temporary = null;
 
             return trim($directory, '/') . '/' . $filename;
         } catch (\Throwable $e) {
             $this->error('      Erro ao baixar: ' . $e->getMessage());
             return null;
+        } finally {
+            if ($temporary && is_file($temporary)) {
+                @unlink($temporary);
+            }
         }
+    }
+
+    protected function requestHeaders(): array
+    {
+        return [
+            'User-Agent' => 'Mozilla/5.0 (compatible; SomosUNN-MagazineSync/2.0; +https://somosunn.com.br)',
+            'Accept' => 'text/html,application/pdf,image/avif,image/webp,image/*,*/*;q=0.8',
+        ];
+    }
+
+    protected function isOfficialUrl(string $url): bool
+    {
+        $parts = parse_url(html_entity_decode($url));
+        $host = strtolower((string) ($parts['host'] ?? ''));
+
+        return ($parts['scheme'] ?? null) === 'https'
+            && in_array($host, ['revistamanchete.com.br', 'www.revistamanchete.com.br'], true);
     }
 
     protected function generateThumbnailFromPdf(string $pdfPath, string $slug): ?string

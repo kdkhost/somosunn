@@ -23,6 +23,7 @@ return [
             'feedback:request-daily' => 'Solicitar feedback de compradores',
         ],
         'Conteudo e Membros' => [
+            'magazines:import-manchete' => 'Sincronizar revistas oficiais da Manchete',
             'lessons:process-pending-videos --limit=2' => 'Processar videos pendentes',
             'points:award-top-ranking' => 'Pontuar top ranking semanal',
             'points:award-birthday-bonus' => 'Pontuar aniversariantes',
@@ -50,6 +51,7 @@ return [
         ['command' => 'emails:process-queue', 'frequency' => '* * * * *', 'active' => true],
         ['command' => 'queue:work --stop-when-empty --tries=3 --timeout=120', 'frequency' => '* * * * *', 'active' => true],
         ['command' => 'lessons:process-pending-videos --limit=2', 'frequency' => '* * * * *', 'active' => true],
+        ['command' => 'magazines:import-manchete', 'frequency' => '30 2 * * *', 'active' => true],
         ['command' => 'points:award-top-ranking', 'frequency' => '5 0 * * 0', 'active' => true],
         ['command' => 'points:award-birthday-bonus', 'frequency' => '0 1 * * *', 'active' => true],
         ['command' => 'share-requests:expire', 'frequency' => '0 2 * * *', 'active' => true],
