@@ -356,21 +356,21 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.gallery-delete-form').forEach((form) => {
         form.addEventListener('submit', function (event) {
             const prompt = 'Esta midia sera removida da galeria. Deseja continuar?';
-            if (typeof Swal === 'undefined') {
-                if (!window.confirm(prompt)) event.preventDefault();
-                return;
-            }
             event.preventDefault();
-            Swal.fire({
-                icon: 'warning',
-                title: 'Excluir midia?',
-                text: prompt,
-                showCancelButton: true,
-                confirmButtonText: 'Sim, excluir',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#64748b'
-            }).then((result) => { if (result.isConfirmed) form.submit(); });
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Excluir midia?',
+                    text: prompt,
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, excluir',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#64748b'
+                }).then((result) => { if (result.isConfirmed) form.submit(); });
+            } else {
+                form.submit();
+            }
         });
     });
 

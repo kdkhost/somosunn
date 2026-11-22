@@ -323,9 +323,12 @@ $(function () {
             const f = this;
             const title = $(f).data('confirm-title')||'Tem certeza?';
             const text  = $(f).data('confirm-text')||'Esta acao nao podera ser desfeita.';
-            if (typeof Swal==='undefined') { if (window.confirm(text)) f.submit(); return; }
-            Swal.fire({title,text,icon:'warning',showCancelButton:true,confirmButtonColor:'#1e293b',cancelButtonColor:'#ef4444',confirmButtonText:'Sim, excluir',cancelButtonText:'Cancelar'})
-                .then(r=>{ if(r.isConfirmed) f.submit(); });
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({title,text,icon:'warning',showCancelButton:true,confirmButtonColor:'#1e293b',cancelButtonColor:'#ef4444',confirmButtonText:'Sim, excluir',cancelButtonText:'Cancelar'})
+                    .then(r=>{ if(r.isConfirmed) f.submit(); });
+            } else {
+                f.submit();
+            }
         });
     }
     function shouldAppend(item) {
@@ -478,9 +481,12 @@ $(function () {
         const f = this;
         const title = $(f).data('confirm-title')||'Tem certeza?';
         const text  = $(f).data('confirm-text')||'Esta acao nao podera ser desfeita.';
-        if (typeof Swal==='undefined') { if (window.confirm(text)) f.submit(); return; }
-        Swal.fire({title,text,icon:'warning',showCancelButton:true,confirmButtonColor:'#1e293b',cancelButtonColor:'#ef4444',confirmButtonText:'Sim, excluir',cancelButtonText:'Cancelar'})
-            .then(r=>{ if(r.isConfirmed) f.submit(); });
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({title,text,icon:'warning',showCancelButton:true,confirmButtonColor:'#1e293b',cancelButtonColor:'#ef4444',confirmButtonText:'Sim, excluir',cancelButtonText:'Cancelar'})
+                .then(r=>{ if(r.isConfirmed) f.submit(); });
+        } else {
+            f.submit();
+        }
     });
 
     /* ── init ── */

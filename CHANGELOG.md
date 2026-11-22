@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - perf(frontend): FullCalendar 6 unificado e eliminação de confirms nativos
+
+- **FullCalendar 6 unificado (`resources/views/admin/dashboard.blade.php`):**
+  - Atualizado o calendário do dashboard administrativo para FullCalendar `6.1.15` (alinhado a `/admin/events` e `/painel/admin/events`), eliminando o bundle legado v5 e dependências antigas de CSS.
+- **Eliminação de alerts e confirms nativos (`resources/views/admin/gallery/partials/scripts.blade.php`, `resources/views/panel/gallery/partials/scripts.blade.php`):**
+  - Substituídos os últimos `window.confirm()` restantes da galeria por SweetAlert2 estilizado, garantindo 100% de conformidade com a política de notificações e confirmações globais da plataforma.
+
 ## [2026-11-22] - fix(auth): restauração e configuração do login social com Google
 
 - Corrigida a ausência do switch global `social_login_enabled` nos formulários de configuração de Login Social de ambos os painéis (`/admin` e `/painel`).

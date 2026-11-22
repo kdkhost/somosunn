@@ -683,8 +683,6 @@
 @endsection
 
 @push('styles')
-    {{-- FullCalendar CSS --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
     <style>
         .fc-event {
             cursor: pointer;
@@ -701,11 +699,10 @@
 @endpush
 
 @push('scripts')
-    {{-- Chart.js & FullCalendar JS --}}
+    {{-- FullCalendar 6 & Realtime --}}
     @include('partials.service-visits-realtime')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales/pt-br.global.min.js"></script>
 
     <script>
         function renderLegacyAdminServiceVisits(payload) {
