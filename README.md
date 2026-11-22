@@ -1,5 +1,7 @@
 # UNN — Plataforma de Networking
 
+- **Reformulação da Página de Afiliados e Indicações com Design React SaaS (22/11):** Reformulada a página `/admin/referrals?tab=programa`, entregando Hero Card moderno para link e código de indicação com cópia Toastr, compartilhamento social vibrante, 4 cartões de KPIs harmonizados no Dark Mode, prévia rica de indicados recentes com avatares e passos interativos do programa.
+
 - **Harmonização do Catálogo do Marketplace no Tema Escuro (22/11):** Corrigidos os cards de KPI, botões de filtro e barras de busca em `/admin/marketplace/catalogo` para o Dark Mode, eliminando gradientes esbranquiçados e adotando a paleta dark profunda nativa da plataforma com contraste e legibilidade impecáveis.
 
 - **Modernização dos Modais do Painel `/admin` Estilo React Radix / Shadcn UI (22/11):** Todos os modais de todas as páginas administrativas foram modernizados com animação fluida de escala e fade (`scale(0.95)` -> `scale(1)`), backdrop com glassmorphism (`blur(8px)`), centralização vertical automática, cantos generosos de 20px, botões fechar circulares com rotação de 90° e rodapés com botões padronizados e responsivos.

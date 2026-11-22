@@ -1,5 +1,14 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - feat(admin/referrals): reformulação completa da aba de programa de afiliados com design react saas
+
+- **Reformulação Visual e Funcional de `/admin/referrals?tab=programa` (`resources/views/admin/referrals/index.blade.php`):**
+  - **Design React/SaaS Contemporâneo:** Reformulada a página de afiliados e indicações com cabeçalho limpo, badges de status do programa ativo e abas modernas em formato pílula (*pills*) com sombra suave azul UNN (`#1F5EDB`) e suporte impecável ao modo claro e escuro.
+  - **Hero Card do Link de Indicação:** Card de 20px com acento sutil, campo de link de 48px com cantos arredondados, botão de cópia com gradiente azul UNN e feedback instantâneo via **Toastr**, além de botões de compartilhamento social (WhatsApp, Telegram, LinkedIn e E-mail) estilizados em cápsulas vibrantes.
+  - **Cards de Métricas e Performance (KPIs):** Substituídos os info-boxes legados por 4 cartões modernos responsivos com ícones coloridos em círculos translúcidos (Total de Indicados, Convertidos com barra de progresso suave, Pontos Ganhos e Ganhos por Indicação com potencial pendente), 100% harmonizados no Dark Mode.
+  - **Tabela de Indicados Recentes:** Prévia limpa com avatares de 42px, badges suaves para os planos de assinatura (Ativo, Vitalício, Expirado ou Sem Plano) e pontos destacados em verde.
+  - **Guia Visual "Como Funciona":** Timeline de 4 passos com números em círculos de destaque, layout moderno conectado e botão de chamada para cópia rápida do link.
+
 ## [2026-11-22] - fix(admin/marketplace): harmonização completa do catálogo no tema escuro (dark mode)
 
 - **Correção Visual de Cores e Contraste no Dark Mode (`resources/views/admin/marketplace/catalog/index.blade.php`):**

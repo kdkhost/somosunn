@@ -7,30 +7,249 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
     <style>
-        .referral-legacy-tabs .nav-link { font-weight: 600; color: #495057; }
-        .referral-legacy-tabs .nav-link.active { color: #007bff; }
+        /* Estilos Globais e Abas Estilo React */
+        .referral-legacy-tabs {
+            border-bottom: 0 !important;
+            gap: 0.5rem;
+            padding: 0.5rem 0.5rem 0 0.5rem;
+            flex-wrap: wrap;
+        }
+        .referral-legacy-tabs .nav-link {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #64748b;
+            border: 1px solid transparent !important;
+            border-radius: 0.75rem !important;
+            padding: 0.55rem 1.15rem !important;
+            transition: all 0.15s ease;
+            background: transparent;
+        }
+        .referral-legacy-tabs .nav-link:hover {
+            color: #1F5EDB;
+            background: #f1f5f9;
+        }
+        .referral-legacy-tabs .nav-link.active {
+            color: #ffffff !important;
+            background: #1F5EDB !important;
+            box-shadow: 0 4px 12px rgba(31, 94, 219, 0.28) !important;
+        }
+
+        .dark-mode .referral-legacy-tabs .nav-link {
+            color: #94a3b8;
+        }
+        .dark-mode .referral-legacy-tabs .nav-link:hover {
+            color: #ffffff;
+            background: #1e293b;
+        }
+        .dark-mode .referral-legacy-tabs .nav-link.active {
+            color: #ffffff !important;
+            background: #1F5EDB !important;
+        }
+
         .referral-legacy-subtabs { gap: .65rem; }
         .referral-legacy-subtabs .nav-link { border-radius: 999px; font-weight: 700; color: #495057; background: #f4f6f9; }
         .referral-legacy-subtabs .nav-link.active { background: #007bff; color: #fff; box-shadow: 0 .35rem .85rem rgba(0, 123, 255, .18); }
         .referral-avatar, .referral-avatar-lg { border-radius: 999px; object-fit: cover; flex-shrink: 0; background: #f4f6f9; }
         .referral-avatar { width: 42px; height: 42px; }
         .referral-avatar-lg { width: 56px; height: 56px; }
-        .referral-hero-card { border-radius: 1rem; }
-        .referral-stat-card { border-radius: .9rem; min-height: 100%; }
-        .referral-stat-card .info-box-icon { border-radius: .85rem; }
-        .referral-mini-card { border: 1px solid #e9ecef; border-radius: .9rem; padding: 1rem; background: #fff; height: 100%; }
-        .referral-steps-card .step-badge { width: 2rem; height: 2rem; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; margin-bottom: .75rem; }
+
+        /* Hero Card do Link */
+        .referral-hero-card {
+            border-radius: 1.25rem !important;
+            border: 1px solid #e2e8f0 !important;
+            background-color: #ffffff;
+        }
+        .dark-mode .referral-hero-card {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        /* Input de Link Estilo React */
+        .referral-link-input-group .form-control {
+            height: 48px !important;
+            border-radius: 0.75rem 0 0 0.75rem !important;
+            border: 1px solid #cbd5e1 !important;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+            background-color: #f8fafc !important;
+            color: #1e293b !important;
+        }
+        .dark-mode .referral-link-input-group .form-control {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+        .referral-link-input-group .input-group-text {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-right: 0 !important;
+            border-radius: 0.75rem 0 0 0.75rem !important;
+            color: #1F5EDB !important;
+        }
+        .dark-mode .referral-link-input-group .input-group-text {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #60a5fa !important;
+        }
+        .referral-link-input-group .btn-copy-link {
+            height: 48px !important;
+            border-radius: 0 0.75rem 0.75rem 0 !important;
+            padding: 0 1.5rem !important;
+            font-weight: 600 !important;
+            background: linear-gradient(135deg, #1F5EDB 0%, #177FD6 100%) !important;
+            border: none !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(31, 94, 219, 0.25) !important;
+            transition: all 0.2s ease !important;
+        }
+        .referral-link-input-group .btn-copy-link:hover {
+            box-shadow: 0 6px 18px rgba(31, 94, 219, 0.35) !important;
+            transform: translateY(-1px);
+        }
+
+        /* Botões de Compartilhamento Social Modernos */
+        .btn-social-share {
+            border-radius: 9999px !important;
+            font-size: 0.8125rem !important;
+            font-weight: 600 !important;
+            padding: 0.5rem 1rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            border: none !important;
+            color: #ffffff !important;
+            transition: all 0.15s ease !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+        }
+        .btn-social-share:hover {
+            transform: translateY(-2px);
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+        .btn-share-whatsapp { background: #25D366 !important; }
+        .btn-share-telegram { background: #0088cc !important; }
+        .btn-share-linkedin { background: #0a66c2 !important; }
+        .btn-share-email { background: #475569 !important; }
+
+        /* Mini Cards de Código e Regras */
+        .referral-mini-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.15rem;
+            background: #f8fafc;
+            height: 100%;
+            transition: all 0.2s ease;
+        }
+        .dark-mode .referral-mini-card {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        /* Cards de Métricas e KPIs */
+        .ref-kpi-card {
+            border-radius: 1rem !important;
+            border: 1px solid #e2e8f0 !important;
+            background-color: #ffffff;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            height: 100%;
+        }
+        .ref-kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+        .dark-mode .ref-kpi-card {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        .dark-mode .ref-kpi-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .ref-kpi-total { background: linear-gradient(135deg, rgba(31, 94, 219, 0.04) 0%, #ffffff 100%); }
+        .ref-kpi-converted { background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, #ffffff 100%); }
+        .ref-kpi-points { background: linear-gradient(135deg, rgba(245, 158, 11, 0.06) 0%, #ffffff 100%); }
+        .ref-kpi-potential { background: linear-gradient(135deg, rgba(147, 51, 234, 0.05) 0%, #ffffff 100%); }
+
+        .dark-mode .ref-kpi-total { background: linear-gradient(135deg, rgba(31, 94, 219, 0.16) 0%, #1e293b 100%) !important; }
+        .dark-mode .ref-kpi-converted { background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, #1e293b 100%) !important; }
+        .dark-mode .ref-kpi-points { background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, #1e293b 100%) !important; }
+        .dark-mode .ref-kpi-potential { background: linear-gradient(135deg, rgba(147, 51, 234, 0.16) 0%, #1e293b 100%) !important; }
+
+        .ref-kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        .ref-kpi-icon-blue { background: rgba(31, 94, 219, 0.12); color: #1F5EDB; }
+        .ref-kpi-icon-green { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+        .ref-kpi-icon-amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+        .ref-kpi-icon-purple { background: rgba(147, 51, 234, 0.12); color: #9333ea; }
+
+        .dark-mode .ref-kpi-icon-blue { background: rgba(31, 94, 219, 0.28); color: #60a5fa; }
+        .dark-mode .ref-kpi-icon-green { background: rgba(16, 185, 129, 0.28); color: #34d399; }
+        .dark-mode .ref-kpi-icon-amber { background: rgba(245, 158, 11, 0.28); color: #fbbf24; }
+        .dark-mode .ref-kpi-icon-purple { background: rgba(147, 51, 234, 0.28); color: #c084fc; }
+
+        /* Card Como Funciona (Steps) */
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #ffffff;
+            flex-shrink: 0;
+        }
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 0.85rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            transition: all 0.15s ease;
+        }
+        .step-item:hover {
+            transform: translateX(3px);
+        }
+        .dark-mode .step-item {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        /* Badges Suaves */
+        .badge-primary-soft { background-color: rgba(31, 94, 219, 0.12) !important; color: #1F5EDB !important; }
+        .badge-success-soft { background-color: rgba(16, 185, 129, 0.12) !important; color: #10b981 !important; }
+        .badge-warning-soft { background-color: rgba(245, 158, 11, 0.14) !important; color: #f59e0b !important; }
+        .badge-purple-soft { background-color: rgba(147, 51, 234, 0.12) !important; color: #9333ea !important; }
+        .badge-secondary-soft { background-color: rgba(100, 116, 139, 0.12) !important; color: #64748b !important; }
+
+        .dark-mode .badge-primary-soft { background-color: rgba(31, 94, 219, 0.25) !important; color: #60a5fa !important; }
+        .dark-mode .badge-success-soft { background-color: rgba(16, 185, 129, 0.25) !important; color: #34d399 !important; }
+        .dark-mode .badge-warning-soft { background-color: rgba(245, 158, 11, 0.25) !important; color: #fbbf24 !important; }
+        .dark-mode .badge-purple-soft { background-color: rgba(147, 51, 234, 0.25) !important; color: #c084fc !important; }
+        .dark-mode .badge-secondary-soft { background-color: rgba(100, 116, 139, 0.25) !important; color: #94a3b8 !important; }
+
         .referral-activity-feed .list-group-item { border-left: 0; border-right: 0; padding-left: 0; padding-right: 0; }
         .referral-activity-feed .list-group-item:first-child { border-top: 0; }
         .referral-activity-feed .list-group-item:last-child { border-bottom: 0; }
         .referral-source-url, .referral-break-anywhere { word-break: break-word; }
         .referral-empty-state { min-height: 180px; display: flex; align-items: center; justify-content: center; text-align: center; color: #6c757d; background: #f8f9fa; border: 1px dashed #ced4da; border-radius: .9rem; padding: 2rem; }
+        .dark-mode .referral-empty-state { background: #0f172a !important; border-color: #334155 !important; color: #94a3b8 !important; }
         .referral-table-actions { white-space: nowrap; }
         .dataTables_wrapper .row:first-child, .dataTables_wrapper .row:last-child { margin-left: 0; margin-right: 0; }
         .dataTables_wrapper .dataTables_filter label, .dataTables_wrapper .dataTables_length label { font-weight: 600; }
         .dataTables_wrapper .dataTables_filter input, .dataTables_wrapper .dataTables_length select { margin-left: .35rem; }
         
-        /* Novo Design de Cartão de Rastreio (Flexível e Vertical) */
+        /* Cartão de Rastreio */
         .referral-tracking-card {
             background: #fff;
             border: 1px solid #e9ecef;
@@ -65,6 +284,8 @@
             margin-bottom: 0.25rem;
             word-break: break-all;
         }
+        .dark-mode .referral-tracking-card { background: #1e293b !important; border-color: #334155 !important; }
+        .dark-mode .referral-tracking-value { color: #f8fafc !important; }
         .referral-tracking-label {
             font-size: 0.8rem;
             font-weight: 800;
@@ -116,13 +337,33 @@
         </div>
     @endif
 
-    <div class="callout callout-info">
-        <h5 class="mb-2"><i class="fas fa-bullhorn mr-2"></i>Afiliados e indicações no AdminLTE 3.2</h5>
-        <p class="mb-0">O superadmin acompanha o link pessoal, os indicados, os tokens da API, os tickets de sandbox e o rastreio consolidado sem misturar tudo na mesma rolagem.</p>
+    {{-- Cabeçalho Moderno Estilo React SaaS --}}
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <h4 class="font-weight-bold text-dark mb-0 d-flex align-items-center" style="letter-spacing: -0.02em;">
+                    <i class="fas fa-share-nodes text-primary mr-2"></i> Programa de Afiliados e Indicações
+                </h4>
+                <span class="badge badge-primary-soft font-weight-600 px-2.5 py-1 rounded-pill" style="font-size: 0.78rem;">
+                    <i class="fas fa-circle-check mr-1"></i> Programa Ativo
+                </span>
+            </div>
+            <p class="text-muted small mb-0 mt-1">
+                Monitore seu link pessoal, conversão de indicados, comissões em pontos e métricas do programa de parceiros.
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-none" data-referral-tab-target="tracking">
+                <i class="fas fa-chart-line mr-1"></i> Rastreio Global
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-none" data-referral-tab-target="api">
+                <i class="fas fa-key mr-1"></i> API Pessoal
+            </button>
+        </div>
     </div>
 
-    <div class="card card-primary card-outline shadow-sm">
-        <div class="card-header p-0 border-bottom-0">
+    <div class="card card-primary card-outline shadow-sm border-0 mb-4" style="border-radius: 1.25rem;">
+        <div class="card-header p-2 border-bottom">
             <ul class="nav nav-tabs referral-legacy-tabs" id="admin-referrals-tabs" role="tablist">
                 <li class="nav-item"><a class="nav-link {{ $activeTab === 'programa' ? 'active' : '' }}" id="admin-referrals-programa-tab" data-toggle="pill" href="#admin-referrals-programa" role="tab" data-tab-name="programa"><i class="fas fa-link mr-1"></i> Programa e link pessoal</a></li>
                 <li class="nav-item"><a class="nav-link {{ $activeTab === 'indicados' ? 'active' : '' }}" id="admin-referrals-indicados-tab" data-toggle="pill" href="#admin-referrals-indicados" role="tab" data-tab-name="indicados"><i class="fas fa-users mr-1"></i> Indicados</a></li>
@@ -131,61 +372,208 @@
                 <li class="nav-item"><a class="nav-link {{ $activeTab === 'tracking' ? 'active' : '' }}" id="admin-referrals-tracking-tab" data-toggle="pill" href="#admin-referrals-tracking" role="tab" data-tab-name="tracking"><i class="fas fa-chart-line mr-1"></i> Rastreio global</a></li>
             </ul>
         </div>
-        <div class="card-body">
+        <div class="card-body p-3 p-md-4">
             <div class="tab-content">
+                {{-- ABA: PROGRAMA E LINK PESSOAL (REMODELADA COM DESIGN REACT SAAS) --}}
                 <div class="tab-pane fade {{ $activeTab === 'programa' ? 'show active' : '' }}" id="admin-referrals-programa" role="tabpanel">
-                    <div class="row">
-                        <div class="col-xl-7">
-                            <div class="card card-primary card-outline referral-hero-card shadow-sm">
-                                <div class="card-header border-0"><h3 class="card-title font-weight-bold"><i class="fas fa-link mr-2"></i>Seu link de indicação</h3></div>
-                                <div class="card-body">
-                                    <p class="text-muted mb-4">Compartilhe este link. O sistema registra automaticamente quem entrou pelo seu convite.</p>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-link"></i></span></div>
+                    <div class="row g-3">
+                        {{-- Hero Card: Link de Indicação --}}
+                        <div class="col-xl-7 mb-3 mb-xl-0">
+                            <div class="card referral-hero-card shadow-sm h-100">
+                                <div class="card-header bg-transparent border-0 pt-3.5 pb-2 px-3.5 d-flex align-items-center justify-content-between">
+                                    <h5 class="font-weight-bold mb-0 d-flex align-items-center text-dark">
+                                        <i class="fas fa-link text-primary mr-2"></i> Seu Link de Indicação
+                                    </h5>
+                                    <span class="badge badge-success-soft font-weight-600 px-2.5 py-1 rounded-pill" style="font-size: 0.75rem;">
+                                        <i class="fas fa-bolt mr-1"></i> Rastreamento Ativo
+                                    </span>
+                                </div>
+                                <div class="card-body px-3.5 pt-1 pb-3.5">
+                                    <p class="text-muted small mb-3">
+                                        Compartilhe seu link exclusivo. O sistema atribui automaticamente cadastros, checkouts e planos contratados ao seu perfil.
+                                    </p>
+
+                                    {{-- Campo de Cópia Estilizado --}}
+                                    <div class="input-group referral-link-input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-link"></i></span>
+                                        </div>
                                         <input id="adminReferralLinkInput" type="text" readonly class="form-control" value="{{ $referralLink }}">
                                         <div class="input-group-append">
-                                            <button type="button" class="btn btn-primary font-weight-bold" onclick="copyAdminReferralMaterial(this, document.getElementById('adminReferralLinkInput').value, 'legacy-admin-link', @json($referralLink))"><i class="fas fa-copy mr-1"></i> Copiar</button>
+                                            <button type="button" class="btn btn-copy-link" onclick="copyAdminReferralMaterial(this, document.getElementById('adminReferralLinkInput').value, 'legacy-admin-link', @json($referralLink))">
+                                                <i class="fas fa-copy mr-1"></i> Copiar Link
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="d-flex flex-wrap mb-4" style="gap:.75rem;">
-                                        <a href="https://wa.me/?text={{ urlencode('Ei! Faça parte da maior comunidade de empreendedores e networking do Brasil. Use meu link: ' . $referralLink) }}" target="_blank" rel="noopener noreferrer" onclick="trackAdminReferralShare('share', 'whatsapp', @json($referralLink))" class="btn btn-success font-weight-bold"><i class="fab fa-whatsapp mr-1"></i> WhatsApp</a>
-                                        <a href="https://t.me/share/url?url={{ urlencode($referralLink) }}&text={{ urlencode('Entre na plataforma com meu convite e comece a fazer networking!') }}" target="_blank" rel="noopener noreferrer" onclick="trackAdminReferralShare('share', 'telegram', @json($referralLink))" class="btn btn-info font-weight-bold text-white"><i class="fab fa-telegram-plane mr-1"></i> Telegram</a>
-                                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode($referralLink) }}" target="_blank" rel="noopener noreferrer" onclick="trackAdminReferralShare('share', 'linkedin', @json($referralLink))" class="btn btn-primary font-weight-bold"><i class="fab fa-linkedin mr-1"></i> LinkedIn</a>
-                                        <a href="mailto:?subject={{ urlencode('Convite para a comunidade UNN') }}&body={{ urlencode('Olá! Quero te convidar para a maior plataforma de networking para empreendedores. Acesse: ' . $referralLink) }}" onclick="trackAdminReferralShare('share', 'email', @json($referralLink))" class="btn btn-secondary font-weight-bold"><i class="fas fa-envelope mr-1"></i> E-mail</a>
+
+                                    {{-- Botões de Compartilhamento Social Modernos --}}
+                                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3.5">
+                                        <a href="https://wa.me/?text={{ urlencode('Ei! Faça parte da maior comunidade de empreendedores e networking do Brasil. Use meu link: ' . $referralLink) }}" target="_blank" rel="noopener noreferrer" onclick="trackAdminReferralShare('share', 'whatsapp', @json($referralLink))" class="btn btn-social-share btn-share-whatsapp">
+                                            <i class="fab fa-whatsapp mr-1.5" style="font-size: 1rem;"></i> WhatsApp
+                                        </a>
+                                        <a href="https://t.me/share/url?url={{ urlencode($referralLink) }}&text={{ urlencode('Entre na plataforma com meu convite e comece a fazer networking!') }}" target="_blank" rel="noopener noreferrer" onclick="trackAdminReferralShare('share', 'telegram', @json($referralLink))" class="btn btn-social-share btn-share-telegram">
+                                            <i class="fab fa-telegram-plane mr-1.5" style="font-size: 1rem;"></i> Telegram
+                                        </a>
+                                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode($referralLink) }}" target="_blank" rel="noopener noreferrer" onclick="trackAdminReferralShare('share', 'linkedin', @json($referralLink))" class="btn btn-social-share btn-share-linkedin">
+                                            <i class="fab fa-linkedin-in mr-1.5" style="font-size: 1rem;"></i> LinkedIn
+                                        </a>
+                                        <a href="mailto:?subject={{ urlencode('Convite para a comunidade UNN') }}&body={{ urlencode('Olá! Quero te convidar para a maior plataforma de networking para empreendedores. Acesse: ' . $referralLink) }}" onclick="trackAdminReferralShare('share', 'email', @json($referralLink))" class="btn btn-social-share btn-share-email">
+                                            <i class="fas fa-envelope mr-1.5" style="font-size: 0.95rem;"></i> E-mail
+                                        </a>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-4 mb-3 mb-md-0"><div class="referral-mini-card h-100"><div class="text-muted text-uppercase font-weight-bold mb-2" style="font-size: .75rem;">Código único</div><h4 class="mb-0 font-weight-bold">{{ $user->referral_code }}</h4></div></div>
-                                        <div class="col-md-8"><div class="alert alert-light border mb-0 h-100 d-flex align-items-center"><div><i class="fas fa-info-circle text-primary mr-2"></i>Pontos são creditados somente após o indicado assinar um plano pago.</div></div></div>
+
+                                    {{-- Mini Cards de Apoio --}}
+                                    <div class="row g-2">
+                                        <div class="col-md-5 mb-2 mb-md-0">
+                                            <div class="referral-mini-card d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <span class="text-uppercase text-muted font-weight-bold d-block" style="font-size: 0.7rem; letter-spacing: 0.05em;">Código Único</span>
+                                                    <h5 class="mb-0 font-weight-bold text-dark" style="font-family: monospace;">{{ $user->referral_code }}</h5>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 text-muted" title="Copiar código" onclick="copyAdminReferralMaterial(this, '{{ $user->referral_code }}', 'code', @json($referralLink))">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-7">
+                                            <div class="referral-mini-card d-flex align-items-center">
+                                                <div class="rounded-circle d-flex align-items-center justify-content-center mr-2.5 flex-shrink-0" style="width: 38px; height: 38px; background: rgba(31,94,219,0.12); color: #1F5EDB;">
+                                                    <i class="fas fa-award"></i>
+                                                </div>
+                                                <div class="small">
+                                                    <strong class="text-dark d-block">Comissão em Pontos</strong>
+                                                    <span class="text-muted">Crédito gerado automaticamente após a assinatura de um plano pago.</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xl-5 mt-4 mt-xl-0">
-                            <div class="row h-100">
-                                <div class="col-sm-6 mb-3"><div class="info-box bg-primary referral-stat-card shadow-sm mb-0"><span class="info-box-icon"><i class="fas fa-user-plus"></i></span><div class="info-box-content"><span class="info-box-text">Total indicados</span><span class="info-box-number">{{ number_format($totalReferred) }}</span></div></div></div>
-                                <div class="col-sm-6 mb-3"><div class="info-box bg-success referral-stat-card shadow-sm mb-0"><span class="info-box-icon"><i class="fas fa-check-circle"></i></span><div class="info-box-content"><span class="info-box-text">Convertidos</span><span class="info-box-number">{{ number_format($convertedCount) }}</span><div class="progress"><div class="progress-bar" style="width: {{ $conversionRate }}%"></div></div><span class="progress-description">{{ $conversionRate }}% de conversão</span></div></div></div>
-                                <div class="col-sm-6 mb-3 mb-sm-0"><div class="info-box bg-warning referral-stat-card shadow-sm mb-0"><span class="info-box-icon"><i class="fas fa-coins"></i></span><div class="info-box-content"><span class="info-box-text">Pontos ganhos</span><span class="info-box-number">{{ number_format($totalReferralPoints) }}</span></div></div></div>
-                                <div class="col-sm-6"><div class="info-box bg-light border referral-stat-card shadow-sm mb-0"><span class="info-box-icon bg-light"><i class="fas fa-gift text-success"></i></span><div class="info-box-content"><span class="info-box-text">Por indicação</span><span class="info-box-number">{{ $pointsPerReferral ? '+' . number_format($pointsPerReferral) . ' pts' : 'Não configurado' }}</span>@if($pendingCount > 0 && $pointsPerReferral > 0)<span class="progress-description">Potencial pendente: +{{ number_format($potentialPoints) }} pts</span>@endif</div></div></div>
+
+                        {{-- Cards de Métricas e Performance (4 KPIs React) --}}
+                        <div class="col-xl-5">
+                            <div class="row g-2 h-100">
+                                {{-- 1. Total Indicados --}}
+                                <div class="col-sm-6 mb-2">
+                                    <div class="card ref-kpi-card ref-kpi-total p-3 d-flex flex-column justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="text-uppercase text-muted font-weight-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Total Indicados</span>
+                                            <div class="ref-kpi-icon ref-kpi-icon-blue">
+                                                <i class="fas fa-user-plus"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-weight-bold text-dark mb-0">{{ number_format($totalReferred) }}</h3>
+                                            <small class="text-muted">Cadastros via seu convite</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- 2. Convertidos --}}
+                                <div class="col-sm-6 mb-2">
+                                    <div class="card ref-kpi-card ref-kpi-converted p-3 d-flex flex-column justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="text-uppercase text-muted font-weight-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Convertidos</span>
+                                            <div class="ref-kpi-icon ref-kpi-icon-green">
+                                                <i class="fas fa-check-circle"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex align-items-baseline justify-content-between">
+                                                <h3 class="font-weight-bold text-success mb-0">{{ number_format($convertedCount) }}</h3>
+                                                <span class="badge badge-success-soft font-weight-bold" style="font-size: 0.75rem;">{{ $conversionRate }}%</span>
+                                            </div>
+                                            <div class="progress my-1.5" style="height: 5px; border-radius: 9999px; background: rgba(16,185,129,0.15);">
+                                                <div class="progress-bar bg-success rounded-pill" style="width: {{ $conversionRate }}%"></div>
+                                            </div>
+                                            <small class="text-muted">Taxa de conversão em vendas</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- 3. Pontos Ganhos --}}
+                                <div class="col-sm-6 mb-2 mb-sm-0">
+                                    <div class="card ref-kpi-card ref-kpi-points p-3 d-flex flex-column justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="text-uppercase text-muted font-weight-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Pontos Ganhos</span>
+                                            <div class="ref-kpi-icon ref-kpi-icon-amber">
+                                                <i class="fas fa-coins"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-weight-bold text-warning mb-0">{{ number_format($totalReferralPoints) }}</h3>
+                                            <small class="text-muted">Créditos de indicação creditados</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- 4. Por Indicação & Potencial --}}
+                                <div class="col-sm-6">
+                                    <div class="card ref-kpi-card ref-kpi-potential p-3 d-flex flex-column justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="text-uppercase text-muted font-weight-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Por Indicação</span>
+                                            <div class="ref-kpi-icon ref-kpi-icon-purple">
+                                                <i class="fas fa-gift"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-weight-bold text-dark mb-0" style="font-size: 1.25rem;">
+                                                {{ $pointsPerReferral ? '+' . number_format($pointsPerReferral) . ' pts' : 'Configurar' }}
+                                            </h4>
+                                            @if($pendingCount > 0 && $pointsPerReferral > 0)
+                                                <small class="text-muted d-block text-truncate" title="Potencial pendente: +{{ number_format($potentialPoints) }} pts">
+                                                    Pendente: +{{ number_format($potentialPoints) }} pts
+                                                </small>
+                                            @else
+                                                <small class="text-muted">Valor por plano ativo</small>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>                    <div class="row mt-4">
-                        <div class="col-lg-7">
-                            <div class="card card-secondary card-outline shadow-sm mb-0">
-                                <div class="card-header border-0 d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                    </div>
+
+                    {{-- Grid Inferior: Prévia de Indicados & Como Funciona --}}
+                    <div class="row mt-4 g-3">
+                        {{-- Coluna 1: Pessoas que você indicou --}}
+                        <div class="col-lg-7 mb-3 mb-lg-0">
+                            <div class="card referral-hero-card shadow-sm mb-0 h-100">
+                                <div class="card-header bg-transparent border-bottom py-3 px-3.5 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2">
                                     <div>
-                                        <h3 class="card-title font-weight-bold"><i class="fas fa-users mr-2"></i>Pessoas que você indicou</h3>
-                                        <p class="text-muted mb-0 mt-2">Prévia dos membros mais recentes. A listagem completa fica na guia <strong>Indicados</strong>.</p>
+                                        <h5 class="font-weight-bold text-dark mb-0 d-flex align-items-center">
+                                            <i class="fas fa-users text-primary mr-2"></i> Pessoas que Você Indicou
+                                        </h5>
+                                        <small class="text-muted">Prévia dos cadastros mais recentes vinculados ao seu convite</small>
                                     </div>
-                                    <button type="button" class="btn btn-outline-primary font-weight-bold mt-3 mt-md-0" data-referral-tab-target="indicados"><i class="fas fa-table mr-1"></i> Ver listagem completa</button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill font-weight-600 px-3 shadow-none" data-referral-tab-target="indicados">
+                                        <i class="fas fa-table mr-1"></i> Ver Todos ({{ number_format($totalReferred) }})
+                                    </button>
                                 </div>
                                 <div class="card-body p-0">
                                     @if($referralsPreview->isEmpty())
-                                        <div class="referral-empty-state m-3">Nenhuma indicação registrada ainda.</div>
+                                        <div class="referral-empty-state m-3">
+                                            <div>
+                                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center bg-light border mb-2" style="width: 54px; height: 54px;">
+                                                    <i class="fas fa-user-group text-muted" style="font-size: 1.5rem;"></i>
+                                                </div>
+                                                <h6 class="font-weight-bold text-dark mb-1">Nenhuma indicação registrada ainda</h6>
+                                                <p class="text-muted small mb-0">Compartilhe seu link exclusivo com parceiros para começar a pontuar.</p>
+                                            </div>
+                                        </div>
                                     @else
                                         <div class="table-responsive">
-                                            <table class="table table-hover table-striped mb-0">
-                                                <thead><tr><th>Membro</th><th>Cadastro</th><th>Plano</th><th class="text-right">Pontos</th></tr></thead>
-                                                <tbody>
+                                            <table class="table table-hover align-middle mb-0">
+                                                <thead class="bg-light">
+                                                    <tr class="text-uppercase text-muted" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                                                        <th>Membro</th>
+                                                        <th>Data de Entrada</th>
+                                                        <th>Plano Contratado</th>
+                                                        <th class="text-right">Pontos</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y">
                                                     @foreach($referralsPreview as $referred)
                                                         @php
                                                             $logsFromUser = $referralPointsLogs->filter(function ($log) use ($referred) {
@@ -196,26 +584,43 @@
                                                             if ($referred->plan_id) {
                                                                 if (!$referred->plan_expires_at) {
                                                                     $planStatusLabel = 'Vitalício';
-                                                                    $planStatusClass = 'badge-purple';
+                                                                    $planStatusClass = 'badge-purple-soft text-purple';
                                                                 } elseif (\Carbon\Carbon::parse($referred->plan_expires_at)->isFuture()) {
                                                                     $planStatusLabel = 'Assinante ativo';
-                                                                    $planStatusClass = 'badge-success';
+                                                                    $planStatusClass = 'badge-success-soft text-success';
                                                                 } else {
                                                                     $planStatusLabel = 'Plano expirado';
-                                                                    $planStatusClass = 'badge-warning';
+                                                                    $planStatusClass = 'badge-warning-soft text-warning';
                                                                 }
                                                                 $planName = $plansMap[$referred->plan_id] ?? 'Plano';
                                                             } else {
                                                                 $planStatusLabel = 'Sem plano';
-                                                                $planStatusClass = 'badge-secondary';
+                                                                $planStatusClass = 'badge-secondary-soft text-muted';
                                                                 $planName = null;
                                                             }
                                                         @endphp
                                                         <tr>
-                                                            <td><div class="d-flex align-items-center"><img src="{{ $referred->photo ? asset($referred->photo) : asset('img/user.png') }}" alt="{{ $referred->name }}" class="referral-avatar mr-3" loading="lazy" decoding="async"><div><div class="font-weight-bold">{{ $referred->name }}</div><small class="text-muted">{{ $referred->email }}</small></div></div></td>
-                                                            <td>{{ optional($referred->created_at)->format('d/m/Y H:i') ?: '—' }}</td>
-                                                            <td>@if($planName)<div class="font-weight-bold">{{ $planName }}</div>@endif<span class="badge {{ $planStatusClass }}">{{ $planStatusLabel }}</span></td>
-                                                            <td class="text-right font-weight-bold {{ $pointsFromThisUser > 0 ? 'text-success' : 'text-muted' }}">{{ $pointsFromThisUser > 0 ? '+' . number_format($pointsFromThisUser) : '0' }}</td>
+                                                            <td>
+                                                                <div class="d-flex align-items-center">
+                                                                    <img src="{{ $referred->photo ? asset($referred->photo) : asset('img/user.png') }}" alt="{{ $referred->name }}" class="referral-avatar mr-2.5 shadow-xs" loading="lazy" decoding="async">
+                                                                    <div class="min-w-0">
+                                                                        <div class="font-weight-bold text-dark text-truncate mb-0.5" style="font-size: 0.875rem;">{{ $referred->name }}</div>
+                                                                        <small class="text-muted text-truncate d-block">{{ $referred->email }}</small>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-muted small">
+                                                                {{ optional($referred->created_at)->format('d/m/Y H:i') ?: '—' }}
+                                                            </td>
+                                                            <td>
+                                                                @if($planName)
+                                                                    <div class="font-weight-600 text-dark small mb-0.5">{{ $planName }}</div>
+                                                                @endif
+                                                                <span class="badge {{ $planStatusClass }} px-2 py-0.5 rounded-pill" style="font-size: 0.72rem;">{{ $planStatusLabel }}</span>
+                                                            </td>
+                                                            <td class="text-right font-weight-bold {{ $pointsFromThisUser > 0 ? 'text-success' : 'text-muted' }}" style="font-size: 0.9rem;">
+                                                                {{ $pointsFromThisUser > 0 ? '+' . number_format($pointsFromThisUser) : '0' }}
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
@@ -225,14 +630,63 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-5 mt-4 mt-lg-0">
-                            <div class="card card-dark card-outline referral-steps-card shadow-sm mb-0 h-100">
-                                <div class="card-header border-0"><h3 class="card-title font-weight-bold"><i class="fas fa-route mr-2"></i>Como funciona</h3></div>
-                                <div class="card-body">
-                                    <div class="referral-mini-card mb-3"><div class="step-badge bg-primary text-white">1</div><h5 class="font-weight-bold">Copie seu link</h5><p class="text-muted mb-0">Cada membro tem um link e um código únicos de indicação.</p></div>
-                                    <div class="referral-mini-card mb-3"><div class="step-badge bg-purple text-white">2</div><h5 class="font-weight-bold">Compartilhe</h5><p class="text-muted mb-0">Envie para contatos, comunidades, site pessoal ou blog.</p></div>
-                                    <div class="referral-mini-card mb-3"><div class="step-badge bg-info text-white">3</div><h5 class="font-weight-bold">O indicado assina</h5><p class="text-muted mb-0">O sistema atribui o cadastro, checkout e compra ao seu link.</p></div>
-                                    <div class="referral-mini-card mb-0"><div class="step-badge bg-warning text-white">4</div><h5 class="font-weight-bold">Você pontua</h5><p class="text-muted mb-0">Os pontos entram após a confirmação do pagamento do plano.</p></div>
+
+                        {{-- Coluna 2: Como Funciona (Steps Estilizados) --}}
+                        <div class="col-lg-5">
+                            <div class="card referral-hero-card shadow-sm mb-0 h-100">
+                                <div class="card-header bg-transparent border-bottom py-3 px-3.5">
+                                    <h5 class="font-weight-bold text-dark mb-0 d-flex align-items-center">
+                                        <i class="fas fa-route text-primary mr-2"></i> Como Funciona o Programa
+                                    </h5>
+                                </div>
+                                <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                                    <div class="d-flex flex-column gap-2.5 mb-3">
+                                        {{-- Step 1 --}}
+                                        <div class="step-item">
+                                            <div class="step-circle bg-primary shadow-xs">1</div>
+                                            <div class="min-w-0">
+                                                <h6 class="font-weight-bold text-dark mb-0.5">Copie seu Link Exclusivo</h6>
+                                                <p class="text-muted small mb-0">Cada afiliado possui link e código únicos registrados na plataforma.</p>
+                                            </div>
+                                        </div>
+
+                                        {{-- Step 2 --}}
+                                        <div class="step-item">
+                                            <div class="step-circle shadow-xs" style="background: #9333ea;">2</div>
+                                            <div class="min-w-0">
+                                                <h6 class="font-weight-bold text-dark mb-0.5">Compartilhe na sua Rede</h6>
+                                                <p class="text-muted small mb-0">Envie pelo WhatsApp, LinkedIn, redes sociais, blog ou site pessoal.</p>
+                                            </div>
+                                        </div>
+
+                                        {{-- Step 3 --}}
+                                        <div class="step-item">
+                                            <div class="step-circle bg-info shadow-xs">3</div>
+                                            <div class="min-w-0">
+                                                <h6 class="font-weight-bold text-dark mb-0.5">O Indicado Assina um Plano</h6>
+                                                <p class="text-muted small mb-0">O sistema monitora todo o funil: cliques, cadastro e pagamento do plano.</p>
+                                            </div>
+                                        </div>
+
+                                        {{-- Step 4 --}}
+                                        <div class="step-item">
+                                            <div class="step-circle bg-warning shadow-xs">4</div>
+                                            <div class="min-w-0">
+                                                <h6 class="font-weight-bold text-dark mb-0.5">Você Pontua e Resgata</h6>
+                                                <p class="text-muted small mb-0">Os pontos entram após confirmação e podem ser trocados no marketplace.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 rounded-xl border d-flex align-items-center justify-content-between" style="background: rgba(31,94,219,0.04); border-color: rgba(31,94,219,0.2) !important;">
+                                        <div class="small">
+                                            <span class="font-weight-bold text-dark d-block">Pronto para divulgar?</span>
+                                            <span class="text-muted">Copie seu link e envie para sua rede.</span>
+                                        </div>
+                                        <button type="button" class="btn btn-primary btn-sm rounded-pill font-weight-bold px-3 shadow-none" onclick="copyAdminReferralMaterial(this, document.getElementById('adminReferralLinkInput').value, 'steps-cta', @json($referralLink))">
+                                            <i class="fas fa-copy mr-1"></i> Copiar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -547,6 +1001,10 @@
 
             if (trackChannel) {
                 trackAdminReferralShare('copy', trackChannel, targetUrl);
+            }
+
+            if (typeof toastr !== 'undefined') {
+                toastr.success(trackChannel === 'code' ? 'Código copiado com sucesso!' : 'Link copiado para a área de transferência!', 'Afiliados');
             }
 
             const originalHtml = button.innerHTML;
