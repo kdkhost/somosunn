@@ -198,13 +198,13 @@
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center">
                         <span class="inline-flex items-center justify-center px-6 py-2 rounded-full text-sm font-bold text-white border border-white/20 bg-white/15 backdrop-blur">
-                            {{ ($pageData['hero_badge'] ?? null) ?: 'Em destaque' }}
+                            {!! strip_tags(html_entity_decode(html_entity_decode(($pageData['hero_badge'] ?? null) ?: 'Em destaque', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8')) !!}
                         </span>
                         <h1 class="mt-6 text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white">
-                            {{ ($pageData['hero_title'] ?? null) ?: 'Próximo Evento UNN' }}
+                            {!! strip_tags(html_entity_decode(html_entity_decode(($pageData['hero_title'] ?? null) ?: 'Próximo Evento UNN', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8')) !!}
                         </h1>
                         <p class="mt-3 text-white/80 text-base sm:text-lg">
-                            {!! ($pageData['hero_subtitle'] ?? null) ?: 'Não perca a oportunidade de expandir sua rede' !!}
+                            {!! html_entity_decode(html_entity_decode(($pageData['hero_subtitle'] ?? null) ?: 'Não perca a oportunidade de expandir sua rede', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8') !!}
                         </p>
                     </div>
 

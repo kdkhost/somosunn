@@ -86,13 +86,13 @@
                     <div>
                         <span class="inline-block px-4 py-2 rounded-full text-sm font-bold mb-4 md:mb-6"
                             style="background: var(--unn-azul-1); color: white">
-                            <i class="fas fa-crown mr-2"></i> {{ ($pageData['hero_badge'] ?? null) ?: 'Associação Premium' }}
+                            <i class="fas fa-crown mr-2"></i> {!! strip_tags(html_entity_decode(html_entity_decode(($pageData['hero_badge'] ?? null) ?: 'Associação Premium', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8')) !!}
                         </span>
                         <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 unn-title-gradient">
-                            {{ ($pageData['hero_title'] ?? null) ?: 'Invista no seu crescimento' }}
+                            {!! strip_tags(html_entity_decode(html_entity_decode(($pageData['hero_title'] ?? null) ?: 'Invista no seu crescimento', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8')) !!}
                         </h1>
                         <p class="text-xl text-gray-600 leading-relaxed mb-8">
-                            {!! ($pageData['hero_subtitle'] ?? null) ?: 'Escolha o plano ideal para você e desbloqueie todo o potencial da maior comunidade de networking do Brasil.' !!}
+                            {!! html_entity_decode(html_entity_decode(($pageData['hero_subtitle'] ?? null) ?: 'Escolha o plano ideal para você e desbloqueie todo o potencial da maior comunidade de networking do Brasil.', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8') !!}
                         </p>
                         <div class="flex items-center gap-6 text-sm text-gray-500">
                             <span class="flex items-center gap-2">

@@ -202,6 +202,7 @@ Route::middleware(['auth', 'check.plan'])->group(function () {
     // Social / Community
     Route::middleware(['check.feature:community'])->group(function () {
         Route::get('/feed', [\App\Http\Controllers\SocialController::class, 'feed'])->name('social.feed');
+        Route::get('/feed/search-members', [\App\Http\Controllers\SocialController::class, 'searchMembers'])->name('social.members.search');
         Route::get('/profile/{username}', [\App\Http\Controllers\SocialController::class, 'profile'])->name('social.profile');
         Route::post('/connect/{user}', [\App\Http\Controllers\ConnectionController::class, 'connect'])->name('connection.connect');
         Route::post('/connection/accept/{user}', [\App\Http\Controllers\ConnectionController::class, 'accept'])->name('connection.accept');

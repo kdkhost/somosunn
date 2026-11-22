@@ -726,7 +726,56 @@
                                 </div>
                             @endif
 
-                            <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
+                            {{-- Busca Multifacetada de Membros no Feed --}}
+                            <div class="mb-5 pb-4 border-b border-gray-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="font-bold text-gray-900 text-sm flex items-center gap-1.5">
+                                        <i class="fas fa-users text-blue-600 text-xs"></i>
+                                        <span>Buscar Membros</span>
+                                    </h3>
+                                    <a href="{{ route('membros') }}" class="text-[11px] text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1 transition-colors" title="Ver diretório completo">
+                                        <span>Diretório</span> <i class="fas fa-arrow-right text-[9px]"></i>
+                                    </a>
+                                </div>
+
+                                {{-- Input de busca com ícone e botão limpar --}}
+                                <div class="relative mb-2">
+                                    <i class="fas fa-search text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 text-xs"></i>
+                                    <input type="text" id="feed-member-search"
+                                        placeholder="Nome, cargo, empresa ou cidade..."
+                                        autocomplete="off"
+                                        class="w-full bg-slate-50 border border-gray-200 rounded-xl pl-8 pr-7 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-gray-400 font-medium">
+                                    <button type="button" id="feed-member-search-clear" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+
+                                {{-- Pílulas de filtro rápido por meio --}}
+                                <div class="flex items-center gap-1 overflow-x-auto pb-1 text-[10px] font-semibold">
+                                    <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-blue-600 text-white transition-all whitespace-nowrap cursor-pointer" data-type="all">Todos</button>
+                                    <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="role">Cargo</button>
+                                    <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="company">Empresa</button>
+                                    <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="city">Cidade</button>
+                                </div>
+
+                                {{-- Estado de Carregamento --}}
+                                <div id="feed-member-loading" class="hidden text-center py-4 text-xs text-blue-600 font-medium">
+                                    <i class="fas fa-circle-notch fa-spin mr-1.5"></i> Buscando membros...
+                                </div>
+
+                                {{-- Estado Vazio --}}
+                                <div id="feed-member-empty" class="hidden text-center py-4 text-xs text-gray-500">
+                                    Nenhum membro encontrado com este filtro.
+                                </div>
+
+                                {{-- Lista de Resultados --}}
+                                <div id="feed-member-results" class="hidden mt-3 max-h-72 overflow-y-auto space-y-2 pr-1">
+                                    <!-- Renderizado via JS -->
+                                </div>
+                            </div>
+
+                            <div id="feed-recommended-container">
+                                <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
                             <div class="space-y-4">
                                 @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
                                     @php
@@ -786,6 +835,7 @@
                                 @endif
                             </div>
                         </div>
+                    </div>
                         <div id="right-conversation-info" class="bg-white rounded-lg shadow p-4 sticky top-24 hidden">
                             <div class="flex flex-col items-center text-center mb-4">
                                 <div class="w-20 h-20 rounded-full overflow-hidden bg-gray-100 mb-3">
@@ -2693,5 +2743,155 @@
             });
 
             setActivePanel('feed');
+
+            // --- Busca Multifacetada de Membros no Feed ---
+            (function() {
+                const searchInput = document.getElementById('feed-member-search');
+                const clearBtn = document.getElementById('feed-member-search-clear');
+                const loadingEl = document.getElementById('feed-member-loading');
+                const emptyEl = document.getElementById('feed-member-empty');
+                const resultsContainer = document.getElementById('feed-member-results');
+                const recommendedContainer = document.getElementById('feed-recommended-container');
+                const typeBtns = document.querySelectorAll('.feed-search-type-btn');
+
+                if (!searchInput || !resultsContainer) return;
+
+                let currentType = 'all';
+                let debounceTimer = null;
+
+                typeBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        currentType = this.getAttribute('data-type') || 'all';
+                        typeBtns.forEach(b => {
+                            b.classList.remove('bg-blue-600', 'text-white');
+                            b.classList.add('bg-slate-100', 'text-gray-600');
+                        });
+                        this.classList.remove('bg-slate-100', 'text-gray-600');
+                        this.classList.add('bg-blue-600', 'text-white');
+
+                        if (searchInput.value.trim().length > 0) {
+                            executeSearch();
+                        }
+                    });
+                });
+
+                searchInput.addEventListener('input', function() {
+                    const q = this.value.trim();
+                    if (clearBtn) {
+                        clearBtn.classList.toggle('hidden', q.length === 0);
+                    }
+
+                    clearTimeout(debounceTimer);
+                    if (q.length === 0) {
+                        resetSearch();
+                    } else {
+                        debounceTimer = setTimeout(executeSearch, 300);
+                    }
+                });
+
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', function() {
+                        searchInput.value = '';
+                        this.classList.add('hidden');
+                        resetSearch();
+                        searchInput.focus();
+                    });
+                }
+
+                function resetSearch() {
+                    if (loadingEl) loadingEl.classList.add('hidden');
+                    if (emptyEl) emptyEl.classList.add('hidden');
+                    resultsContainer.classList.add('hidden');
+                    resultsContainer.innerHTML = '';
+                    if (recommendedContainer) recommendedContainer.classList.remove('hidden');
+                }
+
+                function executeSearch() {
+                    const q = searchInput.value.trim();
+                    if (q.length === 0) {
+                        resetSearch();
+                        return;
+                    }
+
+                    if (recommendedContainer) recommendedContainer.classList.add('hidden');
+                    if (loadingEl) loadingEl.classList.remove('hidden');
+                    if (emptyEl) emptyEl.classList.add('hidden');
+                    resultsContainer.classList.add('hidden');
+
+                    const url = `{{ route('social.members.search') }}?q=${encodeURIComponent(q)}&type=${encodeURIComponent(currentType)}`;
+
+                    fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+                        .then(res => res.json())
+                        .then(members => {
+                            if (loadingEl) loadingEl.classList.add('hidden');
+                            resultsContainer.innerHTML = '';
+
+                            if (!Array.isArray(members) || members.length === 0) {
+                                if (emptyEl) emptyEl.classList.remove('hidden');
+                                return;
+                            }
+
+                            members.forEach(member => {
+                                const card = document.createElement('div');
+                                card.className = 'flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-50/80 hover:bg-blue-50/50 border border-slate-100 transition-colors';
+
+                                let actionHtml = '';
+                                if (member.connection_status === 'accepted') {
+                                    actionHtml = `<span class="text-[11px] font-semibold text-emerald-600 shrink-0"><i class="fas fa-check mr-1"></i>Conectado</span>`;
+                                } else if (member.connection_status === 'pending_sent') {
+                                    actionHtml = `<button type="button" class="text-[11px] text-red-500 hover:text-red-700 font-medium shrink-0" onclick="cancelInvite(${member.id})">Cancelar</button>`;
+                                } else if (member.connection_status === 'pending_received') {
+                                    actionHtml = `<button type="button" class="text-[11px] text-emerald-600 hover:text-emerald-700 font-bold shrink-0" onclick="acceptInvite(${member.id})">Aceitar</button>`;
+                                } else {
+                                    actionHtml = `<button type="button" class="text-[11px] text-blue-600 hover:text-blue-700 font-bold bg-white border border-blue-200 hover:border-blue-300 px-2.5 py-1 rounded-lg shadow-xs transition-all shrink-0" onclick="requestInvite(${member.id})">+ Conectar</button>`;
+                                }
+
+                                const details = [];
+                                if (member.headline) details.push(escapeHtml(member.headline));
+                                if (member.company) details.push(`<i class="fas fa-building text-[9px] text-slate-400"></i> ${escapeHtml(member.company)}`);
+                                if (member.city) details.push(`<i class="fas fa-map-marker-alt text-[9px] text-slate-400"></i> ${escapeHtml(member.city)}`);
+
+                                const subtitle = details.length > 0 ? details.join(' &bull; ') : 'Membro da comunidade';
+
+                                card.innerHTML = `
+                                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                        <a href="${member.profile_url}" class="shrink-0 w-9 h-9 rounded-full overflow-hidden bg-white border border-slate-200">
+                                            <img src="${member.avatar}" alt="${escapeHtml(member.name)}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                        </a>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <a href="${member.profile_url}" class="text-xs font-bold text-slate-800 hover:text-blue-600 truncate">
+                                                    ${escapeHtml(member.name)}
+                                                </a>
+                                                ${member.plan_name ? `<span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-blue-700">${escapeHtml(member.plan_name)}</span>` : ''}
+                                            </div>
+                                            <p class="text-[11px] text-slate-500 truncate leading-tight">${subtitle}</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        ${actionHtml}
+                                    </div>
+                                `;
+                                resultsContainer.appendChild(card);
+                            });
+
+                            resultsContainer.classList.remove('hidden');
+                        })
+                        .catch(err => {
+                            if (loadingEl) loadingEl.classList.add('hidden');
+                            console.error('Erro ao buscar membros no feed:', err);
+                        });
+                }
+
+                function escapeHtml(str) {
+                    if (!str) return '';
+                    return String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                }
+            })();
         </script>
 @endpush

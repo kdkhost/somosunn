@@ -110,21 +110,21 @@
     <div class="min-h-screen bg-slate-50 overflow-hidden">
 
         <!-- Hero Section - IDÊNTICO AO DE EVENTOS (LIMPO E CLARO) -->
-        <section class="unn-events-hero relative">
+        <section class="unn-events-hero relative z-30">
             <div class="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/20 pointer-events-none"></div>
 
-            <div class="px-4 md:px-12 lg:px-24 pt-10 md:pt-14 pb-32 md:pb-48 relative z-30">
+            <div class="px-4 md:px-12 lg:px-24 pt-10 md:pt-14 pb-44 md:pb-60 relative z-20">
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center">
                         <span
-                            class="inline-flex items-center justify-center px-6 py-2 rounded-full text-sm font-bold text-white border border-white/20 bg-white/15 backdrop-blur">
-                            {{ html_entity_decode(($pageData['hero_badge'] ?? null) ?: 'Carreiras & Oportunidades', ENT_QUOTES, 'UTF-8') }}
+                            class="inline-flex items-center justify-center px-6 py-2 rounded-full text-sm font-bold text-white border border-white/20 bg-white/15 backdrop-blur shadow-sm">
+                            {!! strip_tags(html_entity_decode(html_entity_decode(($pageData['hero_badge'] ?? null) ?: 'Carreiras & Oportunidades', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8')) !!}
                         </span>
                         <h1 class="mt-6 text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-6">
-                            {{ html_entity_decode(($pageData['hero_title'] ?? null) ?: 'Descubra seu próximo passo na SOMOS UNN Startups', ENT_QUOTES, 'UTF-8') }}
+                            {!! strip_tags(html_entity_decode(html_entity_decode(($pageData['hero_title'] ?? null) ?: 'Descubra seu próximo passo na SOMOS UNN Startups', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8')) !!}
                         </h1>
                         <p class="mt-3 text-white/80 text-base sm:text-lg mb-8 max-w-2xl mx-auto">
-                            {!! ($pageData['hero_subtitle'] ?? null) ?: 'Conecte-se com empresas inovadoras, aplique para vagas exclusivas e acelere sua trajetória profissional com precisão.' !!}
+                            {!! html_entity_decode(html_entity_decode(($pageData['hero_subtitle'] ?? null) ?: 'Conecte-se com empresas inovadoras, aplique para vagas exclusivas e acelere sua trajetória profissional com precisão.', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8') !!}
                         </p>
 
                         <!-- Search/Filter Bar -->
@@ -153,7 +153,7 @@
                                         class="h-14 px-8 rounded-full btn-primary font-bold flex items-center justify-center gap-2 shrink-0 shadow-lg group"
                                         aria-label="Buscar vagas">
                                         Buscar <i class="fas fa-search text-sm group-hover:scale-110 transition-transform"
-                                            aria-hidden="true"></i>
+                                             aria-hidden="true"></i>
                                     </button>
                                 </div>
                                 {{-- Linha 2: Filtros avançados (empresa + tipo) --}}
@@ -167,15 +167,15 @@
                                             class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 text-sm font-medium placeholder:text-slate-400">
                                     </div>
                                     {{-- Custom Dropdown Estilizado (Substitui select nativo sem estilo) --}}
-                                    <div class="w-full md:w-56 relative select-none z-50" id="custom-tipo-container">
+                                    <div class="w-full md:w-60 relative select-none z-50" id="custom-tipo-container">
                                         <input type="hidden" name="tipo" id="filtro-tipo" value="{{ request('tipo') }}">
                                         
                                         <button type="button" id="custom-tipo-trigger"
-                                            class="filter-input w-full h-12 flex items-center justify-between px-5 bg-white hover:bg-slate-50 text-left transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer shadow-sm"
+                                            class="filter-input w-full h-12 flex items-center justify-between px-5 bg-white hover:bg-slate-50 text-left transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer shadow-sm rounded-full"
                                             aria-haspopup="listbox" aria-expanded="false" aria-label="Filtrar por tipo de vaga">
                                             <span class="flex items-center min-w-0 pr-2">
                                                 <i class="fas fa-layer-group text-slate-400 mr-2.5 text-xs shrink-0" aria-hidden="true"></i>
-                                                <span id="custom-tipo-label" class="truncate text-sm font-medium {{ request('tipo') ? 'text-slate-800 font-semibold' : 'text-slate-500' }}">
+                                                <span id="custom-tipo-label" class="truncate text-sm font-medium {{ request('tipo') ? 'text-slate-800 font-bold' : 'text-slate-500' }}">
                                                     {{ request('tipo') ? request('tipo') : 'Tipo de vaga' }}
                                                 </span>
                                             </span>
@@ -184,10 +184,14 @@
 
                                         {{-- Menu Dropdown Flutuante Estilo React / Radix / Shadcn UI --}}
                                         <div id="custom-tipo-menu"
-                                            class="hidden absolute top-full mt-2 left-0 right-0 w-full bg-white rounded-2xl border border-slate-300 py-2.5 z-[100] overflow-hidden transform opacity-0 scale-95 transition-all duration-200 ease-out origin-top text-left shadow-[0_25px_60px_-10px_rgba(15,23,42,0.4),0_0_0_1px_rgba(0,0,0,0.08)]"
+                                            class="hidden absolute top-full mt-2 left-0 right-0 w-full md:min-w-[260px] bg-white rounded-2xl border border-slate-200/90 py-2.5 z-[100] overflow-hidden transform opacity-0 scale-95 transition-all duration-200 ease-out origin-top text-left shadow-[0_20px_50px_rgba(8,112,184,0.18),0_10px_25px_rgba(0,0,0,0.1)]"
                                             role="listbox">
+                                            <div class="px-3.5 pb-2 mb-1.5 border-b border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                                                <span>Tipo de Vaga</span>
+                                                <span class="text-[10px] bg-slate-100 px-2 py-0.5 rounded-full text-slate-500 font-bold">{{ count($tiposDisponiveis) + 1 }} opções</span>
+                                            </div>
                                             <div class="max-h-60 overflow-y-auto custom-select-scrollbar px-1.5 space-y-1">
-                                                <div class="custom-tipo-opt px-3.5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all flex items-center justify-between {{ !request('tipo') ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-800 hover:bg-blue-50 hover:text-blue-700' }}"
+                                                <div class="custom-tipo-opt px-3.5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all flex items-center justify-between {{ !request('tipo') ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/25' : 'text-slate-800 hover:bg-blue-50/80 hover:text-blue-700' }}"
                                                     data-value=""
                                                     data-label="Tipo de vaga"
                                                     role="option"
@@ -201,7 +205,7 @@
 
                                                 @foreach($tiposDisponiveis as $tipo)
                                                     @php $isSelected = request('tipo') == $tipo; @endphp
-                                                    <div class="custom-tipo-opt px-3.5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all flex items-center justify-between {{ $isSelected ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-800 hover:bg-blue-50 hover:text-blue-700' }}"
+                                                    <div class="custom-tipo-opt px-3.5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all flex items-center justify-between {{ $isSelected ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/25' : 'text-slate-800 hover:bg-blue-50/80 hover:text-blue-700' }}"
                                                         data-value="{{ $tipo }}"
                                                         data-label="{{ $tipo }}"
                                                         role="option"
@@ -231,7 +235,7 @@
                 </div>
             </div>
             <!-- Wave divider Limpo Branco -->
-            <div class="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-[0] pointer-events-none z-10">
+            <div class="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-[0] pointer-events-none z-0">
                 <svg class="relative block w-[calc(100%+1.3px)] h-[50px] md:h-[80px]" data-name="Layer 1"
                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                     <path
@@ -242,7 +246,7 @@
         </section>
 
         <section
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 {{ $featuredJob && (request()->page == 1 || !request()->has('page')) ? '-mt-8 md:-mt-16' : 'mt-8 md:mt-12' }} mb-20 pt-10">
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 {{ $featuredJob && (request()->page == 1 || !request()->has('page')) ? '-mt-8 md:-mt-16' : 'mt-8 md:mt-12' }} mb-20 pt-10">
             <!-- Vaga de Destaque Card Limpo -->
             @if($featuredJob && (request()->page == 1 || !request()->has('page')))
                 <div
@@ -583,7 +587,7 @@
                         // Ajustar posicionamento inteligente (para cima ou para baixo)
                         const rect = trigger.getBoundingClientRect();
                         const spaceBelow = window.innerHeight - rect.bottom;
-                        if (spaceBelow < 250 && rect.top > 250) {
+                        if (spaceBelow < 280 && rect.top > 250) {
                             menu.classList.remove('top-full', 'mt-2', 'origin-top');
                             menu.classList.add('bottom-full', 'mb-2', 'origin-bottom');
                         } else {
@@ -638,11 +642,14 @@
                             options.forEach(o => {
                                 const isCurrent = o === opt;
                                 o.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
-                                o.classList.toggle('bg-blue-600', isCurrent);
+                                o.classList.toggle('bg-gradient-to-r', isCurrent);
+                                o.classList.toggle('from-blue-600', isCurrent);
+                                o.classList.toggle('to-blue-700', isCurrent);
                                 o.classList.toggle('text-white', isCurrent);
-                                o.classList.toggle('shadow-sm', isCurrent);
+                                o.classList.toggle('shadow-md', isCurrent);
+                                o.classList.toggle('shadow-blue-500/25', isCurrent);
                                 o.classList.toggle('text-slate-800', !isCurrent);
-                                o.classList.toggle('hover:bg-blue-50', !isCurrent);
+                                o.classList.toggle('hover:bg-blue-50/80', !isCurrent);
                                 o.classList.toggle('hover:text-blue-700', !isCurrent);
                                 
                                 const dot = o.querySelector('.opt-dot');

@@ -1,6 +1,19 @@
 # CHANGELOG - SOMOS UNN
 
-## [2.6.0] - 2026-11-22 - feat(membros): restauração de visibilidade de membros, filtros avançados de busca e controle administrativo total
+## [2.6.1] - 2026-11-22 - feat(feed, vagas): busca multifacetada de membros no feed e correção definitiva de dropdown e escape de entidades
+
+- **Busca Multifacetada de Membros Integrada ao Feed Social (`app/Http/Controllers/SocialController.php`, `routes/app.php`, `resources/views/social/feed.blade.php`):**
+  - **Pesquisa Multifacetada em Tempo Real:** Implementado endpoint `/feed/search-members` com pesquisa instantânea via AJAX por múltiplos critérios (Nome/@, Cargo/Profissão, Empresa e Cidade/Localização).
+  - **Pílulas de Filtro Rápido:** Adicionados seletores dinâmicos de tipo (`Todos`, `Cargo`, `Empresa`, `Cidade`) permitindo segmentar instantaneamente a busca.
+  - **Ações Imediatas de Conexão:** Cada card de resultado exibe o status em tempo real com botões de ação imediata (Conectar via SweetAlert2, Cancelar solicitação, Aceitar convite ou badge de Conectado).
+  - **Alternância Fluida na Sidebar:** Integrado na barra lateral direita do feed com suporte a debounce de digitação, botão de limpar busca e restauração transparente da lista de membros recomendados quando a busca está vazia.
+- **Correção Definitiva de Layout, Z-Index e Dropdown de Vagas (`resources/views/oportunidades.blade.php`):**
+  - **Eliminação de Sobreposição pela Onda e Seção Seguinte:** Reestruturado o empilhamento CSS (*Stacking Context*): Hero com `z-30`, conteúdo do Hero com `relative z-20` e padding inferior ampliado (`pb-44 md:pb-60`), onda SVG limpa com `z-0` e seção de listagem com `z-10`. O dropdown flutuante agora sobrepõe qualquer elemento da página sem sofrer cortes.
+  - **Abertura Inteligente Aperfeiçoada:** O menu detecta a altura da janela e se adapta dinamicamente, abrindo para cima (`bottom-full mb-2`) ou para baixo com folga garantida.
+  - **Estilização Premium:** Itens com gradiente azul UNN no estado selecionado, cantos suaves `rounded-2xl`, sombra multicamadas de alta definição e cabeçalho explicativo com contagem de opções disponíveis.
+- **Blindagem Global Contra Duplo Escape de Entidades HTML (`resources/views/oportunidades.blade.php`, `resources/views/courses/index.blade.php`, `resources/views/events/index.blade.php`, `resources/views/site/premium.blade.php`):**
+  - **Eliminação de `&amp;` em Badges e Títulos:** Implementada decodificação recursiva de entidades HTML (`html_entity_decode`) combinada com `strip_tags` e renderização limpa `{!! ... !!}` em badges, títulos e subtítulos de heróis de páginas públicas. Valores como `Carreiras & Oportunidades` agora são exibidos perfeitamente, sem jamais expor códigos como `&amp;` ao usuário.
+
 
 - **Restauração e Exibição Completa de Membros (`app/Http/Controllers/MemberController.php`):**
   - **Fim do Bloqueio Forçado de Planos Pagos:** Eliminada a restrição rígida anterior que ocultava mais de 97% dos membros cadastrados na comunidade por estarem no plano inicial Starter ou sem assinatura paga ativa. Agora todos os membros ativos cadastrados são exibidos com dignidade e destaque no diretório público.

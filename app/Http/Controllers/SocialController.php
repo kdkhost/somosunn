@@ -82,6 +82,126 @@ use Illuminate\Support\Str;
 
 class SocialController extends Controller
 {
+    /**
+     * Busca multifacetada de membros para o Feed em tempo real.
+     */
+    public function searchMembers(Request $request)
+    {
+        $term = trim($request->input('q') ?: $request->input('query') ?: '');
+        $filterType = trim($request->input('type') ?: 'all'); // 'all', 'role', 'company', 'city'
+        $authId = Auth::id();
+
+        if (mb_strlen($term) < 2) {
+            return response()->json(['members' => [], 'total' => 0]);
+        }
+
+        $blockedUserIds = [];
+        $connectedUserIds = [];
+        $pendingUserIds = [];
+        $sentRequests = [];
+
+        if ($authId) {
+            $connections = Connection::where(function ($q) use ($authId) {
+                $q->where('requester_id', $authId)->orWhere('requested_id', $authId);
+            })->get();
+
+            foreach ($connections as $c) {
+                $otherId = $c->requester_id === $authId ? $c->requested_id : $c->requester_id;
+                if ($c->status === 'blocked') {
+                    $blockedUserIds[] = $otherId;
+                } elseif ($c->status === 'accepted') {
+                    $connectedUserIds[] = $otherId;
+                } elseif ($c->status === 'pending') {
+                    $pendingUserIds[] = $otherId;
+                    if ($c->requester_id === $authId) {
+                        $sentRequests[] = $otherId;
+                    }
+                }
+            }
+        }
+
+        $query = User::query()
+            ->where('role', '!=', 'superadmin');
+
+        if ($authId) {
+            $query->where('id', '!=', $authId);
+        }
+
+        if (!empty($blockedUserIds)) {
+            $query->whereNotIn('id', $blockedUserIds);
+        }
+
+        if (!Auth::user()?->isAdmin()) {
+            $query->where(function ($q) use ($connectedUserIds) {
+                $q->where('hide_profile', false)
+                    ->orWhereIn('id', $connectedUserIds);
+            });
+        }
+
+        if ($filterType === 'role' || $filterType === 'occupation') {
+            $query->where(function ($q) use ($term) {
+                $q->where('occupation', 'like', "%{$term}%")
+                    ->orWhere('bio', 'like', "%{$term}%");
+            });
+        } elseif ($filterType === 'company') {
+            $query->where('company', 'like', "%{$term}%");
+        } elseif ($filterType === 'city') {
+            $query->where(function ($q) use ($term) {
+                $q->where('city', 'like', "%{$term}%")
+                    ->orWhere('state', 'like', "%{$term}%");
+            });
+        } else {
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                    ->orWhere('occupation', 'like', "%{$term}%")
+                    ->orWhere('company', 'like', "%{$term}%")
+                    ->orWhere('city', 'like', "%{$term}%")
+                    ->orWhere('state', 'like', "%{$term}%")
+                    ->orWhere('bio', 'like', "%{$term}%");
+            });
+        }
+
+        $members = $query->with('plan')
+            ->take(10)
+            ->get()
+            ->map(function ($u) use ($connectedUserIds, $pendingUserIds, $sentRequests) {
+                $isConnected = in_array($u->id, $connectedUserIds);
+                $isPending = in_array($u->id, $pendingUserIds);
+                $isRequester = in_array($u->id, $sentRequests);
+
+                $status = 'none';
+                if ($isConnected) {
+                    $status = 'accepted';
+                } elseif ($isPending && $isRequester) {
+                    $status = 'pending_sent';
+                } elseif ($isPending) {
+                    $status = 'pending_received';
+                }
+
+                $avatarUrl = $u->profile_photo_url;
+                $initials = collect(explode(' ', $u->name))->take(2)->map(fn($n) => strtoupper(mb_substr($n, 0, 1)))->join('');
+
+                return [
+                    'id' => $u->id,
+                    'name' => $u->name,
+                    'avatar' => $avatarUrl,
+                    'initials' => $initials,
+                    'occupation' => $u->occupation ?: null,
+                    'company' => $u->company ?: null,
+                    'city' => trim(($u->city ?? '') . ($u->state ? ', ' . $u->state : '')),
+                    'plan' => $u->plan?->name ? ($u->plan->is_free ? 'Starter' : $u->plan->name) : 'Membro',
+                    'profile_url' => route('social.profile', $u->id),
+                    'status' => $status,
+                ];
+            });
+
+        return response()->json([
+            'members' => $members,
+            'total' => $members->count(),
+            'term' => $term,
+        ]);
+    }
+
     public function feed()
     {
         $demoMode = (bool) config('app.demo_mode');
