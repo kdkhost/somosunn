@@ -3,6 +3,7 @@
 ## [2026-11-21] - perf/arch: auditoria, desmembramento por subdominios, performance e padroes pt-BR
 
 - **Subdominios, CDN cookieless e cache publico de borda (`config/domains.php`, `app/Support/DomainManager.php`, `app/Helpers/AssetHelpers.php`, `app/Http/Kernel.php`, `app/Providers/RouteServiceProvider.php`, `routes/public.php`, `routes/app.php`, `routes/webhooks.php`):**
+  - Priorizacao de `EnforceSubdomainRouting` antes de `Authenticate` em `app/Http/Kernel.php` (`$middlewarePriority`) garantindo redirecionamento direto `/admin` e `/painel` -> `https://app.somosunn.com.br/...` sem perda de `url.intended`.
   - Desmembramento das rotas em `routes/public.php` (grupo `web.public` com `StartPublicSession` usando `NullSessionHandler` e `PublicCacheableResponse` sem `Set-Cookie` para visitantes anonimos em `somosunn.com.br`), `routes/app.php` (`/admin`, `/painel`, autenticacao, checkout e acoes autenticadas em `app.somosunn.com.br`) e `routes/webhooks.php` (grupo `webhook` em `api.somosunn.com.br`, mantendo retrocompatibilidade quando o roteamento estrito esta desligado).
   - Remoção do middleware global `TrackServiceVisit` da pilha global e otimizacao de `TrackServiceVisit` / `TrackVisitor` (cache de `Schema::hasTable`, deduplicacao via `Cache::add` sem abrir sessao e registro em `app()->terminating()`).
   - Helpers globais `cdn_asset()` e `unn_asset()` registrados no `composer.json` e integrados ao `UploadStorage::resolveLocalUrl()` e CSP dinamica em `SecurityHeadersMiddleware`, com fallback seguro para `localhost`/`127.0.0.1`/testes.

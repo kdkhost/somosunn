@@ -110,4 +110,24 @@ class Kernel extends HttpKernel
         'subdomain' => \App\Http\Middleware\EnforceSubdomainRouting::class,
         'public.cache' => \App\Http\Middleware\PublicCacheableResponse::class,
     ];
+
+    /**
+     * Garante que o isolamento por subdominio execute antes do redirect de
+     * autenticacao (`auth`) para preservar `url.intended` no host `app.`.
+     */
+    protected $middlewarePriority = [
+        \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+        \Illuminate\Cookie\Middleware\EncryptCookies::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \App\Http\Middleware\StartPublicSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \App\Http\Middleware\EnforceSubdomainRouting::class,
+        \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+        \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class,
+        \Illuminate\Contracts\Session\Middleware\AuthenticatesSessions::class,
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        \Illuminate\Auth\Middleware\Authorize::class,
+    ];
 }
