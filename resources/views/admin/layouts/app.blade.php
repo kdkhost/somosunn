@@ -2050,7 +2050,14 @@
 
         /* ─── 10. Content-Header & Breadcrumb Modernos ─── */
         .content-header {
-            padding: 1.15rem 0 0.85rem 0 !important;
+            padding: 0.85rem 0 0.5rem 0 !important;
+            background: transparent !important;
+            border: none !important;
+        }
+
+        .dark-mode .content-header {
+            background: transparent !important;
+            border: none !important;
         }
 
         .content-header h1,
@@ -2796,18 +2803,24 @@
             @include('admin.partials.sidebar')
 
             <div class="content-wrapper">
-                @if(View::hasSection('page_title') || View::hasSection('breadcrumb'))
+                @if(View::hasSection('page_title') || View::hasSection('breadcrumb') || View::hasSection('breadcrumb_items'))
                     <div class="content-header">
-                        <div class="d-flex justify-content-between align-items-center py-2">
-                            <h1 class="m-0 h4">@yield('page_title')</h1>
-                            <ol class="breadcrumb mb-0">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" data-pjax>Home</a></li>
-                                @hasSection('breadcrumb_items')
-                                    @yield('breadcrumb_items')
-                                @else
-                                    <li class="breadcrumb-item active">@yield('page_title')</li>
-                                @endif
-                            </ol>
+                        <div class="container-fluid">
+                            <div class="d-flex justify-content-between align-items-center py-2">
+                                <h1 class="m-0 h4 font-weight-bold">@yield('page_title')</h1>
+                                <ol class="breadcrumb mb-0">
+                                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" data-pjax>Home</a></li>
+                                    @hasSection('breadcrumb_items')
+                                        @yield('breadcrumb_items')
+                                    @else
+                                        @hasSection('breadcrumb')
+                                            @yield('breadcrumb')
+                                        @else
+                                            <li class="breadcrumb-item active">@yield('page_title')</li>
+                                        @endif
+                                    @endif
+                                </ol>
+                            </div>
                         </div>
                     </div>
                 @endif

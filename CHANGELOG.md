@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - fix(admin/chat): alinhamento do content-header e padronização do card de chat ao padrão adminlte
+
+- **Harmonização do Chat e Content-Header (`resources/views/admin/layouts/app.blade.php`, `resources/views/admin/chat/show.blade.php`, `resources/views/admin/chat/index.blade.php`):**
+  - **Alinhamento do Content-Header:** Adicionado container `<div class="container-fluid">` no `content-header` em `admin/layouts/app.blade.php`, corrigindo o desalinhamento visual onde o título e breadcrumb ficavam encostados nas bordas de 0px da tela enquanto o conteúdo estava recuado.
+  - **Fundo 100% transparente no cabeçalho:** Removida faixa cinza dissonante do `content-header`, integrando o cabeçalho perfeitamente ao fundo geral da aplicação tanto no modo claro quanto no modo escuro.
+  - **Preservação do padrão de card do AdminLTE:** Reestruturado o chat para utilizar o container padrão `card card-outline card-primary shadow-sm direct-chat direct-chat-primary`, com o cabeçalho integrado no `.card-header` padrão do sistema (com avatar, nome, status online, badge de cargo e ferramentas), mantendo a identidade nativa de todas as outras páginas do painel com acabamento limpo e campos padronizados (42px, radius 10px e foco azul UNN).
+
 ## [2026-11-22] - feat(admin/chat): remodelação completa do chat administrativo estilo react saas
 
 - **Remodelação Moderna do Chat Administrativo (`resources/views/admin/chat/show.blade.php`, `resources/views/admin/chat/index.blade.php`):**
