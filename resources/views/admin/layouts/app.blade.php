@@ -2773,6 +2773,519 @@
                 left: auto !important;
             }
         }
+
+        /* ─── 20. Padronização Global Completa: Select2, Checkboxes, Summernote, Dropzone, Abas, Callouts e Controles ─── */
+        
+        /* Select2 Universal */
+        .select2-container .select2-selection--single {
+            height: 42px !important;
+            min-height: 42px !important;
+            border-radius: 0.625rem !important;
+            border: 1px solid #cbd5e1 !important;
+            display: flex !important;
+            align-items: center !important;
+            padding: 0.35rem 0.85rem !important;
+            background-color: #ffffff !important;
+            transition: all 0.15s ease !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: normal !important;
+            padding-left: 0 !important;
+            color: #1e293b !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+            right: 10px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #1F5EDB !important;
+            box-shadow: 0 0 0 3px rgba(31, 94, 219, 0.18) !important;
+            outline: 0 !important;
+        }
+
+        .select2-container--default .select2-selection--multiple {
+            min-height: 42px !important;
+            border-radius: 0.625rem !important;
+            border: 1px solid #cbd5e1 !important;
+            padding: 0.25rem 0.5rem !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #1F5EDB !important;
+            box-shadow: 0 0 0 3px rgba(31, 94, 219, 0.18) !important;
+            outline: 0 !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: rgba(31, 94, 219, 0.08) !important;
+            border: 1px solid rgba(31, 94, 219, 0.25) !important;
+            color: #1F5EDB !important;
+            border-radius: 0.375rem !important;
+            font-weight: 600 !important;
+            padding: 2px 8px !important;
+            font-size: 0.8125rem !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #1F5EDB !important;
+            margin-right: 4px !important;
+        }
+
+        .select2-dropdown {
+            border-radius: 0.75rem !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+            overflow: hidden !important;
+            background-color: #ffffff !important;
+            margin-top: 4px !important;
+            z-index: 1055 !important;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border-radius: 0.5rem !important;
+            border: 1px solid #cbd5e1 !important;
+            padding: 6px 10px !important;
+            font-size: 0.875rem !important;
+            outline: 0 !important;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+            border-color: #1F5EDB !important;
+            box-shadow: 0 0 0 2px rgba(31, 94, 219, 0.18) !important;
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 8px 12px !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            color: #1e293b !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #1F5EDB !important;
+            color: #ffffff !important;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected="true"] {
+            background-color: #f1f5f9 !important;
+            color: #1F5EDB !important;
+            font-weight: 600 !important;
+        }
+
+        /* Select2 Dark Mode */
+        .dark-mode .select2-container .select2-selection--single,
+        .dark-mode .select2-container--default .select2-selection--multiple {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .dark-mode .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .select2-container--default.select2-container--focus .select2-selection--single,
+        .dark-mode .select2-container--default.select2-container--open .select2-selection--single,
+        .dark-mode .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #60a5fa !important;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22) !important;
+        }
+
+        .dark-mode .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: rgba(96, 165, 250, 0.15) !important;
+            border-color: rgba(96, 165, 250, 0.3) !important;
+            color: #93c5fd !important;
+        }
+
+        .dark-mode .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #93c5fd !important;
+        }
+
+        .dark-mode .select2-dropdown {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .dark-mode .select2-container--default .select2-search--dropdown .select2-search__field {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .select2-container--default .select2-results__option {
+            color: #e2e8f0 !important;
+        }
+
+        .dark-mode .select2-container--default .select2-results__option[aria-selected="true"] {
+            background-color: #334155 !important;
+            color: #ffffff !important;
+        }
+
+        /* Checkboxes e Radios Customizados */
+        .custom-checkbox .custom-control-label::before {
+            border-radius: 0.375rem !important;
+            border: 1.5px solid #cbd5e1 !important;
+            width: 1.15rem !important;
+            height: 1.15rem !important;
+            top: 0.15rem !important;
+            background-color: #ffffff !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .custom-radio .custom-control-label::before {
+            border-radius: 50% !important;
+            border: 1.5px solid #cbd5e1 !important;
+            width: 1.15rem !important;
+            height: 1.15rem !important;
+            top: 0.15rem !important;
+            background-color: #ffffff !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .custom-control-input:checked ~ .custom-control-label::before {
+            background-color: #1F5EDB !important;
+            border-color: #1F5EDB !important;
+            box-shadow: 0 0 0 3px rgba(31, 94, 219, 0.15) !important;
+        }
+
+        .custom-control-input:focus ~ .custom-control-label::before {
+            box-shadow: 0 0 0 3px rgba(31, 94, 219, 0.18) !important;
+        }
+
+        .dark-mode .custom-checkbox .custom-control-label::before,
+        .dark-mode .custom-radio .custom-control-label::before {
+            background-color: #0f172a !important;
+            border-color: #475569 !important;
+        }
+
+        .dark-mode .custom-control-input:checked ~ .custom-control-label::before {
+            background-color: #1F5EDB !important;
+            border-color: #1F5EDB !important;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22) !important;
+        }
+
+        /* Custom File Input (Uploads do Bootstrap) */
+        .custom-file {
+            height: 42px !important;
+        }
+
+        .custom-file-input {
+            height: 42px !important;
+        }
+
+        .custom-file-label {
+            height: 42px !important;
+            line-height: 28px !important;
+            border-radius: 0.625rem !important;
+            border: 1px solid #cbd5e1 !important;
+            padding: 0.55rem 0.85rem !important;
+            font-size: 0.875rem !important;
+            color: #64748b !important;
+            background-color: #ffffff !important;
+        }
+
+        .custom-file-label::after {
+            height: 40px !important;
+            line-height: 26px !important;
+            border-top-right-radius: 0.625rem !important;
+            border-bottom-right-radius: 0.625rem !important;
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
+            font-weight: 600 !important;
+            border-left: 1px solid #cbd5e1 !important;
+            padding: 0.45rem 1rem !important;
+        }
+
+        .dark-mode .custom-file-label {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #94a3b8 !important;
+        }
+
+        .dark-mode .custom-file-label::after {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
+        /* Dropzone e Caixas de Upload Modernas */
+        .dropzone,
+        .upload-box,
+        .x-unn-dropzone {
+            border: 2px dashed #93c5fd !important;
+            border-radius: 1rem !important;
+            background-color: #f8fafc !important;
+            transition: all 0.2s ease !important;
+            padding: 2rem 1.5rem !important;
+            text-align: center !important;
+        }
+
+        .dropzone:hover,
+        .upload-box:hover,
+        .x-unn-dropzone:hover {
+            border-color: #1F5EDB !important;
+            background-color: rgba(31, 94, 219, 0.04) !important;
+        }
+
+        .dark-mode .dropzone,
+        .dark-mode .upload-box,
+        .dark-mode .x-unn-dropzone {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        .dark-mode .dropzone:hover,
+        .dark-mode .upload-box:hover,
+        .dark-mode .x-unn-dropzone:hover {
+            border-color: #60a5fa !important;
+            background-color: rgba(96, 165, 250, 0.06) !important;
+        }
+
+        /* Summernote Editor Moderno */
+        .note-editor.note-frame {
+            border-radius: 0.75rem !important;
+            border: 1px solid #cbd5e1 !important;
+            overflow: hidden !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+        }
+
+        .note-toolbar {
+            background-color: #f8fafc !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            padding: 6px 8px !important;
+        }
+
+        .note-btn {
+            border-radius: 0.375rem !important;
+            border: 1px solid #cbd5e1 !important;
+            background-color: #ffffff !important;
+            color: #475569 !important;
+            font-size: 0.8125rem !important;
+            padding: 4px 8px !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .note-btn:hover,
+        .note-btn.active {
+            background-color: #1F5EDB !important;
+            color: #ffffff !important;
+            border-color: #1F5EDB !important;
+        }
+
+        .note-statusbar {
+            background-color: #f8fafc !important;
+            border-top: 1px solid #e2e8f0 !important;
+        }
+
+        .dark-mode .note-editor.note-frame {
+            border-color: #334155 !important;
+        }
+
+        .dark-mode .note-toolbar {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        .dark-mode .note-btn {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+
+        .dark-mode .note-editable {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .note-statusbar {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        /* Callouts Modernos */
+        .callout {
+            border-radius: 0.75rem !important;
+            border-left-width: 4px !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+            padding: 1rem 1.25rem !important;
+            margin-bottom: 1.25rem !important;
+            border-top: 0 !important;
+            border-right: 0 !important;
+            border-bottom: 0 !important;
+        }
+
+        .callout.callout-info {
+            background-color: rgba(31, 94, 219, 0.05) !important;
+            border-left-color: #1F5EDB !important;
+            color: #1e293b !important;
+        }
+
+        .callout.callout-success {
+            background-color: rgba(16, 185, 129, 0.06) !important;
+            border-left-color: #10b981 !important;
+            color: #1e293b !important;
+        }
+
+        .callout.callout-warning {
+            background-color: rgba(245, 158, 11, 0.08) !important;
+            border-left-color: #f59e0b !important;
+            color: #1e293b !important;
+        }
+
+        .callout.callout-danger {
+            background-color: rgba(239, 68, 68, 0.06) !important;
+            border-left-color: #ef4444 !important;
+            color: #1e293b !important;
+        }
+
+        .dark-mode .callout.callout-info {
+            background-color: rgba(31, 94, 219, 0.12) !important;
+            color: #e2e8f0 !important;
+        }
+
+        .dark-mode .callout.callout-success {
+            background-color: rgba(16, 185, 129, 0.12) !important;
+            color: #e2e8f0 !important;
+        }
+
+        .dark-mode .callout.callout-warning {
+            background-color: rgba(245, 158, 11, 0.12) !important;
+            color: #e2e8f0 !important;
+        }
+
+        .dark-mode .callout.callout-danger {
+            background-color: rgba(239, 68, 68, 0.12) !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* Cards Outline do AdminLTE com Acento Superior */
+        .card.card-outline {
+            border-top-width: 3px !important;
+            border-top-style: solid !important;
+        }
+
+        .card-outline.card-primary {
+            border-top-color: #1F5EDB !important;
+        }
+
+        .card-outline.card-success {
+            border-top-color: #10b981 !important;
+        }
+
+        .card-outline.card-warning {
+            border-top-color: #f59e0b !important;
+        }
+
+        .card-outline.card-danger {
+            border-top-color: #ef4444 !important;
+        }
+
+        .card-outline.card-info {
+            border-top-color: #0ea5e9 !important;
+        }
+
+        .card-outline.card-secondary {
+            border-top-color: #64748b !important;
+        }
+
+        /* Controles DataTables Modernizados */
+        .dataTables_wrapper .dataTables_filter input {
+            height: 38px !important;
+            min-height: 38px !important;
+            border-radius: 9999px !important;
+            padding: 0.35rem 1rem !important;
+            border: 1px solid #cbd5e1 !important;
+            font-size: 0.875rem !important;
+            width: 220px !important;
+            transition: all 0.2s ease !important;
+            outline: 0 !important;
+        }
+
+        .dataTables_wrapper .dataTables_filter input:focus {
+            width: 260px !important;
+            border-color: #1F5EDB !important;
+            box-shadow: 0 0 0 3px rgba(31, 94, 219, 0.18) !important;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            height: 36px !important;
+            min-height: 36px !important;
+            border-radius: 0.5rem !important;
+            border: 1px solid #cbd5e1 !important;
+            padding: 0.25rem 0.65rem !important;
+            font-size: 0.875rem !important;
+            outline: 0 !important;
+        }
+
+        .dark-mode .dataTables_wrapper .dataTables_filter input {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .dataTables_wrapper .dataTables_length select {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        /* Accordions e List Groups */
+        .accordion .card {
+            border-radius: 0.75rem !important;
+            margin-bottom: 0.75rem !important;
+            overflow: hidden !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        .list-group-item {
+            border-color: #e2e8f0 !important;
+            padding: 0.85rem 1.15rem !important;
+            font-size: 0.875rem !important;
+        }
+
+        .dark-mode .list-group-item {
+            border-color: #334155 !important;
+            background-color: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* Timelines AdminLTE Modernizadas */
+        .timeline::before {
+            background-color: #e2e8f0 !important;
+            width: 3px !important;
+            border-radius: 9999px !important;
+        }
+
+        .timeline > div > .timeline-item {
+            border-radius: 0.75rem !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+            background-color: #ffffff !important;
+        }
+
+        .dark-mode .timeline::before {
+            background-color: #334155 !important;
+        }
+
+        .dark-mode .timeline > div > .timeline-item {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
     </style>
     @stack('styles')
 </head>

@@ -1,5 +1,18 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - feat(admin): padronização global estilo react saas em todas as páginas e componentes do /admin
+
+- **Design System React/Modern SaaS Aplicado em Todas as Páginas de `/admin` (`resources/views/admin/layouts/app.blade.php`):**
+  - **Universalidade Total:** Garantida a aparência moderna e uniforme em 100% das páginas administrativas (mais de 100 views em 43 seções), mantendo 100% da compatibilidade com Blade, rotas e AdminLTE 3 sob o capô.
+  - **Select2 Universal:** Seletores simples e múltiplos customizados com altura de 42px, `border-radius: 0.625rem` (10px), borda `#cbd5e1`, anel de foco azul UNN (`#1F5EDB`), tags pill em seleções múltiplas e dropdowns suspensos com sombra profunda e cantos arredondados (12px), inclusive com suporte refinado ao Dark Mode.
+  - **Checkboxes e Radios Modernizados:** Estilizados no padrão Tailwind/React (`.custom-checkbox`, `.custom-radio`, `.custom-control-input`), com cantos arredondados, preenchimento azul UNN no estado checado e anéis de foco suaves.
+  - **Uploads e Custom File Inputs:** Padronizados inputs de upload com 42px, cantos arredondados e botão de anexo elegante; caixas de upload (`.dropzone`, `.upload-box`, `.x-unn-dropzone`) com bordas tracejadas suaves (`#93c5fd`), cantos de 16px e hover azul UNN.
+  - **Editor Summernote Contemporâneo:** Toolbar limpa com botões arredondados, fundo suave `#f8fafc` e bordas `#cbd5e1`, eliminando a estética cinza pesada em todas as telas de edição de conteúdo.
+  - **Callouts e Alertas em Cartão:** Avisos do AdminLTE (`.callout-info`, `.callout-success`, `.callout-warning`, `.callout-danger`) com cantos de 12px, borda esquerda sutil de 4px e fundos pastéis harmoniosos.
+  - **Cards Outline:** Cartões com acento superior fino de 3px com cores vivas e harmoniosas (`#1F5EDB`, `#10b981`, `#f59e0b`, `#ef4444`, `#0ea5e9`), sem sobrecargas visuais.
+  - **Controles de Tabelas e DataTables:** Campos de busca arredondados no estilo cápsula (pill) de 38px com expansão suave no foco, seletores de paginação modernos e navegação sem grades duras.
+  - **Abas, Accordions e Timelines:** Abas (`.nav-tabs`) com indicador inferior azul UNN de 3px e transparência, accordions com cantos arredondados e timeline AdminLTE com linhas suaves e balões em estilo card React.
+
 ## [2026-11-22] - fix(admin/chat): alinhamento do content-header e padronização do card de chat ao padrão adminlte
 
 - **Harmonização do Chat e Content-Header (`resources/views/admin/layouts/app.blade.php`, `resources/views/admin/chat/show.blade.php`, `resources/views/admin/chat/index.blade.php`):**

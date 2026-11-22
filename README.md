@@ -1,5 +1,7 @@
 # UNN — Plataforma de Networking
 
+- **Padronização Global Estilo React/SaaS em Todo o Painel `/admin` (22/11):** Estendida e consolidada a aparência contemporânea estilo React em 100% das páginas administrativas e componentes do sistema (Select2 em 42px com anel azul UNN e dropdown moderno, checkboxes e radios estilizados, upload de arquivos e Dropzones com cantos arredondados, Summernote limpo sem caixas pesadas, Callouts pastéis, Cards Outline refinados, buscas DataTables em cápsula pill e abas/timelines elegantes), mantendo a perfeita integridade funcional, Blade e rotas nativas.
+
 - **Padronização e Alinhamento do Chat Administrativo ao Padrão do Painel (22/11):** Integrado o chat ao padrão visual nativo de cards do AdminLTE (`card card-outline card-primary`) com cabeçalho de atendimento integrado e campos padronizados, além de alinhar o cabeçalho superior (`content-header`) com `container-fluid` e fundo transparente sem quebra da identidade visual.
 
 - **Remodelação do Chat Administrativo com Design React-like (22/11):** Reformulada a experiência de atendimento e chat em `/admin/chat/{id}` e `/admin/chat`, entregando layout SaaS moderno de duas colunas, busca em tempo real de conversas, balões de mensagem estilizados com gradiente UNN, atalhos de envio via teclado e compatibilidade mobile total.
