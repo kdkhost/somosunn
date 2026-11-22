@@ -1,5 +1,7 @@
 # UNN — Plataforma de Networking
 
+- **Blindagem de Responsividade Mobile e Correção de Layout nas Listagens (22/11):** Eliminada a quebra de botões de ação e estouramento horizontal de tabelas em dispositivos móveis e telas estreitas. Implementado auto-wrap e empilhamento fluido para barras de ferramentas, busca e botões (Scanner Universal, Novo Evento, etc.), proteção contra overflow em todos os cards e descolamento vertical dos botões flutuantes de chat e voltar ao topo sem sobreposição.
+
 - **Padronização Global do Sidebar, Navbar, Footer, Header, Modais e Componentes no `/admin` (22/11):** Estendida a padronização e modernização visual do painel `/admin` para cobrir de forma integral a barra lateral (sidebar com submenus em guia vertical, user panel e gradiente ativo), navbar translúcida com glassmorphism e dropdowns de 16px, cabeçalho de conteúdo (content-header) com títulos destacados e breadcrumbs minimalistas, modais com backdrop blur e botões fechar circulares, rodapé (footer) moderno, abas (nav-tabs/nav-pills), alertas pastéis acessíveis, métricas (small-boxes) e scrollbars universais, mantendo 100% da integridade e layout funcional atual.
 
 - **Venda de Áreas para Expositores em Eventos (26/05):** Eventos podem vender áreas independentes para expositores com lotes próprios, planta/mapa, reservas temporárias, checkout Mercado Pago/SumUp, confirmações por webhook e gestão completa nos painéis `/admin` e `/painel/admin`, sem consumir a capacidade de ingressos normais.

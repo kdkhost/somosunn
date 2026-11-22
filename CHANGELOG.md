@@ -1,5 +1,14 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - fix(responsividade): blindagem universal contra quebra de layout mobile e botões de ação
+
+- **Correção e Blindagem de Responsividade no Mobile (`resources/views/admin/layouts/app.blade.php`, `resources/views/admin/events/list.blade.php`):**
+  - **Eliminado estouramento de botões de topo:** Ajustada a barra de ações em `/admin/events` e regras globais para que botões de ação (ex: "Scanner Universal" e "Novo Evento") e barras de busca dividam a largura em coluna/wrap fluido no mobile (`flex-direction: column` e `flex: 1 1 auto`) sem nunca transbordar a tela.
+  - **Auto-responsividade de tabelas em cards:** Adicionada proteção CSS global em `.card` e `.card-body` garantindo `overflow-x: auto` e `-webkit-overflow-scrolling: touch` para todas as tabelas administrativas, além da inclusão de `<div class="table-responsive">` na listagem de eventos.
+  - **Prevenção total de overflow horizontal:** Aplicado `max-width: 100vw` e `overflow-x: hidden` no `html`/`body`, além de `box-sizing: border-box` na `.wrapper`, `.content-wrapper` e `.container-fluid`.
+  - **Separação de botões flutuantes no mobile:** Descolados verticalmente o botão de voltar ao topo (`.admin-back-to-top`) e o widget de chat flutuante (`#chat-widget-container`) para que fiquem empilhados perfeitamente sem sobreposição visual.
+  - **Navbar compacta em telas pequenas:** Ajustados espaçamentos e dimensões de ícones/dropdowns para visualização limpa abaixo de 576px.
+
 ## [2026-11-22] - feat(admin): padronização global do sidebar, navbar, footer, header, modal e componentes
 
 - **Padronização Abrangente e Profunda do Painel `/admin` (`resources/views/admin/layouts/app.blade.php`):**

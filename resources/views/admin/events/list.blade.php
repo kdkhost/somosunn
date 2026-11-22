@@ -53,27 +53,27 @@
 
         {{-- Action Buttons --}}
         <div class="row mb-3">
-            <div class="col-12 d-flex flex-wrap justify-content-between align-items-center" style="gap: 10px;">
-                <form method="GET" action="{{ url()->current() }}" class="form-inline">
+            <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center" style="gap: 12px;">
+                <form method="GET" action="{{ url()->current() }}" class="form-inline w-100 w-md-auto mb-2 mb-md-0" style="max-width: 100%;">
                     @if(request('type'))
                         <input type="hidden" name="type" value="{{ request('type') }}">
                     @endif
-                    <div class="input-group input-group-sm">
+                    <div class="input-group input-group-sm w-100" style="min-width: 240px; max-width: 100%;">
                         <input type="text" name="q" value="{{ $search ?? '' }}" class="form-control" placeholder="Buscar por título...">
                         <div class="input-group-append">
                             <button type="submit" class="btn btn-outline-primary"><i class="fas fa-search"></i></button>
                         </div>
                     </div>
                 </form>
-                <div class="d-inline-flex" style="gap: 10px;">
+                <div class="d-flex flex-wrap align-items-center w-100 w-md-auto" style="gap: 10px;">
                     @if(!(isset($type) && $type === 'album'))
                     <a href="{{ route('admin.quick-scanner') }}"
-                        class="btn btn-success rounded-pill elevation-1">
+                        class="btn btn-success rounded-pill elevation-1 flex-fill flex-md-grow-0 text-nowrap">
                         <i class="fas fa-qrcode mr-2"></i> Scanner Universal
                     </a>
                     @endif
                     <a href="{{ (isset($type) && $type === 'album') ? route('admin.acervo.create') : route('admin.events.create') }}"
-                        class="btn btn-primary rounded-pill elevation-1">
+                        class="btn btn-primary rounded-pill elevation-1 flex-fill flex-md-grow-0 text-nowrap">
                         <i class="fas fa-plus mr-2"></i> Novo {{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}
                     </a>
                 </div>
@@ -91,7 +91,8 @@
                         </h3>
                     </div>
                     <div class="card-body p-0">
-                        <table id="admin-events-table" class="table table-hover align-middle mb-0 w-100">
+                        <div class="table-responsive">
+                            <table id="admin-events-table" class="table table-hover align-middle mb-0 w-100">
                             <thead class="bg-light">
                                 <tr>
                                     <th><i class="fas fa-{{ (isset($type) && $type === 'album') ? 'images' : 'calendar-star' }} text-muted mr-1"></i>{{ (isset($type) && $type === 'album') ? 'Álbum' : 'Evento' }}</th>
@@ -220,6 +221,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                     </div>
                     @if($events instanceof \Illuminate\Pagination\AbstractPaginator && $events->hasPages())
                         <div class="card-footer bg-white border-top py-3">

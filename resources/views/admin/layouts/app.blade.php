@@ -2525,6 +2525,188 @@
             border-color: #334155 !important;
             color: #cbd5e1 !important;
         }
+
+        /* ─── 19. Blindagem Universal de Responsividade e Proteção Mobile ─── */
+        html, body {
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
+        }
+
+        .wrapper,
+        .content-wrapper,
+        .main-header,
+        .main-footer,
+        .content,
+        .content-header {
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .container-fluid {
+            max-width: 100% !important;
+            padding-left: 14px !important;
+            padding-right: 14px !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Auto-responsividade universal de tabelas em cards */
+        .card {
+            max-width: 100% !important;
+            overflow: hidden !important;
+        }
+
+        .card-body {
+            max-width: 100% !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        .table {
+            max-width: 100%;
+        }
+
+        .table-responsive,
+        .dataTables_wrapper {
+            max-width: 100% !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        /* Alinhamento dos botões flutuantes: Chat e Back-to-Top */
+        #chat-widget-container {
+            position: fixed !important;
+            bottom: 20px !important;
+            right: 20px !important;
+            z-index: 1040 !important;
+        }
+
+        .admin-back-to-top {
+            position: fixed !important;
+            bottom: 90px !important;
+            right: 26px !important;
+            z-index: 1045 !important;
+        }
+
+        /* Quebras Inteligentes para Mobile e Telas Estreitas (< 768px) */
+        @media (max-width: 767.98px) {
+            .container-fluid {
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+            }
+
+            /* Barras de ações e filtros em coluna no mobile */
+            .row > .col-12.d-flex.justify-content-between:not(.pagination):not(.modal-footer),
+            .col-12.d-flex.flex-wrap.justify-content-between {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.75rem !important;
+            }
+
+            /* Agrupamentos de botões de ação e ferramentas no topo */
+            .col-12 .d-inline-flex,
+            .col-12 .d-flex.align-items-center:has(> .btn),
+            .card-tools {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                width: 100% !important;
+                gap: 0.5rem !important;
+            }
+
+            .col-12 .d-inline-flex > .btn,
+            .col-12 .d-flex.align-items-center > .btn,
+            .col-12 .d-flex > .btn:not(.dropdown-item),
+            .card-tools > .btn {
+                flex: 1 1 auto !important;
+                min-width: 120px !important;
+                text-align: center !important;
+                justify-content: center !important;
+                white-space: nowrap !important;
+            }
+
+            /* Formulários de busca ocupam largura total */
+            form.form-inline,
+            .form-inline .input-group,
+            .form-inline .form-control {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            /* Header e Título de página */
+            .content-header .d-flex.justify-content-between {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 0.4rem !important;
+            }
+
+            .content-header h1,
+            .content-header h1.m-0 {
+                font-size: 1.25rem !important;
+            }
+
+            .content-header .breadcrumb {
+                flex-wrap: wrap !important;
+            }
+
+            /* Tabelas em mobile: padding otimizado para não estourar */
+            .table th,
+            .table td {
+                padding: 0.65rem 0.6rem !important;
+                font-size: 0.8125rem !important;
+                white-space: nowrap !important;
+            }
+
+            .table th:first-child,
+            .table td:first-child {
+                white-space: normal !important;
+                min-width: 130px !important;
+            }
+
+            /* Ajuste dos botões flutuantes em mobile para nunca se sobreporem */
+            #chat-widget-container {
+                bottom: 14px !important;
+                right: 14px !important;
+            }
+
+            #chat-toggle-btn {
+                width: 50px !important;
+                height: 50px !important;
+            }
+
+            #chat-toggle-btn i {
+                font-size: 1.25rem !important;
+            }
+
+            .admin-back-to-top {
+                bottom: 74px !important;
+                right: 19px !important;
+                width: 40px !important;
+                height: 40px !important;
+            }
+        }
+
+        /* Ajustes de Navbar em telas muito pequenas (< 576px) */
+        @media (max-width: 575.98px) {
+            .main-header.navbar {
+                padding: 0.35rem 0.5rem !important;
+            }
+
+            .navbar-nav .nav-link {
+                padding: 0.35rem 0.45rem !important;
+                font-size: 0.8125rem !important;
+            }
+
+            .navbar-nav .nav-item a[href*="home"],
+            .navbar-nav .nav-item a[target="_blank"] {
+                padding: 0.25rem 0.6rem !important;
+                font-size: 0.75rem !important;
+            }
+
+            .navbar .dropdown-menu {
+                max-width: calc(100vw - 1rem) !important;
+                right: 0 !important;
+                left: auto !important;
+            }
+        }
     </style>
     @stack('styles')
 </head>
