@@ -17,11 +17,11 @@
     <style>
         /* Estado Padrão (Aberto): Logo Visível, Favicon Oculto */
         .brand-link .brand-logo-img {
-            display: block;
+            display: block !important;
         }
 
         .brand-link .brand-favicon-img {
-            display: none;
+            display: none !important;
         }
 
         /* Estado Fechado (.sidebar-collapse no body): Logo Oculto, Favicon Visível */
@@ -39,6 +39,15 @@
         }
 
         body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-favicon-img {
+            display: none !important;
+        }
+
+        /* Estado Aberto em Mobile (.sidebar-open no body) */
+        body.sidebar-open .brand-link .brand-logo-img {
+            display: block !important;
+        }
+
+        body.sidebar-open .brand-link .brand-favicon-img {
             display: none !important;
         }
     </style>

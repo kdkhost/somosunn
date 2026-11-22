@@ -3898,10 +3898,14 @@
                 });
         });
 
-        const logo = $('.brand-logo-img');
-        const favicon = $('.brand-favicon-img');
-        $(document).on('collapsed.lte.pushmenu', function () { logo.addClass('d-none'); favicon.removeClass('d-none'); });
-        $(document).on('expanded.lte.pushmenu', function () { favicon.addClass('d-none'); logo.removeClass('d-none'); });
+        // Sincronização e integridade de Logo e Favicon da Sidebar
+        function clearBrandLogoClasses() {
+            $('.brand-logo-img, .brand-favicon-img').removeClass('d-none');
+        }
+        clearBrandLogoClasses();
+        $(document).on('collapsed.lte.pushmenu shown.lte.pushmenu expanded.lte.pushmenu pjax:end', function () {
+            clearBrandLogoClasses();
+        });
 
         // Persistência de aba ativa (nav-tabs)
         const tabKey = 'admin-active-tab-' + (location.pathname || 'root');

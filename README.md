@@ -1,5 +1,7 @@
 # UNN — Plataforma de Networking
 
+- **Correção da Alternância de Logotipo/Favicon no Sidebar (22/11):** Corrigido o comportamento da barra lateral para garantir que o logotipo completo da UNN retorne imediatamente ao reabrir o menu (desktop e mobile), eliminando classes conflitantes e estabelecendo controle CSS determinístico nos estados expandido, recolhido e hover.
+
 - **Otimização de Cards de Métricas e Desobstrução do Chat Flutuante no Mobile (22/11):** Corrigido o redimensionamento de valores monetários nos cards de KPI do dashboard para telas estreitas (eliminando cortes de dígitos em valores como "R$ 370,00"), ocultando ícones decorativos de fundo no mobile e adicionando espaçamento inferior de rolagem para que o botão flutuante de chat não encubra botões de ação finais.
 
 - **Blindagem de Responsividade Mobile e Correção de Layout nas Listagens (22/11):** Eliminada a quebra de botões de ação e estouramento horizontal de tabelas em dispositivos móveis e telas estreitas. Implementado auto-wrap e empilhamento fluido para barras de ferramentas, busca e botões (Scanner Universal, Novo Evento, etc.), proteção contra overflow em todos os cards e descolamento vertical dos botões flutuantes de chat e voltar ao topo sem sobreposição.

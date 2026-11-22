@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - fix(sidebar): restauração confiável do logotipo ao reabrir a sidebar
+
+- **Alternância Infalível entre Logo e Favicon (`resources/views/admin/partials/sidebar.blade.php`, `resources/views/admin/layouts/app.blade.php`):**
+  - **Eliminado bug de logo invisível:** Corrigido o problema onde a classe `.d-none` aplicada por evento JS bloqueava o retorno do logotipo completo ao reabrir a barra lateral.
+  - **Controle Determinístico via CSS:** Implementadas regras CSS com precedência explícita (`display: block !important` e `display: none !important`) baseadas nas classes nativas do AdminLTE (`body.sidebar-collapse`, `body:not(.sidebar-collapse)`, `body.sidebar-open` e hover mini), garantindo transição imediata e infalível sem depender de eventos assíncronos.
+  - **Saneamento de classes residuais:** Removida manipulação com `d-none` no script mestre e adicionada rotina de limpeza para garantir renderização perfeita em transições desktop e mobile.
+
 ## [2026-11-22] - fix(dashboard/mobile): auto-ajuste de valores monetários em cards e proteção de rolagem
 
 - **Ajuste Fino de Cards de Métricas (`small-box`) e Chat Flutuante (`resources/views/admin/layouts/app.blade.php`):**
