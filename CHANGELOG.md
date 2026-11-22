@@ -6,6 +6,8 @@
 - Evitada a desativação acidental do login social ao salvar configurações administrativas na aba Social.
 - Reativada a configuração `social_login_enabled` no banco de dados e restaurada a exibição do botão de login do Google ("Continuar com Google") na tela de autenticação e no card lateral visual.
 - Aprimorado o layout do componente de autenticação social para manter alinhamento e proporção otimizados quando apenas um provedor social estiver ativo.
+- Corrigido o erro `400: redirect_uri_mismatch` do Google OAuth: configurada a URI canônica correta do subdomínio (`https://app.somosunn.com.br/auth/callback/google`) e implementada resolução dinâmica do callback no runtime do Socialite baseada na rota do host atual.
+- Adicionado campo opcional nos formulários administrativos dos dois painéis para customização de `Callback URL (Redirect URI)` por provedor social.
 
 ## [2026-11-21] - perf/arch: auditoria, desmembramento por subdominios, performance e padroes pt-BR
 

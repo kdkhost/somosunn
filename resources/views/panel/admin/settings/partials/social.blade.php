@@ -160,6 +160,16 @@
                                 class="w-full pl-9 pr-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-medium text-slate-800 dark:text-white">
                         </div>
                     </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                            Callback URL (Redirect URI) customizada (opcional)
+                        </label>
+                        <input type="text" name="social_{{ $key }}_redirect"
+                            value="{{ $settings['social_'.$key.'_redirect'] ?? '' }}"
+                            placeholder="Deixe em branco para usar o padrão da plataforma"
+                            class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-xs font-mono text-slate-800 dark:text-white">
+                        <span class="text-[10px] text-slate-400 mt-1 block">Padrão detectado: <code class="text-blue-600 dark:text-blue-400">{{ route('social.callback', ['provider' => $key]) }}</code></span>
+                    </div>
                 </div>
             </div>
         @endforeach

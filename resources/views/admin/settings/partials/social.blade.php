@@ -147,6 +147,14 @@
                                     value="{{ $settings['social_'.$key.'_client_secret'] ?? ($key === 'facebook' ? ($settings['social_facebook_app_secret'] ?? '') : '') }}">
                             </div>
                         </div>
+
+                        <div class="form-group mb-0">
+                            <label class="small font-weight-bold">Callback URL (Redirect URI) customizada (opcional)</label>
+                            <input name="social_{{ $key }}_redirect" class="form-control form-control-sm font-monospace"
+                                placeholder="Deixe em branco para usar o padrão da plataforma"
+                                value="{{ $settings['social_'.$key.'_redirect'] ?? '' }}">
+                            <small class="text-muted d-block mt-1">Padrão detectado: <code>{{ route('social.callback', ['provider' => $key]) }}</code></small>
+                        </div>
                     </div>
                 </div>
             </div>

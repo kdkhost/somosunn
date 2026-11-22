@@ -335,6 +335,15 @@ class SocialAuthController extends Controller
 
         if ($redirect !== '') {
             Config::set("services.{$provider}.redirect", $redirect);
+        } else {
+            try {
+                $callbackUrl = route('social.callback', ['provider' => $provider]);
+                if ($callbackUrl !== '') {
+                    Config::set("services.{$provider}.redirect", $callbackUrl);
+                }
+            } catch (\Throwable $e) {
+                // Mantem fallback configurado
+            }
         }
     }
 
