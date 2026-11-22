@@ -1,5 +1,18 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.6.0] - 2026-11-22 - feat(membros): restauração de visibilidade de membros, filtros avançados de busca e controle administrativo total
+
+- **Restauração e Exibição Completa de Membros (`app/Http/Controllers/MemberController.php`):**
+  - **Fim do Bloqueio Forçado de Planos Pagos:** Eliminada a restrição rígida anterior que ocultava mais de 97% dos membros cadastrados na comunidade por estarem no plano inicial Starter ou sem assinatura paga ativa. Agora todos os membros ativos cadastrados são exibidos com dignidade e destaque no diretório público.
+  - **Busca Multifacetada e Classificação Geral:** Implementada filtragem pública por múltiplos critérios: busca textual livre (nome, @, profissão, empresa, bio), filtro dinâmico por cidade/estado, filtro seletor por plano (Elite, Pro, Starter) e ordenação por Mais Conectados, Mais Recentes ou Ordem Alfabética (A-Z), com preservação de paginação via URL.
+  - **Badges de Plano nos Cards:** Exibido badge com o plano/categoria de cada membro no card da listagem pública (`resources/views/site/partials/member-card.blade.php`).
+- **Controle Administrativo para Admin e Superadmin (`app/Http/Controllers/Admin/PageController.php`, `app/Http/Controllers/Panel/Admin/PageController.php`, `resources/views/admin/pages/partials/membros.blade.php`, `resources/views/panel/admin/pages/partials/membros.blade.php`):**
+  - **Seletor de Regra de Exibição Global:** Adicionada nas configurações da página de membros em ambos os painéis (`/admin` e `/painel/admin`) a escolha entre exibir "Todos os membros ativos", "Apenas membros com qualquer plano" ou "Apenas membros de planos pagos".
+  - **Toggles de Controle Refinado:** Opções administrativas para definir se administradores aparecem na listagem pública e se apenas perfis com foto real devem ser exibidos.
+  - **Paridade Absoluta:** Configurações integradas e funcionais tanto no painel legado (AdminLTE) quanto no painel novo (Tailwind).
+- **Hero de Busca e Filtros na Interface Pública (`resources/views/site/membros.blade.php`):**
+  - Interface moderna estilo React / Tailwind com barra de pesquisa integrada, contadores dinâmicos de membros encontrados e botão de limpeza de filtros.
+
 ## [2.5.2] - 2026-11-22 - fix(vagas): eliminação de duplo escape html em títulos e badges do sistema
 
 - **Auditoria e Correção de Entidades HTML no Blade (`resources/views/oportunidades.blade.php`, `resources/views/admin/pages/partials/vagas-abertas.blade.php`):**

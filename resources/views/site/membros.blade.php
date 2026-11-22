@@ -50,6 +50,89 @@
             </section>
         @endif
 
+        <!-- Search and Multifaceted Filters (Classificação e Busca) -->
+        <section class="pb-8 px-4 md:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="bg-white rounded-3xl p-4 md:p-6 shadow-xl border border-slate-200/90">
+                    <form method="GET" action="{{ route('membros') }}" class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
+                            {{-- Campo de busca por texto livre --}}
+                            <div class="sm:col-span-2 lg:col-span-4 relative flex items-center h-12 bg-slate-50 hover:bg-slate-100/80 rounded-2xl px-4 border border-slate-200 transition-colors focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
+                                <i class="fas fa-search text-slate-400 mr-3 text-sm shrink-0"></i>
+                                <input type="text" name="q" value="{{ request('q') }}"
+                                    placeholder="Buscar por nome, cargo, empresa ou bio..."
+                                    class="w-full bg-transparent border-none outline-none text-slate-800 text-sm font-medium placeholder:text-slate-400">
+                            </div>
+
+                            {{-- Filtro por Cidade / Estado --}}
+                            <div class="lg:col-span-3 relative flex items-center h-12 bg-slate-50 hover:bg-slate-100/80 rounded-2xl px-4 border border-slate-200 transition-colors focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
+                                <i class="fas fa-map-marker-alt text-slate-400 mr-2.5 text-sm shrink-0"></i>
+                                <select name="city" class="w-full bg-transparent border-none outline-none text-slate-800 text-sm font-medium cursor-pointer appearance-none">
+                                    <option value="">Todas as Cidades</option>
+                                    @foreach($availableCities ?? [] as $cityName)
+                                        <option value="{{ $cityName }}" {{ request('city') === $cityName ? 'selected' : '' }}>
+                                            {{ $cityName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <i class="fas fa-chevron-down text-slate-400 text-xs ml-2 pointer-events-none shrink-0"></i>
+                            </div>
+
+                            {{-- Filtro por Plano / Categoria --}}
+                            <div class="lg:col-span-2 relative flex items-center h-12 bg-slate-50 hover:bg-slate-100/80 rounded-2xl px-4 border border-slate-200 transition-colors focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
+                                <i class="fas fa-crown text-slate-400 mr-2.5 text-sm shrink-0"></i>
+                                <select name="plan_id" class="w-full bg-transparent border-none outline-none text-slate-800 text-sm font-medium cursor-pointer appearance-none">
+                                    <option value="">Todos os Planos</option>
+                                    @foreach($availablePlans ?? [] as $p)
+                                        <option value="{{ $p->id }}" {{ request('plan_id') == $p->id ? 'selected' : '' }}>
+                                            {{ $p->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <i class="fas fa-chevron-down text-slate-400 text-xs ml-2 pointer-events-none shrink-0"></i>
+                            </div>
+
+                            {{-- Classificação / Ordenação --}}
+                            <div class="lg:col-span-2 relative flex items-center h-12 bg-slate-50 hover:bg-slate-100/80 rounded-2xl px-4 border border-slate-200 transition-colors focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
+                                <i class="fas fa-sort-amount-down text-slate-400 mr-2.5 text-sm shrink-0"></i>
+                                <select name="sort" class="w-full bg-transparent border-none outline-none text-slate-800 text-sm font-medium cursor-pointer appearance-none">
+                                    <option value="latest" {{ request('sort') === 'latest' ? 'selected' : '' }}>Mais Recentes</option>
+                                    <option value="connections" {{ request('sort') === 'connections' ? 'selected' : '' }}>Mais Conectados</option>
+                                    <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Ordem Alfabética (A-Z)</option>
+                                </select>
+                                <i class="fas fa-chevron-down text-slate-400 text-xs ml-2 pointer-events-none shrink-0"></i>
+                            </div>
+
+                            {{-- Botão Filtrar --}}
+                            <div class="lg:col-span-1">
+                                <button type="submit"
+                                    class="w-full h-12 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                                    title="Aplicar filtros">
+                                    <i class="fas fa-filter text-xs"></i>
+                                    <span class="lg:hidden text-sm">Filtrar</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {{-- Barra de Status / Limpeza de Filtros --}}
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
+                            <div class="flex items-center gap-2 text-slate-600 font-medium">
+                                <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Total de <strong>{{ method_exists($members, 'total') ? $members->total() : $members->count() }}</strong> membros encontrados</span>
+                            </div>
+
+                            @if(request()->anyFilled(['q', 'search', 'city', 'plan_id', 'sort']))
+                                <a href="{{ route('membros') }}"
+                                    class="inline-flex items-center gap-1.5 text-slate-600 hover:text-red-600 font-semibold transition-colors bg-slate-100 hover:bg-red-50 px-3.5 py-1.5 rounded-full">
+                                    <i class="fas fa-times text-[10px]"></i> Limpar filtros
+                                </a>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
         <!-- Members -->
         <section class="pb-16 px-4 md:px-8">
             <div class="max-w-7xl mx-auto">

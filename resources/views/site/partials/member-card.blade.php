@@ -11,6 +11,10 @@
     <div class="h-14 bg-gradient-to-r from-blue-600 to-indigo-600 relative flex-shrink-0">
         @if($isDemo)
             <span class="absolute top-1.5 right-1.5 bg-yellow-100 text-yellow-800 text-[9px] px-1.5 py-0.5 rounded font-bold">DEMO</span>
+        @elseif(!empty($member->plan_badge))
+            <span class="absolute top-2 right-2 bg-white/95 text-blue-700 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm tracking-wider uppercase">
+                {{ $member->plan_badge }}
+            </span>
         @endif
     </div>
 

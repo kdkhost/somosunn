@@ -70,6 +70,12 @@
             'sec-stats' => ['icon' => 'fa-chart-bar', 'label' => 'Números'],
             'sec-cta' => ['icon' => 'fa-bullhorn', 'label' => 'CTA Final'],
         ],
+        'membros' => [
+            'sec-hero' => ['icon' => 'fa-users', 'label' => 'Hero'],
+            'sec-rules' => ['icon' => 'fa-sliders-h', 'label' => 'Regras de Exibição'],
+            'sec-stats' => ['icon' => 'fa-chart-bar', 'label' => 'Estatísticas'],
+            'sec-cta' => ['icon' => 'fa-bullhorn', 'label' => 'CTA Final'],
+        ],
         'portal' => [
             'sec-hero' => ['icon' => 'fa-network-wired', 'label' => 'Hero'],
             'sec-stats' => ['icon' => 'fa-chart-bar', 'label' => 'Estatísticas'],

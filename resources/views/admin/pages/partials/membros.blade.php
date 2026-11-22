@@ -19,6 +19,52 @@
     </div>
 </div>
 
+<div class="tab-pane fade" id="sec-rules">
+    <div class="card card-outline card-warning mb-4">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-sliders-h mr-1"></i> Regras de Exibição de Membros</h3>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label class="font-weight-bold">Quem deve aparecer na lista pública de membros?</label>
+                <select name="members_display_mode" class="form-control">
+                    <option value="all" {{ old('members_display_mode', $data['members_display_mode'] ?? 'all') === 'all' ? 'selected' : '' }}>
+                        Todos os membros cadastrados ativos (Recomendado para fortalecer a comunidade)
+                    </option>
+                    <option value="with_plan" {{ old('members_display_mode', $data['members_display_mode'] ?? '') === 'with_plan' ? 'selected' : '' }}>
+                        Apenas membros vinculados a qualquer plano (Starter, Pro, Elite)
+                    </option>
+                    <option value="paid_only" {{ old('members_display_mode', $data['members_display_mode'] ?? '') === 'paid_only' ? 'selected' : '' }}>
+                        Apenas assinantes com plano pago ativo (Pro / Elite)
+                    </option>
+                </select>
+                <small class="form-text text-muted">Controle global do que aparece na listagem pública de membros.</small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Exibir Administradores na lista pública?</label>
+                        <select name="members_show_admins" class="form-control">
+                            <option value="0" {{ old('members_show_admins', $data['members_show_admins'] ?? '0') == '0' ? 'selected' : '' }}>Não (Apenas membros da rede)</option>
+                            <option value="1" {{ old('members_show_admins', $data['members_show_admins'] ?? '0') == '1' ? 'selected' : '' }}>Sim (Exibir administradores)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Exibir somente perfis com foto cadastrada?</label>
+                        <select name="members_only_with_photo" class="form-control">
+                            <option value="0" {{ old('members_only_with_photo', $data['members_only_with_photo'] ?? '0') == '0' ? 'selected' : '' }}>Não (Exibir membros com foto ou iniciais)</option>
+                            <option value="1" {{ old('members_only_with_photo', $data['members_only_with_photo'] ?? '0') == '1' ? 'selected' : '' }}>Sim (Apenas membros com foto real)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="tab-pane fade" id="sec-stats">
     <div class="card card-outline card-primary mb-4">
         <div class="card-header">

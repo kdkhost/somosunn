@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Page;
+use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +13,7 @@ class MemberController extends Controller
     /**
      * Display a listing of members.
      */
-    public function index()
+    public function index(Request $request)
     {
         $demoMode = (bool) config('app.demo_mode');
 
@@ -23,40 +24,74 @@ class MemberController extends Controller
             abort(404, 'Membros temporariamente indisponível');
         }
 
+        $pageData = Page::dataBySlug('membros');
+
+        // Regras de controle do Admin/Superadmin:
+        // 'all' = Todos os membros ativos cadastrados (padrão recomendado para a comunidade)
+        // 'with_plan' = Membros vinculados a qualquer plano (Starter, Pro, Elite)
+        // 'paid_only' = Estritamente membros com plano pago ativo
+        $displayMode = $pageData['members_display_mode'] ?? \App\Models\Setting::get('members_display_mode', 'all');
+        $showAdmins = (bool) ($pageData['members_show_admins'] ?? \App\Models\Setting::get('members_show_admins', false));
+        $onlyWithPhoto = (bool) ($pageData['members_only_with_photo'] ?? false);
+
         $blockedUserIds = [];
         $connectedUserIds = [];
         $connectionMap = [];
 
         if (auth()->check()) {
-            $connectionRecords = \App\Models\Connection::where(function ($q) {
-                $q->where('requester_id', auth()->id())->orWhere('requested_id', auth()->id());
+            $authId = auth()->id();
+            $connectionRecords = \App\Models\Connection::where(function ($q) use ($authId) {
+                $q->where('requester_id', $authId)->orWhere('requested_id', $authId);
             })->get();
 
-            $connectionMap = $connectionRecords->mapWithKeys(function ($conn) {
-                $otherId = $conn->requester_id === auth()->id() ? $conn->requested_id : $conn->requester_id;
+            $connectionMap = $connectionRecords->mapWithKeys(function ($conn) use ($authId) {
+                $otherId = $conn->requester_id === $authId ? $conn->requested_id : $conn->requester_id;
                 return [$otherId => $conn];
             })->toArray();
 
             $blockedUserIds = $connectionRecords->filter(fn($c) => $c->status === 'blocked')
-                ->map(function ($conn) {
-                    return $conn->requester_id === auth()->id() ? $conn->requested_id : $conn->requester_id;
-                })->toArray();
+                ->map(fn($c) => $c->requester_id === $authId ? $c->requested_id : $c->requester_id)
+                ->toArray();
 
             $connectedUserIds = $connectionRecords->filter(fn($c) => $c->status === 'accepted')
-                ->map(function ($conn) {
-                    return $conn->requester_id === auth()->id() ? $conn->requested_id : $conn->requester_id;
-                })->toArray();
+                ->map(fn($c) => $c->requester_id === $authId ? $c->requested_id : $c->requester_id)
+                ->toArray();
         }
 
         $members = collect();
+        $availableCities = collect();
+        $availablePlans = collect();
 
         try {
-            $query = User::where('role', '!=', 'superadmin')
-                ->whereNotIn('id', $blockedUserIds);
+            $query = User::query();
 
-            $this->applyPaidPlanFilter($query);
+            // Ocultar superadmin do diretório público por segurança/privacidade
+            $query->where('role', '!=', 'superadmin');
 
-            // Hide private profiles if not connected and not admin
+            // Controle do Admin: exibir administradores ou apenas membros?
+            if (!$showAdmins) {
+                $query->where('role', '!=', 'admin');
+            }
+
+            // Excluir usuários bloqueados
+            if (!empty($blockedUserIds)) {
+                $query->whereNotIn('id', $blockedUserIds);
+            }
+
+            // Controle do Admin: exibir apenas membros com foto de perfil?
+            if ($onlyWithPhoto) {
+                $query->whereNotNull('photo')->where('photo', '!=', '');
+            }
+
+            // Controle do Admin: Modo de exibição de planos
+            if ($displayMode === 'paid_only') {
+                $this->applyPaidPlanFilter($query);
+            } elseif ($displayMode === 'with_plan') {
+                $query->whereNotNull('plan_id');
+            }
+            // Se 'all', exibe todos os membros ativos cadastrados
+
+            // Perfis privados: visitantes não vêem perfis marcados como ocultos
             if (!auth()->user()?->isAdmin()) {
                 $query->where(function ($q) use ($connectedUserIds) {
                     $q->where('hide_profile', false)
@@ -64,8 +99,71 @@ class MemberController extends Controller
                 });
             }
 
-            $members = $query->latest()
+            // --- FILTRO DE BUSCA MULTIFACETADO NA PÁGINA PÚBLICA ---
+            // 1. Busca textual livre (Nome, Profissão, Empresa, Bio)
+            $search = trim($request->input('q') ?: $request->input('search') ?: '');
+            if ($search !== '') {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('company', 'like', "%{$search}%")
+                        ->orWhere('occupation', 'like', "%{$search}%")
+                        ->orWhere('bio', 'like', "%{$search}%");
+                });
+            }
+
+            // 2. Filtro por Cidade ou Estado
+            $city = trim($request->input('city', ''));
+            if ($city !== '') {
+                $query->where(function ($q) use ($city) {
+                    $q->where('city', 'like', "%{$city}%")
+                        ->orWhere('state', 'like', "%{$city}%");
+                });
+            }
+
+            // 3. Filtro por Plano / Nível
+            $planId = $request->input('plan_id') ?: $request->input('plan');
+            if (!empty($planId)) {
+                $query->where('plan_id', $planId);
+            }
+
+            // 4. Ordenação / Classificação
+            $sort = $request->input('sort', 'latest');
+            if ($sort === 'name') {
+                $query->orderBy('name', 'asc');
+            } elseif ($sort === 'connections') {
+                $query->select('users.*')
+                    ->selectSub(function ($sub) {
+                        $sub->from('connections')
+                            ->selectRaw('count(*)')
+                            ->where('status', 'accepted')
+                            ->where(function ($q) {
+                                $q->whereColumn('connections.requester_id', 'users.id')
+                                    ->orWhereColumn('connections.requested_id', 'users.id');
+                            });
+                    }, 'connections_count')
+                    ->orderByDesc('connections_count')
+                    ->orderBy('name', 'asc');
+            } else {
+                $query->latest();
+            }
+
+            // Listas dinâmicas para os selects de filtros da página
+            $availableCities = User::whereNotNull('city')
+                ->where('city', '!=', '')
+                ->where('hide_profile', false)
+                ->distinct()
+                ->pluck('city')
+                ->filter()
+                ->sort()
+                ->values();
+
+            $availablePlans = Plan::where('is_active', true)
+                ->orderBy('price', 'asc')
+                ->get(['id', 'name', 'price', 'is_free']);
+
+            $members = $query->with('plan')
                 ->paginate(20)
+                ->appends($request->query())
                 ->through(function ($user) {
                     return (object) [
                         'id' => $user->id,
@@ -82,7 +180,9 @@ class MemberController extends Controller
                         'twitter' => $user->twitter,
                         'youtube' => $user->youtube,
                         'website' => $user->website,
-                        'level' => $user->level ?? 'Iniciante',
+                        'level' => $user->level ?? ($user->plan?->name ?: 'Membro'),
+                        'plan_name' => $user->plan?->name ?: null,
+                        'plan_badge' => $user->plan?->name ? ($user->plan->is_free ? 'Starter' : $user->plan->name) : null,
                         'connections' => \App\Models\Connection::where(function ($q) use ($user) {
                             $q->where('requester_id', $user->id)->orWhere('requested_id', $user->id);
                         })->where('status', 'accepted')->count(),
@@ -186,13 +286,19 @@ class MemberController extends Controller
                 'members' => $members,
                 'isDemo' => true,
                 'connectionMap' => $connectionMap,
-                'pageData' => Page::dataBySlug('membros'),
+                'pageData' => $pageData,
+                'availableCities' => $availableCities,
+                'availablePlans' => $availablePlans,
             ]);
         }
 
-        $pageData = Page::dataBySlug('membros');
-
-        return view('site.membros', compact('members', 'connectionMap', 'pageData'));
+        return view('site.membros', compact(
+            'members',
+            'connectionMap',
+            'pageData',
+            'availableCities',
+            'availablePlans'
+        ));
     }
 
     protected function applyPaidPlanFilter($query): void

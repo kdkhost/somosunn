@@ -66,6 +66,7 @@
                             'valores' => ['Hero', 'Citação', 'Valores', 'CTA'],
                             'como-funciona' => ['Hero', 'Planos', 'Passos', 'CTA'],
                             'quem-somos' => ['Hero', 'Fundadores', 'Time', 'Estatísticas', 'CTA'],
+                            'membros' => ['Hero', 'Regras', 'Estatísticas', 'CTA'],
                             'eventos' => ['Hero', 'Listagem', 'CTA'],
                             'portal' => ['Hero', 'Estatísticas', 'Niveis da Comunidade', 'Top Networkers', 'CTA'],
                             'somos-unicas' => ['Identidade', 'Banner', 'Conteudo'],

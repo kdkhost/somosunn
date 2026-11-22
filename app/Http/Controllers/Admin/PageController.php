@@ -174,6 +174,9 @@ class PageController extends Controller
         'membros' => [
             'hero_title',
             'hero_subtitle',
+            'members_display_mode',
+            'members_show_admins',
+            'members_only_with_photo',
             'stat_1_value',
             'stat_1_label',
             'stat_2_value',
