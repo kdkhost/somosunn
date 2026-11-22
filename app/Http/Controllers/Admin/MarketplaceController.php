@@ -162,6 +162,15 @@ class MarketplaceController extends Controller
         }
 
         $search = trim((string) $request->query('q', ''));
+        $status = trim((string) $request->query('status', ''));
+        $type = trim((string) $request->query('type', ''));
+
+        $stats = [
+            'total' => SellerProduct::count(),
+            'published' => SellerProduct::where('status', 'published')->count(),
+            'draft' => SellerProduct::where('status', 'draft')->count(),
+            'blocked' => SellerProduct::where('status', 'blocked')->count(),
+        ];
 
         $products = SellerProduct::query()
             ->with(['user:id,name,email', 'store:id,brand_name,slug'])
@@ -175,18 +184,27 @@ class MarketplaceController extends Controller
                         });
                 });
             })
+            ->when($status !== '' && in_array($status, ['published', 'draft', 'blocked'], true), function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when($type !== '' && in_array($type, ['physical', 'digital', 'service'], true), function ($query) use ($type) {
+                $query->where('type', $type);
+            })
             ->latest('id')
             ->paginate(20)
             ->withQueryString();
 
         app(SalesAnalyticsService::class)->decorateSellerProducts($products);
 
-        return view('admin.marketplace.catalog.index', compact('products', 'search'));
+        return view('admin.marketplace.catalog.index', compact('products', 'search', 'status', 'type', 'stats'));
     }
 
     public function toggleCatalogProduct(Request $request, SellerProduct $product)
     {
         if (!SellerStore::tableAvailable() || !SellerProduct::tableAvailable()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Modulo da loja virtual nao instalado.'], 500);
+            }
             return redirect()
                 ->route('admin.dashboard')
                 ->with('error', 'O modulo da loja virtual ainda nao foi instalado. Rode php artisan migrate.');
@@ -204,6 +222,22 @@ class MarketplaceController extends Controller
             $product->published_at = null;
         }
         $product->save();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Status do produto atualizado com sucesso.',
+                'product_id' => $product->id,
+                'status' => $product->status,
+                'status_label' => match ($product->status) {
+                    'published' => 'Publicado',
+                    'draft' => 'Rascunho',
+                    'blocked' => 'Bloqueado',
+                    default => ucfirst($product->status),
+                },
+                'published_at' => $product->published_at ? $product->published_at->format('d/m/Y H:i') : null,
+            ]);
+        }
 
         return back()->with('success', 'Status do produto atualizado com sucesso.');
     }

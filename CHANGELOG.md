@@ -1,5 +1,14 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - feat(admin/marketplace): remodelação completa do catálogo com design react saas e moderação ajax
+
+- **Remodelação Contemporânea de `/admin/marketplace/catalogo` (`resources/views/admin/marketplace/catalog/index.blade.php`, `app/Http/Controllers/Admin/MarketplaceController.php`, `app/Http/Controllers/Panel/Admin/SellerProductController.php`):**
+  - **Interface React SaaS:** Reformulado o catálogo de produtos de vendedores e parceiros com layout moderno, cards de métricas (KPIs) com gradientes e indicadores em tempo real (Total, Publicados, Rascunhos, Bloqueados).
+  - **Filtros Rápidos e Busca Integrada:** Adicionadas abas estilo pílula (*pills*) para alternância instantânea entre status de moderação e filtro seletor por tipo de produto (Físico, Digital, Serviço), além de busca aprimorada por título, SKU e loja parceira.
+  - **Visualização Rica de Produtos:** Tabela reestilizada com miniaturas de fotos dos produtos (`cover_url`) ou placeholders elegantes, SKU em tag monospace, preços normais e promocionais destacados, informações da loja com ícone, canal de venda e métricas de vendas e compradores.
+  - **Moderação Instantânea com AJAX e SweetAlert2:** Atualização do status de publicação de produtos (Rascunho, Publicado, Bloqueado) via requisições assíncronas AJAX sem recarregar a tela, com confirmação prévia no SweetAlert2 para bloqueio, feedback imediato com Toastr e sincronização dinâmica dos badges e números dos cards de KPI.
+  - **Paridade Permanente de Painéis:** Atualizados ambos os controllers (`Admin\MarketplaceController` e `Panel\Admin\SellerProductController`) garantindo resposta estruturada JSON para chamadas AJAX e preservação de compatibilidade integral entre `/admin` e `/painel`.
+
 ## [2026-11-22] - feat(admin): padronização global estilo react saas em todas as páginas e componentes do /admin
 
 - **Design System React/Modern SaaS Aplicado em Todas as Páginas de `/admin` (`resources/views/admin/layouts/app.blade.php`):**

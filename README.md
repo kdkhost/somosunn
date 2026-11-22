@@ -1,5 +1,7 @@
 # UNN — Plataforma de Networking
 
+- **Remodelação do Catálogo de Produtos do Marketplace com Design React SaaS e Moderação AJAX (22/11):** Reformulada a página `/admin/marketplace/catalogo`, trazendo cards de métricas em tempo real, visualização com fotos e detalhes ricos de produtos, filtros instantâneos por status/tipo e moderação assíncrona com SweetAlert2 e Toastr sem recarregar a tela, mantendo paridade com o painel novo.
+
 - **Padronização Global Estilo React/SaaS em Todo o Painel `/admin` (22/11):** Estendida e consolidada a aparência contemporânea estilo React em 100% das páginas administrativas e componentes do sistema (Select2 em 42px com anel azul UNN e dropdown moderno, checkboxes e radios estilizados, upload de arquivos e Dropzones com cantos arredondados, Summernote limpo sem caixas pesadas, Callouts pastéis, Cards Outline refinados, buscas DataTables em cápsula pill e abas/timelines elegantes), mantendo a perfeita integridade funcional, Blade e rotas nativas.
 
 - **Padronização e Alinhamento do Chat Administrativo ao Padrão do Painel (22/11):** Integrado o chat ao padrão visual nativo de cards do AdminLTE (`card card-outline card-primary`) com cabeçalho de atendimento integrado e campos padronizados, além de alinhar o cabeçalho superior (`content-header`) com `container-fluid` e fundo transparente sem quebra da identidade visual.
