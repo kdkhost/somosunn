@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - fix(admin/marketplace): harmonização completa do catálogo no tema escuro (dark mode)
+
+- **Correção Visual de Cores e Contraste no Dark Mode (`resources/views/admin/marketplace/catalog/index.blade.php`):**
+  - **Eliminação de Fundos Claros Forçados:** Removidos gradientes com branco inline (`rgba(255,255,255,1)`) que tornavam os cards de KPI foscos e ilegíveis no tema escuro.
+  - **Cards de Métricas Harmonizados:** Implementadas classes dedicadas `.kpi-card` com paleta dark integrada (`#1e293b` com borda `#334155`), gradientes sutis transparentes específicos para cada status (azul, verde, âmbar e vermelho) e tipografia de alto contraste (`#ffffff` para números e `#94a3b8` para rótulos).
+  - **Pílulas de Filtro (Filter Pills) Dark:** Estilizados os botões inativos com fundo dark `#1e293b` e texto `#cbd5e1`, eliminando o visual branco chapado indevido do `.btn-light`.
+  - **Barra de Busca e Tabela:** Fundo da barra de busca e cabeçalho da tabela com azul-marinho profundo (`#0f172a` e `#162032`), bordas discretas `#334155`, tags de SKU e placeholders perfeitamente ajustados ao modo escuro.
+
 ## [2026-11-22] - feat(admin/modais): modernização completa de todos os modais estilo react radix e shadcn ui
 
 - **Arquitetura Visual de Modais Estilo React Radix / Shadcn UI (`resources/views/admin/layouts/app.blade.php`):**
