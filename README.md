@@ -1,5 +1,7 @@
 # UNN — Plataforma de Networking
 
+- **Modernização dos Modais do Painel `/admin` Estilo React Radix / Shadcn UI (22/11):** Todos os modais de todas as páginas administrativas foram modernizados com animação fluida de escala e fade (`scale(0.95)` -> `scale(1)`), backdrop com glassmorphism (`blur(8px)`), centralização vertical automática, cantos generosos de 20px, botões fechar circulares com rotação de 90° e rodapés com botões padronizados e responsivos.
+
 - **Remodelação do Catálogo de Produtos do Marketplace com Design React SaaS e Moderação AJAX (22/11):** Reformulada a página `/admin/marketplace/catalogo`, trazendo cards de métricas em tempo real, visualização com fotos e detalhes ricos de produtos, filtros instantâneos por status/tipo e moderação assíncrona com SweetAlert2 e Toastr sem recarregar a tela, mantendo paridade com o painel novo.
 
 - **Padronização Global Estilo React/SaaS em Todo o Painel `/admin` (22/11):** Estendida e consolidada a aparência contemporânea estilo React em 100% das páginas administrativas e componentes do sistema (Select2 em 42px com anel azul UNN e dropdown moderno, checkboxes e radios estilizados, upload de arquivos e Dropzones com cantos arredondados, Summernote limpo sem caixas pesadas, Callouts pastéis, Cards Outline refinados, buscas DataTables em cápsula pill e abas/timelines elegantes), mantendo a perfeita integridade funcional, Blade e rotas nativas.

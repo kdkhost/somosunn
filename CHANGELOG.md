@@ -1,5 +1,16 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - feat(admin/modais): modernização completa de todos os modais estilo react radix e shadcn ui
+
+- **Arquitetura Visual de Modais Estilo React Radix / Shadcn UI (`resources/views/admin/layouts/app.blade.php`):**
+  - **Animação Fluida Scale + Fade:** Eliminada a queda rígida padrão do Bootstrap (`translateY(-50px)`); implementada animação elástica suave (`transform: scale(0.95)` para `scale(1)`) com curva cúbica contemporânea (`cubic-bezier(0.16, 1, 0.3, 1)`), idêntica aos componentes Dialog de React (Radix UI, Shadcn e Tailwind UI).
+  - **Backdrop com Glassmorphism Real:** Desfoque aprofundado (`backdrop-filter: blur(8px)`) e fundo escuro translúcido `#0f172a` com transição de opacidade limpa.
+  - **Centralização Vertical Nativa:** Todos os modais passam a abrir perfeitamente centralizados na tela por padrão, independentemente da presença da classe `.modal-dialog-centered`.
+  - **Container com Cantos Generosos (20px):** Cantos de `1.25rem` (20px), borda sutil translúcida e elevação multicamada com sombras profundas e anéis de contorno modernos.
+  - **Botão Fechar Circular Estilizado:** Botão circular moderno (34x34px, `border-radius: 9999px`) com transição suave, efeito de rotação de 90 graus no hover e destaque em vermelho suave `#ef4444`.
+  - **Padronização dos Botões de Ação no Rodapé:** Botões com altura uniforme de 40px, cantos arredondados de `0.625rem`, botão secundário em cinza suave neutro e botão primário em azul UNN (`#1F5EDB`) com elevação suave.
+  - **Responsividade Mobile:** Modais auto-ajustáveis para dispositivos móveis (`calc(100% - 1.25rem)`), sem grudar nas margens da tela e com empilhamento limpo dos botões.
+
 ## [2026-11-22] - feat(admin/marketplace): remodelação completa do catálogo com design react saas e moderação ajax
 
 - **Remodelação Contemporânea de `/admin/marketplace/catalogo` (`resources/views/admin/marketplace/catalog/index.blade.php`, `app/Http/Controllers/Admin/MarketplaceController.php`, `app/Http/Controllers/Panel/Admin/SellerProductController.php`):**

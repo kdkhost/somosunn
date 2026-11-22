@@ -2121,29 +2121,55 @@
             color: #475569 !important;
         }
 
-        /* ─── 11. Modais Estilo SaaS Moderno ─── */
+        /* ─── 11. Modais Estilo React Radix / Shadcn / SaaS Contemporâneo ─── */
+        /* Backdrop translúcido com glassmorphism */
         .modal-backdrop {
-            background-color: rgba(15, 23, 42, 0.5) !important;
-            backdrop-filter: blur(4px) !important;
-            -webkit-backdrop-filter: blur(4px) !important;
+            background-color: rgba(15, 23, 42, 0.65) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
+        .modal-backdrop.show {
+            opacity: 1 !important;
+        }
+
+        /* Animação React: Scale + Fade (Substituindo a queda dura do Bootstrap) */
+        .modal.fade .modal-dialog {
+            transform: scale(0.95) !important;
+            opacity: 0 !important;
+            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease-out !important;
+            display: flex !important;
+            align-items: center !important;
+            min-height: calc(100% - 3rem) !important;
+            margin: 1.5rem auto !important;
+        }
+
+        .modal.show .modal-dialog {
+            transform: scale(1) !important;
+            opacity: 1 !important;
+        }
+
+        /* Container do Modal: Cantos arredondados generosos (20px), borda sutil e sombra profunda */
         .modal-content {
-            border-radius: 1rem !important;
-            border: 1px solid rgba(226, 232, 240, 0.9) !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.18), 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
+            border-radius: 1.25rem !important;
+            border: 1px solid rgba(226, 232, 240, 0.95) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
             background-color: #ffffff !important;
             overflow: hidden !important;
+            position: relative !important;
+            outline: 0 !important;
         }
 
         .dark-mode .modal-content {
             background-color: #0f172a !important;
-            border: 1px solid rgba(51, 65, 85, 0.85) !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+            border: 1px solid rgba(51, 65, 85, 0.8) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
         }
 
+        /* Cabeçalho do Modal: Limpo e espaçado */
         .modal-header {
-            padding: 1.2rem 1.5rem !important;
+            padding: 1.25rem 1.75rem !important;
             border-bottom: 1px solid #f1f5f9 !important;
             background-color: #ffffff !important;
             display: flex !important;
@@ -2156,73 +2182,201 @@
             border-bottom: 1px solid #1e293b !important;
         }
 
-        .modal-header .modal-title {
-            font-size: 1.125rem !important;
+        .modal-header .modal-title,
+        .modal-title {
+            font-size: 1.15rem !important;
             font-weight: 700 !important;
             color: #0f172a !important;
-            letter-spacing: -0.015em !important;
+            letter-spacing: -0.02em !important;
+            line-height: 1.35 !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
         }
 
-        .dark-mode .modal-header .modal-title {
+        .modal-header .modal-title i,
+        .modal-title i {
+            color: #1F5EDB !important;
+            margin-right: 0.5rem !important;
+        }
+
+        .dark-mode .modal-header .modal-title,
+        .dark-mode .modal-title {
             color: #f8fafc !important;
         }
 
-        .modal-header .close {
-            width: 32px !important;
-            height: 32px !important;
+        .dark-mode .modal-header .modal-title i,
+        .dark-mode .modal-title i {
+            color: #60a5fa !important;
+        }
+
+        /* Botão Fechar estilo Pill / Circle com animação */
+        .modal-header .close,
+        .modal-header [data-dismiss="modal"] {
+            width: 34px !important;
+            height: 34px !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            border-radius: 0.5rem !important;
+            border-radius: 9999px !important;
             background-color: #f1f5f9 !important;
             color: #64748b !important;
             opacity: 1 !important;
-            border: none !important;
+            border: 1px solid transparent !important;
             font-size: 1.25rem !important;
             line-height: 1 !important;
             padding: 0 !important;
             margin: -0.25rem 0 -0.25rem auto !important;
-            transition: all 0.15s ease !important;
+            transition: all 0.2s ease !important;
+            cursor: pointer !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
         }
 
-        .modal-header .close:hover {
+        .modal-header .close:hover,
+        .modal-header [data-dismiss="modal"]:hover {
             background-color: #fee2e2 !important;
             color: #ef4444 !important;
-            transform: scale(1.08) !important;
+            border-color: rgba(239, 68, 68, 0.2) !important;
+            transform: rotate(90deg) scale(1.05) !important;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2) !important;
         }
 
-        .dark-mode .modal-header .close {
+        .dark-mode .modal-header .close,
+        .dark-mode .modal-header [data-dismiss="modal"] {
             background-color: #1e293b !important;
             color: #94a3b8 !important;
+            border-color: #334155 !important;
         }
 
-        .dark-mode .modal-header .close:hover {
-            background-color: rgba(239, 68, 68, 0.2) !important;
+        .dark-mode .modal-header .close:hover,
+        .dark-mode .modal-header [data-dismiss="modal"]:hover {
+            background-color: rgba(239, 68, 68, 0.25) !important;
             color: #fca5a5 !important;
+            border-color: rgba(239, 68, 68, 0.4) !important;
         }
 
+        /* Corpo do Modal: Espaçamento refinado */
         .modal-body {
-            padding: 1.5rem !important;
+            padding: 1.5rem 1.75rem !important;
             color: #334155 !important;
+            font-size: 0.875rem !important;
+            background-color: #ffffff !important;
         }
 
         .dark-mode .modal-body {
             color: #cbd5e1 !important;
+            background-color: #0f172a !important;
         }
 
+        /* Rodapé do Modal com botões contemporâneos */
         .modal-footer {
-            padding: 1rem 1.5rem !important;
+            padding: 1.15rem 1.75rem !important;
             border-top: 1px solid #f1f5f9 !important;
             background-color: #f8fafc !important;
             display: flex !important;
             align-items: center !important;
             justify-content: flex-end !important;
-            gap: 0.5rem !important;
+            gap: 0.65rem !important;
+            border-bottom-left-radius: 1.25rem !important;
+            border-bottom-right-radius: 1.25rem !important;
         }
 
         .dark-mode .modal-footer {
             background-color: #0b1120 !important;
             border-top: 1px solid #1e293b !important;
+        }
+
+        /* Botões dentro do modal */
+        .modal-footer .btn {
+            height: 40px !important;
+            min-height: 40px !important;
+            padding: 0.5rem 1.25rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            border-radius: 0.625rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .modal-footer .btn-secondary,
+        .modal-footer .btn-light,
+        .modal-footer [data-dismiss="modal"]:not(.close) {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .modal-footer .btn-secondary:hover,
+        .modal-footer .btn-light:hover,
+        .modal-footer [data-dismiss="modal"]:not(.close):hover {
+            background-color: #e2e8f0 !important;
+            color: #1e293b !important;
+            border-color: #94a3b8 !important;
+        }
+
+        .modal-footer .btn-primary,
+        .modal-footer button[type="submit"] {
+            background-color: #1F5EDB !important;
+            border-color: #1F5EDB !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(31, 94, 219, 0.25) !important;
+        }
+
+        .modal-footer .btn-primary:hover,
+        .modal-footer button[type="submit"]:hover {
+            background-color: #177FD6 !important;
+            border-color: #177FD6 !important;
+            box-shadow: 0 4px 12px rgba(31, 94, 219, 0.35) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .dark-mode .modal-footer .btn-secondary,
+        .dark-mode .modal-footer .btn-light,
+        .dark-mode .modal-footer [data-dismiss="modal"]:not(.close) {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
+        .dark-mode .modal-footer .btn-secondary:hover,
+        .dark-mode .modal-footer .btn-light:hover,
+        .dark-mode .modal-footer [data-dismiss="modal"]:not(.close):hover {
+            background-color: #334155 !important;
+            color: #ffffff !important;
+            border-color: #475569 !important;
+        }
+
+        /* Responsividade Mobile para Modais */
+        @media (max-width: 575.98px) {
+            .modal.fade .modal-dialog {
+                width: calc(100% - 1.25rem) !important;
+                max-width: calc(100% - 1.25rem) !important;
+                margin: 0.625rem auto !important;
+            }
+
+            .modal-content {
+                border-radius: 1rem !important;
+            }
+
+            .modal-header {
+                padding: 1rem 1.15rem !important;
+            }
+
+            .modal-body {
+                padding: 1.15rem !important;
+            }
+
+            .modal-footer {
+                padding: 0.85rem 1.15rem !important;
+                flex-wrap: wrap !important;
+            }
+
+            .modal-footer .btn {
+                flex: 1 1 auto !important;
+            }
         }
 
         /* ─── 12. Footer Estilo SaaS Moderno ─── */
