@@ -1752,13 +1752,15 @@
             color: #93c5fd !important;
         }
 
-        /* ─── 8. Navbar e Sidebar Estilo SaaS Moderno ─── */
+        /* ─── 8. Navbar Estilo SaaS Moderno ─── */
         .main-header.navbar {
             backdrop-filter: blur(14px) !important;
             -webkit-backdrop-filter: blur(14px) !important;
             background-color: rgba(255, 255, 255, 0.94) !important;
             border-bottom: 1px solid rgba(226, 232, 240, 0.85) !important;
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02) !important;
+            padding: 0.5rem 1rem !important;
+            min-height: 58px !important;
         }
 
         .dark-mode .main-header.navbar {
@@ -1766,43 +1768,741 @@
             border-bottom: 1px solid rgba(51, 65, 85, 0.85) !important;
         }
 
-        .main-sidebar {
-            box-shadow: 2px 0 12px 0 rgba(0, 0, 0, 0.04) !important;
+        .navbar-nav .nav-link {
+            border-radius: 0.5rem !important;
+            padding: 0.45rem 0.65rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #475569 !important;
+            transition: all 0.15s ease !important;
+            font-weight: 500 !important;
         }
 
-        .nav-sidebar .nav-item .nav-link {
-            border-radius: 0.625rem !important;
-            margin: 2px 8px !important;
-            padding: 0.65rem 0.85rem !important;
-            font-size: 0.875rem !important;
-            font-weight: 500 !important;
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(0, 0, 0, 0.04) !important;
+            color: #1F5EDB !important;
+        }
+
+        .dark-mode .navbar-nav .nav-link {
+            color: #94a3b8 !important;
+        }
+
+        .dark-mode .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.06) !important;
+            color: #60a5fa !important;
+        }
+
+        /* Botão Ver Site Estilo Tag Pill */
+        .navbar-nav .nav-item a[href*="home"],
+        .navbar-nav .nav-item a[target="_blank"] {
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 9999px !important;
+            padding: 0.35rem 0.95rem !important;
+            font-size: 0.8125rem !important;
+            font-weight: 600 !important;
+            color: #475569 !important;
+            background-color: #f8fafc !important;
             transition: all 0.15s ease !important;
         }
 
-        .nav-sidebar .nav-link.active {
-            background-color: #1F5EDB !important;
+        .navbar-nav .nav-item a[href*="home"]:hover,
+        .navbar-nav .nav-item a[target="_blank"]:hover {
+            border-color: #1F5EDB !important;
+            background-color: rgba(31, 94, 219, 0.06) !important;
+            color: #1F5EDB !important;
+        }
+
+        .dark-mode .navbar-nav .nav-item a[href*="home"],
+        .dark-mode .navbar-nav .nav-item a[target="_blank"] {
+            border-color: #334155 !important;
+            background-color: #1e293b !important;
+            color: #cbd5e1 !important;
+        }
+
+        .dark-mode .navbar-nav .nav-item a[href*="home"]:hover,
+        .dark-mode .navbar-nav .nav-item a[target="_blank"]:hover {
+            border-color: #60a5fa !important;
+            background-color: rgba(96, 165, 250, 0.12) !important;
+            color: #60a5fa !important;
+        }
+
+        /* Badges de Notificação na Navbar */
+        .navbar-badge {
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            padding: 2px 5px !important;
+            top: 5px !important;
+            right: 4px !important;
+            border-radius: 9999px !important;
+            box-shadow: 0 0 0 2px #ffffff !important;
+        }
+
+        .dark-mode .navbar-badge {
+            box-shadow: 0 0 0 2px #0f172a !important;
+        }
+
+        /* Dropdowns da Navbar Estilo Cartão Moderno */
+        .navbar .dropdown-menu {
+            border-radius: 1rem !important;
+            border: 1px solid rgba(226, 232, 240, 0.9) !important;
+            box-shadow: 0 14px 34px -4px rgba(0, 0, 0, 0.12), 0 4px 14px -2px rgba(0, 0, 0, 0.06) !important;
+            padding: 0.5rem !important;
+            margin-top: 0.5rem !important;
+            background-color: #ffffff !important;
+            animation: modernDropdownFade 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        @keyframes modernDropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dark-mode .navbar .dropdown-menu {
+            background-color: #0f172a !important;
+            border: 1px solid rgba(51, 65, 85, 0.9) !important;
+            box-shadow: 0 14px 34px -4px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .navbar .dropdown-item {
+            border-radius: 0.5rem !important;
+            padding: 0.55rem 0.85rem !important;
+            font-size: 0.84375rem !important;
+            font-weight: 500 !important;
+            color: #334155 !important;
+            transition: all 0.12s ease !important;
+        }
+
+        .navbar .dropdown-item:hover,
+        .navbar .dropdown-item:focus {
+            background-color: #f1f5f9 !important;
+            color: #1F5EDB !important;
+        }
+
+        .dark-mode .navbar .dropdown-item {
+            color: #cbd5e1 !important;
+        }
+
+        .dark-mode .navbar .dropdown-item:hover,
+        .dark-mode .navbar .dropdown-item:focus {
+            background-color: #1e293b !important;
+            color: #60a5fa !important;
+        }
+
+        .navbar .dropdown-header {
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            color: #64748b !important;
+            padding: 0.65rem 0.85rem 0.35rem 0.85rem !important;
+        }
+
+        .dark-mode .navbar .dropdown-header {
+            color: #94a3b8 !important;
+        }
+
+        .navbar .dropdown-footer {
+            font-size: 0.8125rem !important;
+            font-weight: 600 !important;
+            color: #1F5EDB !important;
+            text-align: center !important;
+            padding: 0.55rem !important;
+            border-radius: 0.5rem !important;
+        }
+
+        .dark-mode .navbar .dropdown-footer {
+            color: #60a5fa !important;
+        }
+
+        .navbar .dropdown-divider {
+            margin: 0.35rem 0 !important;
+            border-top: 1px solid #f1f5f9 !important;
+        }
+
+        .dark-mode .navbar .dropdown-divider {
+            border-top: 1px solid #1e293b !important;
+        }
+
+        /* ─── 9. Sidebar Estilo SaaS Moderno ─── */
+        .main-sidebar {
+            box-shadow: 3px 0 20px 0 rgba(0, 0, 0, 0.06) !important;
+            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .sidebar-dark-primary {
+            background: #111827 !important;
+        }
+
+        .dark-mode .sidebar-dark-primary {
+            background: #0a0f1d !important;
+            border-right: 1px solid rgba(51, 65, 85, 0.5) !important;
+        }
+
+        /* Header da Sidebar (Logo) */
+        .main-sidebar .brand-link {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+            transition: all 0.2s ease !important;
+            background-color: rgba(0, 0, 0, 0.12) !important;
+        }
+
+        /* Painel de Usuário na Sidebar */
+        .sidebar .user-panel {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+            padding: 0.85rem 0.75rem !important;
+            margin: 0.5rem 0.5rem 1rem 0.5rem !important;
+            border-radius: 0.75rem !important;
+            background-color: rgba(255, 255, 255, 0.03) !important;
+        }
+
+        .sidebar .user-panel .image img {
+            border-radius: 9999px !important;
+            box-shadow: 0 0 0 2px rgba(31, 94, 219, 0.4) !important;
+        }
+
+        .sidebar .user-panel .info a {
+            font-weight: 600 !important;
+            color: #f8fafc !important;
+            font-size: 0.875rem !important;
+            transition: color 0.15s ease !important;
+        }
+
+        .sidebar .user-panel .info a:hover {
+            color: #60a5fa !important;
+        }
+
+        /* Seções e Cabeçalhos do Menu */
+        .nav-sidebar .nav-header {
+            font-size: 0.6875rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+            color: #64748b !important;
+            padding: 1.15rem 1rem 0.45rem 1rem !important;
+        }
+
+        /* Links de Menu da Sidebar */
+        .nav-sidebar .nav-item .nav-link {
+            border-radius: 0.625rem !important;
+            margin: 3px 10px !important;
+            padding: 0.6rem 0.85rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            color: #94a3b8 !important;
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .nav-sidebar .nav-item .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.07) !important;
             color: #ffffff !important;
-            box-shadow: 0 4px 14px rgba(31, 94, 219, 0.35) !important;
+            transform: translateX(2px) !important;
+        }
+
+        .nav-sidebar .nav-link.active {
+            background: linear-gradient(135deg, #1F5EDB 0%, #177FD6 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(31, 94, 219, 0.38) !important;
+            font-weight: 600 !important;
+            transform: none !important;
+        }
+
+        .nav-sidebar .nav-link > .nav-icon {
+            font-size: 1rem !important;
+            width: 1.5rem !important;
+            margin-right: 0.55rem !important;
+            text-align: center !important;
+            opacity: 0.9 !important;
+        }
+
+        /* Submenus com Guia Visual Discreta */
+        .nav-sidebar .nav-treeview {
+            border-left: 2px solid rgba(255, 255, 255, 0.08) !important;
+            margin-left: 1.65rem !important;
+            padding-left: 0.25rem !important;
+        }
+
+        .nav-sidebar .nav-treeview > .nav-item > .nav-link {
+            font-size: 0.8125rem !important;
+            padding: 0.45rem 0.75rem !important;
+            margin: 2px 6px !important;
+            color: #94a3b8 !important;
+            border-radius: 0.5rem !important;
+        }
+
+        .nav-sidebar .nav-treeview > .nav-item > .nav-link:hover {
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .nav-sidebar .nav-treeview > .nav-item > .nav-link.active {
+            background: rgba(31, 94, 219, 0.22) !important;
+            color: #60a5fa !important;
+            box-shadow: none !important;
             font-weight: 600 !important;
         }
 
-        /* ─── 9. Breadcrumb Estilo Minimalista ─── */
+        /* ─── 10. Content-Header & Breadcrumb Modernos ─── */
+        .content-header {
+            padding: 1.15rem 0 0.85rem 0 !important;
+        }
+
+        .content-header h1,
+        .content-header h1.m-0 {
+            font-size: 1.5rem !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.025em !important;
+            color: #0f172a !important;
+            margin: 0 !important;
+        }
+
+        .dark-mode .content-header h1,
+        .dark-mode .content-header h1.m-0 {
+            color: #f8fafc !important;
+        }
+
         .breadcrumb {
             background-color: transparent !important;
             padding: 0 !important;
             font-size: 0.8125rem !important;
             font-weight: 500 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .breadcrumb-item a {
+            color: #64748b !important;
+            text-decoration: none !important;
+            transition: color 0.15s ease !important;
+        }
+
+        .breadcrumb-item a:hover {
+            color: #1F5EDB !important;
+        }
+
+        .dark-mode .breadcrumb-item a {
+            color: #94a3b8 !important;
+        }
+
+        .dark-mode .breadcrumb-item a:hover {
+            color: #60a5fa !important;
+        }
+
+        .breadcrumb-item.active {
+            color: #0f172a !important;
+            font-weight: 600 !important;
+        }
+
+        .dark-mode .breadcrumb-item.active {
+            color: #f1f5f9 !important;
         }
 
         .breadcrumb-item + .breadcrumb-item::before {
             content: "›" !important;
             font-size: 1.15em !important;
             line-height: 1 !important;
-            color: #94a3b8 !important;
+            color: #cbd5e1 !important;
             padding: 0 0.45rem !important;
         }
 
-        /* ─── 10. Paginação Arredondada ─── */
+        .dark-mode .breadcrumb-item + .breadcrumb-item::before {
+            color: #475569 !important;
+        }
+
+        /* ─── 11. Modais Estilo SaaS Moderno ─── */
+        .modal-backdrop {
+            background-color: rgba(15, 23, 42, 0.5) !important;
+            backdrop-filter: blur(4px) !important;
+            -webkit-backdrop-filter: blur(4px) !important;
+        }
+
+        .modal-content {
+            border-radius: 1rem !important;
+            border: 1px solid rgba(226, 232, 240, 0.9) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.18), 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
+            background-color: #ffffff !important;
+            overflow: hidden !important;
+        }
+
+        .dark-mode .modal-content {
+            background-color: #0f172a !important;
+            border: 1px solid rgba(51, 65, 85, 0.85) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .modal-header {
+            padding: 1.2rem 1.5rem !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            background-color: #ffffff !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+        }
+
+        .dark-mode .modal-header {
+            background-color: #0f172a !important;
+            border-bottom: 1px solid #1e293b !important;
+        }
+
+        .modal-header .modal-title {
+            font-size: 1.125rem !important;
+            font-weight: 700 !important;
+            color: #0f172a !important;
+            letter-spacing: -0.015em !important;
+        }
+
+        .dark-mode .modal-header .modal-title {
+            color: #f8fafc !important;
+        }
+
+        .modal-header .close {
+            width: 32px !important;
+            height: 32px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 0.5rem !important;
+            background-color: #f1f5f9 !important;
+            color: #64748b !important;
+            opacity: 1 !important;
+            border: none !important;
+            font-size: 1.25rem !important;
+            line-height: 1 !important;
+            padding: 0 !important;
+            margin: -0.25rem 0 -0.25rem auto !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .modal-header .close:hover {
+            background-color: #fee2e2 !important;
+            color: #ef4444 !important;
+            transform: scale(1.08) !important;
+        }
+
+        .dark-mode .modal-header .close {
+            background-color: #1e293b !important;
+            color: #94a3b8 !important;
+        }
+
+        .dark-mode .modal-header .close:hover {
+            background-color: rgba(239, 68, 68, 0.2) !important;
+            color: #fca5a5 !important;
+        }
+
+        .modal-body {
+            padding: 1.5rem !important;
+            color: #334155 !important;
+        }
+
+        .dark-mode .modal-body {
+            color: #cbd5e1 !important;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem !important;
+            border-top: 1px solid #f1f5f9 !important;
+            background-color: #f8fafc !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            gap: 0.5rem !important;
+        }
+
+        .dark-mode .modal-footer {
+            background-color: #0b1120 !important;
+            border-top: 1px solid #1e293b !important;
+        }
+
+        /* ─── 12. Footer Estilo SaaS Moderno ─── */
+        .main-footer {
+            background-color: #ffffff !important;
+            border-top: 1px solid #e2e8f0 !important;
+            color: #64748b !important;
+            font-size: 0.8125rem !important;
+            padding: 0.9rem 1.5rem !important;
+            transition: background-color 0.2s ease !important;
+        }
+
+        .main-footer a {
+            color: #1F5EDB !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+        }
+
+        .main-footer a:hover {
+            text-decoration: underline !important;
+        }
+
+        .dark-mode .main-footer {
+            background-color: #0f172a !important;
+            border-top: 1px solid #1e293b !important;
+            color: #94a3b8 !important;
+        }
+
+        .dark-mode .main-footer a {
+            color: #60a5fa !important;
+        }
+
+        /* ─── 13. Alertas Globais Modernos ─── */
+        .alert {
+            border-radius: 0.75rem !important;
+            border: 1px solid transparent !important;
+            padding: 0.85rem 1.15rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03) !important;
+        }
+
+        .alert-success {
+            background-color: #ecfdf5 !important;
+            border-color: #a7f3d0 !important;
+            color: #065f46 !important;
+        }
+
+        .alert-danger {
+            background-color: #fef2f2 !important;
+            border-color: #fecaca !important;
+            color: #991b1b !important;
+        }
+
+        .alert-warning {
+            background-color: #fffbeb !important;
+            border-color: #fde68a !important;
+            color: #92400e !important;
+        }
+
+        .alert-info {
+            background-color: #f0f9ff !important;
+            border-color: #bae6fd !important;
+            color: #075985 !important;
+        }
+
+        .dark-mode .alert-success {
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            color: #6ee7b7 !important;
+        }
+
+        .dark-mode .alert-danger {
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            border-color: rgba(239, 68, 68, 0.3) !important;
+            color: #fca5a5 !important;
+        }
+
+        .dark-mode .alert-warning {
+            background-color: rgba(245, 158, 11, 0.15) !important;
+            border-color: rgba(245, 158, 11, 0.3) !important;
+            color: #fcd34d !important;
+        }
+
+        .dark-mode .alert-info {
+            background-color: rgba(14, 165, 233, 0.15) !important;
+            border-color: rgba(14, 165, 233, 0.3) !important;
+            color: #7dd3fc !important;
+        }
+
+        /* ─── 14. Abas Modernas (Nav-Tabs & Nav-Pills) ─── */
+        .nav-tabs {
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        .dark-mode .nav-tabs {
+            border-bottom: 1px solid #334155 !important;
+        }
+
+        .nav-tabs .nav-link {
+            border: none !important;
+            border-bottom: 2px solid transparent !important;
+            color: #64748b !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+            padding: 0.65rem 1.15rem !important;
+            border-radius: 0 !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: #1F5EDB !important;
+            border-bottom-color: #cbd5e1 !important;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #1F5EDB !important;
+            border-bottom-color: #1F5EDB !important;
+            background-color: transparent !important;
+            font-weight: 700 !important;
+        }
+
+        .dark-mode .nav-tabs .nav-link {
+            color: #94a3b8 !important;
+        }
+
+        .dark-mode .nav-tabs .nav-link:hover {
+            color: #60a5fa !important;
+            border-bottom-color: #475569 !important;
+        }
+
+        .dark-mode .nav-tabs .nav-link.active {
+            color: #60a5fa !important;
+            border-bottom-color: #60a5fa !important;
+        }
+
+        .nav-pills .nav-link {
+            border-radius: 0.625rem !important;
+            padding: 0.5rem 1rem !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+            color: #475569 !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .nav-pills .nav-link:hover {
+            background-color: rgba(0, 0, 0, 0.04) !important;
+            color: #1F5EDB !important;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #1F5EDB !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(31, 94, 219, 0.28) !important;
+        }
+
+        /* ─── 15. Cards de Métricas (Small-Boxes & Info-Boxes) ─── */
+        .small-box {
+            border-radius: 1rem !important;
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.05) !important;
+            overflow: hidden !important;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .small-box:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 10px 24px 0 rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .small-box .inner {
+            padding: 1.25rem !important;
+        }
+
+        .small-box .inner h3 {
+            font-weight: 800 !important;
+            letter-spacing: -0.03em !important;
+            font-size: 2rem !important;
+        }
+
+        .small-box .inner p {
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            opacity: 0.9 !important;
+        }
+
+        .small-box-footer {
+            background-color: rgba(0, 0, 0, 0.1) !important;
+            padding: 0.45rem 1rem !important;
+            font-weight: 600 !important;
+            font-size: 0.8125rem !important;
+            letter-spacing: 0.01em !important;
+            transition: background-color 0.15s ease !important;
+        }
+
+        .small-box-footer:hover {
+            background-color: rgba(0, 0, 0, 0.16) !important;
+        }
+
+        .info-box {
+            border-radius: 1rem !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
+            border: 1px solid #e2e8f0 !important;
+            overflow: hidden !important;
+        }
+
+        .dark-mode .info-box {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        /* ─── 16. SweetAlert2 e Notificações Padronizadas ─── */
+        .swal2-popup {
+            border-radius: 1.25rem !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            padding: 1.75rem !important;
+            border: 1px solid rgba(226, 232, 240, 0.8) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        .dark-mode .swal2-popup {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+            border-color: #334155 !important;
+        }
+
+        .swal2-title {
+            font-weight: 700 !important;
+            font-size: 1.25rem !important;
+            color: #0f172a !important;
+        }
+
+        .dark-mode .swal2-title {
+            color: #f8fafc !important;
+        }
+
+        .swal2-styled.swal2-confirm {
+            border-radius: 0.625rem !important;
+            font-weight: 600 !important;
+            padding: 0.65rem 1.4rem !important;
+            background-color: #1F5EDB !important;
+            box-shadow: 0 4px 12px rgba(31, 94, 219, 0.3) !important;
+        }
+
+        .swal2-styled.swal2-cancel {
+            border-radius: 0.625rem !important;
+            font-weight: 600 !important;
+            padding: 0.65rem 1.4rem !important;
+            background-color: #64748b !important;
+        }
+
+        #toast-container > div {
+            border-radius: 0.75rem !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15) !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            opacity: 0.98 !important;
+        }
+
+        /* ─── 17. Barras de Rolagem Universais Discretas ─── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark-mode ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        .dark-mode ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* ─── 18. Paginação Arredondada ─── */
         .pagination .page-item .page-link {
             border-radius: 0.5rem !important;
             margin: 0 2px !important;

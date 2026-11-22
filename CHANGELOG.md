@@ -1,6 +1,14 @@
 # CHANGELOG - SOMOS UNN
 
-## [2026-11-22] - feat(admin): design system moderno react-like e padronização universal de campos
+## [2026-11-22] - feat(admin): padronização global do sidebar, navbar, footer, header, modal e componentes
+
+- **Padronização Abrangente e Profunda do Painel `/admin` (`resources/views/admin/layouts/app.blade.php`):**
+  - **Sidebar:** Fundo escuro contemporâneo (`#111827` / `#0a0f1d`), header do logotipo com divisória sutil, user panel com borda translúcida e aro no avatar, itens de navegação em cápsula com padding confortável, item ativo com gradiente UNN (`#1F5EDB` -> `#177FD6`) e elevação `box-shadow: 0 4px 14px rgba(31, 94, 219, 0.38)`, submenus (treeview) com guia vertical discreta estilo SaaS, cabeçalhos de seção em caixa alta e scrollbar ultrafina.
+  - **Navbar:** Efeito glassmorphism translúcido (`backdrop-filter: blur(14px)`), botões de ação e ícones padronizados (chat, câmera rápida, notificações, tema, sliders), badges de contagem com aro de contraste sem quebrar layout, botão "Ver site" no estilo tag pill moderna, e dropdowns de mensagens/notificações com cantos arredondados de 16px, sombras macias e separadores elegantes.
+  - **Header / Content-Header:** Título da página destacado com tipografia `font-weight: 800` e kerning limpo (`-0.025em`), integrado a breadcrumbs minimalistas transparentes com separador `›` sem caixas cinzas pesadas.
+  - **Modais:** Backdrop com desfoque de fundo (`backdrop-filter: blur(4px)`), container modal com cantos arredondados modernos (16px), sombras profundas, cabeçalho limpo com botão fechar circular estilizado (com efeito de rotação e cor suave no hover), corpo com espaçamento harmonioso e rodapé com botões de ação espaçados.
+  - **Footer:** Rodapé leve com borda superior sutil, tipografia moderna de 0.8125rem, links azuis UNN e versão alinhada de forma limpa.
+  - **Componentes e Funções Globais:** Alertas estilizados em tons pastéis com alto contraste de texto, abas `nav-tabs` com linha indicadora ativa azul UNN sem caixas rígidas, `nav-pills` em cápsula moderna, cards de métricas (`small-box` e `info-box`) com hover e elevação suaves, modais de confirmação SweetAlert2 e toasts do Toastr perfeitamente integrados à mesma família tipográfica Inter e paleta de cores, e scrollbars universais discretas para todo o sistema.
 
 - **Camada Visual Moderna React-like para `/admin` (`resources/views/admin/layouts/app.blade.php`):**
   - Implementado Design System moderno no painel `/admin` inspirado na estética de aplicações SaaS contemporâneas em React, preservando 100% da compatibilidade com Blade, AdminLTE 3 e scripts jQuery existentes sem quebrar nenhuma das views ou rotas.
