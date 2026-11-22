@@ -79,6 +79,12 @@ class SecurityHeadersMiddleware
             'https://unpkg.com',
             'https://gateway.sumup.com',
             'https://api.sumup.com',
+            'https://static.cloudflareinsights.com',
+            'https://pagead2.googlesyndication.com',
+            'https://googleads.g.doubleclick.net',
+            'https://tpc.googlesyndication.com',
+            'https://ep1.adtrafficquality.google',
+            'https://ep2.adtrafficquality.google',
         ],
         'style-src' => [
             'https://cdn.jsdelivr.net',
@@ -86,6 +92,7 @@ class SecurityHeadersMiddleware
             'https://cdn.datatables.net',
             'https://fonts.googleapis.com',
             'https://unpkg.com',
+            'https://pagead2.googlesyndication.com',
         ],
         'img-src' => [
             'data:',
@@ -114,6 +121,11 @@ class SecurityHeadersMiddleware
             'https://api.sumup.com',
             'https://www.openstreetmap.org',
             'https://maps.google.com',
+            'https://googleads.g.doubleclick.net',
+            'https://tpc.googlesyndication.com',
+            'https://ep1.adtrafficquality.google',
+            'https://ep2.adtrafficquality.google',
+            'https://www.google.com',
         ],
         // media-src cobre <video src="blob:...">/<audio src="blob:...">
         // criados via URL.createObjectURL() em previews de upload, alem de
