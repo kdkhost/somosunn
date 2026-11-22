@@ -16,7 +16,7 @@
         <div class="form-group">
             <label>Texto do badge <small class="text-muted">(etiqueta acima do título)</small></label>
             <input type="text" name="hero_badge" class="form-control"
-                value="{{ old('hero_badge', $data['hero_badge'] ?? '') }}" placeholder="Carreiras &amp; Oportunidades">
+                value="{{ old('hero_badge', $data['hero_badge'] ?? '') }}" placeholder="Carreiras & Oportunidades">
         </div>
         <div class="form-group">
             <label>Título principal</label>

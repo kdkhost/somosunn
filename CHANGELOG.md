@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.5.2] - 2026-11-22 - fix(vagas): eliminação de duplo escape html em títulos e badges do sistema
+
+- **Auditoria e Correção de Entidades HTML no Blade (`resources/views/oportunidades.blade.php`, `resources/views/admin/pages/partials/vagas-abertas.blade.php`):**
+  - **Eliminação de Duplo Escape:** Corrigido o badge do hero que exibia o texto literal `Carreiras &amp; Oportunidades` causado por `&amp;` dentro de interpolação `{{ ... }}` do Blade (que aplica `htmlspecialchars()` automaticamente).
+  - **Decodificação Preventiva com Fallback Limpo:** Implementado `html_entity_decode(..., ENT_QUOTES, 'UTF-8')` no `hero_badge` e `hero_title`, garantindo que mesmo que dados legados tenham sido salvos com entidades HTML codificadas pelo formulário administrativo, a exibição no site público sempre renderize o caractere comercial `&` correto e limpo (`Carreiras & Oportunidades`).
+  - **Varredura Global no Sistema:** Executada auditoria automatizada em todas as views Blade (`.blade.php`) e controllers da aplicação para garantir que nenhuma outra tag `{{ ... }}` possua entidades HTML codificadas indevidamente.
+  - **Placeholder Administrativo:** Atualizado o campo `hero_badge` no painel `/admin` para usar o texto literal `Carreiras & Oportunidades`.
+
 ## [2.5.1] - 2026-11-22 - fix(vagas): correção de contraste, z-index, sobreposição e abertura inteligente do dropdown
 
 - **Ajustes de Visibilidade e Stacking Context no Dropdown de Vagas (`resources/views/oportunidades.blade.php`):**
