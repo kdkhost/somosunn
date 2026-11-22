@@ -12,7 +12,8 @@ return [
         ],
         'Filas' => [
             'emails:process-queue' => 'Processar fila de e-mails',
-            'queue:work --stop-when-empty --tries=3 --timeout=120' => 'Processar fila geral',
+            'queue:work --queue=webhooks,uploads,notifications,default --stop-when-empty --tries=3 --timeout=120' => 'Processar filas (webhooks, uploads, notificacoes e geral)',
+            'queue:work --stop-when-empty --tries=3 --timeout=120' => 'Processar fila geral (legado)',
         ],
         'Pedidos e Vendas' => [
             'sumup:reconcile-pending --limit=100' => 'Conciliar pedidos SumUp pendentes',
@@ -49,7 +50,7 @@ return [
     'defaults' => [
         ['command' => 'cron:heartbeat', 'frequency' => '* * * * *', 'active' => true],
         ['command' => 'emails:process-queue', 'frequency' => '* * * * *', 'active' => true],
-        ['command' => 'queue:work --stop-when-empty --tries=3 --timeout=120', 'frequency' => '* * * * *', 'active' => true],
+        ['command' => 'queue:work --queue=webhooks,uploads,notifications,default --stop-when-empty --tries=3 --timeout=120', 'frequency' => '* * * * *', 'active' => true],
         ['command' => 'lessons:process-pending-videos --limit=2', 'frequency' => '* * * * *', 'active' => true],
         ['command' => 'magazines:import-manchete', 'frequency' => '30 2 * * *', 'active' => true],
         ['command' => 'points:award-top-ranking', 'frequency' => '5 0 * * 0', 'active' => true],

@@ -2,6 +2,8 @@
 
 ## [2026-11-21] - perf/arch: auditoria, desmembramento por subdominios, performance e padroes pt-BR
 
+- **Central de Cron e Filas (`config/cron-panel.php`, `database/migrations/2026_11_22_000001_update_cron_queue_worker_priorities.php`):**
+  - Worker agendado atualizado para `--queue=webhooks,uploads,notifications,default --stop-when-empty --tries=3 --timeout=120`, garantindo processamento automatico de webhooks assincronos (`webhooks`), midias (`uploads`) e notificacoes (`notifications`) pela linha unica de Cron.
 - **Subdominios, CDN cookieless e cache publico de borda (`config/domains.php`, `app/Support/DomainManager.php`, `app/Helpers/AssetHelpers.php`, `app/Http/Kernel.php`, `app/Providers/RouteServiceProvider.php`, `routes/public.php`, `routes/app.php`, `routes/webhooks.php`):**
   - Priorizacao de `EnforceSubdomainRouting` antes de `Authenticate` em `app/Http/Kernel.php` (`$middlewarePriority`) garantindo redirecionamento direto `/admin` e `/painel` -> `https://app.somosunn.com.br/...` sem perda de `url.intended`.
   - Desmembramento das rotas em `routes/public.php` (grupo `web.public` com `StartPublicSession` usando `NullSessionHandler` e `PublicCacheableResponse` sem `Set-Cookie` para visitantes anonimos em `somosunn.com.br`), `routes/app.php` (`/admin`, `/painel`, autenticacao, checkout e acoes autenticadas em `app.somosunn.com.br`) e `routes/webhooks.php` (grupo `webhook` em `api.somosunn.com.br`, mantendo retrocompatibilidade quando o roteamento estrito esta desligado).
