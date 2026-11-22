@@ -1,5 +1,15 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - feat(admin/chat): remodelação completa do chat administrativo estilo react saas
+
+- **Remodelação Moderna do Chat Administrativo (`resources/views/admin/chat/show.blade.php`, `resources/views/admin/chat/index.blade.php`):**
+  - **Interface inspirada em React/SaaS moderno:** Reformulada a página `/admin/chat/{id}` e o index `/admin/chat` substituindo o layout legado AdminLTE Direct-Chat por uma interface limpa de duas colunas em estilo React SPA contemporânea.
+  - **Balões de mensagem refinados:** Mensagens do usuário com degradê azul UNN (`#1F5EDB` -> `#177FD6`) e cantos arredondados assimétricos (`1.15rem 1.15rem 0.25rem 1.15rem`), e mensagens do interlocutor em cartão branco/dark com borda sutil e sombras suaves.
+  - **Barra lateral de conversas:** Lista lateral com busca em tempo real (`conversationSearchInput`), avatares com ponto indicador online, prévias de mensagem e badges de não lidas estilo pill arredondado.
+  - **Cabeçalho de atendimento ativo:** Avatar do interlocutor, indicador de presença, identificação do papel do usuário (`Superadmin`, `Administrador`, `Membro UNN`), atalho rápido para o perfil do usuário e botão de atualização manual de mensagens.
+  - **Barra de envio e atalhos:** Input de 44px com anel de foco azul UNN, botão com gradiente e suporte nativo ao envio com `Enter` (sem quebra indesejada com Shift+Enter).
+  - **Responsividade total:** No mobile, alternância fluida entre a lista de conversas e o chat individual com botão voltar dedicado.
+
 ## [2026-11-22] - fix(sidebar): restauração confiável do logotipo ao reabrir a sidebar
 
 - **Alternância Infalível entre Logo e Favicon (`resources/views/admin/partials/sidebar.blade.php`, `resources/views/admin/layouts/app.blade.php`):**

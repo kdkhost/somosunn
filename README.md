@@ -1,5 +1,7 @@
 # UNN — Plataforma de Networking
 
+- **Remodelação do Chat Administrativo com Design React-like (22/11):** Reformulada a experiência de atendimento e chat em `/admin/chat/{id}` e `/admin/chat`, entregando layout SaaS moderno de duas colunas, busca em tempo real de conversas, balões de mensagem estilizados com gradiente UNN, atalhos de envio via teclado e compatibilidade mobile total.
+
 - **Correção da Alternância de Logotipo/Favicon no Sidebar (22/11):** Corrigido o comportamento da barra lateral para garantir que o logotipo completo da UNN retorne imediatamente ao reabrir o menu (desktop e mobile), eliminando classes conflitantes e estabelecendo controle CSS determinístico nos estados expandido, recolhido e hover.
 
 - **Otimização de Cards de Métricas e Desobstrução do Chat Flutuante no Mobile (22/11):** Corrigido o redimensionamento de valores monetários nos cards de KPI do dashboard para telas estreitas (eliminando cortes de dígitos em valores como "R$ 370,00"), ocultando ícones decorativos de fundo no mobile e adicionando espaçamento inferior de rolagem para que o botão flutuante de chat não encubra botões de ação finais.
