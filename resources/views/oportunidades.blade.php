@@ -110,10 +110,10 @@
     <div class="min-h-screen bg-slate-50 overflow-hidden">
 
         <!-- Hero Section - IDÊNTICO AO DE EVENTOS (LIMPO E CLARO) -->
-        <section class="unn-events-hero relative overflow-hidden">
+        <section class="unn-events-hero relative">
             <div class="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/20 pointer-events-none"></div>
 
-            <div class="px-4 md:px-12 lg:px-24 pt-10 md:pt-14 pb-14 md:pb-20 relative">
+            <div class="px-4 md:px-12 lg:px-24 pt-10 md:pt-14 pb-32 md:pb-48 relative z-30">
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center">
                         <span
@@ -128,7 +128,7 @@
                         </p>
 
                         <!-- Search/Filter Bar -->
-                        <div class="max-w-4xl mx-auto bg-white/10 border border-white/20 backdrop-blur-md p-3 md:p-4 rounded-3xl"
+                        <div class="max-w-4xl mx-auto bg-white/10 border border-white/20 backdrop-blur-md p-3 md:p-4 rounded-3xl relative z-40"
                             role="search" aria-label="Filtros de vagas">
                             <form method="GET" action="" class="flex flex-col gap-3">
                                 {{-- Linha 1: Busca principal + Local + Buscar --}}
@@ -167,11 +167,11 @@
                                             class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 text-sm font-medium placeholder:text-slate-400">
                                     </div>
                                     {{-- Custom Dropdown Estilizado (Substitui select nativo sem estilo) --}}
-                                    <div class="w-full md:w-56 relative select-none" id="custom-tipo-container">
+                                    <div class="w-full md:w-56 relative select-none z-50" id="custom-tipo-container">
                                         <input type="hidden" name="tipo" id="filtro-tipo" value="{{ request('tipo') }}">
                                         
                                         <button type="button" id="custom-tipo-trigger"
-                                            class="filter-input w-full h-12 flex items-center justify-between px-5 bg-white/90 hover:bg-white text-left transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+                                            class="filter-input w-full h-12 flex items-center justify-between px-5 bg-white hover:bg-slate-50 text-left transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer shadow-sm"
                                             aria-haspopup="listbox" aria-expanded="false" aria-label="Filtrar por tipo de vaga">
                                             <span class="flex items-center min-w-0 pr-2">
                                                 <i class="fas fa-layer-group text-slate-400 mr-2.5 text-xs shrink-0" aria-hidden="true"></i>
@@ -184,34 +184,33 @@
 
                                         {{-- Menu Dropdown Flutuante Estilo React / Radix / Shadcn UI --}}
                                         <div id="custom-tipo-menu"
-                                            class="hidden absolute top-full mt-2 left-0 right-0 w-full bg-white/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 py-2 z-50 overflow-hidden transform opacity-0 scale-95 transition-all duration-200 ease-out origin-top text-left"
-                                            style="box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);"
+                                            class="hidden absolute top-full mt-2 left-0 right-0 w-full bg-white rounded-2xl border border-slate-300 py-2.5 z-[100] overflow-hidden transform opacity-0 scale-95 transition-all duration-200 ease-out origin-top text-left shadow-[0_25px_60px_-10px_rgba(15,23,42,0.4),0_0_0_1px_rgba(0,0,0,0.08)]"
                                             role="listbox">
                                             <div class="max-h-60 overflow-y-auto custom-select-scrollbar px-1.5 space-y-1">
-                                                <div class="custom-tipo-opt px-3.5 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors flex items-center justify-between {{ !request('tipo') ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}"
+                                                <div class="custom-tipo-opt px-3.5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all flex items-center justify-between {{ !request('tipo') ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-800 hover:bg-blue-50 hover:text-blue-700' }}"
                                                     data-value=""
                                                     data-label="Tipo de vaga"
                                                     role="option"
                                                     aria-selected="{{ !request('tipo') ? 'true' : 'false' }}">
                                                     <span class="flex items-center gap-2">
-                                                        <span class="w-1.5 h-1.5 rounded-full {{ !request('tipo') ? 'bg-blue-600' : 'bg-transparent' }}"></span>
+                                                        <span class="opt-dot w-2 h-2 rounded-full {{ !request('tipo') ? 'bg-white' : 'bg-slate-300' }}"></span>
                                                         <span>Todos os tipos</span>
                                                     </span>
-                                                    <i class="fas fa-check text-blue-600 text-xs check-icon {{ !request('tipo') ? '' : 'hidden' }}"></i>
+                                                    <i class="fas fa-check text-xs check-icon {{ !request('tipo') ? 'text-white' : 'hidden' }}"></i>
                                                 </div>
 
                                                 @foreach($tiposDisponiveis as $tipo)
                                                     @php $isSelected = request('tipo') == $tipo; @endphp
-                                                    <div class="custom-tipo-opt px-3.5 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors flex items-center justify-between {{ $isSelected ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}"
+                                                    <div class="custom-tipo-opt px-3.5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all flex items-center justify-between {{ $isSelected ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-800 hover:bg-blue-50 hover:text-blue-700' }}"
                                                         data-value="{{ $tipo }}"
                                                         data-label="{{ $tipo }}"
                                                         role="option"
                                                         aria-selected="{{ $isSelected ? 'true' : 'false' }}">
                                                         <span class="flex items-center gap-2">
-                                                            <span class="w-1.5 h-1.5 rounded-full {{ $isSelected ? 'bg-blue-600' : 'bg-transparent' }}"></span>
+                                                            <span class="opt-dot w-2 h-2 rounded-full {{ $isSelected ? 'bg-white' : 'bg-slate-300' }}"></span>
                                                             <span class="truncate">{{ $tipo }}</span>
                                                         </span>
-                                                        <i class="fas fa-check text-blue-600 text-xs check-icon {{ $isSelected ? '' : 'hidden' }}"></i>
+                                                        <i class="fas fa-check text-xs check-icon {{ $isSelected ? 'text-white' : 'hidden' }}"></i>
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -232,7 +231,7 @@
                 </div>
             </div>
             <!-- Wave divider Limpo Branco -->
-            <div class="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-[0]">
+            <div class="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-[0] pointer-events-none z-10">
                 <svg class="relative block w-[calc(100%+1.3px)] h-[50px] md:h-[80px]" data-name="Layer 1"
                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                     <path
@@ -580,6 +579,18 @@
 
                     const openDropdown = () => {
                         isOpen = true;
+                        
+                        // Ajustar posicionamento inteligente (para cima ou para baixo)
+                        const rect = trigger.getBoundingClientRect();
+                        const spaceBelow = window.innerHeight - rect.bottom;
+                        if (spaceBelow < 250 && rect.top > 250) {
+                            menu.classList.remove('top-full', 'mt-2', 'origin-top');
+                            menu.classList.add('bottom-full', 'mb-2', 'origin-bottom');
+                        } else {
+                            menu.classList.remove('bottom-full', 'mb-2', 'origin-bottom');
+                            menu.classList.add('top-full', 'mt-2', 'origin-top');
+                        }
+
                         menu.classList.remove('hidden');
                         requestAnimationFrame(() => {
                             menu.classList.remove('opacity-0', 'scale-95');
@@ -623,24 +634,27 @@
                                 label.classList.add('text-slate-500');
                             }
 
-                            // Atualizar seleção visual
+                            // Atualizar seleção visual com contraste absoluto
                             options.forEach(o => {
                                 const isCurrent = o === opt;
                                 o.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
-                                o.classList.toggle('bg-blue-50', isCurrent);
-                                o.classList.toggle('text-blue-700', isCurrent);
-                                o.classList.toggle('font-semibold', isCurrent);
-                                o.classList.toggle('text-slate-700', !isCurrent);
+                                o.classList.toggle('bg-blue-600', isCurrent);
+                                o.classList.toggle('text-white', isCurrent);
+                                o.classList.toggle('shadow-sm', isCurrent);
+                                o.classList.toggle('text-slate-800', !isCurrent);
+                                o.classList.toggle('hover:bg-blue-50', !isCurrent);
+                                o.classList.toggle('hover:text-blue-700', !isCurrent);
                                 
-                                const dot = o.querySelector('span > span');
+                                const dot = o.querySelector('.opt-dot');
                                 if (dot) {
-                                    dot.classList.toggle('bg-blue-600', isCurrent);
-                                    dot.classList.toggle('bg-transparent', !isCurrent);
+                                    dot.classList.toggle('bg-white', isCurrent);
+                                    dot.classList.toggle('bg-slate-300', !isCurrent);
                                 }
 
                                 const check = o.querySelector('.check-icon');
                                 if (check) {
                                     check.classList.toggle('hidden', !isCurrent);
+                                    check.classList.toggle('text-white', isCurrent);
                                 }
                             });
 

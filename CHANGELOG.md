@@ -1,5 +1,14 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.5.1] - 2026-11-22 - fix(vagas): correção de contraste, z-index, sobreposição e abertura inteligente do dropdown
+
+- **Ajustes de Visibilidade e Stacking Context no Dropdown de Vagas (`resources/views/oportunidades.blade.php`):**
+  - **Eliminação de Corte por Overflow:** Removido o `overflow-hidden` rígido da section `.unn-events-hero`, permitindo que o menu suspenso flutue livremente sobre qualquer elemento adjacente.
+  - **Hierarquia de Camadas (Z-Index):** Definido `z-[100]` no menu suspenso, `z-40` no container do formulário, `z-30` no container do hero e `pointer-events-none z-10` na onda divisória (*wave divider*), impedindo que a curva branca corte ou cubra o dropdown.
+  - **Espaçamento e Respiro Visual:** Aumentado o padding inferior do hero para `pb-32 md:pb-48`, garantindo espaço vertical de mais de 160px para que o dropdown abra com total folga e elegância.
+  - **Abertura Inteligente (Viewport Aware):** O script agora afere dinamicamente a distância da tela com `getBoundingClientRect()`: caso o espaço inferior seja menor que 250px, ele abre automaticamente para cima (`bottom-full mb-2`), prevenindo cortes em qualquer resolução de tela ou rolagem.
+  - **Contraste Absoluto e Acabamento Premium:** Fundo branco 100% opaco (`bg-white`), borda nítida `border-slate-300`, sombra proeminente de modal `shadow-2xl`, item selecionado com fundo azul UNN sólido (`bg-blue-600`), texto branco em negrito e ícone de checkmark branco.
+
 ## [2.5.0] - 2026-11-22 - feat(core): sistema centralizado de versionamento e exibição dinâmica nos painéis
 
 - **Controle Centralizado e Dinâmico de Versão (`VERSION`, `config/app.php`, `resources/views/admin/partials/footer.blade.php`, `resources/views/panel/partials/sidebar.blade.php`):**
