@@ -345,6 +345,17 @@ class Plan extends Model
         'period_settings',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            \App\Support\AdaptiveQueryCache::forget('plans:available_public');
+        });
+
+        static::deleted(function () {
+            \App\Support\AdaptiveQueryCache::forget('plans:available_public');
+        });
+    }
+
     protected $casts = [
         'is_featured' => 'boolean',
         'highlight_legacy' => 'boolean',

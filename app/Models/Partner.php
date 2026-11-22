@@ -23,6 +23,17 @@ class Partner extends Model
         'order',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            \App\Support\AdaptiveQueryCache::forget('partners:active_names');
+        });
+
+        static::deleted(function () {
+            \App\Support\AdaptiveQueryCache::forget('partners:active_names');
+        });
+    }
+
     protected $casts = [
         'active' => 'boolean',
         'order' => 'integer',

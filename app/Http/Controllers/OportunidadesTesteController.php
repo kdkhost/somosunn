@@ -40,14 +40,18 @@ class OportunidadesTesteController extends Controller
             $limit = (int) \App\Models\Setting::get('frontend_item_limit', 9);
             $vagas = $query->orderByDesc('created_at')->paginate($limit > 0 ? $limit : 9);
 
-            // Nomes de empresas parceiras (lowercase para comparação case-insensitive)
-            $partnerNames = Partner::active()->pluck('name')
-                ->map(fn ($n) => mb_strtolower(trim($n)))->all();
+            // Nomes de empresas parceiras com microcache adaptativo inteligente
+            $partnerNames = \App\Support\AdaptiveQueryCache::remember('partners:active_names', function () {
+                return Partner::active()->pluck('name')
+                    ->map(fn ($n) => mb_strtolower(trim($n)))->all();
+            });
 
-            // Tipos distintos para o filtro
-            $tiposDisponiveis = JobVacancy::where('is_active', true)
-                ->whereNotNull('type')->where('type', '!=', '')
-                ->distinct()->orderBy('type')->pluck('type');
+            // Tipos distintos para o filtro com microcache adaptativo
+            $tiposDisponiveis = \App\Support\AdaptiveQueryCache::remember('jobs:distinct_types', function () {
+                return JobVacancy::where('is_active', true)
+                    ->whereNotNull('type')->where('type', '!=', '')
+                    ->distinct()->orderBy('type')->pluck('type');
+            });
 
             $pageData = Page::dataBySlug('vagas-abertas');
 

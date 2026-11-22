@@ -30,6 +30,17 @@ class JobVacancy extends Model
         'expires_at',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            \App\Support\AdaptiveQueryCache::forget('jobs:distinct_types');
+        });
+
+        static::deleted(function () {
+            \App\Support\AdaptiveQueryCache::forget('jobs:distinct_types');
+        });
+    }
+
     protected $casts = [
         'is_active' => 'boolean',
         'is_demo' => 'boolean',

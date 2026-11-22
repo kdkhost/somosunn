@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Support\DomainManager;
+use App\Support\TrafficLoadDetector;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,17 +45,21 @@ class PublicCacheableResponse
                 }
             }
 
-            $maxAge = max(60, (int) config('domains.public_cache_max_age', 300));
-            $sMaxAge = max($maxAge, (int) config('domains.public_cache_s_maxage', 600));
+            $policy = TrafficLoadDetector::getAdaptivePolicy();
+            $maxAge = max(60, (int) ($policy['edge_max_age'] ?? config('domains.public_cache_max_age', 300)));
+            $sMaxAge = max($maxAge, (int) ($policy['edge_s_maxage'] ?? config('domains.public_cache_s_maxage', 600)));
+            $staleWhileRevalidate = (int) ($policy['edge_stale_while_revalidate'] ?? 60);
+            $staleIfError = (int) ($policy['edge_stale_if_error'] ?? 300);
 
             $response->headers->remove('Pragma');
             $response->headers->remove('Expires');
             $response->headers->set(
                 'Cache-Control',
-                "public, max-age={$maxAge}, s-maxage={$sMaxAge}, stale-while-revalidate=60"
+                "public, max-age={$maxAge}, s-maxage={$sMaxAge}, stale-while-revalidate={$staleWhileRevalidate}, stale-if-error={$staleIfError}"
             );
             $response->headers->set('Vary', 'Accept-Encoding');
             $response->headers->set('X-UNN-Cache', 'public-edge');
+            $response->headers->set('X-UNN-Edge-Scaling', $policy['level']);
 
             return $response;
         }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\AdaptiveQueryCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
@@ -22,6 +23,17 @@ class Page extends Model
         'data' => 'array',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(function (self $page) {
+            AdaptiveQueryCache::forget("page:data:{$page->slug}");
+        });
+
+        static::deleted(function (self $page) {
+            AdaptiveQueryCache::forget("page:data:{$page->slug}");
+        });
+    }
+
     /**
      * Busca uma page pelo slug ou retorna null.
      */
@@ -35,13 +47,15 @@ class Page extends Model
     }
 
     /**
-     * Retorna os dados de uma página pelo slug sem quebrar se a tabela não existir.
+     * Retorna os dados de uma página pelo slug com microcache adaptativo inteligente.
      */
     public static function dataBySlug(string $slug, array $default = []): array
     {
-        $data = static::findBySlug($slug)?->data;
+        return AdaptiveQueryCache::remember("page:data:{$slug}", function () use ($slug, $default) {
+            $data = static::findBySlug($slug)?->data;
 
-        return is_array($data) ? $data : $default;
+            return is_array($data) ? $data : $default;
+        });
     }
 
     /**

@@ -147,19 +147,23 @@ class MemberController extends Controller
                 $query->latest();
             }
 
-            // Listas dinâmicas para os selects de filtros da página
-            $availableCities = User::whereNotNull('city')
-                ->where('city', '!=', '')
-                ->where('hide_profile', false)
-                ->distinct()
-                ->pluck('city')
-                ->filter()
-                ->sort()
-                ->values();
+            // Listas dinâmicas para os filtros da página com microcache adaptativo
+            $availableCities = \App\Support\AdaptiveQueryCache::remember('members:available_cities', function () {
+                return User::whereNotNull('city')
+                    ->where('city', '!=', '')
+                    ->where('hide_profile', false)
+                    ->distinct()
+                    ->pluck('city')
+                    ->filter()
+                    ->sort()
+                    ->values();
+            });
 
-            $availablePlans = Plan::where('is_active', true)
-                ->orderBy('price', 'asc')
-                ->get(['id', 'name', 'price', 'is_free']);
+            $availablePlans = \App\Support\AdaptiveQueryCache::remember('plans:available_public', function () {
+                return Plan::where('is_active', true)
+                    ->orderBy('price', 'asc')
+                    ->get(['id', 'name', 'price', 'is_free']);
+            });
 
             $members = $query->with('plan')
                 ->paginate(20)
