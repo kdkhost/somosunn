@@ -31,8 +31,10 @@ AddDefaultCharset UTF-8
     # expor arquivos do public sem /public na URL
     RewriteRule ^uploads/(.*)$ public/uploads/$1 [L,NC]
     RewriteRule ^img/(.*)$ public/img/$1 [L,NC]
+    RewriteRule ^css/(.*)$ public/css/$1 [L,NC]
+    RewriteRule ^js/(.*)$ public/js/$1 [L,NC]
     RewriteRule ^assets-dflip/(.*)$ public/assets-dflip/$1 [L,NC]
-    RewriteRule ^assets/admin/datatables/(.*)$ public/assets/admin/datatables/$1 [L,NC]
+    RewriteRule ^assets/(.*)$ public/assets/$1 [L,NC]
 
     # /storage: evita depender de symlink e serve uploads tanto do public/storage
     # quanto do storage/app/public (Laravel padrão) quando existirem.
@@ -69,4 +71,6 @@ AddDefaultCharset UTF-8
     ExpiresByType image/svg+xml "access plus 30 days"
     ExpiresByType image/jpeg "access plus 30 days"
     ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType font/woff2 "access plus 30 days"
 </IfModule>

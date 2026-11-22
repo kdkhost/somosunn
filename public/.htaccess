@@ -81,7 +81,7 @@ AddDefaultCharset UTF-8
     </FilesMatch>
     
     # Allow caching for vendor assets (CSS, JS, fonts, images)
-    <FilesMatch "\.(css|js|woff|woff2|ttf|eot|svg|jpg|jpeg|png|gif|ico)$">
+    <FilesMatch "\.(css|js|woff|woff2|ttf|eot|svg|jpg|jpeg|png|webp|gif|ico)$">
         Header set Cache-Control "max-age=604800, public"
     </FilesMatch>
     

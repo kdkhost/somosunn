@@ -22,8 +22,8 @@
   - Atualizacao do calendario de eventos em `/admin/events` para FullCalendar `6.1.15` (alinhado ao `/painel/admin/events`).
   - Conversao das 24 imagens raster `>200 KB` em `public/` para `.webp` (mantendo originais como fallback) com entrega WebP automatica em `UploadStorage::resolveLocalUrl()` e inclusao de `loading="lazy" decoding="async"` nas tags `<img>` aplicaveis.
   - Centralizacao de mascaras brasileiras (incluindo `mask-rg` / `data-mask="rg"`) e ViaCEP no 8o digito com foco automatico em `Numero` via `public/js/unn-masks.js`; eliminacao de `alert()`/`confirm()`/`prompt()` nativos restantes em favor de SweetAlert2 e Toastr; exibicao da barra `mobile-bottom-nav` apenas em PWA standalone (`display-mode: standalone`).
-- **Git e Deploy cPanel (`DEPLOY_CPANEL.md`, `.gitignore`, `vendor/composer/platform_check.php`):**
-  - Limpeza de `.ftpquota`, arquivos `.bak` e temporarios `vendor/composer/tmp-*.zip` rastreados; regeneracao do autoloader otimizado e atualizacao do guia `DEPLOY_CPANEL.md`.
+- **Git e Deploy cPanel (`DEPLOY_CPANEL.md`, `.gitignore`, `.htaccess`, `public/.htaccess`):**
+  - Limpeza de `.ftpquota`, arquivos `.bak` e temporarios `vendor/composer/tmp-*.zip` rastreados; adicao de `bootstrap/cache/.gitignore`, atualizacao do guia `DEPLOY_CPANEL.md` e liberacao de rewrites para `css/`, `js/` e `assets/` (alem de cache WebP/WOFF2) no `.htaccess` raiz e `public/.htaccess` para DocumentRoot em `public_html`.
 
 ## [2026-08-24] - fix(eventos): capas ausentes sem imagens quebradas
 
