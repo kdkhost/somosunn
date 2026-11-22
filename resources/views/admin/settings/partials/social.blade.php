@@ -47,6 +47,22 @@
 <div class="card-body">
     <h5 class="text-primary mb-3"><i class="fas fa-users mr-2"></i>Login Social</h5>
 
+    <!-- Toggle Geral de Ativação do Login Social -->
+    <div class="card card-outline card-primary mb-4">
+        <div class="card-body d-flex align-items-center justify-content-between py-3">
+            <div>
+                <h6 class="mb-1 font-weight-bold text-dark">Habilitar Login Social (Global)</h6>
+                <p class="text-muted small mb-0">Ativa ou desativa a exibição dos botões de login social nas telas de login e cadastro.</p>
+            </div>
+            <div class="custom-control custom-switch">
+                <input type="hidden" name="social_login_enabled" value="0">
+                <input type="checkbox" class="custom-control-input" id="social_login_enabled"
+                    name="social_login_enabled" value="1" {{ ($settings['social_login_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
+                <label class="custom-control-label font-weight-bold" for="social_login_enabled">Ativo</label>
+            </div>
+        </div>
+    </div>
+
     <div class="alert alert-info">
         <h6 class="mb-2"><i class="fas fa-info-circle mr-1"></i>Instrucoes rapidas</h6>
         <p class="mb-2">

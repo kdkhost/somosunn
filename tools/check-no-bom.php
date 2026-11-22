@@ -24,7 +24,9 @@ $skipDirs = [
     "vendor",
     "storage",
     "bootstrap" . DIRECTORY_SEPARATOR . "cache",
+    "graphify-out",
     "node_modules",
+    "public" . DIRECTORY_SEPARATOR . "uploads",
 ];
 
 $binaryExtensions = [

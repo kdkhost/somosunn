@@ -67,10 +67,10 @@
 
 @if(count($providers) > 0)
     <div {{ $attributes->merge(['class' => 'space-y-4']) }}>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 {{ count($providers) > 1 ? 'sm:grid-cols-2' : '' }} gap-3">
             @foreach($providers as $provider)
                 <a href="{{ route('social.redirect', ['provider' => $provider['key'], 'ref' => $referralCode !== '' ? $referralCode : null]) }}"
-                    class="inline-flex items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">
+                    class="inline-flex items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition w-full shadow-sm">
                     <i class="{{ $provider['icon'] }} {{ $provider['icon_class'] }}"></i>
                     <span>Continuar com {{ $provider['label'] }}</span>
                 </a>

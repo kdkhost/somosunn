@@ -51,6 +51,19 @@
         </div>
     </div>
 
+    <!-- Toggle Geral de Ativação do Login Social -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 flex items-center justify-between">
+        <div>
+            <h4 class="font-bold text-slate-800 dark:text-white">Habilitar Login Social (Global)</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Ativa ou desativa a exibicao dos botoes de login social nas telas de login e cadastro.</p>
+        </div>
+        <label for="social_login_enabled" class="relative inline-flex items-center cursor-pointer">
+            <input type="hidden" name="social_login_enabled" value="0">
+            <input type="checkbox" name="social_login_enabled" id="social_login_enabled" value="1" class="sr-only peer" {{ ($settings['social_login_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
+            <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+    </div>
+
     <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h4 class="font-bold text-slate-800 dark:text-white">Instrucoes e callback URL</h4>

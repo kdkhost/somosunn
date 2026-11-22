@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - fix(auth): restauração e configuração do login social com Google
+
+- Corrigida a ausência do switch global `social_login_enabled` nos formulários de configuração de Login Social de ambos os painéis (`/admin` e `/painel`).
+- Evitada a desativação acidental do login social ao salvar configurações administrativas na aba Social.
+- Reativada a configuração `social_login_enabled` no banco de dados e restaurada a exibição do botão de login do Google ("Continuar com Google") na tela de autenticação e no card lateral visual.
+- Aprimorado o layout do componente de autenticação social para manter alinhamento e proporção otimizados quando apenas um provedor social estiver ativo.
+
 ## [2026-11-21] - perf/arch: auditoria, desmembramento por subdominios, performance e padroes pt-BR
 
 - **Central de Cron e Filas (`config/cron-panel.php`, `database/migrations/2026_11_22_000001_update_cron_queue_worker_priorities.php`):**
