@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - fix(dashboard/mobile): auto-ajuste de valores monetários em cards e proteção de rolagem
+
+- **Ajuste Fino de Cards de Métricas (`small-box`) e Chat Flutuante (`resources/views/admin/layouts/app.blade.php`):**
+  - **Valores monetários sem corte no mobile:** Implementado redimensionamento inteligente de tipografia com `clamp()` e `1.25rem`/`1.1rem` para números em `.small-box .inner h3`, ocultando o ícone de fundo decorativo em telas mobile (`display: none`) e reduzindo paddings laterais para liberar 100% da largura útil do card, evitando que valores como "R$ 370,00" sejam cortados na borda direita.
+  - **Proteção contra sobreposição do botão de chat:** Adicionado espaçamento inferior generoso de `padding-bottom: 115px` no container da página (`.content-wrapper`, `#pjax-container`, `section.content`) em dispositivos móveis, garantindo que o usuário consiga rolar até o fim da tela e interagir com botões inferiores (como "Registrar Fotos") sem que sejam encobertos pelo botão fixo do widget de chat.
+  - **Dimensão e toque responsivo do chat:** Reduzido o botão flutuante de chat no mobile para 48px com sombra proporcional e posicionamento refinado.
+
 ## [2026-11-22] - fix(responsividade): blindagem universal contra quebra de layout mobile e botões de ação
 
 - **Correção e Blindagem de Responsividade no Mobile (`resources/views/admin/layouts/app.blade.php`, `resources/views/admin/events/list.blade.php`):**

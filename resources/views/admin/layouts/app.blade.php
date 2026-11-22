@@ -2391,8 +2391,13 @@
 
         .small-box .inner h3 {
             font-weight: 800 !important;
-            letter-spacing: -0.03em !important;
-            font-size: 2rem !important;
+            letter-spacing: -0.025em !important;
+            font-size: clamp(1.2rem, 3.5vw, 1.85rem) !important;
+            line-height: 1.15 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            margin-bottom: 0.25rem !important;
         }
 
         .small-box .inner p {
@@ -2549,6 +2554,13 @@
             box-sizing: border-box !important;
         }
 
+        /* Garante que o conteúdo role além dos botões flutuantes para que nenhum card/botão inferior fique encoberto */
+        .content-wrapper,
+        #pjax-container,
+        section.content {
+            padding-bottom: 90px !important;
+        }
+
         /* Auto-responsividade universal de tabelas em cards */
         .card {
             max-width: 100% !important;
@@ -2582,16 +2594,52 @@
 
         .admin-back-to-top {
             position: fixed !important;
-            bottom: 90px !important;
-            right: 26px !important;
+            bottom: 86px !important;
+            right: 24px !important;
             z-index: 1045 !important;
         }
 
         /* Quebras Inteligentes para Mobile e Telas Estreitas (< 768px) */
         @media (max-width: 767.98px) {
+            .content-wrapper,
+            #pjax-container,
+            section.content {
+                padding-bottom: 115px !important;
+            }
+
             .container-fluid {
                 padding-left: 10px !important;
                 padding-right: 10px !important;
+            }
+
+            /* Small-box de métricas no mobile: auto-ajuste de largura e tipografia para nunca cortar valores monetários */
+            .small-box .inner {
+                padding: 0.85rem 0.65rem !important;
+            }
+
+            .small-box .inner h3 {
+                font-size: 1.25rem !important;
+                letter-spacing: -0.02em !important;
+            }
+
+            .small-box .inner p {
+                font-size: 0.75rem !important;
+                margin-bottom: 0 !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+
+            .small-box .icon {
+                display: none !important; /* Libera 100% do espaço horizontal para os valores nos cards do mobile */
+            }
+
+            .small-box-footer {
+                font-size: 0.71875rem !important;
+                padding: 0.35rem 0.5rem !important;
+                line-height: 1.25 !important;
+                white-space: normal !important;
+                text-align: center !important;
             }
 
             /* Barras de ações e filtros em coluna no mobile */
@@ -2668,19 +2716,30 @@
             }
 
             #chat-toggle-btn {
-                width: 50px !important;
-                height: 50px !important;
+                width: 48px !important;
+                height: 48px !important;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22) !important;
             }
 
             #chat-toggle-btn i {
-                font-size: 1.25rem !important;
+                font-size: 1.15rem !important;
             }
 
             .admin-back-to-top {
-                bottom: 74px !important;
-                right: 19px !important;
+                bottom: 72px !important;
+                right: 18px !important;
                 width: 40px !important;
                 height: 40px !important;
+            }
+        }
+
+        /* Ajuste fino para telas extra-estreitas (< 420px) */
+        @media (max-width: 420px) {
+            .small-box .inner h3 {
+                font-size: 1.1rem !important;
+            }
+            .small-box .inner {
+                padding: 0.65rem 0.45rem !important;
             }
         }
 
