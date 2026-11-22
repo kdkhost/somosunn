@@ -42,6 +42,10 @@ AddDefaultCharset UTF-8
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+    # Responder preflight CORS OPTIONS para ativos estaticos / PDFs / midias do CDN
+    RewriteCond %{REQUEST_METHOD} ^OPTIONS$
+    RewriteRule \.(?:css|js|woff|woff2|ttf|eot|svg|pdf|jpg|jpeg|png|webp|gif|ico|mp4|webm|ogg|mp3|wav)$ - [R=204,L,NC]
+
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
@@ -64,11 +68,12 @@ AddDefaultCharset UTF-8
 </FilesMatch>
 
 <IfModule mod_headers.c>
-    # CORS headers for external resources (prevent CORB blocking)
-    <FilesMatch "\.(css|js|woff|woff2|ttf|eot|svg)$">
-        Header set Access-Control-Allow-Origin "*"
-        Header set Access-Control-Allow-Methods "GET, OPTIONS"
-        Header set Access-Control-Allow-Headers "Content-Type"
+    # CORS headers (always inclui 204 OPTIONS e 206 Partial Content para PDF.js/CDN)
+    <FilesMatch "\.(css|js|woff|woff2|ttf|eot|svg|pdf|jpg|jpeg|png|webp|gif|ico|mp4|webm|ogg|mp3|wav)$">
+        Header always set Access-Control-Allow-Origin "*"
+        Header always set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+        Header always set Access-Control-Allow-Headers "Range, Content-Type, Accept, Origin"
+        Header always set Access-Control-Expose-Headers "Accept-Ranges, Content-Range, Content-Length, Content-Type"
     </FilesMatch>
     
     # Ensure correct Content-Type for CSS and JS
@@ -80,8 +85,8 @@ AddDefaultCharset UTF-8
         Header set Content-Type "application/javascript; charset=utf-8"
     </FilesMatch>
     
-    # Allow caching for vendor assets (CSS, JS, fonts, images)
-    <FilesMatch "\.(css|js|woff|woff2|ttf|eot|svg|jpg|jpeg|png|webp|gif|ico)$">
+    # Allow caching for vendor assets, PDFs, fonts, images and media
+    <FilesMatch "\.(css|js|woff|woff2|ttf|eot|svg|pdf|jpg|jpeg|png|webp|gif|ico|mp4|webm)$">
         Header set Cache-Control "max-age=604800, public"
     </FilesMatch>
     

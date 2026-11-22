@@ -805,6 +805,10 @@ class UploadStorage
 
     public static function response(string $path)
     {
+        if (app()->bound('request') && request()->isMethod('OPTIONS')) {
+            return response('', 204, self::publicMediaCorsHeaders());
+        }
+
         $normalized = self::normalizePath($path);
         abort_if($normalized === null, 404);
 
@@ -813,11 +817,11 @@ class UploadStorage
                 if (is_file($candidate)) {
                     $size = @filesize($candidate);
                     $lastModified = @filemtime($candidate);
-                    $headers = [
+                    $headers = array_merge([
                         'Content-Type' => self::mimeTypeFromPath($candidate),
                         'Cache-Control' => 'public, max-age=86400, stale-while-revalidate=604800',
                         'Accept-Ranges' => 'bytes',
-                    ];
+                    ], self::publicMediaCorsHeaders());
 
                     if (is_int($lastModified) && $lastModified > 0) {
                         $headers['Last-Modified'] = gmdate('D, d M Y H:i:s', $lastModified) . ' GMT';
@@ -884,10 +888,10 @@ class UploadStorage
             abort(404);
         }
 
-        $headers = [
+        $headers = array_merge([
             'Content-Type' => self::mimeType($normalized),
             'Cache-Control' => 'public, max-age=31536000',
-        ];
+        ], self::publicMediaCorsHeaders());
 
         try {
             $size = (int) self::disk()->size($normalized);
@@ -905,6 +909,16 @@ class UploadStorage
                 fclose($stream);
             }
         }, 200, $headers);
+    }
+
+    public static function publicMediaCorsHeaders(): array
+    {
+        return [
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, HEAD, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Range, Content-Type, Accept, Origin',
+            'Access-Control-Expose-Headers' => 'Accept-Ranges, Content-Range, Content-Length, Content-Type',
+        ];
     }
 
     /** @return array{0:int,1:int}|null|false */

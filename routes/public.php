@@ -37,10 +37,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'index'])->name('health');
 
-Route::get('/storage/{path}', [PublicStorageProxyController::class, 'storage'])
+Route::match(['GET', 'HEAD', 'OPTIONS'], '/storage/{path}', [PublicStorageProxyController::class, 'storage'])
     ->where('path', '.*')
     ->name('public.storage');
-Route::get('/uploads/{path}', [PublicStorageProxyController::class, 'uploads'])
+Route::match(['GET', 'HEAD', 'OPTIONS'], '/uploads/{path}', [PublicStorageProxyController::class, 'uploads'])
     ->where('path', '.*')
     ->name('public.uploads');
 

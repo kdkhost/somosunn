@@ -105,6 +105,10 @@ class PublicStorageProxyController extends Controller
             }
         }
 
+        if (request()->isMethod('OPTIONS')) {
+            return response('', 204, UploadStorage::publicMediaCorsHeaders());
+        }
+
         abort(404);
     }
 
