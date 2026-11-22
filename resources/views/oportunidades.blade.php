@@ -76,6 +76,22 @@
             border-color: var(--unn-azul-1);
             box-shadow: 0 0 0 4px rgba(43, 110, 250, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0);
         }
+
+        /* Custom Dropdown Scrollbar */
+        .custom-select-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-select-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .custom-select-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .custom-select-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
     </style>
 @endpush
 
@@ -150,17 +166,56 @@
                                             aria-label="Filtrar por empresa"
                                             class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 text-sm font-medium placeholder:text-slate-400">
                                     </div>
-                                    <div
-                                        class="w-full md:w-56 filter-input relative flex items-center h-12 bg-white/90 rounded-full px-5">
-                                        <i class="fas fa-layer-group text-slate-400 mr-2" aria-hidden="true"></i>
-                                        <select name="tipo" id="filtro-tipo" aria-label="Filtrar por tipo de vaga"
-                                            class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-sm font-medium {{ request('tipo') ? 'text-slate-700' : 'text-slate-400' }} cursor-pointer appearance-none">
-                                            <option value="">Tipo de vaga</option>
-                                            @foreach($tiposDisponiveis as $tipo)
-                                                <option value="{{ $tipo }}" {{ request('tipo') == $tipo ? 'selected' : '' }}>
-                                                    {{ $tipo }}</option>
-                                            @endforeach
-                                        </select>
+                                    {{-- Custom Dropdown Estilizado (Substitui select nativo sem estilo) --}}
+                                    <div class="w-full md:w-56 relative select-none" id="custom-tipo-container">
+                                        <input type="hidden" name="tipo" id="filtro-tipo" value="{{ request('tipo') }}">
+                                        
+                                        <button type="button" id="custom-tipo-trigger"
+                                            class="filter-input w-full h-12 flex items-center justify-between px-5 bg-white/90 hover:bg-white text-left transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+                                            aria-haspopup="listbox" aria-expanded="false" aria-label="Filtrar por tipo de vaga">
+                                            <span class="flex items-center min-w-0 pr-2">
+                                                <i class="fas fa-layer-group text-slate-400 mr-2.5 text-xs shrink-0" aria-hidden="true"></i>
+                                                <span id="custom-tipo-label" class="truncate text-sm font-medium {{ request('tipo') ? 'text-slate-800 font-semibold' : 'text-slate-500' }}">
+                                                    {{ request('tipo') ? request('tipo') : 'Tipo de vaga' }}
+                                                </span>
+                                            </span>
+                                            <i id="custom-tipo-arrow" class="fas fa-chevron-down text-slate-400 text-xs transition-transform duration-200 shrink-0"></i>
+                                        </button>
+
+                                        {{-- Menu Dropdown Flutuante Estilo React / Radix / Shadcn UI --}}
+                                        <div id="custom-tipo-menu"
+                                            class="hidden absolute top-full mt-2 left-0 right-0 w-full bg-white/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 py-2 z-50 overflow-hidden transform opacity-0 scale-95 transition-all duration-200 ease-out origin-top text-left"
+                                            style="box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);"
+                                            role="listbox">
+                                            <div class="max-h-60 overflow-y-auto custom-select-scrollbar px-1.5 space-y-1">
+                                                <div class="custom-tipo-opt px-3.5 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors flex items-center justify-between {{ !request('tipo') ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}"
+                                                    data-value=""
+                                                    data-label="Tipo de vaga"
+                                                    role="option"
+                                                    aria-selected="{{ !request('tipo') ? 'true' : 'false' }}">
+                                                    <span class="flex items-center gap-2">
+                                                        <span class="w-1.5 h-1.5 rounded-full {{ !request('tipo') ? 'bg-blue-600' : 'bg-transparent' }}"></span>
+                                                        <span>Todos os tipos</span>
+                                                    </span>
+                                                    <i class="fas fa-check text-blue-600 text-xs check-icon {{ !request('tipo') ? '' : 'hidden' }}"></i>
+                                                </div>
+
+                                                @foreach($tiposDisponiveis as $tipo)
+                                                    @php $isSelected = request('tipo') == $tipo; @endphp
+                                                    <div class="custom-tipo-opt px-3.5 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors flex items-center justify-between {{ $isSelected ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}"
+                                                        data-value="{{ $tipo }}"
+                                                        data-label="{{ $tipo }}"
+                                                        role="option"
+                                                        aria-selected="{{ $isSelected ? 'true' : 'false' }}">
+                                                        <span class="flex items-center gap-2">
+                                                            <span class="w-1.5 h-1.5 rounded-full {{ $isSelected ? 'bg-blue-600' : 'bg-transparent' }}"></span>
+                                                            <span class="truncate">{{ $tipo }}</span>
+                                                        </span>
+                                                        <i class="fas fa-check text-blue-600 text-xs check-icon {{ $isSelected ? '' : 'hidden' }}"></i>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -503,13 +558,110 @@
 
     @push('scripts')
         <script>
-            // Ensure hover animations trigger correctly
             document.addEventListener('DOMContentLoaded', () => {
+                // Hover animations para glass-cards
                 setTimeout(() => {
                     document.querySelectorAll('.glass-card').forEach(el => {
                         el.style.opacity = '1';
                     });
                 }, 500);
+
+                // Custom Dropdown Tipo de Vaga
+                const container = document.getElementById('custom-tipo-container');
+                const trigger = document.getElementById('custom-tipo-trigger');
+                const menu = document.getElementById('custom-tipo-menu');
+                const arrow = document.getElementById('custom-tipo-arrow');
+                const label = document.getElementById('custom-tipo-label');
+                const hiddenInput = document.getElementById('filtro-tipo');
+                const options = document.querySelectorAll('.custom-tipo-opt');
+
+                if (trigger && menu) {
+                    let isOpen = false;
+
+                    const openDropdown = () => {
+                        isOpen = true;
+                        menu.classList.remove('hidden');
+                        requestAnimationFrame(() => {
+                            menu.classList.remove('opacity-0', 'scale-95');
+                            menu.classList.add('opacity-100', 'scale-100');
+                        });
+                        if (arrow) arrow.classList.add('rotate-180');
+                        trigger.setAttribute('aria-expanded', 'true');
+                    };
+
+                    const closeDropdown = () => {
+                        if (!isOpen) return;
+                        isOpen = false;
+                        menu.classList.remove('opacity-100', 'scale-100');
+                        menu.classList.add('opacity-0', 'scale-95');
+                        if (arrow) arrow.classList.remove('rotate-180');
+                        trigger.setAttribute('aria-expanded', 'false');
+                        setTimeout(() => {
+                            if (!isOpen) menu.classList.add('hidden');
+                        }, 200);
+                    };
+
+                    trigger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        isOpen ? closeDropdown() : openDropdown();
+                    });
+
+                    options.forEach(opt => {
+                        opt.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const val = opt.getAttribute('data-value');
+                            const text = opt.getAttribute('data-label');
+
+                            hiddenInput.value = val;
+                            label.textContent = text;
+
+                            if (val) {
+                                label.classList.remove('text-slate-500');
+                                label.classList.add('text-slate-800', 'font-semibold');
+                            } else {
+                                label.classList.remove('text-slate-800', 'font-semibold');
+                                label.classList.add('text-slate-500');
+                            }
+
+                            // Atualizar seleção visual
+                            options.forEach(o => {
+                                const isCurrent = o === opt;
+                                o.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+                                o.classList.toggle('bg-blue-50', isCurrent);
+                                o.classList.toggle('text-blue-700', isCurrent);
+                                o.classList.toggle('font-semibold', isCurrent);
+                                o.classList.toggle('text-slate-700', !isCurrent);
+                                
+                                const dot = o.querySelector('span > span');
+                                if (dot) {
+                                    dot.classList.toggle('bg-blue-600', isCurrent);
+                                    dot.classList.toggle('bg-transparent', !isCurrent);
+                                }
+
+                                const check = o.querySelector('.check-icon');
+                                if (check) {
+                                    check.classList.toggle('hidden', !isCurrent);
+                                }
+                            });
+
+                            closeDropdown();
+                        });
+                    });
+
+                    // Fechar ao clicar fora
+                    document.addEventListener('click', (e) => {
+                        if (isOpen && container && !container.contains(e.target)) {
+                            closeDropdown();
+                        }
+                    });
+
+                    // Fechar com ESC
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && isOpen) {
+                            closeDropdown();
+                        }
+                    });
+                }
             });
         </script>
     @endpush

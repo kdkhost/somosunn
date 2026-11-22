@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - feat(vagas): custom dropdown moderno estilo react tailwind para filtro de tipo de vaga
+
+- **Substituição de `<select>` Nativo por Custom Dropdown Estilizado (`resources/views/oportunidades.blade.php`):**
+  - **Experiência Visual React / Tailwind:** O seletor de "Tipo de vaga" na barra de pesquisa da página pública `/vagas-abertas` foi transformado de uma tag `<select>` HTML nativa em um componente de Dropdown Customizado com acabamento premium no padrão do ecossistema UNN.
+  - **Eliminação do Menu Rígido do Sistema Operacional:** O `<select>` padrão delegava a abertura para a camada gráfica do Windows/SO, impedindo estilização CSS. O novo componente utiliza lista suspensa em `<div>` com cantos de 16px (`rounded-2xl`), sombra profunda `shadow-2xl`, fundo translúcido `backdrop-blur-xl`, borda suave e scrollbar customizada.
+  - **Interatividade Fluida e Acessibilidade:** Botão disparador em cápsula com rotação de 180° no chevron ao abrir, animação elástica suave (`scale-95` para `scale-100` com transição de opacidade), itens com indicador ativo em azul UNN (`#1F5EDB`), ícone de checkmark na opção selecionada, fechamento automático ao clicar fora e suporte a tecla `Escape`.
+  - **Sincronização com Formulário de Busca:** Mantido `<input type="hidden" name="tipo">` perfeitamente sincronizado com o envio do formulário GET de pesquisa e limpeza de filtros.
+
 ## [2026-11-22] - feat(admin/referrals): reformulação completa da aba de programa de afiliados com design react saas
 
 - **Reformulação Visual e Funcional de `/admin/referrals?tab=programa` (`resources/views/admin/referrals/index.blade.php`):**

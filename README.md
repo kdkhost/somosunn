@@ -1,5 +1,7 @@
 # UNN — Plataforma de Networking
 
+- **Custom Dropdown Estilizado estilo React / Tailwind para Vagas (`resources/views/oportunidades.blade.php`) (22/11):** Substituído o seletor `<select>` nativo da barra de busca de `/vagas-abertas` por um Dropdown Customizado moderno com acabamento premium, lista suspensa com cantos de 16px (`rounded-2xl`), fundo translúcido `backdrop-blur-xl`, sombra profunda `shadow-2xl`, chevron com rotação animada, indicador azul UNN com checkmark na opção ativa, fechamento ao clicar fora ou com a tecla ESC e sincronização determinística com o formulário de busca.
+
 - **Reformulação da Página de Afiliados e Indicações com Design React SaaS (22/11):** Reformulada a página `/admin/referrals?tab=programa`, entregando Hero Card moderno para link e código de indicação com cópia Toastr, compartilhamento social vibrante, 4 cartões de KPIs harmonizados no Dark Mode, prévia rica de indicados recentes com avatares e passos interativos do programa.
 
 - **Harmonização do Catálogo do Marketplace no Tema Escuro (22/11):** Corrigidos os cards de KPI, botões de filtro e barras de busca em `/admin/marketplace/catalogo` para o Dark Mode, eliminando gradientes esbranquiçados e adotando a paleta dark profunda nativa da plataforma com contraste e legibilidade impecáveis.
