@@ -20,12 +20,13 @@ AddDefaultCharset UTF-8
     # Curriculos contem dados pessoais e so podem ser baixados por rota autenticada.
     RewriteRule ^storage/resumes(?:/|$) - [R=404,L,NC]
 
-    # IMPORTANTE: Permitir acesso a public/vendor (assets CSS/JS)
-    # ANTES de bloquear vendor do composer
+    # IMPORTANTE: Permitir acesso apenas a arquivos estaticos existentes em public/vendor
+    # ANTES de bloquear vendor do composer na raiz
+    RewriteCond %{DOCUMENT_ROOT}/public/vendor/$1 -f
     RewriteRule ^vendor/(.*)$ public/vendor/$1 [L,NC]
-    
+
     # bloquear diretórios privados (vendor do composer na raiz, node_modules)
-    RewriteRule ^(?:vendor|node_modules)/(.*)$ - [F,L,NC]
+    RewriteRule ^(?:vendor|node_modules)(?:/.*)?$ - [F,L,NC]
     RewriteRule ^storage/(framework|logs|app)/(.*)$ - [F,L,NC]
 
     # expor arquivos do public sem /public na URL

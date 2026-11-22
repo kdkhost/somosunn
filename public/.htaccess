@@ -27,8 +27,8 @@ AddDefaultCharset UTF-8
     # Block package files
     RewriteRule ^package(-lock)?\.json$ - [F,L]
 
-    # Block vendor directory direct access
-    RewriteRule ^vendor/ - [F,L]
+    # Bloquear apenas scripts/arquivos sensiveis dentro de public/vendor (assets JS/CSS/fontes permanecem publicos)
+    RewriteRule ^vendor/.*\.(?:php|phtml|phar|sh|sql|json|lock|md|yml|yaml|bak|env)$ - [F,L,NC]
 
     # Block config directory
     RewriteRule ^config/ - [F,L]

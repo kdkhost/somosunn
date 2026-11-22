@@ -25,7 +25,9 @@
   - Atualizacao do calendario de eventos em `/admin/events` para FullCalendar `6.1.15` (alinhado ao `/painel/admin/events`).
   - Conversao das 24 imagens raster `>200 KB` em `public/` para `.webp` (mantendo originais como fallback) com entrega WebP automatica em `UploadStorage::resolveLocalUrl()` e inclusao de `loading="lazy" decoding="async"` nas tags `<img>` aplicaveis.
   - Centralizacao de mascaras brasileiras (incluindo `mask-rg` / `data-mask="rg"`) e ViaCEP no 8o digito com foco automatico em `Numero` via `public/js/unn-masks.js`; eliminacao de `alert()`/`confirm()`/`prompt()` nativos restantes em favor de SweetAlert2 e Toastr; exibicao da barra `mobile-bottom-nav` apenas em PWA standalone (`display-mode: standalone`).
-- **Git e Deploy cPanel (`DEPLOY_CPANEL.md`, `.gitignore`, `.htaccess`, `public/.htaccess`):**
+- **Git e Deploy cPanel (`DEPLOY_CPANEL.md`, `.gitignore`, `.htaccess`, `public/.htaccess`, `app/Http/Middleware/TrustProxies.php`):**
+  - Adicao do middleware `TrustProxies` com ranges oficiais IPv4/IPv6 da Cloudflare (sem confiar em `X-Forwarded-Host`), preservando IP real e esquema HTTPS em rate limiters/WAF atras do proxy da borda.
+  - Liberacao segura de assets estaticos em `public/vendor/*` (corrigindo `403` em `/vendor/plyr/*` e `/vendor/admin-lte/*`), mantendo o bloqueio de scripts PHP/sensiveis e do diretorio `/vendor` do Composer na raiz.
   - Remocao de scripts PHP de diagnostico/migracao sem autenticacao expostos na webroot (`public/clear.php`, `public/clear_opcache.php`, `public/debug_sync.php`, `public/fix_clean.php`, `public/run-migration.php`, `public/test-post.php`, `clean_mail_templates.php`).
   - Limpeza de `.ftpquota`, arquivos `.bak` e temporarios `vendor/composer/tmp-*.zip` rastreados; adicao de `bootstrap/cache/.gitignore`, atualizacao do guia `DEPLOY_CPANEL.md`, liberacao de rewrites para `css/`, `js/` e `assets/` (alem de cache WebP/WOFF2) no `.htaccess` raiz e `Header setifempty Cache-Control` em `public/.htaccess` para preservar headers `public-edge` das paginas publicas em `/eventos`, `/courses`, `/planos` e institucionais.
 
