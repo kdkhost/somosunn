@@ -1,5 +1,22 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-22] - feat(admin): design system moderno react-like e padronização universal de campos
+
+- **Camada Visual Moderna React-like para `/admin` (`resources/views/admin/layouts/app.blade.php`):**
+  - Implementado Design System moderno no painel `/admin` inspirado na estética de aplicações SaaS contemporâneas em React, preservando 100% da compatibilidade com Blade, AdminLTE 3 e scripts jQuery existentes sem quebrar nenhuma das views ou rotas.
+  - Tipografia refinada com fonte Inter, espaçamentos limpos e background neutro `#f8fafc` com suporte nativo ao Modo Escuro (`dark-mode` com `#0f172a`).
+  - Navbar com efeito translúcido glassmorphism (`backdrop-filter: blur(14px)`) e borda sutil.
+  - Sidebar reestilizada com itens em formato de pílula suave e estado ativo com sombra azul UNN (`#1F5EDB`).
+  - Cards e painéis reestilizados com cantos arredondados (`border-radius: 1rem`), bordas sutis e elevação limpa sem linhas pesadas.
+  - Botões com cantos arredondados (`border-radius: 0.625rem`), transição de foco e elevação suave no hover.
+  - Tabelas estilo SaaS minimalista com cabeçalho limpo e linhas suaves sem divisórias verticais pesadas.
+  - Badges no formato pill arredondado (`rounded-full`) com cores e contrastes harmônicos.
+  - Breadcrumb e paginação minimalistas arredondadas.
+- **Padronização Universal de Campos de Formulário:**
+  - Padronizada a altura dos inputs, selects e textareas para 42px com bordas suaves (`border-radius: 0.625rem`), padding proporcional e anel de foco azul UNN (`box-shadow: 0 0 0 3px rgba(31, 94, 219, 0.18)`).
+  - Labels padronizadas com tipografia semi-bold `#475569` (e `#cbd5e1` no dark mode).
+  - Suporte completo a Select2, Input Groups, Custom Files e Switches modernos estilo iOS/Tailwind (`.custom-switch`).
+
 ## [2026-11-22] - perf(frontend): FullCalendar 6 unificado e eliminação de confirms nativos
 
 - **FullCalendar 6 unificado (`resources/views/admin/dashboard.blade.php`):**

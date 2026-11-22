@@ -1289,6 +1289,542 @@
         .border-2 {
             border-width: 2px !important;
         }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           MODERN REACT-LIKE DESIGN SYSTEM FOR /admin (AdminLTE Modern UI Layer)
+           Preserva 100% dos seletores e scripts existentes enquanto entrega
+           o visual limpo, moderno, responsivo e padronizado de um SaaS em React.
+           ═══════════════════════════════════════════════════════════════════════ */
+
+        /* ─── 1. Tipografia Global e Layout Base ─── */
+        body.hold-transition.sidebar-mini {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            letter-spacing: -0.011em;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .dark-mode body.hold-transition.sidebar-mini {
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+
+        /* ─── 2. Padronização Universal de Campos de Formulário ─── */
+        .form-control,
+        .custom-select,
+        select.form-control,
+        input.form-control:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+            height: 42px !important;
+            min-height: 42px !important;
+            border-radius: 0.625rem !important;
+            border: 1px solid #cbd5e1 !important;
+            padding: 0.55rem 0.85rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            color: #1e293b !important;
+            background-color: #ffffff !important;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+        }
+
+        textarea.form-control {
+            border-radius: 0.625rem !important;
+            border: 1px solid #cbd5e1 !important;
+            padding: 0.65rem 0.85rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            color: #1e293b !important;
+            background-color: #ffffff !important;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+        }
+
+        .form-control:focus,
+        .custom-select:focus,
+        select.form-control:focus,
+        textarea.form-control:focus {
+            border-color: #1F5EDB !important;
+            box-shadow: 0 0 0 3px rgba(31, 94, 219, 0.18) !important;
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            outline: 0 !important;
+        }
+
+        /* Dark Mode: Formulários */
+        .dark-mode .form-control,
+        .dark-mode .custom-select,
+        .dark-mode select.form-control,
+        .dark-mode input.form-control:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+        .dark-mode textarea.form-control {
+            background-color: #0f172a !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .dark-mode .form-control:focus,
+        .dark-mode .custom-select:focus,
+        .dark-mode select.form-control:focus,
+        .dark-mode textarea.form-control:focus {
+            background-color: #0f172a !important;
+            border-color: #60a5fa !important;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22) !important;
+            color: #ffffff !important;
+        }
+
+        /* Labels Padronizadas */
+        label,
+        .form-group label,
+        .col-form-label {
+            font-size: 0.8125rem !important;
+            font-weight: 600 !important;
+            color: #475569 !important;
+            margin-bottom: 0.35rem !important;
+            letter-spacing: -0.01em !important;
+        }
+
+        .dark-mode label,
+        .dark-mode .form-group label,
+        .dark-mode .col-form-label {
+            color: #cbd5e1 !important;
+        }
+
+        /* Input Group com encaixe arredondado */
+        .input-group {
+            border-radius: 0.625rem !important;
+        }
+
+        .input-group > .form-control:not(:last-child),
+        .input-group > .custom-select:not(:last-child) {
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+
+        .input-group > .form-control:not(:first-child),
+        .input-group > .custom-select:not(:first-child) {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
+
+        .input-group-prepend .input-group-text,
+        .input-group-append .input-group-text {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #64748b !important;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            border-radius: 0.625rem !important;
+        }
+
+        .input-group-prepend .input-group-text {
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+
+        .input-group-append .input-group-text {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
+
+        .dark-mode .input-group-prepend .input-group-text,
+        .dark-mode .input-group-append .input-group-text {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #94a3b8 !important;
+        }
+
+        /* ─── 3. Switches Modernos Estilo iOS / Tailwind ─── */
+        .custom-switch {
+            padding-left: 2.85rem !important;
+            cursor: pointer;
+        }
+
+        .custom-switch .custom-control-label {
+            cursor: pointer;
+            user-select: none;
+            font-weight: 500 !important;
+            color: #334155 !important;
+            line-height: 24px;
+        }
+
+        .dark-mode .custom-switch .custom-control-label {
+            color: #e2e8f0 !important;
+        }
+
+        .custom-switch .custom-control-label::before {
+            left: -2.85rem !important;
+            width: 2.45rem !important;
+            height: 1.45rem !important;
+            border-radius: 9999px !important;
+            background-color: #cbd5e1 !important;
+            border: none !important;
+            transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease !important;
+        }
+
+        .custom-switch .custom-control-label::after {
+            left: calc(-2.85rem + 2px) !important;
+            top: calc(0.125rem + 2px) !important;
+            width: calc(1.45rem - 4px) !important;
+            height: calc(1.45rem - 4px) !important;
+            border-radius: 9999px !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16) !important;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+            background-color: #1F5EDB !important;
+        }
+
+        .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
+            transform: translateX(1rem) !important;
+            background-color: #ffffff !important;
+        }
+
+        .custom-switch .custom-control-input:focus ~ .custom-control-label::before {
+            box-shadow: 0 0 0 3px rgba(31, 94, 219, 0.2) !important;
+        }
+
+        .dark-mode .custom-switch .custom-control-label::before {
+            background-color: #334155 !important;
+        }
+
+        .dark-mode .custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+            background-color: #2563eb !important;
+        }
+
+        /* ─── 4. Cards com Estética React / Modern SaaS ─── */
+        .card {
+            border-radius: 1rem !important;
+            border: 1px solid #e2e8f0 !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease !important;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .dark-mode .card {
+            background-color: #1e293b !important;
+            border: 1px solid #334155 !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25) !important;
+        }
+
+        .card-header {
+            background-color: transparent !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            padding: 1rem 1.25rem !important;
+        }
+
+        .dark-mode .card-header {
+            border-bottom: 1px solid #334155 !important;
+        }
+
+        .card-title {
+            font-size: 1rem !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.015em !important;
+            color: #0f172a !important;
+        }
+
+        .dark-mode .card-title {
+            color: #f8fafc !important;
+        }
+
+        .card-body {
+            padding: 1.25rem !important;
+        }
+
+        .card-footer {
+            background-color: #f8fafc !important;
+            border-top: 1px solid #f1f5f9 !important;
+            padding: 0.85rem 1.25rem !important;
+        }
+
+        .dark-mode .card-footer {
+            background-color: #162032 !important;
+            border-top: 1px solid #334155 !important;
+        }
+
+        /* ─── 5. Botões Modernos (React Button Components) ─── */
+        .btn {
+            border-radius: 0.625rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            padding: 0.5rem 1.15rem !important;
+            letter-spacing: -0.01em !important;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.45rem !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px) !important;
+        }
+
+        .btn:active {
+            transform: translateY(0) !important;
+        }
+
+        .btn-sm {
+            padding: 0.35rem 0.75rem !important;
+            font-size: 0.78125rem !important;
+            border-radius: 0.5rem !important;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem !important;
+            font-size: 1rem !important;
+            border-radius: 0.75rem !important;
+        }
+
+        .btn-primary {
+            background-color: #1F5EDB !important;
+            border-color: #1F5EDB !important;
+            color: #ffffff !important;
+        }
+
+        .btn-primary:hover {
+            background-color: #174eb8 !important;
+            border-color: #174eb8 !important;
+            box-shadow: 0 4px 14px rgba(31, 94, 219, 0.32) !important;
+        }
+
+        .btn-success {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+            color: #ffffff !important;
+        }
+
+        .btn-success:hover {
+            background-color: #059669 !important;
+            border-color: #059669 !important;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3) !important;
+        }
+
+        .btn-danger {
+            background-color: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: #ffffff !important;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626 !important;
+            border-color: #dc2626 !important;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3) !important;
+        }
+
+        .btn-outline-primary {
+            color: #1F5EDB !important;
+            border-color: #93c5fd !important;
+            background-color: transparent !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #1F5EDB !important;
+            border-color: #1F5EDB !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(31, 94, 219, 0.25) !important;
+        }
+
+        .dark-mode .btn-outline-primary {
+            color: #60a5fa !important;
+            border-color: #2563eb !important;
+        }
+
+        /* ─── 6. Tabelas e DataTables Limpas (No Grid Lines) ─── */
+        .table {
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .table thead th {
+            background-color: #f8fafc !important;
+            color: #64748b !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            border-top: none !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            padding: 0.85rem 1rem !important;
+            white-space: nowrap !important;
+        }
+
+        .dark-mode .table thead th {
+            background-color: #162032 !important;
+            color: #94a3b8 !important;
+            border-bottom: 1px solid #334155 !important;
+        }
+
+        .table tbody td {
+            padding: 0.95rem 1rem !important;
+            vertical-align: middle !important;
+            border-top: 1px solid #f1f5f9 !important;
+            color: #334155 !important;
+            font-size: 0.875rem !important;
+        }
+
+        .dark-mode .table tbody td {
+            border-top: 1px solid #283548 !important;
+            color: #e2e8f0 !important;
+        }
+
+        .table-hover tbody tr {
+            transition: background-color 0.15s ease !important;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(241, 245, 249, 0.8) !important;
+        }
+
+        .dark-mode .table-hover tbody tr:hover {
+            background-color: rgba(59, 130, 246, 0.08) !important;
+        }
+
+        /* ─── 7. Badges Estilo Pill Moderno ─── */
+        .badge {
+            border-radius: 9999px !important;
+            padding: 0.38em 0.85em !important;
+            font-weight: 700 !important;
+            font-size: 0.71875rem !important;
+            letter-spacing: 0.03em !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.25rem !important;
+        }
+
+        .badge-success {
+            background-color: #d1fae5 !important;
+            color: #065f46 !important;
+        }
+
+        .badge-danger {
+            background-color: #fee2e2 !important;
+            color: #991b1b !important;
+        }
+
+        .badge-warning {
+            background-color: #fef3c7 !important;
+            color: #92400e !important;
+        }
+
+        .badge-info {
+            background-color: #e0f2fe !important;
+            color: #075985 !important;
+        }
+
+        .badge-primary {
+            background-color: #dbeafe !important;
+            color: #1e40af !important;
+        }
+
+        .dark-mode .badge-success {
+            background-color: rgba(16, 185, 129, 0.18) !important;
+            color: #6ee7b7 !important;
+        }
+
+        .dark-mode .badge-danger {
+            background-color: rgba(239, 68, 68, 0.18) !important;
+            color: #fca5a5 !important;
+        }
+
+        .dark-mode .badge-warning {
+            background-color: rgba(245, 158, 11, 0.18) !important;
+            color: #fcd34d !important;
+        }
+
+        .dark-mode .badge-info {
+            background-color: rgba(14, 165, 233, 0.18) !important;
+            color: #7dd3fc !important;
+        }
+
+        .dark-mode .badge-primary {
+            background-color: rgba(37, 99, 235, 0.22) !important;
+            color: #93c5fd !important;
+        }
+
+        /* ─── 8. Navbar e Sidebar Estilo SaaS Moderno ─── */
+        .main-header.navbar {
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            background-color: rgba(255, 255, 255, 0.94) !important;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.85) !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02) !important;
+        }
+
+        .dark-mode .main-header.navbar {
+            background-color: rgba(15, 23, 42, 0.94) !important;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.85) !important;
+        }
+
+        .main-sidebar {
+            box-shadow: 2px 0 12px 0 rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .nav-sidebar .nav-item .nav-link {
+            border-radius: 0.625rem !important;
+            margin: 2px 8px !important;
+            padding: 0.65rem 0.85rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .nav-sidebar .nav-link.active {
+            background-color: #1F5EDB !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(31, 94, 219, 0.35) !important;
+            font-weight: 600 !important;
+        }
+
+        /* ─── 9. Breadcrumb Estilo Minimalista ─── */
+        .breadcrumb {
+            background-color: transparent !important;
+            padding: 0 !important;
+            font-size: 0.8125rem !important;
+            font-weight: 500 !important;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "›" !important;
+            font-size: 1.15em !important;
+            line-height: 1 !important;
+            color: #94a3b8 !important;
+            padding: 0 0.45rem !important;
+        }
+
+        /* ─── 10. Paginação Arredondada ─── */
+        .pagination .page-item .page-link {
+            border-radius: 0.5rem !important;
+            margin: 0 2px !important;
+            border: 1px solid #e2e8f0 !important;
+            font-size: 0.8125rem !important;
+            font-weight: 600 !important;
+            padding: 0.45rem 0.85rem !important;
+            color: #475569 !important;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #1F5EDB !important;
+            border-color: #1F5EDB !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(31, 94, 219, 0.28) !important;
+        }
+
+        .dark-mode .pagination .page-item .page-link {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
     </style>
     @stack('styles')
 </head>
