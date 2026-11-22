@@ -2,6 +2,7 @@
 
 return [
     'name' => env('APP_NAME', 'UNN'),
+    'version' => env('APP_VERSION', trim(@file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'VERSION') ?: '2.5.0')),
     'env' => env('APP_ENV', 'production'),
     'debug' => (bool) env('APP_DEBUG', false),
     'demo_mode' => (bool) env('DEMO_MODE', false),

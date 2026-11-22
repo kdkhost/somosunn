@@ -680,6 +680,12 @@
                 </div>
             </button>
         </div>
+
+        <div class="mt-2 px-4 pb-4 text-center">
+            <span class="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                SOMOS UNN v{{ config('app.version', '2.5.0') }}
+            </span>
+        </div>
     </div>
 </div>
 

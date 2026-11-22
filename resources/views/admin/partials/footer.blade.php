@@ -5,7 +5,7 @@
             ?: config('app.name', 'UNN');
     @endphp
     <div class="float-right d-none d-sm-block">
-        <b>Versão</b> 1.0
+        <b>Versão</b> {{ config('app.version', '2.5.0') }}
     </div>
     <strong>Copyright &copy; {{ date('Y') }} <a href="#">{{ $footerSiteName }}</a>.</strong> Todos os direitos reservados.
 </footer>

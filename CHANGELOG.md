@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.5.0] - 2026-11-22 - feat(core): sistema centralizado de versionamento e exibição dinâmica nos painéis
+
+- **Controle Centralizado e Dinâmico de Versão (`VERSION`, `config/app.php`, `resources/views/admin/partials/footer.blade.php`, `resources/views/panel/partials/sidebar.blade.php`):**
+  - **Arquivo de Versão Raiz:** Criado o arquivo `VERSION` na raiz da aplicação contendo `2.5.0`, com leitura automática e fallback seguro no `config('app.version')`.
+  - **Exibição Dinâmica no Painel Legado (`/admin`):** Substituída a versão estática `1.0` no rodapé (`main-footer`) para consumir dinamicamente a versão configurada no sistema.
+  - **Exibição Dinâmica no Painel Moderno (`/painel`):** Adicionado identificador visual sutil no rodapé da barra lateral exibindo `SOMOS UNN v2.5.0`, unificando a rastreabilidade entre ambos os painéis.
+  - **Diretriz de Documentação:** Definido que o `CHANGELOG.md` e a versão do sistema são atualizados a cada ciclo e entrega, mantendo o `README.md` estável e sem sobrecarga a cada commit.
+
 ## [2026-11-22] - feat(vagas): custom dropdown moderno estilo react tailwind para filtro de tipo de vaga
 
 - **Substituição de `<select>` Nativo por Custom Dropdown Estilizado (`resources/views/oportunidades.blade.php`):**
