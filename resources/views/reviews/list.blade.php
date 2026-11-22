@@ -8,7 +8,7 @@
                         @if(!empty($review->user->photo))
                             <img src="{{ $review->user->profile_photo_url ?? '' }}"
                                 alt="Foto de {{ $review->user->name ?? 'Usuário' }}"
-                                class="w-full h-full object-cover rounded-full">
+                                class="w-full h-full object-cover rounded-full" loading="lazy" decoding="async">
                         @else
                             {{ strtoupper(mb_substr((string) ($review->user->name ?? 'U'), 0, 1)) }}
                         @endif

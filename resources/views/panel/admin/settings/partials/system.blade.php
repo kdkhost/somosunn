@@ -70,20 +70,8 @@
     @push('scripts')
     <script>
         function toggleDebugMode() {
-            if (!confirm('Tem certeza que deseja ' + ({{ $debugEnabled ? 'true' : 'false' }} ? 'DESATIVAR' : 'ATIVAR') + ' o modo debug?')) return;
-
-            fetch('{{ route("panel.admin.settings.toggle") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ key: 'app_debug', value: {{ $debugEnabled ? '0' : '1' }} })
-            })
-            .then(r => r.json())
-            .then(data => {
-                // Alterar .env via API
+            const actionLabel = {{ $debugEnabled ? 'true' : 'false' }} ? 'DESATIVAR' : 'ATIVAR';
+            const applyToggle = () => {
                 fetch('{{ route("panel.admin.settings.toggle") }}', {
                     method: 'POST',
                     headers: {
@@ -91,11 +79,28 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ key: 'toggle_env_debug', value: {{ $debugEnabled ? '0' : '1' }} })
-                }).then(() => {
-                    window.location.reload();
+                    body: JSON.stringify({ key: 'app_debug', value: {{ $debugEnabled ? '0' : '1' }} })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (typeof toastr !== 'undefined') toastr.info(data.message || 'Configuracao atualizada.');
                 });
-            });
+            };
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Alterar modo debug?',
+                    text: 'Tem certeza que deseja ' + actionLabel + ' o modo debug?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, confirmar',
+                    cancelButtonText: 'Cancelar'
+                }).then((res) => {
+                    if (res.isConfirmed) applyToggle();
+                });
+                return;
+            }
+            applyToggle();
         }
     </script>
     @endpush
@@ -343,11 +348,129 @@
                     value="{{ $settings['maintenance_contact_email'] ?? ($settings['smtp_from_email'] ?? '') }}"
                     class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
             </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">IPs ou CIDRs liberados</label>
+                <textarea id="panel_maintenance_allowed_ips" name="maintenance_allowed_ips" rows="3"
+                    placeholder="Ex.: 187.10.20.30"
+                    class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">{{ $settings['maintenance_allowed_ips'] ?? '' }}</textarea>
+                <div class="flex items-center justify-between mt-1.5 text-xs text-slate-500">
+                    <span>Seu IP: <code>{{ request()->header('CF-Connecting-IP') ?: request()->ip() }}</code></span>
+                    <button type="button" id="btnAddCurrentIpPanel" class="text-blue-600 hover:underline font-semibold">Usar meu IP</button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Token de dispositivo autorizado</label>
+                <div class="flex gap-2">
+                    <input type="text" id="panel_maintenance_bypass_token" name="maintenance_bypass_token"
+                        value="{{ $settings['maintenance_bypass_token'] ?? '' }}"
+                        placeholder="Token para cookie de dispositivo confiavel"
+                        class="flex-1 px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white">
+                    <button type="button" id="btnAuthorizeMaintenanceDevicePanel"
+                        class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition whitespace-nowrap">
+                        Autorizar navegador
+                    </button>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1.5">MAC addresses nao trafegam via HTTP; utilize este cookie assinado ou <code>?maintenance_bypass_token=...</code>.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm space-y-6 mt-6">
+        <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center">
+                <i class="fas fa-network-wired"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-800 dark:text-white">Subdominios, CDN e Cache Publico</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Isolamento entre landing page, sistema App, webhooks API e midias CDN.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <label class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 cursor-pointer">
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Roteamento por subdominio</span>
+                <input type="hidden" name="domain_routing_enabled" value="0">
+                <input type="checkbox" name="domain_routing_enabled" value="1" class="rounded text-blue-600" {{ !empty($settings['domain_routing_enabled']) ? 'checked' : '' }}>
+            </label>
+            <label class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 cursor-pointer">
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">CDN sem cookies (cdn_asset)</span>
+                <input type="hidden" name="cdn_enabled" value="0">
+                <input type="checkbox" name="cdn_enabled" value="1" class="rounded text-blue-600" {{ !empty($settings['cdn_enabled']) ? 'checked' : '' }}>
+            </label>
+            <label class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 cursor-pointer">
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Cache de borda (anonimos)</span>
+                <input type="hidden" name="public_page_cache_enabled" value="0">
+                <input type="checkbox" name="public_page_cache_enabled" value="1" class="rounded text-blue-600" {{ ($settings['public_page_cache_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
+            </label>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Dominio Principal</label>
+                <input type="text" name="domain_main" value="{{ $settings['domain_main'] ?? config('domains.main', 'somosunn.com.br') }}"
+                    class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm font-medium text-slate-800 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Subdominio App</label>
+                <input type="text" name="domain_app" value="{{ $settings['domain_app'] ?? config('domains.app', 'app.somosunn.com.br') }}"
+                    class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm font-medium text-slate-800 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Subdominio API</label>
+                <input type="text" name="domain_api" value="{{ $settings['domain_api'] ?? config('domains.api', 'api.somosunn.com.br') }}"
+                    class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm font-medium text-slate-800 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Subdominio CDN</label>
+                <input type="text" name="domain_cdn" value="{{ $settings['domain_cdn'] ?? config('domains.cdn', 'cdn.somosunn.com.br') }}"
+                    class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm font-medium text-slate-800 dark:text-white">
+            </div>
+            <div class="md:col-span-2 lg:col-span-4">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">URL base personalizada do CDN (opcional)</label>
+                <input type="url" name="cdn_url" placeholder="https://cdn.somosunn.com.br" value="{{ $settings['cdn_url'] ?? '' }}"
+                    class="w-full px-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm font-medium text-slate-800 dark:text-white">
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    (function () {
+        const ipBtn = document.getElementById('btnAddCurrentIpPanel');
+        const ipArea = document.getElementById('panel_maintenance_allowed_ips');
+        if (ipBtn && ipArea) {
+            ipBtn.addEventListener('click', function () {
+                const currentIp = @json(request()->header('CF-Connecting-IP') ?: request()->ip());
+                if (currentIp && !ipArea.value.includes(currentIp)) {
+                    ipArea.value = (ipArea.value.trim() ? ipArea.value.trim() + '\n' : '') + currentIp;
+                }
+            });
+        }
+
+        const authBtn = document.getElementById('btnAuthorizeMaintenanceDevicePanel');
+        if (authBtn) {
+            authBtn.addEventListener('click', function () {
+                authBtn.disabled = true;
+                fetch(@json(route('panel.admin.settings.authorize-device')), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': @json(csrf_token()),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    const tokenInput = document.getElementById('panel_maintenance_bypass_token');
+                    if (tokenInput && data.bypass_token) tokenInput.value = data.bypass_token;
+                    if (typeof toastr !== 'undefined') toastr.success(data.message || 'Dispositivo autorizado.');
+                })
+                .catch(() => {
+                    if (typeof toastr !== 'undefined') toastr.error('Falha ao autorizar dispositivo.');
+                })
+                .finally(() => { authBtn.disabled = false; });
+            });
+        }
+    })();
     document.querySelectorAll('[data-maintenance-action]').forEach((button) => {
         button.addEventListener('click', function () {
             const form = this.closest('form');

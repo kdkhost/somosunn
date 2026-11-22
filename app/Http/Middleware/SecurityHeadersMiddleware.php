@@ -361,6 +361,25 @@ class SecurityHeadersMiddleware
             }
         }
 
+        // Permite dinamicamente o subdominio CDN e API quando ativos nas configuracoes
+        if (class_exists(\App\Support\DomainManager::class)) {
+            $cdnOrigin = \App\Support\DomainManager::cdnBaseUrl();
+            if ($cdnOrigin !== '' && \App\Support\DomainManager::isCdnEnabled()) {
+                foreach (['script-src', 'style-src', 'img-src', 'font-src', 'media-src'] as $cdnDirective) {
+                    if (!in_array($cdnOrigin, $directives[$cdnDirective], true)) {
+                        $directives[$cdnDirective][] = $cdnOrigin;
+                    }
+                }
+            }
+
+            if (\App\Support\DomainManager::isRoutingEnabled()) {
+                $apiOrigin = \App\Support\DomainManager::scheme() . '://' . \App\Support\DomainManager::apiDomain();
+                if (!in_array($apiOrigin, $directives['connect-src'], true)) {
+                    $directives['connect-src'][] = $apiOrigin;
+                }
+            }
+        }
+
         return $directives;
     }
 

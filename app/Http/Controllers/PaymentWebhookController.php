@@ -110,12 +110,83 @@ class PaymentWebhookController extends Controller
         } catch (\Throwable $e) { /* swallow - never let audit break webhook */ }
 
         try {
-            app(SumUpWebhookProcessor::class)->process($payload, $token);
+            app(\App\Services\QueueManagerService::class)->dispatch(
+                \App\Services\QueueManagerService::QUEUE_WEBHOOKS,
+                new \App\Jobs\ProcessPaymentWebhookJob('sumup', $payload, [
+                    'order_id' => $orderId,
+                    'token' => $token,
+                ])
+            );
         } catch (\Throwable $e) {
-            Log::error('SumUp webhook processing error', [
-                'order_id' => $orderId,
-                'error'    => $e->getMessage(),
+            try {
+                app(SumUpWebhookProcessor::class)->process($payload, $token);
+            } catch (\Throwable $inner) {
+                Log::error('SumUp webhook processing error', [
+                    'order_id' => $orderId,
+                    'error'    => $inner->getMessage(),
+                ]);
+            }
+        }
+
+        return response('OK', 200);
+    }
+
+    /**
+     * Webhook Pix da Efi Pro (Gerencianet) com validacao de assinatura HMAC/token
+     * e processamento assincrono na fila `webhooks`.
+     */
+    public function efi(Request $request)
+    {
+        if ($request->isMethod('GET') && !$request->has('pix')) {
+            return response('OK', 200);
+        }
+
+        $rawPayload = $request->getContent();
+        $signature = (string) ($request->header('x-webhook-signature') ?: $request->header('x-hub-signature-256') ?: '');
+        $hmacQuery = (string) ($request->query('hmac', '') ?: $request->query('token', ''));
+
+        $efiService = app(\App\Services\Payment\EfiService::class);
+        if ($request->isMethod('POST') && !$efiService->validateWebhookRequest($rawPayload, $signature, $hmacQuery)) {
+            try {
+                app(\App\Services\AnomalyDetectorService::class)->recordWebhook('efi_' . (string) $request->ip(), false);
+            } catch (\Throwable $e) { /* swallow */ }
+
+            Log::channel('security')->warning('Webhook Efi Pro rejeitado por autenticacao invalida', [
+                'ip_hash' => hash('sha256', (string) $request->ip()),
             ]);
+
+            return response('Unauthorized', 401);
+        }
+
+        try {
+            app(\App\Services\AnomalyDetectorService::class)->recordWebhook('efi_' . (string) $request->ip(), true);
+        } catch (\Throwable $e) { /* swallow */ }
+
+        $payload = $request->all();
+        $firstTxid = (string) data_get($payload, 'pix.0.txid', '');
+
+        try {
+            PaymentWebhookLog::create([
+                'provider'    => 'efi',
+                'external_id' => $firstTxid,
+                'signature'   => $signature,
+                'status'      => 'pix_received',
+                'payload'     => ['pix_count' => is_array($payload['pix'] ?? null) ? count($payload['pix']) : 0, 'txid' => $firstTxid],
+                'ip'          => $request->ip(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Falha ao registrar log webhook Efi Pro: ' . $e->getMessage());
+        }
+
+        try {
+            app(\App\Services\QueueManagerService::class)->dispatch(
+                \App\Services\QueueManagerService::QUEUE_WEBHOOKS,
+                new \App\Jobs\ProcessPaymentWebhookJob('efi', $payload, [
+                    'txid' => $firstTxid,
+                ])
+            );
+        } catch (\Throwable $e) {
+            Log::error('Webhook Efi Pro falhou ao enfileirar: ' . $e->getMessage(), ['txid' => $firstTxid]);
         }
 
         return response('OK', 200);
@@ -206,13 +277,27 @@ class PaymentWebhookController extends Controller
             );
         } catch (\Throwable $e) { /* swallow - never let audit break webhook */ }
 
+        if (!in_array($type, ['subscription_preapproval', 'preapproval', 'payment'], true)) {
+            return response('OK', 200);
+        }
+
+        try {
+            app(\App\Services\QueueManagerService::class)->dispatch(
+                \App\Services\QueueManagerService::QUEUE_WEBHOOKS,
+                new \App\Jobs\ProcessPaymentWebhookJob('mercadopago', $request->all(), [
+                    'seller_id' => (string) $seller_id,
+                    'data_id' => (string) ($webhookSecurity['data_id'] ?? $paymentIdForLog ?? ''),
+                ])
+            );
+
+            return response('OK', 200);
+        } catch (\Throwable $dispatchError) {
+            Log::warning('MP Webhook fallback sincrono apos falha de fila: ' . $dispatchError->getMessage());
+        }
+
         // Se for preapproval (assinatura iniciada/autorizada)
         if ($type === 'subscription_preapproval' || $type === 'preapproval') {
             return $this->handleMPPreapproval($request);
-        }
-
-        if ($type !== 'payment') {
-            return response('OK', 200);
         }
 
         try {
@@ -478,106 +563,6 @@ class PaymentWebhookController extends Controller
     private function calculateAndSaveSplits(Order $order)
     {
         app(\App\Services\OrderSplitService::class)->syncForPaidOrder($order);
-        return;
-
-        $total = (float) $order->total_amount;
-        if ($total <= 0)
-            return;
-
-        // Limpar splits existentes se houver
-        OrderSplit::where('order_id', $order->id)->delete();
-
-        // Pegar porcentagens das configurações
-        $sellerPercent = (float) Setting::get('marketplace_split_seller_percent', 70);
-        $platformPercent = (float) Setting::get('marketplace_split_platform_percent', 10);
-        $trafficPercent = (float) Setting::get('marketplace_split_traffic_percent', 10);
-        $superadminPercent = (float) Setting::get('marketplace_split_superadmin_percent', 10);
-
-        // Achar SuperAdmin (para a chave PIX)
-        $superadmin = User::where('role', 'superadmin')
-            ->orWhere('level', 'superadmin')
-            ->first();
-
-        // Responsavel de Marketing (configurado pelo admin na listagem de usuarios)
-        $marketingManagerId = (int) Setting::get('platform_marketing_user_id', 0);
-        $marketingManager = $marketingManagerId > 0 ? User::find($marketingManagerId) : null;
-
-        // Admin da plataforma (quem recebe o split "platform")
-        $platformAdminId = (int) Setting::get('platform_admin_user_id', 0);
-        $configuredPlatformAdmin = $platformAdminId > 0 ? User::find($platformAdminId) : null;
-        $platformAdmin = $configuredPlatformAdmin?->isAdmin() ? $configuredPlatformAdmin : null;
-        $platformAdmin ??= User::query()
-            ->where(fn ($query) => $query->where('role', 'admin')->orWhere('level', 'sucesso'))
-            ->oldest('id')
-            ->first();
-        $platformAdmin ??= $superadmin;
-
-        // Determinar gateway usado (informativo para o painel de splits)
-        $gateway = (string) ($order->gateway ?? '');
-
-        $splits = [
-            [
-                'type' => 'seller',
-                'percent' => $sellerPercent,
-                'user_id' => ($order->seller_id && $order->seller_id !== 'platform') ? $order->seller_id : null,
-            ],
-            [
-                'type' => 'platform',
-                'percent' => $platformPercent,
-                'user_id' => $platformAdmin?->id,
-            ],
-            [
-                'type' => 'traffic',
-                'percent' => $trafficPercent,
-                'user_id' => $marketingManager?->id,
-            ],
-            [
-                'type' => 'superadmin',
-                'percent' => $superadminPercent,
-                'user_id' => $superadmin ? $superadmin->id : null,
-            ],
-        ];
-
-        foreach ($splits as $split) {
-            $percent = (float) $split['percent'];
-            if ($percent <= 0) {
-                continue;
-            }
-
-            $amount = round(($total * $percent) / 100, 2);
-            $pixKey = null;
-
-            if ($split['type'] === 'seller' && $order->seller) {
-                $pixKey = $order->seller->pix_key;
-            } elseif ($split['type'] === 'superadmin' && $superadmin) {
-                $pixKey = $superadmin->pix_key;
-            } elseif ($split['type'] === 'platform') {
-                $pixKey = $platformAdmin?->pix_key;
-            } elseif ($split['type'] === 'traffic') {
-                $pixKey = $marketingManager?->pix_key;
-            }
-
-            // Status: sempre "pending" até confirmação manual pelo admin/superadmin.
-            // SumUp não tem split automático — o sistema registra quem deve o quê.
-            // MercadoPago com application_fee: o gateway distribui, mas o admin confirma no painel.
-            $status = 'pending';
-
-            \App\Models\OrderSplit::create([
-                'order_id' => $order->id,
-                'receiver_id' => $split['user_id'],
-                'receiver_type' => $split['type'],
-                'percentage' => $percent,
-                'amount' => $amount,
-                'pix_key' => $pixKey,
-                'status' => $status,
-            ]);
-        }
-
-        // Registrar platform_fee_amount no pedido para referência
-        $platformFee = round($total * (($platformPercent + $superadminPercent + $trafficPercent) / 100), 2);
-        if ($platformFee > 0 && !(float) $order->platform_fee_amount) {
-            $order->update(['platform_fee_amount' => $platformFee]);
-        }
     }
 
     private function confirmEventRegistrationsForOrder(Order $order): void

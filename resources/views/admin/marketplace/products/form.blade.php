@@ -207,7 +207,7 @@
                     </div>
                     <div class="card-body">
                         @if($product->cover_url)
-                            <img src="{{ $product->cover_url }}" alt="Capa" class="img-fluid rounded border mb-3" style="max-height:160px; width:100%; object-fit:cover;">
+                            <img src="{{ $product->cover_url }}" alt="Capa" class="img-fluid rounded border mb-3" style="max-height:160px; width:100%; object-fit:cover;" loading="lazy" decoding="async">
                         @endif
                         <div class="dropzone-area" id="cover-dropzone">
                             <input type="file" name="cover" accept="image/*" class="dropzone-input" id="cover-input">
@@ -217,7 +217,7 @@
                                 <p class="text-muted small mb-0">ou clique para selecionar (JPG, PNG, WEBP)</p>
                             </div>
                             <div class="dropzone-preview d-none">
-                                <img src="" alt="Preview" class="img-fluid rounded border" style="max-height:120px; width:100%; object-fit:cover;">
+                                <img src="" alt="Preview" class="img-fluid rounded border" style="max-height:120px; width:100%; object-fit:cover;" loading="lazy" decoding="async">
                                 <div class="dropzone-file-info mt-2 text-sm text-muted"></div>
                             </div>
                         </div>
@@ -261,7 +261,7 @@
                                                 <video src="{{ $media->file_url }}" class="w-100 h-100" style="object-fit:cover;" muted></video>
                                                 <span class="position-absolute badge badge-dark" style="top:4px;right:4px;font-size:9px;"><i class="fas fa-play"></i></span>
                                             @else
-                                                <img src="{{ $media->file_url }}" alt="Mídia" class="w-100 h-100" style="object-fit:cover;">
+                                                <img src="{{ $media->file_url }}" alt="Mídia" class="w-100 h-100" style="object-fit:cover;" loading="lazy" decoding="async">
                                             @endif
                                             <form action="{{ route('admin.marketplace.products.media.destroy', [$product, $media]) }}" method="POST"
                                                 class="position-absolute" style="bottom:4px;right:4px;">
@@ -308,7 +308,7 @@
                 </a>
                 <div>
                     @if($product->exists)
-                        <button type="submit" formaction="{{ route('admin.marketplace.products.destroy', $product) }}" formmethod="POST" onclick="event.preventDefault(); if(confirm('Deseja remover este produto?')) { const form = this.closest('form'); const temp = document.createElement('input'); temp.type='hidden'; temp.name='_method'; temp.value='DELETE'; form.appendChild(temp); form.submit(); }" class="btn btn-outline-danger rounded-pill px-4 mr-2">
+                        <button type="submit" formaction="{{ route('admin.marketplace.products.destroy', $product) }}" formmethod="POST" onclick="event.preventDefault(); const form = this.closest('form'); const runDel = () => { const temp = document.createElement('input'); temp.type='hidden'; temp.name='_method'; temp.value='DELETE'; temp.setAttribute('formaction', '{{ route('admin.marketplace.products.destroy', $product) }}'); form.action = '{{ route('admin.marketplace.products.destroy', $product) }}'; form.method = 'POST'; form.appendChild(temp); form.submit(); }; if (typeof Swal !== 'undefined') { Swal.fire({ icon: 'warning', title: 'Remover produto?', text: 'Deseja remover este produto?', showCancelButton: true, confirmButtonText: 'Sim, remover', cancelButtonText: 'Cancelar', confirmButtonColor: '#dc3545' }).then(r => { if (r.isConfirmed) runDel(); }); }" class="btn btn-outline-danger rounded-pill px-4 mr-2">
                             <i class="fas fa-trash mr-1"></i> Excluir
                         </button>
                     @endif

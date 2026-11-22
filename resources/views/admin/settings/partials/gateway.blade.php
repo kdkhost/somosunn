@@ -48,9 +48,15 @@
                 <span class="badge badge-success ml-2">Ativo</span>
             @endif
         </button>
-        <button type="button" class="btn btn-lg btn-outline-secondary main-gateway-tab mb-2" data-target="main-tab-sumup" onclick="switchMainGatewayTab(this)">
+        <button type="button" class="btn btn-lg btn-outline-secondary main-gateway-tab mr-2 mb-2" data-target="main-tab-sumup" onclick="switchMainGatewayTab(this)">
             <i class="fas fa-credit-card mr-2"></i>SumUp
             @if(($settings['sumup_enabled'] ?? 0))
+                <span class="badge badge-success ml-2">Ativo</span>
+            @endif
+        </button>
+        <button type="button" class="btn btn-lg btn-outline-secondary main-gateway-tab mb-2" data-target="main-tab-efi" onclick="switchMainGatewayTab(this)">
+            <i class="fas fa-qrcode mr-2"></i>Efi Pro (Pix)
+            @if(!empty($settings['efi_enabled']))
                 <span class="badge badge-success ml-2">Ativo</span>
             @endif
         </button>
@@ -753,10 +759,114 @@
 
     {{-- FIM TAB SUMUP --}}
 
+    {{-- ============================================================
+         TAB EFI PRO (PIX)
+         ============================================================ --}}
+    <div class="main-gateway-pane" id="main-tab-efi">
+        <div class="card card-outline card-success gateway-section mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title font-weight-bold">
+                    <i class="fas fa-qrcode mr-2"></i> Efi Pro (Gerencianet Pix)
+                </h3>
+                <div class="custom-control custom-switch">
+                    <input type="hidden" name="efi_enabled" value="0">
+                    <input type="checkbox" class="custom-control-input" id="efi_enabled" name="efi_enabled" value="1"
+                        {{ !empty($settings['efi_enabled']) ? 'checked' : '' }}>
+                    <label class="custom-control-label" for="efi_enabled">Ativar gateway Efi Pro</label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>Ambiente</label>
+                        <select name="efi_env" id="admin_efi_env" class="form-control">
+                            <option value="sandbox" {{ ($settings['efi_env'] ?? 'sandbox') === 'sandbox' ? 'selected' : '' }}>Sandbox (Homologacao)</option>
+                            <option value="production" {{ ($settings['efi_env'] ?? 'sandbox') === 'production' ? 'selected' : '' }}>Producao</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Client ID</label>
+                        <input type="text" name="efi_client_id" id="admin_efi_client_id" class="form-control"
+                            value="{{ $settings['efi_client_id'] ?? '' }}" placeholder="Client_Id_...">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Client Secret</label>
+                        <input type="password" name="efi_client_secret" id="admin_efi_client_secret" class="form-control"
+                            value="{{ $settings['efi_client_secret'] ?? '' }}" placeholder="Client_Secret_...">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Chave Pix Recebedora</label>
+                        <input type="text" name="efi_pix_key" class="form-control"
+                            value="{{ $settings['efi_pix_key'] ?? '' }}" placeholder="EVP, CNPJ, e-mail ou telefone">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Caminho do Certificado (.pem / .p12)</label>
+                        <input type="text" name="efi_certificate_path" class="form-control"
+                            value="{{ $settings['efi_certificate_path'] ?? '' }}" placeholder="/home/somosunn/certs/efi-prod.pem">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Webhook Secret / Token HMAC</label>
+                        <input type="password" name="efi_webhook_secret" class="form-control"
+                            value="{{ $settings['efi_webhook_secret'] ?? '' }}" placeholder="Segredo para validacao HMAC">
+                    </div>
+                </div>
+                <div class="alert alert-light border small mb-3">
+                    <strong>URL do Webhook Efi Pro:</strong>
+                    <code>{{ \App\Support\DomainManager::apiUrl('/webhook/efi') }}</code>
+                    <br><span class="text-muted">Processado assincronamente na fila <code>webhooks</code> com protecao mTLS/HMAC.</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="custom-control custom-switch">
+                        <input type="hidden" name="efi_mtls_enabled" value="0">
+                        <input type="checkbox" class="custom-control-input" id="efi_mtls_enabled" name="efi_mtls_enabled" value="1"
+                            {{ ($settings['efi_mtls_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="efi_mtls_enabled">Exigir certificado mTLS em producao</label>
+                    </div>
+                    <button type="button" class="btn btn-outline-success" id="btn-test-efi" onclick="testEfiConnection()">
+                        <i class="fas fa-plug mr-1"></i> Testar conexao Efi Pro
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @push('scripts')
 <script>
+function testEfiConnection() {
+    const btn = document.getElementById('btn-test-efi');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando...';
+
+    fetch('{{ route("admin.settings.test_gateway") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            gateway: 'efi',
+            env: document.getElementById('admin_efi_env')?.value || 'sandbox',
+            client_id: document.getElementById('admin_efi_client_id')?.value || '',
+            client_secret: document.getElementById('admin_efi_client_secret')?.value || ''
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (typeof toastr !== 'undefined') {
+            data.success ? toastr.success(data.message) : toastr.error(data.message || 'Falha na conexao Efi Pro.');
+        } else if (typeof Swal !== 'undefined') {
+            Swal.fire(data.success ? 'Sucesso' : 'Falha', data.message || '', data.success ? 'success' : 'error');
+        }
+    })
+    .catch(() => {
+        if (typeof toastr !== 'undefined') toastr.error('Erro ao testar Efi Pro.');
+    })
+    .finally(() => { btn.disabled = false; btn.innerHTML = orig; });
+}
 function switchMainGatewayTab(btn) {
     // Remove active from all main tabs
     document.querySelectorAll('.main-gateway-tab').forEach(tab => {

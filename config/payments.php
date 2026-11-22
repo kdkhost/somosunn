@@ -43,4 +43,15 @@ return [
         'pass_fee' => env('SUMUP_PASS_FEE', false),
         'webhook_secret' => env('SUMUP_WEBHOOK_SECRET', ''),
     ],
+
+    'efi' => [
+        'enabled' => env('PAYMENT_EFI_ENABLED', false),
+        'env' => env('EFI_ENV', 'sandbox'),
+        'client_id' => env('EFI_CLIENT_ID', ''),
+        'client_secret' => env('EFI_CLIENT_SECRET', ''),
+        'pix_key' => env('EFI_PIX_KEY', ''),
+        'certificate_path' => env('EFI_CERTIFICATE_PATH', ''),
+        'webhook_secret' => env('EFI_WEBHOOK_SECRET', ''),
+        'mtls_enabled' => env('EFI_MTLS_ENABLED', true),
+    ],
 ];

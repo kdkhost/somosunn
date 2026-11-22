@@ -38,7 +38,7 @@
 
             @if($metaImage !== '')
                 <div class="mt-6">
-                    <img src="{{ $metaImage }}" alt="{{ $label }}" class="w-full max-h-72 object-cover rounded-2xl border border-slate-100">
+                    <img src="{{ $metaImage }}" alt="{{ $label }}" class="w-full max-h-72 object-cover rounded-2xl border border-slate-100" loading="lazy" decoding="async">
                 </div>
             @endif
 

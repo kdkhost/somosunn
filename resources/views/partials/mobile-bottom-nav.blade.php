@@ -38,7 +38,7 @@
     ];
 @endphp
 
-<div class="mobile-app-nav lg:hidden fixed inset-x-0 bottom-0 z-[90] animate-fade-in-up">
+<div id="unnPwaBottomNav" class="mobile-app-nav fixed inset-x-0 bottom-0 z-[90] animate-fade-in-up">
     <nav class="mobile-app-nav__bar" aria-label="Navegacao rapida">
         @foreach ($navItems as $item)
             <a href="{{ $item['route'] }}"
@@ -53,14 +53,53 @@
     </nav>
 </div>
 
+<script>
+    (function () {
+        const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+            || window.navigator.standalone === true
+            || (window.matchMedia && window.matchMedia('(display-mode: minimal-ui)').matches);
+
+        if (isStandalone) {
+            document.documentElement.classList.add('unn-pwa-standalone');
+        }
+    })();
+</script>
+
 <style>
     :root {
         --mobile-app-nav-height: 78px;
         --mobile-app-nav-safe-area: env(safe-area-inset-bottom, 0px);
     }
 
-    body {
-        padding-bottom: calc(var(--mobile-app-nav-height) + var(--mobile-app-nav-safe-area)) !important;
+    .mobile-app-nav {
+        display: none;
+    }
+
+    @media (max-width: 1023.98px) and (display-mode: standalone), (max-width: 1023.98px) and (display-mode: minimal-ui) {
+        .mobile-app-nav {
+            display: block;
+        }
+
+        body {
+            padding-bottom: calc(var(--mobile-app-nav-height) + var(--mobile-app-nav-safe-area)) !important;
+        }
+    }
+
+    html.unn-pwa-standalone .mobile-app-nav {
+        display: block;
+    }
+
+    @media (min-width: 1024px) {
+        html.unn-pwa-standalone .mobile-app-nav,
+        .mobile-app-nav {
+            display: none !important;
+        }
+    }
+
+    @media (max-width: 1023.98px) {
+        html.unn-pwa-standalone body {
+            padding-bottom: calc(var(--mobile-app-nav-height) + var(--mobile-app-nav-safe-area)) !important;
+        }
     }
 
     .mobile-app-nav__bar {

@@ -258,7 +258,7 @@
 
                     <div class="relative w-full aspect-video bg-slate-50 dark:bg-slate-950 rounded-2xl overflow-hidden border-2 border-dashed border-slate-200 dark:border-slate-800 group transition-all">
                         @if($plan->image)
-                            <img id="plan_preview" src="{{ asset('storage/' . $plan->image) }}" class="w-full h-full object-cover">
+                            <img id="plan_preview" src="{{ asset('storage/' . $plan->image) }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center backdrop-blur-sm">
                                 <label class="cursor-pointer text-white flex flex-col items-center gap-2">
                                     <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -274,7 +274,7 @@
                                 <span class="text-[10px] font-black uppercase tracking-widest">Enviar imagem</span>
                                 <input type="file" name="image" class="hidden" accept="image/*" onchange="previewPlanImage(this)">
                             </label>
-                            <img id="plan_preview" class="hidden w-full h-full object-cover">
+                            <img id="plan_preview" class="hidden w-full h-full object-cover" loading="lazy" decoding="async">
                         @endif
                     </div>
 

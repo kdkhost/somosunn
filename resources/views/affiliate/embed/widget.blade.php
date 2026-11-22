@@ -89,7 +89,7 @@
 
         <div class="brand">
             @if(!empty($branding['logo_url']))
-                <img src="{{ $branding['logo_url'] }}" alt="{{ $branding['site_name'] ?? 'Marca' }}">
+                <img src="{{ $branding['logo_url'] }}" alt="{{ $branding['site_name'] ?? 'Marca' }}" loading="lazy" decoding="async">
             @endif
             <div>
                 <div style="font-size:12px; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,.64); font-weight:800;">Afiliado</div>

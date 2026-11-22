@@ -752,7 +752,7 @@
                                                                     <source media="(max-width: 767px)" srcset="{{ $slide['image_mobile'] }}">
                                                                 @endif
                                                                 <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
-                                                                    style="width:100%; height:100%; object-fit:cover; display:block;">
+                                                                    style="width:100%; height:100%; object-fit:cover; display:block;" loading="lazy" decoding="async">
                                                             </picture>
                                                         </div>
                                                     @endif
@@ -795,7 +795,7 @@
                                                 @if(($slide['image'] ?? '') !== '')
                                                     <picture class="absolute inset-0" style="z-index:1;">
                                                         <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
-                                                            style="width:100%; height:100%; object-fit:cover; display:block;">
+                                                            style="width:100%; height:100%; object-fit:cover; display:block;" loading="lazy" decoding="async">
                                                     </picture>
                                                 @endif
                                                 <div class="absolute inset-0"
@@ -857,7 +857,7 @@
                                                                             srcset="{{ $slide['image_mobile'] }}">
                                                                     @endif
                                                                     <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
-                                                                        style="width:100%; height:100%; object-fit:cover; display:block;">
+                                                                        style="width:100%; height:100%; object-fit:cover; display:block;" loading="lazy" decoding="async">
                                                                 </picture>
                                                             </div>
                                                         @endif
@@ -900,7 +900,7 @@
                                                     @if(($slide['image'] ?? '') !== '')
                                                         <picture class="absolute inset-0" style="z-index:1;">
                                                             <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? '' }}"
-                                                                style="width:100%; height:100%; object-fit:cover; display:block;">
+                                                                style="width:100%; height:100%; object-fit:cover; display:block;" loading="lazy" decoding="async">
                                                         </picture>
                                                     @endif
                                                     <div class="absolute inset-0"
@@ -1186,7 +1186,7 @@
                                         <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
                                             @if(($deal['image_url'] ?? '') !== '')
                                                 <img src="{{ $deal['image_url'] }}" alt="{{ $deal['title'] }}"
-                                                    class="w-full h-full object-cover">
+                                                    class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center text-slate-300">
                                                     <i class="fas fa-image text-4xl"></i>
@@ -1281,7 +1281,7 @@
                             <a href="{{ $productUrl }}" class="block flex flex-1 flex-col">
                                 <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
                                     @if($product->cover_url)
-                                        <img src="{{ $product->cover_url }}" alt="{{ $product->title }}" class="w-full h-full object-cover">
+                                        <img src="{{ $product->cover_url }}" alt="{{ $product->title }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-slate-300">
                                             <i class="fas fa-box text-4xl"></i>
@@ -1403,7 +1403,7 @@
                             <a href="{{ route('courses.show', $showParam) }}" class="block flex flex-1 flex-col">
                                 <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
                                     @if($thumbUrl !== '')
-                                        <img src="{{ $thumbUrl }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                                        <img src="{{ $thumbUrl }}" alt="{{ $course->title }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-slate-300">
                                             <i class="fas fa-image text-4xl"></i>
@@ -1547,7 +1547,7 @@
                                 <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
                                     @if($imageUrl !== '')
                                         <img src="{{ $imageUrl }}" alt="{{ $mentorship->title }}"
-                                            class="w-full h-full object-cover">
+                                            class="w-full h-full object-cover" loading="lazy" decoding="async">
                                     @else
                                         <div class="absolute inset-0 opacity-80"
                                             style="background: radial-gradient(900px circle at 20% 10%, rgba(31, 94, 219, 0.18) 0%, transparent 60%), radial-gradient(700px circle at 90% 20%, rgba(23, 127, 214, 0.12) 0%, transparent 55%);">
@@ -1716,7 +1716,7 @@
                             @endif
                                 <div class="mp-selling-media aspect-[16/9] bg-slate-100 relative">
                                     @if($imageUrl !== '')
-                                        <img src="{{ $imageUrl }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
+                                        <img src="{{ $imageUrl }}" alt="{{ $event->title }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-slate-300">
                                             <i class="fas fa-image text-4xl"></i>
@@ -1937,7 +1937,7 @@
 
                     <div class="bg-slate-50 border-t md:border-t-0 md:border-l border-slate-100">
                         @if($marketplaceExitImage !== '')
-                            <img src="{{ $marketplaceExitImage }}" alt="Oferta" class="w-full h-full object-cover">
+                            <img src="{{ $marketplaceExitImage }}" alt="Oferta" class="w-full h-full object-cover" loading="lazy" decoding="async">
                         @else
                             <div class="w-full h-full min-h-[240px] flex items-center justify-center text-slate-300">
                                 <i class="fas fa-gift text-6xl"></i>

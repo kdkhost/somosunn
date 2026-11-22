@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Painel do Membro')</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS Estatico Compilado -->
+    <link rel="stylesheet" href="{{ unn_asset('css/unn-tailwind.css') }}">
     <!-- FontAwesome (opcional) -->
     <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
     @stack('styles')
@@ -17,7 +17,7 @@
     <header
         class="bg-white dark:bg-slate-900 shadow p-4 flex items-center justify-between border-b dark:border-slate-800 transition-colors">
         <div class="flex items-center gap-2">
-            <img src="{{ asset('img/logo-unn.png') }}" alt="Logo UNN" class="h-8">
+            <img src="{{ asset('img/logo-unn.png') }}" alt="Logo UNN" class="h-8" loading="lazy" decoding="async">
             <span class="font-bold text-lg text-blue-900 dark:text-white transition-colors">SOMOS UNN</span>
         </div>
         <!-- Menu Desktop -->
@@ -45,7 +45,7 @@
             id="mobile-menu-panel" tabindex="-1" aria-modal="true" role="dialog">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-2">
-                    <img src="{{ asset('img/logo-unn.png') }}" alt="Logo UNN" class="h-8">
+                    <img src="{{ asset('img/logo-unn.png') }}" alt="Logo UNN" class="h-8" loading="lazy" decoding="async">
                     <span class="font-bold text-lg text-blue-900 dark:text-white">SOMOS UNN</span>
                 </div>
                 <button id="mobile-menu-close" class="text-gray-700 dark:text-slate-300 text-2xl focus:outline-none"

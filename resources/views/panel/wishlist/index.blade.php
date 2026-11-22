@@ -48,7 +48,7 @@
                         class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden hover:shadow-md transition group relative">
                         <div class="relative h-48 bg-slate-100 dark:bg-slate-800">
                             @if($thumbUrl)
-                                <img src="{{ $thumbUrl }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                                <img src="{{ $thumbUrl }}" alt="{{ $course->title }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
                                     <i class="fas fa-image text-4xl"></i>

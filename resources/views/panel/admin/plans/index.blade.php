@@ -40,7 +40,7 @@
                                     <div class="flex items-center gap-4">
                                         <div class="w-16 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700 transition-colors">
                                             @if($plan->image)
-                                                <img src="{{ asset('storage/' . $plan->image) }}" alt="" class="w-full h-full object-cover">
+                                                <img src="{{ asset('storage/' . $plan->image) }}" alt="" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600 transition-colors">
                                                     <i class="fas fa-image"></i>

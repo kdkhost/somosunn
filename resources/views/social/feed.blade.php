@@ -99,7 +99,7 @@
                                 <div class="flex items-center gap-3 mb-6">
                                     <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
                                         <img src="{{ $authAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
-                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                     </div>
                                     <div>
                                         <p class="font-bold text-gray-900">{{ Auth::user()->name }}</p>
@@ -181,7 +181,7 @@
                                     <div class="flex gap-3">
                                         <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
                                             <img src="{{ $authAvatar }}" alt="Avatar" class="w-10 h-10 object-cover"
-                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                         </div>
                                         <div class="flex-1">
                                             <textarea name="content" rows="3" id="post-content"
@@ -192,7 +192,7 @@
                                     <div id="post-preview-top" class="hidden mt-3">
                                         <div class="relative inline-flex">
                                             <img id="post-preview-top-img" src="" alt="Preview"
-                                                class="max-h-40 rounded-lg border border-gray-200 object-cover">
+                                                class="max-h-40 rounded-lg border border-gray-200 object-cover" loading="lazy" decoding="async">
                                             <button type="button" id="post-preview-remove"
                                                 class="absolute -top-2 -right-2 bg-white text-gray-500 border border-gray-200 rounded-full w-7 h-7 flex items-center justify-center hover:text-red-600">
                                                 <i class="fas fa-times"></i>
@@ -221,7 +221,7 @@
                                             </div>
                                             <div id="post-preview-inline" class="hidden items-center gap-3">
                                                 <img id="post-preview-inline-img" src="" alt="Preview"
-                                                    class="w-12 h-12 rounded border border-gray-200 object-cover">
+                                                    class="w-12 h-12 rounded border border-gray-200 object-cover" loading="lazy" decoding="async">
                                                 <span class="text-xs text-gray-600" id="post-preview-inline-name"></span>
                                             </div>
                                         </div>
@@ -283,7 +283,7 @@
                                                             class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0 block">
                                                             <img src="{{ $postAvatar }}" alt="Avatar"
                                                                 class="w-10 h-10 object-cover hover:opacity-80 transition"
-                                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                                         </a>
                                                         <div>
                                                             <a href="{{ route('social.profile', $post->user->id) }}"
@@ -362,14 +362,14 @@
                                                         @endphp
                                                         @if($mediaCount === 1)
                                                             <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
-                                                                class="w-full rounded-lg object-cover">
+                                                                class="w-full rounded-lg object-cover" loading="lazy" decoding="async">
                                                         @else
                                                             <div class="relative" data-carousel data-total="{{ $mediaCount }}">
                                                                 <div class="overflow-hidden rounded-lg">
                                                                     <div class="flex transition-transform duration-300" data-track>
                                                                         @foreach($post->media as $media)
                                                                             <img src="{{ asset($media->path) }}" alt="Midia do post"
-                                                                                class="w-full shrink-0 object-cover">
+                                                                                class="w-full shrink-0 object-cover" loading="lazy" decoding="async">
                                                                         @endforeach
                                                                     </div>
                                                                 </div>
@@ -491,7 +491,7 @@
                                                             <div class="flex gap-3">
                                                                 <div class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0">
                                                                     <img src="{{ $commentAvatar }}" alt="Avatar" class="w-8 h-8 object-cover"
-                                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                                                 </div>
                                                                 <div class="bg-gray-50 rounded-lg px-3 py-2 w-full">
                                                                     <div class="flex justify-between items-center">
@@ -567,7 +567,7 @@
                                     <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-100"
                                         id="conversation-avatar-wrap">
                                         <img id="conversation-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
-                                            class="w-10 h-10 object-cover">
+                                            class="w-10 h-10 object-cover" loading="lazy" decoding="async">
                                     </div>
                                     <div>
                                         <p class="font-semibold text-gray-900" id="conversation-name">Selecione uma conversa
@@ -651,7 +651,7 @@
                                                     <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
                                                         <img src="{{ $request->requester->profile_photo_url }}" alt="Avatar"
                                                             class="w-10 h-10 object-cover"
-                                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                                     </div>
                                                     <div>
                                                         <p class="text-sm font-semibold text-gray-800">{{ $request->requester->name }}
@@ -695,7 +695,7 @@
                                                 <div class="flex items-center gap-2">
                                                     <img src="{{ $sr->fromUser?->profile_photo_url ?? asset('img/default-user.svg') }}"
                                                          class="w-8 h-8 rounded-full object-cover shrink-0"
-                                                         onerror="this.src='{{ asset('img/default-user.svg') }}'">
+                                                         onerror="this.src='{{ asset('img/default-user.svg') }}'" loading="lazy" decoding="async">
                                                     <div class="min-w-0">
                                                         <p class="font-semibold text-gray-800 text-xs leading-tight truncate">{{ $sr->fromUser?->name }}</p>
                                                         <p class="text-[10px] text-gray-500">quer compartilhar um post com você</p>
@@ -747,7 +747,7 @@
                                                     href="{{ route('social.profile', $user->id) }}">
                                                     <img src="{{ $user->profile_photo_url }}" alt="Avatar"
                                                         class="w-10 h-10 object-cover"
-                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                                 </a>
                                                 <div>
                                                     <a href="{{ route('social.profile', $user->id) }}"
@@ -790,7 +790,7 @@
                             <div class="flex flex-col items-center text-center mb-4">
                                 <div class="w-20 h-20 rounded-full overflow-hidden bg-gray-100 mb-3">
                                     <img id="conversation-info-avatar" src="{{ asset('img/default-user.svg') }}" alt="Avatar"
-                                        class="w-20 h-20 object-cover">
+                                        class="w-20 h-20 object-cover" loading="lazy" decoding="async">
                                 </div>
                                 <p class="font-semibold text-gray-900" id="conversation-info-name">Selecione uma conversa</p>
                                 <p class="text-xs text-gray-500" id="conversation-info-status">Online recentemente</p>
@@ -1796,7 +1796,7 @@
                         // Update inner HTML only if content changed or if it was empty
                         const unreadHtml = (conv.unread_count || 0) > 0 ? `<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${conv.unread_count}</span>` : '';
                         const contentHtml = `
-                                                    <img src="${avatar || '/img/default-user.svg'}" class="w-10 h-10 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" />
+                                                    <img src="${avatar || '/img/default-user.svg'}" class="w-10 h-10 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" loading="lazy" decoding="async" />
                                                     <div class="flex-1 min-w-0">
                                                         <div class="flex items-center justify-between">
                                                             <p class="text-sm font-semibold text-gray-800 truncate" data-role="conversation-name">${otherUser.name}</p>
@@ -1955,7 +1955,7 @@
             chat.innerHTML = `
                                             <div class="bg-[#1F5EDB] text-white px-3 py-2 rounded-t-xl flex items-center justify-between">
                                                 <div class="flex items-center gap-2">
-                                                    <img src="${userPhoto || '/img/default-user.svg'}" class="w-7 h-7 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" />
+                                                    <img src="${userPhoto || '/img/default-user.svg'}" class="w-7 h-7 rounded-full object-cover" onerror="this.onerror=null;this.src='/img/default-user.svg';" loading="lazy" decoding="async" />
                                                     <span class="text-sm font-semibold truncate" style="max-width: 140px;">${userName}</span>
                                                 </div>
                                                 <div class="flex items-center gap-2">

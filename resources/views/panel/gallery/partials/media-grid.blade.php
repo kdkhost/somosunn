@@ -51,8 +51,7 @@
                             </div>
                         @else
                             <img src="{{ $assetUrl }}" alt="{{ $eventTitle }}"
-                                class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                                loading="lazy" decoding="async">
+                                class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" decoding="async">
                         @endif
 
                         {{-- Overlay badges --}}

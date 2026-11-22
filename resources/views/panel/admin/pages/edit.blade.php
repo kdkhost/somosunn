@@ -144,7 +144,7 @@
                                             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Facebook / WhatsApp</label>
                                             <div class="relative group aspect-video rounded-3xl overflow-hidden bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center">
                                                 @if (!empty($data['seo_og_image'] ?? ($data['seo_image'] ?? null)))
-                                                    <img src="{{ Storage::url($data['seo_og_image'] ?? ($data['seo_image'] ?? null)) }}" class="w-full h-full object-cover">
+                                                    <img src="{{ Storage::url($data['seo_og_image'] ?? ($data['seo_image'] ?? null)) }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                                     <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2">
                                                         <label class="cursor-pointer bg-white text-slate-900 px-3 py-1.5 rounded-xl font-bold text-[10px]"><i class="fas fa-edit mr-1"></i>Trocar<input type="file" name="seo_og_image" class="hidden"></label>
                                                         <label class="cursor-pointer bg-red-500 text-white px-3 py-1.5 rounded-xl font-bold text-[10px]"><input type="checkbox" name="remove_seo_og_image" value="1" class="hidden"><i class="fas fa-trash"></i></label>
@@ -162,7 +162,7 @@
                                             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Twitter / X</label>
                                             <div class="relative group aspect-video rounded-3xl overflow-hidden bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center">
                                                 @if (!empty($data['seo_twitter_image']))
-                                                    <img src="{{ Storage::url($data['seo_twitter_image']) }}" class="w-full h-full object-cover">
+                                                    <img src="{{ Storage::url($data['seo_twitter_image']) }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                                     <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2">
                                                         <label class="cursor-pointer bg-white text-slate-900 px-3 py-1.5 rounded-xl font-bold text-[10px]"><i class="fas fa-edit mr-1"></i>Trocar<input type="file" name="seo_twitter_image" class="hidden"></label>
                                                         <label class="cursor-pointer bg-red-500 text-white px-3 py-1.5 rounded-xl font-bold text-[10px]"><input type="checkbox" name="remove_seo_twitter_image" value="1" class="hidden"><i class="fas fa-trash"></i></label>

@@ -37,7 +37,7 @@
             <label class="block text-sm font-semibold mb-1">Thumbnail</label>
             <input type="file" name="thumbnail" accept="image/*" class="w-full border rounded px-3 py-2">
             @if(!empty($course->thumbnail))
-                <img src="/{{ $course->thumbnail }}" alt="Thumbnail" class="h-20 mt-2">
+                <img src="/{{ $course->thumbnail }}" alt="Thumbnail" class="h-20 mt-2" loading="lazy" decoding="async">
             @endif
         </div>
         <div class="flex justify-end gap-2">

@@ -76,7 +76,7 @@
                         <div class="flex items-center gap-4 mb-6">
                             @if($planImageUrl)
                                 <img src="{{ $planImageUrl }}" alt="{{ $plan->name }}"
-                                    class="w-16 h-16 rounded-lg object-cover">
+                                    class="w-16 h-16 rounded-lg object-cover" loading="lazy" decoding="async">
                             @else
                                 <div class="w-16 h-16 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
                                     <i class="fas fa-crown text-2xl"></i>
@@ -751,7 +751,7 @@
                         if (qrDiv && data.qr_code_base64) {
                             qrDiv.innerHTML = '<img src="data:image/png;base64,' + data.qr_code_base64 + '" class="w-48 h-48 mx-auto border rounded-xl">';
                         } else if (qrDiv && data.qr_code_url) {
-                            qrDiv.innerHTML = '<img src="' + data.qr_code_url + '" class="w-48 h-48 mx-auto border rounded-xl">';
+                            qrDiv.innerHTML = '<img src="' + data.qr_code_url + '" class="w-48 h-48 mx-auto border rounded-xl" loading="lazy" decoding="async">';
                         }
 
                         // Código copia-e-cola

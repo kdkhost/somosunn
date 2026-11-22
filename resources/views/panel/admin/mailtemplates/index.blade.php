@@ -344,7 +344,7 @@
                 const html = `
                     <div style="background-color: #ffffff; width: 100%; font-family: 'Inter', Helvetica, Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 45px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; margin: 0 auto; max-width: 600px; transition: all 0.3s ease;">
                         <div style="${config.headerStyle} padding: 45px 30px; text-align: center; flex-shrink: 0; display: block; border-bottom: 5px solid rgba(0,0,0,0.1);">
-                            <img src="${config.logo}" alt="${config.siteName}" style="max-height: 55px; max-width: 85%; width: auto; height: auto; display: inline-block; vertical-align: middle; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+                            <img src="${config.logo}" alt="${config.siteName}" style="max-height: 55px; max-width: 85%; width: auto; height: auto; display: inline-block; vertical-align: middle; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));" loading="lazy" decoding="async">
                         </div>
                         <div style="padding: 40px 35px; color: #1e293b; line-height: 1.8; word-wrap: break-word; font-size: 16px; min-height: 250px; background-color: #ffffff; display: block; text-align: left;">
                             ${bodyContent}

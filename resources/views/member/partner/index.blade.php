@@ -27,7 +27,7 @@
                     <div class="flex h-20 w-20 md:h-24 md:w-24 items-center justify-center rounded-2xl bg-white shadow-xl border border-white/20 shrink-0">
                         @if($partner->logo_url)
                             <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}"
-                                 class="max-h-16 max-w-16 md:max-h-20 md:max-w-20 object-contain">
+                                 class="max-h-16 max-w-16 md:max-h-20 md:max-w-20 object-contain" loading="lazy" decoding="async">
                         @else
                             <i class="fas fa-building text-slate-400 text-3xl"></i>
                         @endif

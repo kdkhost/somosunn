@@ -19,7 +19,7 @@
                 <div class="d-flex align-items-center">
                     <div class="d-flex align-items-center justify-content-center rounded-circle bg-white mr-3" style="width:50px;height:50px;">
                         @if($store->logo_url)
-                            <img src="{{ $store->logo_url }}" alt="Logo" class="rounded-circle" style="width:44px;height:44px;object-fit:cover;">
+                            <img src="{{ $store->logo_url }}" alt="Logo" class="rounded-circle" style="width:44px;height:44px;object-fit:cover;" loading="lazy" decoding="async">
                         @else
                             <i class="fas fa-store text-primary" style="font-size:20px;"></i>
                         @endif
@@ -188,7 +188,7 @@
                     <div class="card-body">
                         @if($store->logo_url)
                             <div class="text-center mb-3">
-                                <img src="{{ $store->logo_url }}" alt="Logo" class="rounded border" style="max-height:120px; max-width:100%;">
+                                <img src="{{ $store->logo_url }}" alt="Logo" class="rounded border" style="max-height:120px; max-width:100%;" loading="lazy" decoding="async">
                             </div>
                         @endif
                         <div class="store-dropzone" data-target="logo-input">
@@ -199,7 +199,7 @@
                                 <p class="text-muted mb-0" style="font-size:10px;">PNG, JPG ou SVG (máx. 2MB)</p>
                             </div>
                             <div class="store-dropzone-preview d-none">
-                                <img src="" alt="Preview" class="rounded border" style="max-height:100px; max-width:100%;">
+                                <img src="" alt="Preview" class="rounded border" style="max-height:100px; max-width:100%;" loading="lazy" decoding="async">
                                 <p class="store-dropzone-filename text-muted mt-1 mb-0" style="font-size:10px;"></p>
                             </div>
                         </div>
@@ -221,7 +221,7 @@
                     <div class="card-body">
                         @if($store->banner_url)
                             <div class="mb-3">
-                                <img src="{{ $store->banner_url }}" alt="Banner" class="img-fluid rounded border" style="max-height:120px; width:100%; object-fit:cover;">
+                                <img src="{{ $store->banner_url }}" alt="Banner" class="img-fluid rounded border" style="max-height:120px; width:100%; object-fit:cover;" loading="lazy" decoding="async">
                             </div>
                         @endif
                         <div class="store-dropzone" data-target="banner-input">
@@ -232,7 +232,7 @@
                                 <p class="text-muted mb-0" style="font-size:10px;">Recomendado: 1200x400px</p>
                             </div>
                             <div class="store-dropzone-preview d-none">
-                                <img src="" alt="Preview" class="rounded border" style="max-height:80px; width:100%; object-fit:cover;">
+                                <img src="" alt="Preview" class="rounded border" style="max-height:80px; width:100%; object-fit:cover;" loading="lazy" decoding="async">
                                 <p class="store-dropzone-filename text-muted mt-1 mb-0" style="font-size:10px;"></p>
                             </div>
                         </div>

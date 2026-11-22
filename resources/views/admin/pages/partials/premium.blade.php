@@ -58,7 +58,7 @@
             @if ($heroImg)
                 <div class="mb-2">
                     <img src="{{ asset('storage/' . $heroImg) }}" alt="Hero" class="img-thumbnail"
-                        style="max-height:160px;">
+                        style="max-height:160px;" loading="lazy" decoding="async">
                     <div class="mt-1">
                         <input type="checkbox" name="remove_hero_image" value="1" id="remove_premium_hero_image">
                         <label for="remove_premium_hero_image" class="text-danger ml-1">Remover imagem atual</label>

@@ -2,6 +2,22 @@
 
 ## Painéis Administrativos
 
+### Atualização aplicada em 21/11/2026 - arquitetura multi-subdomínios, desempenho, Server-Side e frontend otimizado
+
+- **Recursos existentes e compartilhados entre os dois painéis:**
+  - `/admin` (AdminLTE, `@extends('admin.layouts.app')`) e `/painel/admin` (Tailwind, `@extends('panel.layouts.app')`) compartilham `Admin\SettingController`, `PaymentWebhookController`, `SumUpController`, `Services\Payment\EfiService`, `Jobs\ProcessPaymentWebhookJob` e `Support\DomainManager`.
+  - Ambos os painéis exibem configurações de Subdomínios/CDN/Cache Público (`domain_*`, `cdn_*`, `public_page_cache_enabled`), liberação de manutenção por IP/CIDR (`maintenance_allowed_ips`) e dispositivo autorizado (`maintenance_bypass_token` + botão de autorização via cookie HttpOnly assinado), além da nova aba do gateway **Efí Pro (Pix)**.
+- **Rotas preservadas e adicionadas:**
+  - Rotas públicas GET/HEAD cacheáveis movidas para `routes/public.php` (`web.public` + `subdomain:public`), área autenticada/paineis em `routes/app.php` (`web` + `subdomain:app`), e callbacks em `routes/webhooks.php` (`webhook`) com `routes/api.php`, mantendo os mesmos nomes (`home`, `admin.*`, `panel.*`, `webhook.*`, `api.webhooks.*`).
+  - Rotas adicionadas: `admin.settings.authorize-device` (`/admin/settings/authorize-device`), `panel.admin.settings.authorize-device` (`/painel/admin/settings/authorize-device`), `admin.users.data` (`/admin/users/data`), `panel.admin.cron.data` (`/painel/admin/cron/data`), `webhook.efi` (`/webhook/efi`), `webhook.sumup.direct` (`/webhook/sumup`) e `api.webhooks.efi` (`/api/v1/webhooks/efi`).
+- **Controllers, Services e Desempenho:**
+  - `Admin\UserController` (`paginate(15)` + `data()` DataTables Server-Side), `Panel\Admin\UserController` (`paginate(20)` com paginação reativada na view), `Admin\EventController::list()` e `Panel\Admin\EventController::list()` (`paginate(20)` + KPIs agregados), `Admin\CourseController::index()` (`with(['creator'])->withCount(['lessons','enrollments'])->paginate(20)`), `Admin\TestimonialController` (limite 200 no dropdown de usuários) e `Panel\Admin\CronController` (`paginate(20)` + `data()` JSON).
+  - Correção de `use Illuminate\Support\Facades\Cache;` em `Panel\DashboardController`, cache global em `Setting::allValues()`, `HomeController`, `DashboardMetricsService`, e migration aditiva `2026_11_21_000001_add_scale_performance_indexes.php`.
+- **Diferenças visuais mantidas, permissões e UX:**
+  - AdminLTE 3.2 preservado em `/admin` (com FullCalendar atualizado de 4.2.0 para `6.1.15`, lazy-loading de bibliotecas pesadas e Tailwind sem Preflight estático apenas na ramificação `!$isAdmin`).
+  - Painel Tailwind em `/painel` e frontend público servem CSS compilado estático (`public/css/unn-tailwind.css`), WebP automático em `UploadStorage::resolveLocalUrl()` para browsers compatíveis, `loading="lazy" decoding="async"`, máscaras padronizadas (`public/js/unn-masks.js` com RG e ViaCEP focado em `Número`), SweetAlert2/Toastr em lugar de diálogos nativos e barra `mobile-bottom-nav` restrita ao modo PWA `standalone`.
+  - Permissões existentes (`admin`, `EnsureUserIsAdmin`, `events.*`, `courses.*`, etc.) mantidas integralmente.
+
 ### Atualização aplicada em 24/08/2026 - integridade visual das capas de eventos
 
 - A restauração do banco recuperou caminhos de capas, mas sete arquivos binários não estavam presentes no storage nem nos backups de arquivos disponíveis.

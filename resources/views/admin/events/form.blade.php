@@ -450,7 +450,7 @@
                                                 style="position: relative; width: 842px; height: 595px; background-color: white; box-shadow: 0 0 30px rgba(0,0,0,0.5); flex-shrink: 0; overflow: hidden;">
                                                 @if($event->certificate_bg)
                                                     <img src="{{ asset($event->certificate_bg) }}" id="cert-bg-img"
-                                                        style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;">
+                                                        style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;" loading="lazy" decoding="async">
                                                 @else
                                                     <div id="cert-bg-placeholder"
                                                         style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc; z-index: 1; position: absolute; background: #eee;">
@@ -549,7 +549,7 @@
                                                 @if($event->instructor_signature)
                                                     <div class="mb-2 text-center border p-2 rounded certificate-signature-preview">
                                                         <img src="{{ asset($event->instructor_signature) }}"
-                                                            style="max-height: 50px;" class="img-fluid">
+                                                            style="max-height: 50px;" class="img-fluid" loading="lazy" decoding="async">
                                                     </div>
                                                 @endif
                                                 <div class="custom-file">
@@ -779,7 +779,7 @@
                                     <div class="card h-100 position-relative group">
                                         @if($media->type === 'image')
                                             <a href="{{ asset('storage/'.$media->file_path) }}" data-fancybox="gallery">
-                                                <img src="{{ asset('storage/'.$media->file_path) }}" class="card-img-top object-cover" style="height: 150px; object-fit: cover;">
+                                                <img src="{{ asset('storage/'.$media->file_path) }}" class="card-img-top object-cover" style="height: 150px; object-fit: cover;" loading="lazy" decoding="async">
                                             </a>
                                         @else
                                             <div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 150px;">
@@ -1416,7 +1416,7 @@ async function uploadAdminGallery(files) {
             if (container && Array.isArray(response.data.media)) {
                 response.data.media.slice().reverse().forEach((media) => {
                     const preview = media.type === 'image'
-                        ? `<a href="${media.url}" data-fancybox="gallery"><img src="${media.url}" class="card-img-top object-cover" style="height: 150px; object-fit: cover;"></a>`
+                        ? `<a href="${media.url}" data-fancybox="gallery"><img src="${media.url}" class="card-img-top object-cover" style="height: 150px; object-fit: cover;" loading="lazy" decoding="async"></a>`
                         : `<div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 150px;"><i class="fas fa-video text-white fa-3x"></i></div>`;
 
                     container.insertAdjacentHTML('afterbegin', `
@@ -2511,7 +2511,7 @@ async function setAsCover(mediaId) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     if ($('#cert-bg-img').length) $('#cert-bg-img').attr('src', e.target.result);
-                    else $('#cert-bg-placeholder').replaceWith('<img src="' + e.target.result + '" id="cert-bg-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;">');
+                    else $('#cert-bg-placeholder').replaceWith('<img src="' + e.target.result + '" id="cert-bg-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;" loading="lazy" decoding="async">');
 
                     const fit = ($('#cert-bg-fit').val() || 'cover') === 'stretch' ? 'fill' : 'cover';
                     $('#cert-bg-img').css('object-fit', fit);

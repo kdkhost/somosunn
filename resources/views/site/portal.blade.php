@@ -150,7 +150,7 @@
                                         class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Grátis</span>
                                 @endif
                                 <img src="{{ $course->thumbnail_url ?? asset('img/course-default.png') }}" alt="{{ $course->title }}"
-                                    class="w-full h-40 object-cover rounded-xl mb-4">
+                                    class="w-full h-40 object-cover rounded-xl mb-4" loading="lazy" decoding="async">
                                 <div class="mb-2 flex items-center gap-2">
                                     <span class="text-xs font-bold text-blue-600">{{ $course->category ?? 'Categoria' }}</span>
                                     <span class="text-xs text-gray-400 flex items-center gap-1"><i class="fas fa-clock"></i>
@@ -200,7 +200,7 @@
                                 <span
                                     class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Gratuito</span>
                                 <img src="{{ $event->thumbnail_url ?? asset('img/event-default.png') }}" alt="{{ $event->title }}"
-                                    class="w-full h-28 object-cover rounded-xl mb-3">
+                                    class="w-full h-28 object-cover rounded-xl mb-3" loading="lazy" decoding="async">
                                 <h3 class="text-base font-bold text-gray-900 mb-1">{{ $event->title }}</h3>
                                 <p class="text-xs text-gray-500 mb-1">
                                     {{ $event->speaker ?? $event->author_name ?? 'Palestrante UNN' }}</p>
@@ -243,7 +243,7 @@
                             <article class="bg-slate-50 rounded-3xl p-8 border border-gray-100 flex flex-col">
                                 <div class="mb-3">
                                     <img src="{{ $course->thumbnail_url ?? asset('img/course-default.png') }}"
-                                        alt="{{ $course->title }}" class="w-full h-40 object-cover rounded-xl mb-2">
+                                        alt="{{ $course->title }}" class="w-full h-40 object-cover rounded-xl mb-2" loading="lazy" decoding="async">
                                     <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $course->title }}</h3>
                                     <p class="text-gray-600 text-sm mb-2">
                                         {{ Str::limit(strip_tags((string) ($course->short_description ?? '')), 80) }}</p>
@@ -368,7 +368,7 @@
                                 <div class="flex items-center gap-4 mb-4">
                                     @if($showUserAvatar)
                                         <img src="{{ $userAvatar }}" alt="{{ $userName }}"
-                                            class="w-14 h-14 rounded-full object-cover shadow-sm">
+                                            class="w-14 h-14 rounded-full object-cover shadow-sm" loading="lazy" decoding="async">
                                     @else
                                         <div
                                             class="w-14 h-14 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl">

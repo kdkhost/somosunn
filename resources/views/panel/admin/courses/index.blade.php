@@ -56,7 +56,7 @@
                                             class="w-16 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
                                             @if($course->thumbnail_url)
                                                 <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}"
-                                                    class="w-full h-full object-cover">
+                                                    class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 transition-colors">
                                                     <i class="fas fa-book text-slate-300 dark:text-slate-600"></i>
@@ -73,7 +73,7 @@
                                         @php $creatorName = $course->author_name ?: ($course->creator->name ?? 'N/A'); @endphp
                                         <div class="w-7 h-7 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
                                             @if($course->creator && $course->creator->profile_photo_url && !str_contains($course->creator->profile_photo_url, 'default-user.svg'))
-                                                <img src="{{ $course->creator->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                                <img src="{{ $course->creator->profile_photo_url }}" alt="" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <i class="fas fa-user text-slate-400 dark:text-slate-500 text-[10px]"></i>
                                             @endif

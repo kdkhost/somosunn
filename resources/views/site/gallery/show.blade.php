@@ -103,7 +103,7 @@
                                 data-gallery-open-slide="{{ $loop->index }}"
                                 class="group relative overflow-hidden rounded-[1.8rem] border border-slate-200 bg-slate-950 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_rgba(15,23,42,0.16)]">
                                 <img src="{{ $photoUrl }}" alt="{{ $event->title }}"
-                                    class="h-64 w-full object-cover transition duration-700 group-hover:scale-[1.04]">
+                                    class="h-64 w-full object-cover transition duration-700 group-hover:scale-[1.04]" loading="lazy" decoding="async">
                                 <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.0),rgba(15,23,42,0.55))]"></div>
                                 <div class="absolute right-4 top-4">
                                     <span class="inline-flex h-10 w-10 items-center justify-center rounded-[1.1rem] border border-white/10 bg-white/10 text-white backdrop-blur">
@@ -203,7 +203,7 @@
                                 class="group overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-950 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_rgba(15,23,42,0.18)]">
                                 <div class="relative h-52 overflow-hidden">
                                     <img src="{{ $relatedEvent->gallery_cover_url ?: asset('img/logo.svg') }}" alt="{{ $relatedEvent->title }}"
-                                        class="h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-[1.04] group-hover:opacity-100">
+                                        class="h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-[1.04] group-hover:opacity-100" loading="lazy" decoding="async">
                                     <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08),rgba(15,23,42,0.80))]"></div>
                                     <div class="absolute inset-x-5 bottom-5">
                                         @if($relatedEvent->start_at)
@@ -229,7 +229,7 @@
             <div id="event-gallery-track" class="absolute inset-0 flex items-center justify-center transition-transform duration-300 ease-out">
                 <img id="event-gallery-lightbox-image" src="" alt=""
                     class="h-full w-full object-contain transition-transform duration-300"
-                    style="max-width: 100vw; max-height: 100dvh;">
+                    style="max-width: 100vw; max-height: 100dvh;" loading="lazy" decoding="async">
             </div>
 
             {{-- Loader --}}
@@ -309,7 +309,7 @@
             if (!thumbs || !slides.length) return;
             thumbs.innerHTML = slides.map((s, i) => `
                 <button type="button" class="shrink-0 overflow-hidden rounded-lg border-2 ${i === current ? 'border-white' : 'border-transparent opacity-50'} transition-all duration-300 hover:opacity-100" data-gallery-thumb-index="${i}">
-                    <img src="${s.src}" alt="" class="h-14 w-20 object-cover">
+                    <img src="${s.src}" alt="" class="h-14 w-20 object-cover" loading="lazy" decoding="async">
                 </button>`).join('');
             thumbs.querySelectorAll('[data-gallery-thumb-index]').forEach(b =>
                 b.addEventListener('click', (e) => {

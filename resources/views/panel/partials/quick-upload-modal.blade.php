@@ -309,7 +309,9 @@
             });
         }
 
-        alert(`${title}\n\n${text}`);
+        if (typeof toastr !== 'undefined') {
+            toastr[icon === 'error' ? 'error' : 'info'](`${title}: ${text}`);
+        }
         return Promise.resolve();
     }
 

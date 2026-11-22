@@ -1060,8 +1060,8 @@
                                         html: errorMessage,
                                         confirmButtonText: 'Entendi'
                                     });
-                                } else {
-                                    alert('Erro no Upload: ' + errorMessage.replace(/<br>/g, '\n').replace(/<[^>]+>/g, ''));
+                                } else if (typeof toastr !== 'undefined') {
+                                    toastr.error('Erro no Upload: ' + errorMessage.replace(/<br>/g, ' ').replace(/<[^>]+>/g, ''));
                                 }
                             });
 
@@ -1127,6 +1127,9 @@
                 window.initPanelScripts = function () {
                     window.initializePanelFileUploads(document);
                     window.initializePanelDateTimePickers(document);
+                    if (typeof window.initUnnMasks === 'function') {
+                        window.initUnnMasks(document);
+                    }
 
                     // Flash messages já são exibidas pelo layout pai (layouts/app.blade.php)
                 };

@@ -6,6 +6,7 @@ use App\Models\VisitorLog;
 use App\Services\IpInfoService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
@@ -39,7 +40,16 @@ class TrackVisitor
                 return;
             }
 
-            if (!Schema::hasTable('visitor_logs')) {
+            $hasTable = false;
+            try {
+                $hasTable = Cache::remember('unn:schema:has_visitor_logs', 3600, static function (): bool {
+                    return Schema::hasTable('visitor_logs');
+                });
+            } catch (\Throwable) {
+                $hasTable = Schema::hasTable('visitor_logs');
+            }
+
+            if (!$hasTable) {
                 return;
             }
 
@@ -55,25 +65,33 @@ class TrackVisitor
                 $dedupeSeconds = 0;
             }
 
-            try {
-                $last = $request->session()->get('visitor_log.last', null);
-                if (
-                    is_array($last)
-                    && ($last['ip_hash'] ?? null) === $ipHash
-                    && ($last['path'] ?? null) === $request->path()
-                    && isset($last['ts'])
-                    && (time() - (int) $last['ts']) < $dedupeSeconds
-                ) {
-                    return;
-                }
+            // Deduplicacao via cache sem gravar ou abrir sessao para visitantes anonimos
+            if ($dedupeSeconds > 0) {
+                $dedupeKey = 'unn:visitor_dedupe:' . sha1($ipHash . '|' . $request->path());
+                try {
+                    if (!Cache::add($dedupeKey, 1, $dedupeSeconds)) {
+                        return;
+                    }
+                } catch (\Throwable) {
+                    if ($request->hasSession()) {
+                        $last = $request->session()->get('visitor_log.last', null);
+                        if (
+                            is_array($last)
+                            && ($last['ip_hash'] ?? null) === $ipHash
+                            && ($last['path'] ?? null) === $request->path()
+                            && isset($last['ts'])
+                            && (time() - (int) $last['ts']) < $dedupeSeconds
+                        ) {
+                            return;
+                        }
 
-                $request->session()->put('visitor_log.last', [
-                    'ip_hash' => $ipHash,
-                    'path' => $request->path(),
-                    'ts' => time(),
-                ]);
-            } catch (\Throwable $e) {
-                // session pode não estar disponível em alguns contextos
+                        $request->session()->put('visitor_log.last', [
+                            'ip_hash' => $ipHash,
+                            'path' => $request->path(),
+                            'ts' => time(),
+                        ]);
+                    }
+                }
             }
 
             $country = strtoupper(trim((string) ($request->header('CF-IPCountry') ?: '')));

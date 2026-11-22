@@ -114,6 +114,11 @@
                 return;
             }
 
+            if (typeof toastr !== 'undefined') {
+                toastr.success(message || 'Operacao concluida com sucesso.');
+                return;
+            }
+
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: 'success',
@@ -122,15 +127,17 @@
                     timer: 2200,
                     showConfirmButton: false,
                 });
-                return;
             }
-
-            window.alert(message || 'Operacao concluida com sucesso.');
         }
 
         function showError(message) {
             if (typeof window.showError === 'function') {
                 window.showError(message);
+                return;
+            }
+
+            if (typeof toastr !== 'undefined') {
+                toastr.error(message || 'Nao foi possivel concluir a operacao.');
                 return;
             }
 
@@ -140,10 +147,7 @@
                     title: 'Erro',
                     text: message || 'Nao foi possivel concluir a operacao.',
                 });
-                return;
             }
-
-            window.alert(message || 'Nao foi possivel concluir a operacao.');
         }
 
         function setSubmittingState(form, state) {

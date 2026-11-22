@@ -67,7 +67,7 @@
             <!-- Capa -->
             <div class="h-64 sm:h-80 w-full bg-gray-200 overflow-hidden relative group">
                 @if(isset($user->cover_photo) && $user->cover_photo)
-                    <img src="{{ asset($user->cover_photo) }}" alt="Capa" class="w-full h-full object-cover">
+                    <img src="{{ asset($user->cover_photo) }}" alt="Capa" class="w-full h-full object-cover" loading="lazy" decoding="async">
                 @else
                     <div class="w-full h-full bg-gradient-to-r from-[#1F5EDB] to-[#0d3b96]"></div>
                 @endif
@@ -82,7 +82,7 @@
                         <div class="w-40 h-40 sm:w-48 sm:h-48 bg-white rounded-full p-1.5 shadow-xl">
                             <img src="{{ $user->profile_photo_url }}"
                                 class="w-full h-full rounded-full object-cover border-4 border-white" alt="Avatar"
-                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                         </div>
                     </div>
 
@@ -383,7 +383,7 @@
                                             <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
                                                 <img src="{{ $requester->profile_photo_url }}" alt="Avatar"
                                                     class="w-10 h-10 object-cover"
-                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                             </div>
                                             <div>
                                                 <p class="text-sm font-semibold text-gray-800">{{ $requester->name }}</p>
@@ -459,7 +459,7 @@
                                             class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0 block">
                                             <img src="{{ $postAvatar }}" alt="Avatar"
                                                 class="w-10 h-10 object-cover hover:opacity-80 transition"
-                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                         </a>
                                         <div>
                                             <a href="{{ route('social.profile', $post->user->id) }}"
@@ -538,14 +538,14 @@
                                         @endphp
                                         @if($mediaCount === 1)
                                             <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
-                                                class="w-full rounded-lg object-cover">
+                                                class="w-full rounded-lg object-cover" loading="lazy" decoding="async">
                                         @else
                                             <div class="relative" data-carousel data-total="{{ $mediaCount }}">
                                                 <div class="overflow-hidden rounded-lg">
                                                     <div class="flex transition-transform duration-300" data-track>
                                                         @foreach($post->media as $media)
                                                             <img src="{{ asset($media->path) }}" alt="Midia do post"
-                                                                class="w-full shrink-0 object-cover">
+                                                                class="w-full shrink-0 object-cover" loading="lazy" decoding="async">
                                                         @endforeach
                                                     </div>
                                                 </div>
@@ -665,7 +665,7 @@
                                             <div class="flex gap-3">
                                                 <div class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0">
                                                     <img src="{{ $commentAvatar }}" alt="Avatar" class="w-8 h-8 object-cover"
-                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                                 </div>
                                                 <div class="bg-gray-50 rounded-lg px-3 py-2 w-full">
                                                     <div class="flex justify-between items-center">
@@ -736,7 +736,7 @@
             onclick="toggleMinimizeChat()">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden">
-                    <img id="chatUserAvatar" src="" alt="Avatar" class="w-full h-full object-cover hidden">
+                    <img id="chatUserAvatar" src="" alt="Avatar" class="w-full h-full object-cover hidden" loading="lazy" decoding="async">
                     <span id="chatUserInitial" class="text-[#1F5EDB] font-bold text-lg"></span>
                 </div>
                 <div>

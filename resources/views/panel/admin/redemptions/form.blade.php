@@ -49,7 +49,7 @@
                                 <div class="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
                                     <div class="aspect-square w-full">
                                         @if($item->image)
-                                            <img src="{{ \App\Support\UploadStorage::url($item->image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover">
+                                            <img src="{{ \App\Support\UploadStorage::url($item->image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover" loading="lazy" decoding="async">
                                         @else
                                             <div class="flex h-full items-center justify-center text-slate-300 dark:text-slate-700">
                                                 <i class="fas fa-image text-4xl"></i>

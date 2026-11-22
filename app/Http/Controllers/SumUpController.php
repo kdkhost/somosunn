@@ -204,25 +204,37 @@ class SumUpController extends Controller
                 return response('Order not found', 404);
             }
 
-            // Processar evento baseado no tipo
-            switch ($eventType) {
-                case 'CHECKOUT_PAID':
-                    $this->handleCheckoutPaid($order, $data);
-                    break;
-                    
-                case 'CHECKOUT_FAILED':
-                    $this->handleCheckoutFailed($order, $data);
-                    break;
-                    
-                case 'CHECKOUT_CANCELLED':
-                    $this->handleCheckoutCancelled($order, $data);
-                    break;
-                    
-                default:
-                    Log::info('SumUp webhook unhandled event type', [
+            // Despacha processamento assincrono na fila dedicada de webhooks
+            try {
+                app(\App\Services\QueueManagerService::class)->dispatch(
+                    \App\Services\QueueManagerService::QUEUE_WEBHOOKS,
+                    new \App\Jobs\ProcessPaymentWebhookJob('sumup', $data, [
+                        'order_id' => (int) $order->id,
                         'event_type' => $eventType,
-                        'data' => $data
-                    ]);
+                    ])
+                );
+            } catch (\Throwable $dispatchError) {
+                Log::warning('SumUp webhook fallback sincrono apos falha de fila', [
+                    'order_id' => $order->id,
+                    'error' => $dispatchError->getMessage(),
+                ]);
+
+                switch ($eventType) {
+                    case 'CHECKOUT_PAID':
+                        $this->handleCheckoutPaid($order, $data);
+                        break;
+                    case 'CHECKOUT_FAILED':
+                        $this->handleCheckoutFailed($order, $data);
+                        break;
+                    case 'CHECKOUT_CANCELLED':
+                        $this->handleCheckoutCancelled($order, $data);
+                        break;
+                    default:
+                        Log::info('SumUp webhook unhandled event type', [
+                            'event_type' => $eventType,
+                            'data' => $data
+                        ]);
+                }
             }
 
             return response('OK', 200);

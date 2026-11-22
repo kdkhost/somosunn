@@ -43,14 +43,14 @@
                                 </div>
                                 <div class="text-muted small" id="admin-upload-name">Nenhuma imagem selecionada</div>
                                 <div id="admin-preview-inline" class="d-none align-items-center">
-                                    <img id="admin-preview-inline-img" src="" alt="Preview" class="mr-2 rounded border" style="width:44px;height:44px;object-fit:cover;">
+                                    <img id="admin-preview-inline-img" src="" alt="Preview" class="mr-2 rounded border" style="width:44px;height:44px;object-fit:cover;" loading="lazy" decoding="async">
                                     <span class="text-muted small" id="admin-preview-inline-name"></span>
                                 </div>
                             </div>
                         </div>
                         <div id="admin-preview-top" class="d-none mb-3">
                             <div class="position-relative d-inline-block">
-                                <img id="admin-preview-top-img" src="" alt="Preview" class="rounded border" style="max-height:160px;">
+                                <img id="admin-preview-top-img" src="" alt="Preview" class="rounded border" style="max-height:160px;" loading="lazy" decoding="async">
                                 <button type="button" id="admin-preview-remove"
                                     class="btn btn-sm btn-light border position-absolute" style="top:-10px;right:-10px;">
                                     <i class="fas fa-times"></i>
@@ -87,7 +87,7 @@
                         <div class="d-flex align-items-center">
                             <div class="mr-3">
                                 <img src="{{ $post->user?->profile_photo_url ?? asset('img/default-user.svg') }}"
-                                    alt="Avatar" class="img-circle" style="width:40px;height:40px;object-fit:cover;">
+                                    alt="Avatar" class="img-circle" style="width:40px;height:40px;object-fit:cover;" loading="lazy" decoding="async">
                             </div>
                             <div>
                                 <strong>{{ $post->user->name ?? 'Anonimo' }}</strong>
@@ -138,13 +138,13 @@
                                 $mediaCount = $post->media->count();
                             @endphp
                             @if($mediaCount === 1)
-                                <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post" class="img-fluid rounded">
+                                <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post" class="img-fluid rounded" loading="lazy" decoding="async">
                             @else
                                 <div class="position-relative" data-carousel data-total="{{ $mediaCount }}">
                                     <div class="overflow-hidden rounded">
                                         <div class="d-flex" data-track style="transition: transform 0.3s ease;">
                                             @foreach($post->media as $media)
-                                                <img src="{{ asset($media->path) }}" alt="Midia do post" class="w-100 flex-shrink-0" style="object-fit: cover;">
+                                                <img src="{{ asset($media->path) }}" alt="Midia do post" class="w-100 flex-shrink-0" style="object-fit: cover;" loading="lazy" decoding="async">
                                             @endforeach
                                         </div>
                                     </div>
@@ -240,7 +240,7 @@
                                         <a class="mr-2" href="{{ route('social.profile', $user->id) }}">
                                             <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="img-circle"
                                                 style="width:36px;height:36px;object-fit:cover;"
-                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                         </a>
                                         <div>
                                             <a href="{{ route('social.profile', $user->id) }}" class="text-sm font-weight-bold text-dark">

@@ -105,7 +105,7 @@
                 </div>
                 <div
                     class="mt-2 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm max-w-sm">
-                    <img src="{{ Storage::url($data['hero_image']) }}" class="w-full h-auto">
+                    <img src="{{ Storage::url($data['hero_image']) }}" class="w-full h-auto" loading="lazy" decoding="async">
                 </div>
             @endif
         </div>

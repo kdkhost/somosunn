@@ -211,7 +211,7 @@
                                 class="w-24 h-24 md:w-32 md:h-32 bg-white rounded-[1.5rem] p-4 flex items-center justify-center mx-auto mb-6 transform group-hover:scale-105 transition-transform duration-500 border border-slate-100 overflow-hidden shadow-sm">
                                 @if($featuredJob->image)
                                     <img src="{{ $featuredJob->image_url }}" alt="{{ $featuredJob->company_name }}"
-                                        class="w-full h-full object-contain">
+                                        class="w-full h-full object-contain" loading="lazy" decoding="async">
                                 @else
                                     <i class="fas fa-briefcase text-4xl text-blue-500/30"></i>
                                 @endif
@@ -321,7 +321,7 @@
                                         <div
                                             class="w-14 h-14 bg-white rounded-xl shadow-md border border-slate-100 flex flex-shrink-0 items-center justify-center overflow-hidden p-2 relative z-10 group-hover:scale-110 transition-transform duration-500">
                                             @if($vaga->image)
-                                                <img src="{{ $vaga->image_url }}" alt="Logo" class="w-full h-full object-contain">
+                                                <img src="{{ $vaga->image_url }}" alt="Logo" class="w-full h-full object-contain" loading="lazy" decoding="async">
                                             @else
                                                 <i class="fas fa-building text-xl text-slate-300"></i>
                                             @endif

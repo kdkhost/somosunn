@@ -142,7 +142,7 @@
                                 <div class="row align-items-center">
                                     <div class="col-md-4">
                                         @if($mentorship->image)
-                                            <img src="{{ $mentorship->image_url }}" class="img-fluid rounded shadow-sm" alt="Capa da mentoria">
+                                            <img src="{{ $mentorship->image_url }}" class="img-fluid rounded shadow-sm" alt="Capa da mentoria" loading="lazy" decoding="async">
                                         @else
                                             <div class="bg-white rounded mb-2 d-flex align-items-center justify-content-center border"
                                                 style="height: 120px;">
@@ -282,7 +282,7 @@
                                                 style="position: relative; width: 842px; height: 595px; background-color: white; box-shadow: 0 0 30px rgba(0,0,0,0.5); flex-shrink: 0; overflow: hidden;">
                                                 @if($mentorship->certificate_bg)
                                                     <img src="{{ asset($mentorship->certificate_bg) }}" id="cert-bg-img"
-                                                        style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;">
+                                                        style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;" loading="lazy" decoding="async">
                                                 @else
                                                     <div id="cert-bg-placeholder"
                                                         style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc; z-index: 1; position: absolute; background: #eee;">
@@ -381,7 +381,7 @@
                                                 @if($mentorship->instructor_signature)
                                                     <div class="mb-2 text-center border p-2 bg-light rounded">
                                                         <img src="{{ asset($mentorship->instructor_signature) }}"
-                                                            style="max-height: 50px;" class="img-fluid">
+                                                            style="max-height: 50px;" class="img-fluid" loading="lazy" decoding="async">
                                                     </div>
                                                 @endif
                                                 <div class="custom-file">
@@ -1308,7 +1308,7 @@
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     if ($('#cert-bg-img').length) $('#cert-bg-img').attr('src', e.target.result);
-                    else $('#cert-bg-placeholder').replaceWith('<img src="' + e.target.result + '" id="cert-bg-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;">');
+                    else $('#cert-bg-placeholder').replaceWith('<img src="' + e.target.result + '" id="cert-bg-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;" loading="lazy" decoding="async">');
 
                     const fit = ($('#cert-bg-fit').val() || 'cover') === 'stretch' ? 'fill' : 'cover';
                     $('#cert-bg-img').css('object-fit', fit);

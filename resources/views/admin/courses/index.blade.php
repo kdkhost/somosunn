@@ -7,9 +7,9 @@
 
 @section('content')
     @php
-        $totalCourses = $courses->count();
-        $publishedCount = $courses->where('status', 'published')->count();
-        $draftCount = $courses->where('status', 'draft')->count();
+        $totalCourses = $totalCoursesCount ?? ($courses instanceof \Illuminate\Pagination\AbstractPaginator ? $courses->total() : $courses->count());
+        $publishedCount = $publishedCoursesCount ?? $courses->where('status', 'published')->count();
+        $draftCount = $draftCoursesCount ?? $courses->where('status', 'draft')->count();
     @endphp
 
     {{-- KPI Cards --}}
@@ -86,7 +86,7 @@
                                 <td class="pl-4">
                                     @if($c->thumbnail)
                                         <img src="{{ $c->thumbnail_url }}" alt="Capa" class="img-circle elevation-2"
-                                            style="width: 46px; height: 46px; object-fit: cover;">
+                                            style="width: 46px; height: 46px; object-fit: cover;" loading="lazy" decoding="async">
                                     @else
                                         <div class="img-circle elevation-2 d-flex align-items-center justify-content-center bg-gradient-secondary"
                                             style="width: 46px; height: 46px;">
@@ -159,56 +159,42 @@
                 </table>
             </div>
         </div>
+        @if($courses instanceof \Illuminate\Pagination\AbstractPaginator && $courses->hasPages())
+            <div class="card-footer bg-white border-top py-3">
+                {{ $courses->links() }}
+            </div>
+        @endif
     </div>
 @endsection
 
 @push('styles')
-    <!-- DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css">
+    <!-- DataTables Local -->
+    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/responsive.bootstrap4.min.css') }}">
     <style>
         .align-middle td { vertical-align: middle !important; }
-        #example1_wrapper .dataTables_paginate {
-            display: flex;
-            justify-content: center;
-            padding: 0.75rem;
-        }
-        #example1_wrapper .dataTables_info {
-            margin: 0.95rem 0 0 0.75rem;
-            color: #6c757d;
-            font-size: 0.875rem;
-        }
     </style>
 @endpush
 
 @push('scripts')
-    <!-- DataTables & Plugins -->
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+    <!-- DataTables Local -->
+    <script src="{{ cdn_asset('assets/admin/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/responsive.bootstrap4.min.js') }}"></script>
 
     <script>
         $(function () {
             $("#example1").DataTable({
                 "responsive": true,
-                "lengthChange": false,
+                "paging": false,
+                "info": false,
+                "searching": false,
                 "autoWidth": false,
-                "pageLength": 20,
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
-                },
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+                    "url": "{{ cdn_asset('assets/admin/datatables/pt-BR.json') }}"
+                }
+            });
 
             // SweetAlert2 for delete course confirmation
             $('.delete-course-form').on('submit', function (e) {

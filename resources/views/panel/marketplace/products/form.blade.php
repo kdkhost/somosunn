@@ -204,7 +204,7 @@
                     <section class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 shadow-sm">
                         <h2 class="text-lg font-black text-slate-900 dark:text-white">Capa do produto</h2>
                         @if($product->cover_url)
-                            <img src="{{ $product->cover_url }}" alt="Capa" class="mt-4 h-44 w-full rounded-3xl object-cover border border-slate-200 dark:border-slate-700">
+                            <img src="{{ $product->cover_url }}" alt="Capa" class="mt-4 h-44 w-full rounded-3xl object-cover border border-slate-200 dark:border-slate-700" loading="lazy" decoding="async">
                         @endif
                         <input type="file" name="cover" accept="image/*" class="mt-4 block w-full text-sm text-slate-500 dark:text-slate-300">
                         @error('cover')<p class="mt-2 text-sm text-red-500">{{ $message }}</p>@enderror
@@ -225,7 +225,7 @@
                                         @if($media->media_type === 'video')
                                             <video src="{{ $media->file_url }}" controls class="h-28 w-full rounded-2xl object-cover"></video>
                                         @else
-                                            <img src="{{ $media->file_url }}" alt="Midia" class="h-28 w-full rounded-2xl object-cover">
+                                            <img src="{{ $media->file_url }}" alt="Midia" class="h-28 w-full rounded-2xl object-cover" loading="lazy" decoding="async">
                                         @endif
                                         <form action="{{ route('panel.marketplace.products.media.destroy', [$product, $media]) }}" method="POST" class="mt-3">
                                             @csrf
@@ -262,7 +262,7 @@
 
             <div class="flex flex-wrap justify-end gap-3">
                 @if($product->exists)
-                    <button type="submit" formaction="{{ route('panel.marketplace.products.destroy', $product) }}" formmethod="POST" onclick="event.preventDefault(); if(confirm('Deseja remover este produto?')) { const form = this.closest('form'); const temp = document.createElement('input'); temp.type='hidden'; temp.name='_method'; temp.value='DELETE'; form.appendChild(temp); form.submit(); }" class="inline-flex items-center gap-2 rounded-2xl bg-red-50 px-5 py-3 text-sm font-black text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-300 transition">
+                    <button type="submit" formaction="{{ route('panel.marketplace.products.destroy', $product) }}" formmethod="POST" onclick="event.preventDefault(); const form = this.closest('form'); const submitDel = () => { const temp = document.createElement('input'); temp.type='hidden'; temp.name='_method'; temp.value='DELETE'; form.action = '{{ route('panel.marketplace.products.destroy', $product) }}'; form.method = 'POST'; form.appendChild(temp); form.submit(); }; if (typeof Swal !== 'undefined') { Swal.fire({ icon: 'warning', title: 'Remover produto?', text: 'Deseja remover este produto?', showCancelButton: true, confirmButtonText: 'Sim, remover', cancelButtonText: 'Cancelar', confirmButtonColor: '#dc3545' }).then(r => { if (r.isConfirmed) submitDel(); }); }" class="inline-flex items-center gap-2 rounded-2xl bg-red-50 px-5 py-3 text-sm font-black text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-300 transition">
                         <i class="fas fa-trash"></i> Excluir
                     </button>
                 @endif

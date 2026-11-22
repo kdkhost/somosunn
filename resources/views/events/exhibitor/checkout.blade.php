@@ -29,7 +29,7 @@
             <aside class="lg:col-span-1">
                 <div class="sticky top-28 overflow-hidden rounded-2xl bg-white shadow-lg">
                     @if($event->exhibitor_area_image_url)
-                        <img src="{{ $event->exhibitor_area_image_url }}" alt="Mapa da área de expositores" class="h-56 w-full object-cover">
+                        <img src="{{ $event->exhibitor_area_image_url }}" alt="Mapa da área de expositores" class="h-56 w-full object-cover" loading="lazy" decoding="async">
                     @endif
                     <div class="p-6">
                         <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-black uppercase tracking-wider text-blue-700">

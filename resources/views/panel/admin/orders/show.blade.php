@@ -89,7 +89,7 @@
                     <div class="flex items-center gap-4">
                         <div class="h-16 w-16 overflow-hidden rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                             @if($user && $user->profile_photo_url)
-                                <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="h-full w-full object-cover">
+                                <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="h-full w-full object-cover" loading="lazy" decoding="async">
                             @else
                                 <span class="text-2xl font-black text-slate-500 dark:text-slate-300">{{ mb_substr($user->name ?? '?', 0, 1) }}</span>
                             @endif

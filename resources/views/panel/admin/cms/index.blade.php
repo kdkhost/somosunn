@@ -123,7 +123,7 @@
                             @if(!empty($contents['hero_image']))
                                 <div class="rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
                                     <img src="{{ asset('storage/' . $contents['hero_image']) }}" alt="Hero atual"
-                                        class="w-full aspect-video object-cover">
+                                        class="w-full aspect-video object-cover" loading="lazy" decoding="async">
                                 </div>
 
                                 <label class="inline-flex items-center gap-2 text-sm font-semibold text-rose-600 dark:text-rose-400">

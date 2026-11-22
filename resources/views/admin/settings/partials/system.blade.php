@@ -236,6 +236,105 @@
                         value="{{ $settings['maintenance_contact_email'] ?? ($settings['smtp_from_email'] ?? '') }}">
                 </div>
             </div>
+
+            <hr class="my-4">
+
+            <h5 class="text-primary mb-3"><i class="fas fa-shield-alt mr-2"></i> Liberacao por IP e Dispositivo Autorizado</h5>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="maintenance_allowed_ips">IPs ou faixas CIDR liberados (um por linha ou separados por virgula)</label>
+                    <textarea id="maintenance_allowed_ips" name="maintenance_allowed_ips" class="form-control" rows="3"
+                        placeholder="Ex.: 187.10.20.30&#10;192.168.1.0/24">{{ $settings['maintenance_allowed_ips'] ?? '' }}</textarea>
+                    <small class="form-text text-muted">
+                        Seu IP atual detectado: <code>{{ request()->header('CF-Connecting-IP') ?: request()->ip() }}</code>
+                        <button type="button" class="btn btn-xs btn-outline-info ml-2" id="btnAddCurrentIpAdmin">Usar meu IP</button>
+                    </small>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="maintenance_bypass_token">Token de dispositivo autorizado (cookie seguro)</label>
+                    <div class="input-group">
+                        <input type="text" id="maintenance_bypass_token" name="maintenance_bypass_token" class="form-control"
+                            placeholder="Clique em Autorizar ou defina um token secreto"
+                            value="{{ $settings['maintenance_bypass_token'] ?? '' }}">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-primary" id="btnAuthorizeMaintenanceDeviceAdmin">
+                                <i class="fas fa-laptop-medical mr-1"></i> Autorizar este dispositivo
+                            </button>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">
+                        Enderecos MAC nao trafegam via HTTP; utilize este token para liberar este navegador via cookie assinado ou acesse via <code>?maintenance_bypass_token=SEU_TOKEN</code>.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- SUBDOMINIOS, CACHE DE BORDA & CDN --}}
+    <div class="card card-outline card-primary mb-4">
+        <div class="card-header">
+            <h3 class="card-title font-weight-bold">
+                <i class="fas fa-network-wired mr-2"></i> Subdominios, CDN e Cache Publico (Cloudflare/LiteSpeed)
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="custom-control custom-switch">
+                        <input type="hidden" name="domain_routing_enabled" value="0">
+                        <input type="checkbox" class="custom-control-input" id="domain_routing_enabled" name="domain_routing_enabled" value="1"
+                            {{ !empty($settings['domain_routing_enabled']) ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="domain_routing_enabled">Ativar isolamento estrito por subdominio</label>
+                    </div>
+                    <small class="text-muted d-block mt-1">Redireciona /admin, /painel e auth para o subdominio App em producao.</small>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-control custom-switch">
+                        <input type="hidden" name="cdn_enabled" value="0">
+                        <input type="checkbox" class="custom-control-input" id="cdn_enabled" name="cdn_enabled" value="1"
+                            {{ !empty($settings['cdn_enabled']) ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="cdn_enabled">Ativar subdominio CDN sem cookies</label>
+                    </div>
+                    <small class="text-muted d-block mt-1">Serve imagens, CSS/JS e uploads via dominio estatico.</small>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-control custom-switch">
+                        <input type="hidden" name="public_page_cache_enabled" value="0">
+                        <input type="checkbox" class="custom-control-input" id="public_page_cache_enabled" name="public_page_cache_enabled" value="1"
+                            {{ ($settings['public_page_cache_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="public_page_cache_enabled">Cache de borda para visitantes anonimos</label>
+                    </div>
+                    <small class="text-muted d-block mt-1">Remove cookies nas paginas publicas para cache no Cloudflare/LSCache.</small>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 form-group">
+                    <label>Dominio Principal (Landing)</label>
+                    <input type="text" name="domain_main" class="form-control" placeholder="somosunn.com.br"
+                        value="{{ $settings['domain_main'] ?? config('domains.main', 'somosunn.com.br') }}">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label>Subdominio do Sistema (App)</label>
+                    <input type="text" name="domain_app" class="form-control" placeholder="app.somosunn.com.br"
+                        value="{{ $settings['domain_app'] ?? config('domains.app', 'app.somosunn.com.br') }}">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label>Subdominio de API/Webhooks</label>
+                    <input type="text" name="domain_api" class="form-control" placeholder="api.somosunn.com.br"
+                        value="{{ $settings['domain_api'] ?? config('domains.api', 'api.somosunn.com.br') }}">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label>Subdominio CDN (Assets)</label>
+                    <input type="text" name="domain_cdn" class="form-control" placeholder="cdn.somosunn.com.br"
+                        value="{{ $settings['domain_cdn'] ?? config('domains.cdn', 'cdn.somosunn.com.br') }}">
+                </div>
+                <div class="col-md-12 form-group mb-0">
+                    <label>URL base personalizada do CDN (opcional, sobrescreve o subdominio)</label>
+                    <input type="url" name="cdn_url" class="form-control" placeholder="https://cdn.somosunn.com.br"
+                        value="{{ $settings['cdn_url'] ?? '' }}">
+                </div>
+            </div>
         </div>
     </div>
 
@@ -308,6 +407,34 @@
                 if (action === 'auto-off') $auto.prop('checked', false);
 
                 $form.trigger('submit');
+            });
+
+            $('#btnAddCurrentIpAdmin').on('click', function () {
+                const currentIp = @json(request()->header('CF-Connecting-IP') ?: request()->ip());
+                const $area = $('#maintenance_allowed_ips');
+                if (currentIp && $area.length && !$area.val().includes(currentIp)) {
+                    $area.val(($area.val().trim() ? $area.val().trim() + '\n' : '') + currentIp);
+                }
+            });
+
+            $('#btnAuthorizeMaintenanceDeviceAdmin').on('click', function () {
+                const $btn = $(this).prop('disabled', true);
+                fetch(@json(route('admin.settings.authorize-device')), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': @json(csrf_token()),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.bypass_token) $('#maintenance_bypass_token').val(data.bypass_token);
+                    if (typeof toastr !== 'undefined') toastr.success(data.message || 'Dispositivo autorizado.');
+                })
+                .catch(() => {
+                    if (typeof toastr !== 'undefined') toastr.error('Falha ao autorizar dispositivo.');
+                })
+                .finally(() => { $btn.prop('disabled', false); });
             });
         });
     </script>

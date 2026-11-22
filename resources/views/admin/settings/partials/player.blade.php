@@ -192,7 +192,7 @@
                         <input type="hidden" name="remove_watermark_image" id="remove_watermark_image" value="0">
                         <div class="upload-preview mb-3 text-center watermark-preview-surface rounded border p-3">
                             @if($url = $getUrl('watermark_image'))
-                                <img src="{{ $url }}" class="img-fluid" style="max-height: 120px; max-width: 180px;">
+                                <img src="{{ $url }}" class="img-fluid" style="max-height: 120px; max-width: 180px;" loading="lazy" decoding="async">
                             @else
                                 <div class="text-muted p-3">Nenhuma marca d'agua transparente enviada</div>
                             @endif

@@ -264,7 +264,7 @@ Persists across pages using localStorage
 
                     box.innerHTML = `
                     <div class="floating-chat-header" onclick="window.toggleFloatingChat(${userId})">
-                        <img src="${userPhoto || '/img/default-user.svg'}" alt="${userName}" onerror="this.src='/img/default-user.svg'">
+                        <img src="${userPhoto || '/img/default-user.svg'}" alt="${userName}" onerror="this.src='/img/default-user.svg'" loading="lazy" decoding="async">
                         <div class="floating-chat-header-info">
                             <div class="floating-chat-header-name">${escapeHtml(userName)}</div>
                             <div class="floating-chat-header-status">Conversando agora</div>

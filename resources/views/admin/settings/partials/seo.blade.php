@@ -33,7 +33,7 @@
                 <div class="upload-preview mb-2 text-center">
                     @if($url = $getUrl('seo_og_image'))
                         <img src="{{ $url }}" class="img-fluid rounded border"
-                            style="max-height: 200px; width: 100%; object-fit: cover;">
+                            style="max-height: 200px; width: 100%; object-fit: cover;" loading="lazy" decoding="async">
                     @else
                         <div class="text-muted p-5 border rounded bg-light">
                             <i class="fab fa-facebook fa-3x mb-2"></i><br>1200x630px
@@ -58,7 +58,7 @@
                 <div class="upload-preview mb-2 text-center">
                     @if($url = $getUrl('seo_twitter_image'))
                         <img src="{{ $url }}" class="img-fluid rounded border"
-                            style="max-height: 200px; width: 100%; object-fit: cover;">
+                            style="max-height: 200px; width: 100%; object-fit: cover;" loading="lazy" decoding="async">
                     @else
                         <div class="text-muted p-5 border rounded bg-light">
                             <i class="fab fa-twitter fa-3x mb-2"></i><br>1200x600px

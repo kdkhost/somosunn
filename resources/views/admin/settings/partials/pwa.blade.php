@@ -105,7 +105,7 @@
                     <input type="hidden" name="remove_pwa_icon_192" id="remove_pwa_icon_192" value="0">
                     <div class="upload-preview mb-2">
                         @if($url = $getUrl('pwa_icon_192'))
-                            <img src="{{ $url }}" class="img-fluid rounded border">
+                            <img src="{{ $url }}" class="img-fluid rounded border" loading="lazy" decoding="async">
                         @else
                             <div class="text-muted p-4 border rounded bg-light">
                                 <i class="fas fa-image fa-2x mb-2"></i><br>192x192
@@ -131,7 +131,7 @@
                     <input type="hidden" name="remove_pwa_icon_512" id="remove_pwa_icon_512" value="0">
                     <div class="upload-preview mb-2">
                         @if($url = $getUrl('pwa_icon_512'))
-                            <img src="{{ $url }}" class="img-fluid rounded border">
+                            <img src="{{ $url }}" class="img-fluid rounded border" loading="lazy" decoding="async">
                         @else
                             <div class="text-muted p-4 border rounded bg-light">
                                 <i class="fas fa-image fa-2x mb-2"></i><br>512x512
@@ -157,7 +157,7 @@
                     <input type="hidden" name="remove_pwa_banner" id="remove_pwa_banner" value="0">
                     <div class="upload-preview mb-2 text-center">
                         @if($url = $getUrl('pwa_banner'))
-                            <img src="{{ $url }}" class="img-fluid rounded border" style="max-height: 200px;">
+                            <img src="{{ $url }}" class="img-fluid rounded border" style="max-height: 200px;" loading="lazy" decoding="async">
                         @else
                             <div class="text-muted p-5 border rounded bg-light">
                                 <i class="fas fa-image fa-3x mb-2"></i><br>Banner Promocional

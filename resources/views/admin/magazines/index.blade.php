@@ -153,7 +153,7 @@
                                 @if($m->thumbnail_url)
                                     <img src="{{ $m->thumbnail_url }}" alt=""
                                         style="width: 46px; height: 62px; object-fit: cover; border-radius: 4px;"
-                                        class="shadow-sm">
+                                        class="shadow-sm" loading="lazy" decoding="async">
                                 @else
                                     <div class="d-flex align-items-center justify-content-center text-muted"
                                         style="width:46px;height:62px;background:#f1f5f9;border-radius:4px;">

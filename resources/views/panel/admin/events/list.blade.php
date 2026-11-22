@@ -75,7 +75,7 @@
                                             <div class="w-20 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 overflow-hidden border-2 border-slate-200/60 dark:border-slate-700 shrink-0 transition-all duration-500 group-hover/thumb:scale-110 shadow-sm">
                                                 @if($event->image_url)
                                                     <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
-                                                        class="w-full h-full object-cover">
+                                                        class="w-full h-full object-cover" loading="lazy" decoding="async">
                                                 @else
                                                     <div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 transition-colors">
                                                         <i class="fas fa-{{ $event->type === 'album' ? 'images' : 'calendar-star' }} text-slate-300 dark:text-slate-600 text-xl"></i>
@@ -217,57 +217,19 @@
                     </tbody>
                 </table>
             </div>
+            @if($events instanceof \Illuminate\Pagination\AbstractPaginator && $events->hasPages())
+                <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
+                    {{ $events->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection
 
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/responsive.bootstrap4.min.css') }}">
     <style>
-        #panel-events-table_wrapper .dataTables_length,
-        #panel-events-table_wrapper .dataTables_filter {
-            margin-bottom: 1rem;
-        }
-
-        #panel-events-table_wrapper .dataTables_filter input,
-        #panel-events-table_wrapper .dataTables_length select {
-            border-radius: 0.9rem;
-            border: 1px solid rgb(226 232 240);
-            background: rgb(248 250 252);
-            color: rgb(15 23 42);
-            padding: 0.55rem 0.85rem;
-        }
-
-        .dark #panel-events-table_wrapper .dataTables_filter input,
-        .dark #panel-events-table_wrapper .dataTables_length select {
-            border-color: rgb(51 65 85);
-            background: rgb(15 23 42);
-            color: rgb(248 250 252);
-        }
-
-        #panel-events-table_wrapper .dataTables_info,
-        #panel-events-table_wrapper .dataTables_paginate {
-            margin-top: 1rem;
-            color: rgb(100 116 139) !important;
-        }
-
-        .dark #panel-events-table_wrapper .dataTables_info,
-        .dark #panel-events-table_wrapper .dataTables_paginate {
-            color: rgb(148 163 184) !important;
-        }
-
-        #panel-events-table_wrapper .paginate_button {
-            border-radius: 0.85rem !important;
-        }
-
-        #panel-events-table_wrapper .paginate_button.current,
-        #panel-events-table_wrapper .paginate_button.current:hover {
-            background: rgb(37 99 235) !important;
-            border-color: rgb(37 99 235) !important;
-            color: #fff !important;
-        }
-
         .panel-events-table__title,
         .panel-events-table__location {
             white-space: normal;
@@ -282,17 +244,19 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/dataTables.responsive.min.js') }}"></script>
     <script>
         $(function () {
             const table = $('#panel-events-table').DataTable({
                 responsive: true,
                 autoWidth: false,
-                pageLength: 10,
+                paging: false,
+                info: false,
+                searching: false,
                 order: [[0, 'desc']],
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json'
+                    url: '{{ cdn_asset('assets/admin/datatables/pt-BR.json') }}'
                 },
                 columnDefs: [
                     { targets: -1, orderable: false, searchable: false, responsivePriority: 1 },

@@ -31,7 +31,7 @@
                         style="background:#ffffff;border:2px solid rgba(255,255,255,0.3);border-radius:20px;padding:1rem;min-width:140px;min-height:80px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.2);">
                         @if($partner->logo_url)
                             <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}"
-                                style="max-width:120px;max-height:64px;object-fit:contain;">
+                                style="max-width:120px;max-height:64px;object-fit:contain;" loading="lazy" decoding="async">
                         @else
                             <i class="fas fa-building text-slate-400 text-3xl"></i>
                         @endif

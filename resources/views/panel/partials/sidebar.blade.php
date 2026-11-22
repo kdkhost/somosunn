@@ -459,7 +459,7 @@
             <div class="relative z-10 flex flex-col xl:flex-row items-center xl:items-start gap-4 text-center xl:text-left">
                 <div class="w-16 h-16 xl:w-14 xl:h-14 rounded-[1.2rem] overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border-[3px] border-white dark:border-slate-700 shadow-md transform transition-all duration-500 group-hover/profile:rotate-3 group-hover/profile:scale-105">
                     @if($user->profile_photo_url && !str_contains($user->profile_photo_url, 'default-user.svg'))
-                        <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover">
+                        <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     @else
                         <i class="fas fa-user text-slate-400 dark:text-slate-500 text-xl"></i>
                     @endif

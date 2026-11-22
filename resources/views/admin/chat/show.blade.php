@@ -46,7 +46,7 @@
                                             class="list-group-item list-group-item-action {{ $isActive ? 'active' : '' }}">
                                             <div class="d-flex w-100 align-items-center">
                                                 <img src="{{ $cPhoto }}" class="img-circle mr-3"
-                                                    style="width: 40px; height: 40px; object-fit: cover;">
+                                                    style="width: 40px; height: 40px; object-fit: cover;" loading="lazy" decoding="async">
                                                 <div class="flex-grow-1 text-truncate">
                                                     <strong>{{ $cName }}</strong>
                                                     @if($conv->unread_count > 0)
@@ -82,7 +82,7 @@
                                         </div>
                                         <img class="direct-chat-img"
                                             src="{{ $isMe ? (Auth::user()->profile_photo_url ?? asset('img/default-user.svg')) : $chatOtherUserPhoto }}"
-                                            alt="User">
+                                            alt="User" loading="lazy" decoding="async">
                                         <div class="direct-chat-text">
                                             {{ $msg->body }}
                                         </div>
@@ -131,7 +131,7 @@
                             <span class="direct-chat-name float-right">Você</span>
                             <span class="direct-chat-timestamp float-left">${time}</span>
                         </div>
-                        <img class="direct-chat-img" src="{{ Auth::user()->profile_photo_url ?? asset('img/default-user.svg') }}" alt="User">
+                        <img class="direct-chat-img" src="{{ Auth::user()->profile_photo_url ?? asset('img/default-user.svg') }}" alt="User" loading="lazy" decoding="async">
                         <div class="direct-chat-text">
                             ${body.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
                         </div>

@@ -208,7 +208,7 @@
                             <div class="member-ticket-main">
                                 <div class="member-ticket-cover">
                                     @if($event->image_url)
-                                        <img src="{{ $event->image_url }}" alt="{{ $event->title }}">
+                                        <img src="{{ $event->image_url }}" alt="{{ $event->title }}" loading="lazy" decoding="async">
                                     @else
                                         <div class="flex h-full w-full items-center justify-center">
                                             <i class="fas fa-ticket-alt text-5xl text-white/80"></i>

@@ -33,7 +33,7 @@
 
                     <div class="text-center mb-4">
                         @if($company['logo_url'])
-                            <img src="{{ $company['logo_url'] }}" alt="Logo" class="img-fluid mb-2" style="max-height: 50px;">
+                            <img src="{{ $company['logo_url'] }}" alt="Logo" class="img-fluid mb-2" style="max-height: 50px;" loading="lazy" decoding="async">
                         @else
                             <h3 class="text-primary font-weight-bold">{{ $company['name'] }}</h3>
                         @endif

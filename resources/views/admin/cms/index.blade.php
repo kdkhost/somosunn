@@ -51,7 +51,7 @@
                                 @if(!empty($contents['hero_image']))
                                     <div class="mt-2">
                                         <img src="{{ asset('storage/' . ltrim($contents['hero_image'], '/')) }}" alt="Hero"
-                                            style="max-width: 280px; border-radius: 8px;">
+                                            style="max-width: 280px; border-radius: 8px;" loading="lazy" decoding="async">
                                     </div>
                                     <div class="form-check mt-2">
                                         <input class="form-check-input" type="checkbox" name="remove_hero_image" value="1"

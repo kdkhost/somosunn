@@ -79,7 +79,7 @@
                                 {{-- Avatar --}}
                                 <div class="flex h-12 w-12 items-center justify-center rounded-2xl overflow-hidden bg-slate-200 dark:bg-slate-700 shrink-0 ring-2 ring-rose-200/50 dark:ring-rose-900/40">
                                     @if($item->user->profile_photo)
-                                        <img src="{{ asset($item->user->profile_photo) }}" alt="{{ $item->user->name }}" class="w-full h-full object-cover">
+                                        <img src="{{ asset($item->user->profile_photo) }}" alt="{{ $item->user->name }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                     @else
                                         <span class="text-slate-500 dark:text-slate-400 font-black text-lg">
                                             {{ strtoupper(substr($item->user->name ?? '?', 0, 1)) }}

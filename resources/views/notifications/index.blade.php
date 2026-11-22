@@ -14,7 +14,7 @@
                             <div class="flex items-center gap-3 mb-6">
                                 <div class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0">
                                     <img src="{{ Auth::user()->profile_photo_url }}" alt="Avatar" class="w-10 h-10 object-cover"
-                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                 </div>
                                 <div>
                                     <p class="font-bold text-gray-900">{{ Auth::user()->name }}</p>
@@ -108,7 +108,7 @@
                                                 <div class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0">
                                                     <img src="{{ $request->requester->profile_photo_url }}" alt="Avatar"
                                                         class="w-8 h-8 object-cover"
-                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                                 </div>
                                                 <div class="overflow-hidden">
                                                     <p class="text-xs font-semibold text-gray-800 truncate"
@@ -152,7 +152,7 @@
                                             <a class="rounded-full w-8 h-8 overflow-hidden flex-shrink-0"
                                                 href="{{ route('social.profile', $user->id) }}">
                                                 <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="w-8 h-8 object-cover"
-                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                             </a>
                                             <div class="overflow-hidden">
                                                 <a href="{{ route('social.profile', $user->id) }}"

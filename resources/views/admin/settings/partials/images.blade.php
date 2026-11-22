@@ -18,7 +18,7 @@
 
                     <div class="upload-preview mb-3 drop-zone-area">
                         @if($url = $getUrl('logo_front'))
-                            <img src="{{ $url }}" class="img-fluid rounded shadow-sm border" style="max-height: 80px;">
+                            <img src="{{ $url }}" class="img-fluid rounded shadow-sm border" style="max-height: 80px;" loading="lazy" decoding="async">
                         @else
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
@@ -53,7 +53,7 @@
 
                     <div class="upload-preview mb-3 drop-zone-area">
                         @if($url = $getUrl('logo_image'))
-                            <img src="{{ $url }}" class="img-fluid rounded shadow-sm border" style="max-height: 80px;">
+                            <img src="{{ $url }}" class="img-fluid rounded shadow-sm border" style="max-height: 80px;" loading="lazy" decoding="async">
                         @else
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
@@ -88,7 +88,7 @@
 
                     <div class="upload-preview mb-3 drop-zone-area">
                         @if($url = $getUrl('logo_somos_unicas'))
-                            <img src="{{ $url }}" class="img-fluid rounded shadow-sm border" style="max-height: 80px;">
+                            <img src="{{ $url }}" class="img-fluid rounded shadow-sm border" style="max-height: 80px;" loading="lazy" decoding="async">
                         @else
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
@@ -125,7 +125,7 @@
                     <div class="upload-preview mb-3 drop-zone-area">
                         @if($url = $getUrl('favicon_image'))
                             <img src="{{ $url }}" class="img-fluid rounded shadow-sm border"
-                                style="width: 32px; height: 32px;">
+                                style="width: 32px; height: 32px;" loading="lazy" decoding="async">
                         @else
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
@@ -162,7 +162,7 @@
                     <div class="upload-preview mb-3 drop-zone-area">
                         @if($url = $getUrl('logo_admin'))
                             <img src="{{ $url }}" class="img-fluid rounded shadow-sm border"
-                                style="max-height: 80px; background: #343a40; padding: 5px;">
+                                style="max-height: 80px; background: #343a40; padding: 5px;" loading="lazy" decoding="async">
                         @else
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
@@ -197,7 +197,7 @@
 
                     <div class="upload-preview mb-3 drop-zone-area">
                         @if($url = $getUrl('logo_auth'))
-                            <img src="{{ $url }}" class="img-fluid rounded shadow-sm border" style="max-height: 80px;">
+                            <img src="{{ $url }}" class="img-fluid rounded shadow-sm border" style="max-height: 80px;" loading="lazy" decoding="async">
                         @else
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
@@ -239,7 +239,7 @@
                 <div class="upload-preview mb-3 drop-zone-area text-center">
                     @if($url = $getUrl('hero_image'))
                         <img src="{{ $url }}" class="img-fluid rounded shadow-sm border"
-                            style="max-height: 200px; width: 100%; object-fit: cover;">
+                            style="max-height: 200px; width: 100%; object-fit: cover;" loading="lazy" decoding="async">
                     @else
                         <div class="text-muted p-5 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center" style="min-height: 150px;">
                             <i class="fas fa-image fa-3x mb-3 text-primary opacity-50"></i>
@@ -274,7 +274,7 @@
                 <div class="upload-preview mb-3 drop-zone-area text-center">
                     @if($url = $getUrl('site_bg_image'))
                         <img src="{{ $url }}" class="img-fluid rounded shadow-sm border"
-                            style="max-height: 200px; width: 100%; object-fit: cover;">
+                            style="max-height: 200px; width: 100%; object-fit: cover;" loading="lazy" decoding="async">
                     @else
                         <div class="text-muted p-5 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center" style="min-height: 150px;">
                             <i class="fas fa-fill-drip fa-3x mb-3 text-primary opacity-50"></i>

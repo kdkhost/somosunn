@@ -1,5 +1,30 @@
 # CHANGELOG - SOMOS UNN
 
+## [2026-11-21] - perf/arch: auditoria, desmembramento por subdominios, performance e padroes pt-BR
+
+- **Subdominios, CDN cookieless e cache publico de borda (`config/domains.php`, `app/Support/DomainManager.php`, `app/Helpers/AssetHelpers.php`, `app/Http/Kernel.php`, `app/Providers/RouteServiceProvider.php`, `routes/public.php`, `routes/app.php`, `routes/webhooks.php`):**
+  - Desmembramento das rotas em `routes/public.php` (grupo `web.public` com `StartPublicSession` usando `NullSessionHandler` e `PublicCacheableResponse` sem `Set-Cookie` para visitantes anonimos em `somosunn.com.br`), `routes/app.php` (`/admin`, `/painel`, autenticacao, checkout e acoes autenticadas em `app.somosunn.com.br`) e `routes/webhooks.php` (grupo `webhook` em `api.somosunn.com.br`, mantendo retrocompatibilidade quando o roteamento estrito esta desligado).
+  - Remoção do middleware global `TrackServiceVisit` da pilha global e otimizacao de `TrackServiceVisit` / `TrackVisitor` (cache de `Schema::hasTable`, deduplicacao via `Cache::add` sem abrir sessao e registro em `app()->terminating()`).
+  - Helpers globais `cdn_asset()` e `unn_asset()` registrados no `composer.json` e integrados ao `UploadStorage::resolveLocalUrl()` e CSP dinamica em `SecurityHeadersMiddleware`, com fallback seguro para `localhost`/`127.0.0.1`/testes.
+- **Manutencao, Webhooks assincronos e Gateway Efi Pro (`ApplyCustomMaintenanceMode.php`, `ProcessPaymentWebhookJob.php`, `EfiService.php`, `PaymentWebhookController.php`, `SumUpController.php`, `Admin/SettingController.php`):**
+  - `ApplyCustomMaintenanceMode` expandido para suportar lista de IPs/CIDRs (`maintenance_allowed_ips`) e cookie HttpOnly assinado de dispositivo autorizado (`maintenance_bypass_token` / rota `authorize-device` em ambos os paineis).
+  - Webhooks Mercado Pago, SumUp e novo endpoint Efi Pro (`/webhook/efi` e `/api/v1/webhooks/efi`) protegidos por `throttle:webhook_mercadopago`, `throttle:webhook_sumup` e `throttle:webhook_efi`, despachados de forma assincrona na fila `webhooks` via `ProcessPaymentWebhookJob`.
+  - Interface de gestao de subdominios/CDN/bypass de manutencao e aba Efi Pro adicionadas em `/admin/settings` e `/painel/admin/settings`.
+- **Banco de Dados, Cache e Paginacao Server-Side:**
+  - Corrigido `use Illuminate\Support\Facades\Cache;` ausente em `Panel\DashboardController.php`.
+  - Cache persistente de configuracoes em `Setting::allValues()` eliminando queries repetidas em `AppServiceProvider::boot()`, `SettingController::index()` e `admin/layouts/app.blade.php`.
+  - Cache de dados publicos da home e ranking (`HomeController::index()` e `networkingOverview()`), cache de saldo MP (`DashboardMetricsService`) e janela limitada de calendario.
+  - Paginacao/DataTables Server-Side com eager loading em `Admin\UserController` (`admin.users.data`), `Panel\Admin\UserController` (reativacao da paginacao na view), `Admin\EventController::list()`, `Panel\Admin\EventController::list()`, `Admin\CourseController::index()`, `Admin\TestimonialController` (limite no select de usuarios) e `Panel\Admin\CronController` (`panel.admin.cron.data` e paginacao).
+  - Nova migration aditiva `database/migrations/2026_11_21_000001_add_scale_performance_indexes.php` com indices compostos nas tabelas criticas.
+- **Frontend, FullCalendar 6, WebP, Mascaras e PWA (`public/css/unn-tailwind*.css`, `public/js/unn-masks.js`, layouts e views):**
+  - Substituicao do `cdn.tailwindcss.com` (Play CDN) por CSS compilado estatico `public/css/unn-tailwind.css` e `public/css/unn-tailwind-nopreflight.css`.
+  - Remocao de `adminlte.min.css` duplicado no `<head>` do AdminLTE, troca dos assets do DataTables CDN por copia local (`public/assets/admin/datatables/*`) nas listagens atualizadas e carregamento sob demanda + loader PJAX para `jqvmap`, `chart.js`, `jquery-knob`, `summernote`, `cropperjs`, `bootstrap-colorpicker` e `flatpickr`.
+  - Atualizacao do calendario de eventos em `/admin/events` para FullCalendar `6.1.15` (alinhado ao `/painel/admin/events`).
+  - Conversao das 24 imagens raster `>200 KB` em `public/` para `.webp` (mantendo originais como fallback) com entrega WebP automatica em `UploadStorage::resolveLocalUrl()` e inclusao de `loading="lazy" decoding="async"` nas tags `<img>` aplicaveis.
+  - Centralizacao de mascaras brasileiras (incluindo `mask-rg` / `data-mask="rg"`) e ViaCEP no 8o digito com foco automatico em `Numero` via `public/js/unn-masks.js`; eliminacao de `alert()`/`confirm()`/`prompt()` nativos restantes em favor de SweetAlert2 e Toastr; exibicao da barra `mobile-bottom-nav` apenas em PWA standalone (`display-mode: standalone`).
+- **Git e Deploy cPanel (`DEPLOY_CPANEL.md`, `.gitignore`, `vendor/composer/platform_check.php`):**
+  - Limpeza de `.ftpquota`, arquivos `.bak` e temporarios `vendor/composer/tmp-*.zip` rastreados; regeneracao do autoloader otimizado e atualizacao do guia `DEPLOY_CPANEL.md`.
+
 ## [2026-08-24] - fix(eventos): capas ausentes sem imagens quebradas
 
 - O accessor público de imagem do evento passou a confirmar a existência física do arquivo antes de gerar a URL.

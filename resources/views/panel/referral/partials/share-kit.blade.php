@@ -124,12 +124,12 @@
                 <div class="mt-4 grid gap-4 lg:grid-cols-[0.92fr,1.08fr]">
                     <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
                         @if(!empty($branding['hero_image_url']))
-                            <img src="{{ $branding['hero_image_url'] }}" alt="Hero de divulgação" class="h-44 w-full object-cover">
+                            <img src="{{ $branding['hero_image_url'] }}" alt="Hero de divulgação" class="h-44 w-full object-cover" loading="lazy" decoding="async">
                         @endif
                         <div class="space-y-4 p-5">
                             <div class="flex items-center gap-3">
                                 @if(!empty($branding['logo_url']))
-                                    <img src="{{ $branding['logo_url'] }}" alt="{{ $branding['site_name'] ?? 'Marca' }}" class="h-12 w-auto rounded-xl bg-white p-2">
+                                    <img src="{{ $branding['logo_url'] }}" alt="{{ $branding['site_name'] ?? 'Marca' }}" class="h-12 w-auto rounded-xl bg-white p-2" loading="lazy" decoding="async">
                                 @endif
                                 <div>
                                     <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Landing oficial</p>
@@ -211,7 +211,7 @@
                         <div class="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
                             <div class="grid gap-4 xl:grid-cols-[220px,1fr]">
                                 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950">
-                                    <img src="{{ $asset['image_url'] }}" alt="{{ $asset['title'] }}" class="h-36 w-full object-cover">
+                                    <img src="{{ $asset['image_url'] }}" alt="{{ $asset['title'] }}" class="h-36 w-full object-cover" loading="lazy" decoding="async">
                                 </div>
                                 <div class="space-y-3">
                                     <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">

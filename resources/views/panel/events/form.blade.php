@@ -61,7 +61,7 @@
                 <label class="block text-sm font-semibold mb-1">Imagem</label>
                 <input type="file" name="image" accept="image/*" class="w-full border rounded px-3 py-2">
                 @if($event->image_url)
-                    <img src="{{ $event->image_url }}" alt="Imagem" class="h-20 mt-2">
+                    <img src="{{ $event->image_url }}" alt="Imagem" class="h-20 mt-2" loading="lazy" decoding="async">
                 @endif
             </div>
             <div class="flex justify-end gap-2">
@@ -112,7 +112,7 @@
                     @foreach($event->media as $media)
                         <div class="relative bg-gray-100 rounded border group" id="media-{{ $media->id }}">
                             @if($media->type === 'image')
-                                <img src="{{ asset('storage/' . $media->file_path) }}" class="w-full h-32 object-cover rounded">
+                                <img src="{{ asset('storage/' . $media->file_path) }}" class="w-full h-32 object-cover rounded" loading="lazy" decoding="async">
                             @else
                                 <div class="w-full h-32 flex items-center justify-center bg-gray-800 rounded">
                                     <i class="fas fa-video text-white text-3xl"></i>
@@ -138,7 +138,7 @@
         <script>
             function renderGalleryMediaCard(media) {
                 const preview = media.type === 'image'
-                    ? `<img src="${media.url}" class="w-full h-32 object-cover rounded">`
+                    ? `<img src="${media.url}" class="w-full h-32 object-cover rounded" loading="lazy" decoding="async">`
                     : `<div class="w-full h-32 flex items-center justify-center bg-gray-800 rounded"><i class="fas fa-video text-white text-3xl"></i></div>`;
 
                 return `

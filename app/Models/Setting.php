@@ -5,15 +5,30 @@ namespace App\Models;
 use App\Support\UploadStorage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Setting extends Model
 {
     use HasFactory;
 
+    public const CACHE_KEY = 'unn:settings:all:v1';
+    private const CACHE_TTL_SECONDS = 300;
+
     protected $fillable = ['key', 'value', 'group'];
 
     protected static bool $runtimeCacheLoaded = false;
     protected static array $runtimeCache = [];
+
+    protected static function booted(): void
+    {
+        static::saved(static function (): void {
+            static::flushRuntimeCache();
+        });
+
+        static::deleted(static function (): void {
+            static::flushRuntimeCache();
+        });
+    }
 
     protected static function loadRuntimeCache(): void
     {
@@ -22,13 +37,44 @@ class Setting extends Model
         }
 
         try {
-            static::$runtimeCache = static::query()->pluck('value', 'key')->toArray();
+            $cached = null;
+            if (!app()->runningUnitTests()) {
+                try {
+                    $cached = Cache::get(self::CACHE_KEY);
+                } catch (\Throwable) {
+                    $cached = null;
+                }
+            }
+
+            if (is_array($cached)) {
+                static::$runtimeCache = $cached;
+            } else {
+                static::$runtimeCache = static::query()->pluck('value', 'key')->toArray();
+
+                if (!app()->runningUnitTests()) {
+                    try {
+                        Cache::put(self::CACHE_KEY, static::$runtimeCache, self::CACHE_TTL_SECONDS);
+                    } catch (\Throwable) {
+                        // Cache persistente indisponivel; mantem cache em memoria
+                    }
+                }
+            }
         } catch (\Throwable $e) {
             \Log::warning('Configuracoes indisponiveis, cache local vazio: ' . $e->getMessage());
             static::$runtimeCache = [];
         } finally {
             static::$runtimeCacheLoaded = true;
         }
+    }
+
+    /**
+     * Retorna todas as configuracoes em array [key => value] utilizando o cache em memoria/Laravel.
+     */
+    public static function allValues(): array
+    {
+        static::loadRuntimeCache();
+
+        return static::$runtimeCache;
     }
 
     public static function get($key, $default = null)
@@ -65,6 +111,12 @@ class Setting extends Model
             static::$runtimeCache[$key] = $record ? $record->value : $value;
             static::$runtimeCacheLoaded = true;
 
+            try {
+                Cache::forget(self::CACHE_KEY);
+            } catch (\Throwable) {
+                // Ignora erro de backend de cache
+            }
+
             return $record;
         } catch (\Throwable $e) {
             \Log::warning('Nao foi possivel gravar configuracao: ' . $e->getMessage());
@@ -84,5 +136,11 @@ class Setting extends Model
     {
         static::$runtimeCacheLoaded = false;
         static::$runtimeCache = [];
+
+        try {
+            Cache::forget(self::CACHE_KEY);
+        } catch (\Throwable) {
+            // Ignora erro caso cache ainda nao esteja disponivel durante boot
+        }
     }
 }

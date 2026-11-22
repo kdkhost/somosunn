@@ -461,7 +461,7 @@
                                     <div class="flex items-center gap-2 sm:gap-3 min-w-0">
                                         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 flex items-center justify-center">
                                             @if($referred->photo)
-                                                <img src="{{ asset($referred->photo) }}" alt="{{ $referred->name }}" class="w-full h-full object-cover">
+                                                <img src="{{ asset($referred->photo) }}" alt="{{ $referred->name }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <i class="fas fa-user text-slate-400 text-xs"></i>
                                             @endif

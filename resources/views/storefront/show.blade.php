@@ -353,7 +353,7 @@
                     <div class="flex items-center gap-4 flex-shrink-0">
                         <div class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[1.2rem] border border-slate-200 bg-white shadow-sm">
                             @if($store->logo_url)
-                                <img src="{{ $store->logo_url }}" alt="{{ $store->brand_name }}" class="h-full w-full object-cover">
+                                <img src="{{ $store->logo_url }}" alt="{{ $store->brand_name }}" class="h-full w-full object-cover" loading="lazy" decoding="async">
                             @else
                                 <div class="flex h-full w-full items-center justify-center text-2xl text-slate-300">
                                     <i class="fas fa-store"></i>
@@ -419,7 +419,7 @@
                 @if($store->banner_url)
                     <div class="store-home-card overflow-hidden rounded-[1.65rem] mb-5">
                         <div class="relative" style="min-height:200px; max-height:320px;">
-                            <img src="{{ $store->banner_url }}" alt="{{ $store->brand_name }}" class="w-full h-full object-cover" style="min-height:200px; max-height:320px;">
+                            <img src="{{ $store->banner_url }}" alt="{{ $store->brand_name }}" class="w-full h-full object-cover" style="min-height:200px; max-height:320px;" loading="lazy" decoding="async">
                             <div class="absolute inset-0" style="background: linear-gradient(90deg, rgba(15,23,42,.7) 0%, rgba(15,23,42,.2) 60%, transparent 100%);"></div>
                             <div class="absolute inset-0 flex items-center px-8 md:px-12">
                                 <div class="max-w-lg">
@@ -516,7 +516,7 @@
                                 <div class="relative">
                                     <a href="{{ route('seller-stores.products.show', [$store->slug, $product->slug]) }}" class="store-card-image block overflow-hidden">
                                         @if($product->cover_url)
-                                            <img src="{{ $product->cover_url }}" alt="{{ $product->title }}" class="h-full w-full object-cover transition duration-500 hover:scale-[1.03]">
+                                            <img src="{{ $product->cover_url }}" alt="{{ $product->title }}" class="h-full w-full object-cover transition duration-500 hover:scale-[1.03]" loading="lazy" decoding="async">
                                         @else
                                             <div class="flex h-full w-full items-center justify-center text-5xl text-slate-300">
                                                 <i class="fas fa-box-open"></i>
@@ -596,7 +596,7 @@
                                     <div class="relative">
                                         <div class="store-card-image overflow-hidden">
                                             @if(!empty($contentCard['image']))
-                                                <img src="{{ $contentCard['image'] }}" alt="{{ $contentCard['title'] }}" class="h-full w-full object-cover transition duration-500 hover:scale-[1.03]">
+                                                <img src="{{ $contentCard['image'] }}" alt="{{ $contentCard['title'] }}" class="h-full w-full object-cover transition duration-500 hover:scale-[1.03]" loading="lazy" decoding="async">
                                             @else
                                                 <div class="flex h-full w-full items-center justify-center text-5xl text-slate-200" style="background: linear-gradient(135deg, #f8fafc, #eef2ff);">
                                                     <i class="{{ $contentCard['icon'] }}"></i>
@@ -676,7 +676,7 @@
                                 <div class="relative">
                                     <div class="store-card-image overflow-hidden">
                                         @if(!empty($contentCard['image']))
-                                            <img src="{{ $contentCard['image'] }}" alt="{{ $contentCard['title'] }}" class="h-full w-full object-cover transition duration-500 hover:scale-[1.03]">
+                                            <img src="{{ $contentCard['image'] }}" alt="{{ $contentCard['title'] }}" class="h-full w-full object-cover transition duration-500 hover:scale-[1.03]" loading="lazy" decoding="async">
                                         @else
                                             <div class="flex h-full w-full items-center justify-center text-4xl text-slate-200">
                                                 <i class="{{ $contentCard['icon'] }}"></i>

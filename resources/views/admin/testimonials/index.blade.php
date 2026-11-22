@@ -167,7 +167,7 @@
                                 {{-- Avatar --}}
                                 <td>
                                     @if($resolvedAvatar)
-                                        <img src="{{ $resolvedAvatar }}" alt="{{ $displayName }}" class="avatar-circle">
+                                        <img src="{{ $resolvedAvatar }}" alt="{{ $displayName }}" class="avatar-circle" loading="lazy" decoding="async">
                                     @else
                                         <span class="avatar-initials">{{ strtoupper(substr($displayName, 0, 1)) }}</span>
                                     @endif

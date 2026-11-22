@@ -88,7 +88,7 @@
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
                             <td class="hidden sm:table-cell px-2 py-3">
                                 @if($m->thumbnail_url)
-                                    <img src="{{ $m->thumbnail_url }}" alt="" class="w-12 h-16 object-cover rounded-md shadow">
+                                    <img src="{{ $m->thumbnail_url }}" alt="" class="w-12 h-16 object-cover rounded-md shadow" loading="lazy" decoding="async">
                                 @else
                                     <div class="w-12 h-16 rounded-md bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/40 dark:to-indigo-900/40 flex items-center justify-center text-purple-400">
                                         <i class="fas fa-book"></i>

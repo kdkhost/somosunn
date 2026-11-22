@@ -290,7 +290,7 @@
 
                                 <!-- Preview ativo -->
                                 <div id="upload-preview-container" class="absolute inset-x-2 inset-y-2 pointer-events-none transition-opacity duration-300 z-0 flex flex-col items-center justify-center rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 {{ $event->image_url ? 'opacity-100' : 'opacity-0' }}">
-                                    <img id="upload-preview-image" class="w-full h-full object-cover transition-transform duration-700" src="{{ $event->image_url ?? '' }}" alt="Preview da Capa">
+                                    <img id="upload-preview-image" class="w-full h-full object-cover transition-transform duration-700" src="{{ $event->image_url ?? '' }}" alt="Preview da Capa" loading="lazy" decoding="async">
                                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
                                     
                                     <!-- Barra de Progresso Simulação -->

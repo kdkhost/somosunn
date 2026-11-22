@@ -161,7 +161,7 @@
             <div class="p-3 border rounded text-center" id="email_header_preview_container" style="background: #f8f9fa;">
                 <label class="d-block small text-muted mb-2">Pré-visualização do Cabeçalho</label>
                 <div id="email_header_preview" class="mx-auto rounded shadow-sm d-flex align-items-center justify-content-center" style="width: 100%; max-width: 300px; height: 80px; transition: all 0.3s;">
-                    <img src="{{ \App\Models\Setting::getUrl('logo_admin') ?: (\App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg')) }}" alt="Logo" style="max-height: 40px; max-width: 150px;">
+                    <img src="{{ \App\Models\Setting::getUrl('logo_admin') ?: (\App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg')) }}" alt="Logo" style="max-height: 40px; max-width: 150px;" loading="lazy" decoding="async">
                 </div>
             </div>
         </div>

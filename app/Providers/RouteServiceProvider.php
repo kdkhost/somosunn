@@ -16,8 +16,19 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
-            Route::middleware('web')
-                ->group(base_path('routes/web.php'));
+            Route::middleware('webhook')
+                ->group(base_path('routes/webhooks.php'));
+
+            Route::middleware(['web', 'subdomain:app'])
+                ->group(base_path('routes/app.php'));
+
+            Route::middleware(['web.public', 'subdomain:public'])
+                ->group(base_path('routes/public.php'));
+
+            if (file_exists(base_path('routes/web.php'))) {
+                Route::middleware('web')
+                    ->group(base_path('routes/web.php'));
+            }
         });
     }
 }

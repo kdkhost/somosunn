@@ -56,7 +56,7 @@ class EventController extends Controller
             $query->where('title', 'like', '%' . $search . '%');
         }
 
-        $events = $query->get();
+        $events = $query->paginate(20)->withQueryString();
         app(SalesAnalyticsService::class)->decorateEvents($events);
 
         return view('panel.admin.events.list', compact('events', 'search', 'type'));

@@ -96,7 +96,10 @@
             }, options || {});
 
             if (!window.Swal || typeof window.Swal.fire !== 'function') {
-                return window.confirm(merged.text || 'Confirme para continuar.');
+                if (typeof toastr !== 'undefined') {
+                    toastr.info(merged.text || 'Processando...');
+                }
+                return true;
             }
 
             const result = await window.Swal.fire(merged);

@@ -162,7 +162,7 @@
         if (window.toastr && toastr[type]) toastr[type](message);
         else if (window.showSuccess && type === 'success') showSuccess(message);
         else if (window.showError && type === 'error') showError(message);
-        else alert(message);
+        else if (typeof Swal !== 'undefined') Swal.fire({ toast: true, position: 'top-end', icon: type === 'error' ? 'error' : 'info', title: message, showConfirmButton: false, timer: 2500 });
     }
     function escapeHtml(value) {
         return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));

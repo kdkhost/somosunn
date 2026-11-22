@@ -1,7 +1,7 @@
 <div id="gallery-lightbox" class="fixed inset-0 z-[95] flex hidden items-center justify-center bg-black opacity-0 transition-opacity duration-300">
 
     <div id="gallery-track" class="absolute inset-0 flex items-center justify-center transition-transform duration-300 ease-out">
-        <img id="gallery-lightbox-image" src="" alt="" class="max-h-[100dvh] max-w-[100vw] object-contain">
+        <img id="gallery-lightbox-image" src="" alt="" class="max-h-[100dvh] max-w-[100vw] object-contain" loading="lazy" decoding="async">
         <video id="gallery-lightbox-video" src="" class="hidden max-h-[100dvh] max-w-[100vw] object-contain" controls playsinline preload="metadata"></video>
     </div>
 

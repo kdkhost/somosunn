@@ -548,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 qrContainer.innerHTML = '<img src="data:image/png;base64,' + data.qr_code_base64 + '" alt="PIX QR Code" class="w-48 h-48 mx-auto rounded-xl border border-slate-200">';
             } else if (data.copy_paste || data.qr_code) {
                 const pixData = encodeURIComponent(data.copy_paste || data.qr_code);
-                qrContainer.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=' + pixData + '" alt="PIX QR Code" class="w-48 h-48 mx-auto rounded-xl border border-slate-200">';
+                qrContainer.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=' + pixData + '" alt="PIX QR Code" class="w-48 h-48 mx-auto rounded-xl border border-slate-200" loading="lazy" decoding="async">';
             } else {
                 qrContainer.innerHTML = '<div class="w-48 h-48 mx-auto rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400 text-xs">QR Code indisponível</div>';
             }

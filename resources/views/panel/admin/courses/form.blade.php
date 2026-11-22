@@ -298,7 +298,7 @@
                                     </div>
                                 </template>
                                 <template x-if="photoPreview">
-                                    <img :src="photoPreview" class="w-full h-full object-cover">
+                                    <img :src="photoPreview" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                 </template>
                                 <div @click="$refs.thumbnail.click()"
                                     class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer backdrop-blur-sm">
@@ -606,7 +606,7 @@
                                     {{-- BG Image --}}
                                     <img id="cert-bg-img"
                                         src="{{ $course->certificate_bg ? asset($course->certificate_bg) : '' }}"
-                                        class="absolute inset-0 w-full h-full object-cover {{ $course->certificate_bg ? '' : 'hidden' }}">
+                                        class="absolute inset-0 w-full h-full object-cover {{ $course->certificate_bg ? '' : 'hidden' }}" loading="lazy" decoding="async">
 
                                     <div id="cert-elements-layer" class="absolute inset-0 z-10">
                                         {{-- Draggable elements will be injected here --}}
@@ -674,7 +674,7 @@
                                         class="aspect-[3/1] rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden transition-all shadow-inner relative group">
                                         @if($course->instructor_signature)
                                             <img src="{{ asset($course->instructor_signature) }}"
-                                                class="max-h-full object-contain p-2">
+                                                class="max-h-full object-contain p-2" loading="lazy" decoding="async">
                                         @else
                                             <div class="flex flex-col items-center gap-1 text-slate-300 dark:text-slate-700">
                                                 <i class="fas fa-signature text-2xl transition-colors"></i>

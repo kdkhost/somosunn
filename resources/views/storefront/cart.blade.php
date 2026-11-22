@@ -37,7 +37,7 @@
                                 <div class="flex items-center gap-4 min-w-0">
                                     <div class="h-24 w-24 overflow-hidden rounded-3xl bg-slate-100 flex items-center justify-center">
                                         @if($product->cover_url)
-                                            <img src="{{ $product->cover_url }}" alt="{{ $product->title }}" class="h-full w-full object-cover">
+                                            <img src="{{ $product->cover_url }}" alt="{{ $product->title }}" class="h-full w-full object-cover" loading="lazy" decoding="async">
                                         @else
                                             <i class="fas fa-box text-3xl text-slate-300"></i>
                                         @endif

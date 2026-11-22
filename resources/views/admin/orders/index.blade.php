@@ -222,7 +222,7 @@
                                     <div class="d-flex align-items-center">
                                         <img src="{{ $avatarUrl }}" class="img-circle elevation-1 mr-2"
                                             style="width:34px;height:34px;object-fit:cover"
-                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                         <div>
                                             <div class="font-weight-bold text-sm">{{ $order->user->name ?? 'Usuário removido' }}</div>
                                             <small class="text-muted">{{ $order->user->email ?? '' }}</small>

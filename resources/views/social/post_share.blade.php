@@ -76,7 +76,7 @@
                 <div class="flex items-center gap-3 mb-4">
                     <div class="rounded-full w-12 h-12 overflow-hidden flex-shrink-0">
                         <img src="{{ $post->user->profile_photo_url }}" alt="Avatar" class="w-12 h-12 object-cover"
-                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                     </div>
                     <div>
                         <h2 class="font-bold text-gray-900">{{ $post->user->name }}</h2>
@@ -91,7 +91,7 @@
                 @if($post->media->isNotEmpty())
                     <div class="mt-4">
                         <img src="{{ asset($post->media->first()->path) }}" alt="Midia do post"
-                            class="w-full rounded-lg object-cover">
+                            class="w-full rounded-lg object-cover" loading="lazy" decoding="async">
                     </div>
                 @endif
 

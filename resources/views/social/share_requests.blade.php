@@ -26,7 +26,7 @@
                 <div class="flex items-start gap-4 flex-1">
                     <img src="{{ $sr->fromUser?->profile_photo_url ?? asset('img/default-user.svg') }}"
                          class="w-12 h-12 rounded-2xl object-cover shrink-0 border border-slate-100"
-                         onerror="this.src='{{ asset('img/default-user.svg') }}'">
+                         onerror="this.src='{{ asset('img/default-user.svg') }}'" loading="lazy" decoding="async">
                     <div class="min-w-0">
                         <p class="font-bold text-slate-900">{{ $sr->fromUser?->name }}</p>
                         <p class="text-xs text-slate-400 mt-0.5">{{ $sr->created_at->diffForHumans() }} · expira em {{ $sr->expires_at?->format('d/m/Y') }}</p>

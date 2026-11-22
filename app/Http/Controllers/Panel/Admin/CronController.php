@@ -13,9 +13,47 @@ class CronController extends Controller
 {
     public function index()
     {
-        $tasks = ScheduledTask::orderByDesc('id')->get();
+        $tasks = ScheduledTask::orderByDesc('id')->paginate(20)->withQueryString();
 
         return view('panel.admin.cron.index', compact('tasks'));
+    }
+
+    public function data(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $draw = (int) $request->input('draw', 1);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = (int) $request->input('length', 15);
+        $length = $length > 0 ? min($length, 100) : 15;
+        $search = trim((string) $request->input('search.value', ''));
+
+        $total = ScheduledTask::query()->count();
+        $query = ScheduledTask::query();
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search): void {
+                $builder->where('command', 'like', '%' . $search . '%')
+                    ->orWhere('frequency', 'like', '%' . $search . '%');
+                if (is_numeric($search)) {
+                    $builder->orWhere('id', (int) $search);
+                }
+            });
+        }
+
+        $filtered = (clone $query)->count();
+        $tasks = $query->orderByDesc('id')->skip($start)->take($length)->get();
+
+        return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $tasks->map(fn (ScheduledTask $task) => [
+                'id' => $task->id,
+                'command' => $task->command,
+                'frequency' => $task->frequency,
+                'active' => (bool) $task->active,
+                'last_run_at' => $task->last_run_at?->format('d/m/Y H:i'),
+            ])->values(),
+        ]);
     }
 
     public function create()

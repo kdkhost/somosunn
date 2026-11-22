@@ -88,7 +88,7 @@
                                     <td class="pl-3">
                                         @if($product->cover_url)
                                             <img src="{{ $product->cover_url }}" alt="{{ $product->title }}"
-                                                class="rounded border" style="width:44px; height:44px; object-fit:cover;">
+                                                class="rounded border" style="width:44px; height:44px; object-fit:cover;" loading="lazy" decoding="async">
                                         @else
                                             <div class="rounded border bg-light d-flex align-items-center justify-content-center"
                                                 style="width:44px; height:44px;">

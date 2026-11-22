@@ -17,7 +17,7 @@
         <div class="preview-view d-none">
             <div class="row align-items-center">
                 <div class="col-auto">
-                    <img src="" class="img-thumbnail preview-image" style="max-height: 80px; width: auto;">
+                    <img src="" class="img-thumbnail preview-image" style="max-height: 80px; width: auto;" loading="lazy" decoding="async">
                 </div>
                 <div class="col text-left">
                     <h6 class="file-name text-truncate mb-1" style="max-width: 200px;">Nome do Arquivo</h6>
@@ -40,7 +40,7 @@
         @if(isset($currentValue) && $currentValue)
             <div class="existing-view mt-3 pt-3 border-top {{ $currentValue ? '' : 'd-none' }}">
                 <p class="small text-muted mb-2">Imagem Atual:</p>
-                <img src="{{ $currentValue }}" class="img-fluid rounded" style="max-height: 100px;">
+                <img src="{{ $currentValue }}" class="img-fluid rounded" style="max-height: 100px;" loading="lazy" decoding="async">
             </div>
         @endif
     </div>

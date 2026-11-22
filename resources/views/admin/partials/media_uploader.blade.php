@@ -35,7 +35,7 @@
             <div class="modal-body p-0 bg-dark d-flex align-items-center justify-content-center"
                 style="min-height: 400px;">
                 <div class="w-100 h-100">
-                    <img id="cropImage" src="" class="img-fluid" alt="Preview" style="max-height: 70vh;">
+                    <img id="cropImage" src="" class="img-fluid" alt="Preview" style="max-height: 70vh;" loading="lazy" decoding="async">
                 </div>
             </div>
             <div class="modal-footer border-0">
@@ -66,7 +66,7 @@
                 const row = document.createElement('div');
                 row.className = 'upload-item-row mb-3 animate__animated animate__fadeInUp';
                 const isImage = file.type.startsWith('image/');
-                const preview = isImage && previewUrl ? `<img src="${previewUrl}" class="rounded shadow-sm border mr-3" style="width:54px;height:54px;object-fit:cover;">` : `<div class="rounded border bg-light d-flex align-items-center justify-content-center mr-3" style="width:54px;height:54px;"><i class="fas fa-file-alt text-muted fa-lg"></i></div>`;
+                const preview = isImage && previewUrl ? `<img src="${previewUrl}" class="rounded shadow-sm border mr-3" style="width:54px;height:54px;object-fit:cover;" loading="lazy" decoding="async">` : `<div class="rounded border bg-light d-flex align-items-center justify-content-center mr-3" style="width:54px;height:54px;"><i class="fas fa-file-alt text-muted fa-lg"></i></div>`;
 
                 row.innerHTML = `
                 <div class="d-flex align-items-center justify-content-between bg-white border rounded shadow-xs p-3 transition-all">

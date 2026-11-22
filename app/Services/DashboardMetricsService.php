@@ -115,8 +115,11 @@ class DashboardMetricsService
                 });
 
                 try {
-                    $mpService = new \App\Services\Payment\MercadoPagoService();
-                    $stats['mp_balance'] = $mpService->getBalance(null);
+                    $stats['mp_balance'] = Cache::remember('unn:mp_balance:platform', 300, static function (): mixed {
+                        $mpService = new \App\Services\Payment\MercadoPagoService();
+
+                        return $mpService->getBalance(null);
+                    });
                 } catch (\Throwable) {
                 }
             } else {
@@ -147,8 +150,12 @@ class DashboardMetricsService
 
                 if ($user->canSellOnMarketplace()) {
                     try {
-                        $mpService = new \App\Services\Payment\MercadoPagoService();
-                        $stats['mp_balance'] = $mpService->getBalance($user->id);
+                        $sellerId = $user->id;
+                        $stats['mp_balance'] = Cache::remember('unn:mp_balance:user:' . $sellerId, 300, static function () use ($sellerId): mixed {
+                            $mpService = new \App\Services\Payment\MercadoPagoService();
+
+                            return $mpService->getBalance($sellerId);
+                        });
                     } catch (\Throwable) {
                     }
                 }
@@ -358,7 +365,11 @@ class DashboardMetricsService
             }
 
             if ($this->tableExists('events')) {
-                $eventsQuery = Event::query();
+                $eventsQuery = Event::query()
+                    ->whereNotNull('start_at')
+                    ->whereBetween('start_at', [now()->subMonths(3), now()->addMonths(12)])
+                    ->orderBy('start_at')
+                    ->limit(250);
                 if (!$isAdmin) {
                     $eventsQuery->where('published', true);
                 }

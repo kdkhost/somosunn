@@ -10,28 +10,29 @@
 /storage/logs/
 .DS_Store
 .env.*.local
+!.env.example
 .phpunit.result.cache
 /.phpunit.cache/
 /public/hot
 /public/build/
 /public/mix-manifest.json
 /public/js/*.map
+/public/css/*.map
 
-# Instrucoes locais (nao enviar para o servidor)
+# Arquivos locais / editores (não enviar para o servidor)
 AGENTS.md
 .kiro/
 .vscode/
 .windsurf/
 .cursor/
 .idea/
-/public/css/*.map
 npm-debug.log
 composer.lock
+vendor/composer/tmp-*.zip
 
-# Configurações locais de editor
-
-# Segurança: nunca versionar
+# Segurança e temporários: nunca versionar
 .env.*
+!.env.example
 *.bak
 *.old
 *.zip
@@ -42,10 +43,9 @@ composer.lock
 storage/logs/*.log
 bootstrap/cache/*.php
 
-# Documentação de segurança (somente local, não vai para o git)
+# Documentação interna local (não vai para o git)
 SECURITY_FIXES.md
 AUDITORIA_SEGURANCA_KIRO.md
-AGENTS.md
 CRON_EMAIL_IMPLEMENTATION_PLAN.md
 IMPLEMENTATION_PLAN.md
 INSTRUCOES-CORRECAO-MIGRACAO.md

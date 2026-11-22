@@ -22,7 +22,7 @@
                 <div class="flex-1 flex justify-center">
                     <img src="{{ Str::startsWith($pageData['hero_image'], ['http://', 'https://']) ? $pageData['hero_image'] : asset('storage/' . $pageData['hero_image']) }}" 
                          alt="{{ $pageData['hero_title'] ?? 'Somos Únicas' }}"
-                         class="rounded-3xl shadow-2xl max-h-[500px] object-cover border-4 border-white/30 transform rotate-2 hover:rotate-0 transition duration-500">
+                         class="rounded-3xl shadow-2xl max-h-[500px] object-cover border-4 border-white/30 transform rotate-2 hover:rotate-0 transition duration-500" loading="lazy" decoding="async">
                 </div>
                 @endif
             </div>
@@ -66,7 +66,7 @@
                                 @endphp
                                 <img src="{{ $courseImage }}" alt="{{ $course->title }}"
                                     class="unicas-selling-media w-full h-40 object-cover rounded-xl mb-4 border border-pink-50"
-                                    onerror="this.onerror=null;this.src='{{ asset('img/placeholder-course.jpg') }}';">
+                                    onerror="this.onerror=null;this.src='{{ asset('img/placeholder-course.jpg') }}';" loading="lazy" decoding="async">
                                 <h3 class="unicas-selling-title text-lg font-bold text-gray-900 mb-1 line-clamp-2">{{ $course->title }}</h3>
                                 <p class="unicas-selling-eyebrow text-xs text-pink-500 font-semibold mb-2">Por
                                     {{ $course->author_name ?? 'Especialista UNN' }}</p>
@@ -126,7 +126,7 @@
                                 </div>
                                 @if($event->image_url)
                                     <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
-                                        class="unicas-selling-media w-full h-36 object-cover rounded-xl mb-4">
+                                        class="unicas-selling-media w-full h-36 object-cover rounded-xl mb-4" loading="lazy" decoding="async">
                                 @else
                                     <div class="unicas-selling-media w-full h-36 rounded-xl mb-4 flex items-center justify-center bg-pink-50 text-pink-300" aria-label="Evento sem imagem">
                                         <i class="fas fa-image text-3xl" aria-hidden="true"></i>
@@ -182,7 +182,7 @@
                                             class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 font-bold overflow-hidden">
                                             @if(optional($mentorship->mentor)->profile_photo_url)
                                                 <img src="{{ $mentorship->mentor->profile_photo_url }}"
-                                                    class="w-full h-full object-cover">
+                                                    class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 {{ substr(optional($mentorship->mentor)->name ?? 'M', 0, 1) }}
                                             @endif

@@ -221,7 +221,7 @@
                 height: {{ $logoStyle['height'] ?? 60 }}px;
                 z-index: {{ $logoStyle['zIndex'] ?? 20 }};
             ">
-                <img src="{{ $logoUrl }}" style="width: 100%; height: 100%; object-fit: contain;">
+                <img src="{{ $logoUrl }}" style="width: 100%; height: 100%; object-fit: contain;" loading="lazy" decoding="async">
             </div>
 
             {{-- Instructor Signature (optional, controlled by editor element visibility) --}}
@@ -252,7 +252,7 @@
                             height: {{ $sigH }}px;
                             z-index: {{ $sigZ }};
                         ">
-                            <img src="{{ $sigPath }}" style="width: 100%; height: 100%; object-fit: contain;">
+                            <img src="{{ $sigPath }}" style="width: 100%; height: 100%; object-fit: contain;" loading="lazy" decoding="async">
                         </div>
                     @else
                         {{-- Backward compatible fallback if element isn't saved yet --}}
@@ -261,7 +261,7 @@
                             bottom: 10%;
                             width: 200px;
                         ">
-                            <img src="{{ $sigPath }}" style="width: 100%; height: auto; object-fit: contain;">
+                            <img src="{{ $sigPath }}" style="width: 100%; height: auto; object-fit: contain;" loading="lazy" decoding="async">
                         </div>
                     @endif
                 @endif

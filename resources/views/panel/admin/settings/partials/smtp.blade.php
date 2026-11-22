@@ -271,7 +271,7 @@
                 <div class="flex flex-col justify-center items-center p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Pré-visualização do Cabeçalho</span>
                     <div id="email_header_preview" class="w-full max-w-[300px] h-32 rounded-2xl shadow-lg flex items-center justify-center transition-all duration-500">
-                        <img src="{{ \App\Models\Setting::getUrl('logo_admin') ?: (\App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg')) }}" alt="Logo" class="max-h-12 max-w-[150px]">
+                        <img src="{{ \App\Models\Setting::getUrl('logo_admin') ?: (\App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg')) }}" alt="Logo" class="max-h-12 max-w-[150px]" loading="lazy" decoding="async">
                     </div>
                 </div>
             </div>

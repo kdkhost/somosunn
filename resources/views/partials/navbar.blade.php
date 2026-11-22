@@ -97,7 +97,7 @@
        <a href="{{ route('home') }}" class="flex items-center gap-2 sm:gap-3 shrink min-w-0">
             <div class="inline-flex h-10 sm:h-12 md:h-16 w-auto items-center justify-center overflow-hidden shrink-0">
                 <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain"
-                    onerror="this.style.display='none';">
+                    onerror="this.style.display='none';" loading="lazy" decoding="async">
             </div>
         </a>
 
@@ -430,7 +430,7 @@
             <div class="flex items-center gap-3">
                 <div class="inline-flex h-10 w-auto items-center justify-center overflow-hidden">
                     <img src="{{ $logoSrc }}" alt="UNN" class="h-full w-auto object-contain"
-                        onerror="this.style.display='none';">
+                        onerror="this.style.display='none';" loading="lazy" decoding="async">
                 </div>
             </div>
             <button id="mobile-menu-close"

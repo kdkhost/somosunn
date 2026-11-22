@@ -230,7 +230,7 @@
                     <input type="hidden" name="remove_preloader_image" id="remove_preloader_image" value="0">
                     <div class="upload-preview mb-2">
                         @if($url = $getUrl('preloader_image'))
-                            <img src="{{ $url }}" class="img-fluid" style="max-height: 64px;">
+                            <img src="{{ $url }}" class="img-fluid" style="max-height: 64px;" loading="lazy" decoding="async">
                         @else
                             <div class="text-muted p-4 border rounded bg-light">
                                 <i class="fas fa-spinner fa-spin fa-2x"></i>

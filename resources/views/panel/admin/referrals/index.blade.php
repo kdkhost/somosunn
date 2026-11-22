@@ -125,7 +125,7 @@
                                     <div class="flex items-center gap-3">
                                         <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800">
                                             @if($affiliate->photo)
-                                                <img src="{{ asset($affiliate->photo) }}" alt="{{ $affiliate->name }}" class="h-full w-full object-cover">
+                                                <img src="{{ asset($affiliate->photo) }}" alt="{{ $affiliate->name }}" class="h-full w-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <i class="fas fa-user text-slate-400"></i>
                                             @endif

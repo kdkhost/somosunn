@@ -42,7 +42,7 @@
                             <div
                                 class="w-16 h-16 rounded-full border-4 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-lg group-hover:scale-110 transition-transform">
                                 @if($podium[1]->profile_photo_url && !str_contains($podium[1]->profile_photo_url, 'default-user.svg'))
-                                    <img src="{{ $podium[1]->profile_photo_url }}" class="w-full h-full object-cover">
+                                    <img src="{{ $podium[1]->profile_photo_url }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-500">
                                         <i class="fas fa-user"></i>
@@ -73,7 +73,7 @@
                             <div
                                 class="w-24 h-24 rounded-full border-4 border-yellow-400 bg-white dark:bg-slate-900 overflow-hidden shadow-2xl group-hover:scale-110 transition-transform">
                                 @if($podium[0]->profile_photo_url && !str_contains($podium[0]->profile_photo_url, 'default-user.svg'))
-                                    <img src="{{ $podium[0]->profile_photo_url }}" class="w-full h-full object-cover">
+                                    <img src="{{ $podium[0]->profile_photo_url }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
                                         <i class="fas fa-user"></i>
@@ -101,7 +101,7 @@
                             <div
                                 class="w-16 h-16 rounded-full border-4 border-orange-50 dark:border-orange-900/20 bg-white dark:bg-slate-900 overflow-hidden shadow-lg group-hover:scale-110 transition-transform">
                                 @if($podium[2]->profile_photo_url && !str_contains($podium[2]->profile_photo_url, 'default-user.svg'))
-                                    <img src="{{ $podium[2]->profile_photo_url }}" class="w-full h-full object-cover">
+                                    <img src="{{ $podium[2]->profile_photo_url }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-orange-50/30 dark:bg-orange-950/30 text-orange-300 dark:text-orange-500">
                                         <i class="fas fa-user"></i>
@@ -152,7 +152,7 @@
                                         <div
                                             class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-600 flex items-center justify-center text-xs font-bold overflow-hidden shadow-sm transition-colors border border-transparent dark:border-slate-800">
                                             @if($user->profile_photo_url && !str_contains($user->profile_photo_url, 'default-user.svg'))
-                                                <img src="{{ $user->profile_photo_url }}" class="w-full h-full object-cover">
+                                                <img src="{{ $user->profile_photo_url }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <i class="fas fa-user"></i>
                                             @endif

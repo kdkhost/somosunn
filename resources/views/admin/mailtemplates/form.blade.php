@@ -230,7 +230,7 @@ $(function(){
             $('#tpl_preview').html(`
             <div style="background-color: #ffffff; width: 100%; font-family: sans-serif; box-sizing: border-box; display: flex; flex-direction: column;">
                 <div style="${config.headerStyle} padding: 25px 20px; text-align: center; flex-shrink: 0;">
-                    <img src="${config.logo}" alt="${config.siteName}" style="max-height: 50px; max-width: 100%; height: auto;">
+                    <img src="${config.logo}" alt="${config.siteName}" style="max-height: 50px; max-width: 100%; height: auto;" loading="lazy" decoding="async">
                 </div>
                 <div style="padding: 25px 20px; color: #333333; line-height: 1.6; word-wrap: break-word; font-size: 14px; min-height: 150px;">
                     ${bodyContent}

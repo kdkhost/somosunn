@@ -224,7 +224,7 @@
                     <div
                         class="w-full h-32 rounded-2xl bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative">
                         @if($url = $getUrl($imgKey))
-                            <img id="preview_{{ $imgKey }}" src="{{ $url }}" class="w-full h-full object-cover">
+                            <img id="preview_{{ $imgKey }}" src="{{ $url }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                         @else
                             <div class="text-center p-4">
                                 <i class="fas fa-image text-2xl text-slate-200"></i>
@@ -347,7 +347,7 @@
                 <div
                     class="w-full h-48 rounded-3xl bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative">
                     @if($url = $getUrl('marketplace_exit_banner_image'))
-                        <img id="preview_marketplace_exit_banner_image" src="{{ $url }}" class="w-full h-full object-cover">
+                        <img id="preview_marketplace_exit_banner_image" src="{{ $url }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     @else
                         <div class="text-center p-8">
                             <i class="fas fa-image text-4xl text-slate-200"></i>

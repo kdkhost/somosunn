@@ -14,7 +14,7 @@
                     <div class="text-center mb-3" id="profile-photo-preview">
                         @if($user->photo)
                             <img class="profile-user-img img-fluid img-circle" src="{{ asset($user->photo) }}" alt="Avatar"
-                                id="current-photo" style="width: 100px; height: 100px; object-fit: cover;">
+                                id="current-photo" style="width: 100px; height: 100px; object-fit: cover;" loading="lazy" decoding="async">
                         @else
                             <div class="profile-user-img img-fluid img-circle d-flex align-items-center justify-content-center bg-light text-primary font-weight-bold"
                                 style="width:100px;height:100px;font-size:2rem;margin:0 auto;border:3px solid #adb5bd;"
@@ -170,7 +170,7 @@
                                         <div id="photo-preview" class="mt-2"
                                             style="{{ $user->photo ? '' : 'display: none;' }}">
                                             <img src="{{ $user->photo ? asset($user->photo) : '' }}" class="img-thumbnail"
-                                                style="max-height: 150px;">
+                                                style="max-height: 150px;" loading="lazy" decoding="async">
                                         </div>
                                     </div>
                                 </div>
@@ -197,7 +197,7 @@
                                             style="{{ $user->cover_photo ? '' : 'display: none;' }}">
                                             <img src="{{ $user->cover_photo ? asset($user->cover_photo) : '' }}"
                                                 class="img-fluid rounded"
-                                                style="max-height: 150px; width: 100%; object-fit: cover;">
+                                                style="max-height: 150px; width: 100%; object-fit: cover;" loading="lazy" decoding="async">
                                         </div>
                                     </div>
                                 </div>
@@ -483,7 +483,7 @@
                             // Update div to img
                             const src = e.target.result;
                             const container = $('#profile-photo-preview');
-                            container.html(`<img class="profile-user-img img-fluid img-circle" src="${src}" alt="Avatar" id="current-photo" style="width: 100px; height: 100px; object-fit: cover;">`);
+                            container.html(`<img class="profile-user-img img-fluid img-circle" src="${src}" alt="Avatar" id="current-photo" style="width: 100px; height: 100px; object-fit: cover;" loading="lazy" decoding="async">`);
                         }
                     };
                     reader.readAsDataURL(file);
@@ -571,7 +571,7 @@
                             if ($('#current-photo').is('img')) {
                                 $('#current-photo').attr('src', response.photo_url);
                             } else {
-                                $('#profile-photo-preview').html(`<img class="profile-user-img img-fluid img-circle" src="${response.photo_url}" alt="Avatar" id="current-photo" style="width: 100px; height: 100px; object-fit: cover;">`);
+                                $('#profile-photo-preview').html(`<img class="profile-user-img img-fluid img-circle" src="${response.photo_url}" alt="Avatar" id="current-photo" style="width: 100px; height: 100px; object-fit: cover;" loading="lazy" decoding="async">`);
                             }
                         }
 

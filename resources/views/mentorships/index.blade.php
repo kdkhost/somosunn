@@ -221,7 +221,7 @@
                             <article class="mentorship-card group flex flex-col h-full">
                                 <div class="mentorship-media">
                                     @if($mentorshipImageUrl)
-                                        <img src="{{ $mentorshipImageUrl }}" alt="{{ $mentorship->title ?? 'Mentoria' }}">
+                                        <img src="{{ $mentorshipImageUrl }}" alt="{{ $mentorship->title ?? 'Mentoria' }}" loading="lazy" decoding="async">
                                     @endif
                                 </div>
                                 <div class="mentorship-card-body p-6 md:p-8 flex flex-col h-full">

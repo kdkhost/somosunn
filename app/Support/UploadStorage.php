@@ -590,10 +590,16 @@ class UploadStorage
         // PRIORIDADE 3: Fallback — gerar URL local mesmo que arquivo nao exista
         // (pode ser que o arquivo apareca depois, ou que o path esteja em cache do navegador)
         if (self::shouldUseUploadsRoute($raw, $normalized)) {
-            return asset($normalized);
+            return class_exists(DomainManager::class)
+                ? DomainManager::cdnAsset($normalized)
+                : asset($normalized);
         }
 
-        return asset('storage/' . ltrim($normalized, '/'));
+        $storagePath = 'storage/' . ltrim($normalized, '/');
+
+        return class_exists(DomainManager::class)
+            ? DomainManager::cdnAsset($storagePath)
+            : asset($storagePath);
     }
 
     /**
@@ -601,14 +607,36 @@ class UploadStorage
      */
     private static function resolveLocalUrl(string $raw, string $normalized): ?string
     {
+        $useWebp = !app()->runningInConsole()
+            && app()->bound('request')
+            && !request()->is('*/pdf*', '*/export*')
+            && str_contains(strtolower((string) request()->header('Accept', '')), 'image/webp')
+            && !preg_match('/(pwa-icon|favicon|seo|watermark)/i', $normalized);
+
         // Verificar se existe em algum dos caminhos locais conhecidos
         foreach (self::publicCandidates($normalized) as $candidate) {
             if (is_file($candidate)) {
-                // Arquivo existe localmente — gerar URL local
-                if (self::shouldUseUploadsRoute($raw, $normalized)) {
-                    return asset($normalized);
+                $targetNormalized = $normalized;
+                if ($useWebp && preg_match('/\.(png|jpe?g)$/i', $candidate)) {
+                    $webpCandidate = preg_replace('/\.(png|jpe?g)$/i', '.webp', $candidate);
+                    $webpNormalized = preg_replace('/\.(png|jpe?g)$/i', '.webp', $normalized);
+                    if ($webpCandidate && $webpNormalized && is_file($webpCandidate)) {
+                        $targetNormalized = $webpNormalized;
+                    }
                 }
-                return asset('storage/' . ltrim($normalized, '/'));
+
+                // Arquivo existe localmente — gerar URL local (ou CDN cookieless se ativo)
+                if (self::shouldUseUploadsRoute($raw, $targetNormalized)) {
+                    return class_exists(DomainManager::class)
+                        ? DomainManager::cdnAsset($targetNormalized)
+                        : asset($targetNormalized);
+                }
+
+                $storagePath = 'storage/' . ltrim($targetNormalized, '/');
+
+                return class_exists(DomainManager::class)
+                    ? DomainManager::cdnAsset($storagePath)
+                    : asset($storagePath);
             }
         }
         return null;

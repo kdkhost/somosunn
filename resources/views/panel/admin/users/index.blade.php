@@ -195,7 +195,7 @@
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
                                             @if($u->profile_photo_url && !str_contains($u->profile_photo_url, 'default-user.svg'))
-                                                <img src="{{ $u->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                                <img src="{{ $u->profile_photo_url }}" alt="" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <i class="fas fa-user text-slate-400 dark:text-slate-500"></i>
                                             @endif
@@ -275,7 +275,9 @@
 
                                         @if(!$u->hasVerifiedEmail())
                                             <form action="{{ route('panel.admin.users.verify-email', $u) }}" method="POST"
-                                                onsubmit="return confirm('Validar manualmente o e-mail deste membro?');">
+                                                data-confirm-title="Validar e-mail?"
+                                                data-confirm-text="Validar manualmente o e-mail deste membro?"
+                                                data-confirm-button="Sim, validar">
                                                 @csrf
                                                 <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-amber-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition"
                                                     title="Validar e-mail manualmente">
@@ -315,10 +317,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm text-slate-500 dark:text-slate-400">
-                Exibindo todos os <strong>{{ $users->count() }}</strong> usuários encontrados.
-            </div>
-            @if(false)
+            @if($users instanceof \Illuminate\Pagination\AbstractPaginator && $users->hasPages())
                 <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
                     @php
                         $users->appends(request()->query());

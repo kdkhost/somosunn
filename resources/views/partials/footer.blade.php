@@ -103,7 +103,7 @@
                     <div class="flex flex-col items-start gap-2">
                         <div class="inline-flex h-10 sm:h-12 md:h-16 w-auto items-center justify-center overflow-hidden shrink-0">
                             <img src="{{ $logoSrc }}" alt="" class="h-full w-auto object-contain"
-                                onerror="this.style.display='none';">
+                                onerror="this.style.display='none';" loading="lazy" decoding="async">
                         </div>
 
                         <p class="text-sm leading-6 text-slate-600">

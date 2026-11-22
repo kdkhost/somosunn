@@ -7,7 +7,7 @@
         use Illuminate\Support\Str;
 
         try {
-            $adminLayoutSettings = \App\Models\Setting::all()->pluck('value', 'key')->toArray();
+            $adminLayoutSettings = \App\Models\Setting::allValues();
         } catch (\Throwable $e) {
             $adminLayoutSettings = [];
         }
@@ -86,6 +86,11 @@
             default => 'image/x-icon',
         };
     @endphp
+    @php
+        $needsChartsAssets = request()->routeIs('admin.dashboard*', 'admin.waf.*', 'admin.analytics.*', 'admin.reports*', 'admin.referrals*', 'admin.orders.sales-report*') || View::hasSection('needs_charts');
+        $needsEditorAssets = request()->routeIs('admin.*.create', 'admin.*.edit', 'admin.cms*', 'admin.pages*', 'admin.settings*', 'admin.marketplace.store*', 'admin.mailtemplates*', 'admin.events.calendar', 'admin.invoices.editor*') || View::hasSection('needs_editor');
+        $needsFlatpickrAssets = $needsEditorAssets || request()->routeIs('admin.events.*', 'admin.coupons*', 'admin.orders*');
+    @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Admin - UNN')</title>
@@ -94,26 +99,25 @@
     <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars/css/OverlayScrollbars.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/css/bootstrap-colorpicker.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css">
+    @if($needsChartsAssets)
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css">
+    @endif
+    @if($needsEditorAssets)
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/css/bootstrap-colorpicker.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css">
+    @endif
+    @if($needsFlatpickrAssets)
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    @endif
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js" defer></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     @if(!$isAdmin)
-        <script>
-            window.tailwind = window.tailwind || {};
-            window.tailwind.config = { corePlugins: { preflight: false } };
-        </script>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="{{ unn_asset('css/unn-tailwind-nopreflight.css') }}">
     @endif
     <style>
         /* Layout helpers only — do not override AdminLTE colors here */
@@ -1386,22 +1390,58 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/jquery.inputmask.min.js"></script>
+    <script src="{{ unn_asset('js/unn-masks.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars/js/jquery.overlayScrollbars.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-knob-chif@1.2.13/dist/jquery.knob.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jquery.vmap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/maps/jquery.vmap.world.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-pt-BR.min.js"></script>
+    @if($needsChartsAssets)
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery-knob-chif@1.2.13/dist/jquery.knob.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jquery.vmap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/maps/jquery.vmap.world.js"></script>
+    @endif
+    @if($needsEditorAssets)
+        <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-pt-BR.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/js/bootstrap-colorpicker.min.js"></script>
+    @endif
     <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/js/bootstrap-colorpicker.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    @if($needsFlatpickrAssets)
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    @endif
+    <script>
+        window.UNNLoadAsset = (function () {
+            const loaded = new Set();
+            return {
+                css(href) {
+                    if (!href || loaded.has(href) || document.querySelector('link[href="' + href + '"]')) return Promise.resolve();
+                    loaded.add(href);
+                    return new Promise((resolve) => {
+                        const l = document.createElement('link');
+                        l.rel = 'stylesheet';
+                        l.href = href;
+                        l.onload = resolve;
+                        l.onerror = resolve;
+                        document.head.appendChild(l);
+                    });
+                },
+                js(src) {
+                    if (!src || loaded.has(src) || document.querySelector('script[src="' + src + '"]')) return Promise.resolve();
+                    loaded.add(src);
+                    return new Promise((resolve) => {
+                        const s = document.createElement('script');
+                        s.src = src;
+                        s.onload = resolve;
+                        s.onerror = resolve;
+                        document.body.appendChild(s);
+                    });
+                }
+            };
+        })();
+    </script>
     <script>
         (function () {
             const themeSafeColors = new Set([
@@ -1787,30 +1827,68 @@
 
                 $a.attr('data-pjax', 'true');
             });
-            $(document).on('pjax:end', function () {
-                $('.summernote').summernote({ height: 180, lang: 'pt-BR' });
+            function initLazyAdminAssets(callback) {
+                const tasks = [];
+
+                if ($('.summernote').length && typeof $.fn.summernote !== 'function') {
+                    tasks.push(Promise.all([
+                        window.UNNLoadAsset.css('https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css'),
+                        window.UNNLoadAsset.js('https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js')
+                            .then(() => window.UNNLoadAsset.js('https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-pt-BR.min.js'))
+                    ]));
+                }
+
+                if ($('.colorpicker-element').length && typeof $.fn.colorpicker !== 'function') {
+                    tasks.push(Promise.all([
+                        window.UNNLoadAsset.css('https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/css/bootstrap-colorpicker.min.css'),
+                        window.UNNLoadAsset.js('https://cdn.jsdelivr.net/npm/bootstrap-colorpicker@3.4.0/dist/js/bootstrap-colorpicker.min.js')
+                    ]));
+                }
+
+                if ($('[data-datetime-picker], .flatpickr').length && typeof window.flatpickr === 'undefined') {
+                    tasks.push(Promise.all([
+                        window.UNNLoadAsset.css('https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css'),
+                        window.UNNLoadAsset.js('https://cdn.jsdelivr.net/npm/flatpickr')
+                            .then(() => window.UNNLoadAsset.js('https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js'))
+                    ]));
+                }
+
+                if ($('.upload-box[data-crop="1"], .upload-box[data-crop="true"]').length && typeof window.Cropper === 'undefined') {
+                    tasks.push(Promise.all([
+                        window.UNNLoadAsset.css('https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css'),
+                        window.UNNLoadAsset.js('https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js')
+                    ]));
+                }
+
+                Promise.all(tasks).then(() => {
+                    if ($('.summernote').length && typeof $.fn.summernote === 'function') {
+                        $('.summernote').each(function () {
+                            if (!$(this).next().hasClass('note-editor')) {
+                                $(this).summernote({ height: 180, lang: 'pt-BR' });
+                            }
+                        });
+                    }
+                    if (typeof callback === 'function') callback();
+                });
+            }
+
+            function bindDynamicAdminUI() {
+                initLazyAdminAssets(function () {
+                    initColorPickers();
+                    initDateTimePickers();
+                });
                 initUploadWidgets();
                 initFormUploadProgress(document);
                 initMasks();
-                initColorPickers();
-                initDateTimePickers();
                 initCouponFormEnhancements();
                 initTooltips();
                 if (typeof window.initializeFormDraftAutosave === 'function') {
                     window.initializeFormDraftAutosave(document);
                 }
-            });
-            $('.summernote').summernote({ height: 180, lang: 'pt-BR' });
-            initUploadWidgets();
-            initFormUploadProgress(document);
-            initMasks();
-            initColorPickers();
-            initDateTimePickers();
-            initCouponFormEnhancements();
-            initTooltips();
-            if (typeof window.initializeFormDraftAutosave === 'function') {
-                window.initializeFormDraftAutosave(document);
             }
+
+            $(document).on('pjax:end', bindDynamicAdminUI);
+            bindDynamicAdminUI();
         });
 
         function initTooltips() {
@@ -2089,8 +2167,8 @@
                                 html: errorMessage,
                                 confirmButtonText: 'Entendi'
                             });
-                        } else {
-                            alert('Erro no upload: ' + errorMessage.replace(/<br>/g, '\n').replace(/<[^>]+>/g, ''));
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.error('Erro no upload: ' + errorMessage.replace(/<br>/g, ' ').replace(/<[^>]+>/g, ''));
                         }
                     });
 
@@ -2382,78 +2460,9 @@
         }
 
         function initMasks() {
-            function lookupCep($input) {
-                const cep = $input.val().replace(/\D/g, '');
-                if (cep.length !== 8) return;
-                if ($input.data('lastCep') === cep) return;
-                $input.data('lastCep', cep);
-                const targetNumber = $input.data('target-number');
-                const targetComplement = $input.data('target-complement');
-                const targetDistrict = $input.data('target-district');
-                Swal.fire({ icon: 'info', title: 'Buscando CEP...', showConfirmButton: false, timer: 1500 });
-                fetch('https://viacep.com.br/ws/' + cep + '/json/')
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.erro) {
-                            Swal.fire({ icon: 'error', title: 'Erro', text: 'CEP não encontrado', timer: 2000, showConfirmButton: false });
-                            return;
-                        }
-                        $('[name="company_address"]').val(data.logradouro || '');
-                        if (targetDistrict) { $(targetDistrict).val(data.bairro || ''); } else { $('[name="company_district"]').val(data.bairro || ''); }
-                        $('[name="company_city"]').val(data.localidade || '');
-                        $('[name="company_state"]').val(data.uf || '');
-
-                        Swal.fire({ icon: 'success', title: 'Sucesso', text: 'Endereço preenchido pelo CEP', timer: 2000, showConfirmButton: false });
-
-                        if (targetNumber) { $(targetNumber).focus(); }
-                        else if (targetComplement) { $(targetComplement).focus(); }
-                    })
-                    .catch(() => {
-                        Swal.fire({ icon: 'error', title: 'Erro', text: 'Falha ao buscar CEP', timer: 2000, showConfirmButton: false });
-                    });
+            if (typeof window.initUnnMasks === 'function') {
+                window.initUnnMasks(document);
             }
-
-            // CEP com viacep + feedback
-            $('.mask-cep').inputmask('99999-999', {
-                oncomplete: function () {
-                    lookupCep($(this));
-                }
-            });
-            $('.mask-cep').off('input.cep').on('input.cep', function () {
-                const $input = $(this);
-                const cep = $input.val().replace(/\D/g, '');
-                if (cep.length === 8) {
-                    clearTimeout($input.data('cepTimer'));
-                    $input.data('cepTimer', setTimeout(() => lookupCep($input), 250));
-                }
-            });
-            $('.mask-cep').off('blur.cep').on('blur.cep', function () {
-                lookupCep($(this));
-            });
-            $('.mask-cpf').inputmask('999.999.999-99');
-            $('.mask-cnpj').inputmask('99.999.999/9999-99');
-            $('.mask-date').inputmask('99/99/9999');
-            $('.mask-datetime').inputmask('99/99/9999 99:99');
-            $('.mask-time').inputmask('99:99');
-            $('.mask-phone').inputmask('(99) 9999[9]-9999');
-            $('.mask-money').inputmask('currency', {
-                prefix: 'R$ ',
-                radixPoint: ',',
-                groupSeparator: '.',
-                autoGroup: true,
-                digits: 2,
-                rightAlign: false,
-                substituteRadixPoint: true,
-                onBeforeMask: function (value) {
-                    if (value === null || value === undefined) return value;
-                    value = String(value);
-                    // Eloquent decimal casts usually return "97.00" (dot decimal). Inputmask here expects comma.
-                    if (value.includes(',') || !value.includes('.')) return value;
-                    if (/^\\d+\\.\\d{1,2}$/.test(value)) return value.replace('.', ',');
-                    return value;
-                }
-            });
-            $('.mask-cpf-cnpj').inputmask({ mask: ['999.999.999-99', '99.999.999/9999-99'], keepStatic: true, placeholder: '_' });
         }
 
         function initDateTimePickers() {
@@ -2630,7 +2639,7 @@
                     const imageClassAttr = previewImageClass !== '' ? ' class="' + previewImageClass + '"' : '';
                     const imageStyleAttr = previewImageStyle !== '' ? ' style="' + previewImageStyle + '"' : '';
 
-                    return '<img src="' + url + '" alt="preview"' + imageClassAttr + imageStyleAttr + '>';
+                    return '<img src="' + url + '" alt="preview"' + imageClassAttr + imageStyleAttr + ' loading="lazy" decoding="async">';
                 }
 
                 function renderEmpty() {
@@ -2688,8 +2697,8 @@
                                 confirmButtonColor: '#ef4444',
                                 confirmButtonText: 'Entendi'
                             });
-                        } else {
-                            alert('Arquivo excede o limite');
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.error('Arquivo excede o limite permitido.');
                         }
                         return;
                     }
@@ -2738,8 +2747,8 @@
                                 confirmButtonColor: '#ef4444',
                                 confirmButtonText: 'Entendi'
                             });
-                        } else {
-                            alert('Campo de upload não encontrado.');
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.error('Campo de upload não encontrado.');
                         }
                         return;
                     }
@@ -2819,7 +2828,7 @@
                     '<div class="modal-header"><h5 class="modal-title">Cortar imagem</h5>' +
                     '<button type="button" class="close" data-dismiss="modal">&times;</button></div>' +
                     '<div class="modal-body"><div style="max-height:500px;">' +
-                    '<img id="' + modalId + '-img" style="max-width:100%;"></div></div>' +
+                    '<img id="' + modalId + '-img" style="max-width:100%;" loading="lazy" decoding="async"></div></div>' +
                     '<div class="modal-footer">' +
                     '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>' +
                     '<button type="button" class="btn btn-primary" id="' + modalId + '-apply">Aplicar</button>' +

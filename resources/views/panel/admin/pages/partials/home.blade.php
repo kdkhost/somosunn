@@ -71,7 +71,7 @@
                         atual</label>
                 </div>
                 <div class="mt-2 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 w-48 shadow-sm">
-                    <img src="{{ Storage::url($data['hero_image']) }}" class="w-full h-auto">
+                    <img src="{{ Storage::url($data['hero_image']) }}" class="w-full h-auto" loading="lazy" decoding="async">
                 </div>
             @endif
         </div>
@@ -516,7 +516,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div class="md:col-span-1 space-y-4">
                                 <div class="relative group/img aspect-square rounded-2xl bg-white dark:bg-slate-900 overflow-hidden border border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-sm">
-                                    ${imageExists ? `<img src="${displayImage}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-300"><i class="fas fa-user text-3xl"></i></div>`}
+                                    ${imageExists ? `<img src="${displayImage}" class="w-full h-full object-cover" loading="lazy" decoding="async">` : `<div class="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-300"><i class="fas fa-user text-3xl"></i></div>`}
                                     <button type="button" class="repeater-upload-btn absolute inset-0 bg-black/40 text-white opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center gap-2 text-[10px] font-bold" data-field="image">
                                         <i class="fas fa-camera"></i> FOTO
                                     </button>

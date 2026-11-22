@@ -429,7 +429,7 @@
     <main class="maintenance-shell" role="main" aria-live="polite">
         <aside class="maintenance-visual" aria-hidden="true">
             <div class="maintenance-logo-stage">
-                <img src="{{ $logoUrl }}" alt="" class="maintenance-logo">
+                <img src="{{ $logoUrl }}" alt="" class="maintenance-logo" loading="lazy" decoding="async">
             </div>
             <p class="maintenance-visual-caption">SOMOS UNN</p>
             <p class="maintenance-visual-title">Estamos aprimorando a plataforma para entregar uma experiencia ainda melhor.</p>

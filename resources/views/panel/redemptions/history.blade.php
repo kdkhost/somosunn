@@ -61,7 +61,7 @@
                                     <div class="flex items-center gap-4">
                                         <div class="h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800">
                                             @if($redemption->item && $redemption->item->image)
-                                                <img src="{{ \App\Support\UploadStorage::url($redemption->item->image) }}" alt="{{ $redemption->item->name }}" class="h-full w-full object-cover">
+                                                <img src="{{ \App\Support\UploadStorage::url($redemption->item->image) }}" alt="{{ $redemption->item->name }}" class="h-full w-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <div class="flex h-full items-center justify-center">
                                                     <i class="fas fa-gift text-lg"></i>

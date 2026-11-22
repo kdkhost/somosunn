@@ -30,11 +30,11 @@
                     @if(isset($pageData['hero_image']) && !empty($pageData['hero_image']))
                         <img src="{{ Str::startsWith($pageData['hero_image'], ['http://', 'https://']) ? $pageData['hero_image'] : asset('storage/' . $pageData['hero_image']) }}"
                             alt="{{ $pageData['hero_title'] ?? 'Somos Únicas' }}"
-                            class="rounded-3xl shadow-2xl transform rotate-3 hover:rotate-0 transition duration-500 max-h-[450px] object-cover border-4 border-white/30">
+                            class="rounded-3xl shadow-2xl transform rotate-3 hover:rotate-0 transition duration-500 max-h-[450px] object-cover border-4 border-white/30" loading="lazy" decoding="async">
                     @else
                         <img src="https://placehold.co/500x400/{{ str_replace('#', '', ($pageData['theme_color'] ?? '#db2777')) }}/ffffff?text=Mulheres+Inspiradoras"
                             alt="Comunidade Somos Únicas"
-                            class="rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition duration-500">
+                            class="rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition duration-500" loading="lazy" decoding="async">
                     @endif
                 </div>
             </div>
@@ -101,7 +101,7 @@
                                 : "https://placehold.co/600x500/4c1d95/ffffff?text=Networking+e+Apoio";
                         @endphp
                         <img src="{{ $networkingImageUrl }}" alt="Networking Feminino"
-                            class="relative rounded-2xl shadow-lg w-full object-cover border-4 border-white">
+                            class="relative rounded-2xl shadow-lg w-full object-cover border-4 border-white" loading="lazy" decoding="async">
                     </div>
                 </div>
                 <div class="md:w-1/2">

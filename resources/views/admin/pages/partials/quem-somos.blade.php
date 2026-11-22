@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             function showImage(url) {
                 if (!preview) return;
-                preview.innerHTML = `<img src="${escHtml(url)}" class="w-100 h-100 object-cover" alt="Avatar">`;
+                preview.innerHTML = `<img src="${escHtml(url)}" class="w-100 h-100 object-cover" alt="Avatar" loading="lazy" decoding="async">`;
                 preview.classList.remove('d-none');
                 fallback?.classList.add('d-none');
             }
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="small text-muted mb-2">Arraste ou clique</div>
                             <div class="mb-2 mx-auto overflow-hidden rounded border bg-white d-flex align-items-center justify-content-center" style="width:82px; height:82px;">
                                 <div data-founder-preview class="${item.image ? '' : 'd-none'} w-100 h-100">
-                                    ${item.image ? `<img src="${escHtml(normalizeStorageUrl(item.image))}" class="w-100 h-100 object-cover" alt="Avatar">` : ``}
+                                    ${item.image ? `<img src="${escHtml(normalizeStorageUrl(item.image))}" class="w-100 h-100 object-cover" alt="Avatar" loading="lazy" decoding="async">` : ``}
                                 </div>
                                 <span data-founder-fallback class="${item.image ? 'd-none' : ''} text-muted small">${escHtml((item.initials || 'F').substring(0, 2).toUpperCase())}</span>
                             </div>
@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="small text-muted mb-2">Arraste ou clique</div>
                             <div class="mb-2 mx-auto overflow-hidden rounded border bg-white d-flex align-items-center justify-content-center" style="width:82px; height:82px;">
                                 <div data-team-preview class="${item.image ? '' : 'd-none'} w-100 h-100">
-                                    ${item.image ? `<img src="${escHtml(normalizeStorageUrl(item.image))}" class="w-100 h-100 object-cover" alt="Avatar">` : ``}
+                                    ${item.image ? `<img src="${escHtml(normalizeStorageUrl(item.image))}" class="w-100 h-100 object-cover" alt="Avatar" loading="lazy" decoding="async">` : ``}
                                 </div>
                                 <span data-team-fallback class="${item.image ? 'd-none' : ''} text-muted small">${escHtml((item.initials || 'M').substring(0, 2).toUpperCase())}</span>
                             </div>

@@ -84,7 +84,7 @@
                                 <div class="relative flex-shrink-0">
                                     <img :src="conv.users.find(u => u.id != {{ Auth::id() }})?.profile_photo_url || '{{ asset('img/default-user.svg') }}'"
                                         class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-slate-700"
-                                        x-on:error="$el.src='{{ asset('img/default-user.svg') }}'">
+                                        x-on:error="$el.src='{{ asset('img/default-user.svg') }}'" loading="lazy" decoding="async">
                                     <span
                                         class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
                                 </div>

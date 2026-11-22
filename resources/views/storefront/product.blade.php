@@ -376,7 +376,7 @@
                             </template>
                         </template>
                         <template x-if="items.length && items[activeIndex].type === 'image'">
-                            <img :src="items[activeIndex].url" :alt="items[activeIndex].alt || '{{ addslashes($product->title) }}'">
+                            <img :src="items[activeIndex].url" :alt="items[activeIndex].alt || '{{ addslashes($product->title) }}'" loading="lazy" decoding="async">
                         </template>
 
                         @if($galleryItems->isEmpty())
@@ -415,7 +415,7 @@
                                             </div>
                                         </div>
                                     @else
-                                        <img src="{{ $item['url'] }}" alt="{{ $item['alt'] }}">
+                                        <img src="{{ $item['url'] }}" alt="{{ $item['alt'] }}" loading="lazy" decoding="async">
                                     @endif
                                 </button>
                             @endforeach
@@ -476,7 +476,7 @@
                         <div class="flex items-start gap-4">
                             <div class="w-14 h-14 rounded-2xl bg-white flex items-center justify-center overflow-hidden flex-shrink-0 border border-slate-200">
                                 @if($store->logo_url)
-                                    <img src="{{ $store->logo_url }}" alt="{{ $store->brand_name }}" class="h-full w-full object-cover">
+                                    <img src="{{ $store->logo_url }}" alt="{{ $store->brand_name }}" class="h-full w-full object-cover" loading="lazy" decoding="async">
                                 @else
                                     <i class="fas fa-store text-xl" style="color: {{ $primaryColor }};"></i>
                                 @endif
@@ -529,7 +529,7 @@
                                     class="group block overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:shadow-lg transition-all">
                                     <div class="aspect-[4/3] overflow-hidden bg-slate-100">
                                         @if($relatedProduct->cover_url)
-                                            <img src="{{ $relatedProduct->cover_url }}" alt="{{ $relatedProduct->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                            <img src="{{ $relatedProduct->cover_url }}" alt="{{ $relatedProduct->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" decoding="async">
                                         @else
                                             <div class="flex h-full w-full items-center justify-center text-4xl text-slate-300">
                                                 <i class="fas fa-box-open"></i>

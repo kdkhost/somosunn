@@ -90,7 +90,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (typeof Swal !== 'undefined') {
             return Swal.fire({ icon, title, text, confirmButtonText: 'OK' });
         }
-        alert(`${title}\n\n${text}`);
+        if (typeof toastr !== 'undefined') {
+            toastr[icon === 'error' ? 'error' : 'info'](`${title}: ${text}`);
+        }
         return Promise.resolve();
     }
 

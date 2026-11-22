@@ -88,7 +88,7 @@
 
                     @if($plan->image)
                         <img src="{{ asset('storage/'.$plan->image) }}" alt="{{ $plan->name }}"
-                             style="width:100%;height:90px;object-fit:cover;">
+                             style="width:100%;height:90px;object-fit:cover;" loading="lazy" decoding="async">
                     @endif
 
                     <div class="plan-body">

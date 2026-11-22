@@ -1,50 +1,63 @@
-# Deploy para cPanel (Shared Hosting)
+# Deploy para cPanel / LiteSpeed (SOMOS UNN)
 
-## 1) Requisitos e upload
-1. Verifique a versão do PHP no cPanel (PHP **8.1+**).
-2. Se possível, use SSH: `composer install --no-dev`, `php artisan migrate --force`.
-3. Sem SSH: rode `composer install` localmente, compacte o projeto **incluindo `vendor/`** e envie via FTP/Upload.
-4. Aponte o domínio para a pasta do projeto (este repo já roteia tudo para `public/index.php` via `.htaccess`).
+## 1) Requisitos do servidor
+- **PHP 8.1+ (recomendado PHP 8.3 ou 8.4)** com extensões `pdo_mysql`, `gd`, `mbstring`, `openssl`, `curl`, `fileinfo`, `zip` (e `imagick` opcional para geração de capas PDF).
+- **MariaDB 10.6+ / MySQL 8+** com charset `utf8mb4` e collation `utf8mb4_unicode_ci`.
+- **LiteSpeed** com OPcache ativo no MultiPHP INI Editor.
 
-## 2) Variáveis de ambiente essenciais
-No `.env` do servidor (produção):
+## 2) Estrutura de Subdomínios e DocumentRoot (cPanel)
+Para isolamento de carga e cache estático em produção:
+1. **`somosunn.com.br`** (Landing / Institucional / Conteúdo Público Cacheável) -> DocumentRoot `/home/somosunn/public_html`
+2. **`app.somosunn.com.br`** (Painéis `/admin`, `/painel` e Área do Membro) -> DocumentRoot `/home/somosunn/public_html`
+3. **`api.somosunn.com.br`** (APIs `/api/v1/*` e Webhooks de Pagamento) -> DocumentRoot `/home/somosunn/public_html`
+4. **`cdn.somosunn.com.br`** (Mídias estáticas e uploads sem cookie) -> DocumentRoot `/home/somosunn/public_html/public`
+
+> **Retrocompatibilidade:** enquanto os subdomínios estiverem em transição no DNS/cPanel, o domínio principal mantém fallback seguro das rotas se a opção de isolamento estrito não estiver habilitada no painel Admin.
+
+## 3) Variáveis de ambiente essenciais (`.env`)
 - `APP_ENV=production`
 - `APP_DEBUG=false`
-- `APP_URL=https://seu-dominio.com`
+- `APP_URL=https://somosunn.com.br`
+- `APP_TIMEZONE=America/Sao_Paulo`
+- `SESSION_DOMAIN=.somosunn.com.br` *(compartilha sessão com `app.`)*
+- `SESSION_SECURE_COOKIE=true`
+- `SESSION_HTTP_ONLY=true`
+- `SESSION_SAME_SITE=lax`
+- `SESSION_ENCRYPT=true`
 - `QUEUE_CONNECTION=database`
 - `QUEUE_FAILED_DRIVER=database-uuids`
 
-## 3) Filas (Queues) no cPanel (sem Redis/daemon)
-Em hospedagem compartilhada, o padrão recomendado é:
-- Driver: **database**
-- Processamento: **Cron a cada 1 minuto**, drenando a fila e parando quando vazio
+> **Banco de dados primeiro:** Credenciais de gateways (Mercado Pago, SumUp, Efí Pro), SMTP, SEO, PWA, logos/favicons, domínios/subdomínios e Modo Manutenção (com IP/dispositivo autorizado) são gerenciados no banco MariaDB pelo painel `/admin/settings`.
 
-Cron Job (exemplo):
-`* * * * * /usr/local/bin/php /home/USUARIO/public_html/artisan queue:work --stop-when-empty --sleep=1 --tries=3 >> /home/USUARIO/queue.log 2>&1`
+## 4) Sincronismo GitHub <-> cPanel (SSH)
+Execute no servidor após `git push` na `main`:
 
-Observações:
-- Ajuste o caminho do PHP e do `artisan` conforme sua conta.
-- Garanta que as tabelas `jobs` e `failed_jobs` existam (rode migrations).
+```bash
+rm -f /home/somosunn/public_html/.git/index.lock && \
+cd /home/somosunn/public_html && \
+git fetch origin && \
+git reset --hard origin/main && \
+chmod -R ug+rwX storage bootstrap/cache && \
+php artisan migrate --force && \
+php artisan optimize:clear && \
+php artisan view:clear && \
+php artisan route:clear && \
+php artisan config:clear && \
+php artisan config:cache && \
+php artisan route:cache && \
+php artisan view:cache
+```
 
-## 4) Cache de rotas/config (após deploy)
-Após atualizar arquivos/migrations em produção, rode:
-- `php artisan optimize`
+## 5) Central de Cron Única (apenas 1 linha no cPanel)
+Todas as rotinas agendadas (fila de e-mails, fila de jobs/webhooks, conciliação SumUp/MP, lembretes, backups, WAF e cache do dashboard) são controladas na tabela `scheduled_tasks` (`/admin/cron` e `/painel/admin/cron`).
 
-Se você alterou `.env`/providers/config e algo ficou “travado” em cache:
-- `php artisan optimize:clear`
-- depois `php artisan optimize`
+Configure **apenas 1 tarefa Cron** no cPanel:
+```cron
+* * * * * /usr/local/bin/php /home/somosunn/public_html/artisan schedule:run >> /dev/null 2>&1
+```
 
-## 5) LiteSpeed / OPcache (performance)
-Se o servidor usa LiteSpeed:
-- Ative **OPcache** no cPanel (MultiPHP INI Editor) quando disponível.
-- Use cache agressivo **apenas para assets** (CSS/JS/IMG). Evite cache de páginas com sessão (`/admin`, `/login`, checkout, etc.).
-
-## 6) Banco de dados (MariaDB)
-- Mantenha índices para consultas críticas (ex.: conexões por `status`, listagens e filtros). Este projeto já inclui migrations de índices.
-
-## 7) Gestão de arquivos (crescimento)
-- Para não estourar disco no compartilhado, considere mover anexos/vídeos para S3 compatível.
-- Laravel suporta isso via Filesystem, mas exige configurar o disco e instalar o driver S3 quando necessário.
-
-## 8) Webhooks
-Configure webhooks (MercadoPago) apontando para `/webhook/...` no painel do gateway.
+## 6) LiteSpeed / Cloudflare (Performance e Cache)
+- **`somosunn.com.br` (público):** páginas institucionais e home sem cookie de sessão em GET anônimo; elegível para cache de borda no Cloudflare / LSCache.
+- **`app.somosunn.com.br`:** **Bypass Cache** obrigatório no Cloudflare (e `Cache-Control: no-store, private` automático no Laravel).
+- **`api.somosunn.com.br`:** **Bypass Cache** obrigatório para webhooks e endpoints autenticados, com rate limiting ativo.
+- **`cdn.somosunn.com.br`:** Cache agressivo de longo prazo para `.webp`, `.svg`, `.png`, `.jpg`, `.css`, `.js`, `.woff2` (sem cookies de sessão).

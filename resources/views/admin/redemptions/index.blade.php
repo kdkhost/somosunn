@@ -149,7 +149,7 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             @if($item->image)
-                                                <img src="{{ \App\Support\UploadStorage::url($item->image) }}" alt="{{ $item->name }}" class="img-circle img-size-32 mr-2">
+                                                <img src="{{ \App\Support\UploadStorage::url($item->image) }}" alt="{{ $item->name }}" class="img-circle img-size-32 mr-2" loading="lazy" decoding="async">
                                             @else
                                                 <div class="img-circle img-size-32 mr-2 bg-secondary d-inline-flex align-items-center justify-content-center">
                                                     <i class="fas fa-gift text-xs text-white"></i>

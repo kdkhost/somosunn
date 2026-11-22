@@ -10,6 +10,7 @@ use App\Models\Ranking;
 use App\Models\User;
 use App\Support\ContentVisibility;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
@@ -25,48 +26,61 @@ class HomeController extends Controller
 
         if (view()->shared('unnDbAvailable')) {
             try {
-                $eventBaseQuery = fn () => ContentVisibility::applyPublicFilter(
-                    Event::query()
-                        ->where('published', true)
-                        ->where('type', 'event'),
-                    'events'
-                )->publicUpcoming();
+                $cacheLoader = static function (): array {
+                    $eventBaseQuery = fn () => ContentVisibility::applyPublicFilter(
+                        Event::query()
+                            ->where('published', true)
+                            ->where('type', 'event'),
+                        'events'
+                    )->publicUpcoming();
 
-                $upcomingEvents = $eventBaseQuery()
-                    ->orderBy('start_at')
-                    ->limit(24)
-                    ->get();
+                    $upcomingEvents = $eventBaseQuery()
+                        ->orderBy('start_at')
+                        ->limit(24)
+                        ->get();
 
-                $freeEvents = $upcomingEvents
-                    ->filter(fn (Event $event) => $event->isActuallyFreeForPublic())
-                    ->take(6)
-                    ->values();
+                    $free = $upcomingEvents
+                        ->filter(fn (Event $event) => $event->isActuallyFreeForPublic())
+                        ->take(6)
+                        ->values();
 
-                $promotionalEvents = $upcomingEvents
-                    ->filter(fn (Event $event) => !$event->isActuallyFreeForPublic())
-                    ->take(6)
-                    ->values();
+                    $promo = $upcomingEvents
+                        ->filter(fn (Event $event) => !$event->isActuallyFreeForPublic())
+                        ->take(6)
+                        ->values();
 
-                $paidMentorings = ContentVisibility::applyPublicFilter(
-                    Mentorship::query()->where('slots', '>', 0),
-                    'mentorships'
-                )
-                    ->orderByDesc('price')
-                    ->limit(24)
-                    ->get()
-                    ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
-                    ->take(3)
-                    ->values();
+                    $mentorings = ContentVisibility::applyPublicFilter(
+                        Mentorship::query()->with('mentor')->where('slots', '>', 0),
+                        'mentorships'
+                    )
+                        ->orderByDesc('price')
+                        ->limit(24)
+                        ->get()
+                        ->filter(fn (Mentorship $mentorship) => $mentorship->hasPublicAction())
+                        ->take(3)
+                        ->values();
 
-                $featuredMagazines = Magazine::query()
-                    ->visibleTo(auth()->user())
-                    ->where('is_featured', true)
-                    ->whereNotNull('thumbnail')
-                    ->where('thumbnail', '!=', '')
-                    ->orderByDesc('published_at')
-                    ->orderByDesc('id')
-                    ->limit(12)
-                    ->get();
+                    return [$free, $promo, $mentorings];
+                };
+
+                if (!auth()->check()) {
+                    [$freeEvents, $promotionalEvents, $paidMentorings] = Cache::remember('unn:home:public_catalog:v1', 120, $cacheLoader);
+                } else {
+                    [$freeEvents, $promotionalEvents, $paidMentorings] = $cacheLoader();
+                }
+
+                $magCacheKey = 'unn:home:featured_magazines:v1:' . (auth()->id() ? 'u' . auth()->id() : 'guest');
+                $featuredMagazines = Cache::remember($magCacheKey, 120, static function () {
+                    return Magazine::query()
+                        ->visibleTo(auth()->user())
+                        ->where('is_featured', true)
+                        ->whereNotNull('thumbnail')
+                        ->where('thumbnail', '!=', '')
+                        ->orderByDesc('published_at')
+                        ->orderByDesc('id')
+                        ->limit(12)
+                        ->get();
+                });
             } catch (\Throwable $e) {
                 Log::warning('Falha ao carregar eventos/mentorias: ' . $e->getMessage());
             }
@@ -325,35 +339,40 @@ class HomeController extends Controller
                 'sucesso' => $sucessoCount,
             ]);
 
-            $leaderboard = Ranking::with([
-                'user' => function ($query) {
-                    $query->whereNotIn('role', ['admin', 'superadmin']);
-                },
-            ])
-                ->orderByDesc('score')
-                ->get()
-                ->filter(function ($rank) {
-                    return $rank->user && !in_array($rank->user->role, ['admin', 'superadmin']);
-                })
-                ->take(3)
-                ->values();
-
-            if ($leaderboard->isEmpty()) {
-                $leaderboard = User::whereNotIn('role', ['admin', 'superadmin'])
-                    ->where('points', '>', 0)
-                    ->orderByDesc('points')
-                    ->take(3)
+            $leaderboard = Cache::remember('unn:home:leaderboard:v1', 120, static function () {
+                $rows = Ranking::with([
+                    'user' => function ($query) {
+                        $query->whereNotIn('role', ['admin', 'superadmin']);
+                    },
+                ])
+                    ->orderByDesc('score')
+                    ->limit(20)
                     ->get()
-                    ->map(fn ($user) => (object) [
-                        'user' => $user,
-                        'score' => $user->points ?? 0,
-                        'level' => $user->level ?? 'iniciante',
-                        'interactions_count' => 0,
-                        'average_rating' => null,
-                        'is_points_fallback' => true,
-                    ])
+                    ->filter(function ($rank) {
+                        return $rank->user && !in_array($rank->user->role, ['admin', 'superadmin']);
+                    })
+                    ->take(3)
                     ->values();
-            }
+
+                if ($rows->isEmpty()) {
+                    $rows = User::whereNotIn('role', ['admin', 'superadmin'])
+                        ->where('points', '>', 0)
+                        ->orderByDesc('points')
+                        ->limit(3)
+                        ->get()
+                        ->map(fn ($user) => (object) [
+                            'user' => $user,
+                            'score' => $user->points ?? 0,
+                            'level' => $user->level ?? 'iniciante',
+                            'interactions_count' => 0,
+                            'average_rating' => null,
+                            'is_points_fallback' => true,
+                        ])
+                        ->values();
+                }
+
+                return $rows;
+            });
         } catch (\Throwable $e) {
             Log::warning('Falha ao montar overview de networking: ' . $e->getMessage());
         }

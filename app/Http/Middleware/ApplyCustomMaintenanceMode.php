@@ -7,13 +7,25 @@ use App\Models\Setting;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cookie;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class ApplyCustomMaintenanceMode
 {
+    public const DEVICE_COOKIE_NAME = 'unn_maintenance_device';
+
     public function handle(Request $request, Closure $next)
     {
+        $issuedDeviceCookie = $this->handleBypassTokenQuery($request);
+
         if ($this->shouldBypass($request)) {
-            return $next($request);
+            $response = $next($request);
+            if ($issuedDeviceCookie !== null) {
+                $response->headers->setCookie($issuedDeviceCookie);
+                $response->headers->set('Cache-Control', 'no-store, private, max-age=0');
+            }
+
+            return $response;
         }
 
         $manualEnabled = $this->toBool(Setting::get('maintenance_enabled', '0'));
@@ -32,8 +44,16 @@ class ApplyCustomMaintenanceMode
 
         $isActive = $manualEnabled || $scheduledActive;
         if (!$isActive) {
-            return $next($request);
+            $response = $next($request);
+            if ($issuedDeviceCookie !== null) {
+                $response->headers->setCookie($issuedDeviceCookie);
+            }
+
+            return $response;
         }
+
+        // Garante que nenhuma CDN faça cache de paginas em modo de manutencao
+        $request->attributes->set('unn.no_edge_cache', true);
 
         $title = trim((string) Setting::get('maintenance_title', 'Sistema em manutencao'));
         $subtitle = trim((string) Setting::get('maintenance_subtitle', 'Estamos melhorando sua experiencia.'));
@@ -71,6 +91,9 @@ class ApplyCustomMaintenanceMode
             'maintenanceReturnAt' => $returnAt,
         ], 503);
 
+        $response->headers->set('Cache-Control', 'no-store, private, max-age=0');
+        $response->headers->set('Pragma', 'no-cache');
+
         if ($retryAfter) {
             $response->headers->set('Retry-After', (string) $retryAfter);
         }
@@ -95,11 +118,26 @@ class ApplyCustomMaintenanceMode
             'backend/install',
             'backend/install/*',
             'webhook/*',
+            'v1/webhooks/*',
             'api/*',
+            'health',
+            'up',
             'manifest.webmanifest',
             'service-worker.js',
             'offline'
         )) {
+            return true;
+        }
+
+        if ($this->hasAllowedIp($request)) {
+            $request->attributes->set('unn.no_edge_cache', true);
+
+            return true;
+        }
+
+        if ($this->hasValidDeviceBypass($request)) {
+            $request->attributes->set('unn.no_edge_cache', true);
+
             return true;
         }
 
@@ -116,6 +154,106 @@ class ApplyCustomMaintenanceMode
         $level = (string) ($user->level ?? '');
 
         return $role === 'superadmin' || in_array($level, ['superadmin', 'sucesso'], true);
+    }
+
+    /**
+     * Valida se o endereco IP do cliente (incluindo CIDR) esta na lista de liberacao
+     * gerenciada via painel administrativo.
+     */
+    private function hasAllowedIp(Request $request): bool
+    {
+        $rawAllowed = trim((string) Setting::get('maintenance_allowed_ips', ''));
+        if ($rawAllowed === '') {
+            return false;
+        }
+
+        $entries = preg_split('/[\r\n,;]+/', $rawAllowed) ?: [];
+        $entries = array_values(array_filter(array_map('trim', $entries)));
+        if ($entries === []) {
+            return false;
+        }
+
+        $candidateIps = array_values(array_unique(array_filter([
+            trim((string) $request->header('CF-Connecting-IP', '')),
+            trim((string) $request->ip()),
+        ])));
+
+        foreach ($candidateIps as $clientIp) {
+            if (filter_var($clientIp, FILTER_VALIDATE_IP) === false) {
+                continue;
+            }
+
+            if (IpUtils::checkIp($clientIp, $entries)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Emite um cookie assinado de dispositivo autorizado quando a URL recebe
+     * `?maintenance_bypass_token=...` valido (dispositivos confiaveis fora da rede).
+     */
+    private function handleBypassTokenQuery(Request $request): ?\Symfony\Component\HttpFoundation\Cookie
+    {
+        $queryToken = trim((string) $request->query('maintenance_bypass_token', ''));
+        if ($queryToken === '') {
+            return null;
+        }
+
+        $expectedToken = trim((string) Setting::get('maintenance_bypass_token', ''));
+        if ($expectedToken === '' || !hash_equals($expectedToken, $queryToken)) {
+            return null;
+        }
+
+        $request->attributes->set('unn.no_edge_cache', true);
+        $request->attributes->set('unn.maintenance_device_verified', true);
+
+        return self::makeDeviceBypassCookie($expectedToken);
+    }
+
+    private function hasValidDeviceBypass(Request $request): bool
+    {
+        if ((bool) $request->attributes->get('unn.maintenance_device_verified', false)) {
+            return true;
+        }
+
+        $cookieValue = (string) $request->cookies->get(self::DEVICE_COOKIE_NAME, '');
+        if ($cookieValue === '') {
+            return false;
+        }
+
+        $expectedToken = trim((string) Setting::get('maintenance_bypass_token', ''));
+        if ($expectedToken === '') {
+            return false;
+        }
+
+        $expectedSignature = self::signDeviceToken($expectedToken);
+
+        return hash_equals($expectedSignature, $cookieValue);
+    }
+
+    public static function signDeviceToken(string $bypassToken): string
+    {
+        $appKey = (string) config('app.key', 'somosunn-maintenance');
+
+        return hash_hmac('sha256', 'maintenance-device:' . $bypassToken, $appKey);
+    }
+
+    public static function makeDeviceBypassCookie(string $bypassToken, int $minutes = 10080): \Symfony\Component\HttpFoundation\Cookie
+    {
+        return Cookie::make(
+            self::DEVICE_COOKIE_NAME,
+            self::signDeviceToken($bypassToken),
+            $minutes,
+            '/',
+            null,
+            null,
+            true,
+            false,
+            'lax'
+        );
     }
 
     private function toBool($value): bool

@@ -169,13 +169,13 @@
                 <div class="flex flex-col items-center gap-4">
                     <div class="w-full h-40 rounded-2xl watermark-preview-surface border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative group">
                         @if($url = $getUrl('watermark_image'))
-                            <img id="watermark_preview" src="{{ $url }}" class="max-h-[120px] max-w-[180px] object-contain">
+                            <img id="watermark_preview" src="{{ $url }}" class="max-h-[120px] max-w-[180px] object-contain" loading="lazy" decoding="async">
                             <div id="watermark_placeholder" class="hidden text-center p-4">
                                 <i class="fas fa-image text-2xl text-slate-300 mb-1"></i>
                                 <p class="text-[10px] text-slate-400">Sem imagem</p>
                             </div>
                         @else
-                            <img id="watermark_preview" src="" class="hidden max-h-[120px] max-w-[180px] object-contain">
+                            <img id="watermark_preview" src="" class="hidden max-h-[120px] max-w-[180px] object-contain" loading="lazy" decoding="async">
                             <div id="watermark_placeholder" class="text-center p-4">
                                 <i class="fas fa-image text-2xl text-slate-300 mb-1"></i>
                                 <p class="text-[10px] text-slate-400">Sem imagem transparente</p>

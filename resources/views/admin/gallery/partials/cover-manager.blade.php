@@ -14,7 +14,7 @@
     <div class="card-body">
         <div class="row">
             <div class="col-lg-4 mb-4 mb-lg-0">
-                <img src="{{ $selectedCoverUrl }}" alt="Capa do album" class="img-fluid shadow-sm gallery-admin-cover-preview">
+                <img src="{{ $selectedCoverUrl }}" alt="Capa do album" class="img-fluid shadow-sm gallery-admin-cover-preview" loading="lazy" decoding="async">
 
                 <div class="mt-3">
                     <span class="badge badge-{{ $selectedHasCustomCover ? 'primary' : 'secondary' }}">

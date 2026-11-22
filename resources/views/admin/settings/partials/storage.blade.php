@@ -465,7 +465,23 @@
     };
 
     window.stgMigrateLegacy = function(folder, mode) {
-        if (!confirm('Confirma ' + (mode === 'move' ? 'MOVER' : 'COPIAR') + ' a pasta "' + folder + '" para o provedor ativo?')) return;
+        const msg = 'Confirma ' + (mode === 'move' ? 'MOVER' : 'COPIAR') + ' a pasta "' + folder + '" para o provedor ativo?';
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'question',
+                title: 'Confirmar migracao?',
+                text: msg,
+                showCancelButton: true,
+                confirmButtonText: 'Sim, prosseguir',
+                cancelButtonText: 'Cancelar'
+            }).then(function (result) {
+                if (result.isConfirmed) executeMigrate();
+            });
+            return;
+        }
+        executeMigrate();
+
+        function executeMigrate() {
 
         var progressDiv = document.getElementById('stg-migration-progress-legacy');
         var spinner = document.getElementById('stg-mig-spinner-legacy');
@@ -514,6 +530,7 @@
             status.textContent = 'Erro de conexao';
             resultDiv.textContent = err.message;
         });
+        }
     };
 })();
 </script>

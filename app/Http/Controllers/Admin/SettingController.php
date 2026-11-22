@@ -40,7 +40,7 @@ class SettingController extends Controller
             return redirect()->route('admin.settings', ['group' => 'general']);
         }
 
-        $settings = Setting::all()->pluck('value', 'key')->toArray();
+        $settings = Setting::allValues();
         $settings = $this->normalizeFileSettings($settings);
 
         $getUrl = function ($key) use ($settings) {
@@ -52,6 +52,37 @@ class SettingController extends Controller
         }
 
         return view('admin.settings.index', compact('settings', 'group', 'getUrl'));
+    }
+
+    /**
+     * Autoriza o navegador/dispositivo atual para acessar o sistema durante o modo manutencao
+     * usando cookie HttpOnly assinado vinculado ao token de liberacao.
+     */
+    public function authorizeMaintenanceDevice(Request $request)
+    {
+        $token = trim((string) Setting::get('maintenance_bypass_token', ''));
+        if ($token === '') {
+            $token = bin2hex(random_bytes(20));
+            Setting::set('maintenance_bypass_token', $token, 'system');
+        }
+
+        $cookie = \App\Http\Middleware\ApplyCustomMaintenanceMode::makeDeviceBypassCookie($token);
+        $bypassUrl = url('/?maintenance_bypass_token=' . urlencode($token));
+
+        $payload = [
+            'success' => true,
+            'message' => 'Dispositivo atual autorizado para bypass de manutencao (valido por 7 dias).',
+            'bypass_token' => $token,
+            'bypass_url' => $bypassUrl,
+        ];
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json($payload)->withCookie($cookie);
+        }
+
+        return redirect()->back()
+            ->withCookie($cookie)
+            ->with('success', $payload['message']);
     }
 
     public function toggle(Request $request)
@@ -344,6 +375,8 @@ class SettingController extends Controller
                 'sumup_method_card',
                 'sumup_method_pix',
                 'sumup_pass_fee',
+                'efi_enabled',
+                'efi_mtls_enabled',
             ],            'marketplace' => ['marketplace_hero_enabled', 'marketplace_hero_autoplay', 'marketplace_exit_enabled', 'marketplace_events_popup_enabled'],
             'social' => [
                 'social_login_enabled',
@@ -361,6 +394,9 @@ class SettingController extends Controller
             'system' => [
                 'maintenance_enabled',
                 'maintenance_auto_enabled',
+                'domain_routing_enabled',
+                'cdn_enabled',
+                'public_page_cache_enabled',
             ],
         ];
 
@@ -1285,11 +1321,13 @@ class SettingController extends Controller
     {
         try {
             $data = $request->validate([
-                'gateway'      => 'required|in:mercadopago,sumup',
-                'env'          => 'nullable|in:sandbox,production',
-                'access_token' => 'nullable|string',
-                'token'        => 'nullable|string',
-                'email'        => 'nullable|email',
+                'gateway'       => 'required|in:mercadopago,sumup,efi',
+                'env'           => 'nullable|in:sandbox,production',
+                'access_token'  => 'nullable|string',
+                'token'         => 'nullable|string',
+                'client_id'     => 'nullable|string',
+                'client_secret' => 'nullable|string',
+                'email'         => 'nullable|email',
             ]);
 
             $success = false;
@@ -1334,6 +1372,21 @@ class SettingController extends Controller
                     $error = $response->json()['message'] ?? $response->json()['error_message'] ?? 'Erro desconhecido';
                     throw new \Exception("Falha na conexão SumUp: {$error}");
                 }
+            }
+
+            if ($data['gateway'] === 'efi') {
+                $efi = app(\App\Services\Payment\EfiService::class);
+                $tokenData = $efi->requestAccessToken(
+                    $data['client_id'] ?? null,
+                    $data['client_secret'] ?? null,
+                    $data['env'] ?? null
+                );
+
+                $success = !empty($tokenData['access_token']);
+                $envLabel = ($data['env'] ?? $efi->environment()) === 'production' ? 'Producao' : 'Sandbox';
+                $message = $success
+                    ? "Conexao com Efi Pro [{$envLabel}] autenticada com sucesso!"
+                    : 'Nao foi possivel obter token OAuth2 da Efi Pro.';
             }
 
             return response()->json(['success' => $success, 'message' => $message]);

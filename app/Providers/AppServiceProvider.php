@@ -33,6 +33,11 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register()
     {
+        $assetHelpers = app_path('Helpers/AssetHelpers.php');
+        if (is_file($assetHelpers)) {
+            require_once $assetHelpers;
+        }
+
         // ========================================================
         // Bindings de interfaces para os services do modulo
         // advanced-security-performance.
@@ -158,6 +163,14 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(120)->by((string) $request->ip());
         });
 
+        RateLimiter::for('webhook_sumup', function ($request) {
+            return Limit::perMinute(120)->by((string) $request->ip());
+        });
+
+        RateLimiter::for('webhook_efi', function ($request) {
+            return Limit::perMinute(120)->by((string) $request->ip());
+        });
+
         RateLimiter::for('event_reservations', function ($request) {
             $event = $request->route('event');
             $eventKey = is_object($event) && method_exists($event, 'getRouteKey')
@@ -202,23 +215,16 @@ class AppServiceProvider extends ServiceProvider
         try {
             DB::connection()->getPdo();
 
-            // Carregar configurações sociais se existirem (sobrescreve .env)
-            try {
-                $socialSettings = DB::table('settings')->whereIn('key', [
-                    'social_login_enabled',
-                    'social_google_client_id',
-                    'social_google_client_secret',
-                    'social_google_redirect',
-                    'social_facebook_client_id',
-                    'social_facebook_client_secret',
-                    'social_facebook_app_id',
-                    'social_facebook_app_secret',
-                    'social_facebook_redirect',
-                    'social_linkedin_client_id',
-                    'social_linkedin_client_secret',
-                    'social_linkedin_redirect'
-                ])->pluck('value', 'key')->toArray();
+            // Carrega configuracoes em uma unica leitura cacheada para reduzir queries no boot
+            $allSettings = \App\Models\Setting::allValues();
 
+            $cookieDomain = \App\Support\DomainManager::sessionCookieDomain();
+            if (!App::runningInConsole() && $cookieDomain !== null) {
+                config(['session.domain' => $cookieDomain]);
+            }
+
+            // Carregar configuracoes sociais se existirem (sobrescreve .env)
+            try {
                 $resolveSetting = static function (array $settings, array $keys, string $default = ''): string {
                     foreach ($keys as $key) {
                         if (!array_key_exists($key, $settings)) {
@@ -234,9 +240,9 @@ class AppServiceProvider extends ServiceProvider
                     return $default;
                 };
 
-                $googleClientId = $resolveSetting($socialSettings, ['social_google_client_id']);
-                $googleClientSecret = $resolveSetting($socialSettings, ['social_google_client_secret']);
-                $googleRedirect = $resolveSetting($socialSettings, ['social_google_redirect']);
+                $googleClientId = $resolveSetting($allSettings, ['social_google_client_id']);
+                $googleClientSecret = $resolveSetting($allSettings, ['social_google_client_secret']);
+                $googleRedirect = $resolveSetting($allSettings, ['social_google_redirect']);
 
                 if ($googleClientId !== '') {
                     config(['services.google.client_id' => $googleClientId]);
@@ -248,9 +254,9 @@ class AppServiceProvider extends ServiceProvider
                     config(['services.google.redirect' => $googleRedirect]);
                 }
 
-                $facebookClientId = $resolveSetting($socialSettings, ['social_facebook_client_id', 'social_facebook_app_id']);
-                $facebookClientSecret = $resolveSetting($socialSettings, ['social_facebook_client_secret', 'social_facebook_app_secret']);
-                $facebookRedirect = $resolveSetting($socialSettings, ['social_facebook_redirect']);
+                $facebookClientId = $resolveSetting($allSettings, ['social_facebook_client_id', 'social_facebook_app_id']);
+                $facebookClientSecret = $resolveSetting($allSettings, ['social_facebook_client_secret', 'social_facebook_app_secret']);
+                $facebookRedirect = $resolveSetting($allSettings, ['social_facebook_redirect']);
 
                 if ($facebookClientId !== '') {
                     config(['services.facebook.client_id' => $facebookClientId]);
@@ -262,9 +268,9 @@ class AppServiceProvider extends ServiceProvider
                     config(['services.facebook.redirect' => $facebookRedirect]);
                 }
 
-                $linkedinClientId = $resolveSetting($socialSettings, ['social_linkedin_client_id']);
-                $linkedinClientSecret = $resolveSetting($socialSettings, ['social_linkedin_client_secret']);
-                $linkedinRedirect = $resolveSetting($socialSettings, ['social_linkedin_redirect']);
+                $linkedinClientId = $resolveSetting($allSettings, ['social_linkedin_client_id']);
+                $linkedinClientSecret = $resolveSetting($allSettings, ['social_linkedin_client_secret']);
+                $linkedinRedirect = $resolveSetting($allSettings, ['social_linkedin_redirect']);
 
                 if ($linkedinClientId !== '') {
                     config(['services.linkedin.client_id' => $linkedinClientId]);
@@ -279,21 +285,8 @@ class AppServiceProvider extends ServiceProvider
                 // Silently fail if table doesnt exist yet
             }
 
-            // Carregar integrações/infra (reCAPTCHA e limites de upload) se existirem (sobrescreve .env)
+            // Carregar integracoes/infra (reCAPTCHA e limites de upload)
             try {
-                $extraSettings = DB::table('settings')->whereIn('key', [
-                    // reCAPTCHA v3
-                    'recaptcha_v3_site_key',
-                    'recaptcha_v3_secret_key',
-                    'recaptcha_v3_min_score',
-
-                    // Upload limits
-                    'video_max_mb',
-                    'document_max_mb',
-                    'allowed_video_formats',
-                    'allowed_document_formats',
-                ])->pluck('value', 'key')->toArray();
-
                 $normalizeList = function ($value): array {
                     $raw = trim((string) $value);
                     if ($raw === '') {
@@ -301,72 +294,59 @@ class AppServiceProvider extends ServiceProvider
                     }
 
                     $parts = preg_split('/[,\s;]+/', $raw) ?: [];
-                    $parts = array_map(static fn($p) => strtolower(trim((string) $p)), $parts);
-                    $parts = array_values(array_filter($parts, static fn($p) => $p !== '' && preg_match('/^[a-z0-9]+$/', $p)));
+                    $parts = array_map(static fn ($p) => strtolower(trim((string) $p)), $parts);
+                    $parts = array_values(array_filter($parts, static fn ($p) => $p !== '' && preg_match('/^[a-z0-9]+$/', $p)));
                     $parts = array_values(array_unique($parts));
 
                     return $parts;
                 };
 
-                // reCAPTCHA v3 (sobrescreve config/services.php)
-                $recaptchaSiteKey = trim((string) ($extraSettings['recaptcha_v3_site_key'] ?? ''));
+                $recaptchaSiteKey = trim((string) ($allSettings['recaptcha_v3_site_key'] ?? ''));
                 if ($recaptchaSiteKey !== '') {
                     config(['services.recaptcha.site_key' => $recaptchaSiteKey]);
                 }
 
-                $recaptchaSecret = trim((string) ($extraSettings['recaptcha_v3_secret_key'] ?? ''));
+                $recaptchaSecret = trim((string) ($allSettings['recaptcha_v3_secret_key'] ?? ''));
                 if ($recaptchaSecret !== '') {
                     config(['services.recaptcha.v3_secret' => $recaptchaSecret]);
                 }
 
-                $recaptchaMinScoreRaw = trim((string) ($extraSettings['recaptcha_v3_min_score'] ?? ''));
+                $recaptchaMinScoreRaw = trim((string) ($allSettings['recaptcha_v3_min_score'] ?? ''));
                 if ($recaptchaMinScoreRaw !== '') {
                     $recaptchaMinScoreRaw = str_replace(',', '.', $recaptchaMinScoreRaw);
                     config(['services.recaptcha.v3_min_score' => (float) $recaptchaMinScoreRaw]);
                 }
 
-                // Upload limits (sobrescreve config/uploads.php)
-                $videoMax = trim((string) ($extraSettings['video_max_mb'] ?? ''));
+                $videoMax = trim((string) ($allSettings['video_max_mb'] ?? ''));
                 if ($videoMax !== '' && is_numeric($videoMax)) {
                     config(['uploads.video_max_mb' => (int) $videoMax]);
                 }
 
-                $docMax = trim((string) ($extraSettings['document_max_mb'] ?? ''));
+                $docMax = trim((string) ($allSettings['document_max_mb'] ?? ''));
                 if ($docMax !== '' && is_numeric($docMax)) {
                     config(['uploads.document_max_mb' => (int) $docMax]);
                 }
 
-                $allowedVideosRaw = trim((string) ($extraSettings['allowed_video_formats'] ?? ''));
+                $allowedVideosRaw = trim((string) ($allSettings['allowed_video_formats'] ?? ''));
                 if ($allowedVideosRaw !== '') {
                     config(['uploads.allowed_video_formats' => $normalizeList($allowedVideosRaw)]);
                 }
 
-                $allowedDocsRaw = trim((string) ($extraSettings['allowed_document_formats'] ?? ''));
+                $allowedDocsRaw = trim((string) ($allSettings['allowed_document_formats'] ?? ''));
                 if ($allowedDocsRaw !== '') {
                     config(['uploads.allowed_document_formats' => $normalizeList($allowedDocsRaw)]);
                 }
 
-
-                UploadStorage::applyRuntimeConfig($extraSettings);
+                UploadStorage::applyRuntimeConfig($allSettings);
             } catch (\Throwable $e) {
                 // Silently fail if table doesnt exist yet
             }
 
-            // Carregar configurações de SMTP do banco de dados (sobrescreve .env)
+            // Carregar configuracoes de SMTP do banco de dados
             try {
-                $smtpSettings = DB::table('settings')->whereIn('key', [
-                    'smtp_host',
-                    'smtp_port',
-                    'smtp_username',
-                    'smtp_password',
-                    'smtp_encryption',
-                    'smtp_from_email',
-                    'smtp_from_name',
-                ])->pluck('value', 'key')->toArray();
-
-                $smtpHost = trim((string) ($smtpSettings['smtp_host'] ?? ''));
+                $smtpHost = trim((string) ($allSettings['smtp_host'] ?? ''));
                 if ($smtpHost !== '') {
-                    $encryption = $smtpSettings['smtp_encryption'] ?? 'tls';
+                    $encryption = $allSettings['smtp_encryption'] ?? 'tls';
                     if ($encryption === 'null' || $encryption === '') {
                         $encryption = null;
                     }
@@ -375,20 +355,20 @@ class AppServiceProvider extends ServiceProvider
                         'mail.default' => 'smtp',
                         'mail.mailers.smtp.transport' => 'smtp',
                         'mail.mailers.smtp.host' => $smtpHost,
-                        'mail.mailers.smtp.port' => trim((string) ($smtpSettings['smtp_port'] ?? '587')),
-                        'mail.mailers.smtp.username' => trim((string) ($smtpSettings['smtp_username'] ?? '')),
-                        'mail.mailers.smtp.password' => trim((string) ($smtpSettings['smtp_password'] ?? '')),
+                        'mail.mailers.smtp.port' => trim((string) ($allSettings['smtp_port'] ?? '587')),
+                        'mail.mailers.smtp.username' => trim((string) ($allSettings['smtp_username'] ?? '')),
+                        'mail.mailers.smtp.password' => trim((string) ($allSettings['smtp_password'] ?? '')),
                         'mail.mailers.smtp.encryption' => $encryption,
                         'mail.mailers.smtp.timeout' => null,
                         'mail.mailers.smtp.auth_mode' => null,
                     ]);
 
-                    $fromEmail = trim((string) ($smtpSettings['smtp_from_email'] ?? ''));
+                    $fromEmail = trim((string) ($allSettings['smtp_from_email'] ?? ''));
                     if ($fromEmail !== '') {
                         config(['mail.from.address' => $fromEmail]);
                     }
 
-                    $fromName = trim((string) ($smtpSettings['smtp_from_name'] ?? ''));
+                    $fromName = trim((string) ($allSettings['smtp_from_name'] ?? ''));
                     if ($fromName !== '') {
                         config(['mail.from.name' => $fromName]);
                     }
@@ -397,63 +377,54 @@ class AppServiceProvider extends ServiceProvider
                 // Silently fail if table doesnt exist yet
             }
 
-            // Carregar configurações de Pagamento (Mercado Pago)
+            // Carregar configuracoes de Pagamento (Mercado Pago + Efi Pro)
             try {
-                $paymentSettings = DB::table('settings')->whereIn('key', [
-                    // Config Env
-                    'mercadopago_env',
-                    // Mercado Pago OAuth (App Credentials)
-                    'mercadopago_client_id',
-                    'mercadopago_client_secret',
-                    // Mercado Pago Prod
-                    'mercadopago_prod_public_key',
-                    'mercadopago_prod_access_token',
-                    // Mercado Pago Sandbox
-                    'mercadopago_sandbox_public_key',
-                    'mercadopago_sandbox_access_token',
-                    // Generic Overrides (Marketplace Sync)
-                    'mercadopago_public_key',
-                    'mercadopago_access_token',
-                    // Rastreamento de qualidade / integrador
-                    'mercadopago_integrator_id',
-                    'mercadopago_platform_id',
-                ])->pluck('value', 'key')->toArray();
-
-                // 1. Mercado Pago App Credentials (OAuth) - Always needed for splits
-                if (!empty($paymentSettings['mercadopago_client_id'])) {
-                    config(['payments.mercadopago.client_id' => $paymentSettings['mercadopago_client_id']]);
+                if (!empty($allSettings['mercadopago_client_id'])) {
+                    config(['payments.mercadopago.client_id' => $allSettings['mercadopago_client_id']]);
                 }
-                if (!empty($paymentSettings['mercadopago_client_secret'])) {
-                    config(['payments.mercadopago.client_secret' => $paymentSettings['mercadopago_client_secret']]);
+                if (!empty($allSettings['mercadopago_client_secret'])) {
+                    config(['payments.mercadopago.client_secret' => $allSettings['mercadopago_client_secret']]);
                 }
 
-                // 2. Mercado Pago Platform Access (Check Environment)
-                $mpEnv = $paymentSettings['mercadopago_env'] ?? 'sandbox';
+                $mpEnv = $allSettings['mercadopago_env'] ?? 'sandbox';
                 if ($mpEnv === 'production') {
-                    if (!empty($paymentSettings['mercadopago_prod_public_key'])) {
-                        config(['payments.mercadopago.public_key' => $paymentSettings['mercadopago_prod_public_key']]);
+                    if (!empty($allSettings['mercadopago_prod_public_key'])) {
+                        config(['payments.mercadopago.public_key' => $allSettings['mercadopago_prod_public_key']]);
                     }
-                    if (!empty($paymentSettings['mercadopago_prod_access_token'])) {
-                        config(['payments.mercadopago.access_token' => $paymentSettings['mercadopago_prod_access_token']]);
+                    if (!empty($allSettings['mercadopago_prod_access_token'])) {
+                        config(['payments.mercadopago.access_token' => $allSettings['mercadopago_prod_access_token']]);
                     }
                 } else {
-                    // Sandbox
-                    if (!empty($paymentSettings['mercadopago_sandbox_public_key'])) {
-                        config(['payments.mercadopago.public_key' => $paymentSettings['mercadopago_sandbox_public_key']]);
+                    if (!empty($allSettings['mercadopago_sandbox_public_key'])) {
+                        config(['payments.mercadopago.public_key' => $allSettings['mercadopago_sandbox_public_key']]);
                     }
-                    if (!empty($paymentSettings['mercadopago_sandbox_access_token'])) {
-                        config(['payments.mercadopago.access_token' => $paymentSettings['mercadopago_sandbox_access_token']]);
+                    if (!empty($allSettings['mercadopago_sandbox_access_token'])) {
+                        config(['payments.mercadopago.access_token' => $allSettings['mercadopago_sandbox_access_token']]);
                     }
                 }
 
-                // 3. Integrador / Rastreamento de qualidade
-                if (!empty($paymentSettings['mercadopago_integrator_id'])) {
-                    config(['payments.mercadopago.integrator_id' => $paymentSettings['mercadopago_integrator_id']]);
+                if (!empty($allSettings['mercadopago_integrator_id'])) {
+                    config(['payments.mercadopago.integrator_id' => $allSettings['mercadopago_integrator_id']]);
                 }
-                if (!empty($paymentSettings['mercadopago_platform_id'])) {
-                    config(['payments.mercadopago.platform_id' => $paymentSettings['mercadopago_platform_id']]);
+                if (!empty($allSettings['mercadopago_platform_id'])) {
+                    config(['payments.mercadopago.platform_id' => $allSettings['mercadopago_platform_id']]);
                 }
 
+                if (!empty($allSettings['efi_client_id'])) {
+                    config(['payments.efi.client_id' => $allSettings['efi_client_id']]);
+                }
+                if (!empty($allSettings['efi_client_secret'])) {
+                    config(['payments.efi.client_secret' => $allSettings['efi_client_secret']]);
+                }
+                if (!empty($allSettings['efi_pix_key'])) {
+                    config(['payments.efi.pix_key' => $allSettings['efi_pix_key']]);
+                }
+                if (!empty($allSettings['efi_webhook_secret'])) {
+                    config(['payments.efi.webhook_secret' => $allSettings['efi_webhook_secret']]);
+                }
+                if (!empty($allSettings['efi_env'])) {
+                    config(['payments.efi.env' => $allSettings['efi_env']]);
+                }
             } catch (\Throwable $e) {
                 // Silently fail if table doesnt exist yet
             }

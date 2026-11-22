@@ -94,7 +94,7 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-4">
                                         @if($mentorship->image)
-                                            <img src="{{ $mentorship->image_url }}" class="w-12 h-12 rounded-lg object-cover border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
+                                            <img src="{{ $mentorship->image_url }}" class="w-12 h-12 rounded-lg object-cover border border-slate-100 dark:border-slate-800 shadow-sm transition-colors" loading="lazy" decoding="async">
                                         @else
                                             <div class="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-600 transition-colors">
                                                 <i class="fas fa-chalkboard-teacher"></i>
@@ -110,7 +110,7 @@
                                     <div class="flex items-center gap-2">
                                         <div class="w-7 h-7 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
                                             @if($mentorship->mentor && $mentorship->mentor->profile_photo_url && !str_contains($mentorship->mentor->profile_photo_url, 'default-user.svg'))
-                                                <img src="{{ $mentorship->mentor->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                                <img src="{{ $mentorship->mentor->profile_photo_url }}" alt="" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <i class="fas fa-user text-slate-400 dark:text-slate-500 text-[10px]"></i>
                                             @endif

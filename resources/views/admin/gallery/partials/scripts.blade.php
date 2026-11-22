@@ -68,7 +68,7 @@ $(function () {
     function sig(file) { return [file.name,file.size,file.lastModified].join('::'); }
     function notify(icon, title, text) {
         if (typeof Swal !== 'undefined') return Swal.fire({icon,title,text,confirmButtonText:'OK'});
-        alert(`${title}\n\n${text}`);
+        if (typeof toastr !== 'undefined') toastr[icon === 'error' ? 'error' : 'info'](`${title}: ${text}`);
         return Promise.resolve();
     }
     function countVal(el) {
@@ -110,7 +110,7 @@ $(function () {
         return {badge: item.kind==='video'?'badge-info':'badge-secondary', label: item.kind==='video'?'video':'imagem', bar:'bg-secondary'};
     }
     function previewMarkup(item) {
-        if (item.kind==='image' && item.previewUrl) return `<img src="${item.previewUrl}" alt="${esc(item.file.name)}">`;
+        if (item.kind==='image' && item.previewUrl) return `<img src="${item.previewUrl}" alt="${esc(item.file.name)}" loading="lazy" decoding="async">`;
         if (item.kind==='video' && item.previewUrl) return `<video src="${item.previewUrl}" muted playsinline preload="metadata"></video>`;
         return `<div class="gallery-admin-preview-fallback"><i class="fas fa-file-alt"></i></div>`;
     }
@@ -248,7 +248,7 @@ $(function () {
     function avatarMarkup(item) {
         const name = String(item.owner_name||'Sistema');
         const initial = esc(name.trim().charAt(0)||'S').toUpperCase();
-        if (item.owner_avatar) return `<img src="${esc(item.owner_avatar)}" alt="${esc(name)}" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">`;
+        if (item.owner_avatar) return `<img src="${esc(item.owner_avatar)}" alt="${esc(name)}" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">`;
         return `<span>${initial}</span>`;
     }
     function createMediaCard(item) {

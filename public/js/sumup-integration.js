@@ -280,7 +280,11 @@ class SumUpIntegration {
 
                 } catch (error) {
                     console.error('Erro no pagamento:', error);
-                    alert('Erro ao processar pagamento: ' + error.message);
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'error', title: 'Erro no pagamento', text: error.message || 'Falha ao processar pagamento.' });
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('Erro ao processar pagamento: ' + (error.message || ''));
+                    }
                 } finally {
                     payButton.disabled = false;
                     payButton.textContent = 'Pagar com SumUp';

@@ -107,7 +107,7 @@
                         <div class="relative">
                             <div class="absolute inset-0 btn-primary rounded-3xl opacity-20 blur-3xl"></div>
                             <img src="{{ (!empty($pageData['hero_image'])) ? asset('storage/'.$pageData['hero_image']) : 'https://images.unsplash.com/photo-1552664730-d307ca884978?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800' }}"
-                                alt="Networking" class="relative w-full rounded-3xl shadow-2xl transform rotate-2 hover:rotate-0 transition duration-500">
+                                alt="Networking" class="relative w-full rounded-3xl shadow-2xl transform rotate-2 hover:rotate-0 transition duration-500" loading="lazy" decoding="async">
                         </div>
                     </div>
                 </div>

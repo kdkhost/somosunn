@@ -311,7 +311,7 @@
                             <div class="flex items-start gap-3">
                                 <div class="w-14 h-14 rounded-xl bg-slate-100 overflow-hidden flex-shrink-0">
                                     @if($row['product']->cover_url)
-                                        <img src="{{ $row['product']->cover_url }}" alt="{{ $row['product']->title }}" class="w-full h-full object-cover">
+                                        <img src="{{ $row['product']->cover_url }}" alt="{{ $row['product']->title }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                     @else
                                         <div class="flex h-full w-full items-center justify-center text-xl text-slate-300">
                                             <i class="fas fa-box"></i>

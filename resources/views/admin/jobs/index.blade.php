@@ -77,7 +77,7 @@
                                         <div class="d-flex align-items-center">
                                             @if($vacancy->image)
                                                 <img src="{{ $vacancy->image_url }}" class="img-circle img-size-32 mr-2"
-                                                    style="object-fit: contain; background: #f8f9fa; border: 1px solid #dee2e6;">
+                                                    style="object-fit: contain; background: #f8f9fa; border: 1px solid #dee2e6;" loading="lazy" decoding="async">
                                             @else
                                                 <div class="img-circle img-size-32 mr-2 bg-light d-flex align-items-center justify-content-center text-muted"
                                                     style="border: 1px solid #dee2e6;">

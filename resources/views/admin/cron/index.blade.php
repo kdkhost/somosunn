@@ -123,7 +123,10 @@
                 <a href="{{ route('admin.cron.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
                     <i class="fas fa-plus mr-1"></i> Nova Tarefa
                 </a>
-                <form action="{{ route('admin.cron.run-all') }}" method="POST" class="d-inline ml-1" onsubmit="return confirm('Executar TODAS as tarefas ativas agora?')">
+                <form action="{{ route('admin.cron.run-all') }}" method="POST" class="d-inline ml-1"
+                    data-confirm-title="Executar todas as tarefas"
+                    data-confirm-text="Executar TODAS as tarefas ativas agora?"
+                    data-confirm-button="Executar Todas">
                     @csrf
                     <button type="submit" class="btn btn-success btn-sm rounded-pill elevation-1">
                         <i class="fas fa-play mr-1"></i> Executar Todas

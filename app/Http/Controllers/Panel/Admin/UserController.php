@@ -52,7 +52,7 @@ class UserController extends Controller
             'eventRegistrations as checked_in_tickets_count' => function ($q) {
                 $q->whereNotNull('check_in_at');
             },
-        ])->get();
+        ])->paginate(20)->withQueryString();
 
         return view('panel.admin.users.index', compact('users'));
     }

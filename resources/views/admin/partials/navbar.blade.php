@@ -26,7 +26,7 @@
                         <a href="{{ route('admin.chat.start', $group->user->id) }}" class="dropdown-item">
                             <div class="media">
                                 <img src="{{ $group->user->photo ? asset($group->user->photo) : asset('img/default-user.svg') }}"
-                                    alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                                    alt="User Avatar" class="img-size-50 mr-3 img-circle" loading="lazy" decoding="async">
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title">
                                         {{ $group->user->name }}
@@ -76,7 +76,7 @@
                         <a href="{{ route('admin.reviews.index') }}" class="dropdown-item">
                             <div class="media">
                                 <img src="{{ $review->user->photo ? asset($review->user->photo) : asset('img/default-user.svg') }}"
-                                    class="img-size-50 mr-3 img-circle" alt="">
+                                    class="img-size-50 mr-3 img-circle" alt="" loading="lazy" decoding="async">
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title">
                                         {{ \Illuminate\Support\Str::limit($review->user->name ?? 'Usuário', 15) }}
@@ -111,7 +111,7 @@
                         <a href="{{ route('admin.testimonials.index') }}" class="dropdown-item">
                             <div class="media">
                                 <img src="{{ $testimonial->user && $testimonial->user->photo ? asset($testimonial->user->photo) : asset('img/default-user.svg') }}"
-                                    class="img-size-50 mr-3 img-circle" alt="">
+                                    class="img-size-50 mr-3 img-circle" alt="" loading="lazy" decoding="async">
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title">
                                         {{ \Illuminate\Support\Str::limit($testimonial->author_name ?? ($testimonial->user->name ?? 'Anônimo'), 15) }}
@@ -143,7 +143,7 @@
                         <div class="dropdown-item">
                             <div class="media">
                                 <img src="{{ $conn->requester->photo ? asset($conn->requester->photo) : asset('img/default-user.svg') }}"
-                                    class="img-size-50 mr-3 img-circle">
+                                    class="img-size-50 mr-3 img-circle" loading="lazy" decoding="async">
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title">
                                         {{ \Illuminate\Support\Str::limit($conn->requester->name, 15) }}
@@ -195,7 +195,7 @@
                 <a class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#" aria-expanded="false">
                     @if(auth()->user()->photo)
                         <img src="{{ asset(auth()->user()->photo) }}" alt="User" class="img-circle mr-2"
-                            style="width:30px;height:30px;object-fit:cover;">
+                            style="width:30px;height:30px;object-fit:cover;" loading="lazy" decoding="async">
                     @else
                         <i class="fas fa-user-circle mr-1" style="font-size: 1.5rem;"></i>
                     @endif

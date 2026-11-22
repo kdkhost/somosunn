@@ -18,7 +18,7 @@
                     <span class="info-box-icon"><i class="fas fa-{{ (isset($type) && $type === 'album') ? 'images' : 'calendar-alt' }}"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Total</span>
-                        <span class="info-box-number">{{ count($events) }}</span>
+                        <span class="info-box-number">{{ $totalEventsCount ?? $events->total() }}</span>
                     </div>
                 </div>
             </div>
@@ -27,7 +27,7 @@
                     <span class="info-box-icon"><i class="fas fa-eye"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Publicados</span>
-                        <span class="info-box-number">{{ $events->where('published', true)->count() }}</span>
+                        <span class="info-box-number">{{ $publishedEventsCount ?? $events->where('published', true)->count() }}</span>
                     </div>
                 </div>
             </div>
@@ -36,7 +36,7 @@
                     <span class="info-box-icon"><i class="fas fa-photo-video"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Na Galeria</span>
-                        <span class="info-box-number">{{ $events->where('show_on_gallery', true)->count() }}</span>
+                        <span class="info-box-number">{{ $galleryEventsCount ?? $events->where('show_on_gallery', true)->count() }}</span>
                     </div>
                 </div>
             </div>
@@ -45,7 +45,7 @@
                     <span class="info-box-icon"><i class="fas fa-eye-slash"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Ocultos</span>
-                        <span class="info-box-number">{{ $events->where('published', false)->count() }}</span>
+                        <span class="info-box-number">{{ $hiddenEventsCount ?? $events->where('published', false)->count() }}</span>
                     </div>
                 </div>
             </div>
@@ -53,7 +53,18 @@
 
         {{-- Action Buttons --}}
         <div class="row mb-3">
-            <div class="col-12 text-right">
+            <div class="col-12 d-flex flex-wrap justify-content-between align-items-center" style="gap: 10px;">
+                <form method="GET" action="{{ url()->current() }}" class="form-inline">
+                    @if(request('type'))
+                        <input type="hidden" name="type" value="{{ request('type') }}">
+                    @endif
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="q" value="{{ $search ?? '' }}" class="form-control" placeholder="Buscar por título...">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-outline-primary"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
                 <div class="d-inline-flex" style="gap: 10px;">
                     @if(!(isset($type) && $type === 'album'))
                     <a href="{{ route('admin.quick-scanner') }}"
@@ -102,7 +113,7 @@
                                                 @if($event->image_url)
                                                     <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
                                                         class="img-rounded mr-3 shadow-sm"
-                                                        style="object-fit: cover; width: 50px; height: 35px; border-radius: 4px;">
+                                                        style="object-fit: cover; width: 50px; height: 35px; border-radius: 4px;" loading="lazy" decoding="async">
                                                 @else
                                                     <div class="mr-3 d-flex align-items-center justify-content-center bg-light rounded"
                                                         style="width: 50px; height: 35px;">
@@ -210,6 +221,11 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($events instanceof \Illuminate\Pagination\AbstractPaginator && $events->hasPages())
+                        <div class="card-footer bg-white border-top py-3">
+                            {{ $events->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -217,8 +233,8 @@
 @endsection
 
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/responsive.bootstrap4.min.css') }}">
     <style>
         .img-rounded {
             border-radius: 4px;
@@ -227,26 +243,6 @@
         .table td,
         .table th {
             vertical-align: middle;
-        }
-
-        #admin-events-table_wrapper .row {
-            margin-left: 0;
-            margin-right: 0;
-        }
-
-        #admin-events-table_wrapper .dataTables_length,
-        #admin-events-table_wrapper .dataTables_filter {
-            padding: 1rem 1rem 0;
-        }
-
-        #admin-events-table_wrapper .dataTables_info,
-        #admin-events-table_wrapper .dataTables_paginate {
-            padding: 1rem;
-        }
-
-        #admin-events-table_wrapper .dataTables_filter input,
-        #admin-events-table_wrapper .dataTables_length select {
-            border-radius: .5rem;
         }
 
         .admin-events-table__title,
@@ -262,24 +258,24 @@
 @endpush
 
 @push('scripts')
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/responsive.bootstrap4.min.js') }}"></script>
     <script>
         $(function () {
             const isAlbum = {{ (isset($type) && $type === 'album') ? 'true' : 'false' }};
-            const colCount = $('#admin-events-table thead th').length;
-            const bodyColCount = $('#admin-events-table tbody tr:first td').length;
-            console.log('DataTable Init: isAlbum=', isAlbum, 'thead cols:', colCount, 'tbody first tr cols:', bodyColCount);
 
-            const table = $('#admin-events-table').DataTable({
+            $('#admin-events-table').DataTable({
                 responsive: true,
                 autoWidth: false,
-                pageLength: 15,
+                paging: false,
+                info: false,
+                searching: false,
+                ordering: true,
                 order: isAlbum ? [[0, 'asc']] : [[1, 'desc']],
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json',
+                    url: '{{ cdn_asset('assets/admin/datatables/pt-BR.json') }}',
                     emptyTable: `
                         <div class="text-center py-5 text-muted">
                             <i class="fas fa-folder-open fa-3x mb-3 d-block"></i>

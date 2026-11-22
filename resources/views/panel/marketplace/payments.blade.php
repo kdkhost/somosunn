@@ -264,8 +264,6 @@
                         Swal.fire({ icon: 'success', title: 'Copiado!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
                     } else if (typeof toastr !== 'undefined') {
                         toastr.success('Copiado!');
-                    } else {
-                        alert('Copiado!');
                     }
                 });
             }

@@ -33,7 +33,6 @@ class Kernel extends HttpKernel
         // permitir bloqueio precoce de scanners e flood antes do roteamento.
         // Bloqueia rotas sensíveis (install, migrations, debug) em produção
         \App\Http\Middleware\BlockSensitiveRoutesInProduction::class,
-        \App\Http\Middleware\TrackServiceVisit::class,
     ];
 
     protected $middlewareGroups = [
@@ -54,6 +53,26 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\EnsureLgpdConsent::class,
             // Pass-through observador para o AnomalyDetectorService.
             \App\Http\Middleware\AnomalyDetectorMiddleware::class,
+        ],
+        'web.public' => [
+            \App\Http\Middleware\PublicCacheableResponse::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \App\Http\Middleware\StartPublicSession::class,
+            \App\Http\Middleware\ProtectSupervisedAccess::class,
+            \App\Http\Middleware\WafMiddleware::class,
+            \App\Http\Middleware\AdvancedRateLimitMiddleware::class,
+            \App\Http\Middleware\ApplyCustomMaintenanceMode::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\SecurityHeadersMiddleware::class,
+            \App\Http\Middleware\TrackReferralLink::class,
+            \App\Http\Middleware\TrackVisitor::class,
+        ],
+        'webhook' => [
+            \App\Http\Middleware\AdvancedRateLimitMiddleware::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\SecurityHeadersMiddleware::class,
         ],
         'api' => [
             \App\Http\Middleware\WafMiddleware::class,
@@ -88,5 +107,7 @@ class Kernel extends HttpKernel
         'sensitive.production' => \App\Http\Middleware\BlockSensitiveRoutesInProduction::class,
         'rate.limit.advanced' => \App\Http\Middleware\AdvancedRateLimitMiddleware::class,
         'security.headers' => \App\Http\Middleware\SecurityHeadersMiddleware::class,
+        'subdomain' => \App\Http\Middleware\EnforceSubdomainRouting::class,
+        'public.cache' => \App\Http\Middleware\PublicCacheableResponse::class,
     ];
 }

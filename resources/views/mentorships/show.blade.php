@@ -214,7 +214,7 @@
                 <div class="absolute inset-0 pointer-events-none overflow-hidden">
                     <img src="{{ $mentorshipImageUrl }}" alt=""
                         class="absolute inset-0 w-full h-full object-cover scale-110 saturate-[1.1] brightness-[0.85]"
-                        style="filter: blur({{ $heroBlurPx }}px); opacity: 0.7;" aria-hidden="true">
+                        style="filter: blur({{ $heroBlurPx }}px); opacity: 0.7;" aria-hidden="true" loading="lazy" decoding="async">
 
                     <!-- Película transparente em cor degradê -->
                     <div class="absolute inset-0" style="background: linear-gradient(135deg, 
@@ -281,7 +281,7 @@
                                 <div class="mentorship-avatar-ring">
                                     <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center overflow-hidden">
                                         @if($mentorAvatarUrl)
-                                            <img src="{{ $mentorAvatarUrl }}" alt="{{ $mentorName }}" class="w-full h-full object-cover">
+                                            <img src="{{ $mentorAvatarUrl }}" alt="{{ $mentorName }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                         @else
                                             <span class="text-sm font-black text-slate-600">
                                                 {{ mb_substr($mentorName, 0, 1) }}

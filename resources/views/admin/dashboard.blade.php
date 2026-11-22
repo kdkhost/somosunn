@@ -16,7 +16,7 @@
                             @if(auth()->user()->photo)
                                 <img src="{{ asset(auth()->user()->photo) }}"
                                     class="rounded-circle border border-white elevation-2"
-                                    style="width: 70px; height: 70px; object-fit: cover;">
+                                    style="width: 70px; height: 70px; object-fit: cover;" loading="lazy" decoding="async">
                             @else
                                 <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border border-white elevation-2"
                                     style="width: 70px; height: 70px; font-size: 28px; color: #333;">

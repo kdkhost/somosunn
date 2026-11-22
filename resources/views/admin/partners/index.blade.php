@@ -67,7 +67,7 @@
                                                 style="width:56px;height:36px;background:#f8f9fa;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid #dee2e6;">
                                                 @if($partner->logo_url)
                                                     <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}"
-                                                        style="max-width:52px;max-height:32px;object-fit:contain;">
+                                                        style="max-width:52px;max-height:32px;object-fit:contain;" loading="lazy" decoding="async">
                                                 @else
                                                     <i class="fas fa-building text-muted"></i>
                                                 @endif

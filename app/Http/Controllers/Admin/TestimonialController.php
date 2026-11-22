@@ -56,7 +56,7 @@ class TestimonialController extends Controller
         $this->ensureCanModerate();
 
         $testimonial = new Testimonial();
-        $users = User::select('id', 'name', 'email')->orderBy('name')->get();
+        $users = User::select('id', 'name', 'email')->orderBy('name')->limit(200)->get();
 
         return view('admin.testimonials.form', compact('testimonial', 'users'));
     }
@@ -103,7 +103,17 @@ class TestimonialController extends Controller
     {
         $this->ensureCanModerate();
 
-        $users = User::select('id', 'name', 'email')->orderBy('name')->get();
+        $users = User::select('id', 'name', 'email')
+            ->orderBy('name')
+            ->limit(200)
+            ->get();
+
+        if ($testimonial->user_id && !$users->contains('id', $testimonial->user_id)) {
+            $linkedUser = User::select('id', 'name', 'email')->find($testimonial->user_id);
+            if ($linkedUser) {
+                $users->prepend($linkedUser);
+            }
+        }
 
         return view('admin.testimonials.form', compact('testimonial', 'users'));
     }

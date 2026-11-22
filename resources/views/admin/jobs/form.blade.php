@@ -112,7 +112,7 @@
                                     @if($vacancy->image)
                                         <div class="mb-2">
                                             <img src="{{ $vacancy->image_url }}" class="img-thumbnail"
-                                                style="max-height: 100px;">
+                                                style="max-height: 100px;" loading="lazy" decoding="async">
                                         </div>
                                     @endif
                                     <div class="custom-file">

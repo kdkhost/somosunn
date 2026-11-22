@@ -309,7 +309,7 @@
                 <aside class="error-side">
                     <div class="error-side-brand">
                         <div class="error-side-logo">
-                            <img src="{{ $logoUrl }}" alt="" onerror="this.style.display='none';">
+                            <img src="{{ $logoUrl }}" alt="" onerror="this.style.display='none';" loading="lazy" decoding="async">
                         </div>
                         <p class="error-side-subtitle">Central de status do sistema</p>
                     </div>

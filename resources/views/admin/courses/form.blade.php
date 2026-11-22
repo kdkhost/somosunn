@@ -233,7 +233,7 @@
                                                     <div class="col-md-4">
                                                         @if($course->thumbnail)
                                                             <img src="{{ $course->thumbnail_url }}"
-                                                                class="img-fluid rounded shadow-sm">
+                                                                class="img-fluid rounded shadow-sm" loading="lazy" decoding="async">
                                                         @else
                                                             <div class="bg-white rounded mb-2 d-flex align-items-center justify-content-center border"
                                                                 style="height: 120px;">
@@ -662,7 +662,7 @@
                                                         style="position: relative; width: 842px; height: 595px; background-color: white; box-shadow: 0 0 30px rgba(0,0,0,0.5); flex-shrink: 0; overflow: hidden;">
                                                         @if($course->certificate_bg)
                                                             <img src="{{ asset($course->certificate_bg) }}" id="cert-bg-img"
-                                                                style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;">
+                                                                style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;" loading="lazy" decoding="async">
                                                         @else
                                                             <div id="cert-bg-placeholder"
                                                                 style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc; z-index: 1; position: absolute; background: #eee;">
@@ -820,13 +820,13 @@
                                                                     <div class="mt-2">
                                                                         <img src="{{ asset($course->instructor_signature) }}"
                                                                             id="signaturePreview" class="img-thumbnail"
-                                                                            style="max-width: 150px; background: #f8f9fa;">
+                                                                            style="max-width: 150px; background: #f8f9fa;" loading="lazy" decoding="async">
                                                                     </div>
                                                                 @else
                                                                     <div class="mt-2" id="signaturePreviewWrapper"
                                                                         style="display:none;">
                                                                         <img id="signaturePreview" class="img-thumbnail"
-                                                                            style="max-width: 150px; background: #f8f9fa;">
+                                                                            style="max-width: 150px; background: #f8f9fa;" loading="lazy" decoding="async">
                                                                     </div>
                                                                 @endif
                                                             </div>
@@ -2087,8 +2087,8 @@
                             } else {
                                 // Create img if replacing icon
                                 var wrapper = container.find('.bg-white'); // It has bg-white now
-                                if (wrapper.length) wrapper.replaceWith('<img src="' + e.target.result + '" class="img-fluid rounded shadow-sm">');
-                                else container.prepend('<img src="' + e.target.result + '" class="img-fluid rounded shadow-sm">');
+                                if (wrapper.length) wrapper.replaceWith('<img src="' + e.target.result + '" class="img-fluid rounded shadow-sm" loading="lazy" decoding="async">');
+                                else container.prepend('<img src="' + e.target.result + '" class="img-fluid rounded shadow-sm" loading="lazy" decoding="async">');
                             }
                         }
                         reader.readAsDataURL(file);
@@ -3063,7 +3063,7 @@
                         if ($('#cert-bg-img').length) {
                             $('#cert-bg-img').attr('src', e.target.result);
                         } else {
-                            $('#cert-bg-placeholder').replaceWith('<img src="' + e.target.result + '" id="cert-bg-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;">');
+                            $('#cert-bg-placeholder').replaceWith('<img src="' + e.target.result + '" id="cert-bg-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;" loading="lazy" decoding="async">');
                         }
 
                         const fit = ($('#cert-bg-fit').val() || 'cover') === 'stretch' ? 'fill' : 'cover';

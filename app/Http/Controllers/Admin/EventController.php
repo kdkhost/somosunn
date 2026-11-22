@@ -834,10 +834,23 @@ class EventController extends Controller
             $query->where('title', 'like', '%' . $search . '%');
         }
 
-        $events = $query->get();
+        $totalEventsCount = (clone $query)->count();
+        $publishedEventsCount = (clone $query)->where('published', true)->count();
+        $galleryEventsCount = (clone $query)->where('show_on_gallery', true)->count();
+        $hiddenEventsCount = max(0, $totalEventsCount - $publishedEventsCount);
+
+        $events = $query->paginate(20)->withQueryString();
         app(SalesAnalyticsService::class)->decorateEvents($events);
 
-        return view('admin.events.list', compact('events', 'search', 'type'));
+        return view('admin.events.list', compact(
+            'events',
+            'search',
+            'type',
+            'totalEventsCount',
+            'publishedEventsCount',
+            'galleryEventsCount',
+            'hiddenEventsCount'
+        ));
     }
 
     /**

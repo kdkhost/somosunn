@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="row">
                     <div class="col-md-3 text-center">
                         <div class="mb-2 mx-auto rounded-circle overflow-hidden shadow-sm border bg-light d-flex align-items-center justify-content-center" style="width:80px; height:80px;">
-                            ${item.image ? `<img src="/storage/${item.image}" class="w-100 h-100 object-cover">` : `<i class="fas fa-user text-muted fa-2x"></i>`}
+                            ${item.image ? `<img src="/storage/${item.image}" class="w-100 h-100 object-cover" loading="lazy" decoding="async">` : `<i class="fas fa-user text-muted fa-2x"></i>`}
                         </div>
                     </div>
                     <div class="col-md-9">

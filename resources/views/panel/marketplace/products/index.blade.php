@@ -28,7 +28,7 @@
                 <article class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm">
                     <div class="aspect-[16/10] rounded-3xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                         @if($product->cover_url)
-                            <img src="{{ $product->cover_url }}" alt="{{ $product->title }}" class="w-full h-full object-cover">
+                            <img src="{{ $product->cover_url }}" alt="{{ $product->title }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                         @else
                             <i class="fas fa-image text-4xl text-slate-300"></i>
                         @endif

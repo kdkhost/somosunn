@@ -147,7 +147,7 @@
                                             class="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
                                             @if($order->user && $order->user->profile_photo_url && !str_contains($order->user->profile_photo_url, 'default-user.svg'))
                                                 <img src="{{ $order->user->profile_photo_url }}" alt=""
-                                                    class="w-full h-full object-cover">
+                                                    class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <i class="fas fa-user text-slate-400 dark:text-slate-500 text-[10px]"></i>
                                             @endif

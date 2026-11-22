@@ -168,7 +168,8 @@
     @endpush
 
     @push('scripts')
-        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+        <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales/pt-br.global.min.js'></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 @php
@@ -254,8 +255,8 @@
                                     title: 'Erro',
                                     text: data.message || 'Erro ao mover evento'
                                 });
-                            } else {
-                                alert(data.message || 'Erro ao mover evento');
+                            } else if (typeof toastr !== 'undefined') {
+                                toastr.error(data.message || 'Erro ao mover evento');
                             }
                             info.revert();
                         }

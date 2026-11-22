@@ -79,7 +79,7 @@
                                         <div class="flex items-center gap-4">
                                             <div class="h-14 w-14 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
                                                 @if($item->image)
-                                                    <img src="{{ \App\Support\UploadStorage::url($item->image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover">
+                                                    <img src="{{ \App\Support\UploadStorage::url($item->image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover" loading="lazy" decoding="async">
                                                 @else
                                                     <div class="flex h-full items-center justify-center text-slate-300 dark:text-slate-700">
                                                         <i class="fas fa-gift"></i>

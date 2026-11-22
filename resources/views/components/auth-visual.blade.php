@@ -77,7 +77,7 @@
     
     <div class="relative z-10 flex flex-col items-center w-full">
         <img src="{{ $logoAuthSrc }}" class="h-28 max-w-full mb-8 drop-shadow-2xl object-contain {{ $animClass }}" alt="Logo"
-            onerror="this.style.display='none';">
+            onerror="this.style.display='none';" loading="lazy" decoding="async">
         
         <h2 class="text-3xl font-bold mb-3 text-center drop-shadow-md {{ $animClass }}"
             @if($shouldAnimate) style="animation-delay: 100ms" @endif>

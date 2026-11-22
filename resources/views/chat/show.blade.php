@@ -38,7 +38,7 @@
                             <div class="flex items-center gap-2">
                                 <img src="{{ $otherUserPhoto }}" alt="{{ $otherUserName }}"
                                     class="w-9 h-9 rounded-full object-cover flex-shrink-0"
-                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}'">
+                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}'" loading="lazy" decoding="async">
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-sm font-semibold text-gray-900 truncate">{{ $otherUserName }}
                                     </h4>

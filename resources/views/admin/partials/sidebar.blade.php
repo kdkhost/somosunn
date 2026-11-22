@@ -48,7 +48,7 @@
             <div class="image mr-2">
                 <img src="{{ auth()->user()->photo ? asset(auth()->user()->photo) : asset('img/user.png') }}"
                     class="img-circle elevation-2 border border-blue-200" alt="User Image"
-                    style="width: 38px; height: 38px; object-fit: cover;">
+                    style="width: 38px; height: 38px; object-fit: cover;" loading="lazy" decoding="async">
             </div>
             <div class="info">
                 <a href="{{ route('admin.profile.edit') }}" class="d-block text-wrap"

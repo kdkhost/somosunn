@@ -581,7 +581,7 @@
                             <div class="event-paper-ticket">
                                 <aside class="ticket-stub">
                                     <div>
-                                        <img src="{{ $logo }}" alt="SOMOS UNN" class="ticket-logo mb-1">
+                                        <img src="{{ $logo }}" alt="SOMOS UNN" class="ticket-logo mb-1" loading="lazy" decoding="async">
                                         <div class="ticket-stub-title">{{ $event->title }}</div>
                                     </div>
 
@@ -600,7 +600,7 @@
                                 </aside>
 
                                 <main class="ticket-main">
-                                    <img src="{{ $ticketImage }}" alt="" class="ticket-watermark-image" aria-hidden="true">
+                                    <img src="{{ $ticketImage }}" alt="" class="ticket-watermark-image" aria-hidden="true" loading="lazy" decoding="async">
                                     @if($itemIsExhibitorTicket)
                                         <div class="ticket-exhibitor-stamp">Expositor</div>
                                     @endif
@@ -614,7 +614,7 @@
 
                                             <div class="ticket-title-area">
                                                 <div class="ticket-brand">
-                                                    <img src="{{ $logo }}" alt="SOMOS UNN" class="ticket-logo">
+                                                    <img src="{{ $logo }}" alt="SOMOS UNN" class="ticket-logo" loading="lazy" decoding="async">
                                                     <span>Universidade de Negócios</span>
                                                 </div>
                                                 <h2 class="ticket-event-title">{{ $event->title }}</h2>

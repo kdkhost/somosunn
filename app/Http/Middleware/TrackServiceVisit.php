@@ -7,6 +7,7 @@ use App\Models\ServiceVisit;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
@@ -16,7 +17,20 @@ class TrackServiceVisit
     {
         $response = $next($request);
 
-        if (!$this->shouldTrack($request, $response) || !Schema::hasTable('service_visits')) {
+        if (!$this->shouldTrack($request, $response)) {
+            return $response;
+        }
+
+        $hasTable = false;
+        try {
+            $hasTable = Cache::remember('unn:schema:has_service_visits', 3600, static function (): bool {
+                return Schema::hasTable('service_visits');
+            });
+        } catch (\Throwable) {
+            $hasTable = Schema::hasTable('service_visits');
+        }
+
+        if (!$hasTable) {
             return $response;
         }
 
@@ -26,29 +40,43 @@ class TrackServiceVisit
             return $response;
         }
 
-        try {
-            ServiceVisit::create([
-                'service_type' => $serviceType,
-                'service_id' => $serviceId,
-                'user_id' => Auth::id(),
-                'visited_at' => now(),
-            ]);
+        $userId = Auth::id();
+        $visitedAt = now();
 
-            $count = ServiceVisit::query()
-                ->where('service_type', $serviceType)
-                ->when($serviceId !== null, fn ($query) => $query->where('service_id', $serviceId))
-                ->count();
+        // Executa o registro apos o envio da resposta para nao travar o TTFB
+        app()->terminating(static function () use ($serviceType, $serviceId, $userId, $visitedAt): void {
+            try {
+                ServiceVisit::create([
+                    'service_type' => $serviceType,
+                    'service_id' => $serviceId,
+                    'user_id' => $userId,
+                    'visited_at' => $visitedAt,
+                ]);
 
-            event(new ServiceVisitRegistered($serviceType, $serviceId, $count));
-        } catch (\Throwable $exception) {
-            Log::error('TrackServiceVisit error: ' . $exception->getMessage());
-        }
+                $count = Cache::remember(
+                    'unn:service_visit_count:' . $serviceType . ':' . ($serviceId ?? 'all'),
+                    60,
+                    static fn () => ServiceVisit::query()
+                        ->where('service_type', $serviceType)
+                        ->when($serviceId !== null, fn ($query) => $query->where('service_id', $serviceId))
+                        ->count()
+                );
+
+                event(new ServiceVisitRegistered($serviceType, $serviceId, (int) $count));
+            } catch (\Throwable $exception) {
+                Log::error('TrackServiceVisit error: ' . $exception->getMessage());
+            }
+        });
 
         return $response;
     }
 
     private function shouldTrack(Request $request, mixed $response): bool
     {
+        if ((bool) $request->attributes->get('unn.stateless_public', false)) {
+            return false;
+        }
+
         if (!$request->isMethod('GET') || $request->expectsJson() || $request->ajax()) {
             return false;
         }

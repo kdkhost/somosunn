@@ -16,7 +16,7 @@
             </button>
             <img src="{{ $chatOtherUserPhoto }}" alt="{{ $chatOtherUserName }}"
                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-gray-200 dark:border-slate-700"
-                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}'">
+                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}'" loading="lazy" decoding="async">
             <div>
                 <h4 class="font-bold text-gray-900 dark:text-white text-sm sm:text-base line-clamp-1">
                     {{ $chatOtherUserName }}</h4>

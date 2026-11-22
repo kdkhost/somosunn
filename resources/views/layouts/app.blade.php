@@ -307,26 +307,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ unn_asset('css/unn-tailwind.css') }}">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        unn: {
-                            azul: {
-                                1: '#1F5EDB',
-                                2: '#177FD6',
-                                3: '#1D3FC4',
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <script>
             // Set theme immediately to avoid flash
             (function () {
@@ -963,48 +945,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/inputmask.min.js"></script>
+    <script src="{{ unn_asset('js/unn-masks.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @include('partials.global-sweetalert-confirm')
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Input masks
-            try {
-                if (typeof Inputmask === 'function') {
-                    var imasks = document.querySelectorAll('input[data-mask]');
-                    imasks.forEach(function (el) {
-                        var m = el.getAttribute('data-mask');
-                        if (m) {
-                            Inputmask(m).mask(el);
-                        }
-                    });
-                }
-            } catch (e) {
-                // Se algum CDN estiver bloqueado, não quebra o restante do site
-            }
-
-            // CEP auto-complete on any input with id=cep
-            var cep = document.getElementById('cep');
-            if (cep) {
-                cep.addEventListener('input', function (e) {
-                    var v = e.target.value.replace(/\D/g, '');
-                    if (v.length === 8) {
-                        fetch(`https://viacep.com.br/ws/${v}/json/`).then(r => r.json()).then(data => {
-                            if (!data.erro) {
-                                var address = document.getElementById('address');
-                                if (address) {
-                                    address.value = `${data.logradouro} - ${data.bairro} - ${data.localidade}/${data.uf}`;
-                                    var campos = Array.prototype.slice.call(document.querySelectorAll('input,select,textarea'));
-                                    var idx = campos.indexOf(address);
-                                    if (idx > -1 && campos[idx + 1]) {
-                                        campos[idx + 1].focus();
-                                    }
-                                }
-                            }
-                        });
-                    }
-                });
+            if (typeof window.initUnnMasks === 'function') {
+                window.initUnnMasks(document);
             }
 
             // Password strength indicator
@@ -1932,7 +1881,7 @@
                 modal.innerHTML = `
                                                             <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center relative transform transition-all scale-100">
                                                                 <div class="flex justify-center mb-6">
-                                                                    <img src="{{ $logo }}" alt="Logo" class="h-16 object-contain">
+                                                                    <img src="{{ $logo }}" alt="Logo" class="h-16 object-contain" loading="lazy" decoding="async">
                                                                 </div>
 
                                                                 <h3 class="text-xl font-bold text-slate-900 mb-3">Instale nosso aplicativo!</h3>

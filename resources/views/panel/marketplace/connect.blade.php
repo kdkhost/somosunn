@@ -38,7 +38,7 @@
             <div class="flex items-center gap-4 mb-6">
                 <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center p-2">
                     <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.18.9/mercadolibre/logo__small.png"
-                        class="w-full h-auto" alt="MP">
+                        class="w-full h-auto" alt="MP" loading="lazy" decoding="async">
                 </div>
                 <div class="min-w-0">
                     <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">Mercado Pago</h3>
@@ -220,7 +220,9 @@
                         return;
                     }
 
-                    alert(title + '\n\n' + text);
+                    if (typeof toastr !== 'undefined') {
+                        toastr[icon === 'error' ? 'error' : 'info'](title + ': ' + text);
+                    }
                 }
 
                 function markGatewayConnected(message) {

@@ -64,7 +64,7 @@
                         $isAud = in_array($ext, ['mp3', 'wav', 'ogg']);
                     @endphp
                     @if($isImg)
-                        <img src="{{ $previewUrl }}" class="img-fluid rounded" style="max-height: 200px;">
+                        <img src="{{ $previewUrl }}" class="img-fluid rounded" style="max-height: 200px;" loading="lazy" decoding="async">
                     @elseif($isVid)
                         <video src="{{ $previewUrl }}" controls class="w-100 rounded" style="max-height: 200px;"></video>
                     @elseif($isAud)
@@ -290,7 +290,7 @@
 
             const type = file.type;
             let html = '';
-            if (type.startsWith('image/')) html = `<img src="${url}" class="img-fluid rounded" style="max-height: 200px;">`;
+            if (type.startsWith('image/')) html = `<img src="${url}" class="img-fluid rounded" style="max-height: 200px;" loading="lazy" decoding="async">`;
             else if (type.startsWith('video/')) html = `<video src="${url}" controls class="w-100 rounded" style="max-height: 200px;"></video>`;
             else if (type.startsWith('audio/')) html = `<audio src="${url}" controls class="w-100"></audio>`;
             else html = `<div class="p-4 bg-light rounded text-muted"><i class="fas fa-file-alt fa-3x mb-2"></i><div>${file.name}</div></div>`;

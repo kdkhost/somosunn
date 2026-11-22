@@ -21,7 +21,7 @@
                 
                 <div class="w-24 h-24 rounded-2xl bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative group">
                     @if($url = $getUrl($name))
-                        <img id="preview_{{ $name }}" src="{{ $url }}" class="w-full h-full object-contain">
+                        <img id="preview_{{ $name }}" src="{{ $url }}" class="w-full h-full object-contain" loading="lazy" decoding="async">
                     @else
                         <div class="text-center p-2">
                             <i class="{{ $data[2] }} text-xl text-slate-300 mb-1"></i>
@@ -67,7 +67,7 @@
                 
                 <div class="w-full h-48 rounded-3xl bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative">
                     @if($url = $getUrl($name))
-                        <img id="preview_{{ $name }}" src="{{ $url }}" class="w-full h-full object-cover">
+                        <img id="preview_{{ $name }}" src="{{ $url }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     @else
                         <div class="text-center p-8">
                             <i class="fas fa-image text-4xl text-slate-300 mb-2"></i>
@@ -115,7 +115,7 @@
                     preview.classList.remove('hidden');
                 } else {
                     const container = input.closest('div').previousElementSibling;
-                    container.innerHTML = `<img id="${previewId}" src="${e.target.result}" class="w-full h-full ${previewId.includes('hero') || previewId.includes('bg') ? 'object-cover' : 'object-contain'}">`;
+                    container.innerHTML = `<img id="${previewId}" src="${e.target.result}" class="w-full h-full ${previewId.includes('hero') || previewId.includes('bg') ? 'object-cover' : 'object-contain'}" loading="lazy" decoding="async">`;
                 }
                 
                 // Reset remove hidden input

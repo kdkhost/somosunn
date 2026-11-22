@@ -40,8 +40,7 @@
                                     <a href="{{ $assetUrl }}" target="_blank" rel="noopener"
                                         class="position-absolute" style="inset:0;">
                                         <img src="{{ $assetUrl }}" alt="{{ $eventTitle }}"
-                                            class="w-100 h-100" style="object-fit:cover;"
-                                            loading="lazy" decoding="async">
+                                            class="w-100 h-100" style="object-fit:cover;" loading="lazy" decoding="async">
                                     </a>
                                 @endif
 

@@ -71,7 +71,7 @@
             <div class="md:w-1/3">
                 <div class="bg-white rounded-lg shadow-xl overflow-hidden text-gray-900 p-1">
                     @if($thumbUrl)
-                        <img src="{{ $thumbUrl }}" class="w-full h-48 object-cover rounded-t-lg" alt="{{ $course->title }}">
+                        <img src="{{ $thumbUrl }}" class="w-full h-48 object-cover rounded-t-lg" alt="{{ $course->title }}" loading="lazy" decoding="async">
                     @endif
                     <div class="p-6">
                         @if($isEnrolled)

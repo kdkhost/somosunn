@@ -62,19 +62,38 @@ class CourseController extends Controller
         return view('admin.courses.available', compact('items', 'q'));
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $this->ensurePermission('courses.view');
 
-        $query = Course::query()->withCount('enrollments')->latest();
+        $query = Course::query()->with(['creator'])->withCount(['lessons', 'enrollments'])->latest();
 
         if (!auth()->user()->isAdmin()) {
             $query->where('user_id', auth()->id());
         }
 
-        $courses = $query->get();
+        $search = trim((string) $request->query('q', ''));
+        if ($search !== '') {
+            $query->where(function ($sub) use ($search) {
+                $sub->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('author_name', 'like', '%' . $search . '%');
+            });
+        }
+
+        $totalCoursesCount = (clone $query)->count();
+        $publishedCoursesCount = (clone $query)->where('status', 'published')->count();
+        $draftCoursesCount = max(0, $totalCoursesCount - $publishedCoursesCount);
+
+        $courses = $query->paginate(20)->withQueryString();
         app(SalesAnalyticsService::class)->decorateCourses($courses);
-        return view('admin.courses.index', compact('courses'));
+
+        return view('admin.courses.index', compact(
+            'courses',
+            'search',
+            'totalCoursesCount',
+            'publishedCoursesCount',
+            'draftCoursesCount'
+        ));
     }
 
     public function create()

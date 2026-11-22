@@ -48,7 +48,11 @@
                     <i class="fas fa-plus text-xs"></i>
                     Nova tarefa
                 </a>
-                <form action="{{ route('panel.admin.cron.run-all') }}" method="POST" class="inline-flex" onsubmit="return confirm('Executar TODAS as tarefas ativas agora?')">
+                <form action="{{ route('panel.admin.cron.run-all') }}" method="POST"
+                    class="inline-flex js-confirm-action"
+                    data-confirm-title="Executar todas as tarefas"
+                    data-confirm-text="Executar TODAS as tarefas ativas agora?"
+                    data-confirm-button="Executar Todas">
                     @csrf
                     <button type="submit"
                         class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
@@ -156,6 +160,11 @@
                     </tbody>
                 </table>
             </div>
+            @if($tasks instanceof \Illuminate\Pagination\AbstractPaginator && $tasks->hasPages())
+                <div class="border-t border-slate-200 px-4 py-3 dark:border-slate-800">
+                    {{ $tasks->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection

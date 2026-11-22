@@ -343,7 +343,7 @@
         <div class="mag-loading" id="mag-loading">
             <div class="mag-loader-wrap">
                 <div class="mag-loader"></div>
-                <img src="{{ \App\Models\Setting::getUrl('favicon_image') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg') }}" alt="UNN" class="mag-loader-logo">
+                <img src="{{ \App\Models\Setting::getUrl('favicon_image') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg') }}" alt="UNN" class="mag-loader-logo" loading="lazy" decoding="async">
             </div>
             <div class="mag-loading-label">Carregando revista</div>
             <div class="mag-loading-bar"><div class="mag-loading-bar-fill" id="mag-loading-bar-fill"></div></div>

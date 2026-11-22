@@ -39,7 +39,7 @@
                     <img src="{{ $coverUrl }}"
                          alt="Quem Somos - UNN"
                          class="w-full max-w-5xl mx-auto rounded-3xl shadow-2xl object-cover border border-white/40"
-                         style="max-height: 340px; display: block;">
+                         style="max-height: 340px; display: block;" loading="lazy" decoding="async">
                 </div>
             @endif
         </div>
@@ -61,7 +61,7 @@
                     <div class="flex justify-center -mt-12">
                         <div class="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-slate-100 flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
                             @if($founderImageUrl)
-                                <img src="{{ $founderImageUrl }}" alt="{{ $fundador['name'] ?? 'Fundador' }}" class="w-full h-full object-cover">
+                                <img src="{{ $founderImageUrl }}" alt="{{ $fundador['name'] ?? 'Fundador' }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                             @else
                                 <span class="w-full h-full btn-primary flex items-center justify-center">{{ $founderInitials }}</span>
                             @endif
@@ -92,7 +92,7 @@
                 <div class="w-[148px] md:w-[160px] text-center bg-white rounded-2xl border border-slate-100 shadow-sm p-4 h-[200px] flex flex-col items-center">
                     <div class="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center text-white text-xl font-bold mx-auto mb-3 overflow-hidden">
                         @if($memberImageUrl)
-                            <img src="{{ $memberImageUrl }}" alt="{{ $membro['name'] ?? 'Membro' }}" class="w-full h-full object-cover">
+                            <img src="{{ $memberImageUrl }}" alt="{{ $membro['name'] ?? 'Membro' }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                         @else
                             <span class="w-full h-full btn-primary flex items-center justify-center">{{ $memberInitials }}</span>
                         @endif

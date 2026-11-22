@@ -45,7 +45,7 @@
                 </div>
                 <div
                     class="mt-2 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm max-w-lg">
-                    <img src="{{ Storage::url($data['cover_image']) }}" class="w-full h-auto">
+                    <img src="{{ Storage::url($data['cover_image']) }}" class="w-full h-auto" loading="lazy" decoding="async">
                 </div>
             @endif
         </div>
@@ -111,7 +111,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div class="md:col-span-1 space-y-4">
                                 <div class="relative group/img aspect-square rounded-2xl bg-slate-100 dark:bg-slate-900 overflow-hidden border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                                    ${imageExists ? `<img src="${displayImage}" class="w-full h-full object-cover">` : `<span class="text-2xl font-black text-slate-300 dark:text-slate-700">${item.initials || '?'}</span>`}
+                                    ${imageExists ? `<img src="${displayImage}" class="w-full h-full object-cover" loading="lazy" decoding="async">` : `<span class="text-2xl font-black text-slate-300 dark:text-slate-700">${item.initials || '?'}</span>`}
                                     <button type="button" class="repeater-upload-btn absolute inset-0 bg-black/40 text-white opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center gap-2 text-[10px] font-bold" data-field="image">
                                         <i class="fas fa-camera"></i> ALTERAR FOTO
                                     </button>
@@ -206,7 +206,7 @@
                         return `
                         <div class="flex flex-col md:flex-row gap-6 items-center">
                             <div class="relative group/img w-20 h-20 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-900 overflow-hidden border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                                ${imageExists ? `<img src="${displayImage}" class="w-full h-full object-cover">` : `<span class="text-xl font-black text-slate-300 dark:text-slate-700">${item.initials || '?'}</span>`}
+                                ${imageExists ? `<img src="${displayImage}" class="w-full h-full object-cover" loading="lazy" decoding="async">` : `<span class="text-xl font-black text-slate-300 dark:text-slate-700">${item.initials || '?'}</span>`}
                                 <button type="button" class="repeater-upload-btn absolute inset-0 bg-black/40 text-white opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center text-[8px] font-bold" data-field="image">
                                     ALTERAR
                                 </button>

@@ -276,8 +276,8 @@
     function toast(type, message) {
         if (window.toastr && toastr[type]) {
             toastr[type](message);
-        } else {
-            alert(message);
+        } else if (typeof Swal !== 'undefined') {
+            Swal.fire({ toast: true, position: 'top-end', icon: type === 'error' ? 'error' : 'info', title: message, showConfirmButton: false, timer: 2500 });
         }
     }
 

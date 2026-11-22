@@ -77,7 +77,7 @@
                                         <div
                                             class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
                                             @if(optional($cert->user)->profile_photo_url && !str_contains((string) optional($cert->user)->profile_photo_url, 'default-user.svg'))
-                                                <img src="{{ optional($cert->user)->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                                <img src="{{ optional($cert->user)->profile_photo_url }}" alt="" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <i class="fas fa-user text-slate-400 dark:text-slate-500"></i>
                                             @endif
@@ -177,7 +177,7 @@
                                         <div
                                             class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">
                                             @if(optional($enrollment->user)->profile_photo_url && !str_contains((string) optional($enrollment->user)->profile_photo_url, 'default-user.svg'))
-                                                <img src="{{ optional($enrollment->user)->profile_photo_url }}" alt="" class="w-full h-full object-cover">
+                                                <img src="{{ optional($enrollment->user)->profile_photo_url }}" alt="" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             @else
                                                 <i class="fas fa-user text-slate-400 dark:text-slate-500"></i>
                                             @endif

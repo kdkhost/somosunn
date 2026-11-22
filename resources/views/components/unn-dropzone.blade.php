@@ -39,7 +39,7 @@
 
         <div class="unn-dz-preview" hidden>
             @if($isImage)
-                <img class="unn-dz-preview-img" alt="Preview">
+                <img class="unn-dz-preview-img" alt="Preview" loading="lazy" decoding="async">
             @else
                 <div class="unn-dz-file-icon"><i class="fas fa-file-pdf"></i></div>
             @endif
@@ -56,7 +56,7 @@
     @if($currentUrl)
         <div class="unn-dz-current">
             @if($isImage)
-                <img src="{{ $currentUrl }}" alt="Atual">
+                <img src="{{ $currentUrl }}" alt="Atual" loading="lazy" decoding="async">
             @else
                 <i class="fas fa-file-pdf"></i>
             @endif

@@ -44,7 +44,7 @@
                 
                 <div class="w-full h-40 rounded-3xl bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative">
                     @if($url = $getUrl($name))
-                        <img id="preview_{{ $name }}" src="{{ $url }}" class="w-full h-full object-cover">
+                        <img id="preview_{{ $name }}" src="{{ $url }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     @else
                         <div class="text-center p-6">
                             <i class="{{ $data[2] }} text-3xl text-slate-300 mb-2"></i>

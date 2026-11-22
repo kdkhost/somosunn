@@ -80,7 +80,7 @@
             class="relative w-full h-32 md:h-40 bg-gradient-to-r from-blue-500 to-indigo-600 cursor-pointer group"
             onclick="document.getElementById('cover-input').click()">
             @if($user->cover_photo)
-                <img src="{{ asset($user->cover_photo) }}?t={{ time() }}" alt="Capa" class="w-full h-full object-cover" id="cover-img">
+                <img src="{{ asset($user->cover_photo) }}?t={{ time() }}" alt="Capa" class="w-full h-full object-cover" id="cover-img" loading="lazy" decoding="async">
             @else
                 <div class="w-full h-full flex items-center justify-center" id="cover-img">
                     <span class="text-white/60 text-sm font-bold"><i class="fas fa-camera mr-2"></i>Clique para adicionar capa</span>
@@ -102,7 +102,7 @@
                     class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-lg cursor-pointer relative group flex-shrink-0"
                     onclick="document.getElementById('avatar-input').click()">
                     @if($user->photo)
-                        <img src="{{ asset($user->photo) }}?t={{ time() }}" alt="Avatar" class="w-full h-full object-cover" id="avatar-img">
+                        <img src="{{ asset($user->photo) }}?t={{ time() }}" alt="Avatar" class="w-full h-full object-cover" id="avatar-img" loading="lazy" decoding="async">
                     @else
                         <div class="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-black text-2xl bg-slate-100 dark:bg-slate-800" id="avatar-img">
                             {{ mb_substr((string) $user->name, 0, 1) }}
@@ -139,7 +139,7 @@
             </div>
             <div class="p-4">
                 <div id="crop-container" class="w-full" style="max-height: 400px;">
-                    <img id="crop-image" src="" alt="Crop" class="max-w-full">
+                    <img id="crop-image" src="" alt="Crop" class="max-w-full" loading="lazy" decoding="async">
                 </div>
             </div>
             <div class="p-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
@@ -816,12 +816,12 @@
                             // Atualizar preview
                             if (currentType === 'photo') {
                                 var preview = document.getElementById('avatar-preview');
-                                preview.innerHTML = '<img src="' + data.url + '" alt="Avatar" class="w-full h-full object-cover" id="avatar-img"><div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full"><i class="fas fa-camera text-white text-lg"></i></div>';
+                                preview.innerHTML = '<img src="' + data.url + '" alt="Avatar" class="w-full h-full object-cover" id="avatar-img" loading="lazy" decoding="async"><div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full"><i class="fas fa-camera text-white text-lg"></i></div>';
                                 document.getElementById('avatar-status').classList.remove('hidden');
                                 setTimeout(function() { document.getElementById('avatar-status').classList.add('hidden'); }, 4000);
                             } else {
                                 var preview = document.getElementById('cover-preview');
-                                preview.innerHTML = '<img src="' + data.url + '" alt="Capa" class="w-full h-full object-cover" id="cover-img"><div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><i class="fas fa-camera text-white text-lg"></i></div>';
+                                preview.innerHTML = '<img src="' + data.url + '" alt="Capa" class="w-full h-full object-cover" id="cover-img" loading="lazy" decoding="async"><div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><i class="fas fa-camera text-white text-lg"></i></div>';
                                 document.getElementById('cover-status').classList.remove('hidden');
                                 setTimeout(function() { document.getElementById('cover-status').classList.add('hidden'); }, 4000);
                             }

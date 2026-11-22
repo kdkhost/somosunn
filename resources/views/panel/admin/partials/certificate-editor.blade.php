@@ -77,7 +77,7 @@
             <div id="cert-canvas" class="relative shrink-0 overflow-hidden bg-white shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)]"
                 style="width: 842px; height: 595px; border-radius: 6px;">
                 <img id="cert-bg-img" src="{{ $certificateBgUrl ?: '' }}"
-                    class="absolute inset-0 h-full w-full object-cover {{ $certificateBgUrl ? '' : 'hidden' }}" style="z-index: 1;">
+                    class="absolute inset-0 h-full w-full object-cover {{ $certificateBgUrl ? '' : 'hidden' }}" style="z-index: 1;" loading="lazy" decoding="async">
 
                 <div id="cert-bg-placeholder"
                     class="absolute inset-0 flex items-center justify-center bg-slate-100 text-center text-slate-400 {{ $certificateBgUrl ? 'hidden' : '' }}"
@@ -146,7 +146,7 @@
                         </div>
                         <div id="signaturePreviewWrapper"
                             class="flex min-h-[110px] items-center justify-center rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 {{ $signatureUrl ? '' : 'hidden' }}">
-                            <img id="signaturePreview" src="{{ $signatureUrl ?: '' }}" class="max-h-20 max-w-full object-contain">
+                            <img id="signaturePreview" src="{{ $signatureUrl ?: '' }}" class="max-h-20 max-w-full object-contain" loading="lazy" decoding="async">
                         </div>
                         <div id="signatureEmptyState"
                             class="flex min-h-[110px] items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white p-4 text-center text-slate-400 dark:border-slate-800 dark:bg-slate-900 {{ $signatureUrl ? 'hidden' : '' }}">

@@ -83,7 +83,9 @@
             <i class="fas fa-undo text-red-500"></i> Reembolso
         </h3>
         <form action="{{ route('panel.admin.sumup.refund', $transaction->order) }}" method="POST"
-              onsubmit="return confirm('Confirmar reembolso?')">
+              data-confirm-title="Confirmar reembolso"
+              data-confirm-text="Confirmar reembolso?"
+              data-confirm-button="Sim, reembolsar">
             @csrf
             <div class="flex gap-3 items-end">
                 <div class="flex-1">

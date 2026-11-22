@@ -53,7 +53,7 @@
                                             </div>
                                             <div class="absolute -inset-2 bg-gradient-to-tr from-amber-400 to-yellow-200 rounded-full animate-spin-slow opacity-50"></div>
                                             @if($userAvatar)
-                                                <img src="{{ $userAvatar }}" alt="{{ $userName }}" class="relative w-32 h-32 rounded-full object-cover ring-4 ring-white shadow-2xl">
+                                                <img src="{{ $userAvatar }}" alt="{{ $userName }}" class="relative w-32 h-32 rounded-full object-cover ring-4 ring-white shadow-2xl" loading="lazy" decoding="async">
                                             @else
                                                 <div class="relative w-32 h-32 rounded-full flex items-center justify-center text-white font-black text-5xl shadow-2xl" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
                                                     {{ strtoupper(substr($userName, 0, 1)) }}
@@ -96,7 +96,7 @@
                                         {{-- Avatar --}}
                                         <div class="mb-6">
                                             @if($userAvatar)
-                                                <img src="{{ $userAvatar }}" alt="{{ $userName }}" class="w-20 h-20 rounded-full object-cover ring-4 ring-white shadow-lg">
+                                                <img src="{{ $userAvatar }}" alt="{{ $userName }}" class="w-20 h-20 rounded-full object-cover ring-4 ring-white shadow-lg" loading="lazy" decoding="async">
                                             @else
                                                 <div class="w-20 h-20 rounded-full flex items-center justify-center text-white font-black text-3xl shadow-lg" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
                                                     {{ strtoupper(substr($userName, 0, 1)) }}
@@ -154,7 +154,7 @@
 
                                     <div class="relative flex-shrink-0 mr-4 md:mr-6">
                                         @if($userAvatar)
-                                            <img src="{{ $userAvatar }}" alt="{{ $userName }}" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover ring-2 ring-white shadow-md">
+                                            <img src="{{ $userAvatar }}" alt="{{ $userName }}" class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover ring-2 ring-white shadow-md" loading="lazy" decoding="async">
                                         @else
                                             <div class="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white font-black text-xl shadow-md" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
                                                 {{ strtoupper(substr($userName, 0, 1)) }}

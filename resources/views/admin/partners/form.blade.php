@@ -48,14 +48,14 @@
                                         onclick="document.getElementById('logo-input').click()">
                                         @if(isset($partner->id) && $partner->logo_url)
                                             <img id="logo-preview" src="{{ $partner->logo_url }}"
-                                                style="max-width:190px;max-height:100px;object-fit:contain;">
+                                                style="max-width:190px;max-height:100px;object-fit:contain;" loading="lazy" decoding="async">
                                         @else
                                             <div id="logo-placeholder" style="color:#adb5bd;text-align:center;">
                                                 <i class="fas fa-image fa-2x mb-1"></i><br>
                                                 <small>Clique para enviar logo</small>
                                             </div>
                                             <img id="logo-preview" src=""
-                                                style="max-width:190px;max-height:100px;object-fit:contain;display:none;">
+                                                style="max-width:190px;max-height:100px;object-fit:contain;display:none;" loading="lazy" decoding="async">
                                         @endif
                                     </div>
                                     <input type="file" name="logo" id="logo-input" accept="image/*" class="d-none">

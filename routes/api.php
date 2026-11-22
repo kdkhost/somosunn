@@ -60,7 +60,12 @@ Route::prefix('v1/webhooks')->group(function () {
         ->name('api.webhooks.mercadopago');
     
     Route::match(['get', 'post'], '/sumup', [App\Http\Controllers\SumUpController::class, 'webhook'])
+        ->middleware('throttle:webhook_sumup')
         ->name('api.webhooks.sumup');
+
+    Route::match(['get', 'post'], '/efi', [App\Http\Controllers\PaymentWebhookController::class, 'efi'])
+        ->middleware('throttle:webhook_efi')
+        ->name('api.webhooks.efi');
 });
 
 // SumUp API Routes

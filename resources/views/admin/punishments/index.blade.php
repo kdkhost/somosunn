@@ -47,7 +47,7 @@
                     <td>
                         <div class="d-flex align-items-center">
                             <img src="{{ $user->photo ? asset($user->photo) : asset('img/user.png') }}"
-                                 class="img-circle mr-2" style="width:32px;height:32px;object-fit:cover;" alt="">
+                                 class="img-circle mr-2" style="width:32px;height:32px;object-fit:cover;" alt="" loading="lazy" decoding="async">
                             <div>
                                 <strong>{{ $user->name }}</strong><br>
                                 <small class="text-muted">{{ $user->email }}</small>
@@ -174,7 +174,7 @@ $(function() {
                     title: 'Detalhes da Punicao',
                     html: '<div class="text-left">' +
                         '<div class="d-flex align-items-center mb-3">' +
-                        '<img src="' + u.photo + '" class="img-circle mr-3" style="width:48px;height:48px;object-fit:cover;">' +
+                        '<img src="' + u.photo + '" class="img-circle mr-3" style="width:48px;height:48px;object-fit:cover;" loading="lazy" decoding="async">' +
                         '<div><strong>' + u.name + '</strong><br><small>' + u.email + '</small></div>' +
                         '</div>' +
                         '<table class="table table-sm table-bordered">' +

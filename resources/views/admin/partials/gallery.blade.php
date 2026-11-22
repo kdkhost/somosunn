@@ -47,7 +47,7 @@
                 <div class="col-sm-6 col-md-4 col-lg-3 mb-4 gallery-item" data-id="{{ $item->id }}">
                     <div class="card h-100 shadow-sm border-0 overflow-hidden position-relative">
                         @if($item->type === 'image')
-                            <img src="{{ $item->url }}" class="card-img-top img-fluid" style="height: 160px; object-fit: cover;">
+                            <img src="{{ $item->url }}" class="card-img-top img-fluid" style="height: 160px; object-fit: cover;" loading="lazy" decoding="async">
                         @else
                             <div class="bg-dark d-flex align-items-center justify-content-center" style="height: 160px;">
                                 <i class="fas fa-video fa-3x text-white-50"></i>

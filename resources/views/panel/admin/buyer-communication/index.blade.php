@@ -265,7 +265,8 @@
                 })
                 .catch(error => {
                     console.error('Erro ao carregar destinatários:', error);
-                    alert('Erro ao carregar destinatários. Verifique o console para mais detalhes.');
+                    if (typeof toastr !== 'undefined') toastr.error('Erro ao carregar destinatários. Verifique o console para mais detalhes.');
+                    else if (typeof Swal !== 'undefined') Swal.fire('Erro', 'Erro ao carregar destinatários.', 'error');
                 });
         }
 

@@ -60,7 +60,7 @@
                             class="group block overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_70px_rgba(15,23,42,0.14)]">
                             <div class="relative overflow-hidden">
                                 <img src="{{ $albumCover }}" alt="{{ $album->title }}"
-                                    class="h-64 w-full object-cover transition duration-700 group-hover:scale-[1.05]">
+                                    class="h-64 w-full object-cover transition duration-700 group-hover:scale-[1.05]" loading="lazy" decoding="async">
                                 <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.72))]"></div>
                                 <div class="absolute left-5 top-5">
                                     <span class="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-white backdrop-blur">

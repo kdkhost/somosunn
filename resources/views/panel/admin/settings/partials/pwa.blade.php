@@ -88,7 +88,7 @@
                 
                 <div class="w-32 h-32 rounded-2xl bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative">
                     @if($url = $getUrl($name))
-                        <img id="preview_{{ $name }}" src="{{ $url }}" class="w-full h-full object-contain">
+                        <img id="preview_{{ $name }}" src="{{ $url }}" class="w-full h-full object-contain" loading="lazy" decoding="async">
                     @else
                         <div class="text-center p-4">
                             <i class="fas fa-image text-3xl text-slate-300 mb-1"></i>
@@ -118,7 +118,7 @@
                 
                 <div class="w-full h-32 rounded-2xl bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative">
                     @if($url = $getUrl('pwa_banner'))
-                        <img id="preview_pwa_banner" src="{{ $url }}" class="w-full h-full object-cover">
+                        <img id="preview_pwa_banner" src="{{ $url }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     @else
                         <div class="text-center p-4">
                             <i class="fas fa-image text-3xl text-slate-300 mb-1"></i>

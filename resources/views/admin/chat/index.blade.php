@@ -40,7 +40,7 @@
                                                 class="list-group-item list-group-item-action {{ $isActive ? 'active' : '' }}">
                                                 <div class="d-flex w-100 align-items-center">
                                                     <img src="{{ $otherUserPhoto }}" alt="User Image" class="img-circle mr-3"
-                                                        style="width: 40px; height: 40px; object-fit: cover;">
+                                                        style="width: 40px; height: 40px; object-fit: cover;" loading="lazy" decoding="async">
                                                     <div class="flex-grow-1" style="min-width: 0;">
                                                         <div class="d-flex w-100 justify-content-between">
                                                             <h6 class="mb-1 text-truncate font-weight-bold"

@@ -89,7 +89,7 @@
                         <div class="relative">
                             <div class="absolute inset-0 btn-primary rounded-3xl opacity-20 blur-3xl"></div>
                             <img src="{{ $heroImageUrl }}"
-                                alt="Networking" class="relative w-full rounded-3xl shadow-2xl">
+                                alt="Networking" class="relative w-full rounded-3xl shadow-2xl" loading="lazy" decoding="async">
                         </div>
                     </div>
                 </div>
@@ -430,7 +430,7 @@
                                         @if(optional($mentorship->mentor)->profile_photo_url)
                                             <img src="{{ $mentorship->mentor->profile_photo_url }}"
                                                 alt="{{ optional($mentorship->mentor)->name ?? 'Mentor UNN' }}"
-                                                class="w-full h-full object-cover">
+                                                class="w-full h-full object-cover" loading="lazy" decoding="async">
                                         @else
                                             {{ strtoupper(substr(optional($mentorship->mentor)->name ?? 'M', 0, 1)) }}
                                         @endif
@@ -560,7 +560,7 @@
                                     {{-- Avatar --}}
                                     @if($userAvatar)
                                         <img src="{{ $userAvatar }}" alt="{{ $userName }}"
-                                            class="w-20 h-20 rounded-full object-cover ring-4 ring-yellow-300 shadow-lg mb-4">
+                                            class="w-20 h-20 rounded-full object-cover ring-4 ring-yellow-300 shadow-lg mb-4" loading="lazy" decoding="async">
                                     @else
                                         <div class="w-20 h-20 rounded-full flex items-center justify-center text-white font-black text-3xl ring-4 ring-yellow-300 shadow-lg mb-4"
                                             style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
@@ -607,7 +607,7 @@
                                     {{-- Avatar --}}
                                     @if($userAvatar)
                                         <img src="{{ $userAvatar }}" alt="{{ $userName }}"
-                                            class="w-14 h-14 rounded-full object-cover ring-2 ring-{{ $pos === 1 ? 'slate-300' : 'orange-300' }} mb-3">
+                                            class="w-14 h-14 rounded-full object-cover ring-2 ring-{{ $pos === 1 ? 'slate-300' : 'orange-300' }} mb-3" loading="lazy" decoding="async">
                                     @else
                                         <div class="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl ring-2 ring-{{ $pos === 1 ? 'slate-300' : 'orange-300' }} mb-3"
                                             style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
@@ -738,7 +738,7 @@
                             <div class="flex items-center gap-4">
                                 @if($tAvatar)
                                     <img src="{{ $tAvatar }}" alt="{{ $tName }}"
-                                        class="w-12 h-12 rounded-full object-cover flex-shrink-0">
+                                        class="w-12 h-12 rounded-full object-cover flex-shrink-0" loading="lazy" decoding="async">
                                 @else
                                     <div class="w-12 h-12 btn-primary rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                                         {{ strtoupper(substr($tName, 0, 1)) }}

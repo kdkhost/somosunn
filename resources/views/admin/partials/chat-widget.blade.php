@@ -42,7 +42,7 @@
                             class="fas fa-arrow-left"></i></button>
                     <div class="d-flex align-items-center">
                         <img id="chat-current-avatar" src="" class="rounded-circle mr-2"
-                            style="width: 30px; height: 30px; object-fit: cover;">
+                            style="width: 30px; height: 30px; object-fit: cover;" loading="lazy" decoding="async">
                         <span id="chat-current-name" class="font-weight-bold text-truncate"
                             style="max-width: 180px;">User</span>
                     </div>
@@ -148,7 +148,7 @@
                     item.onclick = () => openChatConversation(conv.id, otherUser.name, avatar);
                     item.innerHTML = `
                         <div class="d-flex align-items-center">
-                            <img src="${avatar}" class="rounded-circle mr-3" style="width: 40px; height: 40px; object-fit: cover;">
+                            <img src="${avatar}" class="rounded-circle mr-3" style="width: 40px; height: 40px; object-fit: cover;" loading="lazy" decoding="async">
                             <div class="flex-grow-1 overflow-hidden">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0 text-truncate font-weight-bold" style="font-size: 0.95rem;">${otherUser.name}</h6>

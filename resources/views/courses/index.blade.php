@@ -144,7 +144,7 @@
                                 <div class="w-full lg:w-3/5 h-[400px] lg:h-auto relative bg-slate-50">
                                     <img src="{{ $featuredImage ?: $fallbackFeaturedImage }}"
                                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700"
-                                        alt="Featured">
+                                        alt="Featured" loading="lazy" decoding="async">
                                     <div
                                         class="absolute inset-0 bg-gradient-to-r from-slate-900/40 via-transparent to-transparent">
                                     </div>
@@ -154,7 +154,7 @@
                                         <div
                                             class="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white/40 shadow-xl bg-white">
                                             <img src="https://ui-avatars.com/api/?name={{ urlencode($featuredAuthor) }}&background=2563eb&color=fff"
-                                                class="w-full h-full object-cover">
+                                                class="w-full h-full object-cover" loading="lazy" decoding="async">
                                         </div>
                                         <div>
                                             <p class="text-[10px] font-black text-amber-300 uppercase tracking-widest">Master
@@ -298,7 +298,7 @@
                                     <div class="h-60 relative overflow-hidden bg-slate-100">
                                         <img src="{{ $cThumb }}"
                                             class="w-full h-full object-cover group-hover:scale-105 transition duration-700"
-                                            alt="Title">
+                                            alt="Title" loading="lazy" decoding="async">
                                         <div
                                             class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent">
                                         </div>
@@ -327,7 +327,7 @@
                                         <div class="flex items-center gap-3">
                                             <div class="w-7 h-7 rounded-full overflow-hidden border border-slate-200 bg-slate-50">
                                                 <img src="https://ui-avatars.com/api/?name={{ urlencode($cAuthor) }}&background=2563eb&color=fff"
-                                                    class="w-full h-full object-cover">
+                                                    class="w-full h-full object-cover" loading="lazy" decoding="async">
                                             </div>
                                             <span
                                                 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{{ $cAuthor }}</span>

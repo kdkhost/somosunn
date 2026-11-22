@@ -76,7 +76,7 @@
                     <div class="store-upload-zone mt-4" data-field="logo" data-current="{{ $store->logo_url }}">
                         <div class="store-upload-placeholder">
                             @if($store->logo_url)
-                                <img src="{{ $store->logo_url }}" alt="Logo" class="h-28 w-28 rounded-3xl object-cover border border-slate-200 dark:border-slate-700 mx-auto">
+                                <img src="{{ $store->logo_url }}" alt="Logo" class="h-28 w-28 rounded-3xl object-cover border border-slate-200 dark:border-slate-700 mx-auto" loading="lazy" decoding="async">
                             @endif
                             <div class="mt-3 text-sm text-slate-500 dark:text-slate-400">Arraste uma imagem ou clique para selecionar</div>
                         </div>
@@ -85,7 +85,7 @@
                             <div class="store-upload-percent text-xs text-slate-500 mt-1"></div>
                         </div>
                         <div class="store-upload-preview hidden">
-                            <img src="" alt="Preview" class="h-28 w-28 rounded-3xl object-cover border border-slate-200 dark:border-slate-700 mx-auto">
+                            <img src="" alt="Preview" class="h-28 w-28 rounded-3xl object-cover border border-slate-200 dark:border-slate-700 mx-auto" loading="lazy" decoding="async">
                             <div class="mt-2 text-xs text-emerald-600 font-bold">Enviado</div>
                             <button type="button" class="store-upload-remove text-xs text-red-500 mt-1 hover:underline">Remover</button>
                         </div>
@@ -103,7 +103,7 @@
                     <div class="store-upload-zone mt-4" data-field="banner" data-current="{{ $store->banner_url }}">
                         <div class="store-upload-placeholder">
                             @if($store->banner_url)
-                                <img src="{{ $store->banner_url }}" alt="Banner" class="h-40 w-full rounded-3xl object-cover border border-slate-200 dark:border-slate-700">
+                                <img src="{{ $store->banner_url }}" alt="Banner" class="h-40 w-full rounded-3xl object-cover border border-slate-200 dark:border-slate-700" loading="lazy" decoding="async">
                             @endif
                             <div class="mt-3 text-sm text-slate-500 dark:text-slate-400">Arraste uma imagem ou clique para selecionar</div>
                         </div>
@@ -112,7 +112,7 @@
                             <div class="store-upload-percent text-xs text-slate-500 mt-1"></div>
                         </div>
                         <div class="store-upload-preview hidden">
-                            <img src="" alt="Preview" class="h-40 w-full rounded-3xl object-cover border border-slate-200 dark:border-slate-700">
+                            <img src="" alt="Preview" class="h-40 w-full rounded-3xl object-cover border border-slate-200 dark:border-slate-700" loading="lazy" decoding="async">
                             <div class="mt-2 text-xs text-emerald-600 font-bold">Enviado</div>
                             <button type="button" class="store-upload-remove text-xs text-red-500 mt-1 hover:underline">Remover</button>
                         </div>

@@ -93,6 +93,16 @@
             <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-500" id="sumup-status-badge">OFF</span>
         @endif
     </button>
+    <button type="button" onclick="gwSwitchMain('efi-tab')" id="main-btn-efi-tab"
+        class="main-gateway-tab-btn flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all text-slate-500 dark:text-slate-400">
+        <i class="fas fa-qrcode"></i>
+        <span>Efi Pro</span>
+        @if(!empty($settings['efi_enabled']))
+            <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">ATIVO</span>
+        @else
+            <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-500">OFF</span>
+        @endif
+    </button>
 </div>
 
 {{-- ============================================================
@@ -816,6 +826,74 @@
     </div>
 </div>
 
+{{-- ============================================================
+     TAB EFI PRO (PIX)
+     ============================================================ --}}
+<div id="efi-tab" class="main-gateway-panel hidden">
+    <div class="gw-card space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div>
+                <h3 class="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-qrcode text-emerald-500"></i> Efi Pro (Gerencianet Pix)
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Recebimentos Pix via subdominio API com validacao HMAC/mTLS e fila assincrona.</p>
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="hidden" name="efi_enabled" value="0">
+                <input type="checkbox" name="efi_enabled" value="1" class="h-5 w-5 rounded border-slate-300 text-emerald-600"
+                    {{ !empty($settings['efi_enabled']) ? 'checked' : '' }}>
+                <span class="text-xs font-black text-slate-700 dark:text-slate-200">Habilitar Efi Pro</span>
+            </label>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="gw-label">Ambiente</label>
+                <select name="efi_env" id="panel_efi_env" class="gw-select w-full px-4 py-3 rounded-xl font-bold text-sm">
+                    <option value="sandbox" {{ ($settings['efi_env'] ?? 'sandbox') === 'sandbox' ? 'selected' : '' }}>Sandbox (Homologacao)</option>
+                    <option value="production" {{ ($settings['efi_env'] ?? 'sandbox') === 'production' ? 'selected' : '' }}>Producao</option>
+                </select>
+            </div>
+            <div>
+                <label class="gw-label">Client ID</label>
+                <input type="text" name="efi_client_id" id="panel_efi_client_id" value="{{ $settings['efi_client_id'] ?? '' }}"
+                    class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm" placeholder="Client_Id_...">
+            </div>
+            <div>
+                <label class="gw-label">Client Secret</label>
+                <input type="password" name="efi_client_secret" id="panel_efi_client_secret" value="{{ $settings['efi_client_secret'] ?? '' }}"
+                    class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm" placeholder="Client_Secret_...">
+            </div>
+            <div>
+                <label class="gw-label">Chave Pix</label>
+                <input type="text" name="efi_pix_key" value="{{ $settings['efi_pix_key'] ?? '' }}"
+                    class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm" placeholder="EVP, CNPJ ou E-mail">
+            </div>
+            <div>
+                <label class="gw-label">Caminho do Certificado (.pem / .p12)</label>
+                <input type="text" name="efi_certificate_path" value="{{ $settings['efi_certificate_path'] ?? '' }}"
+                    class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm" placeholder="/home/somosunn/certs/efi-prod.pem">
+            </div>
+            <div>
+                <label class="gw-label">Webhook Secret / HMAC</label>
+                <input type="password" name="efi_webhook_secret" value="{{ $settings['efi_webhook_secret'] ?? '' }}"
+                    class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm" placeholder="Segredo HMAC">
+            </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
+            <div class="text-xs text-slate-600 dark:text-slate-300">
+                <span class="font-bold">Webhook Efi Pro:</span>
+                <code class="ml-1 text-blue-600 dark:text-blue-400">{{ \App\Support\DomainManager::apiUrl('/webhook/efi') }}</code>
+            </div>
+            <button type="button" id="btn-test-efi-panel" onclick="gwTestEfi()"
+                class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">
+                <i class="fas fa-plug mr-1"></i> Testar Efi Pro
+            </button>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 (function() {
@@ -935,7 +1013,9 @@
                 });
             }
         })
-        .catch(() => alert('Erro na requisição'))
+        .catch(() => {
+            if (typeof toastr !== 'undefined') toastr.error('Erro na requisicao');
+        })
         .finally(() => { btn.disabled = false; btn.innerHTML = orig; });
     };
 
@@ -962,13 +1042,56 @@
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: data.success ? 'success' : 'error',
-                    title: data.success ? 'Conexão OK!' : 'Falhou',
+                    title: data.success ? 'Conexao OK!' : 'Falhou',
                     text: data.message || '',
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 3000
                 });
             }
         })
-        .catch(() => alert('Erro na requisição'))
+        .catch(() => {
+            if (typeof toastr !== 'undefined') toastr.error('Erro na requisicao');
+        })
+        .finally(() => { btn.disabled = false; btn.innerHTML = orig; });
+    };
+
+    // TEST EFI PRO
+    window.gwTestEfi = function() {
+        const btn = document.getElementById('btn-test-efi-panel');
+        if (!btn) return;
+        const orig = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando...';
+
+        fetch('{{ route("panel.admin.settings.test_gateway") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                gateway: 'efi',
+                env: document.getElementById('panel_efi_env')?.value || 'sandbox',
+                client_id: document.getElementById('panel_efi_client_id')?.value || '',
+                client_secret: document.getElementById('panel_efi_client_secret')?.value || ''
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: data.success ? 'success' : 'error',
+                    title: data.success ? 'Conexao OK!' : 'Falhou',
+                    text: data.message || '',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3500
+                });
+            } else if (typeof toastr !== 'undefined') {
+                data.success ? toastr.success(data.message) : toastr.error(data.message || 'Falhou');
+            }
+        })
+        .catch(() => {
+            if (typeof toastr !== 'undefined') toastr.error('Erro ao testar Efi Pro.');
+        })
         .finally(() => { btn.disabled = false; btn.innerHTML = orig; });
     };
 })();

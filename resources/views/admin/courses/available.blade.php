@@ -115,7 +115,7 @@
                         <div class="card h-100">
                             @if($thumbUrl)
                                 <img src="{{ $thumbUrl }}" class="card-img-top" alt="{{ $item->title }}"
-                                    style="height: 200px; object-fit: cover;">
+                                    style="height: 200px; object-fit: cover;" loading="lazy" decoding="async">
                             @else
                                 <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
                                     <i class="fas fa-image fa-3x text-muted"></i>

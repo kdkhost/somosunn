@@ -1148,7 +1148,7 @@
                                             <div class="flex items-center gap-4">
                                                 <div class="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-sm">
                                                     @if($company->logo_url)
-                                                        <img src="{{ $company->logo_url }}" alt="{{ $company->name }}" class="h-full w-full object-contain">
+                                                        <img src="{{ $company->logo_url }}" alt="{{ $company->name }}" class="h-full w-full object-contain" loading="lazy" decoding="async">
                                                     @else
                                                         <i class="fas fa-building text-2xl text-slate-400"></i>
                                                     @endif

@@ -214,7 +214,8 @@ $(function() {
             }
         }).fail(function() {
             $el.prop('checked', !$el.prop('checked'));
-            alert('Erro ao alternar regra.');
+            if (typeof toastr !== 'undefined') toastr.error('Erro ao alternar regra.');
+            else if (typeof Swal !== 'undefined') Swal.fire('Erro', 'Erro ao alternar regra.', 'error');
         });
     });
 });

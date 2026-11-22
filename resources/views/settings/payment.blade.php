@@ -33,7 +33,7 @@
                         <a href="{{ route('gateway.mercadopago.connect') }}"
                             class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 font-bold">
                             <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.18.9/mercadolibre/logo__small.png"
-                                class="h-6 w-auto mr-2 bg-white rounded-full p-1" alt="MP">
+                                class="h-6 w-auto mr-2 bg-white rounded-full p-1" alt="MP" loading="lazy" decoding="async">
                             Conectar com Mercado Pago
                         </a>
                     @endif

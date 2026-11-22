@@ -186,29 +186,19 @@
                                     </div>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <div class="mb-3">
-                                        <i class="fas fa-users fa-3x text-muted"></i>
-                                    </div>
-                                    <h5 class="text-muted font-weight-bold">Nenhum usuário encontrado</h5>
-                                    <p class="text-muted">Cadastre o primeiro usuário para começar.</p>
-                                    <a href="{{ route('admin.users.create') }}" class="btn btn-primary rounded-pill px-4 elevation-1" data-pjax="true">
-                                        <i class="fas fa-plus mr-1"></i> Novo Usuário
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
             <div class="card-footer bg-white border-top py-3">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
                     <div class="text-muted text-sm">
-                        Exibindo todos os <b>{{ $users->count() }}</b> usuários encontrados.
+                        Total na consulta: <b>{{ number_format($totalUsers, 0, ',', '.') }}</b> usuários.
                     </div>
                     <div>
+                        <a href="{{ route('admin.users.create') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-pjax="true">
+                            <i class="fas fa-plus mr-1"></i> Novo Usuário
+                        </a>
                     </div>
                 </div>
             </div>
@@ -217,10 +207,9 @@
 @endsection
 
 @push('styles')
-    <!-- DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css">
+    <!-- DataTables Local -->
+    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/responsive.bootstrap4.min.css') }}">
     <style>
         .align-middle td { vertical-align: middle !important; }
         #example1_wrapper .dataTables_paginate {
@@ -237,33 +226,44 @@
 @endpush
 
 @push('scripts')
-    <!-- DataTables & Plugins -->
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+    <!-- DataTables Server-Side Local -->
+    <script src="{{ cdn_asset('assets/admin/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ cdn_asset('assets/admin/datatables/responsive.bootstrap4.min.js') }}"></script>
 
     <script>
         $(function () {
             $("#example1").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "deferLoading": {{ (int) $totalUsers }},
+                "ajax": {
+                    "url": @json(route('admin.users.data')),
+                    "data": function (d) {
+                        d.search_filter = @json($search ?? '');
+                        d.registered = @json($registered ?? '');
+                        d.created_at = @json($createdAt ?? '');
+                    }
+                },
+                "columns": [
+                    { "data": "name" },
+                    { "data": "email" },
+                    { "data": "role", "className": "text-center" },
+                    { "data": "level", "className": "text-center" },
+                    { "data": "tickets", "className": "text-center" },
+                    { "data": "actions", "orderable": false, "searchable": false, "className": "text-center" }
+                ],
                 "responsive": true,
-                "lengthChange": false,
+                "lengthChange": true,
                 "autoWidth": false,
                 "pageLength": 15,
                 "order": [[0, "asc"]],
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
-                },
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+                    "url": "{{ cdn_asset('assets/admin/datatables/pt-BR.json') }}",
+                    "emptyTable": "Nenhum usuário encontrado."
+                }
+            });
 
             // Marketing Manager toggle
             $(document).on('click', '.btn-toggle-marketing', function () {
@@ -300,10 +300,6 @@
                         if (!result.isConfirmed) return;
                         performToggle(result.value || '');
                     });
-                } else if (confirm(confirmText)) {
-                    var pixKey = requiresPix ? prompt('Informe a chave PIX obrigatória:') : '';
-                    if (requiresPix && (!pixKey || !pixKey.trim())) return;
-                    performToggle(pixKey || '');
                 }
 
                 function performToggle(pixKey) {
@@ -323,7 +319,6 @@
                     }).fail(function (xhr) {
                         var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Erro ao atualizar.';
                         if (typeof toastr !== 'undefined') toastr.error(msg);
-                        else alert(msg);
                     });
                 }
             });
@@ -341,23 +336,19 @@
                                 ? xhr.responseJSON.message
                                 : 'Não foi possível validar o e-mail.';
                             if (typeof toastr !== 'undefined') toastr.error(message);
-                            else alert(message);
                         });
                 };
 
-                if (typeof Swal === 'undefined') {
-                    if (confirm('Validar manualmente o e-mail de ' + button.data('name') + '?')) execute();
-                    return;
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Validar e-mail?',
+                        text: 'O membro poderá realizar compras sem abrir o link de confirmação.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sim, validar',
+                        cancelButtonText: 'Cancelar'
+                    }).then(function (result) { if (result.isConfirmed) execute(); });
                 }
-
-                Swal.fire({
-                    title: 'Validar e-mail?',
-                    text: 'O membro poderá realizar compras sem abrir o link de confirmação.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sim, validar',
-                    cancelButtonText: 'Cancelar'
-                }).then(function (result) { if (result.isConfirmed) execute(); });
             });
         });
     </script>

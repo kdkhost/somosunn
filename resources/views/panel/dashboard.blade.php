@@ -467,7 +467,7 @@
                         <div class="flex items-center gap-4 p-4 rounded-3xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-700 group/u">
                             <div class="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border-2 border-white dark:border-slate-700 shadow-md group-hover/u:scale-105 transition-transform">
                                 @if($sUser->photo)
-                                    <img src="{{ asset($sUser->photo) }}" alt="{{ $sUser->name }}" class="w-full h-full object-cover">
+                                    <img src="{{ asset($sUser->photo) }}" alt="{{ $sUser->name }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-black text-xl">
                                         {{ mb_substr($sUser->name, 0, 1) }}
