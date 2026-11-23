@@ -29,7 +29,7 @@
 ## Deploy
 
 - **Nunca** faça push direto para `main` sem verificar sintaxe PHP (`php -l`) e BOM.
-- Após push: `ssh -i ~/.ssh/deploy_key -p 1979 somosunn@somosunn.com.br "rm -f /home/somosunn/public_html/.git/index.lock && cd /home/somosunn/public_html && git fetch origin && git reset --hard origin/main && php artisan view:clear && php artisan route:clear"`
+- Após push: `ssh -4 -i ~/.ssh/deploy_key -p 1979 somosunn@15.235.57.3 "rm -f /home/somosunn/public_html/.git/index.lock && cd /home/somosunn/public_html && git fetch origin && git reset --hard origin/main && php artisan view:clear && php artisan route:clear && php artisan config:clear && php artisan cache:clear && php artisan optimize:clear"`
 
 ## Padrões de código
 
