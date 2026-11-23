@@ -48,19 +48,20 @@
         @endif
     </div>
 
-    {{-- Avatar com Dimensões Estritas e Anel Branco --}}
+    {{-- Avatar com Dimensões Estritas e Anel Branco Blindado --}}
     <div class="flex justify-center -mt-8 relative z-10 shrink-0" style="height: 64px;">
-        @if(isset($member->avatar) && $member->avatar)
-            <img src="{{ $member->avatar }}" alt="{{ $member->name }}"
-                class="w-16 h-16 rounded-full ring-4 ring-white object-cover shadow-md transition-transform duration-300 group-hover:scale-105 shrink-0 block"
-                style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px; object-fit: cover;"
-                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
-        @else
-            <div class="w-16 h-16 rounded-full ring-4 ring-white bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white text-base font-black shadow-md transition-transform duration-300 group-hover:scale-105 shrink-0"
-                style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px;">
-                {{ $initials }}
-            </div>
-        @endif
+        <div class="w-16 h-16 rounded-full ring-4 ring-white shadow-md overflow-hidden bg-slate-100 flex items-center justify-center shrink-0" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px;">
+            @if(isset($member->avatar) && $member->avatar)
+                <img src="{{ $member->avatar }}" alt="{{ $member->name }}"
+                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 block"
+                    style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
+            @else
+                <div class="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white text-base font-black">
+                    {{ $initials }}
+                </div>
+            @endif
+        </div>
     </div>
 
     {{-- Body com Hierarquia Visual Refinada e Alinhamento Preciso --}}

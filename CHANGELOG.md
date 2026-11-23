@@ -1,5 +1,24 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.15] - 2026-11-22 - fix(ranking, membros): exibir conexões reais no pódio e lista, anéis giratórios 360º, blindagem de cards e correção de avatares CDN
+
+- **Correção da Contagem Real de Conexões (`app/Http/Controllers/RankingPublicController.php`, `resources/views/site/ranking.blade.php`):**
+  - **Pódio (Top 3):** As conexões dos 3 primeiros colocados (KDKHOST SOLUÇÕES com 3 conexões, padacinho do sol com 2 conexões e Leonardo Fonseca Borba com 3 conexões) agora são computadas em tempo real a partir da tabela de conexões aceitas (`Connection::where('status', 'accepted')`), substituindo o valor zerado estático.
+  - **Classificação Geral (4º Lugar em diante):** A listagem de membros ranqueados agora exibe o badge oficial de conexões (`<i class="fas fa-handshake"></i> N conexões`) para cada membro da lista.
+  - **Ocultação de Contas Administrativas:** Contas de administração e superadmin do sistema foram estritamente excluídas do ranking de empreendedores e membros.
+- **Pódio Refinado com Anéis Giratórios e Efeitos Gamificados:**
+  - Implementados anéis cônicos giratórios 360º (`conic-gold-ring`, `conic-silver-ring`, `conic-bronze-ring`) com rotação contínua e glow pulsante nos avatares do 1º, 2º e 3º colocados.
+  - Coroa flutuante animada reposicionada harmoniosamente sobre o avatar do campeão.
+  - Pontuação do 1º colocado em alto contraste (`text-slate-900`) garantindo leitura nítida.
+- **Restauração e Resolução Correta dos Avatares CDN (`RankingPublicController.php`, `MemberController.php`):**
+  - Substituído `asset($user->photo)` por `UploadStorage::url($user->photo)`, garantindo que fotos armazenadas no CDN (`https://cdn.somosunn.com.br/`) sejam carregadas sem erro 404 (como no caso de Anderson souza dos passos, Gerson, Ivone, Edely, Priscilla, Marcus e outros).
+  - O mesmo ajuste foi aplicado a `MemberController.php` tanto para fotos de perfil quanto para fotos de capa.
+- **Blindagem Visual nos Cards de Membros (`resources/views/site/partials/member-card.blade.php`):**
+  - O container de avatar foi envelopado com dimensões estritas (64x64px), `overflow-hidden`, `rounded-full` e `ring-4 ring-white`, impedindo que fotos com proporções atípicas desfigurem a altura dos cards do grid.
+- **Refatoração Visual da Lista de Classificação Geral:**
+  - Tratamento aprimorado de cargos e ocupações (eliminando o rótulo "iniciante" em minúsculo solto e substituindo por "Membro UNN" acompanhado de ícones temáticos).
+  - Exibição de empresa com badge sutil e localidade (cidade/estado) com ícone de mapa.
+
 ## [2.8.14] - 2026-11-22 - feat(revistas, ux): padronizar dropdown de categorias de revistas com o componente oficial do site público
 
 - **Padronização dos Itens do Select na Página Pública `/revistas` (`resources/views/magazines/index.blade.php`):**

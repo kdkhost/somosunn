@@ -18,13 +18,22 @@
             50% { transform: translateY(-6px); }
         }
         .animate-spin-slow {
-            animation: spinSlow 9s linear infinite;
+            animation: spinSlow 8s linear infinite;
         }
         .animate-pulse-glow {
             animation: pulseGlow 3s ease-in-out infinite;
         }
         .animate-float-crown {
             animation: floatCrown 2.5s ease-in-out infinite;
+        }
+        .conic-gold-ring {
+            background: conic-gradient(from 0deg, #d97706, #fbbf24, #fef08a, #f59e0b, #d97706);
+        }
+        .conic-silver-ring {
+            background: conic-gradient(from 0deg, #64748b, #cbd5e1, #f8fafc, #94a3b8, #64748b);
+        }
+        .conic-bronze-ring {
+            background: conic-gradient(from 0deg, #b45309, #f59e0b, #ffedd5, #d97706, #b45309);
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.88);
@@ -146,22 +155,23 @@
                                         <i class="fas fa-medal text-slate-500"></i> 2º Lugar • Prata
                                     </div>
 
-                                    {{-- Avatar com Anel Prateado --}}
-                                    <div class="relative flex justify-center mb-4">
+                                    {{-- Avatar com Anel Prateado Giratório --}}
+                                    <div class="relative flex justify-center mb-4 pt-1">
                                         <div class="relative w-22 h-22 flex items-center justify-center">
-                                            <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-slate-300 via-slate-100 to-slate-400 opacity-90 shadow-sm"></div>
+                                            <div class="absolute -inset-1 rounded-full conic-silver-ring animate-spin-slow opacity-90 shadow-sm"></div>
                                             <div class="absolute inset-0.5 rounded-full bg-white"></div>
-                                            @if($second->avatar)
-                                                <img src="{{ $second->avatar }}" alt="{{ $second->name }}"
-                                                    class="relative z-10 w-20 h-20 rounded-full object-cover shadow-md group-hover:scale-105 transition-transform"
-                                                    style="width: 80px; height: 80px; min-width: 80px; min-height: 80px; object-fit: cover;"
-                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
-                                            @else
-                                                <div class="relative z-10 w-20 h-20 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-xl font-black shadow-md group-hover:scale-105 transition-transform"
-                                                    style="width: 80px; height: 80px; min-width: 80px; min-height: 80px;">
-                                                    {{ $second->initials }}
-                                                </div>
-                                            @endif
+                                            <div class="relative z-10 w-20 h-20 rounded-full overflow-hidden shadow-md" style="width: 80px; height: 80px;">
+                                                @if($second->avatar)
+                                                    <img src="{{ $second->avatar }}" alt="{{ $second->name }}"
+                                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                                                        style="width: 100%; height: 100%; object-fit: cover;"
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
+                                                @else
+                                                    <div class="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-xl font-black">
+                                                        {{ $second->initials }}
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
 
@@ -187,9 +197,12 @@
                                         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5">Pontos</p>
                                     </div>
 
-                                    <div class="mt-3 flex items-center justify-center gap-1.5 text-xs text-slate-500 font-medium">
-                                        <i class="fas fa-handshake text-blue-500"></i>
-                                        <span class="font-bold text-slate-700">{{ $second->interactions_count }}</span> conexões
+                                    @php
+                                        $secondConns = (int) ($second->connections_count ?? $second->interactions_count ?? 0);
+                                    @endphp
+                                    <div class="mt-3 inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100/90 text-slate-700 border border-slate-200/80 text-xs font-bold shadow-2xs">
+                                        <i class="fas fa-handshake text-blue-600"></i>
+                                        <span>{{ $secondConns }} {{ $secondConns === 1 ? 'conexão' : 'conexões' }}</span>
                                     </div>
                                 </a>
                             </div>
@@ -216,34 +229,35 @@
                                             <i class="fas fa-crown text-xs"></i> 1º Lugar • Campeão
                                         </div>
 
-                                        {{-- Avatar Ouro com Coroa Animada e Anel Giratório 360º --}}
-                                        <div class="relative flex justify-center mb-5 pt-3">
-                                            {{-- Coroa flutuante animada no topo --}}
-                                            <div class="absolute -top-6 text-amber-500 text-3xl filter drop-shadow-md z-30 animate-float-crown">
+                                        {{-- Avatar Ouro com Coroa Flutuante e Anel Giratório Conic Glow --}}
+                                        <div class="relative flex justify-center mb-5 pt-4">
+                                            {{-- Coroa flutuante animada no topo com glow dourado --}}
+                                            <div class="absolute -top-4 text-amber-500 text-3xl filter drop-shadow-md z-30 animate-float-crown">
                                                 <i class="fas fa-crown"></i>
                                             </div>
 
-                                            {{-- Anel Giratório Contínuo Dourado --}}
+                                            {{-- Anel Giratório Contínuo Dourado Conic --}}
                                             <div class="relative w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
                                                 {{-- Glow pulsante dourado --}}
-                                                <div class="absolute -inset-2.5 rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 opacity-75 blur-md animate-pulse-glow"></div>
-                                                {{-- Borda giratória contínua em 360 graus --}}
-                                                <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 animate-spin-slow"></div>
+                                                <div class="absolute -inset-2 rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 opacity-60 blur-md animate-pulse-glow"></div>
+                                                {{-- Borda giratória contínua em 360 graus com gradiente cônico vivo --}}
+                                                <div class="absolute -inset-1.5 rounded-full conic-gold-ring animate-spin-slow shadow-md"></div>
                                                 {{-- Borda interna branca para contraste nítido --}}
                                                 <div class="absolute inset-0.5 rounded-full bg-white"></div>
 
                                                 {{-- Foto do Campeão --}}
-                                                @if($first->avatar)
-                                                    <img src="{{ $first->avatar }}" alt="{{ $first->name }}"
-                                                        class="relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-xl group-hover:scale-105 transition-transform"
-                                                        style="width: 104px; height: 104px; min-width: 104px; min-height: 104px; object-fit: cover;"
-                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
-                                                @else
-                                                    <div class="relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-amber-500 via-yellow-500 to-amber-600 flex items-center justify-center text-white text-3xl font-black shadow-xl group-hover:scale-105 transition-transform"
-                                                        style="width: 104px; height: 104px; min-width: 104px; min-height: 104px;">
-                                                        {{ $first->initials }}
-                                                    </div>
-                                                @endif
+                                                <div class="relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden shadow-xl" style="width: 104px; height: 104px;">
+                                                    @if($first->avatar)
+                                                        <img src="{{ $first->avatar }}" alt="{{ $first->name }}"
+                                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                                                            style="width: 100%; height: 100%; object-fit: cover;"
+                                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
+                                                    @else
+                                                        <div class="w-full h-full bg-gradient-to-br from-amber-500 via-yellow-500 to-amber-600 flex items-center justify-center text-white text-3xl font-black">
+                                                            {{ $first->initials }}
+                                                        </div>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
 
@@ -270,9 +284,13 @@
                                             </div>
                                         </div>
 
+                                        @php
+                                            $firstConns = (int) ($first->connections_count ?? $first->interactions_count ?? 0);
+                                        @endphp
                                         <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
-                                                <i class="fas fa-handshake text-amber-600"></i> {{ $first->interactions_count }} conexões
+                                            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-900 text-xs font-bold border border-amber-200 shadow-2xs">
+                                                <i class="fas fa-handshake text-amber-600"></i>
+                                                <span>{{ $firstConns }} {{ $firstConns === 1 ? 'conexão' : 'conexões' }}</span>
                                             </span>
                                             @if($first->plan_badge)
                                                 <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-900 text-amber-400 text-xs font-black uppercase tracking-wider shadow-xs">
@@ -302,22 +320,23 @@
                                         <i class="fas fa-medal text-amber-700"></i> 3º Lugar • Bronze
                                     </div>
 
-                                    {{-- Avatar com Anel Bronze --}}
-                                    <div class="relative flex justify-center mb-4">
+                                    {{-- Avatar com Anel Bronze Giratório --}}
+                                    <div class="relative flex justify-center mb-4 pt-1">
                                         <div class="relative w-22 h-22 flex items-center justify-center">
-                                            <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-amber-700 via-yellow-600 to-amber-800 opacity-80 shadow-sm"></div>
+                                            <div class="absolute -inset-1 rounded-full conic-bronze-ring animate-spin-slow opacity-90 shadow-sm"></div>
                                             <div class="absolute inset-0.5 rounded-full bg-white"></div>
-                                            @if($third->avatar)
-                                                <img src="{{ $third->avatar }}" alt="{{ $third->name }}"
-                                                    class="relative z-10 w-20 h-20 rounded-full object-cover shadow-md group-hover:scale-105 transition-transform"
-                                                    style="width: 80px; height: 80px; min-width: 80px; min-height: 80px; object-fit: cover;"
-                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
-                                            @else
-                                                <div class="relative z-10 w-20 h-20 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center text-white text-xl font-black shadow-md group-hover:scale-105 transition-transform"
-                                                    style="width: 80px; height: 80px; min-width: 80px; min-height: 80px;">
-                                                    {{ $third->initials }}
-                                                </div>
-                                            @endif
+                                            <div class="relative z-10 w-20 h-20 rounded-full overflow-hidden shadow-md" style="width: 80px; height: 80px;">
+                                                @if($third->avatar)
+                                                    <img src="{{ $third->avatar }}" alt="{{ $third->name }}"
+                                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                                                        style="width: 100%; height: 100%; object-fit: cover;"
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
+                                                @else
+                                                    <div class="w-full h-full bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center text-white text-xl font-black">
+                                                        {{ $third->initials }}
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
 
@@ -343,9 +362,12 @@
                                         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5">Pontos</p>
                                     </div>
 
-                                    <div class="mt-3 flex items-center justify-center gap-1.5 text-xs text-slate-500 font-medium">
-                                        <i class="fas fa-handshake text-blue-500"></i>
-                                        <span class="font-bold text-slate-700">{{ $third->interactions_count }}</span> conexões
+                                    @php
+                                        $thirdConns = (int) ($third->connections_count ?? $third->interactions_count ?? 0);
+                                    @endphp
+                                    <div class="mt-3 inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50/80 text-amber-900 border border-amber-200/80 text-xs font-bold shadow-2xs">
+                                        <i class="fas fa-handshake text-amber-700"></i>
+                                        <span>{{ $thirdConns }} {{ $thirdConns === 1 ? 'conexão' : 'conexões' }}</span>
                                     </div>
                                 </a>
                             </div>
@@ -447,21 +469,35 @@
                                     </div>
 
                                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs text-slate-500">
-                                        <span class="truncate max-w-[180px] font-medium text-slate-600">
-                                            {{ $rank->occupation ?: ($rank->level ?? 'Membro da Comunidade') }}
+                                        <span class="truncate max-w-[200px] font-medium text-slate-600 flex items-center gap-1.5">
+                                            @if(!empty($rank->occupation))
+                                                <i class="fas fa-briefcase text-[10px] text-blue-500 shrink-0"></i>
+                                                <span class="truncate">{{ $rank->occupation }}</span>
+                                            @else
+                                                <i class="fas fa-user-check text-[10px] text-slate-400 shrink-0"></i>
+                                                <span>{{ $rank->level ?? 'Membro UNN' }}</span>
+                                            @endif
                                         </span>
 
                                         @if(!empty($rank->company))
-                                            <span class="hidden sm:inline-flex items-center gap-1 text-slate-400 text-[11px] truncate max-w-[160px]">
-                                                <i class="fas fa-building text-[9px] text-slate-400"></i> {{ $rank->company }}
+                                            <span class="inline-flex items-center gap-1 text-slate-500 text-[11px] truncate max-w-[170px] bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+                                                <i class="fas fa-building text-[9px] text-slate-400 shrink-0"></i> {{ $rank->company }}
                                             </span>
                                         @endif
 
-                                        @if($rank->interactions_count > 0)
-                                            <span class="inline-flex items-center gap-1 text-blue-600 font-bold text-[11px] bg-blue-50/80 px-2 py-0.5 rounded-md">
-                                                <i class="fas fa-handshake text-[9px]"></i> {{ $rank->interactions_count }} conexões
+                                        @if(!empty($rank->city))
+                                            <span class="hidden md:inline-flex items-center gap-1 text-slate-400 text-[11px] truncate max-w-[150px]">
+                                                <i class="fas fa-map-marker-alt text-[9px] text-slate-400 shrink-0"></i> {{ $rank->city }}
                                             </span>
                                         @endif
+
+                                        @php
+                                            $conns = (int) ($rank->connections_count ?? $rank->interactions_count ?? 0);
+                                        @endphp
+                                        <span class="inline-flex items-center gap-1.5 text-blue-600 font-bold text-[11px] bg-blue-50/80 border border-blue-200/50 px-2.5 py-0.5 rounded-md shadow-2xs shrink-0">
+                                            <i class="fas fa-handshake text-[10px]"></i>
+                                            <span>{{ $conns }} {{ $conns === 1 ? 'conexão' : 'conexões' }}</span>
+                                        </span>
                                     </div>
                                 </div>
 

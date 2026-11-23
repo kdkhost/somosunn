@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Page;
 use App\Models\Plan;
 use App\Models\User;
+use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
@@ -188,9 +189,9 @@ class MemberController extends Controller
                         'name' => $user->name,
                         'email' => $user->email,
                         'bio' => $user->bio,
-                        'avatar' => $user->photo ? asset($user->photo) : null,
-                        'cover' => $user->cover_photo ? (str_starts_with($user->cover_photo, 'http') ? $user->cover_photo : asset($user->cover_photo)) : null,
-                        'cover_photo' => $user->cover_photo ? (str_starts_with($user->cover_photo, 'http') ? $user->cover_photo : asset($user->cover_photo)) : null,
+                        'avatar' => !empty($user->photo) ? UploadStorage::url($user->photo) : null,
+                        'cover' => !empty($user->cover_photo) ? UploadStorage::url($user->cover_photo) : null,
+                        'cover_photo' => !empty($user->cover_photo) ? UploadStorage::url($user->cover_photo) : null,
                         'city' => trim(($user->city ?? '') . ($user->state ? ', ' . $user->state : '')),
                         'occupation' => $user->occupation,
                         'company' => $user->company,

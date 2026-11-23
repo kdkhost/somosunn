@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Connection;
 use App\Models\Ranking;
 use App\Models\User;
+use App\Support\UploadStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
@@ -27,6 +28,12 @@ class RankingPublicController extends Controller
         $topRankings = collect();
 
         try {
+            // Contagem de conexões aceitas reais em lote para máxima performance e fidelidade
+            $acceptedConnections = Connection::where('status', 'accepted')
+                ->get()
+                ->flatMap(fn($c) => [$c->requester_id, $c->requested_id])
+                ->countBy();
+
             // 1. Tenta carregar da tabela 'rankings' compilada
             if (Schema::hasTable('rankings')) {
                 $rawRankings = Ranking::with(['user.plan'])
@@ -43,21 +50,34 @@ class RankingPublicController extends Controller
                     ->get();
 
                 if ($rawRankings->isNotEmpty()) {
-                    $topRankings = $rawRankings->map(function ($rank) {
+                    $topRankings = $rawRankings->map(function ($rank) use ($acceptedConnections) {
                         $user = $rank->user;
+                        $realConns = (int) $acceptedConnections->get($user->id, 0);
+
+                        // Resolução correta da foto de perfil com fallback inteligente para CDN
+                        $avatarUrl = !empty($user->photo) ? UploadStorage::url($user->photo) : null;
+                        $coverUrl = !empty($user->cover_photo) ? UploadStorage::url($user->cover_photo) : null;
+
+                        // Nível elegante (nunca "iniciante" em minúsculo solto)
+                        $friendlyLevel = $rank->level ?? $user->level;
+                        if (empty($friendlyLevel) || mb_strtolower($friendlyLevel) === 'iniciante') {
+                            $friendlyLevel = 'Membro UNN';
+                        }
+
                         return (object) [
                             'user_id' => $user->id,
                             'name' => $user->name,
-                            'avatar' => $user->photo ? asset($user->photo) : null,
-                            'cover' => $user->cover_photo ? asset($user->cover_photo) : null,
+                            'avatar' => $avatarUrl,
+                            'cover' => $coverUrl,
                             'initials' => collect(explode(' ', $user->name))->take(2)->map(fn($n) => strtoupper(mb_substr($n, 0, 1)))->join(''),
                             'occupation' => $user->occupation,
                             'company' => $user->company,
                             'city' => trim(($user->city ?? '') . ($user->state ? ', ' . $user->state : '')),
                             'plan_badge' => $user->plan?->name ? ($user->plan->is_free ? 'Starter' : $user->plan->name) : null,
                             'score' => (int) $rank->score,
-                            'level' => $rank->level ?? ($user->level ?: 'Membro Ativo'),
-                            'interactions_count' => (int) ($rank->interactions_count ?: 0),
+                            'level' => $friendlyLevel,
+                            'connections_count' => $realConns,
+                            'interactions_count' => $realConns,
                             'is_demo' => false,
                         ];
                     });
@@ -76,14 +96,8 @@ class RankingPublicController extends Controller
                     ->get();
 
                 if ($users->isNotEmpty()) {
-                    // Contagem de conexões em lote para máxima performance
-                    $acceptedConnections = Connection::where('status', 'accepted')
-                        ->get()
-                        ->flatMap(fn($c) => [$c->requester_id, $c->requested_id])
-                        ->countBy();
-
                     $topRankings = $users->map(function ($u) use ($acceptedConnections) {
-                        $conns = $acceptedConnections->get($u->id, 0);
+                        $conns = (int) $acceptedConnections->get($u->id, 0);
                         $basePoints = (int) ($u->points ?? 0);
                         // Pontuação dinâmica: pontos gravados + conexões (50 pts cada) + foto (100 pts) + dados completos
                         $calculatedScore = $basePoints;
@@ -92,18 +106,21 @@ class RankingPublicController extends Controller
                         }
 
                         $level = $u->level;
-                        if (empty($level)) {
+                        if (empty($level) || mb_strtolower($level) === 'iniciante') {
                             if ($calculatedScore >= 1000) $level = 'Elite UNN';
                             elseif ($calculatedScore >= 500) $level = 'Líder de Negócios';
                             elseif ($calculatedScore >= 200) $level = 'Empreendedor Pro';
-                            else $level = 'Membro Ativo';
+                            else $level = 'Membro UNN';
                         }
+
+                        $avatarUrl = !empty($u->photo) ? UploadStorage::url($u->photo) : null;
+                        $coverUrl = !empty($u->cover_photo) ? UploadStorage::url($u->cover_photo) : null;
 
                         return (object) [
                             'user_id' => $u->id,
                             'name' => $u->name,
-                            'avatar' => $u->photo ? asset($u->photo) : null,
-                            'cover' => $u->cover_photo ? asset($u->cover_photo) : null,
+                            'avatar' => $avatarUrl,
+                            'cover' => $coverUrl,
                             'initials' => collect(explode(' ', $u->name))->take(2)->map(fn($n) => strtoupper(mb_substr($n, 0, 1)))->join(''),
                             'occupation' => $u->occupation,
                             'company' => $u->company,
@@ -111,6 +128,7 @@ class RankingPublicController extends Controller
                             'plan_badge' => $u->plan?->name ? ($u->plan->is_free ? 'Starter' : $u->plan->name) : null,
                             'score' => $calculatedScore,
                             'level' => $level,
+                            'connections_count' => $conns,
                             'interactions_count' => $conns,
                             'is_demo' => false,
                         ];
