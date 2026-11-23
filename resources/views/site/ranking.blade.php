@@ -28,45 +28,78 @@
                     </div>
                 @endif
 
-                {{-- Pilares de Pontuação / Como Funciona --}}
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-4xl mx-auto mt-8 text-left">
-                    <div class="bg-white/80 backdrop-blur-sm p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                            <i class="fas fa-user-plus text-sm"></i>
+                {{-- Painel de Regras Recorrentes: Ganhos (+) e Perdas por Inatividade (-) --}}
+                <div class="max-w-4xl mx-auto mt-8 bg-white/90 backdrop-blur-md rounded-3xl p-5 md:p-6 border border-slate-200/90 shadow-sm text-left">
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs">
+                                <i class="fas fa-balance-scale"></i>
+                            </span>
+                            <h3 class="font-black text-sm text-slate-800">Dinâmica de Pontuação: Ganhos & Decaimento por Inatividade</h3>
                         </div>
-                        <div class="min-w-0">
-                            <p class="text-xs font-black text-slate-800">+50 PTS</p>
-                            <p class="text-[11px] text-slate-500 truncate">Nova conexão aceita</p>
-                        </div>
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">Atualização Recorrente</span>
                     </div>
 
-                    <div class="bg-white/80 backdrop-blur-sm p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                            <i class="fas fa-id-badge text-sm"></i>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        {{-- Ganhos (+) --}}
+                        <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200/70">
+                            <p class="font-black text-emerald-900 flex items-center gap-1.5 mb-2.5 text-xs">
+                                <i class="fas fa-arrow-trend-up text-emerald-600"></i> Como Ganhar Pontos Recorrentes (+)
+                            </p>
+                            <ul class="space-y-1.5 text-emerald-950/90 font-medium text-[11px]">
+                                <li class="flex items-center justify-between">
+                                    <span>• Login diário na plataforma</span>
+                                    <strong class="text-emerald-700 font-black">+5 a +10 pts</strong>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>• Consistência semanal ativa (3+ dias)</span>
+                                    <strong class="text-emerald-700 font-black">+20 pts</strong>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>• Sequência de 7 e 30 dias seguidos</span>
+                                    <strong class="text-emerald-700 font-black">+50 a +200 pts</strong>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>• Cada nova conexão aceita</span>
+                                    <strong class="text-emerald-700 font-black">+50 pts</strong>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>• Postagens e comentários no feed</span>
+                                    <strong class="text-emerald-700 font-black">+3 a +20 pts</strong>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>• Eventos, palestras e mentorias</span>
+                                    <strong class="text-emerald-700 font-black">+30 a +150 pts</strong>
+                                </li>
+                            </ul>
                         </div>
-                        <div class="min-w-0">
-                            <p class="text-xs font-black text-slate-800">+100 PTS</p>
-                            <p class="text-[11px] text-slate-500 truncate">Perfil 100% completo</p>
-                        </div>
-                    </div>
 
-                    <div class="bg-white/80 backdrop-blur-sm p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                            <i class="fas fa-comment-dots text-sm"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-xs font-black text-slate-800">+20 PTS</p>
-                            <p class="text-[11px] text-slate-500 truncate">Publicação e interação</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white/80 backdrop-blur-sm p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                            <i class="fas fa-calendar-check text-sm"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-xs font-black text-slate-800">+150 PTS</p>
-                            <p class="text-[11px] text-slate-500 truncate">Participação em eventos</p>
+                        {{-- Perdas / Penalidades (-) --}}
+                        <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80">
+                            <p class="font-black text-amber-950 flex items-center gap-1.5 mb-2.5 text-xs">
+                                <i class="fas fa-arrow-trend-down text-amber-600"></i> Decaimento por Inatividade (-)
+                            </p>
+                            <ul class="space-y-1.5 text-amber-950/90 font-medium text-[11px]">
+                                <li class="flex items-center justify-between">
+                                    <span>• 7 dias sem acessar a plataforma</span>
+                                    <strong class="text-amber-700 font-black">-10 pts/sem</strong>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>• 15 dias sem login consecutivo</span>
+                                    <strong class="text-amber-800 font-black">-25 pts/sem</strong>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>• 30+ dias sem login na rede</span>
+                                    <strong class="text-red-700 font-black">-50 pts/sem</strong>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>• 14 dias sem postar ou interagir</span>
+                                    <strong class="text-amber-700 font-black">-15 pts/quinzena</strong>
+                                </li>
+                                <li class="pt-1 border-t border-amber-200/60 text-[10px] text-amber-800 italic">
+                                    * Proteção: Seus pontos nunca ficam negativos (piso 0). Ao voltar a acessar e interagir, seus pontos voltam a subir normalmente!
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>

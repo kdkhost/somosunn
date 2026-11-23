@@ -79,6 +79,9 @@ class Kernel extends ConsoleKernel
 
         // Limpeza diária automática de novos cadastros não validados
         $schedule->command('members:cleanup-unverified')->dailyAt('03:00');
+
+        // Processamento diário recorrente de pontos: bonificações e decaimento por inatividade (positivo e negativo)
+        $schedule->command('points:process-recurrence')->dailyAt('04:00');
     }
 
     protected function commands(): void

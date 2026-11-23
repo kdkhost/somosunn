@@ -1,5 +1,24 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.7] - 2026-11-22 - feat(gamification): motor de pontuação recorrente com decaimento por inatividade (positivo e negativo)
+
+- **Motor de Penalização e Decaimento em `PointsService` (`app/Services/PointsService.php`):**
+  - **Dedução Controlada (`penalize`):** Método robusto para penalização de pontos que debita pontos com segurança garantindo que a pontuação nunca fique negativa (piso zero), gravando o registro negativo no histórico de `PointsLog` e sincronizando a tabela de rankings.
+  - **Sincronização Bidirecional Contínua:** Ao ganhar (`award`) ou perder (`penalize`/`revoke`) pontos, a tabela de `rankings` é atualizada automaticamente para refletir a nova pontuação em tempo real.
+  - **Rotina de Processamento Recorrente (`processRecurrenceDecay`):**
+    - *Inatividade de 7 a 14 dias sem login:* Penalidade recorrente semanal de `-10 pts`.
+    - *Inatividade de 15 a 29 dias sem login:* Penalidade recorrente semanal de `-25 pts`.
+    - *Inatividade severa de 30+ dias sem login:* Penalidade recorrente semanal de `-50 pts`.
+    - *Inatividade social (14 dias sem posts ou comentários):* Penalidade quinzenal de `-15 pts`.
+    - *Consistência ativa semanal (3+ logins na semana):* Bônus recorrente de incentivo de `+20 pts`.
+    - *Prevenção de Deduções Múltiplas:* Idempotência estrita por período evitando que o membro sofra penalidades duplicadas no mesmo ciclo.
+- **Comando Agendado Automatizado (`app/Console/Commands/ProcessPointsRecurrence.php`, `app/Console/Kernel.php`):**
+  - Criado o comando Artisan `points:process-recurrence`, agendado para execução diária automática às 04:00 da manhã no `Kernel.php`.
+- **Painel de Regras Transparentes na Página de Ranking (`resources/views/site/ranking.blade.php`):**
+  - Adicionado painel visual com duas colunas comparativas:
+    - *Como Ganhar Pontos (+):* Login diário, consistência semanal, conexões aceitas, postagens, comentários e eventos.
+    - *Decaimento por Inatividade (-):* Prazos claros e deduções por ausência de login ou postagens, além do alerta de proteção de piso zero e recuperação imediata de pontos ao voltar a interagir.
+
 ## [2.8.6] - 2026-11-22 - refactor(ranking): refatoração da página de ranking com pódio sofisticado, busca em tempo real e cálculo dinâmico
 
 - **Refatoração Completa do Controller de Ranking Público (`app/Http/Controllers/RankingPublicController.php`):**
