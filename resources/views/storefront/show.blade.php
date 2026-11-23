@@ -190,10 +190,24 @@
             color: #fff;
         }
 
-        .store-header-search,
-        .store-filter-field {
+        .store-header-search {
             border: 1px solid rgba(148, 163, 184, 0.24);
             background: #fff;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .store-filter-field {
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: #fff !important;
+            border-radius: 9999px !important;
+            padding: 0.5rem 2.25rem 0.5rem 1rem !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.85rem center !important;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
@@ -201,6 +215,7 @@
         .store-filter-field:focus {
             border-color: {{ $themePrimary }};
             box-shadow: 0 0 0 4px rgba(31, 94, 219, 0.1);
+            outline: none;
         }
 
         .store-main-nav a:hover,
@@ -445,25 +460,25 @@
                 <div class="store-home-card rounded-[1.65rem] bg-white p-4 mb-5">
                     <form method="GET" class="flex flex-wrap items-center gap-3">
                         <input type="hidden" name="q" value="{{ $catalogSearch }}">
-                        <select name="tipo" class="store-filter-field rounded-lg px-3 py-2 text-sm font-semibold text-slate-700" onchange="this.form.submit()">
+                        <select name="tipo" class="store-filter-field text-sm font-semibold text-slate-700" onchange="this.form.submit()">
                             <option value="">Todos os tipos</option>
                             <option value="digital" {{ $catalogType === 'digital' ? 'selected' : '' }}>Digital</option>
                             <option value="physical" {{ $catalogType === 'physical' ? 'selected' : '' }}>Físico</option>
                         </select>
-                        <select name="canal" class="store-filter-field rounded-lg px-3 py-2 text-sm font-semibold text-slate-700" onchange="this.form.submit()">
+                        <select name="canal" class="store-filter-field text-sm font-semibold text-slate-700" onchange="this.form.submit()">
                             <option value="">Todos os canais</option>
                             <option value="store" {{ $catalogChannel === 'store' ? 'selected' : '' }}>Loja virtual</option>
                             <option value="points" {{ $catalogChannel === 'points' ? 'selected' : '' }}>Troca de pontos</option>
                             <option value="external" {{ $catalogChannel === 'external' ? 'selected' : '' }}>Site externo</option>
                         </select>
-                        <select name="preco" class="store-filter-field rounded-lg px-3 py-2 text-sm font-semibold text-slate-700" onchange="this.form.submit()">
+                        <select name="preco" class="store-filter-field text-sm font-semibold text-slate-700" onchange="this.form.submit()">
                             <option value="">Qualquer preço</option>
                             <option value="under_100" {{ $catalogPrice === 'under_100' ? 'selected' : '' }}>Até R$100</option>
                             <option value="100_300" {{ $catalogPrice === '100_300' ? 'selected' : '' }}>R$100 - R$300</option>
                             <option value="300_700" {{ $catalogPrice === '300_700' ? 'selected' : '' }}>R$300 - R$700</option>
                             <option value="above_700" {{ $catalogPrice === 'above_700' ? 'selected' : '' }}>Acima de R$700</option>
                         </select>
-                        <select name="ordem" class="store-filter-field rounded-lg px-3 py-2 text-sm font-semibold text-slate-700" onchange="this.form.submit()">
+                        <select name="ordem" class="store-filter-field text-sm font-semibold text-slate-700" onchange="this.form.submit()">
                             <option value="featured" {{ $catalogSort === 'featured' ? 'selected' : '' }}>Destaques</option>
                             <option value="latest" {{ $catalogSort === 'latest' ? 'selected' : '' }}>Mais recentes</option>
                             <option value="lowest" {{ $catalogSort === 'lowest' ? 'selected' : '' }}>Menor preço</option>

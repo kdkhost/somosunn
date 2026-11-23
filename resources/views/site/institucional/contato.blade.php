@@ -185,19 +185,48 @@
                                 placeholder="(00) 00000-0000" value="{{ old('phone') }}">
                         </div>
 
-                        <div>
+                        <div class="relative select-none z-20" id="custom-subject-container">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Assunto</label>
-                            <select name="subject" required
-                                class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition"
+                            @php
+                                $subjects = [
+                                    'duvidas' => 'Dúvidas sobre a plataforma',
+                                    'parcerias' => 'Propostas de parceria',
+                                    'suporte' => 'Suporte técnico',
+                                    'comercial' => 'Departamento comercial',
+                                    'imprensa' => 'Assessoria de imprensa',
+                                    'outro' => 'Outro assunto',
+                                ];
+                                $curSubject = old('subject', '');
+                                $curSubjectLabel = $subjects[$curSubject] ?? 'Selecione um assunto';
+                            @endphp
+                            <input type="hidden" name="subject" id="contact-subject" value="{{ $curSubject }}" required>
+                            <button type="button" id="custom-subject-trigger"
+                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-left flex items-center justify-between transition focus:ring-2 outline-none cursor-pointer shadow-xs"
                                 style="--tw-ring-color: var(--unn-azul-1)">
-                                <option value="">Selecione um assunto</option>
-                                <option value="duvidas" {{ old('subject') === 'duvidas' ? 'selected' : '' }}>Duvidas sobre a plataforma</option>
-                                <option value="parcerias" {{ old('subject') === 'parcerias' ? 'selected' : '' }}>Propostas de parceria</option>
-                                <option value="suporte" {{ old('subject') === 'suporte' ? 'selected' : '' }}>Suporte tecnico</option>
-                                <option value="comercial" {{ old('subject') === 'comercial' ? 'selected' : '' }}>Departamento comercial</option>
-                                <option value="imprensa" {{ old('subject') === 'imprensa' ? 'selected' : '' }}>Assessoria de imprensa</option>
-                                <option value="outro" {{ old('subject') === 'outro' ? 'selected' : '' }}>Outro assunto</option>
-                            </select>
+                                <span id="custom-subject-label" class="{{ $curSubject ? 'text-slate-800 font-bold' : 'text-gray-400' }}">
+                                    {{ $curSubjectLabel }}
+                                </span>
+                                <i id="custom-subject-arrow" class="fas fa-chevron-down text-gray-400 text-xs transition-transform duration-200"></i>
+                            </button>
+                            <div id="custom-subject-menu"
+                                class="hidden absolute top-full mt-2 left-0 right-0 w-full bg-white rounded-2xl border border-slate-200/90 py-2.5 z-50 overflow-hidden transform opacity-0 scale-95 transition-all duration-200 ease-out origin-top text-left shadow-[0_20px_50px_rgba(8,112,184,0.18),0_10px_25px_rgba(0,0,0,0.1)]">
+                                <div class="px-3.5 pb-2 mb-1.5 border-b border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <span>Selecione o Assunto</span>
+                                </div>
+                                <div class="max-h-60 overflow-y-auto custom-select-scrollbar px-1.5 space-y-1">
+                                    @foreach($subjects as $val => $lbl)
+                                        @php $isSel = $curSubject === $val; @endphp
+                                        <div class="custom-subject-opt px-3.5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all flex items-center justify-between {{ $isSel ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/25' : 'text-slate-800 hover:bg-blue-50/80 hover:text-blue-700' }}"
+                                            data-value="{{ $val }}" data-label="{{ $lbl }}">
+                                            <span class="flex items-center gap-2">
+                                                <span class="opt-dot w-2 h-2 rounded-full {{ $isSel ? 'bg-white' : 'bg-slate-300' }}"></span>
+                                                <span>{{ $lbl }}</span>
+                                            </span>
+                                            <i class="fas fa-check text-xs check-icon {{ $isSel ? 'text-white' : 'hidden' }}"></i>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
 
                         <div>

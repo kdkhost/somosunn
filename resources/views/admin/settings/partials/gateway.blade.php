@@ -800,14 +800,70 @@
                             value="{{ $settings['efi_pix_key'] ?? '' }}" placeholder="EVP, CNPJ, e-mail ou telefone">
                     </div>
                     <div class="col-md-4 form-group">
+                        <label>Upload do Certificado (.p12 ou .pem)</label>
+                        <input type="file" name="efi_certificate_file" id="admin_efi_certificate_file" class="form-control-file" accept=".p12,.pem,.crt">
+                        <small class="form-text text-muted">Envie o certificado emitido pela Efí (.p12 é convertido automaticamente para .pem).</small>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Senha do Certificado (.p12)</label>
+                        <input type="password" name="efi_certificate_passphrase" id="admin_efi_certificate_passphrase" class="form-control"
+                            placeholder="Deixe em branco se não houver senha">
+                    </div>
+                    <div class="col-md-6 form-group">
                         <label>Caminho do Certificado (.pem / .p12)</label>
                         <input type="text" name="efi_certificate_path" class="form-control"
                             value="{{ $settings['efi_certificate_path'] ?? '' }}" placeholder="/home/somosunn/certs/efi-prod.pem">
+                        <small class="form-text text-muted">Preenchido automaticamente ao fazer upload, ou insira o caminho absoluto no servidor.</small>
                     </div>
-                    <div class="col-md-4 form-group">
+                    <div class="col-md-6 form-group">
                         <label>Webhook Secret / Token HMAC</label>
                         <input type="password" name="efi_webhook_secret" class="form-control"
                             value="{{ $settings['efi_webhook_secret'] ?? '' }}" placeholder="Segredo para validacao HMAC">
+                    </div>
+                </div>
+
+                {{-- Status do Certificado Efí --}}
+                <div class="card card-body bg-light border mb-3">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap">
+                        <div class="d-flex align-items-center mb-2 mb-md-0">
+                            @if(!empty($efiCertInfo) && !empty($efiCertInfo['exists']))
+                                <div class="bg-success text-white rounded-circle p-2 mr-3 d-flex align-items-center justify-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-shield-alt fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 font-weight-bold text-success">
+                                        Certificado Efí Ativo
+                                        @if(!empty($efiCertInfo['is_expired']))
+                                            <span class="badge badge-danger ml-2">EXPIRADO</span>
+                                        @else
+                                            <span class="badge badge-success ml-2">VÁLIDO</span>
+                                        @endif
+                                    </h6>
+                                    <small class="text-muted">
+                                        Arquivo: <strong>{{ $efiCertInfo['filename'] }}</strong>
+                                        @if(!empty($efiCertInfo['valid_to_formatted']))
+                                            &bull; Validade: <strong>{{ $efiCertInfo['valid_to_formatted'] }}</strong>
+                                        @endif
+                                        @if(!empty($efiCertInfo['issuer']))
+                                            &bull; Emissor: {{ $efiCertInfo['issuer'] }}
+                                        @endif
+                                    </small>
+                                </div>
+                            @else
+                                <div class="bg-warning text-dark rounded-circle p-2 mr-3 d-flex align-items-center justify-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-exclamation-triangle fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 font-weight-bold text-warning">Nenhum Certificado Efí Configurado</h6>
+                                    <small class="text-muted">Faça o upload do arquivo .p12 fornecido no painel da Efí para habilitar o Pix em produção.</small>
+                                </div>
+                            @endif
+                        </div>
+                        <div>
+                            @if(!empty($efiCertInfo) && !empty($efiCertInfo['exists']))
+                                <span class="badge badge-pill badge-light border px-3 py-2 text-monospace">{{ $efiCertInfo['path'] }}</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
                 <div class="alert alert-light border small mb-3">

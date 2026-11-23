@@ -1,5 +1,25 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.0] - 2026-11-22 - feat(gateway, membros, ux): gateway efí robusto com certificado mTLS, restrição de membros gratuitos, ativação de conta e padronização global de selects
+
+- **Gateway Efí Pay (Gerencianet Pix) 100% Robusto (`app/Services/Payment/EfiService.php`, `app/Http/Controllers/Admin/SettingController.php`, `resources/views/admin/settings/partials/gateway.blade.php`, `resources/views/panel/admin/settings/partials/gateway.blade.php`):**
+  - **Upload e Conversão Automática de Certificado:** Adicionado campo de upload de certificado (`.p12`, `.pem`, `.crt`) e campo opcional de senha (*passphrase*) nos dois painéis administrativos (`/admin` e `/painel/admin`). Arquivos `.p12` emitidos no portal da Efí são lidos via `openssl_pkcs12_read()` e convertidos automaticamente para `.pem` seguro no storage interno.
+  - **Diagnóstico X.509 em Tempo Real:** Criado método `getCertificateInfo()` que faz o parse do certificado ativo e exibe nos painéis o nome do arquivo, status de validade (*badge* verde VÁLIDO ou vermelho EXPIRADO), data de expiração formatada e autoridade emissora.
+  - **Motor Pix Completo:** Métodos `createImmediatePixCharge()`, `getPixQrCode()` e `getPixCharge()` com suporte a mTLS mútuo, timeout resiliente e geração do payload Copia e Cola / QR Code em base64.
+- **Restrição de Visibilidade para Membros Gratuitos (`app/Http/Controllers/MemberController.php`, `resources/views/site/membros.blade.php`, `app/Models/User.php`):**
+  - **Isolamento de Patamar Gratuito:** Membros de planos gratuitos (`plan_id IS NULL` ou plano com valor R$0/`is_free = true`) agora visualizam exclusivamente outros membros do mesmo patamar (gratuitos), incentivando a evolução de networking.
+  - **Banner de Incentivo ao Upgrade:** Exibição de alerta visual elegante convidando o membro gratuito a assinar um plano Pro ou Elite para desbloquear o diretório completo e conectar-se com líderes empresariais.
+- **Validação Obrigatória de Cadastro e E-mail para Benefícios (`app/Http/Middleware/EnsurePurchaseEligibility.php`, `app/Console/Commands/CleanupUnverifiedMembersCommand.php`, `app/Console/Kernel.php`):**
+  - **Bloqueio de Compras e Inscrições:** Membros com e-mail não verificado ou perfil incompleto são impedidos de realizar compras de eventos, reservas de expositor, mentorias, cursos ou planos até que concluam o cadastro completo (`EnsurePurchaseEligibility`).
+  - **Exclusão Automática de Contas Não Validadas:** Criado comando Artisan agendado `members:cleanup-unverified` (executado diariamente às 03:00) que expurga novas contas criadas a partir de 22/11/2026 que não validarem o e-mail em até 72 horas, mantendo a base de dados íntegra e ativa.
+- **Busca Flexível e Aproximada no Feed Social (`app/Http/Controllers/SocialController.php`, `resources/views/social/feed.blade.php`):**
+  - **Busca por Partes do Nome:** O motor de pesquisa do feed agora divide os termos digitados em palavras individuais (`AND` por palavra), permitindo localizar membros mesmo se o usuário não souber o nome completo ou a ordem exata das palavras.
+  - **Pílula de Filtro Específico:** Adicionada pílula `Nome` para busca direcionada no Feed.
+- **Padronização Global de Selects e Correção Visual Definitiva (`resources/views/oportunidades.blade.php`, `resources/views/site/membros.blade.php`, `resources/views/site/institucional/contato.blade.php`, `resources/views/storefront/show.blade.php`):**
+  - **Fim do Corte pelo Wave Divider:** Resolvido o corte da lista de opções do select de vagas, ajustando o empilhamento (*stacking context*), folga de padding no hero (`pb-52 md:pb-68`), `overflow: visible` e posicionamento inteligente dinâmico que abre para cima caso o espaço inferior seja restrito.
+  - **Padronização Visual:** Custom dropdowns com estilo flutuante Shadcn/Tailwind com dots de status, ícones de check, sombras multicamadas profundas e cantos arredondados implementados na página de membros, contato institucional, vitrine e vagas abertas.
+  - **Badge sem Escape Duplo:** Título e badge do hero de vagas blindados contra códigos como `&amp;`.
+
 ## [2.7.0] - 2026-11-22 - feat(performance): motor de auto-escalabilidade e tráfego adaptativo inteligente para alta concorrência
 
 - **Motor de Detecção e Auto-Ajuste de Carga (`app/Support/TrafficLoadDetector.php`, `app/Http/Middleware/TrafficLoadBalancerMiddleware.php`):**

@@ -407,6 +407,39 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(\App\Models\Plan::class);
     }
 
+    /**
+     * Informa se o usuário possui plano pago ativo.
+     */
+    public function hasPaidPlan(): bool
+    {
+        if ($this->isAdmin() || $this->role === 'superadmin') {
+            return true;
+        }
+
+        if (!$this->plan_id) {
+            return false;
+        }
+
+        $plan = $this->plan;
+        if (!$plan || $plan->is_free || (float) $plan->price <= 0) {
+            return false;
+        }
+
+        if ($this->plan_expires_at && $this->plan_expires_at->isPast()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Informa se o usuário é membro de caráter gratuito.
+     */
+    public function isFreeMember(): bool
+    {
+        return !$this->hasPaidPlan();
+    }
+
     public function subscriptions()
     {
         return $this->hasMany(\App\Models\Subscription::class);

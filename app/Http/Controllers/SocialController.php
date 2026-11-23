@@ -138,31 +138,68 @@ class SocialController extends Controller
             });
         }
 
-        if ($filterType === 'role' || $filterType === 'occupation') {
-            $query->where(function ($q) use ($term) {
+        // Normalização e quebra de palavras para busca flexível e aproximada por nome
+        $words = array_values(array_filter(explode(' ', $term), fn ($w) => mb_strlen(trim($w)) >= 2));
+        if (empty($words)) {
+            $words = [$term];
+        }
+
+        if ($filterType === 'name') {
+            $query->where(function ($q) use ($words, $term) {
+                $q->where(function ($sub) use ($words) {
+                    foreach ($words as $w) {
+                        $sub->where('name', 'like', "%{$w}%");
+                    }
+                })->orWhere('name', 'like', "%{$term}%")
+                  ->orWhere('username', 'like', "%{$term}%");
+            });
+        } elseif ($filterType === 'role' || $filterType === 'occupation') {
+            $query->where(function ($q) use ($term, $words) {
                 $q->where('occupation', 'like', "%{$term}%")
                     ->orWhere('bio', 'like', "%{$term}%");
+                foreach ($words as $w) {
+                    $q->orWhere('occupation', 'like', "%{$w}%");
+                }
             });
         } elseif ($filterType === 'company') {
-            $query->where('company', 'like', "%{$term}%");
+            $query->where(function ($q) use ($term, $words) {
+                $q->where('company', 'like', "%{$term}%");
+                foreach ($words as $w) {
+                    $q->orWhere('company', 'like', "%{$w}%");
+                }
+            });
         } elseif ($filterType === 'city') {
             $query->where(function ($q) use ($term) {
                 $q->where('city', 'like', "%{$term}%")
                     ->orWhere('state', 'like', "%{$term}%");
             });
         } else {
-            $query->where(function ($q) use ($term) {
-                $q->where('name', 'like', "%{$term}%")
-                    ->orWhere('occupation', 'like', "%{$term}%")
-                    ->orWhere('company', 'like', "%{$term}%")
-                    ->orWhere('city', 'like', "%{$term}%")
-                    ->orWhere('state', 'like', "%{$term}%")
-                    ->orWhere('bio', 'like', "%{$term}%");
+            // 'all': busca flexível por nome aproximado, cargo, empresa ou cidade
+            $query->where(function ($q) use ($term, $words) {
+                $q->where(function ($sub) use ($words) {
+                    foreach ($words as $w) {
+                        $sub->where('name', 'like', "%{$w}%");
+                    }
+                })
+                ->orWhere('name', 'like', "%{$term}%")
+                ->orWhere('username', 'like', "%{$term}%")
+                ->orWhere('occupation', 'like', "%{$term}%")
+                ->orWhere('company', 'like', "%{$term}%")
+                ->orWhere('city', 'like', "%{$term}%")
+                ->orWhere('state', 'like', "%{$term}%")
+                ->orWhere('bio', 'like', "%{$term}%");
             });
         }
 
+        $escapedTerm = addslashes($term);
         $members = $query->with('plan')
-            ->take(10)
+            ->orderByRaw("CASE 
+                WHEN name LIKE '{$escapedTerm}%' THEN 1 
+                WHEN name LIKE '%{$escapedTerm}%' THEN 2 
+                ELSE 3 
+            END")
+            ->orderBy('name', 'asc')
+            ->take(15)
             ->get()
             ->map(function ($u) use ($connectedUserIds, $pendingUserIds, $sentRequests) {
                 $isConnected = in_array($u->id, $connectedUserIds);

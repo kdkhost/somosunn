@@ -870,15 +870,70 @@
                     class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm" placeholder="EVP, CNPJ ou E-mail">
             </div>
             <div>
+                <label class="gw-label">Upload do Certificado (.p12 ou .pem)</label>
+                <input type="file" name="efi_certificate_file" id="panel_efi_certificate_file" accept=".p12,.pem,.crt"
+                    class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300 cursor-pointer">
+                <span class="text-[11px] text-slate-400 mt-1 block">O arquivo .p12 é convertido automaticamente para .pem seguro.</span>
+            </div>
+            <div>
+                <label class="gw-label">Senha do Certificado (.p12)</label>
+                <input type="password" name="efi_certificate_passphrase" id="panel_efi_certificate_passphrase"
+                    class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm" placeholder="Senha do .p12 (se houver)">
+            </div>
+            <div class="md:col-span-2">
                 <label class="gw-label">Caminho do Certificado (.pem / .p12)</label>
                 <input type="text" name="efi_certificate_path" value="{{ $settings['efi_certificate_path'] ?? '' }}"
                     class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm" placeholder="/home/somosunn/certs/efi-prod.pem">
+                <span class="text-[11px] text-slate-400 mt-1 block">Preenchido automaticamente ao enviar arquivo ou insira o caminho no servidor.</span>
             </div>
             <div>
                 <label class="gw-label">Webhook Secret / HMAC</label>
                 <input type="password" name="efi_webhook_secret" value="{{ $settings['efi_webhook_secret'] ?? '' }}"
                     class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm" placeholder="Segredo HMAC">
             </div>
+        </div>
+
+        {{-- Status do Certificado Efí (Painel Moderno) --}}
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                @if(!empty($efiCertInfo) && !empty($efiCertInfo['exists']))
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <i class="fas fa-shield-alt text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="text-sm font-black text-emerald-700 dark:text-emerald-400">Certificado Efí Ativo</h4>
+                            @if(!empty($efiCertInfo['is_expired']))
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700">EXPIRADO</span>
+                            @else
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">VÁLIDO</span>
+                            @endif
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            Arquivo: <strong class="text-slate-700 dark:text-slate-300">{{ $efiCertInfo['filename'] }}</strong>
+                            @if(!empty($efiCertInfo['valid_to_formatted']))
+                                &bull; Vence em: <strong>{{ $efiCertInfo['valid_to_formatted'] }}</strong>
+                            @endif
+                            @if(!empty($efiCertInfo['issuer']))
+                                &bull; Emissor: {{ $efiCertInfo['issuer'] }}
+                            @endif
+                        </p>
+                    </div>
+                @else
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <i class="fas fa-exclamation-triangle text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-black text-amber-700 dark:text-amber-400">Nenhum Certificado Efí Configurado</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Faça o upload do arquivo .p12 da Efí para habilitar a emissão de Pix em produção.</p>
+                    </div>
+                @endif
+            </div>
+            @if(!empty($efiCertInfo) && !empty($efiCertInfo['exists']))
+                <span class="text-[11px] font-mono px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 max-w-xs truncate" title="{{ $efiCertInfo['path'] }}">
+                    {{ $efiCertInfo['path'] }}
+                </span>
+            @endif
         </div>
 
         <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">

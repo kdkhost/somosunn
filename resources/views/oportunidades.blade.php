@@ -110,15 +110,15 @@
     <div class="min-h-screen bg-slate-50 overflow-hidden">
 
         <!-- Hero Section - IDÊNTICO AO DE EVENTOS (LIMPO E CLARO) -->
-        <section class="unn-events-hero relative z-30">
+        <section class="unn-events-hero relative z-30 overflow-visible">
             <div class="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/20 pointer-events-none"></div>
 
-            <div class="px-4 md:px-12 lg:px-24 pt-10 md:pt-14 pb-44 md:pb-60 relative z-20">
+            <div class="px-4 md:px-12 lg:px-24 pt-10 md:pt-14 pb-52 md:pb-68 relative z-30">
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center">
                         <span
                             class="inline-flex items-center justify-center px-6 py-2 rounded-full text-sm font-bold text-white border border-white/20 bg-white/15 backdrop-blur shadow-sm">
-                            {!! strip_tags(html_entity_decode(html_entity_decode(($pageData['hero_badge'] ?? null) ?: 'Carreiras & Oportunidades', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8')) !!}
+                            {!! str_replace('&amp;', '&', strip_tags(html_entity_decode(($pageData['hero_badge'] ?? null) ?: 'Carreiras & Oportunidades', ENT_QUOTES, 'UTF-8'))) !!}
                         </span>
                         <h1 class="mt-6 text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-6">
                             {!! strip_tags(html_entity_decode(html_entity_decode(($pageData['hero_title'] ?? null) ?: 'Descubra seu próximo passo na SOMOS UNN Startups', ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8')) !!}
@@ -167,7 +167,7 @@
                                             class="w-full h-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 text-sm font-medium placeholder:text-slate-400">
                                     </div>
                                     {{-- Custom Dropdown Estilizado (Substitui select nativo sem estilo) --}}
-                                    <div class="w-full md:w-60 relative select-none z-50" id="custom-tipo-container">
+                                    <div class="w-full md:w-60 relative select-none z-[60]" id="custom-tipo-container">
                                         <input type="hidden" name="tipo" id="filtro-tipo" value="{{ request('tipo') }}">
                                         
                                         <button type="button" id="custom-tipo-trigger"
@@ -179,12 +179,14 @@
                                                     {{ request('tipo') ? request('tipo') : 'Tipo de vaga' }}
                                                 </span>
                                             </span>
-                                            <i id="custom-tipo-arrow" class="fas fa-chevron-down text-slate-400 text-xs transition-transform duration-200 shrink-0"></i>
+                                            <span class="shrink-0 flex items-center justify-center text-slate-400">
+                                                <i id="custom-tipo-arrow" class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                                            </span>
                                         </button>
 
                                         {{-- Menu Dropdown Flutuante Estilo React / Radix / Shadcn UI --}}
                                         <div id="custom-tipo-menu"
-                                            class="hidden absolute top-full mt-2 left-0 right-0 w-full md:min-w-[260px] bg-white rounded-2xl border border-slate-200/90 py-2.5 z-[100] overflow-hidden transform opacity-0 scale-95 transition-all duration-200 ease-out origin-top text-left shadow-[0_20px_50px_rgba(8,112,184,0.18),0_10px_25px_rgba(0,0,0,0.1)]"
+                                            class="hidden absolute top-full mt-2 left-0 right-0 w-full md:min-w-[260px] bg-white rounded-2xl border border-slate-200/90 py-2.5 z-[9999] overflow-hidden transform opacity-0 scale-95 transition-all duration-200 ease-out origin-top text-left shadow-[0_20px_50px_rgba(8,112,184,0.22),0_10px_25px_rgba(0,0,0,0.12)]"
                                             role="listbox">
                                             <div class="px-3.5 pb-2 mb-1.5 border-b border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                                                 <span>Tipo de Vaga</span>
@@ -587,7 +589,7 @@
                         // Ajustar posicionamento inteligente (para cima ou para baixo)
                         const rect = trigger.getBoundingClientRect();
                         const spaceBelow = window.innerHeight - rect.bottom;
-                        if (spaceBelow < 280 && rect.top > 250) {
+                        if (spaceBelow < 300 && rect.top > 280) {
                             menu.classList.remove('top-full', 'mt-2', 'origin-top');
                             menu.classList.add('bottom-full', 'mb-2', 'origin-bottom');
                         } else {

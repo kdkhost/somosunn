@@ -44,6 +44,20 @@ class EnsurePurchaseEligibility
                 ->with('error', 'Valide seu e-mail antes de realizar uma compra.');
         }
 
+        if (!$user->isProfileComplete()) {
+            $message = 'Complete seu cadastro no perfil antes de participar de eventos, mentorias, adquirir cursos e benefícios.';
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'message' => $message,
+                    'requires_profile_completion' => true,
+                    'profile_url' => route('panel.profile.edit'),
+                ], 403);
+            }
+
+            return redirect()->route('panel.profile.edit')
+                ->with('warning', $message);
+        }
+
         if (!$this->legalConsent->hasAcceptedCurrentVersion($user)) {
             $message = 'Aceite os Termos de Uso, a Política de Privacidade e o Consentimento LGPD antes de realizar uma compra.';
 

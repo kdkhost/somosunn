@@ -753,6 +753,7 @@
                                 {{-- Pílulas de filtro rápido por meio --}}
                                 <div class="flex items-center gap-1 overflow-x-auto pb-1 text-[10px] font-semibold">
                                     <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-blue-600 text-white transition-all whitespace-nowrap cursor-pointer" data-type="all">Todos</button>
+                                    <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="name">Nome</button>
                                     <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="role">Cargo</button>
                                     <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="company">Empresa</button>
                                     <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="city">Cidade</button>

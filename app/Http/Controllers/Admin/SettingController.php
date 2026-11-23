@@ -47,11 +47,20 @@ class SettingController extends Controller
             return \App\Models\Setting::getUrl($key);
         };
 
-        if (request()->routeIs('panel.*')) {
-            return view('panel.admin.settings.index', compact('settings', 'group', 'getUrl'));
+        $efiCertInfo = null;
+        if ($group === 'gateway') {
+            try {
+                $efiCertInfo = app(\App\Services\Payment\EfiService::class)->getCertificateInfo();
+            } catch (\Throwable $e) {
+                $efiCertInfo = null;
+            }
         }
 
-        return view('admin.settings.index', compact('settings', 'group', 'getUrl'));
+        if (request()->routeIs('panel.*')) {
+            return view('panel.admin.settings.index', compact('settings', 'group', 'getUrl', 'efiCertInfo'));
+        }
+
+        return view('admin.settings.index', compact('settings', 'group', 'getUrl', 'efiCertInfo'));
     }
 
     /**
@@ -343,6 +352,24 @@ class SettingController extends Controller
         }
         if ($request->hasFile('marketplace_exit_banner_image')) {
             $this->replaceFile('marketplace_exit_banner_image', $this->storeUploadedPublicFile($request->file('marketplace_exit_banner_image'), 'uploads/imagens/marketplace/exit'));
+        }
+
+        // Upload e conversão do certificado Efí (Gerencianet Pix)
+        if ($request->hasFile('efi_certificate_file')) {
+            try {
+                $passphrase = $request->input('efi_certificate_passphrase');
+                $certPath = app(\App\Services\Payment\EfiService::class)->uploadCertificate(
+                    $request->file('efi_certificate_file'),
+                    $passphrase
+                );
+                Setting::set('efi_certificate_path', $certPath, 'gateway');
+            } catch (\Throwable $e) {
+                \Log::error('Erro ao processar certificado Efi: ' . $e->getMessage());
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['message' => 'Erro ao processar certificado Efi: ' . $e->getMessage()], 422);
+                }
+                return redirect()->back()->with('error', 'Erro ao processar certificado Efi: ' . $e->getMessage())->withInput();
+            }
         }
 
         // Mapeamento de booleanos por grupo para garantir que desativar (unchecked) funcione

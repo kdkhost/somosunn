@@ -76,6 +76,9 @@ class Kernel extends ConsoleKernel
         } catch (\Throwable $e) {
             Log::error('Erro ao carregar scheduler central do banco: ' . $e->getMessage());
         }
+
+        // Limpeza diária automática de novos cadastros não validados
+        $schedule->command('members:cleanup-unverified')->dailyAt('03:00');
     }
 
     protected function commands(): void

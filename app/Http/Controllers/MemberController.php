@@ -99,6 +99,20 @@ class MemberController extends Controller
                 });
             }
 
+            // REGRA: Membros de caráter gratuito só podem ver membros do mesmo patamar (gratuito)
+            $currentUser = auth()->user();
+            $isFreeUserRestricted = false;
+            if ($currentUser && $currentUser->isFreeMember() && !$currentUser->isAdmin()) {
+                $isFreeUserRestricted = true;
+                $query->where(function ($q) {
+                    $q->whereNull('plan_id')
+                        ->orWhereHas('plan', function ($pq) {
+                            $pq->where('is_free', true)
+                                ->orWhere('price', '<=', 0);
+                        });
+                });
+            }
+
             // --- FILTRO DE BUSCA MULTIFACETADO NA PÁGINA PÚBLICA ---
             // 1. Busca textual livre (Nome, Profissão, Empresa, Bio)
             $search = trim($request->input('q') ?: $request->input('search') ?: '');
@@ -301,7 +315,8 @@ class MemberController extends Controller
             'connectionMap',
             'pageData',
             'availableCities',
-            'availablePlans'
+            'availablePlans',
+            'isFreeUserRestricted'
         ));
     }
 
