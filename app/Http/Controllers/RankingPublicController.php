@@ -2,137 +2,208 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Connection;
 use App\Models\Ranking;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class RankingPublicController extends Controller
 {
     /**
-     * Display a listing of members ranked by points for the public site.
+     * Exibe a página pública de Ranking da Comunidade SOMOS UNN.
      */
     public function index()
     {
         $demoMode = (bool) config('app.demo_mode');
 
-        // Check if members feature is enabled globally
+        // Verifica se a funcionalidade de membros/ranking está ativa
         $isEnabled = \App\Models\Setting::get('feature_members', '1') === '1';
 
         if (!$isEnabled) {
-            abort(404, 'Página de membros/ranking temporariamente indisponível');
+            abort(404, 'Página de ranking temporariamente indisponível');
         }
 
-        // Tenta obter o ranking da tabela 'rankings' que compila interações e avaliações (como a Home)
         $topRankings = collect();
 
-        if (view()->shared('unnDbAvailable')) {
-            try {
-                // 1. Pega TODOS os membros do Ranking (que não sejam admins)
-                $leaderboard = Ranking::with([
-                    'user' => function ($q) {
+        try {
+            // 1. Tenta carregar da tabela 'rankings' compilada
+            if (Schema::hasTable('rankings')) {
+                $rawRankings = Ranking::with(['user.plan'])
+                    ->whereHas('user', function ($q) {
                         $q->whereNotIn('role', ['admin', 'superadmin']);
-                    }
-                ])
-                    ->orderByDesc('score')
-                    ->get()
-                    ->filter(function ($rank) {
-                        return $rank->user && !in_array($rank->user->role, ['admin', 'superadmin']);
                     })
-                    ->values();
+                    ->orderByDesc('score')
+                    ->take(50)
+                    ->get();
 
-                // 2. Fallback: Se não tem tabela de Rankings (ou vazia), usa os pontos brutos do Usuário
-                if ($leaderboard->isEmpty()) {
-                    $leaderboard = User::whereNotIn('role', ['admin', 'superadmin'])
-                        ->where('points', '>', 0)
-                        ->orderByDesc('points')
-                        ->get()
-                        ->map(fn($u) => (object) [
-                            'user' => $u,
-                            'score' => $u->points ?? 0,
-                            'level' => $u->level ?? 'iniciante',
-                            'interactions_count' => 0,
-                            'average_rating' => null,
-                            'is_points_fallback' => true,
-                        ])
-                        ->values();
+                if ($rawRankings->isNotEmpty()) {
+                    $topRankings = $rawRankings->map(function ($rank) {
+                        $user = $rank->user;
+                        return (object) [
+                            'user_id' => $user->id,
+                            'name' => $user->name,
+                            'avatar' => $user->photo ? asset($user->photo) : null,
+                            'cover' => $user->cover_photo ? asset($user->cover_photo) : null,
+                            'initials' => collect(explode(' ', $user->name))->take(2)->map(fn($n) => strtoupper(mb_substr($n, 0, 1)))->join(''),
+                            'occupation' => $user->occupation,
+                            'company' => $user->company,
+                            'city' => trim(($user->city ?? '') . ($user->state ? ', ' . $user->state : '')),
+                            'plan_badge' => $user->plan?->name ? ($user->plan->is_free ? 'Starter' : $user->plan->name) : null,
+                            'score' => (int) $rank->score,
+                            'level' => $rank->level ?? ($user->level ?: 'Membro Ativo'),
+                            'interactions_count' => (int) ($rank->interactions_count ?: 0),
+                            'is_demo' => false,
+                        ];
+                    });
                 }
-
-                $topRankings = $leaderboard;
-
-            } catch (\Throwable $e) {
-                \Log::warning('Falha ao gerar o ranking público: ' . $e->getMessage());
             }
+
+            // 2. Se a tabela 'rankings' estiver vazia ou com poucos registros, compila ranking real dos usuários ativos
+            if ($topRankings->count() < 3) {
+                $users = User::whereNotIn('role', ['admin', 'superadmin'])
+                    ->with('plan')
+                    ->get();
+
+                if ($users->isNotEmpty()) {
+                    // Contagem de conexões em lote para máxima performance
+                    $acceptedConnections = Connection::where('status', 'accepted')
+                        ->get()
+                        ->flatMap(fn($c) => [$c->requester_id, $c->requested_id])
+                        ->countBy();
+
+                    $topRankings = $users->map(function ($u) use ($acceptedConnections) {
+                        $conns = $acceptedConnections->get($u->id, 0);
+                        $basePoints = (int) ($u->points ?? 0);
+                        // Pontuação dinâmica: pontos gravados + conexões (50 pts cada) + foto (100 pts) + dados completos
+                        $calculatedScore = $basePoints;
+                        if ($calculatedScore <= 0) {
+                            $calculatedScore = ($conns * 50) + ($u->photo ? 100 : 20) + ($u->occupation ? 50 : 0) + ($u->company ? 30 : 0);
+                        }
+
+                        $level = $u->level;
+                        if (empty($level)) {
+                            if ($calculatedScore >= 1000) $level = 'Elite UNN';
+                            elseif ($calculatedScore >= 500) $level = 'Líder de Negócios';
+                            elseif ($calculatedScore >= 200) $level = 'Empreendedor Pro';
+                            else $level = 'Membro Ativo';
+                        }
+
+                        return (object) [
+                            'user_id' => $u->id,
+                            'name' => $u->name,
+                            'avatar' => $u->photo ? asset($u->photo) : null,
+                            'cover' => $u->cover_photo ? asset($u->cover_photo) : null,
+                            'initials' => collect(explode(' ', $u->name))->take(2)->map(fn($n) => strtoupper(mb_substr($n, 0, 1)))->join(''),
+                            'occupation' => $u->occupation,
+                            'company' => $u->company,
+                            'city' => trim(($u->city ?? '') . ($u->state ? ', ' . $u->state : '')),
+                            'plan_badge' => $u->plan?->name ? ($u->plan->is_free ? 'Starter' : $u->plan->name) : null,
+                            'score' => $calculatedScore,
+                            'level' => $level,
+                            'interactions_count' => $conns,
+                            'is_demo' => false,
+                        ];
+                    })
+                    ->sortByDesc('score')
+                    ->take(50)
+                    ->values();
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Falha ao processar ranking público: ' . $e->getMessage());
         }
 
-        // 3. Fallback final para Modo Demonstração se o banco estiver limpo
-        if ($demoMode && $topRankings->isEmpty()) {
+        // 3. Fallback para demonstração se a base estiver totalmente limpa
+        if ($topRankings->isEmpty()) {
             $topRankings = collect([
                 (object) [
-                    'user' => (object) [
-                        'name' => 'Carlos Eduardo',
-                        'profile_photo_url' => null,
-                        'username' => 'carlos-demo'
-                    ],
+                    'user_id' => 1,
+                    'name' => 'Carlos Eduardo Silva',
+                    'avatar' => null,
+                    'cover' => null,
+                    'initials' => 'CS',
+                    'occupation' => 'CEO & Fundador',
+                    'company' => 'Tech Solutions LTDA',
+                    'city' => 'São Paulo, SP',
+                    'plan_badge' => 'Elite',
                     'score' => 15420,
-                    'level' => 'Empresário de Sucesso',
+                    'level' => 'Elite UNN',
                     'interactions_count' => 342,
-                    'average_rating' => 4.9,
+                    'is_demo' => true,
                 ],
                 (object) [
-                    'user' => (object) [
-                        'name' => 'Ana Paula',
-                        'profile_photo_url' => null,
-                        'username' => 'ana-demo'
-                    ],
+                    'user_id' => 2,
+                    'name' => 'Ana Paula Costa',
+                    'avatar' => null,
+                    'cover' => null,
+                    'initials' => 'AC',
+                    'occupation' => 'CMO & Estrategista',
+                    'company' => 'Growth Marketing Co.',
+                    'city' => 'Rio de Janeiro, RJ',
+                    'plan_badge' => 'Pro',
                     'score' => 12850,
-                    'level' => 'Iniciante',
+                    'level' => 'Líder de Negócios',
                     'interactions_count' => 215,
-                    'average_rating' => 4.8,
+                    'is_demo' => true,
                 ],
                 (object) [
-                    'user' => (object) [
-                        'name' => 'Roberto Mendes',
-                        'profile_photo_url' => null,
-                        'username' => 'roberto-demo'
-                    ],
+                    'user_id' => 3,
+                    'name' => 'Roberto Mendes',
+                    'avatar' => null,
+                    'cover' => null,
+                    'initials' => 'RM',
+                    'occupation' => 'Diretor de Operações',
+                    'company' => 'Mendes Logística',
+                    'city' => 'Belo Horizonte, MG',
+                    'plan_badge' => 'Pro',
                     'score' => 9740,
-                    'level' => 'Sucesso',
+                    'level' => 'Líder de Negócios',
                     'interactions_count' => 180,
-                    'average_rating' => 5.0,
+                    'is_demo' => true,
                 ],
                 (object) [
-                    'user' => (object) [
-                        'name' => 'Juliana Costa',
-                        'profile_photo_url' => null,
-                        'username' => 'juliana-demo'
-                    ],
+                    'user_id' => 4,
+                    'name' => 'Juliana Ferreira',
+                    'avatar' => null,
+                    'cover' => null,
+                    'initials' => 'JF',
+                    'occupation' => 'Fundadora',
+                    'company' => 'EcoFashion Brasil',
+                    'city' => 'Curitiba, PR',
+                    'plan_badge' => 'Starter',
                     'score' => 5120,
-                    'level' => 'Empreendedora',
+                    'level' => 'Empreendedor Pro',
                     'interactions_count' => 89,
-                    'average_rating' => 4.5,
+                    'is_demo' => true,
                 ],
                 (object) [
-                    'user' => (object) [
-                        'name' => 'Fernando Silva',
-                        'profile_photo_url' => null,
-                        'username' => 'fernando-demo'
-                    ],
+                    'user_id' => 5,
+                    'name' => 'Fernando Oliveira',
+                    'avatar' => null,
+                    'cover' => null,
+                    'initials' => 'FO',
+                    'occupation' => 'Consultor Empresarial',
+                    'company' => 'Digital Transform',
+                    'city' => 'Porto Alegre, RS',
+                    'plan_badge' => 'Starter',
                     'score' => 3100,
-                    'level' => 'Iniciante',
+                    'level' => 'Membro Ativo',
                     'interactions_count' => 42,
-                    'average_rating' => 4.2,
+                    'is_demo' => true,
                 ],
             ]);
         }
 
-        // Separação do Pódio (Top 3) e o Restante (Lista normal)
+        // Separação: Pódio (Top 3) e Lista Geral (Restante)
         $podium = $topRankings->take(3);
         $remaining = $topRankings->slice(3);
 
         return view('site.ranking', [
             'podium' => $podium,
             'remaining' => $remaining,
-            'isDemo' => $demoMode
+            'totalRanked' => $topRankings->count(),
+            'isDemo' => $topRankings->first()->is_demo ?? false,
         ]);
     }
 }

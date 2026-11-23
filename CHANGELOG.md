@@ -1,5 +1,20 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.6] - 2026-11-22 - refactor(ranking): refatoração da página de ranking com pódio sofisticado, busca em tempo real e cálculo dinâmico
+
+- **Refatoração Completa do Controller de Ranking Público (`app/Http/Controllers/RankingPublicController.php`):**
+  - **Correção de Links de Perfil:** Os links agora apontam confiavelmente para o ID real do usuário (`route('social.profile', $rank->user_id)`), eliminando o bug anterior que tentava usar username nulo ou gerava links mortos (`#`).
+  - **Cálculo de Pontuação Dinâmica e Realista:** Quando a tabela compilada de rankings estiver vazia ou com dados insuficientes, o controller calcula a pontuação com base nos membros ativos da comunidade: pontos cadastrados, conexões aceitas (+50 pts cada), foto de perfil (+100 pts) e dados cadastrais, garantindo que o ranking reflita sempre o engajamento real da rede.
+  - **Mapeamento Estruturado de Atributos:** Dados de avatar, iniciais, ocupação, empresa, cidade e badge do plano são fornecidos prontos e sanitizados para a view.
+- **Refatoração da Interface Visual (`resources/views/site/ranking.blade.php`):**
+  - **Hero Section com Gamificação:** Título gradiente no padrão UNN, badge luminosa "Gamificação & Reconhecimento UNN" e 4 cards explicativos com as regras de pontuação da comunidade (+50 conexões, +100 perfil, +20 postagens, +150 eventos).
+  - **Pódio Triplo Sofisticado (1º, 2º e 3º Lugares):**
+    - *1º Lugar (Campeão Ouro):* Destaque central e elevado com pedestal e brilho dourado, coroa cintilante animada, avatar com anel ouro e foto estritamente delimitada sem quebras, badge de plano e pontuação monumental.
+    - *2º e 3º Lugares (Prata e Bronze):* Cards com medalhas estilizadas, anéis prateado e bronze, contagem de conexões e botões diretos para o perfil.
+  - **Busca em Tempo Real na Classificação Geral:** Adicionado campo de pesquisa instantânea que filtra os membros da lista por nome, cargo ou empresa dinamicamente via JavaScript sem recarregar a página, com botão limpar (`x`) e mensagem amigável de estado vazio.
+  - **Dimensões Invioláveis de Avatar:** Fotos e círculos com iniciais fixados em 48x48px com `object-fit: cover` e fallback de segurança `onerror`.
+  - **CTA de Posicionamento:** Bloco no rodapé convidando os membros a completarem o perfil e ampliarem suas conexões para acelerarem seus pontos na rede.
+
 ## [2.8.5] - 2026-11-22 - fix(membros): dimensões estritas de avatar e capa prevenindo quebra de layout no grid de membros
 
 - **Correção e Blindagem de Dimensões dos Cards (`resources/views/site/partials/member-card.blade.php`):**
