@@ -150,8 +150,7 @@ class SocialController extends Controller
                     foreach ($words as $w) {
                         $sub->where('name', 'like', "%{$w}%");
                     }
-                })->orWhere('name', 'like', "%{$term}%")
-                  ->orWhere('username', 'like', "%{$term}%");
+                })->orWhere('name', 'like', "%{$term}%");
             });
         } elseif ($filterType === 'role' || $filterType === 'occupation') {
             $query->where(function ($q) use ($term, $words) {
@@ -182,7 +181,6 @@ class SocialController extends Controller
                     }
                 })
                 ->orWhere('name', 'like', "%{$term}%")
-                ->orWhere('username', 'like', "%{$term}%")
                 ->orWhere('occupation', 'like', "%{$term}%")
                 ->orWhere('company', 'like', "%{$term}%")
                 ->orWhere('city', 'like', "%{$term}%")

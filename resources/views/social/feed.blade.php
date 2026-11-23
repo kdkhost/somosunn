@@ -738,19 +738,23 @@
                                     </a>
                                 </div>
 
-                                {{-- Input de busca com ícone e botão limpar --}}
+                                {{-- Input de busca com ícone e botão limpar perfeitamente contido --}}
                                 <div class="relative w-full mb-2.5">
-                                    <div class="relative flex items-center w-full">
-                                        <i class="fas fa-search text-gray-400 absolute left-3.5 pointer-events-none text-xs"></i>
+                                    <div class="relative w-full">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                            <i class="fas fa-search text-xs"></i>
+                                        </div>
                                         <input type="text" id="feed-member-search"
                                             placeholder="Nome, cargo, empresa ou cidade..."
                                             autocomplete="off"
-                                            class="w-full block bg-slate-50 border border-gray-200 rounded-full pl-9 pr-9 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-gray-400 font-medium">
-                                        <button type="button" id="feed-member-search-clear" 
-                                            class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer rounded-full hover:bg-slate-200/60"
-                                            title="Limpar busca">
-                                            <i class="fas fa-times text-[10px]"></i>
-                                        </button>
+                                            class="w-full bg-slate-50 border border-gray-200 rounded-full pl-8 pr-8 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-gray-400 font-medium">
+                                        <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center">
+                                            <button type="button" id="feed-member-search-clear" 
+                                                class="hidden w-5 h-5 items-center justify-center text-gray-400 hover:text-gray-700 transition-colors cursor-pointer rounded-full hover:bg-slate-200"
+                                                title="Limpar busca">
+                                                <i class="fas fa-times text-[10px]"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -2783,7 +2787,13 @@
                 searchInput.addEventListener('input', function() {
                     const q = this.value.trim();
                     if (clearBtn) {
-                        clearBtn.classList.toggle('hidden', q.length === 0);
+                        if (q.length > 0) {
+                            clearBtn.classList.remove('hidden');
+                            clearBtn.classList.add('flex');
+                        } else {
+                            clearBtn.classList.add('hidden');
+                            clearBtn.classList.remove('flex');
+                        }
                     }
 
                     clearTimeout(debounceTimer);
@@ -2797,7 +2807,8 @@
                 if (clearBtn) {
                     clearBtn.addEventListener('click', function() {
                         searchInput.value = '';
-                        this.classList.add('hidden');
+                        clearBtn.classList.add('hidden');
+                        clearBtn.classList.remove('flex');
                         resetSearch();
                         searchInput.focus();
                     });

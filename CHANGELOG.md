@@ -1,5 +1,14 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.11] - 2026-11-22 - fix(social, busca): corrigir erro SQL 1054 em busca de membros e embutir botão de limpar perfeitamente no input
+
+- **Resolução de Erro SQL na Busca de Membros (`app/Http/Controllers/SocialController.php`):**
+  - Identificada e eliminada referência à coluna inexistente `username` que provocava a exceção `SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'WHERE'` ao pesquisar membros (como no caso da busca por "Neka").
+  - Busca agora indexa com precisão por nome completo (`name`), múltiplos termos do nome, cargo/ocupação (`occupation`), biografia (`bio`), empresa (`company`), cidade (`city`) e estado (`state`), permitindo que membros reais como "Neka Assis" sejam encontrados instantaneamente tanto pelo filtro geral quanto pelo filtro de "Nome".
+- **Alinhamento e Embutimento Perfeito do Botão de Limpar Busca (`resources/views/social/feed.blade.php`):**
+  - Reestruturado o container do input de busca com posicionamento relativo e `absolute inset-y-0 right-0 pr-2.5`, garantindo que o ícone de limpar ('X') fique sempre contido dentro da borda arredondada do campo de busca sem transbordar para fora.
+  - Sincronização de classes no JavaScript com controle estrito de `hidden` e `flex`, prevenindo qualquer deformação do layout durante a digitação.
+
 ## [2.8.10] - 2026-11-22 - feat(ranking): redesign hyper moderno, pódio refinado com animações contínuas e experiência visual de alto nível
 
 - **Reformulação Estética Hyper Moderna da Página de Ranking (`resources/views/site/ranking.blade.php`):**
