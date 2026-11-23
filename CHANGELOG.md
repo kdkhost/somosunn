@@ -1,5 +1,15 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.12] - 2026-11-22 - feat(gateway, uploads): padronizar upload do certificado Efí com arrasta e solta, preview e temporizador
+
+- **Padronização do Campo de Upload do Gateway Efí (`resources/views/panel/admin/settings/partials/gateway.blade.php`, `resources/views/admin/settings/partials/gateway.blade.php`):**
+  - **Painel Novo (Tailwind):** Substituído o input nativo tradicional (`fileupload básico`) pelo componente padronizado de **Arrasta e Solta com FilePond** (`class="filepond"`), configurado para aceitar certificados criptográficos `.p12`, `.pem` e `.crt` até 20 MB com preview do arquivo, nome legível, tamanho e botão de remoção.
+  - **Inicialização Dinâmica de Abas:** O método `gwSwitchMain('efi-tab')` agora garante a inicialização sob demanda do FilePond mesmo quando a aba da Efí começa oculta.
+  - **Admin Antigo (AdminLTE):** Integrado o componente oficial `<x-unn-dropzone>` com tema `admin-lte`, ícone de certificado (`fas fa-shield-alt`), drag-and-drop nativo e preview de arquivo.
+- **Temporizador e Barra de Progresso em Tempo Real (`resources/views/panel/admin/settings/index.blade.php`, `resources/views/panel/layouts/app.blade.php`):**
+  - O envio do formulário de configurações foi integrado ao sistema de upload com XMLHttpRequest e barra flutuante (`ensureUploadProgressCard`), calculando velocidade em KB/s, porcentagem e **temporizador regressivo de upload em tempo real** ("calculando tempo restante...", "2s restantes", etc.) sempre que houver envio de arquivos.
+  - Expostas no escopo global as funções utilitárias de upload e progresso para interoperabilidade contínua.
+
 ## [2.8.11] - 2026-11-22 - fix(social, busca): corrigir erro SQL 1054 em busca de membros e embutir botão de limpar perfeitamente no input
 
 - **Resolução de Erro SQL na Busca de Membros (`app/Http/Controllers/SocialController.php`):**

@@ -870,12 +870,16 @@
                         return false;
                     }
 
+                    if (input.classList.contains('filepond')) {
+                        return true;
+                    }
+
                     const computed = window.getComputedStyle(input);
                     if (computed.display === 'none' || computed.visibility === 'hidden') {
                         return false;
                     }
 
-                    return input.offsetParent !== null || input.classList.contains('filepond');
+                    return input.offsetParent !== null;
                 }
 
                 function createFilePondForInput(input) {
@@ -1094,6 +1098,14 @@
                     root.querySelectorAll('input[type="file"]').forEach(createFilePondForInput);
                     attachUploadProgressToForms(root);
                 };
+
+                window.createFilePondForInput = createFilePondForInput;
+                window.ensureUploadProgressCard = ensureUploadProgressCard;
+                window.updateUploadProgressCard = updateUploadProgressCard;
+                window.setUploadCardVisible = setUploadCardVisible;
+                window.formatRemainingTime = formatRemainingTime;
+                window.formatBytes = formatBytes;
+                window.formHasSelectedFiles = formHasSelectedFiles;
 
                 window.initializePanelDateTimePickers = function (root = document) {
                     if (!window.flatpickr) {

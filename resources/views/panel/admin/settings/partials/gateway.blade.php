@@ -869,11 +869,25 @@
                 <input type="text" name="efi_pix_key" value="{{ $settings['efi_pix_key'] ?? '' }}"
                     class="gw-input w-full px-4 py-3 rounded-xl font-bold text-sm" placeholder="EVP, CNPJ ou E-mail">
             </div>
-            <div>
-                <label class="gw-label">Upload do Certificado (.p12 ou .pem)</label>
-                <input type="file" name="efi_certificate_file" id="panel_efi_certificate_file" accept=".p12,.pem,.crt"
-                    class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300 cursor-pointer">
-                <span class="text-[11px] text-slate-400 mt-1 block">O arquivo .p12 é convertido automaticamente para .pem seguro.</span>
+            <div class="md:col-span-2">
+                <label class="gw-label flex items-center justify-between mb-2">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-file-contract text-blue-600 dark:text-blue-400"></i>
+                        <span>Upload do Certificado Efí (.p12 ou .pem)</span>
+                    </span>
+                    <span class="text-[11px] font-semibold text-slate-400 dark:text-slate-500">Padrão da Plataforma (Arrasta e Solta com Preview e Temporizador)</span>
+                </label>
+                <div class="rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 p-2 bg-slate-50/50 dark:bg-slate-900/40">
+                    <input type="file" name="efi_certificate_file" id="panel_efi_certificate_file"
+                        accept=".p12,.pem,.crt,application/x-pkcs12,application/x-pem-file,application/octet-stream"
+                        class="filepond"
+                        data-max-file-size="20MB"
+                        data-max-files="1">
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-2 mt-2 text-[11px] text-slate-400 dark:text-slate-500">
+                    <span><i class="fas fa-shield-alt text-emerald-500 mr-1"></i>O arquivo <strong>.p12</strong> é convertido automaticamente em <strong>.pem seguro</strong> no servidor.</span>
+                    <span>Formatos suportados: <strong>.p12, .pem, .crt</strong> (máx. 20 MB)</span>
+                </div>
             </div>
             <div>
                 <label class="gw-label">Senha do Certificado (.p12)</label>
@@ -956,7 +970,14 @@
     window.gwSwitchMain = function(tabId) {
         document.querySelectorAll('.main-gateway-panel').forEach(p => p.classList.add('hidden'));
         const panel = document.getElementById(tabId);
-        if (panel) panel.classList.remove('hidden');
+        if (panel) {
+            panel.classList.remove('hidden');
+            if (window.initializePanelFileUploads) {
+                window.initializePanelFileUploads(panel);
+            } else if (window.createFilePondForInput) {
+                panel.querySelectorAll('input[type="file"].filepond').forEach(window.createFilePondForInput);
+            }
+        }
 
         document.querySelectorAll('.main-gateway-tab-btn').forEach(btn => {
             btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');

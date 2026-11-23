@@ -799,12 +799,20 @@
                         <input type="text" name="efi_pix_key" class="form-control"
                             value="{{ $settings['efi_pix_key'] ?? '' }}" placeholder="EVP, CNPJ, e-mail ou telefone">
                     </div>
-                    <div class="col-md-4 form-group">
-                        <label>Upload do Certificado (.p12 ou .pem)</label>
-                        <input type="file" name="efi_certificate_file" id="admin_efi_certificate_file" class="form-control-file" accept=".p12,.pem,.crt">
+                    <div class="col-md-6 form-group">
+                        <label class="font-weight-bold d-flex align-items-center justify-content-between">
+                            <span><i class="fas fa-file-contract text-primary mr-1"></i> Upload do Certificado Efí (.p12 ou .pem)</span>
+                            <span class="badge badge-light text-muted">Arrasta e Solta</span>
+                        </label>
+                        <x-unn-dropzone name="efi_certificate_file" accept=".p12,.pem,.crt,application/x-pkcs12,application/x-pem-file,application/octet-stream"
+                            label="Arraste e solte o certificado Efí (.p12 ou .pem)"
+                            hint="ou clique para selecionar no computador"
+                            icon="fas fa-shield-alt"
+                            :maxSizeMb="20"
+                            theme="admin-lte" />
                         <small class="form-text text-muted">Envie o certificado emitido pela Efí (.p12 é convertido automaticamente para .pem).</small>
                     </div>
-                    <div class="col-md-4 form-group">
+                    <div class="col-md-6 form-group">
                         <label>Senha do Certificado (.p12)</label>
                         <input type="password" name="efi_certificate_passphrase" id="admin_efi_certificate_passphrase" class="form-control"
                             placeholder="Deixe em branco se não houver senha">
