@@ -1,5 +1,28 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.3] - 2026-11-22 - fix(membros, ux): correção definitiva de z-index nos dropdowns, refatoração de layout e melhoria visual dos cards de membros
+
+- **Correção Definitiva do Dropdown Sobreposto pelos Cards (`resources/views/site/membros.blade.php`):**
+  - **Empilhamento de Camadas (Stacking Context):** A seção do formulário de filtros e seu container receberam `relative z-50` e a seção de membros inferior recebeu `relative z-10`.
+  - **Elevação Dinâmica de Z-Index:** O mecanismo JavaScript `initCustomDropdown` agora eleva instantaneamente o container do dropdown aberto para `z-[100]`, garantindo que o menu nunca mais fique atrás de outros campos de busca ou dos cards de membros abaixo.
+  - **Abertura Inteligente no Viewport:** O menu calcula dinamicamente a distância inferior da tela e inverte para cima (`bottom-full mb-2 origin-bottom`) sempre que o espaço inferior for insuficiente, com sombra volumétrica profunda (`shadow-[0_25px_60px_rgba(8,112,184,0.22),0_15px_30px_rgba(0,0,0,0.12)]`).
+  - **Submissão Ágil de Filtros:** Ao clicar em uma opção de Cidade, Plano ou Ordenação, o formulário agora aplica o filtro automaticamente para navegação fluida.
+- **Refatoração Completa do Layout da Página de Membros (`resources/views/site/membros.blade.php`):**
+  - **Hero Institucional Moderno:** Adicionada badge com pulso de atividade "Rede de Empreendedores UNN" e tipografia limpa com o gradiente característico azul UNN.
+  - **Cards de Métricas (Stats) Reestilizados:** 4 cards com ícones circulares correspondentes, contornos suaves e números com tipografia de destaque.
+  - **Barra de Busca com Botão Limpar Rápido:** Adicionado botão `x` interno no campo de busca de texto para limpeza instantânea.
+  - **Chips / Badges de Filtros Ativos:** Exibição de etiquetas interativas com botão de exclusão individual para busca, cidade ou plano ativo, além da ação "Limpar tudo".
+- **Melhoria Visual e Hierárquica dos Cards de Membros (`resources/views/site/partials/member-card.blade.php`):**
+  - **Capa com Gradiente UNN:** Cabeçalho com gradiente de alta definição (`from-blue-700 via-blue-600 to-indigo-700`).
+  - **Badges de Plano com Estilos Exclusivos:**
+    - *Plano Elite:* Badge dourado com coroa e anel brilhante (`bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500`).
+    - *Plano Pro:* Badge branco/azul com gema lapidada (`ring-1 ring-blue-300/40`).
+    - *Plano Starter / Gratuito:* Badge elegante e discreto.
+  - **Avatar com Anel de Destaque:** Avatar ampliado para `w-18 h-18` com borda `ring-4 ring-white` e sombra suave.
+  - **Tipografia e Botões de Ação:** Hierarquia nítida de nome, cargo, empresa e cidade com micro-ícones, além de botões arredondados em `rounded-xl`.
+- **Limpeza de Entidades HTML em Vagas (`resources/views/oportunidades.blade.php`):**
+  - **Prevenção de `&amp;` Residual:** Tratamento regex rigoroso no badge do hero de oportunidades para garantir que o texto seja sempre renderizado como `Carreiras & Oportunidades`.
+
 ## [2.8.2] - 2026-11-22 - fix(feed): correção do parsing de resposta da busca de membros e alinhamento do botão limpar no input
 
 - **Correção Crítica no Consumo da API de Busca de Membros (`resources/views/social/feed.blade.php`):**
