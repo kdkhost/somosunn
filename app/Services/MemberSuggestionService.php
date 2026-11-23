@@ -12,7 +12,11 @@ class MemberSuggestionService
         $excludedIds = array_unique(array_merge([$authUser->id], $blockedUserIds, $connectedUserIds));
 
         $query = User::whereNotIn('id', $excludedIds)
-            ->where('role', '!=', 'superadmin');
+            ->whereNotIn('role', ['admin', 'superadmin', 'sucesso', 'staff'])
+            ->where('name', 'not like', '%Admin%')
+            ->where('name', 'not like', '%Suporte%')
+            ->where('email', 'not like', '%admin%')
+            ->where('email', 'not like', '%suporte%');
 
         if (!$authUser->isAdmin()) {
             $query->where(function ($q) use ($connectedUserIds) {

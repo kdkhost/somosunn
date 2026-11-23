@@ -758,13 +758,13 @@
                                     </div>
                                 </div>
 
-                                {{-- Pílulas de filtro rápido por meio com padding e espaçamento padronizados --}}
-                                <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-[11px] font-semibold no-scrollbar">
-                                    <button type="button" class="feed-search-type-btn px-2.5 py-1 rounded-lg bg-blue-600 text-white transition-all whitespace-nowrap cursor-pointer shadow-2xs" data-type="all">Todos</button>
-                                    <button type="button" class="feed-search-type-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="name">Nome</button>
-                                    <button type="button" class="feed-search-type-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="role">Cargo</button>
-                                    <button type="button" class="feed-search-type-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="company">Empresa</button>
-                                    <button type="button" class="feed-search-type-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="city">Cidade</button>
+                                {{-- Pílulas de filtro rápido por meio - 100% responsivo e SEM NENHUM SCROLL --}}
+                                <div class="grid grid-cols-5 gap-1 text-[11px] font-bold w-full">
+                                    <button type="button" class="feed-search-type-btn py-1 px-0.5 rounded-lg bg-blue-600 text-white transition-all text-center truncate cursor-pointer shadow-2xs" data-type="all" title="Buscar em todos">Todos</button>
+                                    <button type="button" class="feed-search-type-btn py-1 px-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all text-center truncate cursor-pointer" data-type="name" title="Filtrar por nome">Nome</button>
+                                    <button type="button" class="feed-search-type-btn py-1 px-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all text-center truncate cursor-pointer" data-type="role" title="Filtrar por cargo">Cargo</button>
+                                    <button type="button" class="feed-search-type-btn py-1 px-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all text-center truncate cursor-pointer" data-type="company" title="Filtrar por empresa">Empresa</button>
+                                    <button type="button" class="feed-search-type-btn py-1 px-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all text-center truncate cursor-pointer" data-type="city" title="Filtrar por cidade">Cidade</button>
                                 </div>
 
                                 {{-- Estado de Carregamento --}}
@@ -783,67 +783,82 @@
                                 </div>
                             </div>
 
-                            <div id="feed-recommended-container">
-                                <h3 class="font-bold text-gray-900 text-sm mb-3">Recomendados</h3>
-                            <div class="space-y-3.5">
-                                @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
-                                    @php
-                                        $connectionMap = $connectionMap ?? [];
-                                        $authUserId = auth()->id();
-                                    @endphp
-                                    @foreach($recommendedUsers as $user)
+                            <div id="feed-recommended-container" class="pt-1">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-bold text-gray-900 text-sm flex items-center gap-1.5">
+                                        <i class="fas fa-user-friends text-blue-600 text-xs"></i>
+                                        <span>Recomendados</span>
+                                    </h3>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">Para você</span>
+                                </div>
+
+                                <div class="space-y-2.5">
+                                    @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
                                         @php
-                                            $connection = $connectionMap[$user->id] ?? null;
-                                            $isPending = $connection && $connection->status === 'pending';
-                                            $isConnected = $connection && $connection->status === 'accepted';
-                                            $isRequester = $connection && $authUserId && $connection->requester_id === $authUserId;
-                                            $pendingTime = $connection ? $connection->created_at->diffForHumans() : '';
+                                            $connectionMap = $connectionMap ?? [];
+                                            $authUserId = auth()->id();
                                         @endphp
-                                        <div class="flex items-center justify-between gap-3">
-                                            <div class="flex items-center gap-3">
-                                                <a class="rounded-full w-10 h-10 overflow-hidden flex-shrink-0"
-                                                    href="{{ route('social.profile', $user->id) }}">
-                                                    <img src="{{ $user->profile_photo_url }}" alt="Avatar"
-                                                        class="w-10 h-10 object-cover"
-                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
-                                                </a>
-                                                <div>
-                                                    <a href="{{ route('social.profile', $user->id) }}"
-                                                        class="text-sm font-semibold text-gray-800 hover:text-blue-600">
-                                                        {{ $user->name }}
+                                        @foreach($recommendedUsers as $user)
+                                            @php
+                                                $connection = $connectionMap[$user->id] ?? null;
+                                                $isPending = $connection && $connection->status === 'pending';
+                                                $isConnected = $connection && $connection->status === 'accepted';
+                                                $isRequester = $connection && $authUserId && $connection->requester_id === $authUserId;
+                                                $pendingTime = $connection ? $connection->created_at->diffForHumans() : '';
+                                                $occupationText = $user->occupation ?: ($user->company ?: 'Membro UNN');
+                                            @endphp
+                                            <div class="flex items-center justify-between gap-2.5 p-2 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors">
+                                                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                                    <a class="w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ring-slate-100 shadow-2xs block"
+                                                        href="{{ route('social.profile', $user->id) }}">
+                                                        <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}"
+                                                            class="w-full h-full object-cover"
+                                                            style="width: 40px; height: 40px; object-fit: cover;"
+                                                            onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                                     </a>
-                                                    <p class="text-xs text-gray-500">Membro</p>
+                                                    <div class="min-w-0 flex-1">
+                                                        <a href="{{ route('social.profile', $user->id) }}"
+                                                            class="text-xs font-bold text-slate-800 hover:text-blue-600 truncate block"
+                                                            title="{{ $user->name }}">
+                                                            {{ $user->name }}
+                                                        </a>
+                                                        <p class="text-[11px] text-slate-500 truncate" title="{{ $occupationText }}">
+                                                            {{ $occupationText }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="text-right shrink-0">
+                                                    @if($isConnected)
+                                                        <span class="text-[11px] font-semibold text-emerald-600 inline-flex items-center gap-1">
+                                                            <i class="fas fa-check text-[9px]"></i> Conectado
+                                                        </span>
+                                                    @elseif($isPending && $isRequester)
+                                                        <div class="text-[10px] text-slate-400 mb-0.5">Pendente</div>
+                                                        <button type="button" class="text-[11px] text-red-500 hover:text-red-700 font-semibold px-2 py-0.5 rounded hover:bg-red-50 transition-colors cursor-pointer"
+                                                            onclick="cancelInvite({{ $user->id }})">
+                                                            Cancelar
+                                                        </button>
+                                                    @elseif($isPending)
+                                                        <button type="button" class="text-[11px] text-emerald-600 hover:text-emerald-700 font-bold bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                                                            onclick="acceptInvite({{ $user->id }})">
+                                                            Aceitar
+                                                        </button>
+                                                    @else
+                                                        <button type="button" class="text-[11px] font-bold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-200/80 hover:border-transparent px-2.5 py-1 rounded-lg transition-all shadow-2xs cursor-pointer"
+                                                            onclick="requestInvite({{ $user->id }})">
+                                                            Conectar
+                                                        </button>
+                                                    @endif
                                                 </div>
                                             </div>
-                                            <div class="text-right">
-                                                @if($isConnected)
-                                                    <span class="text-xs text-gray-400">Conectado</span>
-                                                @elseif($isPending && $isRequester)
-                                                    <div class="text-[11px] text-gray-400">Pendente {{ $pendingTime }}</div>
-                                                    <button type="button" class="text-xs text-red-600 hover:text-red-700 font-medium"
-                                                        onclick="cancelInvite({{ $user->id }})">
-                                                        Cancelar
-                                                    </button>
-                                                @elseif($isPending)
-                                                    <div class="text-[11px] text-gray-400">Solicitacao recebida</div>
-                                                    <button type="button" class="text-xs text-green-600 hover:text-green-700 font-medium"
-                                                        onclick="acceptInvite({{ $user->id }})">
-                                                        Aceitar
-                                                    </button>
-                                                @else
-                                                    <button type="button" class="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                                                        onclick="requestInvite({{ $user->id }})">
-                                                        Conectar
-                                                    </button>
-                                                @endif
-                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="text-center py-4 bg-slate-50 rounded-xl border border-slate-100">
+                                            <p class="text-xs text-slate-400">Sem recomendações no momento.</p>
                                         </div>
-                                    @endforeach
-                                @else
-                                    <p class="text-xs text-gray-500">Sem recomendacoes no momento.</p>
-                                @endif
+                                    @endif
+                                </div>
                             </div>
-                        </div>
                     </div>
                         <div id="right-conversation-info" class="bg-white rounded-lg shadow p-4 sticky top-24 hidden">
                             <div class="flex flex-col items-center text-center mb-4">
@@ -2861,7 +2876,7 @@
                                 } else if (member.connection_status === 'pending_received') {
                                     actionHtml = `<button type="button" class="text-[11px] text-emerald-600 hover:text-emerald-700 font-bold shrink-0" onclick="acceptInvite(${member.id})">Aceitar</button>`;
                                 } else {
-                                    actionHtml = `<button type="button" class="text-[11px] text-blue-600 hover:text-blue-700 font-bold bg-white border border-blue-200 hover:border-blue-300 px-2.5 py-1 rounded-lg shadow-xs transition-all shrink-0" onclick="requestInvite(${member.id})">+ Conectar</button>`;
+                                    actionHtml = `<button type="button" class="text-[11px] font-bold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-200/80 hover:border-transparent px-2.5 py-1 rounded-lg transition-all shadow-2xs cursor-pointer shrink-0" onclick="requestInvite(${member.id})">Conectar</button>`;
                                 }
 
                                 const details = [];

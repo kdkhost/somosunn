@@ -1,5 +1,16 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.16] - 2026-11-22 - fix(feed, layout): eliminar scroll horizontal nos filtros de busca e padronizar espacamentos e design de membros recomendados
+
+- **Eliminação Absoluta do Scroll Horizontal na Sidebar de Busca (`resources/views/social/feed.blade.php`):**
+  - Substituído o container com `overflow-x-auto` e botões soltos por uma grade uniforme de 5 colunas (`grid grid-cols-5 gap-1 w-full`), distribuindo equitativamente os filtros (Todos, Nome, Cargo, Empresa, Cidade) sem provocar nenhuma barra de rolagem horizontal nativa no navegador em nenhuma resolução.
+- **Padronização Visual e Espaçamento dos Membros Recomendados (`resources/views/social/feed.blade.php`):**
+  - **Espaçamento e Ritmo:** Aplicado espaçamento simétrico (`space-y-2.5`, padding uniforme `p-2` com bordas arredondadas e efeito hover sutil), eliminando o desnível e a quebra de alinhamento com a seção superior.
+  - **Hierarquia Tipográfica:** Ocupação/empresa exibida de forma concisa e truncada (`text-[11px] text-slate-500 truncate`) ao invés do rótulo cru "Membro", com limite de largura para evitar empurramento horizontal.
+  - **Botão Conectar Uniforme:** Substituído o link solto pelo botão no formato pílula padronizado oficial (`bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded-lg font-bold border border-blue-200/80 shadow-2xs`).
+- **Ocultação de Administradores em Sugestões e Buscas (`app/Services/MemberSuggestionService.php`, `app/Http/Controllers/SocialController.php`):**
+  - Bloqueada a exibição de administradores, superadmins e contas de suporte (`role in ['admin', 'superadmin', 'sucesso', 'staff']` e nomes como "Admin Somos UNN") tanto na lista de membros recomendados quanto na busca de membros em tempo real.
+
 ## [2.8.15] - 2026-11-22 - fix(ranking, membros): exibir conexões reais no pódio e lista, anéis giratórios 360º, blindagem de cards e correção de avatares CDN
 
 - **Correção da Contagem Real de Conexões (`app/Http/Controllers/RankingPublicController.php`, `resources/views/site/ranking.blade.php`):**

@@ -121,7 +121,11 @@ class SocialController extends Controller
         }
 
         $query = User::query()
-            ->where('role', '!=', 'superadmin');
+            ->whereNotIn('role', ['admin', 'superadmin', 'sucesso', 'staff'])
+            ->where('name', 'not like', '%Admin%')
+            ->where('name', 'not like', '%Suporte%')
+            ->where('email', 'not like', '%admin%')
+            ->where('email', 'not like', '%suporte%');
 
         if ($authId) {
             $query->where('id', '!=', $authId);
