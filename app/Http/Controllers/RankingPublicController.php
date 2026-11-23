@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Connection;
-use App\Models\Ranking;
-use App\Models\User;
-use App\Support\UploadStorage;
+use App\Services\RankingService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 
 class RankingPublicController extends Controller
 {
@@ -25,140 +21,9 @@ class RankingPublicController extends Controller
             abort(404, 'Página de ranking temporariamente indisponível');
         }
 
-        $topRankings = collect();
+        $topRankings = RankingService::getPublicLeaderboard(50);
 
-        try {
-            // Contagem de conexões aceitas reais em lote para máxima performance e fidelidade
-            $acceptedConnections = Connection::where('status', 'accepted')
-                ->get()
-                ->flatMap(fn($c) => [$c->requester_id, $c->requested_id])
-                ->countBy();
-
-            // 1. Tenta carregar da tabela 'rankings' compilada
-            if (Schema::hasTable('rankings')) {
-                $rawRankings = Ranking::with(['user.plan'])
-                    ->whereHas('user', function ($q) {
-                        $q->whereNotIn('role', ['admin', 'superadmin', 'sucesso', 'staff'])
-                          ->whereNotIn('level', ['admin', 'superadmin', 'sucesso', 'staff'])
-                          ->where('name', 'not like', '%Admin%')
-                          ->where('name', 'not like', '%Suporte%')
-                          ->where('email', 'not like', '%admin%')
-                          ->where('email', 'not like', '%suporte%');
-                    })
-                    ->orderByDesc('score')
-                    ->take(50)
-                    ->get();
-
-                if ($rawRankings->isNotEmpty()) {
-                    $topRankings = $rawRankings->map(function ($rank) use ($acceptedConnections) {
-                        $user = $rank->user;
-                        $realConns = (int) $acceptedConnections->get($user->id, 0);
-
-                        // Resolução correta da foto de perfil com suporte a photo e avatar (CDN / local)
-                        $photoField = $user->photo ?: $user->avatar;
-                        $avatarUrl = null;
-                        if (!empty($photoField)) {
-                            if (str_starts_with($photoField, 'http://') || str_starts_with($photoField, 'https://')) {
-                                $avatarUrl = $photoField;
-                            } else {
-                                $avatarUrl = UploadStorage::url($photoField);
-                            }
-                        }
-                        $coverUrl = !empty($user->cover_photo) ? UploadStorage::url($user->cover_photo) : null;
-
-                        // Nível elegante (nunca "iniciante" em minúsculo solto)
-                        $friendlyLevel = $rank->level ?? $user->level;
-                        if (empty($friendlyLevel) || mb_strtolower($friendlyLevel) === 'iniciante') {
-                            $friendlyLevel = 'Membro UNN';
-                        }
-
-                        return (object) [
-                            'user_id' => $user->id,
-                            'name' => $user->name,
-                            'avatar' => $avatarUrl,
-                            'cover' => $coverUrl,
-                            'initials' => collect(explode(' ', $user->name))->take(2)->map(fn($n) => strtoupper(mb_substr($n, 0, 1)))->join(''),
-                            'occupation' => $user->occupation,
-                            'company' => $user->company,
-                            'city' => trim(($user->city ?? '') . ($user->state ? ', ' . $user->state : '')),
-                            'plan_badge' => $user->plan?->name ? ($user->plan->is_free ? 'Starter' : $user->plan->name) : null,
-                            'score' => (int) $rank->score,
-                            'level' => $friendlyLevel,
-                            'connections_count' => $realConns,
-                            'interactions_count' => $realConns,
-                            'is_demo' => false,
-                        ];
-                    });
-                }
-            }
-
-            // 2. Se a tabela 'rankings' estiver vazia ou com poucos registros, compila ranking real dos usuários ativos
-            if ($topRankings->count() < 3) {
-                $users = User::whereNotIn('role', ['admin', 'superadmin', 'sucesso', 'staff'])
-                    ->whereNotIn('level', ['admin', 'superadmin', 'sucesso', 'staff'])
-                    ->where('name', 'not like', '%Admin%')
-                    ->where('name', 'not like', '%Suporte%')
-                    ->where('email', 'not like', '%admin%')
-                    ->where('email', 'not like', '%suporte%')
-                    ->with('plan')
-                    ->get();
-
-                if ($users->isNotEmpty()) {
-                    $topRankings = $users->map(function ($u) use ($acceptedConnections) {
-                        $conns = (int) $acceptedConnections->get($u->id, 0);
-                        $basePoints = (int) ($u->points ?? 0);
-                        // Pontuação dinâmica: pontos gravados + conexões (50 pts cada) + foto (100 pts) + dados completos
-                        $calculatedScore = $basePoints;
-                        if ($calculatedScore <= 0) {
-                            $calculatedScore = ($conns * 50) + ($u->photo ? 100 : 20) + ($u->occupation ? 50 : 0) + ($u->company ? 30 : 0);
-                        }
-
-                        $level = $u->level;
-                        if (empty($level) || mb_strtolower($level) === 'iniciante') {
-                            if ($calculatedScore >= 1000) $level = 'Elite UNN';
-                            elseif ($calculatedScore >= 500) $level = 'Líder de Negócios';
-                            elseif ($calculatedScore >= 200) $level = 'Empreendedor Pro';
-                            else $level = 'Membro UNN';
-                        }
-
-                        $photoField = $u->photo ?: $u->avatar;
-                        $avatarUrl = null;
-                        if (!empty($photoField)) {
-                            if (str_starts_with($photoField, 'http://') || str_starts_with($photoField, 'https://')) {
-                                $avatarUrl = $photoField;
-                            } else {
-                                $avatarUrl = UploadStorage::url($photoField);
-                            }
-                        }
-                        $coverUrl = !empty($u->cover_photo) ? UploadStorage::url($u->cover_photo) : null;
-
-                        return (object) [
-                            'user_id' => $u->id,
-                            'name' => $u->name,
-                            'avatar' => $avatarUrl,
-                            'cover' => $coverUrl,
-                            'initials' => collect(explode(' ', $u->name))->take(2)->map(fn($n) => strtoupper(mb_substr($n, 0, 1)))->join(''),
-                            'occupation' => $u->occupation,
-                            'company' => $u->company,
-                            'city' => trim(($u->city ?? '') . ($u->state ? ', ' . $u->state : '')),
-                            'plan_badge' => $u->plan?->name ? ($u->plan->is_free ? 'Starter' : $u->plan->name) : null,
-                            'score' => $calculatedScore,
-                            'level' => $level,
-                            'connections_count' => $conns,
-                            'interactions_count' => $conns,
-                            'is_demo' => false,
-                        ];
-                    })
-                    ->sortByDesc('score')
-                    ->take(50)
-                    ->values();
-                }
-            }
-        } catch (\Throwable $e) {
-            \Log::warning('Falha ao processar ranking público: ' . $e->getMessage());
-        }
-
-        // 3. Fallback para demonstração se a base estiver totalmente limpa
+        // Fallback para demonstração se a base estiver totalmente limpa
         if ($topRankings->isEmpty()) {
             $topRankings = collect([
                 (object) [
@@ -173,6 +38,7 @@ class RankingPublicController extends Controller
                     'plan_badge' => 'Elite',
                     'score' => 15420,
                     'level' => 'Elite UNN',
+                    'connections_count' => 342,
                     'interactions_count' => 342,
                     'is_demo' => true,
                 ],
@@ -188,6 +54,7 @@ class RankingPublicController extends Controller
                     'plan_badge' => 'Pro',
                     'score' => 12850,
                     'level' => 'Líder de Negócios',
+                    'connections_count' => 215,
                     'interactions_count' => 215,
                     'is_demo' => true,
                 ],
@@ -203,6 +70,7 @@ class RankingPublicController extends Controller
                     'plan_badge' => 'Pro',
                     'score' => 9740,
                     'level' => 'Líder de Negócios',
+                    'connections_count' => 180,
                     'interactions_count' => 180,
                     'is_demo' => true,
                 ],
@@ -218,6 +86,7 @@ class RankingPublicController extends Controller
                     'plan_badge' => 'Starter',
                     'score' => 5120,
                     'level' => 'Empreendedor Pro',
+                    'connections_count' => 89,
                     'interactions_count' => 89,
                     'is_demo' => true,
                 ],
@@ -232,7 +101,8 @@ class RankingPublicController extends Controller
                     'city' => 'Porto Alegre, RS',
                     'plan_badge' => 'Starter',
                     'score' => 3100,
-                    'level' => 'Membro Ativo',
+                    'level' => 'Membro UNN',
+                    'connections_count' => 42,
                     'interactions_count' => 42,
                     'is_demo' => true,
                 ],

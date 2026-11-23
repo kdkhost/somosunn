@@ -507,136 +507,45 @@
         </section>
         @endif
 
-        <!-- Ranking -->
+        <!-- Ranking Oficial da Comunidade -->
         @if($homePage->get('ranking_enabled', true))
-        <section class="py-16 bg-white w-full overflow-x-hidden">
+        <section class="py-16 bg-white w-full overflow-x-hidden relative">
             <div class="unn-container">
-                <div class="flex items-center justify-between mb-10">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
                     <div>
-                        <h2 class="text-3xl font-black text-gray-900">{{ $homePage->get('ranking_title', 'Ranking do networking') }}</h2>
-                        <p class="text-gray-500">{{ $homePage->get('ranking_subtitle', 'Baseado nas avaliações após cada conexão') }}</p>
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-black uppercase tracking-wider mb-2">
+                            <i class="fas fa-trophy text-amber-500"></i> Top Líderes
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">{{ $homePage->get('ranking_title', 'Ranking do Networking') }}</h2>
+                        <p class="text-gray-500 text-sm sm:text-base mt-1">{{ $homePage->get('ranking_subtitle', 'Membros que mais geram conexões qualificadas e impulsionam o ecossistema UNN') }}</p>
                     </div>
-                    @if($topRankings->isNotEmpty())
-                        <span class="text-sm uppercase tracking-wider text-gray-500">Top {{ $topRankings->count() }}</span>
-                    @endif
+                    <div class="shrink-0">
+                        <a href="{{ route('ranking.public') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 font-bold text-xs uppercase tracking-wider transition-all border border-slate-200 hover:border-blue-200 shadow-2xs">
+                            <span>Ver Classificação Completa</span>
+                            <i class="fas fa-arrow-right text-[10px]"></i>
+                        </a>
+                    </div>
                 </div>
 
                 @if($topRankings->isEmpty())
                     <div class="text-center py-16 text-gray-400">
                         <i class="fas fa-trophy text-5xl mb-4 opacity-30"></i>
-                        <p class="text-lg">Nenhum ranking disponível ainda.</p>
-                        <p class="text-sm mt-2">Participe de conexões e avaliações para aparecer aqui!</p>
+                        <p class="text-lg font-bold">Nenhum ranking disponível no momento.</p>
+                        <p class="text-sm mt-2">Participe de conexões e avaliações para inaugurar o quadro de líderes!</p>
                     </div>
                 @else
                     @php
-                        $medals = [
-                            0 => ['bg' => 'from-yellow-400 to-amber-500',  'ring' => 'ring-yellow-400',  'label' => '🥇 1º lugar',  'icon' => 'fas fa-crown',   'iconColor' => 'text-yellow-400'],
-                            1 => ['bg' => 'from-slate-300 to-slate-400',   'ring' => 'ring-slate-300',   'label' => '🥈 2º lugar',  'icon' => 'fas fa-medal',   'iconColor' => 'text-slate-400'],
-                            2 => ['bg' => 'from-orange-400 to-amber-600',  'ring' => 'ring-orange-400',  'label' => '🥉 3º lugar',  'icon' => 'fas fa-medal',   'iconColor' => 'text-orange-400'],
-                        ];
+                        $podium = $topRankings;
                     @endphp
 
-                    <div class="grid lg:grid-cols-3 gap-6 items-end">
-                        @foreach($topRankings as $rank)
-                            @php
-                                $pos = $loop->index;
-                                $med = $medals[$pos] ?? $medals[2];
-                                $userName = optional($rank->user)->name ?? 'Empreendedor';
-                                $userAvatar = optional($rank->user)->profile_photo_url ?? null;
-                                $isFirst = $pos === 0;
-                            @endphp
+                    {{-- Pódio Moderno Unificado com a Página Oficial --}}
+                    @include('site.partials.ranking-podium')
 
-                            {{-- 1º lugar: card destacado com ouro --}}
-                            @if($isFirst)
-                                <article class="lg:col-start-2 order-first lg:order-none bg-gradient-to-b from-amber-50 to-white rounded-3xl p-8 shadow-xl ring-2 ring-yellow-400 relative overflow-hidden flex flex-col items-center text-center">
-                                    {{-- Brilho decorativo --}}
-                                    <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-20" style="background: radial-gradient(circle, #fbbf24, transparent)"></div>
-
-                                    {{-- Corona --}}
-                                    <div class="mb-3">
-                                        <i class="fas fa-crown text-3xl text-yellow-400" style="filter: drop-shadow(0 2px 4px rgba(251,191,36,.5))"></i>
-                                    </div>
-
-                                    {{-- Avatar --}}
-                                    @if($userAvatar)
-                                        <img src="{{ $userAvatar }}" alt="{{ $userName }}"
-                                            class="w-20 h-20 rounded-full object-cover ring-4 ring-yellow-300 shadow-lg mb-4" loading="lazy" decoding="async">
-                                    @else
-                                        <div class="w-20 h-20 rounded-full flex items-center justify-center text-white font-black text-3xl ring-4 ring-yellow-300 shadow-lg mb-4"
-                                            style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-                                            {{ strtoupper(substr($userName, 0, 1)) }}
-                                        </div>
-                                    @endif
-
-                                    <h3 class="font-black text-xl text-gray-900">{{ $userName }}</h3>
-                                    <p class="text-sm text-amber-600 font-semibold mt-1">{{ ucfirst($rank->level) }}</p>
-
-                                    <div class="mt-4 pt-4 border-t border-yellow-200 w-full">
-                                        <p class="text-3xl font-black" style="color: var(--unn-azul-1)">
-                                            {{ number_format($rank->score, 0, ',', '.') }}
-                                        </p>
-                                        <p class="text-xs uppercase tracking-widest text-gray-500 mt-1">pontos</p>
-                                    </div>
-
-                                    @if($rank->interactions_count > 0)
-                                        <p class="text-xs text-gray-400 mt-3">
-                                            {{ $rank->interactions_count }} conexões
-                                            @if($rank->average_rating)
-                                                · {{ number_format($rank->average_rating, 1, ',', '.') }}
-                                                <i class="fas fa-star text-yellow-400"></i>
-                                            @endif
-                                        </p>
-                                    @endif
-
-                                    <span class="absolute top-3 left-3 bg-yellow-400 text-white text-xs font-bold px-2 py-1 rounded-full">1º</span>
-                                </article>
-
-                            {{-- 2º e 3º lugar: cards menores --}}
-                            @else
-                                @php $orderClass = $pos === 1 ? 'lg:order-first' : 'lg:order-last'; @endphp
-                                <article class="{{ $orderClass }} bg-slate-50 rounded-3xl p-6 hover:shadow-md transition relative overflow-hidden flex flex-col items-center text-center">
-
-                                    {{-- Número da posição --}}
-                                    <span class="absolute top-3 left-3 bg-{{ $pos === 1 ? 'slate-400' : 'orange-400' }} text-white text-xs font-bold px-2 py-1 rounded-full">{{ $pos + 1 }}º</span>
-
-                                    {{-- Ícone medalha --}}
-                                    <div class="mb-3 mt-2">
-                                        <i class="{{ $med['icon'] }} text-xl {{ $med['iconColor'] }}"></i>
-                                    </div>
-
-                                    {{-- Avatar --}}
-                                    @if($userAvatar)
-                                        <img src="{{ $userAvatar }}" alt="{{ $userName }}"
-                                            class="w-14 h-14 rounded-full object-cover ring-2 ring-{{ $pos === 1 ? 'slate-300' : 'orange-300' }} mb-3" loading="lazy" decoding="async">
-                                    @else
-                                        <div class="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl ring-2 ring-{{ $pos === 1 ? 'slate-300' : 'orange-300' }} mb-3"
-                                            style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-                                            {{ strtoupper(substr($userName, 0, 1)) }}
-                                        </div>
-                                    @endif
-
-                                    <h3 class="font-bold text-gray-900">{{ $userName }}</h3>
-                                    <p class="text-xs text-gray-500 mt-0.5">{{ ucfirst($rank->level) }}</p>
-
-                                    <div class="mt-3 pt-3 border-t border-slate-200 w-full">
-                                        <p class="text-2xl font-black" style="color: var(--unn-azul-1)">
-                                            {{ number_format($rank->score, 0, ',', '.') }}
-                                        </p>
-                                        <p class="text-xs text-gray-400">pontos</p>
-                                    </div>
-
-                                    @if($rank->interactions_count > 0)
-                                        <p class="text-xs text-gray-400 mt-2">
-                                            {{ $rank->interactions_count }} conexões
-                                            @if($rank->average_rating)
-                                                · {{ number_format($rank->average_rating, 1, ',', '.') }}
-                                                <i class="fas fa-star text-yellow-400"></i>
-                                            @endif
-                                        </p>
-                                    @endif
-                                </article>
-                            @endif
-                        @endforeach
+                    <div class="mt-10 text-center">
+                        <a href="{{ route('ranking.public') }}" class="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full btn-primary text-white font-bold text-sm shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                            <span>Ver Quadro Geral de Líderes</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
                     </div>
                 @endif
             </div>

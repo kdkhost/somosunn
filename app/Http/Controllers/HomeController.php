@@ -339,40 +339,8 @@ class HomeController extends Controller
                 'sucesso' => $sucessoCount,
             ]);
 
-            $leaderboard = Cache::remember('unn:home:leaderboard:v1', 120, static function () {
-                $rows = Ranking::with([
-                    'user' => function ($query) {
-                        $query->whereNotIn('role', ['admin', 'superadmin']);
-                    },
-                ])
-                    ->orderByDesc('score')
-                    ->limit(20)
-                    ->get()
-                    ->filter(function ($rank) {
-                        return $rank->user && !in_array($rank->user->role, ['admin', 'superadmin']);
-                    })
-                    ->take(3)
-                    ->values();
-
-                if ($rows->isEmpty()) {
-                    $rows = User::whereNotIn('role', ['admin', 'superadmin'])
-                        ->where('points', '>', 0)
-                        ->orderByDesc('points')
-                        ->limit(3)
-                        ->get()
-                        ->map(fn ($user) => (object) [
-                            'user' => $user,
-                            'score' => $user->points ?? 0,
-                            'level' => $user->level ?? 'iniciante',
-                            'interactions_count' => 0,
-                            'average_rating' => null,
-                            'is_points_fallback' => true,
-                        ])
-                        ->values();
-                }
-
-                return $rows;
-            });
+            // Utiliza a mesma fonte de dados oficial e blindada da página /ranking
+            $leaderboard = \App\Services\RankingService::getPublicLeaderboard(3);
         } catch (\Throwable $e) {
             Log::warning('Falha ao montar overview de networking: ' . $e->getMessage());
         }

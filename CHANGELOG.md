@@ -1,5 +1,15 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.23] - 2026-11-23 - fix(ranking, home): sincronizar ranking da home com a pagina oficial e unificar podio moderno
+
+- **Unificação da Fonte de Dados do Ranking (`app/Services/RankingService.php`, `app/Http/Controllers/HomeController.php`, `app/Http/Controllers/RankingPublicController.php`):**
+  - **Eliminação de Divergência de Dados:** Centralizada a consulta oficial de líderes no método `RankingService::getPublicLeaderboard()`, consumido tanto pela Home (`HomeController::networkingOverview()`) quanto pela página oficial de ranking (`RankingPublicController::index()`).
+  - **Filtro Estrito de Contas Administrativas:** Eliminadas de forma definitiva da Home as contas de sistema (`Admin Somos UNN`, `Suporte ACEPE`, `staff`, etc.) que apareciam indevidamente no Top 3 devido a caches e queries legadas.
+  - **Dados 100% Sincronizados:** A Home agora exibe exatamente os mesmos líderes reais, conexões contabilizadas e pontuações calculadas da página `/ranking` (ex: 1º KDKHOST SOLUÇÕES, 2º padacinho do sol, 3º Leonardo Fonseca Borba).
+- **Componentização e Redesign do Pódio na Home (`resources/views/site/partials/ranking-podium.blade.php`, `resources/views/site/index.blade.php`, `resources/views/site/ranking.blade.php`):**
+  - **Pódio Moderno Compartilhado:** Criado componente parcial `ranking-podium.blade.php` com o design de alto padrão (aura luminosa dourada, coroa flutuante animada, anéis giratórios cônicos ouro, prata e bronze em 360°, badges oficiais, contagem de conexões e botões com links diretos aos perfis dos membros).
+  - **Substituição dos Cards Antigos na Home:** Substituídos os blocos cinzas e estáticos da Home pelo pódio moderno idêntico ao de `/ranking`, acompanhado de botão de ação para conferir a classificação geral completa da comunidade.
+
 ## [2.8.22] - 2026-11-23 - feat(preloader, ux): preloader moderno futurista com aneis orbitais duplos, barra linear com shimmer e saida cinematografica
 
 - **Preloader Moderno de Alta Tecnologia (`resources/views/partials/modern-preloader.blade.php`, `resources/views/layouts/app.blade.php`):**
