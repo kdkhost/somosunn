@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.26] - 2026-11-23 - fix(profile, ux): reposicionar cabecalho do perfil para eliminar sobreposicao de texto em capas escuras
+
+- **Reposicionamento Estrutural do Cabeçalho do Perfil Social (`resources/views/social/profile.blade.php`):**
+  - **Eliminação de Sobreposição na Capa:** Removida a margem negativa global da linha pai que empurrava indevidamente o nome do usuário e badges para dentro da foto de capa.
+  - **Isolamento de Elevação do Avatar:** A margem negativa de sobreposição (`-mt-20 sm:-mt-24`) foi isolada exclusivamente no container do avatar, com aro branco de proteção reforçado (`ring-4 ring-white shadow-xl`).
+  - **Legibilidade Absoluta e Contraste Máximo:** As informações textuais (nome do membro, selo de reputação, data de filiação, localização e redes sociais) agora iniciam integralmente dentro da área branca (`bg-white`) abaixo da capa, garantindo 100% de contraste e legibilidade impecável independentemente de a foto de capa ser preta, escura, colorida ou clara.
+  - **Alinhamento Responsivo das Ações:** Botões de ação (mensagem, conectar, bloquear) alinhados de forma fluida à direita no desktop e organizados com espaçamento harmonioso no mobile.
+
 ## [2.8.25] - 2026-11-23 - fix(ranking): ajustar ordenacao estrita por pontuacao e refinar exclusao exclusiva do admin do sistema
 
 - **Ordenação Estrita por Pontuação e Refinamento de Filtro do Ranking (`app/Services/RankingService.php`):**

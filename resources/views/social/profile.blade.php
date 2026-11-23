@@ -65,41 +65,42 @@
         <!-- Cover & Info -->
         <div class="bg-white shadow relative">
             <!-- Capa -->
-            <div class="h-64 sm:h-80 w-full bg-gray-200 overflow-hidden relative group">
+            <div class="h-64 sm:h-80 w-full bg-slate-900 overflow-hidden relative group">
                 @if(isset($user->cover_photo) && $user->cover_photo)
                     <img src="{{ asset($user->cover_photo) }}" alt="Capa" class="w-full h-full object-cover" loading="lazy" decoding="async">
                 @else
                     <div class="w-full h-full bg-gradient-to-r from-[#1F5EDB] to-[#0d3b96]"></div>
                 @endif
+                <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
             </div>
 
             <!-- Info do Perfil -->
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative pb-8">
-                <div class="flex flex-col md:flex-row items-end -mt-20 sm:-mt-24 mb-4 gap-6 relative">
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6 relative mb-4">
 
-                    <!-- Avatar -->
-                    <div class="flex-shrink-0 relative">
-                        <div class="w-40 h-40 sm:w-48 sm:h-48 bg-white rounded-full p-1.5 shadow-xl">
+                    <!-- Avatar com Sobreposição Blindada na Capa -->
+                    <div class="flex-shrink-0 -mt-20 sm:-mt-24 relative z-10">
+                        <div class="w-36 h-36 sm:w-44 sm:h-44 bg-white rounded-full p-1.5 shadow-xl ring-4 ring-white overflow-hidden">
                             <img src="{{ $user->profile_photo_url }}"
-                                class="w-full h-full rounded-full object-cover border-4 border-white" alt="Avatar"
+                                class="w-full h-full rounded-full object-cover" alt="Avatar"
                                 onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                         </div>
                     </div>
 
-                    <!-- Detalhes -->
-                    <div class="flex-1 pb-2 w-full text-center md:text-left pt-16 md:pt-0">
-                        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-1">
-                            {{ $user->name }}
+                    <!-- Detalhes 100% no fundo branco com contraste absoluto -->
+                    <div class="flex-1 min-w-0 w-full text-center md:text-left pt-2 md:pt-4">
+                        <h1 class="text-2xl sm:text-3xl font-black text-gray-900 mb-1.5 tracking-tight flex flex-wrap items-center justify-center md:justify-start gap-2">
+                            <span>{{ $user->name }}</span>
                             <x-reputation-badge :score="$user->reputation_score" size="md" />
                         </h1>
 
-                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-gray-600 mb-4">
-                            <span class="flex items-center gap-1">
+                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-3 font-medium">
+                            <span class="flex items-center gap-1.5">
                                 <i class="fas fa-calendar-alt text-[#1F5EDB]"></i> Membro desde
                                 {{ $user->created_at->format('M Y') }}
                             </span>
                             @if(isset($user->city) && $user->city)
-                                <span class="flex items-center gap-1">
+                                <span class="flex items-center gap-1.5">
                                     <i class="fas fa-map-marker-alt text-[#1F5EDB]"></i> {{ $user->city }}
                                 </span>
                             @endif
@@ -131,7 +132,7 @@
                     </div>
 
                     <!-- Ações -->
-                    <div class="flex gap-3 pb-4 w-full md:w-auto justify-center md:justify-end">
+                    <div class="flex gap-2.5 sm:gap-3 pt-2 md:pt-4 w-full md:w-auto justify-center md:justify-end shrink-0">
                         @if(auth()->check() && auth()->id() !== $user->id)
                             @php
                                 $isConnected = auth()->user()->isConnectedWith($user->id);
