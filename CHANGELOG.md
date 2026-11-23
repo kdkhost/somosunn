@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.25] - 2026-11-23 - fix(ranking): ajustar ordenacao estrita por pontuacao e refinar exclusao exclusiva do admin do sistema
+
+- **Ordenação Estrita por Pontuação e Refinamento de Filtro do Ranking (`app/Services/RankingService.php`):**
+  - **Exclusão Exclusiva do Admin do Sistema:** Ajustado o filtro de membros para remover unicamente as contas de administração interna (`role: admin, superadmin`, email `admin@somosunn.com.br` ou nome `Admin Somos UNN`), preservando todos os membros participantes da comunidade.
+  - **Recomposição Justa do Pódio:** O membro `Suporte ACEPE` (4.635 pontos) retorna à sua classificação natural de 1º Lugar, `KDKHOST SOLUÇÕES` (4.629 pontos) assume o 2º Lugar, e `padacinho do sol` (4.595 pontos) assume com justiça o 3º Lugar.
+  - **Posicionamento Conforme a Pontuação:** O membro `Leonardo Fonseca Borba` (40 pontos) é posicionado corretamente em 4º lugar (`#04`), respeitando a ordem estritamente decrescente de pontuações em todo o quadro de líderes.
+  - **Renovação de Cache do Ranking Público:** Atualizada a chave para `unn:public_leaderboard:v4:` para invalidação instantânea e sincronização em tempo real entre a Home e `/ranking`.
+
 ## [2.8.24] - 2026-11-23 - fix(avatar, ux): garantir contraste absoluto e legibilidade nos avatares sem foto em todas as telas
 
 - **Contraste Absoluto e Visibilidade dos Avatares sem Foto (`resources/views/site/partials/ranking-podium.blade.php`, `resources/views/site/ranking.blade.php`, `resources/views/site/partials/member-card.blade.php`, `resources/views/site/index.blade.php`, `resources/views/site/portal.blade.php`, `resources/views/social/feed.blade.php`):**

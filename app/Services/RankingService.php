@@ -19,7 +19,7 @@ class RankingService
      */
     public static function getPublicLeaderboard(int $limit = 50): Collection
     {
-        return Cache::remember('unn:public_leaderboard:v2:' . $limit, 60, function () use ($limit) {
+        return Cache::remember('unn:public_leaderboard:v4:' . $limit, 60, function () use ($limit) {
             $topRankings = collect();
 
             try {
@@ -29,18 +29,17 @@ class RankingService
                     ->flatMap(fn($c) => [$c->requester_id, $c->requested_id])
                     ->countBy();
 
-                // 1. Tenta carregar da tabela 'rankings' compilada excluindo administradores e equipe
+                // 1. Tenta carregar da tabela 'rankings' compilada excluindo apenas os administradores do sistema
                 if (Schema::hasTable('rankings')) {
                     $rawRankings = Ranking::with(['user.plan'])
                         ->whereHas('user', function ($q) {
-                            $q->whereNotIn('role', ['admin', 'superadmin', 'sucesso', 'staff'])
-                              ->whereNotIn('level', ['admin', 'superadmin', 'sucesso', 'staff'])
-                              ->where('name', 'not like', '%Admin%')
-                              ->where('name', 'not like', '%Suporte%')
-                              ->where('email', 'not like', '%admin%')
-                              ->where('email', 'not like', '%suporte%');
+                            $q->whereNotIn('role', ['admin', 'superadmin'])
+                              ->where('name', 'not like', '%Admin Somos UNN%')
+                              ->where('name', 'not like', '%Administrador%')
+                              ->where('email', 'not like', 'admin@somosunn.com.br');
                         })
                         ->orderByDesc('score')
+                        ->orderByDesc('id')
                         ->take($limit)
                         ->get();
 
@@ -60,9 +59,13 @@ class RankingService
                             }
                             $coverUrl = !empty($user->cover_photo) ? UploadStorage::url($user->cover_photo) : null;
 
+                            $score = (int) $rank->score;
                             $friendlyLevel = $rank->level ?? $user->level;
                             if (empty($friendlyLevel) || mb_strtolower($friendlyLevel) === 'iniciante') {
-                                $friendlyLevel = 'Membro UNN';
+                                if ($score >= 4000) $friendlyLevel = 'Elite UNN';
+                                elseif ($score >= 1000) $friendlyLevel = 'Líder de Negócios';
+                                elseif ($score >= 200) $friendlyLevel = 'Empreendedor Pro';
+                                else $friendlyLevel = 'Membro UNN';
                             }
 
                             return (object) [
@@ -75,7 +78,7 @@ class RankingService
                                 'company' => $user->company,
                                 'city' => trim(($user->city ?? '') . ($user->state ? ', ' . $user->state : '')),
                                 'plan_badge' => $user->plan?->name ? ($user->plan->is_free ? 'Starter' : $user->plan->name) : null,
-                                'score' => (int) $rank->score,
+                                'score' => $score,
                                 'level' => $friendlyLevel,
                                 'connections_count' => $realConns,
                                 'interactions_count' => $realConns,
@@ -87,13 +90,12 @@ class RankingService
 
                 // 2. Se a tabela 'rankings' estiver vazia ou com poucos registros, compila ranking real dos usuários ativos
                 if ($topRankings->count() < 3) {
-                    $users = User::whereNotIn('role', ['admin', 'superadmin', 'sucesso', 'staff'])
-                        ->whereNotIn('level', ['admin', 'superadmin', 'sucesso', 'staff'])
-                        ->where('name', 'not like', '%Admin%')
-                        ->where('name', 'not like', '%Suporte%')
-                        ->where('email', 'not like', '%admin%')
-                        ->where('email', 'not like', '%suporte%')
+                    $users = User::whereNotIn('role', ['admin', 'superadmin'])
+                        ->where('name', 'not like', '%Admin Somos UNN%')
+                        ->where('name', 'not like', '%Administrador%')
+                        ->where('email', 'not like', 'admin@somosunn.com.br')
                         ->with('plan')
+                        ->orderByDesc('points')
                         ->get();
 
                     if ($users->isNotEmpty()) {
@@ -107,8 +109,8 @@ class RankingService
 
                             $level = $u->level;
                             if (empty($level) || mb_strtolower($level) === 'iniciante') {
-                                if ($calculatedScore >= 1000) $level = 'Elite UNN';
-                                elseif ($calculatedScore >= 500) $level = 'Líder de Negócios';
+                                if ($calculatedScore >= 4000) $level = 'Elite UNN';
+                                elseif ($calculatedScore >= 1000) $level = 'Líder de Negócios';
                                 elseif ($calculatedScore >= 200) $level = 'Empreendedor Pro';
                                 else $level = 'Membro UNN';
                             }
