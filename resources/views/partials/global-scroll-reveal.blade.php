@@ -144,7 +144,9 @@
                     el.closest('.modal') ||
                     el.closest('.dropdown') ||
                     el.classList.contains('no-scroll-reveal') ||
-                    el.id === 'preloader'
+                    el.id === 'preloader' ||
+                    el.id === 'unn-preloader' ||
+                    el.closest('#unn-preloader')
                 ) {
                     return;
                 }

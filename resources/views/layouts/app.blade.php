@@ -835,58 +835,7 @@
 </head>
 
 <body class="bg-slate-50 min-h-screen">
-    @if($preloaderEnabled)
-        <div id="preloader"
-            class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white/95 dark:bg-slate-900/95 backdrop-blur-md transition-opacity duration-400 ease-out">
-            <div class="relative flex items-center justify-center">
-                {{-- Glow difuso sutil no fundo --}}
-                <div class="absolute -inset-6 rounded-full bg-blue-500/10 blur-xl"></div>
-                {{-- Anel giratório externo elegante --}}
-                <div class="absolute -inset-3.5 border-2 border-slate-200/60 dark:border-slate-700/60 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin" style="animation-duration: 0.9s;"></div>
-                {{-- Imagem ou Logo Central com pulso suave --}}
-                <img src="{{ $preloaderImage }}" alt="Carregando..."
-                    class="h-16 w-16 sm:h-20 sm:w-20 object-contain relative z-10 animate-pulse drop-shadow-sm select-none pointer-events-none"
-                    onerror="this.onerror=null;this.src='{{ asset('img/logo.svg') }}';">
-            </div>
-        </div>
-        <script>
-            (function () {
-                const preloader = document.getElementById('preloader');
-                if (!preloader) return;
-
-                const startTime = performance.now();
-                const minDisplayTime = 400; // Tempo mínimo para animação suave da marca
-
-                function hidePreloader() {
-                    const elapsed = performance.now() - startTime;
-                    const remaining = Math.max(0, minDisplayTime - elapsed);
-
-                    setTimeout(function () {
-                        preloader.style.opacity = '0';
-                        preloader.style.pointerEvents = 'none';
-                        setTimeout(function () {
-                            if (preloader.parentNode) {
-                                preloader.parentNode.removeChild(preloader);
-                            }
-                            // Dispara atualização do scroll reveal global logo após o preloader sair
-                            if (window.UNNScrollReveal && typeof window.UNNScrollReveal.refresh === 'function') {
-                                window.UNNScrollReveal.refresh();
-                            }
-                        }, 400);
-                    }, remaining);
-                }
-
-                if (document.readyState === 'complete') {
-                    hidePreloader();
-                } else {
-                    window.addEventListener('load', hidePreloader);
-                }
-
-                // Trava de segurança máxima de 2.5s para nunca travar a navegação
-                setTimeout(hidePreloader, 2500);
-            })();
-        </script>
-    @endif
+    @include('partials.modern-preloader')
     @if($trackingBody !== '')
         {!! $trackingBody !!}
     @endif

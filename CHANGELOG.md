@@ -1,5 +1,15 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.22] - 2026-11-23 - feat(preloader, ux): preloader moderno futurista com aneis orbitais duplos, barra linear com shimmer e saida cinematografica
+
+- **Preloader Moderno de Alta Tecnologia (`resources/views/partials/modern-preloader.blade.php`, `resources/views/layouts/app.blade.php`):**
+  - **Núcleo Orbital Dinâmico:** Anel externo com gradiente cônico em 360° nas cores da marca UNN (`#1F5EDB` a `#29ABE2`), anel intermediário pontilhado em contra-rotação reversa e ondas de ripple radial expansivo.
+  - **Logo Central com Efeito de Respiração:** Imagem oficial do preloader emoldurada em container circular com iluminação ambiente (`drop-shadow-lg`) e pulso suave (`unn-logo-breathe`).
+  - **Barra de Progresso Linear com Shimmer:** Barra de carregamento horizontal ultra elegante com reflexo luminoso correndo continuamente pela superfície.
+  - **Tipografia e Indicador Dinâmico:** Texto oficial ("SOMOS UNN" ou valor configurado) com efeito de brilho metálico (`shimmer text`) e 3 micro-pontos pulsantes em onda sequencial.
+  - **Saída Cinematográfica (Page Reveal Exit):** Transição de saída com desfoque de movimento (`filter: blur(8px)`), expansão sutil (`scale(1.05)`) e desvanecimento suave em 550ms, revelando o conteúdo sem flash ou corte seco.
+  - **Failsafe Inteligente:** Trava de segurança máxima de 2.2 segundos para garantir que a navegação nunca fique retida sob qualquer condição de rede.
+
 ## [2.8.21] - 2026-11-23 - feat(ux, ranking, global): autodescoberta global de animacoes, resolucao de avatares e blindagem de layout
 
 - **Autodescoberta Global de Animações em Todo o Site Público (`resources/views/partials/global-scroll-reveal.blade.php`):**
