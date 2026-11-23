@@ -201,7 +201,7 @@
                             @endphp
                             <input type="hidden" name="subject" id="contact-subject" value="{{ $curSubject }}" required>
                             <button type="button" id="custom-subject-trigger"
-                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-left flex items-center justify-between transition focus:ring-2 outline-none cursor-pointer shadow-xs"
+                                class="w-full px-5 py-3.5 bg-white border border-gray-200/90 rounded-full text-left flex items-center justify-between transition focus:ring-2 outline-none cursor-pointer shadow-xs"
                                 style="--tw-ring-color: var(--unn-azul-1)">
                                 <span id="custom-subject-label" class="{{ $curSubject ? 'text-slate-800 font-bold' : 'text-gray-400' }}">
                                     {{ $curSubjectLabel }}

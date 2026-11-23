@@ -113,7 +113,7 @@
         <section class="unn-events-hero relative z-30 overflow-visible">
             <div class="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/20 pointer-events-none"></div>
 
-            <div class="px-4 md:px-12 lg:px-24 pt-10 md:pt-14 pb-52 md:pb-68 relative z-30">
+            <div class="px-4 md:px-12 lg:px-24 pt-10 md:pt-14 pb-16 md:pb-24 relative z-30">
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center">
                         <span

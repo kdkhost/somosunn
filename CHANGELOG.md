@@ -1,5 +1,17 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.1] - 2026-11-22 - fix(ux, membros, vagas): restauração da busca compacta de vagas, padronização visual em pílula de membros e paginação tailwind em português
+
+- **Restauração da Altura Compacta do Hero de Vagas (`resources/views/oportunidades.blade.php`):**
+  - **Fim do Vazio Excessivo:** Restaurado o padding inferior do hero para o padrão original compacto (`pb-16 md:pb-24`), eliminando o espaçamento vertical gigante que havia afastado o formulário das listagens.
+  - **Posicionamento Responsivo Inteligente:** Mantida a abertura do dropdown adaptativa para cima ou para baixo com contraste absoluto, sem corte pelo wave divider.
+- **Harmonização Visual Idêntica a Vagas na Página de Membros (`resources/views/site/membros.blade.php`):**
+  - **Filtros e Selects em Pílula (`rounded-full`):** Os 3 seletores de membros (`Cidade`, `Plano` e `Ordenação`) e o campo de busca livre foram convertidos de retângulos cinzas para pílulas brancas puras (`bg-white rounded-full border border-slate-200/90 shadow-xs`), com ícones alinhados e estados hover idênticos ao padrão refinado de vagas abertas.
+  - **Botão Filtrar em Pílula:** Botão de busca atualizado para `rounded-full` com gradiente azul UNN e sombra volumétrica.
+- **Eliminação da Paginação Crua em Inglês (`resources/views/site/membros.blade.php`, `resources/views/vendor/pagination/tailwind.blade.php`, `resources/lang/pt_BR/pagination.php`):**
+  - **Fim da Quebra Vertical:** Substituída a listagem crua da paginação por `{{ $members->links('pagination::tailwind') }}`.
+  - **Componente Tailwind 100% em Português:** Criada a view global de paginação em `resources/views/vendor/pagination/tailwind.blade.php` com visual em pílula (`rounded-full`), botões de navegação estilizados, destaque ativo em gradiente azul UNN e texto em português ("Exibindo X a Y de Z resultados"), corrigindo a exibição em todo o sistema.
+
 ## [2.8.0] - 2026-11-22 - feat(gateway, membros, ux): gateway efí robusto com certificado mTLS, restrição de membros gratuitos, ativação de conta e padronização global de selects
 
 - **Gateway Efí Pay (Gerencianet Pix) 100% Robusto (`app/Services/Payment/EfiService.php`, `app/Http/Controllers/Admin/SettingController.php`, `resources/views/admin/settings/partials/gateway.blade.php`, `resources/views/panel/admin/settings/partials/gateway.blade.php`):**

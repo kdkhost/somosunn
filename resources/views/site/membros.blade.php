@@ -73,21 +73,21 @@
                     @endif
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
-                        {{-- Campo de busca por texto livre --}}
-                        <div class="sm:col-span-2 lg:col-span-4 relative flex items-center h-12 bg-slate-50 hover:bg-slate-100/80 rounded-2xl px-4 border border-slate-200 transition-colors focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
+                        {{-- Campo de busca por texto livre (Padrão Vagas Abertas) --}}
+                        <div class="sm:col-span-2 lg:col-span-4 relative flex items-center h-12 bg-white hover:bg-slate-50/50 rounded-full px-5 border border-slate-200/90 shadow-xs transition-all focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
                             <i class="fas fa-search text-slate-400 mr-3 text-sm shrink-0"></i>
                             <input type="text" name="q" value="{{ request('q') }}"
                                 placeholder="Buscar por nome, cargo, empresa ou bio..."
                                 class="w-full bg-transparent border-none outline-none text-slate-800 text-sm font-medium placeholder:text-slate-400">
                         </div>
 
-                        {{-- Custom Dropdown: Cidade / Estado --}}
+                        {{-- Custom Dropdown: Cidade / Estado (Padrão Vagas Abertas) --}}
                         <div class="lg:col-span-3 relative select-none z-30" id="custom-city-container">
                             <input type="hidden" name="city" id="filtro-city" value="{{ request('city') }}">
                             <button type="button" id="custom-city-trigger"
-                                class="w-full h-12 flex items-center justify-between px-4 bg-slate-50 hover:bg-slate-100/80 text-left rounded-2xl border border-slate-200 transition-all outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
+                                class="w-full h-12 flex items-center justify-between px-5 bg-white hover:bg-slate-50 text-left rounded-full border border-slate-200/90 shadow-xs transition-all outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
                                 <span class="flex items-center min-w-0 pr-2">
-                                    <i class="fas fa-map-marker-alt text-slate-400 mr-2 text-xs shrink-0"></i>
+                                    <i class="fas fa-map-marker-alt text-slate-400 mr-2.5 text-xs shrink-0"></i>
                                     <span id="custom-city-label" class="truncate text-sm font-medium {{ request('city') ? 'text-slate-800 font-bold' : 'text-slate-500' }}">
                                         {{ request('city') ?: 'Todas as Cidades' }}
                                     </span>
@@ -124,7 +124,7 @@
                             </div>
                         </div>
 
-                        {{-- Custom Dropdown: Plano / Categoria --}}
+                        {{-- Custom Dropdown: Plano / Categoria (Padrão Vagas Abertas) --}}
                         <div class="lg:col-span-2 relative select-none z-30" id="custom-plan-container">
                             <input type="hidden" name="plan_id" id="filtro-plan" value="{{ request('plan_id') }}">
                             @php
@@ -135,9 +135,9 @@
                                 }
                             @endphp
                             <button type="button" id="custom-plan-trigger"
-                                class="w-full h-12 flex items-center justify-between px-4 bg-slate-50 hover:bg-slate-100/80 text-left rounded-2xl border border-slate-200 transition-all outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
+                                class="w-full h-12 flex items-center justify-between px-5 bg-white hover:bg-slate-50 text-left rounded-full border border-slate-200/90 shadow-xs transition-all outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
                                 <span class="flex items-center min-w-0 pr-2">
-                                    <i class="fas fa-crown text-slate-400 mr-2 text-xs shrink-0"></i>
+                                    <i class="fas fa-crown text-slate-400 mr-2.5 text-xs shrink-0"></i>
                                     <span id="custom-plan-label" class="truncate text-sm font-medium {{ request('plan_id') ? 'text-slate-800 font-bold' : 'text-slate-500' }}">
                                         {{ $selectedPlanName }}
                                     </span>
@@ -174,7 +174,7 @@
                             </div>
                         </div>
 
-                        {{-- Custom Dropdown: Classificação / Ordenação --}}
+                        {{-- Custom Dropdown: Classificação / Ordenação (Padrão Vagas Abertas) --}}
                         <div class="lg:col-span-2 relative select-none z-30" id="custom-sort-container">
                             <input type="hidden" name="sort" id="filtro-sort" value="{{ request('sort', 'latest') }}">
                             @php
@@ -186,9 +186,9 @@
                                 $selectedSortLabel = $sortLabels[request('sort', 'latest')] ?? 'Mais Recentes';
                             @endphp
                             <button type="button" id="custom-sort-trigger"
-                                class="w-full h-12 flex items-center justify-between px-4 bg-slate-50 hover:bg-slate-100/80 text-left rounded-2xl border border-slate-200 transition-all outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
+                                class="w-full h-12 flex items-center justify-between px-5 bg-white hover:bg-slate-50 text-left rounded-full border border-slate-200/90 shadow-xs transition-all outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
                                 <span class="flex items-center min-w-0 pr-2">
-                                    <i class="fas fa-sort-amount-down text-slate-400 mr-2 text-xs shrink-0"></i>
+                                    <i class="fas fa-sort-amount-down text-slate-400 mr-2.5 text-xs shrink-0"></i>
                                     <span id="custom-sort-label" class="truncate text-sm font-bold text-slate-800">
                                         {{ $selectedSortLabel }}
                                     </span>
@@ -217,10 +217,10 @@
                             </div>
                         </div>
 
-                        {{-- Botão Filtrar --}}
+                        {{-- Botão Filtrar (Padrão Vagas Abertas) --}}
                         <div class="lg:col-span-1">
                             <button type="submit"
-                                class="w-full h-12 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                                class="w-full h-12 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                                 title="Aplicar filtros">
                                 <i class="fas fa-filter text-xs"></i>
                                 <span class="lg:hidden text-sm">Filtrar</span>
@@ -283,10 +283,10 @@
                     </div>
                 </div>
 
-                {{-- Paginacao --}}
+                {{-- Paginacao Estilizada Padrao UNN --}}
                 @if(method_exists($members, 'hasPages') && $members->hasPages())
-                    <div class="mt-8">
-                        {{ $members->links() }}
+                    <div class="mt-12 flex justify-center unn-pagination-wrapper">
+                        {{ $members->links('pagination::tailwind') }}
                     </div>
                 @endif
             </div>
