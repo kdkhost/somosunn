@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.14] - 2026-11-22 - feat(revistas, ux): padronizar dropdown de categorias de revistas com o componente oficial do site público
+
+- **Padronização dos Itens do Select na Página Pública `/revistas` (`resources/views/magazines/index.blade.php`):**
+  - **Fim do Select HTML Nativo:** A view pública de revistas residia no diretório `resources/views/magazines/` e ainda mantinha o `<select>` cru nativo do navegador com opções retangulares simples.
+  - **Custom Dropdown Oficial Padronizado:** Implementado o componente de seleção customizado oficial com botão arredondado em pílula (`rounded-full`), ícone de categorias (`fas fa-layer-group`), menu flutuante em `rounded-2xl` com sombra tridimensional, contador de opções, itens com cantos arredondados, dots indicadores de status e seleção ativa em gradiente azul (`from-blue-600 to-blue-700`) com ícone de check.
+  - **Submissão Ágil e Viewport Inteligente:** O dropdown possui verificação dinâmica de posicionamento (abrindo para cima caso próximo ao rodapé), elevação de z-index (`z-[100]`), suporte a tecla ESC / clique fora e submissão automática instantânea ao escolher uma categoria. Botão de limpeza de filtros adicionado para quando houver busca ou categoria ativa.
+
 ## [2.8.13] - 2026-11-22 - fix(social, layout): padronizar espaçamento visual e vertical do widget de busca de membros
 
 - **Harmonização e Padronização de Espaçamentos (`resources/views/social/feed.blade.php`):**

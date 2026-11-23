@@ -105,28 +105,10 @@
         transform: translateY(-50%);
         color: #94a3b8;
     }
-    .mag-category-select {
-        padding: .85rem 1.25rem;
-        border-radius: 999px;
-        border: 1.5px solid #e2e8f0;
-        background: #ffffff !important;
-        font-size: .9rem;
-        font-weight: 600;
-        color: #1e293b !important;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        appearance: none;
-        -webkit-appearance: none;
-        padding-right: 2.5rem;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
-        background-repeat: no-repeat !important;
-        background-position: right 1rem center !important;
-    }
-    .mag-category-select:focus {
-        outline: none;
-        border-color: #1F5EDB;
-        box-shadow: 0 0 0 4px rgba(31,94,219,0.1);
-    }
+    .custom-select-scrollbar::-webkit-scrollbar { width: 5px; }
+    .custom-select-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-select-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .custom-select-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
     /* Grid desktop */
     .mag-grid {
@@ -416,20 +398,69 @@
     </div>
 @endif
 
-<form method="GET" class="mag-filters">
+<form method="GET" class="mag-filters" id="magazines-filter-form">
     <div class="mag-filter-input">
         <i class="fas fa-search"></i>
         <input type="text" name="q" value="{{ $q }}" placeholder="Buscar por título ou edição...">
     </div>
     @if($categories->count())
-        <select name="category" onchange="this.form.submit()" class="mag-category-select">
-            <option value="">Todas as categorias</option>
-            @foreach($categories as $cat)
-                <option value="{{ $cat }}" @selected($category === $cat)>{{ $cat }}</option>
-            @endforeach
-        </select>
+        @php
+            $selectedCategoryLabel = $category ?: 'Todas as categorias';
+        @endphp
+        <div class="relative select-none z-[45]" id="custom-category-container" style="min-width: 230px;">
+            <input type="hidden" name="category" id="filtro-category" value="{{ $category }}">
+            <button type="button" id="custom-category-trigger"
+                class="w-full h-[48px] flex items-center justify-between px-5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-left rounded-full border border-slate-200/90 dark:border-slate-800 shadow-2xs transition-all outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
+                <span class="flex items-center min-w-0 pr-2">
+                    <i class="fas fa-layer-group text-slate-400 dark:text-slate-500 mr-2.5 text-xs shrink-0"></i>
+                    <span id="custom-category-label" class="truncate text-sm font-bold text-slate-800 dark:text-slate-200">
+                        {{ $selectedCategoryLabel }}
+                    </span>
+                </span>
+                <i id="custom-category-arrow" class="fas fa-chevron-down text-slate-400 text-xs transition-transform duration-200 shrink-0"></i>
+            </button>
+            <div id="custom-category-menu"
+                class="hidden absolute top-full mt-2 left-0 right-0 w-full min-w-[240px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 py-2.5 z-[9999] overflow-hidden transform opacity-0 scale-95 transition-all duration-200 ease-out origin-top text-left shadow-[0_25px_60px_rgba(8,112,184,0.22),0_15px_30px_rgba(0,0,0,0.12)]">
+                <div class="px-3.5 pb-2 mb-1.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    <span>Categorias</span>
+                    <span class="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full text-slate-500 font-bold">{{ $categories->count() + 1 }} opções</span>
+                </div>
+                <div class="max-h-60 overflow-y-auto custom-select-scrollbar px-1.5 space-y-1">
+                    <div class="custom-category-opt px-3.5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all flex items-center justify-between {{ empty($category) ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/25' : 'text-slate-800 dark:text-slate-200 hover:bg-blue-50/80 dark:hover:bg-slate-800 hover:text-blue-700' }}"
+                        data-value="" data-label="Todas as categorias">
+                        <span class="flex items-center gap-2 truncate">
+                            <span class="opt-dot w-2 h-2 rounded-full {{ empty($category) ? 'bg-white' : 'bg-slate-300' }}"></span>
+                            <span class="truncate">Todas as categorias</span>
+                        </span>
+                        <i class="fas fa-check text-xs check-icon {{ empty($category) ? 'text-white' : 'hidden' }}"></i>
+                    </div>
+                    @foreach($categories as $cat)
+                        @php $isCatSelected = $category === $cat; @endphp
+                        <div class="custom-category-opt px-3.5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all flex items-center justify-between {{ $isCatSelected ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/25' : 'text-slate-800 dark:text-slate-200 hover:bg-blue-50/80 dark:hover:bg-slate-800 hover:text-blue-700' }}"
+                            data-value="{{ $cat }}" data-label="{{ $cat }}">
+                            <span class="flex items-center gap-2 truncate">
+                                <span class="opt-dot w-2 h-2 rounded-full {{ $isCatSelected ? 'bg-white' : 'bg-slate-300' }}"></span>
+                                <span class="truncate">{{ $cat }}</span>
+                            </span>
+                            <i class="fas fa-check text-xs check-icon {{ $isCatSelected ? 'text-white' : 'hidden' }}"></i>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
     @endif
-    <button type="submit" style="padding: .85rem 1.5rem; border-radius: 999px; background: linear-gradient(135deg, #1F5EDB, #177FD6); color: #fff; font-weight: 800; font-size: .85rem; border: 0; cursor: pointer; box-shadow: 0 8px 20px rgba(31,94,219,0.3);">Filtrar</button>
+    <button type="submit" style="height: 48px; padding: 0 1.75rem; border-radius: 999px; background: linear-gradient(135deg, #1F5EDB, #177FD6); color: #fff; font-weight: 800; font-size: .85rem; border: 0; cursor: pointer; box-shadow: 0 8px 20px rgba(31,94,219,0.3); display: inline-flex; align-items: center; justify-content: center; gap: .5rem;" class="transition-all hover:scale-105 active:scale-95">
+        <i class="fas fa-filter text-xs"></i>
+        <span>Filtrar</span>
+    </button>
+    @if(!empty($q) || !empty($category))
+        <a href="{{ route('magazines.index') }}"
+            style="height: 48px; padding: 0 1.25rem; border-radius: 999px; background: #f1f5f9; color: #64748b; font-weight: 700; font-size: .85rem; border: 1.5px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; gap: .4rem; text-decoration: none;"
+            class="hover:bg-slate-200 transition-colors" title="Limpar filtros">
+            <i class="fas fa-times text-xs"></i>
+            <span>Limpar</span>
+        </a>
+    @endif
 </form>
 
 @if($magazines->count())
@@ -545,6 +576,109 @@
             grabCursor: true,
         });
     }
+
+    // Engine de Dropdown Customizado Padronizado
+    function initCustomDropdown(containerId, triggerId, menuId, arrowId, labelId, inputId, optClass) {
+        const container = document.getElementById(containerId);
+        const trigger = document.getElementById(triggerId);
+        const menu = document.getElementById(menuId);
+        const arrow = document.getElementById(arrowId);
+        const label = document.getElementById(labelId);
+        const input = document.getElementById(inputId);
+        const options = document.querySelectorAll('.' + optClass);
+
+        if (!trigger || !menu || !container) return;
+        let isOpen = false;
+
+        const openMenu = () => {
+            container.style.zIndex = '100';
+
+            // Checagem inteligente de viewport para abrir para cima se o espaço abaixo for insuficiente
+            const triggerRect = trigger.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - triggerRect.bottom;
+            if (spaceBelow < 280 && triggerRect.top > 280) {
+                menu.classList.remove('top-full', 'mt-2', 'origin-top');
+                menu.classList.add('bottom-full', 'mb-2', 'origin-bottom');
+            } else {
+                menu.classList.remove('bottom-full', 'mb-2', 'origin-bottom');
+                menu.classList.add('top-full', 'mt-2', 'origin-top');
+            }
+
+            isOpen = true;
+            menu.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                menu.classList.remove('opacity-0', 'scale-95');
+                menu.classList.add('opacity-100', 'scale-100');
+            });
+            if (arrow) arrow.classList.add('rotate-180');
+            trigger.setAttribute('aria-expanded', 'true');
+        };
+
+        const closeMenu = () => {
+            if (!isOpen) return;
+            isOpen = false;
+            menu.classList.remove('opacity-100', 'scale-100');
+            menu.classList.add('opacity-0', 'scale-95');
+            if (arrow) arrow.classList.remove('rotate-180');
+            trigger.setAttribute('aria-expanded', 'false');
+            container.style.zIndex = '';
+            setTimeout(() => {
+                if (!isOpen) menu.classList.add('hidden');
+            }, 180);
+        };
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isOpen ? closeMenu() : openMenu();
+        });
+
+        options.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const val = opt.getAttribute('data-value');
+                const lbl = opt.getAttribute('data-label');
+
+                if (input) input.value = val;
+                if (label) label.textContent = lbl;
+
+                options.forEach(o => {
+                    o.classList.remove('bg-gradient-to-r', 'from-blue-600', 'to-blue-700', 'text-white', 'shadow-md', 'shadow-blue-500/25');
+                    o.classList.add('text-slate-800', 'hover:bg-blue-50/80', 'hover:text-blue-700');
+                    const check = o.querySelector('.check-icon');
+                    if (check) { check.classList.add('hidden'); check.classList.remove('text-white'); }
+                    const dot = o.querySelector('.opt-dot');
+                    if (dot) { dot.classList.add('bg-slate-300'); dot.classList.remove('bg-white'); }
+                });
+
+                opt.classList.remove('text-slate-800', 'hover:bg-blue-50/80', 'hover:text-blue-700');
+                opt.classList.add('bg-gradient-to-r', 'from-blue-600', 'to-blue-700', 'text-white', 'shadow-md', 'shadow-blue-500/25');
+                const check = opt.querySelector('.check-icon');
+                if (check) { check.classList.remove('hidden'); check.classList.add('text-white'); }
+                const dot = opt.querySelector('.opt-dot');
+                if (dot) { dot.classList.remove('bg-slate-300'); dot.classList.add('bg-white'); }
+
+                closeMenu();
+
+                // Submeter formulário automaticamente ao selecionar para agilidade
+                const form = document.getElementById('magazines-filter-form');
+                if (form) form.submit();
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (isOpen && !container.contains(e.target)) {
+                closeMenu();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                closeMenu();
+            }
+        });
+    }
+
+    initCustomDropdown('custom-category-container', 'custom-category-trigger', 'custom-category-menu', 'custom-category-arrow', 'custom-category-label', 'filtro-category', 'custom-category-opt');
 })();
 </script>
 @endpush
