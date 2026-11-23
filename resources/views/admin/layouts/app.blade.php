@@ -98,8 +98,9 @@
     <link rel="shortcut icon" href="{{ $faviconUrl }}" type="{{ $faviconType }}">
     <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars/css/OverlayScrollbars.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-beta3/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="{{ unn_asset('css/adminlte4-compat.css') }}">
     @if($needsChartsAssets)
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css">
     @endif
@@ -3445,7 +3446,8 @@
 </head>
 
 <body
-    class="{{ $isAdmin ? 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}">
+    class="{{ $isAdmin ? 'layout-fixed sidebar-expand-lg bg-body-tertiary sidebar-mini' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}"
+    data-bs-theme="{{ $siteTheme === 'dark' ? 'dark' : 'light' }}">
     {{-- Badge de Impersonation - Flutuante discreto --}}
     @if(session()->has('impersonator_id'))
         <div id="impersonation-badge"
@@ -3465,15 +3467,15 @@
     @endif
 
     @if($isAdmin)
-        <div class="wrapper">
+        <div class="app-wrapper wrapper">
             @include('admin.partials.navbar')
             @include('admin.partials.sidebar')
 
-            <div class="content-wrapper">
+            <main class="app-main content-wrapper" id="main-content-wrapper">
                 @if(View::hasSection('page_title') || View::hasSection('breadcrumb') || View::hasSection('breadcrumb_items'))
-                    <div class="content-header">
+                    <div class="app-content-header content-header py-3">
                         <div class="container-fluid">
-                            <div class="d-flex justify-content-between align-items-center py-2">
+                            <div class="d-flex justify-content-between align-items-center">
                                 <h1 class="m-0 h4 font-weight-bold">@yield('page_title')</h1>
                                 <ol class="breadcrumb mb-0">
                                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" data-pjax>Home</a></li>
@@ -3491,12 +3493,12 @@
                         </div>
                     </div>
                 @endif
-                <section class="content">
+                <div class="app-content content">
                     <div class="container-fluid pb-4" id="pjax-container">
                         @yield('content')
                     </div>
-                </section>
-            </div>
+                </div>
+            </main>
 
             @include('admin.partials.control-sidebar')
             @include('admin.partials.footer')
@@ -3545,11 +3547,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-beta3/dist/js/adminlte.min.js"></script>
+    <script src="{{ unn_asset('js/adminlte4-compat.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/jquery.inputmask.min.js"></script>
     <script src="{{ unn_asset('js/unn-masks.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars/js/jquery.overlayScrollbars.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     @if($needsChartsAssets)
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery-knob-chif@1.2.13/dist/jquery.knob.min.js"></script>

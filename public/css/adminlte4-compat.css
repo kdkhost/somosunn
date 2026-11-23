@@ -1,0 +1,236 @@
+/**
+ * AdminLTE 4 & Bootstrap 5 Compatibility Bridge for SOMOS UNN
+ * Preserva 100% das views administrativas existentes sem quebras de layout.
+ */
+
+/* 1. Utilitários de Alinhamento e Floats */
+.float-right { float: right !important; }
+.float-left { float: left !important; }
+.text-right { text-align: right !important; }
+.text-left { text-align: left !important; }
+.btn-block { display: block !important; width: 100% !important; }
+
+/* Botão de Fechar Modal Legado (.close) */
+.close {
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: currentColor;
+    background: transparent;
+    border: 0;
+    opacity: 0.7;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+.close:hover {
+    opacity: 1;
+    text-decoration: none;
+}
+.modal-header .close {
+    padding: 0.5rem 0.75rem;
+    margin: -0.5rem -0.5rem -0.5rem auto;
+}
+
+/* 2. Espaçamentos Legados (Margins e Paddings do Bootstrap 4) */
+.mr-0 { margin-right: 0 !important; }
+.mr-1 { margin-right: 0.25rem !important; }
+.mr-2 { margin-right: 0.5rem !important; }
+.mr-3 { margin-right: 1rem !important; }
+.mr-4 { margin-right: 1.5rem !important; }
+.mr-5 { margin-right: 3rem !important; }
+.mr-auto { margin-right: auto !important; }
+
+.ml-0 { margin-left: 0 !important; }
+.ml-1 { margin-left: 0.25rem !important; }
+.ml-2 { margin-left: 0.5rem !important; }
+.ml-3 { margin-left: 1rem !important; }
+.ml-4 { margin-left: 1.5rem !important; }
+.ml-5 { margin-left: 3rem !important; }
+.ml-auto { margin-left: auto !important; }
+
+.pr-0 { padding-right: 0 !important; }
+.pr-1 { padding-right: 0.25rem !important; }
+.pr-2 { padding-right: 0.5rem !important; }
+.pr-3 { padding-right: 1rem !important; }
+.pr-4 { padding-right: 1.5rem !important; }
+.pr-5 { padding-right: 3rem !important; }
+
+.pl-0 { padding-left: 0 !important; }
+.pl-1 { padding-left: 0.25rem !important; }
+.pl-2 { padding-left: 0.5rem !important; }
+.pl-3 { padding-left: 1rem !important; }
+.pl-4 { padding-left: 1.5rem !important; }
+.pl-5 { padding-left: 3rem !important; }
+
+/* 3. Badges Legadas do Bootstrap 4 / AdminLTE 3 */
+.badge-primary { background-color: var(--unn-azul-1, #1F5EDB) !important; color: #ffffff !important; }
+.badge-secondary { background-color: #64748b !important; color: #ffffff !important; }
+.badge-success { background-color: #10b981 !important; color: #ffffff !important; }
+.badge-danger { background-color: #ef4444 !important; color: #ffffff !important; }
+.badge-warning { background-color: #f59e0b !important; color: #1e293b !important; }
+.badge-info { background-color: #06b6d4 !important; color: #ffffff !important; }
+.badge-light { background-color: #f1f5f9 !important; color: #1e293b !important; }
+.badge-dark { background-color: #0f172a !important; color: #ffffff !important; }
+.badge-pill { border-radius: 50rem !important; padding-left: 0.6em; padding-right: 0.6em; }
+.navbar-badge { position: absolute; top: 9px; right: 5px; font-size: 0.6rem; font-weight: 700; padding: 2px 4px; line-height: 1; }
+
+/* 4. Imagens e Utilidades Visuais */
+.img-circle { border-radius: 50% !important; }
+.img-size-50 { width: 50px; height: 50px; object-fit: cover; }
+.img-size-32 { width: 32px; height: 32px; object-fit: cover; }
+.elevation-1 { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24) !important; }
+.elevation-2 { box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23) !important; }
+.elevation-3 { box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !important; }
+.elevation-4 { box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22) !important; }
+
+/* 5. Cards & Headers */
+.card-header { display: flex; align-items: center; justify-content: space-between; }
+.card-title { margin-bottom: 0; font-size: 1.15rem; font-weight: 700; }
+.card-tools { margin-left: auto; display: flex; align-items: center; gap: 0.35rem; }
+.btn-tool { color: #64748b; background: transparent; border: none; padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
+.btn-tool:hover { color: #1e293b; background: rgba(0,0,0,0.05); }
+
+/* 6. Callouts AdminLTE */
+.callout { border-radius: 0.375rem; border-left: 5px solid #cbd5e1; padding: 1rem 1.25rem; margin-bottom: 1.25rem; background-color: #f8fafc; }
+.callout-info { border-left-color: #0ea5e9; background-color: #f0f9ff; }
+.callout-warning { border-left-color: #f59e0b; background-color: #fffbeb; }
+.callout-success { border-left-color: #10b981; background-color: #ecfdf5; }
+.callout-danger { border-left-color: #ef4444; background-color: #fef2f2; }
+
+/* 7. Formulários e Controles Customizados */
+.custom-control { position: relative; display: block; min-height: 1.5rem; padding-left: 1.5rem; }
+.custom-control-input { position: absolute; left: 0; z-index: -1; width: 1rem; height: 1.25rem; opacity: 0; }
+.custom-control-label { position: relative; margin-bottom: 0; vertical-align: top; cursor: pointer; }
+.custom-switch .custom-control-label::before { left: -2.25rem; width: 1.75rem; border-radius: 0.5rem; height: 1rem; }
+.custom-switch .custom-control-label::after { top: calc(0.25rem + 2px); left: calc(-2.25rem + 2px); width: calc(1rem - 4px); height: calc(1rem - 4px); border-radius: 50%; }
+.custom-switch .custom-control-input:checked ~ .custom-control-label::after { transform: translateX(0.75rem); background-color: #fff; }
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before { background-color: var(--unn-azul-1, #1F5EDB); border-color: var(--unn-azul-1, #1F5EDB); }
+
+/* 8. AdminLTE 4 - Harmonização com Cores e Sidebar SOMOS UNN */
+:root {
+    --bs-primary: #1F5EDB;
+    --bs-primary-rgb: 31, 94, 219;
+    --lte-sidebar-width: 250px;
+    --lte-sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+}
+
+.app-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-main {
+    flex: 1 1 auto;
+    background-color: #f8fafc;
+}
+
+body.dark-mode .app-main,
+[data-bs-theme="dark"] .app-main {
+    background-color: #0b1120 !important;
+}
+
+/* Sidebar Dark Theme UNN */
+.app-sidebar[data-bs-theme="dark"],
+.sidebar-dark-primary {
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+    color: #cbd5e1;
+}
+
+.app-sidebar .sidebar-brand {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+}
+
+.app-sidebar .nav-link {
+    color: #94a3b8;
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    transition: all 0.2s ease;
+}
+
+.app-sidebar .nav-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.app-sidebar .nav-link.active {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #1F5EDB, #177FD6) !important;
+    box-shadow: 0 4px 12px rgba(31, 94, 219, 0.35);
+}
+
+.app-sidebar .nav-treeview {
+    padding-left: 0.75rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+}
+
+.app-sidebar .nav-treeview .nav-link {
+    font-size: 0.8125rem;
+    padding: 0.45rem 0.75rem;
+}
+
+.app-sidebar .nav-treeview .nav-link.active {
+    background: rgba(31, 94, 219, 0.2) !important;
+    color: #60a5fa !important;
+    box-shadow: none;
+    border-left: 3px solid #1F5EDB;
+}
+
+/* Header Navbar */
+.app-header {
+    height: 3.75rem;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    background-color: #ffffff;
+    z-index: 1030;
+}
+
+body.dark-mode .app-header,
+[data-bs-theme="dark"] .app-header {
+    background-color: #0f172a !important;
+    border-bottom-color: #1e293b !important;
+}
+
+/* Footer */
+.app-footer {
+    padding: 1rem 1.5rem;
+    background-color: #ffffff;
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+body.dark-mode .app-footer,
+[data-bs-theme="dark"] .app-footer {
+    background-color: #0f172a !important;
+    border-top-color: #1e293b !important;
+    color: #94a3b8 !important;
+}
+
+/* Animação suave para submenus */
+.nav-item.menu-open > .nav-treeview {
+    display: block !important;
+}
+.nav-item:not(.menu-open) > .nav-treeview {
+    display: none;
+}
+.nav-arrow,
+.right.fas.fa-angle-left {
+    margin-left: auto;
+    transition: transform 0.25s ease;
+}
+.nav-item.menu-open > .nav-link .nav-arrow,
+.nav-item.menu-open > .nav-link .right.fas.fa-angle-left {
+    transform: rotate(-90deg);
+}

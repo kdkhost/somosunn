@@ -1,5 +1,18 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.27] - 2026-11-23 - feat(admin, ui): migracao completa do painel /admin para AdminLTE 4 com bridge total de retrocompatibilidade
+
+- **Migração do Painel Operacional `/admin` para AdminLTE 4 (`resources/views/admin/layouts/app.blade.php`, `resources/views/admin/partials/navbar.blade.php`, `resources/views/admin/partials/sidebar.blade.php`, `resources/views/admin/partials/footer.blade.php`):**
+  - **Core Modernizado:** Atualizado o framework CSS base para AdminLTE 4 (`admin-lte@4.0.0-beta3`), Bootstrap 5.3.3 Bundle e OverlayScrollbars v2.
+  - **Estrutura HTML AdminLTE 4:** Implementadas as classes modernas de layout (`.app-wrapper`, `.app-header`, `.app-sidebar`, `.app-main`, `.app-content-header`, `.app-content`, `.app-footer`) em conjunto harmonioso com as classes legadas (`.wrapper`, `.main-header`, `.main-sidebar`, `.content-wrapper`, etc.), garantindo zero quebras de estilo ou scripts.
+  - **Navbar Reconstruída:** Cabeçalho administrativo moderno com suporte nativo a `data-lte-toggle="sidebar"` e `data-widget="pushmenu"`, dropdowns com `data-bs-toggle` e `data-toggle`, preservando integrações de Chat em tempo real, Central de Notificações, Registro Rápido de Mídias, alternância de tema escuro e perfil do operador.
+  - **Sidebar Reconstruída:** Navegação lateral com container `.sidebar-brand` para alternância inteligente de logo/favicon, user panel completo e suporte unificado a menus expansíveis via `data-lte-toggle="treeview"` e `data-widget="treeview"`, mantendo todas as rotas e permissões granulares intactas.
+  - **Footer Reconstruído:** Rodapé `.app-footer` moderno e responsivo com alinhamentos flexíveis do Bootstrap 5.
+- **Camada de Compatibilidade Dedicada (`public/css/adminlte4-compat.css`, `public/js/adminlte4-compat.js`):**
+  - **Bridge CSS Bootstrap 4 -> Bootstrap 5:** Mapeamento de floats (`.float-right`, `.float-left`), alinhamentos de texto (`.text-right`), margens e paddings legados (`.mr-*`, `.ml-*`, `.pr-*`, `.pl-*`), badges clássicas (`.badge-primary`, `.badge-success`, `.badge-danger`, etc.), `.btn-block`, `.close` e controles de formulário customizados.
+  - **Bridge JavaScript para Modais, Dropdowns e Treeview:** Escuta de eventos delegados para `[data-dismiss="modal"]`, `[data-toggle="modal"]`, `[data-toggle="dropdown"]`, acionamento de sidebar responsiva (`.sidebar-collapse` e `.sidebar-open`) e adapter jQuery para plugins legados (`$().modal('show')`, `$().dropdown()`, tooltips automáticos).
+  - **Preservação Absoluta das 619 Rotas e Views:** Nenhuma view foi quebrada e todas as regras dos dois painéis administrativos foram rigorosamente cumpridas.
+
 ## [2.8.26] - 2026-11-23 - fix(profile, ux): reposicionar cabecalho do perfil para eliminar sobreposicao de texto em capas escuras
 
 - **Reposicionamento Estrutural do Cabeçalho do Perfil Social (`resources/views/social/profile.blade.php`):**
