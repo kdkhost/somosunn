@@ -1,5 +1,20 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.10] - 2026-11-22 - feat(ranking): redesign hyper moderno, pódio refinado com animações contínuas e experiência visual de alto nível
+
+- **Reformulação Estética Hyper Moderna da Página de Ranking (`resources/views/site/ranking.blade.php`):**
+  - **Atmosfera Visual & Efeitos Glassmorphism:** Fundo estilizado com luzes difusas e glows em degradê nas cores institucionais UNN, cards translúcidos `glass-card` com desfoque de alta fidelidade (`backdrop-blur-xl`) e bordas suaves de 1px.
+  - **Pódio dos Campeões Monumental (1º, 2º e 3º Lugares):**
+    - *1º Lugar (Campeão Ouro):* Pedestal central elevado com coroa flutuante animada (`animate-float-crown`), anel externo com degradê giratório contínuo em 360º (`animate-spin-slow`), glow pulsante de ouro (`animate-pulse-glow`), anel interno branco para nitidez estrita do avatar, nome proeminente com micro-interações e pontuação monumental em alto contraste com badge "Pontos Acumulados".
+    - *2º Lugar (Prata) & 3º Lugar (Bronze):* Acabamentos metálicos premium com faixas decorativas de platina e bronze, anéis de contorno reluzentes e dados de conexões e plano alinhados.
+  - **Painel de Controle e Classificação Geral Aperfeiçoada:**
+    - Barra de busca instantânea arredondada em formato pill com indicador de status em tempo real (dot pulsante verde).
+    - Itens da lista em formato de cartões horizontais premium com destaque estilizado para o Top 10, avatares em proporções 48x48px invioláveis e micro-botões de navegação direta para o perfil social do membro.
+  - **Seção Informativa de Dinâmica de Pontuação Reorganizada:**
+    - Cards comparativos "Como Ganhar Pontos Recorrentes (+)" e "Decaimento por Inatividade (-)" com ícones modernos, métricas claras e selo de "Garantia de Piso Zero".
+  - **CTA de Posicionamento:**
+    - Banner cinematográfico em degradê azul UNN com botões estilizados para completar perfil e explorar membros.
+
 ## [2.8.9] - 2026-11-22 - fix(ranking): restauracao da animacao giratoria do avatar do campeao e reorganizacao estrutural do ranking
 
 - **Restauração da Animação Giratória em Volta do Avatar (`resources/views/site/ranking.blade.php`):**
