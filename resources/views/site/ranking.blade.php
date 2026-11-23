@@ -527,7 +527,7 @@
                         <a href="{{ url('/painel/perfil') }}" class="px-6 py-3 rounded-2xl bg-white text-blue-700 font-black text-sm hover:bg-blue-50 transition shadow-lg">
                             <i class="fas fa-user-edit mr-1"></i> Completar Meu Perfil
                         </a>
-                        <a href="{{ route('members.index') }}" class="px-6 py-3 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-black text-sm border border-white/30 transition">
+                        <a href="{{ url('/membros') }}" class="px-6 py-3 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-black text-sm border border-white/30 transition">
                             <i class="fas fa-users mr-1"></i> Conectar com Membros
                         </a>
                     </div>
