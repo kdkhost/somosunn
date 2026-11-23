@@ -524,7 +524,7 @@
                         Complete 100% do seu perfil, expanda suas conexões empresariais e participe dos eventos para somar pontos e conquistar posições de destaque.
                     </p>
                     <div class="flex flex-wrap items-center justify-center gap-3">
-                        <a href="{{ route('profile.edit') }}" class="px-6 py-3 rounded-2xl bg-white text-blue-700 font-black text-sm hover:bg-blue-50 transition shadow-lg">
+                        <a href="{{ url('/painel/perfil') }}" class="px-6 py-3 rounded-2xl bg-white text-blue-700 font-black text-sm hover:bg-blue-50 transition shadow-lg">
                             <i class="fas fa-user-edit mr-1"></i> Completar Meu Perfil
                         </a>
                         <a href="{{ route('members.index') }}" class="px-6 py-3 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-black text-sm border border-white/30 transition">
