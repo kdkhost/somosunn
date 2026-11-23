@@ -54,8 +54,16 @@ class RankingPublicController extends Controller
                         $user = $rank->user;
                         $realConns = (int) $acceptedConnections->get($user->id, 0);
 
-                        // Resolução correta da foto de perfil com fallback inteligente para CDN
-                        $avatarUrl = !empty($user->photo) ? UploadStorage::url($user->photo) : null;
+                        // Resolução correta da foto de perfil com suporte a photo e avatar (CDN / local)
+                        $photoField = $user->photo ?: $user->avatar;
+                        $avatarUrl = null;
+                        if (!empty($photoField)) {
+                            if (str_starts_with($photoField, 'http://') || str_starts_with($photoField, 'https://')) {
+                                $avatarUrl = $photoField;
+                            } else {
+                                $avatarUrl = UploadStorage::url($photoField);
+                            }
+                        }
                         $coverUrl = !empty($user->cover_photo) ? UploadStorage::url($user->cover_photo) : null;
 
                         // Nível elegante (nunca "iniciante" em minúsculo solto)
@@ -113,7 +121,15 @@ class RankingPublicController extends Controller
                             else $level = 'Membro UNN';
                         }
 
-                        $avatarUrl = !empty($u->photo) ? UploadStorage::url($u->photo) : null;
+                        $photoField = $u->photo ?: $u->avatar;
+                        $avatarUrl = null;
+                        if (!empty($photoField)) {
+                            if (str_starts_with($photoField, 'http://') || str_starts_with($photoField, 'https://')) {
+                                $avatarUrl = $photoField;
+                            } else {
+                                $avatarUrl = UploadStorage::url($photoField);
+                            }
+                        }
                         $coverUrl = !empty($u->cover_photo) ? UploadStorage::url($u->cover_photo) : null;
 
                         return (object) [

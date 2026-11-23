@@ -68,11 +68,15 @@ class ProfilePhotoService
 {
     public function urlFor(?User $user): string
     {
-        if (!$user || !$user->photo) {
+        if (!$user) {
             return asset('img/default-user.svg');
         }
 
-        $photo = $user->photo;
+        $photo = $user->photo ?: $user->avatar;
+
+        if (!$photo) {
+            return asset('img/default-user.svg');
+        }
 
         if (str_starts_with($photo, 'http://') || str_starts_with($photo, 'https://')) {
             return $photo;

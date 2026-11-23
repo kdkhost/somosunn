@@ -5,10 +5,14 @@
 @section('content')
     <style>
         @media (min-width: 768px) {
+            .step-block.step-reverse,
             .step-reverse {
+                display: flex !important;
                 flex-direction: row-reverse !important;
             }
+            .step-block.step-normal,
             .step-normal {
+                display: flex !important;
                 flex-direction: row !important;
             }
         }

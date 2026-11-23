@@ -1,5 +1,19 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.21] - 2026-11-23 - feat(ux, ranking, global): autodescoberta global de animacoes, resolucao de avatares e blindagem de layout
+
+- **Autodescoberta Global de Animações em Todo o Site Público (`resources/views/partials/global-scroll-reveal.blade.php`):**
+  - **Varredura e Marcação Automática:** Implementada função inteligente `autoTagPublicBlocks()` que descobre e monitora automaticamente todas as seções e artigos de qualquer página pública renderizada sob `<main>`, aplicando animações fluidas bidirecionais (scroll down e scroll up) sem exigir adição manual de classes nos arquivos Blade.
+  - **Preservação de Componentes:** Isolados e protegidos contra alterações indesejadas a navbar, modais, dropdowns, dock do chat flutuante e preloader.
+  - **Exibição Imediata na Viewport Inicial:** Verificação de coordenadas via `getBoundingClientRect()` para elementos visíveis no carregamento da tela, evitando qualquer atraso ou flash.
+- **Resolução de Avatares e Conexões no Ranking Público (`app/Http/Controllers/RankingPublicController.php`, `app/Services/ProfilePhotoService.php`):**
+  - **Blindagem do Avatar e Fallback Inteligente:** Atualizado tanto o `ProfilePhotoService` quanto o `RankingPublicController` para verificar e resolver fotos armazenadas em `photo` ou em `avatar` (suporte a logins sociais, links diretos de CDN e storage local), eliminando qualquer falha de carregamento de avatares no pódio e na lista geral.
+  - **Exibição Fiel de Conexões:** Garantida a exibição precisa do número de conexões aceitas reais tanto nos 3 primeiros colocados (ouro, prata e bronze) quanto nas posições #04 a #50.
+- **Garantia de Layout Intercalado em Etapas (`resources/views/site/institucional/como-funciona.blade.php`):**
+  - **Blindagem CSS com Especificidade Máxima:** Adicionadas regras diretas com `!important` para `.step-block.step-reverse` e `.step-block.step-normal` sob `@media (min-width: 768px)`, assegurando a alternância perfeita (Passo 1: número à esquerda e card à direita; Passo 2: card à esquerda e número à direita) sem depender da compilação do Tailwind JIT.
+- **Eliminação de Scroll Residual na Busca de Membros (`resources/views/social/feed.blade.php`):**
+  - **Travamento de Overflow:** Inclusão de `overflow-hidden` e `overflow-x: hidden !important; width: 100%;` no container de filtros rápidos de busca de membros no feed, impedindo o surgimento de barra de rolagem horizontal em qualquer navegador.
+
 ## [2.8.20] - 2026-11-22 - fix(preloader, ux): restaurar preloader com anel giratorio UNN, resolucao CDN e ativacao automatica
 
 - **Restauração e Blindagem do Preloader (`resources/views/layouts/app.blade.php`, migration `2026_11_23_000001_ensure_preloader_enabled`):**

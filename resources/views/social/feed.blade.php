@@ -759,7 +759,7 @@
                                 </div>
 
                                 {{-- Pílulas de filtro rápido por meio - 100% responsivo e SEM NENHUM SCROLL --}}
-                                <div class="grid grid-cols-5 gap-1 text-[11px] font-bold w-full">
+                                <div class="grid grid-cols-5 gap-1 text-[11px] font-bold w-full overflow-hidden" style="overflow-x: hidden !important; width: 100%;">
                                     <button type="button" class="feed-search-type-btn py-1 px-0.5 rounded-lg bg-blue-600 text-white transition-all text-center truncate cursor-pointer shadow-2xs" data-type="all" title="Buscar em todos">Todos</button>
                                     <button type="button" class="feed-search-type-btn py-1 px-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all text-center truncate cursor-pointer" data-type="name" title="Filtrar por nome">Nome</button>
                                     <button type="button" class="feed-search-type-btn py-1 px-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all text-center truncate cursor-pointer" data-type="role" title="Filtrar por cargo">Cargo</button>
