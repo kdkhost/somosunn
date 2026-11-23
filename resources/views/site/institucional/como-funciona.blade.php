@@ -12,6 +12,95 @@
                 flex-direction: row !important;
             }
         }
+
+        /* Animação Suave Bidirecional (Scroll Down e Scroll Up) */
+        .step-block {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .step-block .step-badge {
+            transition: transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out;
+            will-change: transform, opacity;
+        }
+
+        .step-block .step-card {
+            transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease-out, box-shadow 0.3s ease;
+            will-change: transform, opacity;
+        }
+
+        /* Estado Inicial (oculto / fora da viewport) */
+        .step-block:not(.is-visible) .step-badge {
+            opacity: 0;
+            transform: scale(0.65) rotate(-10deg);
+        }
+
+        .step-block.step-normal:not(.is-visible) .step-card {
+            opacity: 0;
+            transform: translateX(35px);
+        }
+
+        .step-block.step-reverse:not(.is-visible) .step-card {
+            opacity: 0;
+            transform: translateX(-35px);
+        }
+
+        /* Estado Visível (revelado ao rolar em qualquer direção) */
+        .step-block.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step-block.is-visible .step-badge {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        .step-block.is-visible .step-card {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .step-block.is-visible .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(31, 94, 219, 0.15), 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Animação dos Cards de Planos */
+        .plan-block {
+            opacity: 0;
+            transform: translateY(40px) scale(0.97);
+            transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .plan-block.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Seção CTA */
+        .cta-block {
+            opacity: 0;
+            transform: translateY(35px) scale(0.98);
+            transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .cta-block.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .step-block, .step-block .step-badge, .step-block .step-card, .plan-block, .cta-block {
+                transition: none !important;
+                transform: none !important;
+                opacity: 1 !important;
+            }
+        }
     </style>
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
         <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
@@ -42,11 +131,11 @@
                         @php
                             $isReverse = ($i % 2 !== 0);
                         @endphp
-                        <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-center {{ $isReverse ? 'md:flex-row-reverse step-reverse' : 'step-normal' }}">
-                            <div class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0 shadow-lg">
+                        <div class="step-block flex flex-col md:flex-row gap-6 md:gap-8 items-center {{ $isReverse ? 'md:flex-row-reverse step-reverse' : 'step-normal' }}">
+                            <div class="step-badge w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0 shadow-lg">
                                 {{ $i + 1 }}
                             </div>
-                            <div class="flex-1 w-full bg-white rounded-3xl p-6 md:p-8 shadow-lg border border-slate-100">
+                            <div class="step-card flex-1 w-full bg-white rounded-3xl p-6 md:p-8 shadow-lg border border-slate-100">
                                 <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ $step['title'] }}</h3>
                                 <p class="text-gray-600 mb-4">{{ $step['text'] }}</p>
                                 <ul class="space-y-2 text-gray-600">
@@ -95,8 +184,8 @@
                                 : (string) ($plan->description ?? '');
                         @endphp
 
-                        <div class="{{ $plan->highlight ? 'bg-white shadow-2xl ring-2 -mt-4 relative' : 'bg-slate-50' }} rounded-3xl p-6 md:p-8 text-center shadow-lg"
-                            style="{{ $plan->highlight ? '--tw-ring-color: var(--unn-azul-1)' : '' }}">
+                        <div class="plan-block {{ $plan->highlight ? 'bg-white shadow-2xl ring-2 -mt-4 relative' : 'bg-slate-50' }} rounded-3xl p-6 md:p-8 text-center shadow-lg"
+                            style="{{ $plan->highlight ? '--tw-ring-color: var(--unn-azul-1);' : '' }} transition-delay: {{ $loop->index * 100 }}ms;">
                             @if($plan->highlight)
                                 <span class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 btn-primary text-white text-sm font-bold rounded-full whitespace-nowrap">
                                     POPULAR
@@ -143,12 +232,12 @@
 
         <section class="py-16 px-6 md:px-12 lg:px-24"
             style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
-            <div class="max-w-4xl mx-auto text-center text-white">
+            <div class="cta-block max-w-4xl mx-auto text-center text-white">
                 <h2 class="text-3xl lg:text-4xl font-black mb-4">{{ $page->get('cta_title', 'Pronto para começar?') }}</h2>
                 <p class="text-lg opacity-90 mb-8">
                     {{ $page->get('cta_subtitle', 'Crie sua conta agora e comece a fazer conexões valiosas.') }}</p>
                 <a href="{{ route('register') }}"
-                    class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition"
+                    class="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition shadow-lg"
                     style="color: var(--unn-azul-1)">
                     <i class="fas fa-rocket"></i>
                     {{ $page->get('cta_btn', 'Criar conta grátis') }}
@@ -156,6 +245,37 @@
             </div>
         </section>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const animatedElements = document.querySelectorAll('.step-block, .plan-block, .cta-block');
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                        } else {
+                            // Ao sair da tela, remove a classe para reanimar em qualquer direção do scroll
+                            entry.target.classList.remove('is-visible');
+                        }
+                    });
+                }, {
+                    root: null,
+                    rootMargin: '0px 0px -40px 0px',
+                    threshold: 0.12
+                });
+
+                animatedElements.forEach(function (el) {
+                    observer.observe(el);
+                });
+            } else {
+                animatedElements.forEach(function (el) {
+                    el.classList.add('is-visible');
+                });
+            }
+        });
+    </script>
 
     <style>
         .text-gradient {

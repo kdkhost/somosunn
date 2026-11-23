@@ -1,5 +1,15 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.18] - 2026-11-22 - feat(como-funciona, ux): implementar animacoes suaves bidirecionais ao rolar a pagina para qualquer direcao
+
+- **Animações de Scroll Bidirecionais (`resources/views/site/institucional/como-funciona.blade.php`):**
+  - **Reanimação em Qualquer Direção:** Configurado `IntersectionObserver` com lógica bidirecional (scroll down e scroll up). Ao entrar na viewport, a classe `.is-visible` é adicionada disparando as animações de entrada; ao sair, a classe é redefinida para que o usuário veja a animação suave novamente sempre que rolar para cima ou para baixo.
+  - **Coreografia dos Blocos de Etapas (`.step-block`):**
+    - **Badges Numéricos (`.step-badge`):** Entrada com escala e rotação elástica suave (`scale(0.65) rotate(-10deg) -> scale(1) rotate(0deg)`).
+    - **Cards de Conteúdo (`.step-card`):** Deslize lateral coordenado com a direção do passo (passos normais deslizam da direita para a esquerda; passos reversos deslizam da esquerda para a direita) acompanhado de fade-in e aceleração por hardware GPU (`cubic-bezier(0.16, 1, 0.3, 1)`).
+    - **Hover Dinâmico:** Efeito de elevação tridimensional suave ao passar o cursor sobre os cards ativos (`translateY(-4px)` com sombra azulada).
+  - **Cards de Planos e CTA:** Efeito de revelação em cascata sequencial (`transition-delay`) nos blocos de planos e zoom-in suave no box de chamada para ação (CTA).
+
 ## [2.8.17] - 2026-11-22 - fix(como-funciona): corrigir alinhamento intercalado em zig-zag dos números e cards nas etapas
 
 - **Correção da Alternância Intercalada em "Como Funciona" (`resources/views/site/institucional/como-funciona.blade.php`):**
