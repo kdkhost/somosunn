@@ -1,5 +1,22 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.8] - 2026-11-22 - refactor(indicacoes): remocao do sandbox, correcao estrutural de abas e refatoracao profissional do painel de indicacoes
+
+- **Expurgo Completo do Sandbox e Playground Técnico (`resources/views/panel/referral/partials/share-kit.blade.php`):**
+  - Removida a antiga aba e seção técnica `#affiliateSandboxSection` que expunha formulários de solicitação de IPs públicos, domínios e playground cURL para o membro afiliado.
+  - O partial agora é uma central comercial limpa e exclusiva de **Materiais e Criativos de Divulgação**, contendo textos prontos para WhatsApp, LinkedIn, e-mails, banners com dimensões para redes sociais e embeds/iframes responsivos.
+- **Correção Estrutural de Isolamento de Abas (`resources/views/panel/referral/index.blade.php`):**
+  - Eliminado o fechamento prematuro de tags `<div>` que fazia com que as seções "Como funciona", "Pessoas que você indicou" e "Histórico de ganhos" vazassem para fora da aba `programa` e aparecessem indevidamente nas abas de rastreio e materiais.
+  - Cada aba agora possui container isolado (`data-panel-referral-tab-panel`) com renderização estrita e sem vazamentos no DOM.
+- **Reorganização Comercial e Profissional das Abas:**
+  - `Programa & Link` (`tab=programa`): Cards de resumo executivo com gradientes (Total indicados, Convertidos com taxa, Pontos acumulados, Pontos por plano), box de destaque do link de indicação exclusivo com botão Copiar rápido, atalhos de redes sociais (WhatsApp, Telegram, LinkedIn, E-mail), código único, passo a passo "Como funciona" e regras do programa.
+  - `Indicados & Ganhos` (`tab=indicados`): Aba dedicada para acompanhamento detalhado dos membros cadastrados pelo link, com avatares em proporções estritas, badges de status de plano, data de ingresso, pontos gerados, paginação e histórico financeiro de pagamentos confirmados.
+  - `Rastreio & Métricas` (`tab=rastreio`): Dashboard analítico completo com métricas de cliques, visitas únicas, checkouts iniciados, faturamento rastreado, gráficos temporais Chart.js de 14 dias, funil de canais e log detalhado com exportação CSV.
+  - `Materiais de Apoio` (`tab=materiais`): Textos e criativos de marketing de alta conversão.
+  - `API Pessoal` (`tab=api`): Chaves e tokens de integração pessoal organizados.
+- **Padronização de Notificações e UX:**
+  - Cópia do link e materiais integrada de forma global com notificações do tipo Toastr e SweetAlert2 toast, respeitando o padrão visual da plataforma.
+
 ## [2.8.7] - 2026-11-22 - feat(gamification): motor de pontuação recorrente com decaimento por inatividade (positivo e negativo)
 
 - **Motor de Penalização e Decaimento em `PointsService` (`app/Services/PointsService.php`):**
