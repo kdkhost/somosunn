@@ -301,7 +301,7 @@
 
             let hasExited = false;
             const startTime = performance.now();
-            const minDisplayTime = 420; // Tempo agradável para percepção de marca sem lentidão
+            const minDisplayTime = 650; // Tempo agradável para percepção fluida da identidade de marca
 
             function exitPreloader() {
                 if (hasExited) return;
@@ -314,9 +314,7 @@
                     preloader.classList.add('unn-preloader-exit');
 
                     setTimeout(function () {
-                        if (preloader.parentNode) {
-                            preloader.parentNode.removeChild(preloader);
-                        }
+                        preloader.style.display = 'none';
                         // Dispara atualização do Scroll Reveal Global logo após a saída suave
                         if (window.UNNScrollReveal && typeof window.UNNScrollReveal.refresh === 'function') {
                             window.UNNScrollReveal.refresh();
@@ -331,8 +329,22 @@
                 window.addEventListener('load', exitPreloader);
             }
 
-            // Trava de segurança máxima de 2.2s para nunca travar a navegação
-            setTimeout(exitPreloader, 2200);
+            // Trava de segurança máxima de 2.5s para nunca travar a navegação
+            setTimeout(exitPreloader, 2500);
+
+            // Integração nativa com PJAX para transições de páginas no painel e admin
+            if (typeof document.addEventListener === 'function') {
+                document.addEventListener('pjax:send', function () {
+                    preloader.classList.remove('unn-preloader-exit');
+                    preloader.style.display = 'flex';
+                });
+                document.addEventListener('pjax:complete', function () {
+                    setTimeout(function () {
+                        preloader.classList.add('unn-preloader-exit');
+                        setTimeout(function () { preloader.style.display = 'none'; }, 550);
+                    }, 300);
+                });
+            }
         })();
     </script>
 @endif

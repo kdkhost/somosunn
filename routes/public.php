@@ -47,6 +47,8 @@ Route::match(['GET', 'HEAD', 'OPTIONS'], '/uploads/{path}', [PublicStorageProxyC
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portal', [HomeController::class, 'portal'])->name('portal');
 Route::get('/planos', [HomeController::class, 'premium'])->name('planos');
+Route::redirect('/premium', '/planos', 301);
+Route::redirect('/lgpd', '/privacidade', 301);
 Route::get('/galeria', [GalleryController::class, 'index'])->name('gallery.index');
 Route::get('/galeria/{event}', [GalleryController::class, 'show'])->name('gallery.show');
 

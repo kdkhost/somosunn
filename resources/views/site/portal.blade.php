@@ -354,9 +354,12 @@
                     <div class="grid md:grid-cols-3 gap-6">
                         @forelse($topRankings as $rank)
                             @php
-                                $userName = optional($rank->user)->name ?? 'Empreendedor';
-                                $userAvatar = optional($rank->user)->profile_photo_url ?? null;
-                                $showUserAvatar = $userAvatar && !str_contains((string) $userAvatar, 'default-user.svg');
+                                $userName = data_get($rank, 'user.name') ?? data_get($rank, 'name') ?? 'Empreendedor';
+                                $userAvatar = data_get($rank, 'user.profile_photo_url') ?? data_get($rank, 'avatar') ?? null;
+                                $showUserAvatar = !empty($userAvatar) && !str_contains((string) $userAvatar, 'default-user.svg');
+                                $rankLevel = data_get($rank, 'level') ?? data_get($rank, 'plan_badge') ?? 'Membro';
+                                $rankScore = (int) (data_get($rank, 'score') ?? data_get($rank, 'points') ?? 0);
+                                $rankConnections = (int) (data_get($rank, 'interactions_count') ?? data_get($rank, 'connections_count') ?? data_get($rank, 'connections') ?? 0);
                             @endphp
                             <div
                                 class="bg-gradient-to-br from-slate-50 to-white rounded-3xl p-6 border border-gray-100 relative overflow-hidden">
@@ -378,18 +381,18 @@
                                     @endif
                                     <div>
                                         <h3 class="font-bold text-gray-900">{{ $userName }}</h3>
-                                        <p class="text-sm text-gray-500">{{ ucfirst($rank->level) }}</p>
+                                        <p class="text-sm text-gray-500">{{ ucfirst($rankLevel) }}</p>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-4 mt-4">
                                     <div class="text-center p-3 bg-slate-50 rounded-xl">
                                         <p class="text-xl font-bold" style="color: var(--unn-azul-1)">
-                                            {{ number_format($rank->score, 0, '', '.') }}</p>
+                                            {{ number_format($rankScore, 0, '', '.') }}</p>
                                         <p class="text-xs text-gray-500">Pontos</p>
                                     </div>
                                     <div class="text-center p-3 bg-slate-50 rounded-xl">
                                         <p class="text-xl font-bold" style="color: var(--unn-azul-1)">
-                                            {{ $rank->interactions_count }}</p>
+                                            {{ $rankConnections }}</p>
                                         <p class="text-xs text-gray-500">Conexoes</p>
                                     </div>
                                 </div>

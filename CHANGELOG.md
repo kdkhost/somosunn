@@ -1,5 +1,19 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.30] - 2026-11-23 - fix(portal, preloader, routes): resolucao de erro 500 no portal, ativacao do preloader no admin e melhoria de transicoes
+
+- **Correção de Erro 500 no Portal Público e Administrativo (`resources/views/site/portal.blade.php`):**
+  - **Eliminação de Exceção por Propriedade Indefinida:** Substituído o acesso direto `$rank->user` pelo helper seguro `data_get($rank, 'user.name') ?? data_get($rank, 'name')`, eliminando a exceção `Undefined property: stdClass::$user` disparada no PHP 8.4 / Laravel 11.
+  - **Blindagem Completa dos Campos do Ranking:** Mapeamento seguro para `$rankLevel`, `$rankScore` e `$rankConnections`, prevenindo qualquer falha tanto com instâncias Eloquent quanto com objetos padrão `stdClass` retornados pelo `RankingService`.
+- **Correção e Padronização do Preloader Moderno em Todo o Sistema (`resources/views/partials/modern-preloader.blade.php`, `resources/views/admin/layouts/app.blade.php`):**
+  - **Ativação no Painel Admin `/admin`:** Incluído `@include('partials.modern-preloader')` no layout principal do painel administrativo, garantindo que a animação orbital moderna da UNN apareça em todas as áreas do sistema (público, painel do membro e painel administrativo).
+  - **Transição Fluida e Percepção de Marca:** Ajustado o tempo mínimo de exibição para 650ms, garantindo fluidez e permitindo visualizar o giro dos anéis orbitais e o efeito de shimmer mesmo em conexões ultrarrápidas ou páginas cacheadas.
+  - **Integração com PJAX:** Adicionados listeners nativos para `pjax:send` e `pjax:complete`, permitindo que o preloader responda suavemente a trocas de abas e navegação interna sem sumir definitivamente da árvore DOM.
+- **Relacionamento no Model OrderItem (`app/Models/OrderItem.php`):**
+  - Adicionado o relacionamento `public function review() { return $this->hasOne(Review::class, 'order_item_id'); }` para eliminar erro reportado no comando `RequestFeedbackCommand`.
+- **Rotas de Compatibilidade Amigáveis (`routes/public.php`):**
+  - Adicionados redirecionamentos permanentes (301) de `/premium` para `/planos` e de `/lgpd` para `/privacidade`, eliminando erros 404 em digitação manual.
+
 ## [2.8.29] - 2026-11-23 - fix(admin, framework): restauracao completa do layout adminlte 3.2 e atualizacao para laravel 11.57 moderno
 
 - **Restauração e Blindagem do Layout do Painel Admin `/admin`:**

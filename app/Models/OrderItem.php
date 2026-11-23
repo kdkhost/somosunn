@@ -29,6 +29,11 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
+    public function review()
+    {
+        return $this->hasOne(Review::class, 'order_item_id');
+    }
+
     public function getGrossUnitPriceAttribute(): float
     {
         foreach (['original_unit_price', 'gross_unit_price', 'regular_unit_price'] as $key) {

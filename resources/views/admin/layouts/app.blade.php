@@ -3446,6 +3446,7 @@
 
 <body
     class="{{ $isAdmin ? 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}">
+    @include('partials.modern-preloader')
     {{-- Badge de Impersonation - Flutuante discreto --}}
     @if(session()->has('impersonator_id'))
         <div id="impersonation-badge"
