@@ -100,7 +100,7 @@
         <!-- Stats Bar -->
         <!-- Stats Bar -->
         @if($homePage->get('stats_enabled', true))
-        <section class="py-6 md:py-8 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden">
+        <section class="py-6 md:py-8 px-4 md:px-8 lg:px-12 w-full overflow-x-hidden scroll-reveal">
             <div class="unn-container">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                     <div class="bg-white rounded-2xl p-4 md:p-6 text-center shadow-lg">
@@ -130,7 +130,7 @@
 
         <!-- O que é a UNN -->
         @if($homePage->get('about_enabled', true))
-        <section class="py-16 px-4 md:px-8 lg:px-12 bg-white w-full overflow-x-hidden">
+        <section class="py-16 px-4 md:px-8 lg:px-12 bg-white w-full overflow-x-hidden scroll-reveal">
             <div class="unn-container">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl font-black unn-title-gradient mb-4">{{ $homePage->get('about_title', 'O que é a UNN') }}</h2>
@@ -173,7 +173,7 @@
 
         <!-- Onde o network me levou -->
         @if($homePage->get('journey_enabled', true))
-        <section class="py-16 w-full overflow-x-hidden">
+        <section class="py-16 w-full overflow-x-hidden scroll-reveal">
             <div class="unn-container">
                 <!-- Lead Banner (Blue) -->
                 <div class="home-journey-lead rounded-[2rem] md:rounded-[3rem] px-6 py-10 md:p-12 lg:p-16 text-white overflow-hidden relative mb-12">

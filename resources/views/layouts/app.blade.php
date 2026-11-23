@@ -2035,6 +2035,7 @@
 
     @include('partials.global-placeholder-fix')
     @include('partials.global-ajax-crud')
+    @include('partials.global-scroll-reveal')
 
     @include('partials.mobile-bottom-nav')
 

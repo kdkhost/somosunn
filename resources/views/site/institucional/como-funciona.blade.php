@@ -246,37 +246,6 @@
         </section>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const animatedElements = document.querySelectorAll('.step-block, .plan-block, .cta-block');
-
-            if ('IntersectionObserver' in window) {
-                const observer = new IntersectionObserver(function (entries) {
-                    entries.forEach(function (entry) {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('is-visible');
-                        } else {
-                            // Ao sair da tela, remove a classe para reanimar em qualquer direção do scroll
-                            entry.target.classList.remove('is-visible');
-                        }
-                    });
-                }, {
-                    root: null,
-                    rootMargin: '0px 0px -40px 0px',
-                    threshold: 0.12
-                });
-
-                animatedElements.forEach(function (el) {
-                    observer.observe(el);
-                });
-            } else {
-                animatedElements.forEach(function (el) {
-                    el.classList.add('is-visible');
-                });
-            }
-        });
-    </script>
-
     <style>
         .text-gradient {
             background: linear-gradient(135deg, var(--unn-azul-1) 0%, var(--unn-azul-3) 100%);

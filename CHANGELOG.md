@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.19] - 2026-11-22 - feat(animacoes, global): padronizacao global de animacoes suaves de scroll bidirecionais em todo o site
+
+- **Sistema Global de Scroll Reveal Bidirecional (`resources/views/partials/global-scroll-reveal.blade.php`, `resources/views/layouts/app.blade.php`):**
+  - **Mecanismo Centralizado:** Criado componente parcial oficial de animação de rolagem incluído no layout global da plataforma, permitindo que qualquer página utilize animações fluidas sem duplicação de scripts.
+  - **Reanimação em Qualquer Direção (Scroll Up e Scroll Down):** Motor em Vanilla JS com `IntersectionObserver` de alta performance (sem dependências externas) que monitora os seletores (`.scroll-reveal`, `.reveal-on-scroll`, `.reveal-up`, `.reveal-left`, `.reveal-right`, `.reveal-scale`, `.step-block`, `.plan-block`, `.cta-block`). Ao entrar na viewport, a classe `.is-visible` é adicionada com transição fluida acelerada por GPU (`cubic-bezier(0.16, 1, 0.3, 1)`); ao sair do campo de visão, a classe é redefinida para permitir reanimações constantes em ambas as direções de rolagem.
+  - **Interoperabilidade:** Exposta a API `window.UNNScrollReveal.refresh()` para reinicialização dinâmica após navegação Ajax, modais ou filtros.
+  - **Adoção nas Páginas Públicas:** Aplicado o padrão nas seções principais da Home (`site.index`), Sobre (`site.institucional.sobre`) e Como Funciona (`site.institucional.como-funciona`).
+
 ## [2.8.18] - 2026-11-22 - feat(como-funciona, ux): implementar animacoes suaves bidirecionais ao rolar a pagina para qualquer direcao
 
 - **Animações de Scroll Bidirecionais (`resources/views/site/institucional/como-funciona.blade.php`):**

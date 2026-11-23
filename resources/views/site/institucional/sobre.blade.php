@@ -95,7 +95,7 @@
         </div>
     </section>
 
-    <section class="bg-white px-6 py-16 md:px-12 lg:px-24">
+    <section class="bg-white px-6 py-16 md:px-12 lg:px-24 scroll-reveal">
         <div class="mx-auto max-w-4xl">
             <h2 class="mb-8 text-center text-3xl font-black text-gray-900 lg:text-4xl">
                 {{ $page->get('history_title', 'Nossa História') }}
@@ -115,7 +115,7 @@
         </div>
     </section>
 
-    <section class="px-6 py-16 md:px-12 lg:px-24">
+    <section class="px-6 py-16 md:px-12 lg:px-24 scroll-reveal">
         <div class="mx-auto max-w-7xl">
             <h2 class="mb-12 text-center text-3xl font-black text-gray-900 lg:text-4xl">
                 {{ $page->get('diff_title', 'O que nos diferencia') }}
@@ -161,7 +161,7 @@
         </div>
     </section>
 
-    <section class="px-6 py-16 md:px-12 lg:px-24" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
+    <section class="px-6 py-16 md:px-12 lg:px-24 scroll-reveal" style="background: linear-gradient(135deg, var(--unn-azul-1), var(--unn-azul-3))">
         <div class="mx-auto max-w-4xl text-center text-white">
             <h2 class="mb-4 text-3xl font-black lg:text-4xl">
                 {{ $page->get('cta_title', 'Pronto para crescer com a gente?') }}
