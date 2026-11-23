@@ -12,12 +12,13 @@
     }
 @endphp
 
-<article class="group bg-white rounded-2xl shadow-xs border border-slate-200/80 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col {{ $isDemo ? 'ring-2 ring-amber-300' : '' }}">
+<article class="group bg-white rounded-2xl shadow-xs border border-slate-200/80 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full {{ $isDemo ? 'ring-2 ring-amber-300' : '' }}">
     {{-- Header / Cover do Perfil (Capa Configurada pelo Usuário) --}}
-    <div class="h-20 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 relative flex-shrink-0 overflow-hidden">
+    <div class="h-16 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 relative flex-shrink-0 overflow-hidden" style="height: 68px;">
         @if(!empty($coverUrl))
             <img src="{{ $coverUrl }}" alt="Capa de {{ $member->name }}"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                style="width: 100%; height: 100%; object-fit: cover;"
                 onerror="this.style.display='none'" loading="lazy" decoding="async">
             {{-- Overlay sutil com gradiente para garantir leitura perfeita dos badges e contraste do avatar --}}
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-black/25 pointer-events-none"></div>
@@ -47,33 +48,38 @@
         @endif
     </div>
 
-    {{-- Avatar com Anel Branco e Sombra --}}
-    <div class="flex justify-center -mt-10 relative z-10">
+    {{-- Avatar com Dimensões Estritas e Anel Branco --}}
+    <div class="flex justify-center -mt-8 relative z-10 shrink-0" style="height: 64px;">
         @if(isset($member->avatar) && $member->avatar)
             <img src="{{ $member->avatar }}" alt="{{ $member->name }}"
-                class="w-18 h-18 rounded-full ring-4 ring-white object-cover shadow-md transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                class="w-16 h-16 rounded-full ring-4 ring-white object-cover shadow-md transition-transform duration-300 group-hover:scale-105 shrink-0 block"
+                style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px; object-fit: cover;"
+                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
         @else
-            <div class="w-18 h-18 rounded-full ring-4 ring-white bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white text-lg font-black shadow-md transition-transform duration-300 group-hover:scale-105">
+            <div class="w-16 h-16 rounded-full ring-4 ring-white bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white text-base font-black shadow-md transition-transform duration-300 group-hover:scale-105 shrink-0"
+                style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px;">
                 {{ $initials }}
             </div>
         @endif
     </div>
 
-    {{-- Body com Hierarquia Visual Refinada --}}
-    <div class="flex-1 flex flex-col pt-2.5 pb-4 px-3.5 text-center">
+    {{-- Body com Hierarquia Visual Refinada e Alinhamento Preciso --}}
+    <div class="flex-1 flex flex-col pt-3 pb-4 px-3.5 text-center">
         <h3 class="text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors truncate" title="{{ $member->name }}">
             {{ $member->name }}
         </h3>
 
-        @if(!empty($member->occupation))
-            <p class="text-[11px] font-bold text-blue-600 uppercase tracking-wider truncate mt-0.5" title="{{ $member->occupation }}">
-                {{ $member->occupation }}
-            </p>
-        @else
-            <p class="text-[11px] font-medium text-slate-400 mt-0.5 italic">
-                Membro UNN
-            </p>
-        @endif
+        <div class="min-h-[18px] mt-0.5">
+            @if(!empty($member->occupation))
+                <p class="text-[11px] font-bold text-blue-600 uppercase tracking-wider truncate" title="{{ $member->occupation }}">
+                    {{ $member->occupation }}
+                </p>
+            @else
+                <p class="text-[11px] font-medium text-slate-400 italic">
+                    Membro UNN
+                </p>
+            @endif
+        </div>
 
         {{-- Empresa / Localidade --}}
         <div class="mt-1 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-500 min-h-[20px]">
@@ -100,7 +106,7 @@
             <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">conexões</span>
         </div>
 
-        {{-- Botões de Ação --}}
+        {{-- Botões de Ação Fixos no Fundo --}}
         <div class="mt-auto pt-3 space-y-1.5">
             @if(!$isDemo)
                 <a href="{{ route('social.profile', $member->id) }}"
@@ -111,7 +117,7 @@
                 @if(auth()->check() && auth()->id() !== $member->id)
                     @if($status === 'accepted')
                         <button type="button" onclick="openChat({{ $member->id }})"
-                            class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
                             <i class="fas fa-comment text-[10px]"></i> Chat
                         </button>
                     @elseif($status === 'pending')
@@ -121,7 +127,7 @@
                             </button>
                         @else
                             <button type="button" onclick="acceptConnection({{ $member->id }})"
-                                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl font-bold text-xs transition-colors shadow-xs">
+                                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl font-bold text-xs transition-colors shadow-xs cursor-pointer">
                                 <i class="fas fa-check text-[10px]"></i> Aceitar
                             </button>
                         @endif
@@ -148,5 +154,4 @@
             @endif
         </div>
     </div>
-</article>
 </article>

@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.5] - 2026-11-22 - fix(membros): dimensões estritas de avatar e capa prevenindo quebra de layout no grid de membros
+
+- **Correção e Blindagem de Dimensões dos Cards (`resources/views/site/partials/member-card.blade.php`):**
+  - **Fim do Avatar Desproporcional:** Substituídas classes incompatíveis por dimensões estritas explícitas (`style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; object-fit: cover;"`) e classe `w-16 h-16 shrink-0` tanto na tag `img` quanto no container de iniciais. Isso impede que fotos de perfil com resoluções altas ou aspect-ratios incomuns (ex: o avatar da loja Rataplam) quebrem e expandam a altura do card.
+  - **Altura e Recorte Fixo da Capa:** O container da capa foi travado em `height: 68px` com `overflow-hidden` e `object-fit: cover`, garantindo que banners de qualquer proporção preencham o topo harmoniosamente sem empurrar o avatar ou o nome.
+  - **Alinhamento e Altura Uniforme dos Cards:** Inserido `h-full` no `<article>` com slots de altura mínima para cargo e localidade, garantindo que todos os cards da grade fiquem rigorosamente alinhados horizontalmente com os botões "Ver perfil" e "Conectar" na mesma base.
+
 ## [2.8.4] - 2026-11-22 - feat(membros): exibição da capa configurada pelo usuário nos cards de membros
 
 - **Renderização da Capa do Perfil nos Cards de Membros (`app/Http/Controllers/MemberController.php`, `resources/views/site/partials/member-card.blade.php`):**
