@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.20] - 2026-11-22 - fix(preloader, ux): restaurar preloader com anel giratorio UNN, resolucao CDN e ativacao automatica
+
+- **Restauração e Blindagem do Preloader (`resources/views/layouts/app.blade.php`, migration `2026_11_23_000001_ensure_preloader_enabled`):**
+  - **Ativação Garantida no Banco de Dados:** Criada migration para garantir que `preloader_enabled` esteja ativo (`'1'`), corrigindo o cenário onde a chave havia sido zerada na tabela `settings`.
+  - **Resolução Correta da Imagem no CDN:** Substituído o helper local `file_exists(public_path(...))` por `Setting::getUrl('preloader_image')`, garantindo que imagens salvas no CDN (`cdn.somosunn.com.br`) sejam carregadas sem falha ou fallback incorreto.
+  - **Design e Animação Aprimorados:** O preloader agora conta com anel giratório estilizado com as cores da UNN (`border-2 border-t-blue-600 animate-spin`), logo central com pulso suave (`animate-pulse`), backdrop moderno com desfoque (`backdrop-blur-md`) e tempo mínimo de exibição suave (400ms) com transição `opacity-0` e `pointer-events-none` para nunca travar a navegação.
+  - **Sincronização com o Scroll Reveal:** Ao concluir o fade out do preloader, o evento dispara automaticamente `window.UNNScrollReveal.refresh()` para que os blocos da página sejam revelados fluidamente.
+
 ## [2.8.19] - 2026-11-22 - feat(animacoes, global): padronizacao global de animacoes suaves de scroll bidirecionais em todo o site
 
 - **Sistema Global de Scroll Reveal Bidirecional (`resources/views/partials/global-scroll-reveal.blade.php`, `resources/views/layouts/app.blade.php`):**
