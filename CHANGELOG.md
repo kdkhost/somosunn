@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.4] - 2026-11-22 - feat(membros): exibição da capa configurada pelo usuário nos cards de membros
+
+- **Renderização da Capa do Perfil nos Cards de Membros (`app/Http/Controllers/MemberController.php`, `resources/views/site/partials/member-card.blade.php`):**
+  - **Mapeamento da Capa no Controller:** O método `through()` de `MemberController` agora mapeia os campos `cover` e `cover_photo` do modelo `User` convertendo o caminho relativo em URL pública absoluta (`asset()`).
+  - **Visualização da Imagem de Capa no Card:** O cabeçalho de cada card de membro (`member-card.blade.php`) foi ampliado para `h-20` e agora renderiza a imagem real da capa configurada pelo membro com `object-cover`, efeito de zoom suave ao passar o mouse (`group-hover:scale-105`), overlay gradiente para contraste e fallback resiliente (`onerror`) que preserva o gradiente azul UNN padrão caso o membro ainda não tenha adicionado uma capa.
+  - **Badges de Plano Sobrepostos:** Os badges de plano (Elite, Pro, Starter) agora contam com `z-10` para manter total nitidez e destaque sobre qualquer imagem de capa.
+
 ## [2.8.3] - 2026-11-22 - fix(membros, ux): correção definitiva de z-index nos dropdowns, refatoração de layout e melhoria visual dos cards de membros
 
 - **Correção Definitiva do Dropdown Sobreposto pelos Cards (`resources/views/site/membros.blade.php`):**

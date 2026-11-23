@@ -6,29 +6,41 @@
     $isRequester = $conn && ($conn['requester_id'] ?? null) === (auth()->id() ?? 0);
     $planBadge = $member->plan_badge ?? null;
     $badgeUpper = strtoupper($planBadge ?? '');
+    $coverUrl = $member->cover ?? $member->cover_photo ?? null;
+    if ($coverUrl && !str_starts_with($coverUrl, 'http') && !str_starts_with($coverUrl, '/')) {
+        $coverUrl = asset($coverUrl);
+    }
 @endphp
 
 <article class="group bg-white rounded-2xl shadow-xs border border-slate-200/80 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col {{ $isDemo ? 'ring-2 ring-amber-300' : '' }}">
-    {{-- Header / Cover com Gradiente UNN --}}
-    <div class="h-16 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 relative flex-shrink-0">
-        {{-- Detalhe sutil de brilho no fundo --}}
-        <div class="absolute inset-0 bg-white/5 opacity-40"></div>
+    {{-- Header / Cover do Perfil (Capa Configurada pelo Usuário) --}}
+    <div class="h-20 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 relative flex-shrink-0 overflow-hidden">
+        @if(!empty($coverUrl))
+            <img src="{{ $coverUrl }}" alt="Capa de {{ $member->name }}"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onerror="this.style.display='none'" loading="lazy" decoding="async">
+            {{-- Overlay sutil com gradiente para garantir leitura perfeita dos badges e contraste do avatar --}}
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-black/25 pointer-events-none"></div>
+        @else
+            {{-- Detalhe sutil de brilho no fundo quando o usuário não tiver capa personalizada --}}
+            <div class="absolute inset-0 bg-white/5 opacity-40"></div>
+        @endif
 
         @if($isDemo)
-            <span class="absolute top-2 right-2 bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs tracking-wider">
+            <span class="absolute top-2 right-2 bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs tracking-wider z-10">
                 DEMO
             </span>
         @elseif(!empty($planBadge))
             @if(str_contains($badgeUpper, 'ELITE'))
-                <span class="absolute top-2 right-2 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm tracking-wider uppercase ring-1 ring-amber-300/60 flex items-center gap-1">
+                <span class="absolute top-2 right-2 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm tracking-wider uppercase ring-1 ring-amber-300/60 flex items-center gap-1 z-10">
                     <i class="fas fa-crown text-[8px]"></i> {{ $planBadge }}
                 </span>
             @elseif(str_contains($badgeUpper, 'PRO'))
-                <span class="absolute top-2 right-2 bg-white text-blue-700 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm tracking-wider uppercase ring-1 ring-blue-300/40 flex items-center gap-1">
+                <span class="absolute top-2 right-2 bg-white text-blue-700 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm tracking-wider uppercase ring-1 ring-blue-300/40 flex items-center gap-1 z-10">
                     <i class="fas fa-gem text-[8px]"></i> {{ $planBadge }}
                 </span>
             @else
-                <span class="absolute top-2 right-2 bg-white/95 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs tracking-wider uppercase">
+                <span class="absolute top-2 right-2 bg-white/95 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs tracking-wider uppercase z-10">
                     {{ $planBadge }}
                 </span>
             @endif
@@ -36,7 +48,7 @@
     </div>
 
     {{-- Avatar com Anel Branco e Sombra --}}
-    <div class="flex justify-center -mt-9 relative z-10">
+    <div class="flex justify-center -mt-10 relative z-10">
         @if(isset($member->avatar) && $member->avatar)
             <img src="{{ $member->avatar }}" alt="{{ $member->name }}"
                 class="w-18 h-18 rounded-full ring-4 ring-white object-cover shadow-md transition-transform duration-300 group-hover:scale-105" loading="lazy">

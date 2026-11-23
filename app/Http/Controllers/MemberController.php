@@ -189,6 +189,8 @@ class MemberController extends Controller
                         'email' => $user->email,
                         'bio' => $user->bio,
                         'avatar' => $user->photo ? asset($user->photo) : null,
+                        'cover' => $user->cover_photo ? (str_starts_with($user->cover_photo, 'http') ? $user->cover_photo : asset($user->cover_photo)) : null,
+                        'cover_photo' => $user->cover_photo ? (str_starts_with($user->cover_photo, 'http') ? $user->cover_photo : asset($user->cover_photo)) : null,
                         'city' => trim(($user->city ?? '') . ($user->state ? ', ' . $user->state : '')),
                         'occupation' => $user->occupation,
                         'company' => $user->company,
@@ -226,6 +228,8 @@ class MemberController extends Controller
                     'level' => 'Empresário de Sucesso',
                     'connections' => 234,
                     'avatar' => null,
+                    'cover' => null,
+                    'cover_photo' => null,
                     'is_demo' => true,
                 ],
                 (object) [
