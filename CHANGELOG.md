@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.2] - 2026-11-22 - fix(feed): correção do parsing de resposta da busca de membros e alinhamento do botão limpar no input
+
+- **Correção Crítica no Consumo da API de Busca de Membros (`resources/views/social/feed.blade.php`):**
+  - **Fim do Falso Positivo "Nenhum membro encontrado":** O backend enviava `{ members: [...], total: ... }` e o JavaScript aguardava estritamente `Array.isArray()`, descartando os resultados e exibindo erroneamente mensagem vazia mesmo quando o usuário (ex: "Neka Assis") existia no banco. Ajustado para extrair `data.members || data`.
+  - **Compatibilidade de Status de Conexão:** Mapeamento explícito de `connection_status` e `status` no controller `SocialController.php`.
+- **Alinhamento do Botão Limpar Busca (`resources/views/social/feed.blade.php`):**
+  - **Botão Fechar Interno ao Campo:** Corrigido o botão de fechar (`x`), agora posicionado dentro da extremidade direita do input em pílula (`rounded-full`), eliminando o vazamento para fora do campo de busca.
+
 ## [2.8.1] - 2026-11-22 - fix(ux, membros, vagas): restauração da busca compacta de vagas, padronização visual em pílula de membros e paginação tailwind em português
 
 - **Restauração da Altura Compacta do Hero de Vagas (`resources/views/oportunidades.blade.php`):**

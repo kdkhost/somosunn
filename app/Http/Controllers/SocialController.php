@@ -229,6 +229,7 @@ class SocialController extends Controller
                     'plan' => $u->plan?->name ? ($u->plan->is_free ? 'Starter' : $u->plan->name) : 'Membro',
                     'profile_url' => route('social.profile', $u->id),
                     'status' => $status,
+                    'connection_status' => $status,
                 ];
             });
 

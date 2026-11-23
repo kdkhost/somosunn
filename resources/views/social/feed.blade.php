@@ -739,15 +739,19 @@
                                 </div>
 
                                 {{-- Input de busca com ícone e botão limpar --}}
-                                <div class="relative mb-2">
-                                    <i class="fas fa-search text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 text-xs"></i>
-                                    <input type="text" id="feed-member-search"
-                                        placeholder="Nome, cargo, empresa ou cidade..."
-                                        autocomplete="off"
-                                        class="w-full bg-slate-50 border border-gray-200 rounded-xl pl-8 pr-7 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-gray-400 font-medium">
-                                    <button type="button" id="feed-member-search-clear" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
-                                        <i class="fas fa-times"></i>
-                                    </button>
+                                <div class="relative w-full mb-2.5">
+                                    <div class="relative flex items-center w-full">
+                                        <i class="fas fa-search text-gray-400 absolute left-3.5 pointer-events-none text-xs"></i>
+                                        <input type="text" id="feed-member-search"
+                                            placeholder="Nome, cargo, empresa ou cidade..."
+                                            autocomplete="off"
+                                            class="w-full block bg-slate-50 border border-gray-200 rounded-full pl-9 pr-9 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-gray-400 font-medium">
+                                        <button type="button" id="feed-member-search-clear" 
+                                            class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer rounded-full hover:bg-slate-200/60"
+                                            title="Limpar busca">
+                                            <i class="fas fa-times text-[10px]"></i>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {{-- Pílulas de filtro rápido por meio --}}
@@ -2823,9 +2827,11 @@
 
                     fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
                         .then(res => res.json())
-                        .then(members => {
+                        .then(data => {
                             if (loadingEl) loadingEl.classList.add('hidden');
                             resultsContainer.innerHTML = '';
+
+                            const members = Array.isArray(data) ? data : (data.members || []);
 
                             if (!Array.isArray(members) || members.length === 0) {
                                 if (emptyEl) emptyEl.classList.remove('hidden');
