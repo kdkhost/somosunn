@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.13] - 2026-11-22 - fix(social, layout): padronizar espaçamento visual e vertical do widget de busca de membros
+
+- **Harmonização e Padronização de Espaçamentos (`resources/views/social/feed.blade.php`):**
+  - **Ritmo Vertical Padronizado:** Ajustado o espaçamento entre o cabeçalho "Buscar Membros" (`mb-3`), o campo de busca (`mb-3`), as pílulas de filtro rápido (`pb-0.5`) e a linha divisória inferior (`pb-4 mb-4`), eliminando o desnível onde os elementos superiores estavam espremidos e havia um vão excessivo até "Recomendados".
+  - **Pílulas de Filtro Reestruturadas:** Aumentado o padding vertical de `py-0.5` para `py-1 px-2.5` com bordas `rounded-lg` e espaçamento horizontal `gap-1.5`, proporcionando respiro ergonômico, melhor contraste e sensação tátil adequada em qualquer resolução.
+  - **Transição Simétrica para Recomendados:** A seção de "Recomendados" agora segue o mesmo padrão de espaçamento (`text-sm font-bold mb-3` e `space-y-3.5`), conferindo simetria de 16px acima e abaixo da linha divisória.
+
 ## [2.8.12] - 2026-11-22 - feat(gateway, uploads): padronizar upload do certificado Efí com arrasta e solta, preview e temporizador
 
 - **Padronização do Campo de Upload do Gateway Efí (`resources/views/panel/admin/settings/partials/gateway.blade.php`, `resources/views/admin/settings/partials/gateway.blade.php`):**

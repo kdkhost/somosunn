@@ -727,8 +727,8 @@
                             @endif
 
                             {{-- Busca Multifacetada de Membros no Feed --}}
-                            <div class="mb-5 pb-4 border-b border-gray-100">
-                                <div class="flex items-center justify-between mb-2">
+                            <div class="mb-4 pb-4 border-b border-gray-100">
+                                <div class="flex items-center justify-between mb-3">
                                     <h3 class="font-bold text-gray-900 text-sm flex items-center gap-1.5">
                                         <i class="fas fa-users text-blue-600 text-xs"></i>
                                         <span>Buscar Membros</span>
@@ -739,13 +739,13 @@
                                 </div>
 
                                 {{-- Input de busca com ícone e botão limpar perfeitamente contido --}}
-                                <div class="relative w-full mb-2.5">
+                                <div class="relative w-full mb-3">
                                     <div class="relative w-full">
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                             <i class="fas fa-search text-xs"></i>
                                         </div>
                                         <input type="text" id="feed-member-search"
-                                            placeholder="Nome, cargo, empresa ou cidade..."
+                                            placeholder="Buscar por nome, cargo ou cidade..."
                                             autocomplete="off"
                                             class="w-full bg-slate-50 border border-gray-200 rounded-full pl-8 pr-8 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-gray-400 font-medium">
                                         <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center">
@@ -758,13 +758,13 @@
                                     </div>
                                 </div>
 
-                                {{-- Pílulas de filtro rápido por meio --}}
-                                <div class="flex items-center gap-1 overflow-x-auto pb-1 text-[10px] font-semibold">
-                                    <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-blue-600 text-white transition-all whitespace-nowrap cursor-pointer" data-type="all">Todos</button>
-                                    <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="name">Nome</button>
-                                    <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="role">Cargo</button>
-                                    <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="company">Empresa</button>
-                                    <button type="button" class="feed-search-type-btn px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="city">Cidade</button>
+                                {{-- Pílulas de filtro rápido por meio com padding e espaçamento padronizados --}}
+                                <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-[11px] font-semibold no-scrollbar">
+                                    <button type="button" class="feed-search-type-btn px-2.5 py-1 rounded-lg bg-blue-600 text-white transition-all whitespace-nowrap cursor-pointer shadow-2xs" data-type="all">Todos</button>
+                                    <button type="button" class="feed-search-type-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="name">Nome</button>
+                                    <button type="button" class="feed-search-type-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="role">Cargo</button>
+                                    <button type="button" class="feed-search-type-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="company">Empresa</button>
+                                    <button type="button" class="feed-search-type-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-gray-600 transition-all whitespace-nowrap cursor-pointer" data-type="city">Cidade</button>
                                 </div>
 
                                 {{-- Estado de Carregamento --}}
@@ -784,8 +784,8 @@
                             </div>
 
                             <div id="feed-recommended-container">
-                                <h3 class="font-bold text-gray-900 mb-4">Recomendados</h3>
-                            <div class="space-y-4">
+                                <h3 class="font-bold text-gray-900 text-sm mb-3">Recomendados</h3>
+                            <div class="space-y-3.5">
                                 @if(!empty($recommendedUsers) && $recommendedUsers->isNotEmpty())
                                     @php
                                         $connectionMap = $connectionMap ?? [];
@@ -2772,11 +2772,11 @@
                     btn.addEventListener('click', function() {
                         currentType = this.getAttribute('data-type') || 'all';
                         typeBtns.forEach(b => {
-                            b.classList.remove('bg-blue-600', 'text-white');
+                            b.classList.remove('bg-blue-600', 'text-white', 'shadow-2xs');
                             b.classList.add('bg-slate-100', 'text-gray-600');
                         });
                         this.classList.remove('bg-slate-100', 'text-gray-600');
-                        this.classList.add('bg-blue-600', 'text-white');
+                        this.classList.add('bg-blue-600', 'text-white', 'shadow-2xs');
 
                         if (searchInput.value.trim().length > 0) {
                             executeSearch();
