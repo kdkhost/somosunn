@@ -1,24 +1,24 @@
-{{-- Cabeçalho AdminLTE 4 --}}
-<nav class="app-header main-header navbar navbar-expand bg-body shadow-xs" data-bs-theme="{{ ($siteTheme ?? 'light') === 'dark' ? 'dark' : 'light' }}">
-    <ul class="navbar-nav me-auto mr-auto align-items-center">
+{{-- Cabeçalho AdminLTE --}}
+<nav class="main-header navbar navbar-expand navbar-dark sidebar-dark-primary">
+    <ul class="navbar-nav mr-auto align-items-center">
         <li class="nav-item">
-            <a class="nav-link" data-lte-toggle="sidebar" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
             <a href="{{ route('home') }}" class="nav-link" target="_blank" rel="noopener">Ver site</a>
         </li>
     </ul>
 
-    <ul class="navbar-nav ms-auto ml-auto align-items-center">
+    <ul class="navbar-nav ml-auto align-items-center">
         <!-- Chat Icon -->
         <li class="nav-item dropdown mr-2">
-            <a class="nav-link" data-bs-toggle="dropdown" data-toggle="dropdown" href="#">
+            <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="far fa-comments"></i>
                 @if(isset($unreadMessagesCount) && $unreadMessagesCount > 0)
                     <span class="badge badge-danger navbar-badge">{{ $unreadMessagesCount }}</span>
                 @endif
             </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end dropdown-menu-right">
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <span class="dropdown-item dropdown-header">{{ $unreadMessagesCount ?? 0 }} Mensagens</span>
                 <div class="dropdown-divider"></div>
                 @if(isset($unreadMessagesGroups) && $unreadMessagesGroups->isNotEmpty())
@@ -57,13 +57,13 @@
 
         <!-- Bell Icon (Notifications) -->
         <li class="nav-item dropdown mr-2">
-            <a class="nav-link" data-bs-toggle="dropdown" data-toggle="dropdown" href="#">
+            <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="far fa-bell"></i>
                 @if(isset($totalNotificationsCount) && $totalNotificationsCount > 0)
                     <span class="badge badge-warning navbar-badge">{{ $totalNotificationsCount }}</span>
                 @endif
             </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end dropdown-menu-right" style="max-height: 400px; overflow-y: auto;">
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="max-height: 400px; overflow-y: auto;">
                 <span class="dropdown-item dropdown-header">{{ $totalNotificationsCount ?? 0 }} Notificações</span>
                 
                 {{-- Pending Reviews --}}
@@ -192,7 +192,7 @@
         </li>
         @auth
             <li class="nav-item dropdown">
-                <a class="nav-link d-flex align-items-center" data-bs-toggle="dropdown" data-toggle="dropdown" href="#" aria-expanded="false">
+                <a class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#" aria-expanded="false">
                     @if(auth()->user()->photo)
                         <img src="{{ asset(auth()->user()->photo) }}" alt="User" class="img-circle mr-2"
                             style="width:30px;height:30px;object-fit:cover;" loading="lazy" decoding="async">
@@ -201,7 +201,7 @@
                     @endif
                     <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
                 </a>
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-right">
+                <div class="dropdown-menu dropdown-menu-right">
                     <span class="dropdown-item-text text-muted text-sm text-center font-weight-bold">
                         {{ (auth()->user()->role ?? 'user') === 'superadmin' ? 'Superadmin' : (auth()->user()->role === 'admin' ? 'Admin' : 'Membro') }}
                     </span>

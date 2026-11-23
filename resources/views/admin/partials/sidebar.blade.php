@@ -6,16 +6,14 @@
     $brandLogo = \App\Models\Setting::getUrl('logo_admin') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg');
     $brandFavicon = \App\Models\Setting::getUrl('favicon_image') ?: asset('img/logo.svg');
 @endphp
-<aside class="app-sidebar main-sidebar sidebar-dark-primary bg-body-secondary shadow elevation-4" data-bs-theme="dark">
-    <div class="sidebar-brand">
-        <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0"
-            style="height:60px; overflow:hidden;">
-            <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img"
-                style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
-            <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img"
-                style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
-        </a>
-    </div>
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0"
+        style="height:60px; overflow:hidden;">
+        <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img"
+            style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
+        <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img"
+            style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
+    </a>
     <style>
         /* Estado Padrão (Aberto): Logo Visível, Favicon Oculto */
         .brand-link .brand-logo-img {
@@ -53,7 +51,7 @@
             display: none !important;
         }
     </style>
-    <div class="sidebar-wrapper sidebar" style="padding-bottom: 1.5rem;">
+    <div class="sidebar" style="padding-bottom: 1.5rem;">
         {{-- User Panel with Plan --}}
         <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
             <div class="image mr-2">
@@ -70,7 +68,7 @@
         </div>
 
         <nav class="mt-2">
-            <ul class="nav sidebar-menu nav-pills nav-sidebar flex-column" data-lte-toggle="treeview" data-widget="treeview" data-accordion="true"
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" data-accordion="true"
                 id="sidebar-tree" role="menu" style="gap: 2px;">
                 <li class="nav-item">
                     <a href="{{ route('admin.dashboard') }}"

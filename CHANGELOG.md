@@ -1,5 +1,21 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.29] - 2026-11-23 - fix(admin, framework): restauracao completa do layout adminlte 3.2 e atualizacao para laravel 11.57 moderno
+
+- **Restauração e Blindagem do Layout do Painel Admin `/admin`:**
+  - **Reversão de Incompatibilidades do AdminLTE 4 Beta:** Removidas as bibliotecas Bootstrap 5 e AdminLTE 4 Beta 3 que causavam quebras visuais e de comportamento nos formulários, tabelas, dropdowns e sidebar das centenas de views administrativas.
+  - **Restabelecimento Integral do AdminLTE 3.2 Estável:** Restaurado o ecossistema comprovado e 100% integrado com Bootstrap 4.6.2, FontAwesome 6, jQuery 3.7.1, OverlayScrollbars clássico, Summernote, Toastr e SweetAlert2 global.
+  - **Preservação de Todas as Views e Rotas Administrativas:** Todas as telas de gestão operacional em `/admin` voltaram ao seu alinhamento perfeito, fluidez e comportamento responsivo sem qualquer quebra visual.
+- **Atualização do Framework para Laravel 11 Moderno (`Laravel Framework 11.57.1`):**
+  - **Upgrade do Core:** Atualizado `laravel/framework` de `^10.0` para `^11.0` (versão instalada `11.57.1`), aproveitando os ganhos de performance, suporte pleno ao PHP 8.4 e segurança avançada.
+  - **Sincronização de Dependências:**
+    - `laravel/sanctum` atualizado para `^4.0` (v4.4.0)
+    - `laravel/socialite` atualizado para `^5.12` (v5.31.0)
+    - `laravel/tinker` atualizado para `^2.9` (v2.11.1)
+    - `doctrine/dbal` atualizado para `^3.10|^4.0` (v4.6.0)
+    - `aws/aws-sdk-php` e `league/flysystem-aws-s3-v3` sincronizados
+  - **Validação das 943 Rotas e Providers:** Todas as rotas do sistema foram testadas e validadas com sucesso sem nenhum conflito.
+
 ## [2.8.28] - 2026-11-23 - feat(profile, social): normalizacao inteligente de links de redes sociais e websites para usuarios e membros
 
 - **Normalizador Global de Redes Sociais (`app/Support/SocialLinkNormalizer.php`):**

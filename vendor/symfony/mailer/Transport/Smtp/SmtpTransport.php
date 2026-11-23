@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Transport\Smtp;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -107,6 +108,10 @@ class SmtpTransport extends AbstractTransport
      */
     public function setLocalDomain(string $domain): static
     {
+        if (preg_match('/[\x00-\x1F\x7F]/', $domain)) {
+            throw new InvalidArgumentException('The local domain name must not contain control characters.');
+        }
+
         if ('' !== $domain && '[' !== $domain[0]) {
             if (filter_var($domain, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {
                 $domain = '['.$domain.']';
@@ -137,10 +142,21 @@ class SmtpTransport extends AbstractTransport
             $message = parent::send($message, $envelope);
         } catch (TransportExceptionInterface $e) {
             if ($this->started) {
-                try {
-                    $this->executeCommand("RSET\r\n", [250]);
-                } catch (TransportExceptionInterface) {
-                    // ignore this exception as it probably means that the server error was final
+                if ($e instanceof UnexpectedResponseException && 421 !== $e->getCode()) {
+                    // The server replied with an unexpected code: the connection is
+                    // still in sync, so it can be reused after resetting the session.
+                    try {
+                        $this->executeCommand("RSET\r\n", [250]);
+                    } catch (TransportExceptionInterface) {
+                        // ignore this exception as it probably means that the server error was final
+                    }
+                } else {
+                    // A 421 means the server is closing the channel, and any other
+                    // failure (timeout, broken pipe, ...) may have left an
+                    // unread reply in the socket buffer. Reusing the connection would
+                    // desync every following command, so close it and reconnect on the
+                    // next message.
+                    $this->stop();
                 }
             }
 
@@ -200,7 +216,7 @@ class SmtpTransport extends AbstractTransport
             }
 
             $envelope = $message->getEnvelope();
-            $this->doMailFromCommand($envelope->getSender()->getEncodedAddress());
+            $this->doMailFromCommand($envelope->getSender()->getEncodedAddress(), $envelope->anyAddressHasUnicodeLocalpart());
             foreach ($envelope->getRecipients() as $recipient) {
                 $this->doRcptToCommand($recipient->getEncodedAddress());
             }
@@ -233,19 +249,22 @@ class SmtpTransport extends AbstractTransport
         }
     }
 
-    /**
-     * @internal since version 6.1, to be made private in 7.0
-     *
-     * @final since version 6.1, to be made private in 7.0
-     */
-    protected function doHeloCommand(): void
+    protected function serverSupportsSmtpUtf8(): bool
+    {
+        return false;
+    }
+
+    private function doHeloCommand(): void
     {
         $this->executeCommand(\sprintf("HELO %s\r\n", $this->domain), [250]);
     }
 
-    private function doMailFromCommand(string $address): void
+    private function doMailFromCommand(string $address, bool $smtputf8): void
     {
-        $this->executeCommand(\sprintf("MAIL FROM:<%s>\r\n", $address), [250]);
+        if ($smtputf8 && !$this->serverSupportsSmtpUtf8()) {
+            throw new InvalidArgumentException('Invalid addresses: non-ASCII characters not supported in local-part of email.');
+        }
+        $this->executeCommand(\sprintf("MAIL FROM:<%s>%s\r\n", $address, $smtputf8 ? ' SMTPUTF8' : ''), [250]);
     }
 
     private function doRcptToCommand(string $address): void
@@ -262,8 +281,16 @@ class SmtpTransport extends AbstractTransport
         $this->getLogger()->debug(\sprintf('Email transport "%s" starting', __CLASS__));
 
         $this->stream->initialize();
-        $this->assertResponseCode($this->getFullResponse(), [220]);
-        $this->doHeloCommand();
+
+        try {
+            $this->assertResponseCode($this->getFullResponse(), [220]);
+            $this->doHeloCommand();
+        } catch (TransportExceptionInterface $e) {
+            $this->stream->terminate();
+
+            throw $e;
+        }
+
         $this->started = true;
         $this->lastMessageTime = 0;
 
@@ -303,6 +330,12 @@ class SmtpTransport extends AbstractTransport
 
         try {
             $this->executeCommand("NOOP\r\n", [250]);
+
+            if ($this->stream->hasPendingData()) {
+                // The server queued another reply, typically a 421 closing the channel.
+                // The next command would read it as its own reply, so reconnect instead.
+                $this->stop();
+            }
         } catch (TransportExceptionInterface) {
             $this->stop();
         }
