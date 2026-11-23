@@ -31,7 +31,12 @@ class RankingPublicController extends Controller
             if (Schema::hasTable('rankings')) {
                 $rawRankings = Ranking::with(['user.plan'])
                     ->whereHas('user', function ($q) {
-                        $q->whereNotIn('role', ['admin', 'superadmin']);
+                        $q->whereNotIn('role', ['admin', 'superadmin', 'sucesso', 'staff'])
+                          ->whereNotIn('level', ['admin', 'superadmin', 'sucesso', 'staff'])
+                          ->where('name', 'not like', '%Admin%')
+                          ->where('name', 'not like', '%Suporte%')
+                          ->where('email', 'not like', '%admin%')
+                          ->where('email', 'not like', '%suporte%');
                     })
                     ->orderByDesc('score')
                     ->take(50)
@@ -61,7 +66,12 @@ class RankingPublicController extends Controller
 
             // 2. Se a tabela 'rankings' estiver vazia ou com poucos registros, compila ranking real dos usuários ativos
             if ($topRankings->count() < 3) {
-                $users = User::whereNotIn('role', ['admin', 'superadmin'])
+                $users = User::whereNotIn('role', ['admin', 'superadmin', 'sucesso', 'staff'])
+                    ->whereNotIn('level', ['admin', 'superadmin', 'sucesso', 'staff'])
+                    ->where('name', 'not like', '%Admin%')
+                    ->where('name', 'not like', '%Suporte%')
+                    ->where('email', 'not like', '%admin%')
+                    ->where('email', 'not like', '%suporte%')
                     ->with('plan')
                     ->get();
 

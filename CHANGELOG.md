@@ -1,5 +1,18 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.9] - 2026-11-22 - fix(ranking): restauracao da animacao giratoria do avatar do campeao e reorganizacao estrutural do ranking
+
+- **Restauração da Animação Giratória em Volta do Avatar (`resources/views/site/ranking.blade.php`):**
+  - Implementado o anel com gradiente dourado contínuo e animação `@keyframes spinSlow` (`animate-spin-slow`), acompanhado de brilho pulsante `@keyframes pulseGlow` (`animate-pulse-glow`) e borda interna branca ao redor do avatar do 1º lugar (Campeão), restaurando com fidelidade e sofisticação a identidade visual que havia sumido.
+  - Adicionados anéis estilizados correspondentes para o 2º lugar (Prata) e 3º lugar (Bronze).
+  - Correção de legibilidade da pontuação do 1º colocado: removido gradiente transparente que causava invisibilidade/baixo contraste no fundo branco, aplicando `text-slate-900` com número monumental em alta nitidez e `Pontos Acumulados` em dourado destacado.
+- **Exclusão Estrita de Contas Administrativas e Institucionais (`app/Http/Controllers/RankingPublicController.php`):**
+  - Filtradas contas de sistema como `Admin Somos UNN` e `Suporte ACEPE`, impedindo que contas de suporte ou administradores compitam e poluam a classificação pública da comunidade de membros.
+- **Reorganização Intuitiva da Página (`resources/views/site/ranking.blade.php`):**
+  - O **Pódio dos Campeões** agora aparece diretamente no topo, visível na primeira dobra da tela logo após o Hero limpo.
+  - A **Classificação Geral** vem logo na sequência com campo de busca instantânea dinâmico em tempo real, badges de plano alinhadas e pontuação clara.
+  - O painel detalhado de "Como Funciona a Pontuação: Ganhos & Decaimento por Inatividade" foi reposicionado estrategicamente abaixo do ranking, com link direto no topo para quem desejar consultar as regras sem empurrar os líderes para baixo.
+
 ## [2.8.8] - 2026-11-22 - refactor(indicacoes): remocao do sandbox, correcao estrutural de abas e refatoracao profissional do painel de indicacoes
 
 - **Expurgo Completo do Sandbox e Playground Técnico (`resources/views/panel/referral/partials/share-kit.blade.php`):**

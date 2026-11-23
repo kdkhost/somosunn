@@ -1,114 +1,99 @@
 @extends('layouts.app')
 
-@section('title', 'Ranking da Comunidade - UNN')
+@section('title', 'Ranking da Comunidade - SOMOS UNN')
 
 @section('content')
-    <div class="bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 min-h-screen pb-20">
+    <style>
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 0.95; transform: scale(1.05); }
+        }
+        .animate-spin-slow {
+            animation: spinSlow 8s linear infinite;
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 2.8s ease-in-out infinite;
+        }
+    </style>
+
+    <div class="bg-gradient-to-br from-slate-50 via-blue-50/25 to-slate-50 min-h-screen pb-20">
         <!-- Hero Section -->
-        <section class="pt-12 md:pt-20 pb-8 px-4 md:px-8">
-            <div class="max-w-7xl mx-auto text-center">
+        <section class="pt-12 md:pt-16 pb-6 px-4 md:px-8">
+            <div class="max-w-6xl mx-auto text-center">
                 {{-- Badge Institucional --}}
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold text-amber-800 bg-amber-100/80 border border-amber-200/90 mb-4 shadow-2xs">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold text-amber-800 bg-amber-100/80 border border-amber-200 mb-3 shadow-2xs">
                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                     <i class="fas fa-trophy text-amber-600"></i>
                     <span>Gamificação & Reconhecimento UNN</span>
                 </div>
 
-                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-3.5 unn-title-gradient">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-black leading-tight mb-3 unn-title-gradient">
                     Ranking da Comunidade
                 </h1>
-                <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed">
+                <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed">
                     Conheça os empreendedores mais engajados da nossa rede. Membros que geram conexões reais, compartilham valor e aceleram resultados no ecossistema UNN.
                 </p>
 
-                @if(isset($isDemo) && $isDemo)
-                    <div class="mt-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold">
-                        <i class="fas fa-info-circle text-amber-600"></i>
-                        <span>Modo Demonstrativo: Perfis e pontuações ilustrativas</span>
-                    </div>
-                @endif
-
-                {{-- Painel de Regras Recorrentes: Ganhos (+) e Perdas por Inatividade (-) --}}
-                <div class="max-w-4xl mx-auto mt-8 bg-white/90 backdrop-blur-md rounded-3xl p-5 md:p-6 border border-slate-200/90 shadow-sm text-left">
-                    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
-                        <div class="flex items-center gap-2">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs">
-                                <i class="fas fa-balance-scale"></i>
-                            </span>
-                            <h3 class="font-black text-sm text-slate-800">Dinâmica de Pontuação: Ganhos & Decaimento por Inatividade</h3>
+                {{-- Pilares de Pontuação Rápidos --}}
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto mt-6 text-left">
+                    <div class="bg-white/90 p-3 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 text-xs">
+                            <i class="fas fa-user-plus"></i>
                         </div>
-                        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">Atualização Recorrente</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                        {{-- Ganhos (+) --}}
-                        <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200/70">
-                            <p class="font-black text-emerald-900 flex items-center gap-1.5 mb-2.5 text-xs">
-                                <i class="fas fa-arrow-trend-up text-emerald-600"></i> Como Ganhar Pontos Recorrentes (+)
-                            </p>
-                            <ul class="space-y-1.5 text-emerald-950/90 font-medium text-[11px]">
-                                <li class="flex items-center justify-between">
-                                    <span>• Login diário na plataforma</span>
-                                    <strong class="text-emerald-700 font-black">+5 a +10 pts</strong>
-                                </li>
-                                <li class="flex items-center justify-between">
-                                    <span>• Consistência semanal ativa (3+ dias)</span>
-                                    <strong class="text-emerald-700 font-black">+20 pts</strong>
-                                </li>
-                                <li class="flex items-center justify-between">
-                                    <span>• Sequência de 7 e 30 dias seguidos</span>
-                                    <strong class="text-emerald-700 font-black">+50 a +200 pts</strong>
-                                </li>
-                                <li class="flex items-center justify-between">
-                                    <span>• Cada nova conexão aceita</span>
-                                    <strong class="text-emerald-700 font-black">+50 pts</strong>
-                                </li>
-                                <li class="flex items-center justify-between">
-                                    <span>• Postagens e comentários no feed</span>
-                                    <strong class="text-emerald-700 font-black">+3 a +20 pts</strong>
-                                </li>
-                                <li class="flex items-center justify-between">
-                                    <span>• Eventos, palestras e mentorias</span>
-                                    <strong class="text-emerald-700 font-black">+30 a +150 pts</strong>
-                                </li>
-                            </ul>
-                        </div>
-
-                        {{-- Perdas / Penalidades (-) --}}
-                        <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80">
-                            <p class="font-black text-amber-950 flex items-center gap-1.5 mb-2.5 text-xs">
-                                <i class="fas fa-arrow-trend-down text-amber-600"></i> Decaimento por Inatividade (-)
-                            </p>
-                            <ul class="space-y-1.5 text-amber-950/90 font-medium text-[11px]">
-                                <li class="flex items-center justify-between">
-                                    <span>• 7 dias sem acessar a plataforma</span>
-                                    <strong class="text-amber-700 font-black">-10 pts/sem</strong>
-                                </li>
-                                <li class="flex items-center justify-between">
-                                    <span>• 15 dias sem login consecutivo</span>
-                                    <strong class="text-amber-800 font-black">-25 pts/sem</strong>
-                                </li>
-                                <li class="flex items-center justify-between">
-                                    <span>• 30+ dias sem login na rede</span>
-                                    <strong class="text-red-700 font-black">-50 pts/sem</strong>
-                                </li>
-                                <li class="flex items-center justify-between">
-                                    <span>• 14 dias sem postar ou interagir</span>
-                                    <strong class="text-amber-700 font-black">-15 pts/quinzena</strong>
-                                </li>
-                                <li class="pt-1 border-t border-amber-200/60 text-[10px] text-amber-800 italic">
-                                    * Proteção: Seus pontos nunca ficam negativos (piso 0). Ao voltar a acessar e interagir, seus pontos voltam a subir normalmente!
-                                </li>
-                            </ul>
+                        <div class="min-w-0">
+                            <p class="text-xs font-black text-slate-900">+50 PTS</p>
+                            <p class="text-[10px] text-slate-500 truncate">Nova conexão</p>
                         </div>
                     </div>
+
+                    <div class="bg-white/90 p-3 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 text-xs">
+                            <i class="fas fa-id-badge"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-black text-slate-900">+100 PTS</p>
+                            <p class="text-[10px] text-slate-500 truncate">Perfil completo</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/90 p-3 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 text-xs">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-black text-slate-900">+20 PTS</p>
+                            <p class="text-[10px] text-slate-500 truncate">Interação no feed</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/90 p-3 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 text-xs">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-black text-slate-900">+20 PTS</p>
+                            <p class="text-[10px] text-slate-500 truncate">Consistência semanal</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="#regras-pontuacao" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 transition">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ver regras completas de pontuação e decaimento por inatividade</span>
+                        <i class="fas fa-chevron-down text-[10px]"></i>
+                    </a>
                 </div>
             </div>
         </section>
 
         <!-- Ranking Pódio (Top 3) -->
         @if($podium->isNotEmpty())
-            <section class="pt-6 pb-12 px-4 md:px-8">
+            <section class="pt-4 pb-12 px-4 md:px-8">
                 <div class="max-w-5xl mx-auto">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
                         @php
@@ -130,18 +115,22 @@
                                     </div>
 
                                     {{-- Avatar com Anel Prateado --}}
-                                    <div class="flex justify-center mb-4">
-                                        @if($second->avatar)
-                                            <img src="{{ $second->avatar }}" alt="{{ $second->name }}"
-                                                class="w-20 h-20 rounded-full ring-4 ring-slate-200 object-cover shadow-md group-hover:scale-105 transition-transform"
-                                                style="width: 80px; height: 80px; min-width: 80px; min-height: 80px; object-fit: cover;"
-                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
-                                        @else
-                                            <div class="w-20 h-20 rounded-full ring-4 ring-slate-200 bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center text-white text-xl font-black shadow-md group-hover:scale-105 transition-transform"
-                                                style="width: 80px; height: 80px; min-width: 80px; min-height: 80px;">
-                                                {{ $second->initials }}
-                                            </div>
-                                        @endif
+                                    <div class="relative flex justify-center mb-4">
+                                        <div class="relative w-22 h-22 flex items-center justify-center">
+                                            <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-slate-300 via-slate-100 to-slate-400 opacity-80"></div>
+                                            <div class="absolute inset-0.5 rounded-full bg-white"></div>
+                                            @if($second->avatar)
+                                                <img src="{{ $second->avatar }}" alt="{{ $second->name }}"
+                                                    class="relative z-10 w-20 h-20 rounded-full object-cover shadow-md group-hover:scale-105 transition-transform"
+                                                    style="width: 80px; height: 80px; min-width: 80px; min-height: 80px; object-fit: cover;"
+                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
+                                            @else
+                                                <div class="relative z-10 w-20 h-20 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-xl font-black shadow-md group-hover:scale-105 transition-transform"
+                                                    style="width: 80px; height: 80px; min-width: 80px; min-height: 80px;">
+                                                    {{ $second->initials }}
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
 
                                     <h3 class="font-black text-lg text-slate-900 group-hover:text-blue-600 transition-colors truncate" title="{{ $second->name }}">
@@ -160,7 +149,7 @@
                                         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5">Pontos</p>
                                     </div>
 
-                                    <div class="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-500">
+                                    <div class="mt-3 flex items-center justify-center gap-1.5 text-xs text-slate-500">
                                         <i class="fas fa-handshake text-blue-500"></i>
                                         <span class="font-bold">{{ $second->interactions_count }}</span> conexões
                                     </div>
@@ -168,15 +157,15 @@
                             </div>
                         @endif
 
-                        {{-- Primeiro Lugar (Ouro - Campeão) - Centro e elevado --}}
+                        {{-- Primeiro Lugar (Ouro - Campeão) - Centro e elevado com animação giratória --}}
                         @if($first)
                             @php
                                 $firstLink = $first->is_demo ? '#' : route('social.profile', $first->user_id);
                             @endphp
                             <div class="order-1 md:order-2 md:-mb-3">
                                 <div class="relative group">
-                                    {{-- Brilho dourado ao redor --}}
-                                    <div class="absolute -inset-1.5 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 rounded-[2rem] blur-md opacity-35 group-hover:opacity-75 transition duration-500"></div>
+                                    {{-- Brilho dourado ao redor do card --}}
+                                    <div class="absolute -inset-1.5 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 rounded-[2rem] blur-md opacity-40 group-hover:opacity-75 transition duration-500"></div>
 
                                     <a href="{{ $firstLink }}" class="relative block bg-white rounded-3xl p-7 sm:p-8 shadow-xl hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 border-2 border-amber-300/90 text-center">
                                         {{-- Badge Ouro Flutuante --}}
@@ -184,22 +173,35 @@
                                             <i class="fas fa-crown text-xs"></i> 1º Lugar • Campeão
                                         </div>
 
-                                        {{-- Avatar Ouro com Coroa --}}
-                                        <div class="relative flex justify-center mb-5 pt-2">
-                                            <div class="absolute -top-4 text-amber-500 text-3xl filter drop-shadow-md z-10 animate-bounce">
+                                        {{-- Avatar Ouro com Coroa e Anel Giratório Animado --}}
+                                        <div class="relative flex justify-center mb-5 pt-3">
+                                            {{-- Coroa animada --}}
+                                            <div class="absolute -top-5 text-amber-500 text-3xl filter drop-shadow-md z-30 animate-bounce">
                                                 <i class="fas fa-crown"></i>
                                             </div>
-                                            @if($first->avatar)
-                                                <img src="{{ $first->avatar }}" alt="{{ $first->name }}"
-                                                    class="w-24 h-24 sm:w-28 sm:h-28 rounded-full ring-4 ring-amber-400 object-cover shadow-xl group-hover:scale-105 transition-transform"
-                                                    style="width: 100px; height: 100px; min-width: 100px; min-height: 100px; object-fit: cover;"
-                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
-                                            @else
-                                                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full ring-4 ring-amber-400 bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center text-white text-3xl font-black shadow-xl group-hover:scale-105 transition-transform"
-                                                    style="width: 100px; height: 100px; min-width: 100px; min-height: 100px;">
-                                                    {{ $first->initials }}
-                                                </div>
-                                            @endif
+
+                                            {{-- Anel Giratório Contínuo Dourado --}}
+                                            <div class="relative w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
+                                                {{-- Glow pulsante dourado --}}
+                                                <div class="absolute -inset-2 rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 opacity-70 blur-md animate-pulse-glow"></div>
+                                                {{-- Borda giratória contínua em volta do avatar --}}
+                                                <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 animate-spin-slow"></div>
+                                                {{-- Borda interna branca para contraste --}}
+                                                <div class="absolute inset-0.5 rounded-full bg-white"></div>
+
+                                                {{-- Avatar do Campeão --}}
+                                                @if($first->avatar)
+                                                    <img src="{{ $first->avatar }}" alt="{{ $first->name }}"
+                                                        class="relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-xl group-hover:scale-105 transition-transform"
+                                                        style="width: 104px; height: 104px; min-width: 104px; min-height: 104px; object-fit: cover;"
+                                                        onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
+                                                @else
+                                                    <div class="relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center text-white text-3xl font-black shadow-xl group-hover:scale-105 transition-transform"
+                                                        style="width: 104px; height: 104px; min-width: 104px; min-height: 104px;">
+                                                        {{ $first->initials }}
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
 
                                         <h3 class="font-black text-xl sm:text-2xl text-slate-900 group-hover:text-amber-600 transition-colors truncate" title="{{ $first->name }}">
@@ -213,11 +215,12 @@
                                             </p>
                                         @endif
 
+                                        {{-- Pontuação em Alto Contraste (100% legível) --}}
                                         <div class="mt-5 pt-5 border-t border-amber-100">
-                                            <p class="text-4xl sm:text-5xl font-black bg-gradient-to-r from-amber-600 via-yellow-600 to-amber-700 bg-clip-text text-transparent tracking-tight">
+                                            <p class="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
                                                 {{ number_format($first->score, 0, ',', '.') }}
                                             </p>
-                                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">Pontos Acumulados</p>
+                                            <p class="text-[11px] font-black uppercase tracking-widest text-amber-600 mt-1">Pontos Acumulados</p>
                                         </div>
 
                                         <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
@@ -248,18 +251,22 @@
                                     </div>
 
                                     {{-- Avatar com Anel Bronze --}}
-                                    <div class="flex justify-center mb-4">
-                                        @if($third->avatar)
-                                            <img src="{{ $third->avatar }}" alt="{{ $third->name }}"
-                                                class="w-20 h-20 rounded-full ring-4 ring-amber-200 object-cover shadow-md group-hover:scale-105 transition-transform"
-                                                style="width: 80px; height: 80px; min-width: 80px; min-height: 80px; object-fit: cover;"
-                                                onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
-                                        @else
-                                            <div class="w-20 h-20 rounded-full ring-4 ring-amber-200 bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center text-white text-xl font-black shadow-md group-hover:scale-105 transition-transform"
-                                                style="width: 80px; height: 80px; min-width: 80px; min-height: 80px;">
-                                                {{ $third->initials }}
-                                            </div>
-                                        @endif
+                                    <div class="relative flex justify-center mb-4">
+                                        <div class="relative w-22 h-22 flex items-center justify-center">
+                                            <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-600 to-amber-700 opacity-70"></div>
+                                            <div class="absolute inset-0.5 rounded-full bg-white"></div>
+                                            @if($third->avatar)
+                                                <img src="{{ $third->avatar }}" alt="{{ $third->name }}"
+                                                    class="relative z-10 w-20 h-20 rounded-full object-cover shadow-md group-hover:scale-105 transition-transform"
+                                                    style="width: 80px; height: 80px; min-width: 80px; min-height: 80px; object-fit: cover;"
+                                                    onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
+                                            @else
+                                                <div class="relative z-10 w-20 h-20 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center text-white text-xl font-black shadow-md group-hover:scale-105 transition-transform"
+                                                    style="width: 80px; height: 80px; min-width: 80px; min-height: 80px;">
+                                                    {{ $third->initials }}
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
 
                                     <h3 class="font-black text-lg text-slate-900 group-hover:text-blue-600 transition-colors truncate" title="{{ $third->name }}">
@@ -278,7 +285,7 @@
                                         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5">Pontos</p>
                                     </div>
 
-                                    <div class="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-500">
+                                    <div class="mt-3 flex items-center justify-center gap-1.5 text-xs text-slate-500">
                                         <i class="fas fa-handshake text-blue-500"></i>
                                         <span class="font-bold">{{ $third->interactions_count }}</span> conexões
                                     </div>
@@ -298,9 +305,9 @@
             </section>
         @endif
 
-        <!-- Classificação Geral (4º lugar em diante) com Filtro Dinâmico -->
+        <!-- Classificação Geral (4º lugar em diante) -->
         @if($remaining->isNotEmpty())
-            <section class="pb-16 px-4 md:px-8">
+            <section class="pb-12 px-4 md:px-8">
                 <div class="max-w-5xl mx-auto">
                     {{-- Header da Tabela com Busca em Tempo Real --}}
                     <div class="bg-white rounded-3xl p-5 md:p-6 shadow-md border border-slate-200/90 mb-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -373,16 +380,16 @@
                                     </div>
 
                                     <div class="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-slate-500">
-                                        @if(!empty($rank->occupation))
-                                            <span class="truncate max-w-[150px] font-medium text-slate-600">{{ $rank->occupation }}</span>
-                                        @endif
+                                        <span class="truncate max-w-[180px] font-medium text-slate-600">
+                                            {{ $rank->occupation ?: ($rank->level ?? 'Membro da Comunidade') }}
+                                        </span>
                                         @if(!empty($rank->company))
                                             <span class="hidden sm:inline-flex items-center gap-1 text-slate-400 text-[11px]">
                                                 <i class="fas fa-building text-[9px]"></i> {{ $rank->company }}
                                             </span>
                                         @endif
                                         @if($rank->interactions_count > 0)
-                                            <span class="hidden sm:inline-flex items-center gap-1 text-blue-600 font-semibold text-[11px]">
+                                            <span class="inline-flex items-center gap-1 text-blue-600 font-semibold text-[11px]">
                                                 <i class="fas fa-handshake text-[9px]"></i> {{ $rank->interactions_count }} conexões
                                             </span>
                                         @endif
@@ -419,6 +426,90 @@
             </section>
         @endif
 
+        {{-- Painel de Regras e Dinâmica de Pontuação (Posicionado abaixo do ranking) --}}
+        <section id="regras-pontuacao" class="pb-16 px-4 md:px-8">
+            <div class="max-w-5xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-slate-200/90 shadow-sm text-left">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-slate-100 pb-4">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-sm shrink-0">
+                            <i class="fas fa-balance-scale"></i>
+                        </span>
+                        <div>
+                            <h3 class="font-black text-base text-slate-900">Como Funciona a Pontuação: Ganhos & Decaimento</h3>
+                            <p class="text-xs text-slate-500">Regras transparentes de incentivo ao engajamento na comunidade UNN</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-slate-500 bg-slate-100 px-3 py-1 rounded-full w-fit">
+                        <i class="fas fa-rotate text-blue-500"></i> Atualização Diária Automática
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
+                    {{-- Ganhos (+) --}}
+                    <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80">
+                        <p class="font-black text-emerald-900 flex items-center gap-2 mb-3 text-sm">
+                            <i class="fas fa-arrow-trend-up text-emerald-600"></i> Como Ganhar Pontos (+)
+                        </p>
+                        <ul class="space-y-2 text-emerald-950/90 font-medium text-xs">
+                            <li class="flex items-center justify-between py-1 border-b border-emerald-100/60">
+                                <span>• Login diário na plataforma</span>
+                                <strong class="text-emerald-700 font-black">+5 a +10 pts</strong>
+                            </li>
+                            <li class="flex items-center justify-between py-1 border-b border-emerald-100/60">
+                                <span>• Consistência ativa semanal (3+ dias)</span>
+                                <strong class="text-emerald-700 font-black">+20 pts</strong>
+                            </li>
+                            <li class="flex items-center justify-between py-1 border-b border-emerald-100/60">
+                                <span>• Sequência de 7 e 30 dias seguidos</span>
+                                <strong class="text-emerald-700 font-black">+50 a +200 pts</strong>
+                            </li>
+                            <li class="flex items-center justify-between py-1 border-b border-emerald-100/60">
+                                <span>• Cada nova conexão aceita</span>
+                                <strong class="text-emerald-700 font-black">+50 pts</strong>
+                            </li>
+                            <li class="flex items-center justify-between py-1 border-b border-emerald-100/60">
+                                <span>• Postagens e comentários no feed</span>
+                                <strong class="text-emerald-700 font-black">+3 a +20 pts</strong>
+                            </li>
+                            <li class="flex items-center justify-between py-1">
+                                <span>• Eventos, palestras e mentorias</span>
+                                <strong class="text-emerald-700 font-black">+30 a +150 pts</strong>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {{-- Perdas / Penalidades (-) --}}
+                    <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80">
+                        <p class="font-black text-amber-950 flex items-center gap-2 mb-3 text-sm">
+                            <i class="fas fa-arrow-trend-down text-amber-600"></i> Decaimento por Inatividade (-)
+                        </p>
+                        <ul class="space-y-2 text-amber-950/90 font-medium text-xs">
+                            <li class="flex items-center justify-between py-1 border-b border-amber-100/60">
+                                <span>• 7 dias sem acessar a plataforma</span>
+                                <strong class="text-amber-700 font-black">-10 pts/sem</strong>
+                            </li>
+                            <li class="flex items-center justify-between py-1 border-b border-amber-100/60">
+                                <span>• 15 dias sem login consecutivo</span>
+                                <strong class="text-amber-800 font-black">-25 pts/sem</strong>
+                            </li>
+                            <li class="flex items-center justify-between py-1 border-b border-amber-100/60">
+                                <span>• 30+ dias sem login na rede</span>
+                                <strong class="text-rose-700 font-black">-50 pts/sem</strong>
+                            </li>
+                            <li class="flex items-center justify-between py-1 border-b border-amber-100/60">
+                                <span>• 14 dias sem postar ou interagir</span>
+                                <strong class="text-amber-700 font-black">-15 pts/quinzena</strong>
+                            </li>
+                            <li class="pt-2 text-[11px] text-amber-800 italic leading-relaxed">
+                                <i class="fas fa-shield-alt text-amber-600 mr-1"></i>
+                                <strong>Garantia de Piso Zero:</strong> Sua pontuação nunca fica negativa. Ao retomar seus acessos e interações, seus pontos voltam a subir normalmente!
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- CTA de Subida de Ranking -->
         <section class="px-4 md:px-8">
             <div class="max-w-5xl mx-auto rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl"
@@ -429,32 +520,21 @@
                         <i class="fas fa-rocket"></i> Acelere seu Posicionamento
                     </span>
                     <h3 class="text-2xl sm:text-3xl font-black mb-3">Quer alcançar o topo do Ranking UNN?</h3>
-                    <p class="text-sm sm:text-base text-white/90 mb-6 leading-relaxed">
-                        Complete as informações do seu perfil, interaja ativamente na comunidade e envie conexões para outros empresários. Cada ação impulsiona seus pontos!
+                    <p class="text-white/85 text-sm sm:text-base mb-6 leading-relaxed">
+                        Complete 100% do seu perfil, expanda suas conexões empresariais e participe dos eventos para somar pontos e conquistar posições de destaque.
                     </p>
                     <div class="flex flex-wrap items-center justify-center gap-3">
-                        <a href="{{ route('panel.profile.edit') }}"
-                            class="bg-white px-6 py-3 rounded-full font-black text-xs hover:bg-blue-50 transition-all shadow-md hover:scale-105" style="color: var(--unn-azul-1)">
-                            <i class="fas fa-user-edit mr-1"></i> Completar Perfil
+                        <a href="{{ route('panel.profile') }}" class="px-6 py-3 rounded-2xl bg-white text-blue-700 font-black text-sm hover:bg-blue-50 transition shadow-lg">
+                            <i class="fas fa-user-edit mr-1"></i> Completar Meu Perfil
                         </a>
-                        <a href="{{ route('membros') }}"
-                            class="bg-white/15 hover:bg-white/25 border border-white/30 text-white px-6 py-3 rounded-full font-black text-xs transition-all hover:scale-105">
-                            <i class="fas fa-users mr-1"></i> Explorar Membros
+                        <a href="{{ route('members.index') }}" class="px-6 py-3 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-black text-sm border border-white/30 transition">
+                            <i class="fas fa-users mr-1"></i> Conectar com Membros
                         </a>
                     </div>
                 </div>
             </div>
         </section>
     </div>
-
-    <style>
-        .unn-title-gradient {
-            background: linear-gradient(90deg, #1F5EDB 0%, #177FD6 60%, #1D3FC4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-    </style>
 
     @push('scripts')
         <script>
