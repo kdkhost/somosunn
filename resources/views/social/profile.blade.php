@@ -106,7 +106,7 @@
                             @endif
                         </div>
 
-                        <!-- Redes Sociais -->
+                        <!-- Redes Sociais com Normalização Inteligente de Links -->
                         @php
                             $socialLinks = collect([
                                 ['key' => 'linkedin', 'icon' => 'fab fa-linkedin', 'color' => '#0A66C2'],
@@ -115,13 +115,17 @@
                                 ['key' => 'twitter', 'icon' => 'fab fa-twitter', 'color' => '#1DA1F2'],
                                 ['key' => 'youtube', 'icon' => 'fab fa-youtube', 'color' => '#FF0000'],
                                 ['key' => 'website', 'icon' => 'fas fa-globe', 'color' => '#10B981'],
-                            ])->filter(fn($s) => isset($user->{$s['key']}) && $user->{$s['key']});
+                            ])->map(function ($s) use ($user) {
+                                $raw = $user->{$s['key']} ?? null;
+                                $s['url'] = \App\Support\SocialLinkNormalizer::normalize($s['key'], $raw);
+                                return $s;
+                            })->filter(fn($s) => !empty($s['url']));
                         @endphp
 
                         @if($socialLinks->isNotEmpty())
                             <div class="flex items-center justify-center md:justify-start gap-3 mt-2">
                                 @foreach($socialLinks as $social)
-                                    <a href="{{ $user->{$social['key']} }}" target="_blank" rel="noopener"
+                                    <a href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer"
                                         class="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full hover:shadow-md transition transform hover:-translate-y-1"
                                         style="color: {{ $social['color'] }}" title="{{ ucfirst($social['key']) }}">
                                         <i class="{{ $social['icon'] }} text-xl"></i>

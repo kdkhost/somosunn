@@ -34,13 +34,13 @@
                                     <span><i class="fas fa-map-marker-alt mr-1"></i>{{ trim(($company->city ? $company->city . ' - ' : '') . $company->state) }}</span>
                                 @endif
                                 @if($company->website)
-                                    <a href="{{ $company->website }}" target="_blank" rel="noopener"><i class="fas fa-globe mr-1"></i>Site</a>
+                                    <a href="{{ \App\Support\SocialLinkNormalizer::normalize('website', $company->website) }}" target="_blank" rel="noopener noreferrer"><i class="fas fa-globe mr-1"></i>Site</a>
                                 @endif
                                 @if($company->instagram)
-                                    <a href="{{ $company->instagram }}" target="_blank" rel="noopener"><i class="fab fa-instagram mr-1"></i>Instagram</a>
+                                    <a href="{{ \App\Support\SocialLinkNormalizer::normalize('instagram', $company->instagram) }}" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram mr-1"></i>Instagram</a>
                                 @endif
                                 @if($company->linkedin)
-                                    <a href="{{ $company->linkedin }}" target="_blank" rel="noopener"><i class="fab fa-linkedin mr-1"></i>LinkedIn</a>
+                                    <a href="{{ \App\Support\SocialLinkNormalizer::normalize('linkedin', $company->linkedin) }}" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin mr-1"></i>LinkedIn</a>
                                 @endif
                             </div>
                         </div>

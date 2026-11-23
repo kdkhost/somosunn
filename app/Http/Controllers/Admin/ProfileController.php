@@ -49,12 +49,12 @@ class ProfileController extends Controller
             'state' => 'nullable|string|max:2',
 
             // Redes Sociais
-            'website' => 'nullable|url|max:255',
+            'website' => 'nullable|string|max:255',
             'facebook' => 'nullable|string|max:255',
             'instagram' => 'nullable|string|max:255',
             'twitter' => 'nullable|string|max:255',
-            'linkedin' => 'nullable|url|max:255',
-            'youtube' => 'nullable|url|max:255',
+            'linkedin' => 'nullable|string|max:255',
+            'youtube' => 'nullable|string|max:255',
 
             'pix_key' => $user->canManageReceivingPixKey()
                 ? 'required|string|max:255'
@@ -126,6 +126,13 @@ class ProfileController extends Controller
         }
 
         $emailChanged = mb_strtolower((string) $user->email) !== $data['email'];
+
+        // Normalizar redes sociais e website
+        foreach (['website', 'instagram', 'facebook', 'twitter', 'linkedin', 'youtube'] as $socialField) {
+            if (array_key_exists($socialField, $data)) {
+                $data[$socialField] = \App\Support\SocialLinkNormalizer::normalize($socialField, $data[$socialField]);
+            }
+        }
 
         // Salva os dados
         $user->fill($data);

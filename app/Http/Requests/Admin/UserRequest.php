@@ -16,7 +16,15 @@ class UserRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge([
+        $socialNormalized = [];
+        foreach (['website', 'instagram', 'facebook', 'twitter', 'linkedin', 'youtube'] as $socialField) {
+            if ($this->has($socialField)) {
+                $val = trim((string) $this->input($socialField));
+                $socialNormalized[$socialField] = filled($val) ? \App\Support\SocialLinkNormalizer::normalize($socialField, $val) : null;
+            }
+        }
+
+        $this->merge(array_merge([
             'email' => mb_strtolower(trim((string) $this->input('email'))),
             'doc' => preg_replace('/\D/', '', (string) $this->input('doc')) ?: null,
             'email_verified' => $this->boolean('email_verified'),
@@ -25,7 +33,7 @@ class UserRequest extends FormRequest
             'show_phone_public' => $this->boolean('show_phone_public'),
             'show_address_public' => $this->boolean('show_address_public'),
             'hide_profile' => $this->boolean('hide_profile'),
-        ]);
+        ], $socialNormalized));
     }
 
     public function rules(): array
@@ -64,12 +72,12 @@ class UserRequest extends FormRequest
             'neighborhood' => ['nullable', 'string', 'max:100'],
             'city' => ['nullable', 'string', 'max:100'],
             'state' => ['nullable', 'string', 'size:2'],
-            'website' => ['nullable', 'url', 'max:255'],
+            'website' => ['nullable', 'string', 'max:255'],
             'facebook' => ['nullable', 'string', 'max:255'],
             'instagram' => ['nullable', 'string', 'max:255'],
             'twitter' => ['nullable', 'string', 'max:255'],
-            'linkedin' => ['nullable', 'url', 'max:255'],
-            'youtube' => ['nullable', 'url', 'max:255'],
+            'linkedin' => ['nullable', 'string', 'max:255'],
+            'youtube' => ['nullable', 'string', 'max:255'],
             'pix_key' => $requiresPixKey
                 ? ['required', 'string', 'max:255']
                 : ['exclude'],

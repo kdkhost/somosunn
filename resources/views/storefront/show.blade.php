@@ -98,10 +98,10 @@
     }
 
     $socialLinks = collect([
-        ['label' => 'Instagram', 'url' => $store->instagram_url, 'icon' => 'fab fa-instagram'],
-        ['label' => 'Facebook', 'url' => $store->facebook_url, 'icon' => 'fab fa-facebook-f'],
-        ['label' => 'YouTube', 'url' => $store->youtube_url, 'icon' => 'fab fa-youtube'],
-        ['label' => 'Site', 'url' => $store->website_url, 'icon' => 'fas fa-globe'],
+        ['label' => 'Instagram', 'url' => \App\Support\SocialLinkNormalizer::normalize('instagram', $store->instagram_url), 'icon' => 'fab fa-instagram'],
+        ['label' => 'Facebook', 'url' => \App\Support\SocialLinkNormalizer::normalize('facebook', $store->facebook_url), 'icon' => 'fab fa-facebook-f'],
+        ['label' => 'YouTube', 'url' => \App\Support\SocialLinkNormalizer::normalize('youtube', $store->youtube_url), 'icon' => 'fab fa-youtube'],
+        ['label' => 'Site', 'url' => \App\Support\SocialLinkNormalizer::normalize('website', $store->website_url), 'icon' => 'fas fa-globe'],
         ['label' => 'WhatsApp', 'url' => $whatsappUrl, 'icon' => 'fab fa-whatsapp'],
     ])->filter(fn ($item) => filled($item['url']))->values();
 

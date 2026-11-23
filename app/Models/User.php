@@ -367,6 +367,41 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $appends = ['profile_photo_url'];
 
+    public function getSocialUrl(string $network): ?string
+    {
+        return \App\Support\SocialLinkNormalizer::normalize($network, $this->{$network} ?? null);
+    }
+
+    public function getNormalizedInstagramAttribute(): ?string
+    {
+        return $this->getSocialUrl('instagram');
+    }
+
+    public function getNormalizedFacebookAttribute(): ?string
+    {
+        return $this->getSocialUrl('facebook');
+    }
+
+    public function getNormalizedLinkedinAttribute(): ?string
+    {
+        return $this->getSocialUrl('linkedin');
+    }
+
+    public function getNormalizedTwitterAttribute(): ?string
+    {
+        return $this->getSocialUrl('twitter');
+    }
+
+    public function getNormalizedYoutubeAttribute(): ?string
+    {
+        return $this->getSocialUrl('youtube');
+    }
+
+    public function getNormalizedWebsiteAttribute(): ?string
+    {
+        return $this->getSocialUrl('website');
+    }
+
     public function getPhoneAttribute($value): ?string
     {
         return BrazilPhone::format($value);

@@ -1,5 +1,27 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.28] - 2026-11-23 - feat(profile, social): normalizacao inteligente de links de redes sociais e websites para usuarios e membros
+
+- **Normalizador Global de Redes Sociais (`app/Support/SocialLinkNormalizer.php`):**
+  - **Identificação e Tratamento Universal:** Criado serviço centralizado capaz de interpretar e converter automaticamente múltiplos formatos de entrada inseridos por membros (como nos placeholders: `@usuario`, `/usuario`, `/in/usuario`, `/c/canal`, caminhos relativos, URLs sem protocolo como `site.com.br`, ou URLs completas `http`/`https`).
+  - **Suporte Abrangente às Redes:** Normaliza de forma inteligente:
+    - **Instagram:** `@usuario`, `usuario`, `https://instagram.com/usuario` -> `https://instagram.com/usuario`
+    - **Facebook:** `/usuario`, `usuario`, `facebook.com/usuario` -> `https://facebook.com/usuario`
+    - **LinkedIn:** `/in/usuario`, `usuario`, `in/usuario`, `linkedin.com/in/usuario` -> `https://linkedin.com/in/usuario`
+    - **Twitter / X:** `@usuario`, `usuario`, `x.com/usuario` -> `https://x.com/usuario`
+    - **YouTube:** `/c/canal`, `@canal`, `canal`, `youtube.com/@canal` -> `https://youtube.com/@canal` (ou caminho canônico do canal)
+    - **Website:** `meusite.com.br`, `www.meusite.com.br` -> `https://meusite.com.br`
+- **Acessores e Métodos no Model (`app/Models/User.php`):**
+  - Adicionado método `$user->getSocialUrl(string $network): ?string` e acessores normalizados (`normalized_instagram`, `normalized_facebook`, `normalized_linkedin`, `normalized_twitter`, `normalized_youtube`, `normalized_website`).
+- **Compatibilidade Imediata com Dados Históricos e Renderização Segura:**
+  - **Perfil Social do Membro (`resources/views/social/profile.blade.php`):** Todos os ícones sociais no cabeçalho utilizam `SocialLinkNormalizer::normalize(...)` com `target="_blank" rel="noopener noreferrer"`. Dados já gravados no banco que continham `@` ou `/` agora abrem o perfil externo correto instantaneamente.
+  - **Página de Empresas e Marketplace (`resources/views/companies/show.blade.php`, `resources/views/storefront/show.blade.php`):** Normalização de links sociais em lojas e empresas da plataforma.
+  - **Diretório e API de Membros (`app/Http/Controllers/MemberController.php`):** Retorno de URLs de redes sociais 100% normalizadas nos payloads de membros.
+- **Validação e Normalização Pré-Salvar:**
+  - **Edição no Painel do Membro (`app/Http/Controllers/Panel/ProfileController.php`):** Removida restrição cega de URL estrita que bloqueava formatos comuns (`@usuario`, `/usuario`), normalizando os dados automaticamente antes da persistência.
+  - **Edição de Perfil no Admin (`app/Http/Controllers/Admin/ProfileController.php`):** Validação flexível e normalização pré-save sincronizadas.
+  - **Gestão de Usuários pelo Administrador (`app/Http/Requests/Admin/UserRequest.php`):** Normalização no ciclo `prepareForValidation()` para website, instagram, facebook, twitter, linkedin e youtube.
+
 ## [2.8.27] - 2026-11-23 - feat(admin, ui): migracao completa do painel /admin para AdminLTE 4 com bridge total de retrocompatibilidade
 
 - **Migração do Painel Operacional `/admin` para AdminLTE 4 (`resources/views/admin/layouts/app.blade.php`, `resources/views/admin/partials/navbar.blade.php`, `resources/views/admin/partials/sidebar.blade.php`, `resources/views/admin/partials/footer.blade.php`):**
