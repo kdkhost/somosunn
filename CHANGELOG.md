@@ -1,5 +1,17 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.24] - 2026-11-23 - fix(avatar, ux): garantir contraste absoluto e legibilidade nos avatares sem foto em todas as telas
+
+- **Contraste Absoluto e Visibilidade dos Avatares sem Foto (`resources/views/site/partials/ranking-podium.blade.php`, `resources/views/site/ranking.blade.php`, `resources/views/site/partials/member-card.blade.php`, `resources/views/site/index.blade.php`, `resources/views/site/portal.blade.php`, `resources/views/social/feed.blade.php`):**
+  - **Pódio do Ranking (Top 3):** Substituídas as classes utilitárias não compiladas por gradientes CSS inline e sombras de texto (`text-shadow`) com contraste garantido de 100%:
+    - **1º Lugar (Ouro):** Gradiente ouro vibrante (`#d97706` a `#78350f`) com texto branco nítido e sombra de texto profunda.
+    - **2º Lugar (Prata):** Gradiente chumbo/prata escuro (`#475569` a `#0f172a`) com texto branco nítido e sombra de texto profunda, eliminando o problema de iniciais brancas sobre fundo branco.
+    - **3º Lugar (Bronze):** Gradiente bronze escuro (`#b45309` a `#451a03`) com texto branco nítido e sombra de texto profunda, garantindo legibilidade perfeita.
+  - **Lista Geral do Ranking (#04 a #50):** Estilo inline explícito no fallback de iniciais com gradiente azul institucional UNN (`#1F5EDB` a `#177FD6`) e texto branco contrastado.
+  - **Cards de Membros (`member-card.blade.php`):** Blindagem do fallback com iniciais nítidas, gradiente corporativo e sombra de texto.
+  - **Depoimentos e Portal (`index.blade.php`, `portal.blade.php`):** Aplicados estilos inline consistentes para iniciais em círculos de avatar sem foto.
+  - **Feed Social (`feed.blade.php`):** Garantido fallback imediato para o avatar vetorial institucional `default-user.svg` na busca e lista de membros recomendados.
+
 ## [2.8.23] - 2026-11-23 - fix(ranking, home): sincronizar ranking da home com a pagina oficial e unificar podio moderno
 
 - **Unificação da Fonte de Dados do Ranking (`app/Services/RankingService.php`, `app/Http/Controllers/HomeController.php`, `app/Http/Controllers/RankingPublicController.php`):**

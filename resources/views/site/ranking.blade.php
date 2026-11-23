@@ -204,9 +204,9 @@
                                             style="width: 48px; height: 48px; min-width: 48px; min-height: 48px; object-fit: cover;"
                                             onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
                                     @else
-                                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 flex items-center justify-center text-white font-black text-sm shadow-xs shrink-0 group-hover:scale-105 transition-transform"
-                                            style="width: 48px; height: 48px; min-width: 48px; min-height: 48px;">
-                                            {{ $rank->initials }}
+                                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-sm shadow-xs shrink-0 group-hover:scale-105 transition-transform"
+                                            style="width: 48px; height: 48px; min-width: 48px; min-height: 48px; background: linear-gradient(135deg, #1F5EDB 0%, #177FD6 100%) !important; color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.35);">
+                                            {{ $rank->initials ?: 'UN' }}
                                         </div>
                                     @endif
                                 </div>

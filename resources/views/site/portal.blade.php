@@ -371,7 +371,8 @@
                                             class="w-14 h-14 rounded-full object-cover shadow-sm" loading="lazy" decoding="async">
                                     @else
                                         <div
-                                            class="w-14 h-14 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl">
+                                            class="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl"
+                                            style="background: linear-gradient(135deg, #1F5EDB 0%, #177FD6 100%) !important; color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.35);">
                                             {{ strtoupper(substr($userName, 0, 1)) }}
                                         </div>
                                     @endif

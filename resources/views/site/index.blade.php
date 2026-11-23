@@ -649,7 +649,8 @@
                                     <img src="{{ $tAvatar }}" alt="{{ $tName }}"
                                         class="w-12 h-12 rounded-full object-cover flex-shrink-0" loading="lazy" decoding="async">
                                 @else
-                                    <div class="w-12 h-12 btn-primary rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                                    <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
+                                        style="background: linear-gradient(135deg, #1F5EDB 0%, #177FD6 100%) !important; color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.35);">
                                         {{ strtoupper(substr($tName, 0, 1)) }}
                                     </div>
                                 @endif

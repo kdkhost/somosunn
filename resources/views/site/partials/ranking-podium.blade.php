@@ -82,8 +82,9 @@
                                             style="width: 100%; height: 100%; object-fit: cover;"
                                             onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
                                     @else
-                                        <div class="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-xl font-black">
-                                            {{ $second->initials }}
+                                        <div class="w-full h-full flex items-center justify-center text-white text-2xl font-black shadow-inner"
+                                            style="background: linear-gradient(135deg, #475569 0%, #334155 50%, #0f172a 100%) !important; color: #ffffff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.7); letter-spacing: 0.05em;">
+                                            {{ $second->initials ?: 'UN' }}
                                         </div>
                                     @endif
                                 </div>
@@ -168,8 +169,9 @@
                                                 style="width: 100%; height: 100%; object-fit: cover;"
                                                 onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
                                         @else
-                                            <div class="w-full h-full bg-gradient-to-br from-amber-500 via-yellow-500 to-amber-600 flex items-center justify-center text-white text-3xl font-black">
-                                                {{ $first->initials }}
+                                            <div class="w-full h-full flex items-center justify-center text-white text-3xl font-black shadow-inner"
+                                                style="background: linear-gradient(135deg, #d97706 0%, #b45309 50%, #78350f 100%) !important; color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.6); letter-spacing: 0.05em;">
+                                                {{ $first->initials ?: 'UN' }}
                                             </div>
                                         @endif
                                     </div>
@@ -247,8 +249,9 @@
                                             style="width: 100%; height: 100%; object-fit: cover;"
                                             onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
                                     @else
-                                        <div class="w-full h-full bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center text-white text-xl font-black">
-                                            {{ $third->initials }}
+                                        <div class="w-full h-full flex items-center justify-center text-white text-2xl font-black shadow-inner"
+                                            style="background: linear-gradient(135deg, #b45309 0%, #92400e 50%, #451a03 100%) !important; color: #ffffff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.7); letter-spacing: 0.05em;">
+                                            {{ $third->initials ?: 'UN' }}
                                         </div>
                                     @endif
                                 </div>

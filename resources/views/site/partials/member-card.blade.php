@@ -57,8 +57,9 @@
                     style="width: 100%; height: 100%; object-fit: cover; display: block;"
                     onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy">
             @else
-                <div class="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white text-base font-black">
-                    {{ $initials }}
+                <div class="w-full h-full flex items-center justify-center text-white text-base font-black shadow-inner"
+                    style="background: linear-gradient(135deg, #1F5EDB 0%, #177FD6 100%) !important; color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.35);">
+                    {{ $initials ?: 'UN' }}
                 </div>
             @endif
         </div>

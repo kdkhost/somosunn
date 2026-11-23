@@ -2889,7 +2889,7 @@
                                 card.innerHTML = `
                                     <div class="flex items-center gap-2.5 min-w-0 flex-1">
                                         <a href="${member.profile_url}" class="shrink-0 w-9 h-9 rounded-full overflow-hidden bg-white border border-slate-200">
-                                            <img src="${member.avatar}" alt="${escapeHtml(member.name)}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
+                                            <img src="${member.avatar || '{{ asset('img/default-user.svg') }}'}" alt="${escapeHtml(member.name)}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';">
                                         </a>
                                         <div class="min-w-0 flex-1">
                                             <div class="flex items-center gap-1.5 flex-wrap">
