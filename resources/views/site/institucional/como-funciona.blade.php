@@ -3,6 +3,16 @@
 @section('title', $page->get('seo_title', 'Como Funciona - UNN'))
 
 @section('content')
+    <style>
+        @media (min-width: 768px) {
+            .step-reverse {
+                flex-direction: row-reverse !important;
+            }
+            .step-normal {
+                flex-direction: row !important;
+            }
+        }
+    </style>
     <div class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
         <section class="pt-10 md:pt-24 pb-12 px-4 md:px-12 lg:px-24">
             <div class="max-w-7xl mx-auto text-center">
@@ -29,18 +39,22 @@
 
                 <div class="space-y-12">
                     @foreach ($steps as $i => $step)
-                        <div
-                            class="flex flex-col md:flex-row{{ $step['direction'] === 'row-reverse' ? '-reverse' : '' }} gap-6 md:gap-8 items-center">
-                            <div
-                                class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0">
+                        @php
+                            $isReverse = ($i % 2 !== 0);
+                        @endphp
+                        <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-center {{ $isReverse ? 'md:flex-row-reverse step-reverse' : 'step-normal' }}">
+                            <div class="w-16 h-16 md:w-24 md:h-24 btn-primary rounded-3xl flex items-center justify-center text-white text-2xl md:text-4xl font-black shrink-0 shadow-lg">
                                 {{ $i + 1 }}
                             </div>
-                            <div class="flex-1 bg-white rounded-3xl p-6 md:p-8 shadow-lg">
+                            <div class="flex-1 w-full bg-white rounded-3xl p-6 md:p-8 shadow-lg border border-slate-100">
                                 <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ $step['title'] }}</h3>
                                 <p class="text-gray-600 mb-4">{{ $step['text'] }}</p>
                                 <ul class="space-y-2 text-gray-600">
                                     @foreach ($step['li'] as $item)
-                                        <li><i class="fas fa-check mr-2" style="color: var(--unn-azul-1)"></i> {{ $item }}</li>
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-check mt-1 shrink-0" style="color: var(--unn-azul-1)"></i>
+                                            <span>{{ $item }}</span>
+                                        </li>
                                     @endforeach
                                 </ul>
                             </div>

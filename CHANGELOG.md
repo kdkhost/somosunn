@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.17] - 2026-11-22 - fix(como-funciona): corrigir alinhamento intercalado em zig-zag dos números e cards nas etapas
+
+- **Correção da Alternância Intercalada em "Como Funciona" (`resources/views/site/institucional/como-funciona.blade.php`):**
+  - **Eliminação de Concatenação Dinâmica Quebrada:** A classe `md:flex-row{{ ... ? '-reverse' : '' }}` falhava na compilação do Tailwind, provocando o empilhamento vertical do passo 2 com o número centralizado sobre o card ao invés de alinhado à direita.
+  - **Intercalação Automatizada com Blindagem CSS:** Implementada lógica estrita baseada na paridade do índice (`$i % 2 !== 0`), aplicando classes explícitas `md:flex-row-reverse step-reverse` para os passos pares (2, 4, etc.) e `md:flex-row step-normal` para os passos ímpares (1, 3, etc.).
+  - **Regras CSS Explícitas:** Adicionadas regras `@media (min-width: 768px)` com `flex-direction: row-reverse !important;` e `flex-direction: row !important;` garantindo que o layout intercalado em zig-zag funcione infalivelmente em qualquer navegador e tela.
+
 ## [2.8.16] - 2026-11-22 - fix(feed, layout): eliminar scroll horizontal nos filtros de busca e padronizar espacamentos e design de membros recomendados
 
 - **Eliminação Absoluta do Scroll Horizontal na Sidebar de Busca (`resources/views/social/feed.blade.php`):**
