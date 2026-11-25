@@ -1,5 +1,25 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.31] - 2026-11-25 - feat(splits, payments): automacao de comissoes do superadmin (SumUp -> Mercado Pago via Pix Out Efi Pay) e isencao de vendas do administrador
+
+- **Correção das Regras de Comissão e Isenção do Administrador (`app/Services/OrderSplitService.php`):**
+  - Implementado `isAdminOriginatedOrder()` garantindo isenção total de comissão do `superadmin` sobre vendas criadas ou divulgadas pelo administrador (`admin`, `superadmin`, `marketingManager` ou vendas institucionais sem `seller_id`).
+  - Corrigido o comportamento anterior que marcava `'auto_paid' => true` indevidamente para repasses externos em vendas pagas via SumUp; agora comissões do `superadmin` em vendas de membros/mentores/produtores nascem com `status = 'pending'` e entram na fila automática de pagamento.
+  - Suporte à chave Pix de destino exclusiva do `superadmin` (`superadmin_commission_pix_key`) para recebimento direto na conta Mercado Pago.
+- **Envio Automático de Pix Out via Efí Pay (`app/Services/Payment/EfiService.php`, `app/Services/OrderSplitPayoutService.php`):**
+  - Adicionados os métodos `sendPix()` (`PUT /v2/gn/pix/{idEnvio}`), `getAccountBalance()` (`GET /v2/gn/saldo`) e `getPixSendStatus()` utilizando autenticação OAuth2 + mTLS já configurada no sistema.
+  - Implementado `processAutomaticPayout()` com trava pessimista (`lockForUpdate()`), chave de idempotência (`UNNSPLIT{id}`), respeito ao prazo de carência `D+N` da SumUp, verificação de saldo com reagendamento automático sem erro definitivo, gravação do comprovante `endToEndId` e notificação ao recebedor.
+  - Criado o comando `splits:process-payouts` (`app/Console/Commands/ProcessAutomaticSplitPayoutsCommand.php`) agendado de hora em hora em `app/Console/Kernel.php` com `withoutOverlapping()`.
+  - Criado o serviço `PaymentGatewayRouterService` (`app/Services/Payment/PaymentGatewayRouterService.php`) para suporte opcional ao modo de roteamento inteligente para Mercado Pago Marketplace (`mp_routing`).
+- **Banco de Dados (`database/migrations/2026_11_25_030000_add_automation_fields_to_order_split_payouts_table.php`, `app/Models/OrderSplitPayout.php`):**
+  - Adicionadas as colunas `scheduled_for`, `gateway_response` e `batch_id` em `order_split_payouts`.
+- **Paridade Completa nos Dois Painéis Administrativos (`/admin/splits` e `/painel/admin/splits`):**
+  - `Panel\Admin\SplitController` passou a estender `Admin\SplitController` mantendo regra de negócio única sem duplicação.
+  - Adicionadas as rotas `admin.splits.automation_settings`, `admin.splits.process_auto`, `panel.admin.splits.automation_settings` e `panel.admin.splits.process_auto` em `routes/app.php`.
+  - Adicionado painel de configuração exclusivo do `superadmin` (com salvamento AJAX + Toastr/SweetAlert2) e botão de disparo imediato de Pix automático nas views `resources/views/admin/splits/index.blade.php` e `resources/views/panel/admin/splits/index.blade.php`.
+- **Testes Automatizados (`tests/Feature/OrderSplitAutomationTest.php`):**
+  - Adicionados testes cobrindo isenção de vendas do administrador/institucionais, disparo automático via Efí Pay com idempotência e reagendamento automático em caso de saldo insuficiente.
+
 ## [2.8.30] - 2026-11-23 - fix(portal, preloader, routes): resolucao de erro 500 no portal, ativacao do preloader no admin e melhoria de transicoes
 
 - **Correção de Erro 500 no Portal Público e Administrativo (`resources/views/site/portal.blade.php`):**

@@ -82,6 +82,9 @@ class Kernel extends ConsoleKernel
 
         // Processamento diário recorrente de pontos: bonificações e decaimento por inatividade (positivo e negativo)
         $schedule->command('points:process-recurrence')->dailyAt('04:00');
+
+        // Processamento automático de repasses de comissão (Pix Out Efí Pay -> Mercado Pago)
+        $schedule->command('splits:process-payouts')->hourly()->withoutOverlapping();
     }
 
     protected function commands(): void

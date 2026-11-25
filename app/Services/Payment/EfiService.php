@@ -382,4 +382,150 @@ class EfiService
 
         return $response->successful() ? (array) $response->json() : [];
     }
+
+    /**
+     * Consulta o saldo disponível na conta Efí Pay (/v2/gn/saldo).
+     */
+    public function getAccountBalance(): ?float
+    {
+        $tokenData = $this->requestAccessToken();
+        $token = $tokenData['access_token'] ?? '';
+        if ($token === '') {
+            return null;
+        }
+
+        $options = ['timeout' => 15];
+        $certPath = $this->certificatePath();
+        if ($certPath !== '' && is_file($certPath)) {
+            $options['cert'] = $certPath;
+            $options['ssl_key'] = $certPath;
+        }
+
+        $response = Http::withOptions($options)
+            ->withToken($token)
+            ->acceptJson()
+            ->get($this->baseUrl() . '/v2/gn/saldo');
+
+        if (!$response->successful()) {
+            Log::warning('EfiService: falha ao consultar saldo', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            return null;
+        }
+
+        $saldo = $response->json('saldo');
+
+        return is_numeric($saldo) ? (float) $saldo : null;
+    }
+
+    /**
+     * Dispara um Pix Out (transferência automática) via API Efí Pay (PUT /v2/gn/pix/{idEnvio}).
+     * Permite transferir automaticamente comissões para uma chave Pix externa (ex.: Mercado Pago).
+     *
+     * @return array{idEnvio:string,e2eId:?string,status:string,raw:array<string,mixed>}
+     */
+    public function sendPix(string $idEnvio, float $amount, string $targetPixKey, ?string $description = null): array
+    {
+        $cleanIdEnvio = preg_replace('/[^a-zA-Z0-9]/', '', $idEnvio) ?: ('UNN' . time());
+        $cleanIdEnvio = substr($cleanIdEnvio, 0, 35);
+
+        $payerKey = $this->pixKey();
+        if ($payerKey === '') {
+            throw new \RuntimeException('Chave Pix de origem (Efí Pay) não configurada.');
+        }
+
+        $targetPixKey = trim($targetPixKey);
+        if ($targetPixKey === '') {
+            throw new \RuntimeException('Chave Pix de destino do recebedor não informada.');
+        }
+
+        if ($amount <= 0) {
+            throw new \RuntimeException('Valor inválido para envio de Pix automático.');
+        }
+
+        $tokenData = $this->requestAccessToken();
+        $token = $tokenData['access_token'] ?? '';
+        if ($token === '') {
+            throw new \RuntimeException('Token de acesso Efí Pay não obtido.');
+        }
+
+        $payload = [
+            'valor' => number_format($amount, 2, '.', ''),
+            'pagador' => [
+                'chave' => $payerKey,
+            ],
+            'favorecido' => [
+                'chave' => $targetPixKey,
+            ],
+        ];
+
+        if ($description !== null && trim($description) !== '') {
+            $payload['pagador']['infoPagador'] = mb_substr(trim($description), 0, 140);
+        }
+
+        $options = ['timeout' => 25];
+        $certPath = $this->certificatePath();
+        if ($certPath !== '' && is_file($certPath)) {
+            $options['cert'] = $certPath;
+            $options['ssl_key'] = $certPath;
+        }
+
+        $response = Http::withOptions($options)
+            ->withToken($token)
+            ->acceptJson()
+            ->put($this->baseUrl() . '/v2/gn/pix/' . $cleanIdEnvio, $payload);
+
+        if (!$response->successful()) {
+            $errorMsg = $response->json('mensagem')
+                ?: $response->json('error_description')
+                ?: $response->json('detail')
+                ?: ('HTTP ' . $response->status());
+
+            Log::error('EfiService: falha no envio de Pix Out', [
+                'idEnvio' => $cleanIdEnvio,
+                'amount' => $amount,
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            throw new \RuntimeException('Falha no envio de Pix automático (Efí Pay): ' . $errorMsg);
+        }
+
+        $json = (array) $response->json();
+
+        return [
+            'idEnvio' => (string) ($json['idEnvio'] ?? $cleanIdEnvio),
+            'e2eId' => isset($json['e2eId']) ? (string) $json['e2eId'] : null,
+            'status' => (string) ($json['status'] ?? 'EM_PROCESSAMENTO'),
+            'raw' => $json,
+        ];
+    }
+
+    /**
+     * Consulta o status de um Pix enviado pelo identificador endToEndId (/v2/pix/{e2eId}).
+     */
+    public function getPixSendStatus(string $e2eId): array
+    {
+        $tokenData = $this->requestAccessToken();
+        $token = $tokenData['access_token'] ?? '';
+        if ($token === '') {
+            return [];
+        }
+
+        $options = ['timeout' => 15];
+        $certPath = $this->certificatePath();
+        if ($certPath !== '' && is_file($certPath)) {
+            $options['cert'] = $certPath;
+            $options['ssl_key'] = $certPath;
+        }
+
+        $response = Http::withOptions($options)
+            ->withToken($token)
+            ->acceptJson()
+            ->get($this->baseUrl() . '/v2/pix/' . urlencode($e2eId));
+
+        return $response->successful() ? (array) $response->json() : [];
+    }
 }

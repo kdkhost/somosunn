@@ -2,6 +2,19 @@
 
 ## Painéis Administrativos
 
+### Atualização aplicada em 25/11/2026 - automação de comissões do superadmin (SumUp -> Mercado Pago via Pix Out Efí Pay)
+
+- **Recursos existentes e compartilhados entre os dois painéis:**
+  - `/admin/splits` (AdminLTE 3.2) e `/painel/admin/splits` (Tailwind) agora compartilham 100% da lógica via herança (`Panel\Admin\SplitController extends Admin\SplitController`) e dos serviços `OrderSplitService`, `OrderSplitPayoutService`, `Payment\EfiService` e `Payment\PaymentGatewayRouterService`.
+  - Ambos os painéis exibem o painel exclusivo do `superadmin` para configurar chave Pix do Mercado Pago, modo de liquidação (`efi_pix_out`, `mp_routing`, `manual`), percentual de comissão, prazo de carência `D+N`, valor mínimo e ativação do envio automático sem interação humana, além de status detalhado (`E2E`, data agendada, provedor) e disparo imediato via AJAX (SweetAlert2 + Toastr).
+- **Rotas preservadas e adicionadas:**
+  - Preservadas: `admin.splits.index`, `admin.splits.pay`, `admin.splits.fail`, `panel.admin.splits.index`, `panel.admin.splits.pay`, `panel.admin.splits.fail`, `panel.splits.index`.
+  - Adicionadas: `admin.splits.automation_settings`, `admin.splits.process_auto`, `panel.admin.splits.automation_settings`, `panel.admin.splits.process_auto`.
+- **Permissões, testes e diferenças visuais mantidas:**
+  - Configurações de automação restritas a `superadmin` (`isSuperAdmin()`). Vendas do administrador (`admin`, `superadmin`, `marketingManager` ou sem `seller_id`) são isentas automaticamente de comissão.
+  - Diferenças visuais mantidas entre AdminLTE 3.2 (`/admin/splits`) e Tailwind (`/painel/admin/splits`).
+  - Validações executadas: `php -l`, `check-no-bom.php`, `check-text-encoding.php`, `php artisan route:list --name=splits`, `php artisan schedule:list` e suíte `tests/Feature/OrderSplitAutomationTest.php`.
+
 ### Atualização aplicada em 21/11/2026 - arquitetura multi-subdomínios, desempenho, Server-Side e frontend otimizado
 
 - **Recursos existentes e compartilhados entre os dois painéis:**

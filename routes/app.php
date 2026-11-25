@@ -403,7 +403,9 @@ Route::prefix('painel')->name('panel.')->middleware(['auth', 'check.plan', 'chec
         Route::post('orders/{order}/cancel', [\App\Http\Controllers\Panel\Admin\OrderController::class, 'cancel'])->name('orders.cancel');
         Route::post('orders/{order}/invoice', [\App\Http\Controllers\Panel\Admin\InvoiceController::class, 'issueForOrder'])->name('orders.invoice');
         Route::get('splits', [\App\Http\Controllers\Panel\Admin\SplitController::class, 'index'])->name('splits.index');
+        Route::post('splits/automation-settings', [\App\Http\Controllers\Panel\Admin\SplitController::class, 'saveAutomationSettings'])->name('splits.automation_settings');
         Route::post('splits/{split}/pay', [\App\Http\Controllers\Panel\Admin\SplitController::class, 'pay'])->name('splits.pay');
+        Route::post('splits/{split}/process-auto', [\App\Http\Controllers\Panel\Admin\SplitController::class, 'processAuto'])->name('splits.process_auto');
         Route::post('splits/{split}/fail', [\App\Http\Controllers\Panel\Admin\SplitController::class, 'fail'])->name('splits.fail');
 
         Route::prefix('buyer-communication')->name('buyer-communication.')->group(function () {
@@ -638,7 +640,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     });
 
     Route::get('splits', [\App\Http\Controllers\Admin\SplitController::class, 'index'])->name('splits.index');
+    Route::post('splits/automation-settings', [\App\Http\Controllers\Admin\SplitController::class, 'saveAutomationSettings'])->name('splits.automation_settings');
     Route::post('splits/{split}/pay', [\App\Http\Controllers\Admin\SplitController::class, 'pay'])->name('splits.pay');
+    Route::post('splits/{split}/process-auto', [\App\Http\Controllers\Admin\SplitController::class, 'processAuto'])->name('splits.process_auto');
     Route::post('splits/{split}/fail', [\App\Http\Controllers\Admin\SplitController::class, 'fail'])->name('splits.fail');
 
     Route::prefix('chat')->name('chat.')->group(function () {

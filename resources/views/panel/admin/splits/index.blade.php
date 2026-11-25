@@ -39,6 +39,80 @@
             @endforeach
         </div>
 
+        @if(!empty($automation['is_superadmin']))
+            <div class="rounded-2xl border border-blue-200 bg-white p-6 shadow-sm dark:border-blue-900/40 dark:bg-slate-900">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
+                    <div>
+                        <h2 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fas fa-robot text-blue-600"></i>
+                            Automação de Comissões (SumUp &rarr; Mercado Pago)
+                        </h2>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            Vendas divulgadas pelo administrador são <strong>isentas automaticamente</strong>. Vendas de membros, mentores e produtores disparam Pix automático via Efí Pay para sua chave Pix do Mercado Pago.
+                        </p>
+                    </div>
+                    <span class="rounded-full px-3 py-1 text-xs font-bold {{ $automation['enabled'] ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' }}">
+                        {{ $automation['enabled'] ? 'Automação Ativa' : 'Automação Desativada' }}
+                    </span>
+                </div>
+
+                <form id="js-panel-split-automation-form" action="{{ route('panel.admin.splits.automation_settings') }}" method="POST" class="mt-4 grid gap-4 md:grid-cols-5">
+                    @csrf
+                    <div class="md:col-span-2">
+                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Modo de Liquidação</label>
+                        <select name="payout_mode" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                            <option value="efi_pix_out" @selected($automation['mode'] === 'efi_pix_out')>100% SumUp + Pix Automático (Efí &rarr; MP)</option>
+                            <option value="mp_routing" @selected($automation['mode'] === 'mp_routing')>Roteamento Inteligente (Terceiros no MP)</option>
+                            <option value="manual" @selected($automation['mode'] === 'manual')>Apenas Controle (Repasse Manual)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Sua Chave Pix (Mercado Pago)</label>
+                        <input type="text" name="pix_key" value="{{ $automation['pix_key'] }}" placeholder="CPF, CNPJ, e-mail ou aleatória"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Comissão (%)</label>
+                            <input type="number" step="0.01" min="0" max="100" name="percent" value="{{ $automation['percent'] }}"
+                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Prazo D+N</label>
+                            <input type="number" min="0" max="30" name="delay_days" value="{{ $automation['delay_days'] }}"
+                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Valor Mínimo (R$)</label>
+                        <input type="number" step="0.01" min="0.01" name="min_payout" value="{{ number_format($automation['min_payout'], 2, '.', '') }}"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                    </div>
+
+                    <div class="md:col-span-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+                        <div>
+                            <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm font-bold text-slate-800 dark:text-white">
+                                <input type="checkbox" name="auto_enabled" value="1" @checked($automation['enabled'])
+                                    class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                Ativar envio automático sem interação humana
+                            </label>
+                            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                Status Efí Pay:
+                                @if($automation['efi_enabled'] && $automation['efi_has_cert'])
+                                    <span class="font-bold text-emerald-600 dark:text-emerald-400">Conectada e com certificado ativo</span>
+                                @else
+                                    <span class="font-bold text-amber-600 dark:text-amber-400">Configure a Efí Pay em Configurações &gt; Pagamentos</span>
+                                @endif
+                            </p>
+                        </div>
+                        <button type="submit" class="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700">
+                            <i class="fas fa-save mr-2"></i>Salvar Automação
+                        </button>
+                    </div>
+                </form>
+            </div>
+        @endif
+
         <form method="GET" action="{{ route('panel.admin.splits.index') }}"
             class="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-[1fr_180px_180px_auto] dark:border-slate-800 dark:bg-slate-900">
             <input type="text" name="search" value="{{ $search }}" placeholder="Buscar pedido, nome ou e-mail..."
@@ -104,21 +178,41 @@
                                     @else
                                         <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">Pendente</span>
                                     @endif
-                                    <div class="mt-1 text-[11px] text-slate-400">{{ $provider === 'internal' ? 'Interno' : 'Manual' }}</div>
+                                    <div class="mt-1 text-[11px] text-slate-400">
+                                        @switch($provider)
+                                            @case('internal') Interno @break
+                                            @case('efi_pix_out') Pix Auto (Efí) @break
+                                            @case('mercadopago_split') Split Mercado Pago @break
+                                            @default Manual
+                                        @endswitch
+                                    </div>
                                 </td>
                                 <td class="px-5 py-4 text-xs text-slate-500 dark:text-slate-400">
                                     <div><strong>Tentativas:</strong> {{ (int) ($payout?->attempts ?? 0) }}</div>
+                                    @if(!empty($payout?->external_id))
+                                        <div class="mt-1 text-blue-600 dark:text-blue-400"><strong>E2E:</strong> <span class="font-mono">{{ \Illuminate\Support\Str::limit($payout->external_id, 24) }}</span></div>
+                                    @endif
                                     @if(!empty($payout?->last_error))
                                         <div class="mt-1 text-rose-500">{{ $payout->last_error }}</div>
                                     @elseif($payout?->processed_at)
                                         <div class="mt-1 text-emerald-500">Confirmado em {{ $payout->processed_at->format('d/m/Y H:i') }}</div>
+                                    @elseif($payout?->scheduled_for)
+                                        <div class="mt-1 text-blue-500">Agendado para {{ $payout->scheduled_for->format('d/m/Y H:i') }}</div>
                                     @else
-                                        <div class="mt-1">Aguardando tratamento</div>
+                                        <div class="mt-1">{{ $payout?->notes ?: 'Aguardando tratamento' }}</div>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-right">
                                     @if($payoutStatus !== 'paid' && $split->pix_key)
                                         <div class="flex justify-end gap-2">
+                                            @if($split->receiver_type === 'superadmin' && !empty($automation['efi_enabled']))
+                                                <button type="button" data-auto-url="{{ route('panel.admin.splits.process_auto', $split) }}"
+                                                    data-receiver="{{ $split->receiver?->name ?? ($typeLabels[$split->receiver_type] ?? 'Destinatario') }}"
+                                                    data-amount="R$ {{ number_format((float) $split->amount, 2, ',', '.') }}"
+                                                    class="js-auto-split rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700">
+                                                    <i class="fas fa-bolt mr-1"></i>Enviar Pix
+                                                </button>
+                                            @endif
                                             <button type="button" data-pay-url="{{ route('panel.admin.splits.pay', $split) }}"
                                                 data-receiver="{{ $split->receiver?->name ?? ($typeLabels[$split->receiver_type] ?? 'Destinatario') }}"
                                                 data-amount="R$ {{ number_format((float) $split->amount, 2, ',', '.') }}"
@@ -174,6 +268,57 @@ async function postSplitAction(url, payload) {
 
     return data;
 }
+
+const panelAutoForm = document.getElementById('js-panel-split-automation-form');
+if (panelAutoForm) {
+    panelAutoForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const formData = new FormData(panelAutoForm);
+        const payload = {
+            auto_enabled: formData.get('auto_enabled') ? 1 : 0,
+            payout_mode: formData.get('payout_mode'),
+            pix_key: formData.get('pix_key'),
+            percent: formData.get('percent'),
+            delay_days: formData.get('delay_days'),
+            min_payout: formData.get('min_payout')
+        };
+
+        try {
+            const data = await postSplitAction(panelAutoForm.action, payload);
+            if (typeof toastr !== 'undefined') {
+                toastr.success(data.message);
+            } else {
+                await Swal.fire('Salvo', data.message, 'success');
+            }
+            setTimeout(function () { window.location.reload(); }, 800);
+        } catch (error) {
+            await Swal.fire('Erro', error.message, 'error');
+        }
+    });
+}
+
+document.querySelectorAll('.js-auto-split').forEach(function (button) {
+    button.addEventListener('click', async function () {
+        const result = await Swal.fire({
+            title: 'Disparar Pix automático agora?',
+            text: 'O sistema enviará ' + button.dataset.amount + ' via Efí Pay para a chave Pix de ' + button.dataset.receiver + '.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, enviar Pix',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const data = await postSplitAction(button.dataset.autoUrl);
+            await Swal.fire('Processado', data.message, 'success');
+            window.location.reload();
+        } catch (error) {
+            await Swal.fire('Erro no envio', error.message, 'error');
+        }
+    });
+});
 
 document.querySelectorAll('.js-pay-split').forEach(function (button) {
     button.addEventListener('click', async function () {

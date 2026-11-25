@@ -78,6 +78,21 @@ class OrderSplitService
     }
 
     /**
+     * Determina se o pedido foi originado/divulgado pelo administrador da plataforma (isento de comissão do superadmin).
+     */
+    public function isAdminOriginatedOrder(Order $order): bool
+    {
+        $seller = $order->seller;
+
+        // Vendas institucionais sem vendedor específico (ex.: planos/assinaturas da plataforma) pertencem ao administrador
+        if (!$seller) {
+            return true;
+        }
+
+        return !$seller->shouldChargePlatformFee();
+    }
+
+    /**
      * @return array<int,array{receiver_id:?int,receiver_type:string,percentage:float,amount:float,pix_key:?string,auto_paid:bool}>
      */
     private function desiredSplits(Order $order): array
@@ -85,13 +100,15 @@ class OrderSplitService
         $total = (float) $order->total_amount;
         $seller = $order->seller;
 
-        if ($seller && !$seller->shouldChargePlatformFee()) {
+        if ($this->isAdminOriginatedOrder($order)) {
+            $owner = $seller ?? $this->platformOwner();
+
             return [[
-                'receiver_id' => $seller->id,
-                'receiver_type' => 'seller',
+                'receiver_id' => $owner?->id,
+                'receiver_type' => $seller ? 'seller' : 'platform',
                 'percentage' => 100.0,
                 'amount' => round($total, 2),
-                'pix_key' => $seller->pix_key,
+                'pix_key' => $owner?->pix_key,
                 'auto_paid' => true,
             ]];
         }
@@ -100,12 +117,14 @@ class OrderSplitService
         $superadmin = $this->superadmin();
         $revenueOwner = $seller ?? $platformOwner;
         $marketingManager = $this->marketingManager();
+        $superadminPixKey = trim((string) Setting::get('superadmin_commission_pix_key', '')) ?: $superadmin?->pix_key;
+        $mpSplitApplied = (bool) data_get($order->metadata, 'mp_marketplace_split_applied', false);
 
         $shares = [
-            ['type' => $seller ? 'seller' : 'platform', 'percent' => $this->percent('marketplace_split_seller_percent', 70), 'receiver' => $revenueOwner],
-            ['type' => 'platform', 'percent' => $this->percent('marketplace_split_platform_percent', 10), 'receiver' => $platformOwner],
-            ['type' => 'traffic', 'percent' => $this->percent('marketplace_split_traffic_percent', 10), 'receiver' => $marketingManager],
-            ['type' => 'superadmin', 'percent' => $this->percent('marketplace_split_superadmin_percent', 10), 'receiver' => $superadmin],
+            ['type' => $seller ? 'seller' : 'platform', 'percent' => $this->percent('marketplace_split_seller_percent', 70), 'receiver' => $revenueOwner, 'pix_override' => null],
+            ['type' => 'platform', 'percent' => $this->percent('marketplace_split_platform_percent', 10), 'receiver' => $platformOwner, 'pix_override' => null],
+            ['type' => 'traffic', 'percent' => $this->percent('marketplace_split_traffic_percent', 10), 'receiver' => $marketingManager, 'pix_override' => null],
+            ['type' => 'superadmin', 'percent' => $this->percent('marketplace_split_superadmin_percent', 10), 'receiver' => $superadmin, 'pix_override' => $superadminPixKey],
         ];
 
         $grouped = [];
@@ -122,14 +141,17 @@ class OrderSplitService
                 ? 'seller:' . $receiverId
                 : $share['type'] . ':' . ($receiverId ?? 'unassigned');
 
+            $resolvedType = $this->consolidatedType($share['type'], $receiverId, $seller?->id, $revenueOwner?->id, $marketingManager?->id);
+            $isAutoPaid = $mpSplitApplied && in_array($resolvedType, ['superadmin', 'platform'], true);
+
             if (!isset($grouped[$key])) {
                 $grouped[$key] = [
                     'receiver_id' => $receiverId,
-                    'receiver_type' => $this->consolidatedType($share['type'], $receiverId, $seller?->id, $revenueOwner?->id, $marketingManager?->id),
+                    'receiver_type' => $resolvedType,
                     'percentage' => 0.0,
                     'amount' => 0.0,
-                    'pix_key' => $receiver?->pix_key,
-                    'auto_paid' => true,
+                    'pix_key' => $share['pix_override'] ?: $receiver?->pix_key,
+                    'auto_paid' => $isAutoPaid,
                 ];
             }
 

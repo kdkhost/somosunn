@@ -57,6 +57,72 @@
         </div>
     </div>
 
+    @if(!empty($automation['is_superadmin']))
+        <div class="card card-outline card-info shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title font-weight-bold mb-0">
+                    <i class="fas fa-robot mr-2 text-info"></i>Automação de Comissões (SumUp &rarr; Mercado Pago)
+                </h3>
+                <span class="badge badge-{{ $automation['enabled'] ? 'success' : 'secondary' }} px-2 py-1">
+                    {{ $automation['enabled'] ? 'Automação Ativa' : 'Automação Desativada' }}
+                </span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted text-sm mb-3">
+                    Vendas criadas ou divulgadas pelo administrador são <strong>isentas automaticamente</strong>.
+                    Para vendas de membros, mentores e produtores pagas na SumUp, o sistema agenda e dispara o Pix automático via Efí Pay direto para sua chave Pix do Mercado Pago.
+                </p>
+                <form id="js-split-automation-form" action="{{ route('admin.splits.automation_settings') }}" method="POST" class="row">
+                    @csrf
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold text-sm">Modo de Liquidação</label>
+                        <select name="payout_mode" class="form-control">
+                            <option value="efi_pix_out" @selected($automation['mode'] === 'efi_pix_out')>100% SumUp + Pix Automático (Efí &rarr; MP)</option>
+                            <option value="mp_routing" @selected($automation['mode'] === 'mp_routing')>Roteamento Inteligente (Terceiros no MP)</option>
+                            <option value="manual" @selected($automation['mode'] === 'manual')>Apenas Controle (Repasse Manual)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold text-sm">Sua Chave Pix (Mercado Pago)</label>
+                        <input type="text" name="pix_key" class="form-control" value="{{ $automation['pix_key'] }}"
+                            placeholder="CPF, CNPJ, e-mail ou chave aleatória do MP">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="font-weight-bold text-sm">Comissão (%)</label>
+                        <input type="number" step="0.01" min="0" max="100" name="percent" class="form-control" value="{{ $automation['percent'] }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="font-weight-bold text-sm">Carência SumUp (D+dias)</label>
+                        <input type="number" min="0" max="30" name="delay_days" class="form-control" value="{{ $automation['delay_days'] }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="font-weight-bold text-sm">Valor Mínimo (R$)</label>
+                        <input type="number" step="0.01" min="0.01" name="min_payout" class="form-control" value="{{ number_format($automation['min_payout'], 2, '.', '') }}">
+                    </div>
+                    <div class="col-12 d-flex flex-wrap justify-content-between align-items-center pt-2 border-top">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="admin_auto_enabled" name="auto_enabled" value="1" @checked($automation['enabled'])>
+                            <label class="custom-control-label font-weight-bold" for="admin_auto_enabled">
+                                Ativar envio automático sem interação humana
+                            </label>
+                            <small class="d-block text-muted">
+                                Status Efí Pay:
+                                @if($automation['efi_enabled'] && $automation['efi_has_cert'])
+                                    <span class="text-success font-weight-bold">Conectada e com certificado ativo</span>
+                                @else
+                                    <span class="text-warning font-weight-bold">Configure as credenciais e certificado Efí Pay em Configurações &gt; Pagamentos</span>
+                                @endif
+                            </small>
+                        </div>
+                        <button type="submit" class="btn btn-info font-weight-bold mt-2 mt-md-0">
+                            <i class="fas fa-save mr-1"></i>Salvar Automação
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
     <div class="card card-outline card-primary shadow-sm mb-4">
         <div class="card-body">
             <form action="{{ route('admin.splits.index') }}" method="GET" class="row">
@@ -155,24 +221,44 @@
                                             <span class="badge badge-warning px-2 py-1">Pendente</span>
                                         @endif
                                         <div class="text-xs text-muted mt-1">
-                                            {{ $provider === 'internal' ? 'Interno' : 'Manual' }}
+                                            @switch($provider)
+                                                @case('internal') Interno @break
+                                                @case('efi_pix_out') Pix Auto (Efí) @break
+                                                @case('mercadopago_split') Split Mercado Pago @break
+                                                @default Manual
+                                            @endswitch
                                         </div>
                                     </td>
                                     <td class="align-middle">
                                         <div class="text-xs">
                                             <div><strong>Tentativas:</strong> {{ (int) ($payout?->attempts ?? 0) }}</div>
+                                            @if(!empty($payout?->external_id))
+                                                <div class="text-info mt-1"><strong>E2E:</strong> <code>{{ \Illuminate\Support\Str::limit($payout->external_id, 24) }}</code></div>
+                                            @endif
                                             @if(!empty($payout?->last_error))
                                                 <div class="text-danger mt-1">{{ $payout->last_error }}</div>
                                             @elseif($payout?->processed_at)
                                                 <div class="text-success mt-1">Confirmado em {{ $payout->processed_at->format('d/m/Y H:i') }}</div>
+                                            @elseif($payout?->scheduled_for)
+                                                <div class="text-primary mt-1">Agendado para {{ $payout->scheduled_for->format('d/m/Y H:i') }}</div>
                                             @else
-                                                <div class="text-muted mt-1">Aguardando tratamento</div>
+                                                <div class="text-muted mt-1">{{ $payout?->notes ?: 'Aguardando tratamento' }}</div>
                                             @endif
                                         </div>
                                     </td>
                                     <td class="align-middle text-center">
                                         @if($payoutStatus !== 'paid' && $split->pix_key)
                                             <div class="btn-group">
+                                                @if($split->receiver_type === 'superadmin' && !empty($automation['efi_enabled']))
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-info js-process-auto-payout"
+                                                        data-url="{{ route('admin.splits.process_auto', $split) }}"
+                                                        data-receiver="{{ $split->receiver?->name ?? $cfg['label'] }}"
+                                                        data-amount="R$ {{ number_format((float) $split->amount, 2, ',', '.') }}"
+                                                        title="Disparar Pix automático via Efí Pay agora">
+                                                        <i class="fas fa-bolt mr-1"></i>Enviar Pix
+                                                    </button>
+                                                @endif
                                                 <button type="button"
                                                     class="btn btn-sm btn-success js-confirm-payout"
                                                     data-url="{{ route('admin.splits.pay', $split) }}"
@@ -234,6 +320,59 @@
 
         return data;
     }
+
+    const automationForm = document.getElementById('js-split-automation-form');
+    if (automationForm) {
+        automationForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const formData = new FormData(automationForm);
+            const payload = {
+                auto_enabled: formData.get('auto_enabled') ? 1 : 0,
+                payout_mode: formData.get('payout_mode'),
+                pix_key: formData.get('pix_key'),
+                percent: formData.get('percent'),
+                delay_days: formData.get('delay_days'),
+                min_payout: formData.get('min_payout')
+            };
+
+            try {
+                const data = await postJson(automationForm.action, payload);
+                if (typeof toastr !== 'undefined') {
+                    toastr.success(data.message);
+                } else {
+                    await Swal.fire('Salvo', data.message, 'success');
+                }
+                setTimeout(function () { window.location.reload(); }, 800);
+            } catch (error) {
+                await Swal.fire('Erro', error.message, 'error');
+            }
+        });
+    }
+
+    document.querySelectorAll('.js-process-auto-payout').forEach(function (button) {
+        button.addEventListener('click', async function () {
+            const confirmed = await Swal.fire({
+                title: 'Disparar Pix automático agora?',
+                text: 'O sistema enviará ' + button.dataset.amount + ' via Efí Pay para a chave Pix de ' + button.dataset.receiver + '.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, enviar Pix',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (!confirmed.isConfirmed) {
+                return;
+            }
+
+            try {
+                const data = await postJson(button.dataset.url);
+                await Swal.fire('Processado', data.message, 'success');
+                window.location.reload();
+            } catch (error) {
+                await Swal.fire('Erro no envio', error.message, 'error');
+            }
+        });
+    });
 
     document.querySelectorAll('.js-confirm-payout').forEach(function (button) {
         button.addEventListener('click', async function () {

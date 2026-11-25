@@ -16,17 +16,22 @@ class OrderSplitPayout extends Model
         'amount',
         'pix_key',
         'external_id',
+        'batch_id',
         'attempts',
         'last_error',
         'notes',
+        'gateway_response',
         'last_attempt_at',
+        'scheduled_for',
         'processed_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'attempts' => 'integer',
+        'gateway_response' => 'array',
         'last_attempt_at' => 'datetime',
+        'scheduled_for' => 'datetime',
         'processed_at' => 'datetime',
     ];
 
