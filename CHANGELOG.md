@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.44] - 2026-11-25 - feat(admin, backups): reformulacao completa da Central de Backups (/admin/backups) no padrao AdminLTE 4 + React/SaaS
+
+- **Nova Central de Backups (`resources/views/admin/backups/index.blade.php`, `resources/views/admin/backups/partials/table.blade.php`):**
+  - Removido o aninhamento legado (`.content-header` / `section.content`) e adotado o cabeçalho oficial AdminLTE 4 (`@section('page_title')` + `@section('breadcrumb')`).
+  - Adicionado Hero Banner moderno com status em tempo real de S3/Local e agendamentos automáticos, além de botões de geração sob demanda com confirmação SweetAlert2 e feedback visual de carregamento.
+  - KPIs padronizados em `.small-box` oficiais (com animação CountUp), abas estilo React Segmented Control com contadores, filtro instantâneo por disco (`Todos`, `S3`, `Local`) e busca em tempo real por nome de arquivo.
+  - Painel lateral de Retenção, Agendamento e Status S3 harmonizado para Light & Dark Mode e integrado à gaveta global de instruções `?`.
+
 ## [2.8.43] - 2026-11-25 - fix(admin, gateway): restauracao das abas e sub-abas de /admin/settings/gateway (Mercado Pago, SumUp, Efi Pro) no Bootstrap 5
 
 - **Correção da Troca de Abas em `/admin/settings/gateway` (`resources/views/admin/settings/partials/gateway.blade.php`):**
