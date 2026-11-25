@@ -1,5 +1,15 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.62] - 2026-11-25 - fix(admin, layout, calendar): sidebar e cabecalho 100% fixos, correcao definitiva de botoes no card-header, FullCalendar Dark/Light global e Feriados Nacionais do Brasil
+
+- **Header e Sidebar Fixos de Verdade (`public/css/adminlte4-unn.css`):**
+  - Substituído `position: sticky` (que quebrava dentro da track do CSS Grid do AdminLTE 4) por **`position: fixed !important`** permanente em `.app-header.navbar` e `.app-sidebar` (`height: 100vh`) com `padding-top: 3.5rem` e `padding-left: 250px` no `.app-wrapper` (recolhimento sincronizado com `body.sidebar-collapse`).
+- **Botões em `.card-header` Alinhados na Extrema Direita (`public/css/adminlte4-unn.css`):**
+  - Removidos os pseudo-elementos clearfix legados `.card-header::before` e `.card-header::after` que atuavam como 3º item flex e empurravam botões como `+ Evento` para o meio do cabeçalho.
+- **FullCalendar 6 Global Dark/Light + Feriados Nacionais (`public/css/adminlte4-unn.css`, `public/js/adminlte4-unn.js`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/events/calendar.blade.php`):**
+  - Estilização global do FullCalendar 6 eliminando a faixa branca nos dias da semana e o fundo amarelo/marrom do dia atual no Dark Mode (agora com badge circular azul UNN no dia de hoje).
+  - Adicionado `window.UNNBrazilianHolidays` exibindo automaticamente todos os **13 Feriados Nacionais do Brasil** (fixos + móveis pela Páscoa) no calendário do Dashboard (`/admin`) e em `/admin/events`.
+
 ## [2.8.61] - 2026-11-25 - feat(admin, events): reformulacao visual e responsiva do Calendario de Eventos (/admin/events) no padrao AdminLTE 4 + Light/Dark
 
 - **Novo Calendário de Eventos (`resources/views/admin/events/calendar.blade.php`):**

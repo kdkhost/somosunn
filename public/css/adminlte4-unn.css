@@ -44,24 +44,65 @@ html, body {
     min-height: 100vh;
 }
 
-/* Header fixo no topo (padrão oficial AdminLTE 4 fixed-header) */
+/* ==========================================================================
+   HEADER E SIDEBAR 100% FIXOS (À prova de falhas — nunca rolam com a página)
+   ========================================================================== */
 body.fixed-header .app-header.navbar,
 body.layout-fixed .app-header.navbar {
-    position: sticky;
-    top: 0;
-    z-index: 1034;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    height: 3.5rem !important;
+    min-height: 3.5rem !important;
+    z-index: 1038 !important;
+    transition: left 0.3s ease-in-out;
 }
 
-/* Sidebar fixa de ponta a ponta (100vh) com scroll interno apenas no .sidebar-wrapper */
+body.layout-fixed .app-wrapper,
+body.fixed-header .app-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100vh !important;
+    padding-top: 3.5rem !important;
+}
+
 @media (min-width: 992px) {
     body.layout-fixed .app-sidebar {
-        position: sticky !important;
+        position: fixed !important;
         top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: var(--lte-sidebar-width, 250px) !important;
         height: 100vh !important;
         max-height: 100vh !important;
+        z-index: 1039 !important;
         display: flex !important;
         flex-direction: column !important;
-        align-self: flex-start !important;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    body.layout-fixed.sidebar-collapse .app-sidebar {
+        transform: translateX(-100%) !important;
+    }
+
+    body.layout-fixed .app-header.navbar,
+    body.fixed-header .app-header.navbar {
+        left: var(--lte-sidebar-width, 250px) !important;
+    }
+
+    body.layout-fixed.sidebar-collapse .app-header.navbar,
+    body.fixed-header.sidebar-collapse .app-header.navbar {
+        left: 0 !important;
+    }
+
+    body.layout-fixed .app-wrapper {
+        padding-left: var(--lte-sidebar-width, 250px) !important;
+        transition: padding-left 0.3s ease-in-out;
+    }
+
+    body.layout-fixed.sidebar-collapse .app-wrapper {
+        padding-left: 0 !important;
     }
 
     body.layout-fixed .app-sidebar .sidebar-brand {
@@ -79,6 +120,7 @@ body.layout-fixed .app-header.navbar {
 .app-main {
     display: flex;
     flex-direction: column;
+    flex: 1 0 auto;
     min-width: 0;
     background-color: var(--bs-body-bg);
 }
@@ -352,6 +394,20 @@ body.sidebar-collapse .app-sidebar:not(:hover) .sidebar-user-panel .user-info {
     gap: 0.65rem;
     border-top-left-radius: var(--unn-radius-lg);
     border-top-right-radius: var(--unn-radius-lg);
+}
+
+/* Remove clearfix legado do AdminLTE que empurrava botões do card-header para o meio */
+.card-header::before,
+.card-header::after {
+    display: none !important;
+    content: none !important;
+}
+
+.card-header > .card-tools,
+.card-header > a.btn,
+.card-header > button.btn,
+.card-header > .btn-group {
+    margin-left: auto;
 }
 
 .card-header .card-title {
@@ -1275,6 +1331,155 @@ select.form-select option,
 :root:not([data-bs-theme="dark"]) .swal2-popup {
     background-color: #ffffff;
     color: #0f172a;
+}
+
+/* ==========================================================================
+   6.5. FullCalendar 6 Global — 100% Fiel ao Tema Light & Dark + Feriados
+   ========================================================================== */
+.fc {
+    --fc-border-color: var(--bs-border-color);
+    --fc-page-bg-color: transparent;
+    --fc-neutral-bg-color: var(--bs-tertiary-bg);
+    --fc-list-event-hover-bg-color: rgba(31, 94, 219, 0.08);
+    --fc-today-bg-color: rgba(31, 94, 219, 0.09);
+    color: var(--bs-body-color);
+}
+
+.fc .fc-scrollgrid,
+.fc .fc-scrollgrid table,
+.fc.fc-theme-standard td,
+.fc.fc-theme-standard th {
+    border-color: var(--bs-border-color) !important;
+}
+
+.fc .fc-col-header,
+.fc .fc-col-header thead,
+.fc .fc-col-header-cell,
+.fc.fc-theme-standard th {
+    background-color: var(--bs-tertiary-bg) !important;
+    color: var(--bs-body-color) !important;
+}
+
+.fc .fc-col-header-cell-cushion {
+    color: var(--bs-secondary-color) !important;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-decoration: none !important;
+    padding: 0.55rem 0.25rem;
+}
+
+.fc .fc-daygrid-day-number {
+    color: var(--bs-body-color) !important;
+    font-weight: 600;
+    font-size: 0.84rem;
+    text-decoration: none !important;
+    padding: 0.35rem 0.45rem;
+}
+
+.fc .fc-day-other .fc-daygrid-day-number {
+    color: var(--bs-secondary-color) !important;
+    opacity: 0.5;
+}
+
+.fc .fc-daygrid-day.fc-day-today,
+.fc .fc-timegrid-col.fc-day-today {
+    background-color: rgba(31, 94, 219, 0.09) !important;
+}
+
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+    background: var(--unn-azul-1);
+    color: #ffffff !important;
+    border-radius: 999px;
+    min-width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.25rem;
+    padding: 0 0.4rem;
+}
+
+.fc .fc-list-day-cushion {
+    background-color: var(--bs-tertiary-bg) !important;
+    color: var(--bs-body-color) !important;
+}
+
+.fc .fc-list-empty {
+    background-color: transparent !important;
+    color: var(--bs-secondary-color) !important;
+}
+
+.fc .fc-popover {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color) !important;
+    color: var(--bs-body-color) !important;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.fc .fc-popover-header {
+    background-color: var(--bs-tertiary-bg) !important;
+    color: var(--bs-body-color) !important;
+}
+
+/* Dark Mode explícito para FullCalendar */
+[data-bs-theme="dark"] .fc {
+    --fc-border-color: rgba(148, 163, 184, 0.16);
+    --fc-neutral-bg-color: #162033;
+    --fc-today-bg-color: rgba(59, 130, 246, 0.15);
+    --fc-list-event-hover-bg-color: rgba(59, 130, 246, 0.14);
+}
+
+[data-bs-theme="dark"] .fc .fc-col-header,
+[data-bs-theme="dark"] .fc .fc-col-header thead,
+[data-bs-theme="dark"] .fc .fc-col-header-cell,
+[data-bs-theme="dark"] .fc.fc-theme-standard th {
+    background-color: #162033 !important;
+    color: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .fc .fc-col-header-cell-cushion {
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .fc .fc-daygrid-day-frame,
+[data-bs-theme="dark"] .fc .fc-timegrid-slot {
+    background-color: transparent;
+}
+
+[data-bs-theme="dark"] .fc .fc-daygrid-day.fc-day-today,
+[data-bs-theme="dark"] .fc .fc-timegrid-col.fc-day-today {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+[data-bs-theme="dark"] .fc .fc-list-event:hover td {
+    background-color: rgba(59, 130, 246, 0.14) !important;
+}
+
+/* Estilo diferenciado para Feriados Nacionais no FullCalendar */
+.fc-event.unn-holiday-event {
+    background: rgba(245, 158, 11, 0.16) !important;
+    border: 1px solid rgba(245, 158, 11, 0.42) !important;
+    color: #b45309 !important;
+    font-weight: 700 !important;
+    font-size: 0.72rem !important;
+    border-radius: 0.4rem !important;
+    padding: 1px 5px !important;
+    cursor: default !important;
+}
+
+[data-bs-theme="dark"] .fc-event.unn-holiday-event {
+    background: rgba(245, 158, 11, 0.18) !important;
+    border-color: rgba(251, 191, 36, 0.4) !important;
+    color: #fcd34d !important;
+}
+
+.fc-event.unn-holiday-event .fc-event-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ==========================================================================

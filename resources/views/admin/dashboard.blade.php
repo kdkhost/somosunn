@@ -1278,10 +1278,16 @@
                     });
                 }
 
-                // 1. FullCalendar
+                // 1. FullCalendar (com Feriados Nacionais do Brasil)
                 const calendarEl = document.getElementById('calendar');
                 if (calendarEl && typeof FullCalendar !== 'undefined') {
                     calendarEl.innerHTML = '';
+                    const dashEventSources = [
+                        { events: {!! json_encode($calendarEvents ?? []) !!} }
+                    ];
+                    if (window.UNNBrazilianHolidays && typeof window.UNNBrazilianHolidays.eventSource === 'function') {
+                        dashEventSources.push({ events: window.UNNBrazilianHolidays.eventSource });
+                    }
                     const calendar = new FullCalendar.Calendar(calendarEl, {
                         initialView: 'dayGridMonth',
                         locale: 'pt-br',
@@ -1290,10 +1296,20 @@
                             center: 'title',
                             right: 'dayGridMonth,timeGridWeek,listWeek'
                         },
-                        events: {!! json_encode($calendarEvents ?? []) !!},
+                        buttonText: {
+                            today: 'Hoje',
+                            month: 'Mês',
+                            week: 'Semana',
+                            list: 'Lista'
+                        },
+                        eventSources: dashEventSources,
                         height: 'auto',
                         contentHeight: 460,
                         eventClick: function (info) {
+                            if (info.event.extendedProps && info.event.extendedProps.isHoliday) {
+                                info.jsEvent.preventDefault();
+                                return;
+                            }
                             if (info.event.url) {
                                 info.jsEvent.preventDefault();
                                 window.location.href = info.event.url;

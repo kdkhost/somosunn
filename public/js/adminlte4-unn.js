@@ -457,4 +457,89 @@
             document.documentElement.classList.toggle('dark', normalized === 'dark');
         }
     };
+
+    // 9. Feriados Nacionais do Brasil para FullCalendar (fixos + móveis pela Páscoa)
+    window.UNNBrazilianHolidays = (function () {
+        function pad(n) {
+            return String(n).padStart(2, '0');
+        }
+
+        function formatYmd(date) {
+            return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+        }
+
+        function addDays(baseDate, days) {
+            const d = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+            d.setDate(d.getDate() + days);
+            return d;
+        }
+
+        // Algoritmo de Meeus/Jones/Butcher para Páscoa gregoriana
+        function getEasterDate(year) {
+            const a = year % 19;
+            const b = Math.floor(year / 100);
+            const c = year % 100;
+            const d = Math.floor(b / 4);
+            const e = b % 4;
+            const f = Math.floor((b + 8) / 25);
+            const g = Math.floor((b - f + 1) / 3);
+            const h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4);
+            const k = c % 4;
+            const l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const month = Math.floor((h + l - 7 * m + 114) / 31);
+            const day = ((h + l - 7 * m + 114) % 31) + 1;
+            return new Date(year, month - 1, day);
+        }
+
+        function getEventsForYear(year) {
+            const easter = getEasterDate(year);
+            const items = [
+                { date: year + '-01-01', title: 'Confraternização Universal' },
+                { date: formatYmd(addDays(easter, -47)), title: 'Carnaval' },
+                { date: formatYmd(addDays(easter, -2)), title: 'Sexta-feira Santa' },
+                { date: formatYmd(easter), title: 'Páscoa' },
+                { date: year + '-04-21', title: 'Tiradentes' },
+                { date: year + '-05-01', title: 'Dia do Trabalho' },
+                { date: formatYmd(addDays(easter, 60)), title: 'Corpus Christi' },
+                { date: year + '-09-07', title: 'Independência do Brasil' },
+                { date: year + '-10-12', title: 'Nossa Sra. Aparecida' },
+                { date: year + '-11-02', title: 'Finados' },
+                { date: year + '-11-15', title: 'Proclamação da República' },
+                { date: year + '-11-20', title: 'Dia da Consciência Negra' },
+                { date: year + '-12-25', title: 'Natal' }
+            ];
+
+            return items.map(function (h, idx) {
+                return {
+                    id: 'br-holiday-' + year + '-' + idx,
+                    title: '★ ' + h.title,
+                    start: h.date,
+                    allDay: true,
+                    editable: false,
+                    startEditable: false,
+                    durationEditable: false,
+                    classNames: ['unn-holiday-event'],
+                    extendedProps: {
+                        isHoliday: true,
+                        holidayName: h.title
+                    }
+                };
+            });
+        }
+
+        return {
+            getEventsForYear: getEventsForYear,
+            eventSource: function (fetchInfo, successCallback) {
+                const startYear = fetchInfo.start.getFullYear();
+                const endYear = fetchInfo.end.getFullYear();
+                const all = [];
+                for (let y = startYear; y <= endYear; y++) {
+                    all.push.apply(all, getEventsForYear(y));
+                }
+                successCallback(all);
+            }
+        };
+    })();
 })();

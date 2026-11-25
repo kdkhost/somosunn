@@ -804,6 +804,11 @@
                     });
                 }
 
+                var calEventSources = [{ url: feedUrl }];
+                if (window.UNNBrazilianHolidays && typeof window.UNNBrazilianHolidays.eventSource === 'function') {
+                    calEventSources.push({ events: window.UNNBrazilianHolidays.eventSource });
+                }
+
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     locale: 'pt-br',
                     headerToolbar: {
@@ -823,7 +828,7 @@
                     weekNumbers: {{ $weekNumbers ? 'true' : 'false' }},
                     height: 'auto',
                     contentHeight: 700,
-                    events: feedUrl,
+                    eventSources: calEventSources,
                     editable: canEditEvents,
                     droppable: canCreateEvents,
                     eventStartEditable: canEditEvents,
@@ -831,6 +836,13 @@
                     selectable: canCreateEvents,
                     selectMirror: true,
                     eventClick: function (info) {
+                        if (info.event && info.event.extendedProps && info.event.extendedProps.isHoliday) {
+                            info.jsEvent.preventDefault();
+                            if (typeof toastr !== 'undefined') {
+                                toastr.info('Feriado Nacional: ' + (info.event.extendedProps.holidayName || info.event.title));
+                            }
+                            return;
+                        }
                         openModal(info.event);
                     },
                     dateClick: function (info) {
