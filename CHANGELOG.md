@@ -1,5 +1,10 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.54] - 2026-11-25 - feat(ads, seed): criacao e populacao dos 8 Pacotes de Publicidade por periodo (7, 14, 21, 30, 60, 90, 120 e 365 dias)
+
+- **Seeder de Pacotes de Publicidade (`database/seeders/SponsorPlanSeeder.php`):**
+  - Criados e populados em produção 8 pacotes comerciais idempotentes com valores progressivos: **7 dias (R$ 79,90)**, **14 dias (R$ 139,90)**, **21 dias (R$ 189,90)**, **30 dias (R$ 249,90)**, **60 dias (R$ 449,90)**, **90 dias (R$ 599,90)**, **120 dias (R$ 749,90)** e **365 dias VIP (R$ 1.890,00)**.
+
 ## [2.8.53] - 2026-11-25 - fix(site, ux): centralizacao do rotulo Publicidade em x-ad-slot e anel de progresso animado no botao Voltar ao Topo do site publico
 
 - **Alinhamento do Rótulo Publicidade (`resources/views/components/ad-slot.blade.php`):**
