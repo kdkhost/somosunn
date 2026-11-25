@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.64] - 2026-11-25 - feat(panel-admin, adminlte4): implementacao integral do AdminLTE 4 oficial em todo o /painel/admin (66 views migradas sem residuos do layout antigo)
+
+- **Shell AdminLTE 4 Dedicado para `/painel/admin` (`resources/views/panel/layouts/adminlte4.blade.php`, `resources/views/panel/partials/adminlte4-sidebar.blade.php`, `resources/views/panel/partials/adminlte4-navbar.blade.php`):**
+  - Implementado layout 100% **AdminLTE 4.0.0-beta3 + Bootstrap 5.3.3 + OverlayScrollbars v2 + `adminlte4-unn.css`** (header e sidebar fixos, isolamento estrito Light/Dark Mode, alinhamento oficial de botões e preloader/help-drawer integrados), sem carregar o cabeçalho público nem a sidebar antiga em `<details>`.
+  - Sidebar dedicada preservando **100% das rotas e permissões `panel.admin.*`** (Dashboard, Escanear Ingressos, Gestão & Financeiro, Conteúdo & Mídia, Configurações, além de atalhos para Área do Membro e `/admin`).
+  - Camada `unn-tailwind-nopreflight.css` + FilePond, Flatpickr, Tagify, Summernote, Chart.js, Toastr e SweetAlert2 preservados para compatibilidade integral com todas as **66 views** de `resources/views/panel/admin/*`, mantendo intacta a área do membro (`/painel`).
+
 ## [2.8.63] - 2026-11-25 - fix(admin, cron): fallback persistente em scheduled_tasks para monitoramento do Cron imune a cache:clear
 
 - **Detecção Resiliente do Cron (`app/Http/Controllers/Admin/DashboardController.php`, `app/Console/Kernel.php`):**

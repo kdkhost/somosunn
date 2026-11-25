@@ -1,4 +1,4 @@
-@extends('panel.layouts.app')
+@extends('panel.layouts.adminlte4')
 
 @section('title', $course->exists ? 'Editar Curso' : 'Novo Curso')
 

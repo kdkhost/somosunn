@@ -1,4 +1,4 @@
-@extends('panel.layouts.app')
+@extends('panel.layouts.adminlte4')
 
 @section('title', $event->exists ? 'Editar Evento: ' . $event->title : 'Novo Evento')
 

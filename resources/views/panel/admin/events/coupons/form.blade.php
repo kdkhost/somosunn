@@ -1,4 +1,4 @@
-@extends('panel.layouts.app')
+@extends('panel.layouts.adminlte4')
 
 @section('title', $coupon->exists ? 'Editar Cupom do Evento' : 'Novo Cupom do Evento')
 

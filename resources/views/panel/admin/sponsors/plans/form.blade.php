@@ -1,4 +1,4 @@
-@extends('panel.layouts.app')
+@extends('panel.layouts.adminlte4')
 
 @section('title', $plan->exists ? 'Editar Plano de Patrocinio' : 'Novo Plano de Patrocinio')
 

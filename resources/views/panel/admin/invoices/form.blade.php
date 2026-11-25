@@ -1,4 +1,4 @@
-@extends('panel.layouts.app')
+@extends('panel.layouts.adminlte4')
 
 @section('title', $invoice->id ? 'Editar Fatura' : 'Nova Fatura')
 

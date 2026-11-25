@@ -1,4 +1,4 @@
-@extends('panel.layouts.app')
+@extends('panel.layouts.adminlte4')
 
 @section('title', $banner->exists ? 'Editar Banner Patrocinado' : 'Novo Banner Patrocinado')
 
