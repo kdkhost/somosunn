@@ -539,17 +539,8 @@
                                                     </form>
                                                 @endauth
                                             </div>
-                                            @if($adsEnabled && $loop->iteration % $adsenseFrequency === 0)
-                                                <div class="bg-white rounded-lg shadow p-4 ad-container">
-                                                    @if($hasAdsense)
-                                                        <ins class="adsbygoogle" style="display:block" data-ad-client="{{ $adsensePublisherId }}"
-                                                            data-ad-slot="{{ $adsenseSlotId }}" data-ad-format="{{ $adsenseFormat }}"
-                                                            data-full-width-responsive="true"></ins>
-                                                        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-                                                    @elseif(!empty($adsCode))
-                                                        {!! $adsCode !!}
-                                                    @endif
-                                                </div>
+                                            @if($adsEnabled && $loop->iteration % max(1, (int) ($adsenseFrequency ?? 5)) === 0)
+                                                <x-ad-slot context="feed" />
                                             @endif
                         @empty
                             <div class="text-center py-10 text-gray-500">

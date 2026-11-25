@@ -164,15 +164,17 @@
                     }
                 });
 
-                document.addEventListener('DOMContentLoaded', function () {
-                    syncEncodedFields(document);
+                document.addEventListener('submit', function (event) {
+                    if (event.target && event.target.querySelector && event.target.querySelector('.js-encoded-setting-source')) {
+                        syncEncodedFields(event.target);
+                    }
+                }, true);
 
-                    document.querySelectorAll('form[action$="/settings"]').forEach(function (form) {
-                        form.addEventListener('submit', function () {
-                            syncEncodedFields(form);
-                        });
-                    });
-                });
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function () { syncEncodedFields(document); });
+                } else {
+                    syncEncodedFields(document);
+                }
             })();
         </script>
     @endpush

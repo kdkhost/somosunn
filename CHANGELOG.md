@@ -1,5 +1,16 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.51] - 2026-11-25 - feat(ads): sistema real de exibicao de anuncios (componente x-ad-slot, rota /ads.txt, feed da comunidade e correcao PJAX no salvamento)
+
+- **Componente Real de Anúncios (`resources/views/components/ad-slot.blade.php`):**
+  - Renderiza automaticamente anúncios do **Google AdSense** (`<ins class="adsbygoogle">` + `push({})`) ou **HTML/JS personalizado** (`ads_code_html` e `ads_inter_feed_code`), respeitando `ads_enabled`, `ads_global_banner_enabled` e `ads_inter_feed_enabled`, com rótulo *Publicidade* e bloqueio automático em páginas de checkout, login/cadastro e `/admin`.
+- **Integração Real no Site Público, Feed e `/ads.txt` (`resources/views/layouts/app.blade.php`, `resources/views/social/feed.blade.php`, `routes/public.php`):**
+  - Adicionado `<x-ad-slot context="global" />` nas páginas públicas e `<x-ad-slot context="feed" />` entre postagens no feed da comunidade conforme `adsense_frequency`.
+  - Criada a rota dinâmica `GET /ads.txt` que gera automaticamente a linha oficial do Google AdSense a partir de `adsense_publisher_id` + linhas extras opcionais (`ads_txt_custom`).
+- **Correção de Salvamento PJAX e Painel de Status (`resources/views/admin/settings/partials/ads.blade.php`, `resources/views/panel/admin/settings/partials/ads.blade.php`):**
+  - Corrigida a sincronização Base64URL de `ads_code_html_encoded` e `ads_inter_feed_code_encoded` para executar na fase de captura do `submit` e em `pjax:end` (impedindo perda do código salvo ao navegar via PJAX).
+  - Adicionados indicadores reais de status, toggle de banner global, campo `ads_txt_custom` e link direto para verificar `/ads.txt`.
+
 ## [2.8.50] - 2026-11-25 - style(admin, ui): barras de scroll personalizadas e padronizadas na paleta UNN (Light, Dark e OverlayScrollbars da sidebar)
 
 - **Barras de Scroll Padronizadas (`public/css/adminlte4-unn.css`):**

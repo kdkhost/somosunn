@@ -282,7 +282,7 @@
         {!! $trackingHead !!}
     @endif
 
-    {{-- Google AdSense Script --}}
+    {{-- Google AdSense Script + Código Global Head/Body --}}
     @if($adsEnabled && $adsensePublisherId !== '')
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $adsensePublisherId }}"
             crossorigin="anonymous"></script>
@@ -906,6 +906,11 @@
             || request()->is('admin/*');
         $showPartnersCarousel = $showPartnersCarousel ?? ($showNavigation && !$hidePartnersCarousel && !$isBackendArea);
     @endphp
+
+    {{-- Banner Global de Anúncios (AdSense / HTML personalizado — somente páginas públicas) --}}
+    @if(!$isBackendArea && $showNavigation)
+        <x-ad-slot context="global" />
+    @endif
 
     {{-- Parceiros Globais --}}
     @if($showPartnersCarousel)

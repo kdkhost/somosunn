@@ -137,3 +137,26 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::get('/robots.txt', function () {
     return response("User-agent: *\nAllow: /\nSitemap: " . url('sitemap.xml'), 200, ['Content-Type' => 'text/plain']);
 });
+
+Route::get('/ads.txt', function () {
+    $lines = [];
+    $publisherId = trim((string) Setting::get('adsense_publisher_id', ''));
+    if ($publisherId !== '') {
+        $normalizedPub = preg_replace('/^ca-/i', '', $publisherId);
+        if (!str_starts_with(strtolower($normalizedPub), 'pub-')) {
+            $normalizedPub = 'pub-' . ltrim($normalizedPub, '-');
+        }
+        $lines[] = 'google.com, ' . $normalizedPub . ', DIRECT, f08c47fec0942fa0';
+    }
+
+    $customLines = trim((string) Setting::get('ads_txt_custom', ''));
+    if ($customLines !== '') {
+        $lines[] = $customLines;
+    }
+
+    if ($lines === []) {
+        return response("# Nenhum anunciante configurado em /admin/settings/ads\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+    }
+
+    return response(implode("\n", $lines) . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+})->name('ads.txt');
