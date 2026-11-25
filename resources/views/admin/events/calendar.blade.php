@@ -83,354 +83,523 @@
         }
 
         :root {
-            --unn-calendar-primary:
-                {{ $buttonColor }}
-            ;
-            --unn-calendar-primary-hover:
-                {{ $buttonColorHover }}
-            ;
+            --unn-calendar-primary: {{ $buttonColor }};
+            --unn-calendar-primary-hover: {{ $buttonColorHover }};
         }
 
-        .fc .fc-toolbar.fc-header-toolbar {
-            margin-bottom: 1.25rem;
+        /* Hero Executivo */
+        .evcal-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.1rem;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1F5EDB 100%);
+            color: #ffffff;
+            padding: 1.4rem 1.75rem;
+            box-shadow: 0 18px 40px -14px rgba(15, 23, 42, 0.38);
         }
-
-        .fc .fc-toolbar-title {
-            font-size: 1.4rem;
+        .evcal-hero::after {
+            content: '';
+            position: absolute;
+            right: -50px;
+            top: -50px;
+            width: 220px;
+            height: 220px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(56, 189, 248, 0) 70%);
+            pointer-events: none;
+        }
+        .evcal-hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
             font-weight: 700;
-            text-transform: lowercase;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            color: #f8fafc;
+        }
+        .evcal-hero-btn-light {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 0.65rem;
+            font-weight: 700;
+            padding: 0.48rem 1rem;
+            box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.35);
+        }
+        .evcal-hero-btn-light:hover {
+            background: #f8fafc;
+            color: #1F5EDB;
+        }
+        .evcal-hero-btn-ghost {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            border-radius: 0.65rem;
+            font-weight: 600;
+            padding: 0.48rem 0.95rem;
+        }
+        .evcal-hero-btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
         }
 
+        /* FullCalendar 6 — Light & Dark harmonizado */
+        #calendar {
+            min-height: 680px;
+        }
+        #calendar .fc {
+            --fc-border-color: var(--bs-border-color);
+            --fc-page-bg-color: transparent;
+            --fc-neutral-bg-color: var(--bs-tertiary-bg);
+            --fc-today-bg-color: rgba(31, 94, 219, 0.08);
+            --fc-button-bg-color: var(--unn-calendar-primary);
+            --fc-button-border-color: var(--unn-calendar-primary);
+            --fc-button-hover-bg-color: var(--unn-calendar-primary-hover);
+            --fc-button-hover-border-color: var(--unn-calendar-primary-hover);
+            --fc-button-active-bg-color: var(--unn-calendar-primary-hover);
+            --fc-button-active-border-color: var(--unn-calendar-primary-hover);
+        }
+        .fc .fc-toolbar.fc-header-toolbar {
+            margin-bottom: 1.15rem;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+        .fc .fc-toolbar-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-transform: capitalize;
+            color: var(--bs-body-color);
+        }
         .fc .fc-button {
-            border-radius: 6px;
-            box-shadow: none;
+            border-radius: 0.55rem !important;
+            box-shadow: none !important;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.38rem 0.78rem;
         }
-
         .fc .fc-button-primary {
             background: var(--unn-calendar-primary);
             border-color: var(--unn-calendar-primary);
         }
-
         .fc .fc-button-primary:not(:disabled):hover {
             background: var(--unn-calendar-primary-hover);
             border-color: var(--unn-calendar-primary-hover);
         }
-
         .fc .fc-button-primary:disabled {
-            background: #8bb1ff;
-            border-color: #8bb1ff;
+            opacity: 0.55;
+        }
+        .fc .fc-col-header-cell {
+            background: var(--bs-tertiary-bg);
+            padding: 0.45rem 0;
+        }
+        .fc .fc-col-header-cell-cushion,
+        .fc .fc-daygrid-day-number {
+            color: var(--bs-body-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .fc .fc-daygrid-event {
+            border-radius: 0.45rem;
+            padding: 2px 6px;
+            font-weight: 600;
+            font-size: 0.78rem;
+            border: 0;
         }
 
+        /* Eventos Arrastáveis e Seletor de Cores */
         .external-events {
-            min-height: 120px;
+            min-height: 110px;
         }
-
         .external-event {
             color: #fff;
-            padding: 8px 12px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            cursor: move;
+            padding: 0.55rem 0.85rem;
+            border-radius: 0.7rem;
+            margin-bottom: 0.5rem;
+            cursor: grab;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.83rem;
             transition: transform 0.15s ease, box-shadow 0.15s ease;
             display: flex;
             align-items: center;
+            gap: 0.45rem;
         }
-
+        .external-event:active {
+            cursor: grabbing;
+        }
         .external-event:hover {
             transform: translateX(3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,.15);
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
+        }
+
+        .evcal-drop-box {
+            padding: 0.65rem 0.8rem;
+            border-radius: 0.7rem;
+            background: var(--bs-tertiary-bg);
+            border: 1px solid var(--bs-border-color);
         }
 
         .color-chooser {
             display: flex;
-            gap: 8px;
+            gap: 0.5rem;
             flex-wrap: wrap;
         }
-
         .color-chooser .color-item {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 0.55rem;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: all 0.15s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
-
         .color-chooser .color-item:hover {
             transform: scale(1.1);
         }
-
         .color-chooser .color-item.active {
-            border-color: #111827;
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111827;
+            border-color: var(--bs-body-color);
+            box-shadow: 0 0 0 2px var(--bs-body-bg), 0 0 0 4px var(--bs-body-color);
         }
 
         .calendar-card {
-            border-top: 4px solid var(--unn-calendar-primary);
-            border-radius: 10px;
+            border-top: 3px solid var(--unn-calendar-primary);
             overflow: hidden;
         }
 
-        #calendar {
-            min-height: 760px;
+        .evcal-batch-box {
+            border-radius: 0.85rem;
+            border: 1px solid var(--bs-border-color);
+            background: var(--bs-tertiary-bg);
+            padding: 0.95rem 1rem;
+        }
+
+        .evcal-modal-map {
+            height: 220px;
+            border-radius: 0.75rem;
+            border: 1px solid var(--bs-border-color);
+        }
+
+        @media (max-width: 767.98px) {
+            #calendar {
+                min-height: 500px;
+            }
+            .fc .fc-toolbar-title {
+                font-size: 1.05rem;
+            }
         }
     </style>
 @endpush
 
 @section('content')
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card card-outline card-primary shadow-sm">
-                <div class="card-header border-0">
-                    <h4 class="card-title fw-bold">
-                        <i class="fas fa-clock-rotate-left me-2 text-primary"></i>Eventos Recentes
-                    </h4>
+    {{-- HERO EXECUTIVO --}}
+    <section class="evcal-hero mb-4">
+        <div class="row align-items-center g-3 position-relative" style="z-index: 2;">
+            <div class="col-lg-7">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <span class="evcal-hero-pill">
+                        <i class="fas fa-calendar-alt"></i> Agenda Oficial
+                    </span>
+                    <span class="evcal-hero-pill">
+                        <i class="fas fa-hand-pointer"></i> Arraste &amp; Solte Ativo
+                    </span>
                 </div>
-                <div class="card-body">
-                    <div id="recent-events" class="small text-muted">Carregando...</div>
+                <h2 class="h4 fw-bold text-white mb-1">Calendário de Eventos &amp; Reuniões</h2>
+                <p class="mb-0 text-white-50 small">
+                    Organize eventos, mentorias presenciais e reuniões no calendário interativo, arraste modelos rápidos ou crie eventos completos.
+                </p>
+            </div>
+            <div class="col-lg-5">
+                <div class="d-flex flex-wrap align-items-center justify-content-lg-end gap-2">
+                    @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('events.create'))
+                        <a href="{{ route('admin.events.create') }}" class="btn evcal-hero-btn-light btn-sm">
+                            <i class="fas fa-plus me-1"></i> Novo Evento
+                        </a>
+                    @endif
+                    @if(\Illuminate\Support\Facades\Route::has('admin.events.list'))
+                        <a href="{{ route('admin.events.list') }}" class="btn evcal-hero-btn-ghost btn-sm">
+                            <i class="fas fa-list me-1"></i> Ver em Lista
+                        </a>
+                    @endif
+                    @if(auth()->user()->isAdmin())
+                        <button type="button" class="btn evcal-hero-btn-ghost btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#calendarSettingsModal">
+                            <i class="fas fa-sliders-h me-1"></i> Personalizar
+                        </button>
+                    @endif
                 </div>
             </div>
-            @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('events.create'))
-                <div class="card card-outline card-success shadow-sm">
-                    <div class="card-header border-0">
-                        <h3 class="card-title fw-bold">
-                            <i class="fas fa-arrows-alt me-2 text-success"></i>Eventos Arrastáveis
+        </div>
+    </section>
+
+    <div class="row g-3">
+        {{-- COLUNA LATERAL DE CONTROLES --}}
+        <div class="col-xl-3 col-lg-4 d-flex flex-column gap-3">
+            {{-- Eventos Recentes --}}
+            <div class="card card-outline card-primary mb-0">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">
+                            <i class="fas fa-clock-rotate-left me-2 text-primary"></i>Eventos Recentes
                         </h3>
+                        <div class="text-body-secondary small mt-1">Últimos agendamentos</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="recent-events" class="small text-body-secondary">Carregando...</div>
+                </div>
+            </div>
+
+            @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('events.create'))
+                {{-- Eventos Arrastáveis --}}
+                <div class="card card-outline card-success mb-0">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">
+                                <i class="fas fa-arrows-alt me-2 text-success"></i>Eventos Arrastáveis
+                            </h3>
+                            <div class="text-body-secondary small mt-1">Arraste um modelo para o dia</div>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted small mb-2"><i class="fas fa-hand-pointer me-1"></i>Arraste um modelo para o calendário</p>
                         <div id="external-events" class="external-events">
                             @foreach($calendarTemplates as $tpl)
                                 <div class="external-event shadow-sm" data-title="{{ $tpl['title'] }}" data-color="{{ $tpl['color'] }}"
                                     style="background:{{ $tpl['color'] }};">
-                                    <i class="fas fa-grip-vertical me-1"></i>{{ $tpl['title'] }}
+                                    <i class="fas fa-grip-vertical opacity-75"></i>
+                                    <span class="text-truncate">{{ $tpl['title'] }}</span>
                                 </div>
                             @endforeach
                         </div>
-                        <div class="form-check mt-3 p-2 rounded border bg-light">
-                            <input type="checkbox" class="form-check-input" id="drop-remove" {{ $defaultRemoveAfterDrop ? 'checked' : '' }}>
-                            <label class="form-check-label small fw-bold" for="drop-remove">Remover modelo após soltar</label>
+                        <div class="evcal-drop-box mt-3">
+                            <div class="form-check form-switch mb-0">
+                                <input type="checkbox" class="form-check-input" id="drop-remove" {{ $defaultRemoveAfterDrop ? 'checked' : '' }}>
+                                <label class="form-check-label small fw-semibold" for="drop-remove">Remover modelo após soltar</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="card card-outline card-info shadow-sm">
-                    <div class="card-header border-0">
-                        <h3 class="card-title fw-bold">
-                            <i class="fas fa-bolt me-2 text-info"></i>Criar Evento Rápido
-                        </h3>
+
+                {{-- Criar Evento Rápido --}}
+                <div class="card card-outline card-info mb-0">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">
+                                <i class="fas fa-bolt me-2 text-info"></i>Criar Evento Rápido
+                            </h3>
+                            <div class="text-body-secondary small mt-1">Adicione um novo modelo</div>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
-                            <label class="small fw-bold text-muted">Título</label>
+                        <div class="mb-3">
+                            <label class="form-label small" for="new-event-title">Título</label>
                             <input type="text" class="form-control" id="new-event-title" placeholder="Digite o título do evento">
                         </div>
-                        <label class="small fw-bold text-muted mb-2">Cor do evento</label>
+                        <label class="form-label small mb-2">Cor do evento</label>
                         <div class="color-chooser mb-3" id="new-event-colors">
                             @foreach($calendarQuickColors as $idx => $color)
                                 <span class="color-item {{ $idx === 0 ? 'active' : '' }}" data-color="{{ $color }}"
                                     style="background:{{ $color }};"></span>
                             @endforeach
                         </div>
-                        <button id="add-new-event" class="btn btn-primary w-100 rounded-pill elevation-1">
-                            <i class="fas fa-plus me-1"></i> Adicionar ao Calendário
-                        </button>
-                        <button class="btn btn-outline-secondary w-100 mt-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#eventModal">
-                            <i class="fas fa-pen me-1"></i> Novo Evento Completo
-                        </button>
+                        <div class="d-grid gap-2">
+                            <button id="add-new-event" type="button" class="btn btn-primary btn-sm py-2">
+                                <i class="fas fa-plus me-1"></i> Adicionar Modelo
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm py-2" data-bs-toggle="modal" data-bs-target="#eventModal">
+                                <i class="fas fa-pen me-1"></i> Novo Evento no Modal
+                            </button>
+                        </div>
                     </div>
                 </div>
             @endif
         </div>
-        <div class="col-md-9">
-            <div class="card calendar-card shadow-sm">
-                <div class="card-header border-0">
-                    <h3 class="card-title">
-                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Calendário
-                    </h3>
-                    @if(auth()->user()->isAdmin())
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 elevation-1" data-bs-toggle="modal"
+
+        {{-- COLUNA PRINCIPAL DO CALENDÁRIO --}}
+        <div class="col-xl-9 col-lg-8">
+            <div class="card calendar-card mb-0">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">
+                            <i class="fas fa-calendar-alt me-2 text-primary"></i>Agenda Interativa
+                        </h3>
+                        <div class="text-body-secondary small mt-1">Clique em um dia para agendar ou em um evento para editar</div>
+                    </div>
+                    <div class="card-tools">
+                        @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('events.create'))
+                            <a href="{{ route('admin.events.create') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                <i class="fas fa-plus me-1"></i> Novo
+                            </a>
+                        @endif
+                        @if(auth()->user()->isAdmin())
+                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal"
                                 data-bs-target="#calendarSettingsModal">
                                 <i class="fas fa-sliders-h me-1"></i> Personalizar
                             </button>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-3">
                     <div id="calendar"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="eventModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <!-- Modal Gerenciar Evento -->
+    <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Gerenciar Evento</h5>
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-calendar-plus text-primary me-2"></i>Gerenciar Evento
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <form id="eventForm" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" id="event_id" name="id">
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label>Título</label>
-                            <input type="text" class="form-control" name="title" id="title" required>
-                        </div>
-                        <input type="hidden" name="published" value="0">
-                        <div class="form-check mb-3">
-                            <input type="checkbox" class="form-check-input" name="published" id="published" value="1"
-                                checked>
-                            <label class="form-check-label" for="published">Publicado no Site</label>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>Início</label>
-                                    <input type="datetime-local" class="form-control" name="start_at" id="start_at"
-                                        required>
-                                </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label" for="title">Título <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="title" id="title" required>
                             </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>Fim</label>
-                                    <input type="datetime-local" class="form-control" name="end_at" id="end_at">
-                                </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="color">Cor no Calendário</label>
+                                <input type="color" class="form-control form-control-color w-100" name="color" id="color" value="#3788d8">
                             </div>
                         </div>
 
-                        <input type="hidden" name="all_day" value="0">
-                        <div class="form-check mb-3">
-                            <input type="checkbox" class="form-check-input" name="all_day" id="all_day" value="1">
-                            <label class="form-check-label" for="all_day">Dia inteiro</label>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Local (nome)</label>
-                            <input type="text" class="form-control" name="location" id="location"
-                                placeholder="Ex: Centro de Convenções UNN">
-                        </div>
-                        <div class="form-group">
-                            <label>Endereço completo</label>
-                            <input type="text" class="form-control" name="address" id="address"
-                                placeholder="Ex: Av. Paulista, 1000 - SP">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Vagas (0 = ilimitado)</label>
-                            <input type="number" class="form-control" name="capacity" id="capacity" min="0">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Preço base (entrada)</label>
-                            <input type="text" class="form-control mask-money" name="price" id="price"
-                                placeholder="R$ 0,00">
-                            <small class="text-muted">Se os lotes estiverem vazios, este valor será usado como
-                                entrada.</small>
-                        </div>
-
-                        <div class="card card-secondary">
-                            <div class="card-header">
-                                <h3 class="card-title" style="font-size:1rem;">Lotes / Ingressos</h3>
+                        <div class="d-flex flex-wrap gap-4 mb-3 p-2 px-3 rounded border" style="background: var(--bs-tertiary-bg);">
+                            <div>
+                                <input type="hidden" name="published" value="0">
+                                <div class="form-check form-switch mb-0">
+                                    <input type="checkbox" class="form-check-input" name="published" id="published" value="1" checked>
+                                    <label class="form-check-label fw-semibold small" for="published">Publicado no Site</label>
+                                </div>
                             </div>
-                            <div class="card-body p-2">
-                                <!-- Batch 1 -->
-                                <div class="row">
-                                    <div class="col-6">
-                                        <label>1º Lote (R$)</label>
-                                        <input type="text" class="form-control mask-money" name="batch_1_price"
-                                            id="batch_1_price" placeholder="R$ 0,00">
-                                    </div>
-                                    <div class="col-6">
-                                        <label>Até quando?</label>
-                                        <input type="datetime-local" class="form-control" name="batch_1_deadline"
-                                            id="batch_1_deadline">
-                                    </div>
-                                </div>
-                                <div class="dropdown-divider"></div>
-                                <!-- Batch 2 -->
-                                <div class="row">
-                                    <div class="col-6">
-                                        <label>2º Lote (R$)</label>
-                                        <input type="text" class="form-control mask-money" name="batch_2_price"
-                                            id="batch_2_price" placeholder="R$ 0,00">
-                                    </div>
-                                    <div class="col-6">
-                                        <label>Até quando?</label>
-                                        <input type="datetime-local" class="form-control" name="batch_2_deadline"
-                                            id="batch_2_deadline">
-                                    </div>
-                                </div>
-                                <div class="dropdown-divider"></div>
-                                <!-- Batch 3 -->
-                                <div class="row">
-                                    <div class="col-6">
-                                        <label>3º Lote / Na hora (R$)</label>
-                                        <input type="text" class="form-control mask-money" name="batch_3_price"
-                                            id="batch_3_price" placeholder="R$ 0,00">
-                                    </div>
-                                    <div class="col-6">
-                                        <label>Até (ou na hora)</label>
-                                        <input type="datetime-local" class="form-control" name="batch_3_deadline"
-                                            id="batch_3_deadline">
-                                    </div>
+                            <div>
+                                <input type="hidden" name="all_day" value="0">
+                                <div class="form-check form-switch mb-0">
+                                    <input type="checkbox" class="form-check-input" name="all_day" id="all_day" value="1">
+                                    <label class="form-check-label fw-semibold small" for="all_day">Dia inteiro</label>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Cor</label>
-                            <div class="input-group">
-                                <input type="color" class="form-control" name="color" id="color" value="#3788d8">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="start_at">Início <span class="text-danger">*</span></label>
+                                <input type="datetime-local" class="form-control" name="start_at" id="start_at" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="end_at">Fim</label>
+                                <input type="datetime-local" class="form-control" name="end_at" id="end_at">
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label>Descrição</label>
-                            <textarea class="form-control summernote" name="description" id="description"
-                                rows="3"></textarea>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="location">Local (nome)</label>
+                                <input type="text" class="form-control" name="location" id="location"
+                                    placeholder="Ex: Centro de Convenções UNN">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="address">Endereço completo</label>
+                                <input type="text" class="form-control" name="address" id="address"
+                                    placeholder="Ex: Av. Paulista, 1000 - SP">
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Imagem do evento</label>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="capacity">Vagas (0 = ilimitado)</label>
+                                <input type="number" class="form-control" name="capacity" id="capacity" min="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="price">Preço base (entrada)</label>
+                                <input type="text" class="form-control mask-money" name="price" id="price" placeholder="R$ 0,00">
+                                <small class="text-body-secondary">Usado quando os lotes estiverem vazios.</small>
+                            </div>
+                        </div>
+
+                        <div class="evcal-batch-box mb-3">
+                            <div class="fw-bold small mb-2">
+                                <i class="fas fa-layer-group text-primary me-1"></i> Lotes / Ingressos
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">1º Lote (R$)</label>
+                                    <input type="text" class="form-control form-control-sm mask-money" name="batch_1_price" id="batch_1_price" placeholder="R$ 0,00">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Até quando?</label>
+                                    <input type="datetime-local" class="form-control form-control-sm" name="batch_1_deadline" id="batch_1_deadline">
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">2º Lote (R$)</label>
+                                    <input type="text" class="form-control form-control-sm mask-money" name="batch_2_price" id="batch_2_price" placeholder="R$ 0,00">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Até quando?</label>
+                                    <input type="datetime-local" class="form-control form-control-sm" name="batch_2_deadline" id="batch_2_deadline">
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">3º Lote / Na hora (R$)</label>
+                                    <input type="text" class="form-control form-control-sm mask-money" name="batch_3_price" id="batch_3_price" placeholder="R$ 0,00">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Até (ou na hora)</label>
+                                    <input type="datetime-local" class="form-control form-control-sm" name="batch_3_deadline" id="batch_3_deadline">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="description">Descrição</label>
+                            <textarea class="form-control summernote" name="description" id="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Imagem do evento</label>
                             <input type="hidden" name="remove_image" value="0">
                             <div class="upload-box" id="eventImageBox" data-max-size="5242880" data-existing-url=""
                                 data-remove-input="[name='remove_image']">
                                 <input type="file" name="image" id="image" accept="image/*" class="d-none">
                                 <div class="upload-preview mb-2"></div>
-                                <div class="upload-meta text-muted"></div>
-                                <small class="text-muted upload-help"></small>
+                                <div class="upload-meta text-body-secondary small"></div>
+                                <small class="text-body-secondary upload-help d-block"></small>
                                 <div class="progress upload-progress progress-sm d-none mt-2">
                                     <div class="progress-bar bg-primary" style="width:0%"></div>
                                 </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger upload-remove d-none mt-2">
+                                    <i class="fas fa-trash-alt me-1"></i> Remover
+                                </button>
                             </div>
                         </div>
 
                         <div id="modalMapContainer" style="display:none; margin-top:15px;">
-                            <label>Localização</label>
-                            <p id="modalAddress" class="text-muted small"></p>
-                            <div id="modalMap" style="height: 200px; border-radius: 8px; border: 1px solid #ddd;"></div>
+                            <label class="form-label">Localização</label>
+                            <p id="modalAddress" class="text-body-secondary small"></p>
+                            <div id="modalMap" class="evcal-modal-map"></div>
                         </div>
                     </div>
                     <input type="hidden" id="event_latitude" name="latitude">
                     <input type="hidden" id="event_longitude" name="longitude">
                     <div class="modal-footer justify-content-between">
-                        <div>
-                            <a href="#" id="modalEventEdit" class="btn btn-warning"><i class="fas fa-edit me-1"></i> Editar</a>
-                            <a href="#" id="modalEventScanner" class="btn btn-primary d-none"><i class="fas fa-qrcode me-1"></i>
-                                Ler Ingressos</a>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="#" id="modalEventEdit" class="btn btn-warning btn-sm"><i class="fas fa-edit me-1"></i> Editar Completo</a>
+                            <a href="#" id="modalEventScanner" class="btn btn-primary btn-sm d-none"><i class="fas fa-qrcode me-1"></i> Ler Ingressos</a>
                         </div>
-                        <div>
-                            <button type="submit" class="btn btn-success" id="modalEventSave"><i class="fas fa-save me-1"></i>
-                                Salvar</button>
-                            <button type="button" class="btn btn-danger" id="modalEventDelete"><i class="fas fa-trash me-1"></i>
-                                Excluir</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+                            <button type="button" class="btn btn-danger btn-sm" id="modalEventDelete"><i class="fas fa-trash me-1"></i> Excluir</button>
+                            <button type="submit" class="btn btn-success btn-sm" id="modalEventSave"><i class="fas fa-save me-1"></i> Salvar</button>
                         </div>
                     </div>
                 </form>
@@ -438,160 +607,139 @@
         </div>
     </div>
 
-    <!-- Calendar Settings Modal -->
+    <!-- Modal Personalizar Calendário -->
     <div class="modal fade" id="calendarSettingsModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Personalizar calendário</h5>
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-sliders-h text-primary me-2"></i>Personalizar Calendário
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <form id="calendarSettingsForm" action="{{ route('admin.events.calendar.settings') }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <div class="row">
+                        <div class="row g-3 mb-3">
                             <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Visualização inicial</label>
-                                    <select name="initial_view" class="form-control">
-                                        <option value="dayGridMonth" {{ $initialView === 'dayGridMonth' ? 'selected' : '' }}>
-                                            Mês</option>
-                                        <option value="timeGridWeek" {{ $initialView === 'timeGridWeek' ? 'selected' : '' }}>
-                                            Semana</option>
-                                        <option value="timeGridDay" {{ $initialView === 'timeGridDay' ? 'selected' : '' }}>Dia
-                                        </option>
-                                    </select>
-                                </div>
+                                <label class="form-label">Visualização inicial</label>
+                                <select name="initial_view" class="form-select">
+                                    <option value="dayGridMonth" {{ $initialView === 'dayGridMonth' ? 'selected' : '' }}>Mês</option>
+                                    <option value="timeGridWeek" {{ $initialView === 'timeGridWeek' ? 'selected' : '' }}>Semana</option>
+                                    <option value="timeGridDay" {{ $initialView === 'timeGridDay' ? 'selected' : '' }}>Dia</option>
+                                </select>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Primeiro dia da semana</label>
-                                    <select name="first_day" class="form-control">
-                                        <option value="0" {{ $firstDay === 0 ? 'selected' : '' }}>Domingo</option>
-                                        <option value="1" {{ $firstDay === 1 ? 'selected' : '' }}>Segunda</option>
-                                        <option value="2" {{ $firstDay === 2 ? 'selected' : '' }}>Terça</option>
-                                        <option value="3" {{ $firstDay === 3 ? 'selected' : '' }}>Quarta</option>
-                                        <option value="4" {{ $firstDay === 4 ? 'selected' : '' }}>Quinta</option>
-                                        <option value="5" {{ $firstDay === 5 ? 'selected' : '' }}>Sexta</option>
-                                        <option value="6" {{ $firstDay === 6 ? 'selected' : '' }}>Sábado</option>
-                                    </select>
-                                </div>
+                                <label class="form-label">Primeiro dia da semana</label>
+                                <select name="first_day" class="form-select">
+                                    <option value="0" {{ $firstDay === 0 ? 'selected' : '' }}>Domingo</option>
+                                    <option value="1" {{ $firstDay === 1 ? 'selected' : '' }}>Segunda</option>
+                                    <option value="2" {{ $firstDay === 2 ? 'selected' : '' }}>Terça</option>
+                                    <option value="3" {{ $firstDay === 3 ? 'selected' : '' }}>Quarta</option>
+                                    <option value="4" {{ $firstDay === 4 ? 'selected' : '' }}>Quinta</option>
+                                    <option value="5" {{ $firstDay === 5 ? 'selected' : '' }}>Sexta</option>
+                                    <option value="6" {{ $firstDay === 6 ? 'selected' : '' }}>Sábado</option>
+                                </select>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Eventos recentes (quantidade)</label>
-                                    <input type="number" name="recent_limit" class="form-control" min="1" max="20"
-                                        value="{{ $recentLimit }}">
-                                </div>
+                                <label class="form-label">Eventos recentes (qtd.)</label>
+                                <input type="number" name="recent_limit" class="form-control" min="1" max="20" value="{{ $recentLimit }}">
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="row g-3 mb-3">
                             <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Cor dos botões</label>
-                                    <input type="color" name="button_color" class="form-control" value="{{ $buttonColor }}">
-                                </div>
+                                <label class="form-label">Cor dos botões</label>
+                                <input type="color" name="button_color" class="form-control form-control-color w-100" value="{{ $buttonColor }}">
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Cor do texto do evento</label>
-                                    <input type="color" name="event_text_color" class="form-control"
-                                        value="{{ $eventTextColor }}">
-                                </div>
+                                <label class="form-label">Cor do texto do evento</label>
+                                <input type="color" name="event_text_color" class="form-control form-control-color w-100" value="{{ $eventTextColor }}">
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Remover após soltar (padrão)</label>
-                                    <select name="default_remove_after_drop" class="form-control">
-                                        <option value="0" {{ !$defaultRemoveAfterDrop ? 'selected' : '' }}>Não</option>
-                                        <option value="1" {{ $defaultRemoveAfterDrop ? 'selected' : '' }}>Sim</option>
-                                    </select>
-                                </div>
+                                <label class="form-label">Remover após soltar</label>
+                                <select name="default_remove_after_drop" class="form-select">
+                                    <option value="0" {{ !$defaultRemoveAfterDrop ? 'selected' : '' }}>Não</option>
+                                    <option value="1" {{ $defaultRemoveAfterDrop ? 'selected' : '' }}>Sim</option>
+                                </select>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-0">
-                                    <label class="d-block">Opções</label>
-                                    <input type="hidden" name="weekends" value="0">
-                                    <div class="form-check d-inline-block me-3">
-                                        <input type="checkbox" class="form-check-input" id="cal-weekends"
-                                            name="weekends" value="1" {{ $weekends ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="cal-weekends">Mostrar fins de
-                                            semana</label>
-                                    </div>
-
-                                    <input type="hidden" name="week_numbers" value="0">
-                                    <div class="form-check d-inline-block">
-                                        <input type="checkbox" class="form-check-input" id="cal-weeknumbers"
-                                            name="week_numbers" value="1" {{ $weekNumbers ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="cal-weeknumbers">Mostrar número da
-                                            semana</label>
-                                    </div>
+                        <div class="d-flex flex-wrap gap-4 p-2 px-3 rounded border mb-3" style="background: var(--bs-tertiary-bg);">
+                            <div>
+                                <input type="hidden" name="weekends" value="0">
+                                <div class="form-check form-switch mb-0">
+                                    <input type="checkbox" class="form-check-input" id="cal-weekends" name="weekends" value="1" {{ $weekends ? 'checked' : '' }}>
+                                    <label class="form-check-label small fw-semibold" for="cal-weekends">Mostrar fins de semana</label>
+                                </div>
+                            </div>
+                            <div>
+                                <input type="hidden" name="week_numbers" value="0">
+                                <div class="form-check form-switch mb-0">
+                                    <input type="checkbox" class="form-check-input" id="cal-weeknumbers" name="week_numbers" value="1" {{ $weekNumbers ? 'checked' : '' }}>
+                                    <label class="form-check-label small fw-semibold" for="cal-weeknumbers">Mostrar número da semana</label>
                                 </div>
                             </div>
                         </div>
 
                         <hr>
 
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-2">Paleta de cores (criação rápida)</h6>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddQuickColor"><i
-                                            class="fas fa-plus"></i> Adicionar cor</button>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0 small">Paleta de cores (criação rápida)</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddQuickColor">
+                                        <i class="fas fa-plus me-1"></i> Cor
+                                    </button>
                                 </div>
                                 <div id="quickColorsList">
                                     @foreach($calendarQuickColors as $idx => $color)
                                         <div class="row g-2 align-items-center mb-2 calendar-color-row">
                                             <div class="col-10">
-                                                <input type="color" class="form-control" name="quick_colors[{{ $idx }}]"
-                                                    value="{{ $color }}">
+                                                <input type="color" class="form-control form-control-color w-100" name="quick_colors[{{ $idx }}]" value="{{ $color }}">
                                             </div>
                                             <div class="col-2 text-end">
-                                                <button type="button"
-                                                    class="btn btn-sm btn-outline-danger btnRemoveQuickColor"><i
-                                                        class="fas fa-times"></i></button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger btnRemoveQuickColor">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
-                                <small class="text-muted">Essas cores aparecem no “Criar Evento Rápido”.</small>
+                                <small class="text-body-secondary">Essas cores aparecem no “Criar Evento Rápido”.</small>
                             </div>
 
                             <div class="col-md-6">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-2">Modelos de eventos arrastáveis</h6>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddTemplate"><i
-                                            class="fas fa-plus"></i> Adicionar modelo</button>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0 small">Modelos de eventos arrastáveis</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddTemplate">
+                                        <i class="fas fa-plus me-1"></i> Modelo
+                                    </button>
                                 </div>
                                 <div id="templatesList">
                                     @foreach($calendarTemplates as $idx => $tpl)
                                         <div class="row g-2 align-items-center mb-2 calendar-template-row">
                                             <div class="col-7">
-                                                <input type="text" class="form-control" name="templates[{{ $idx }}][title]"
-                                                    value="{{ $tpl['title'] }}" placeholder="Título">
+                                                <input type="text" class="form-control form-control-sm" name="templates[{{ $idx }}][title]" value="{{ $tpl['title'] }}" placeholder="Título">
                                             </div>
                                             <div class="col-3">
-                                                <input type="color" class="form-control" name="templates[{{ $idx }}][color]"
-                                                    value="{{ $tpl['color'] }}">
+                                                <input type="color" class="form-control form-control-color form-control-sm w-100" name="templates[{{ $idx }}][color]" value="{{ $tpl['color'] }}">
                                             </div>
                                             <div class="col-2 text-end">
-                                                <button type="button" class="btn btn-sm btn-outline-danger btnRemoveTemplate"><i
-                                                        class="fas fa-times"></i></button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger btnRemoveTemplate">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
-                                <small class="text-muted">Arraste um modelo para o calendário para criar rápido.</small>
+                                <small class="text-body-secondary">Arraste um modelo para o calendário para criar rápido.</small>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Salvar</button>
                     </div>
                 </form>
             </div>

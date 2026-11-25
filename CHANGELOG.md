@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.61] - 2026-11-25 - feat(admin, events): reformulacao visual e responsiva do Calendario de Eventos (/admin/events) no padrao AdminLTE 4 + Light/Dark
+
+- **Novo Calendário de Eventos (`resources/views/admin/events/calendar.blade.php`):**
+  - Adicionado **Hero Banner** com atalhos rápidos (*Novo Evento*, *Ver em Lista* e *Personalizar*).
+  - **FullCalendar 6** 100% harmonizado com **Light Mode** e **Dark Mode** (variáveis `--fc-*`, cabeçalhos, números de dia, título capitalizado e botões arredondados responsivos).
+  - Coluna lateral moderna (`Eventos Recentes`, `Eventos Arrastáveis` com switch adaptativo e `Criar Evento Rápido` com seletor de cores compatível com Dark Mode) + modais `#eventModal` e `#calendarSettingsModal` padronizados em Bootstrap 5 (`modal-lg modal-dialog-scrollable`, switches, botões alinhados no rodapé).
+
 ## [2.8.60] - 2026-11-25 - feat(admin, events): reformulacao visual e responsiva do formulario /admin/events/create e /admin/events/{event}/edit no padrao AdminLTE 4
 
 - **Novo Formulário de Eventos & Álbuns (`resources/views/admin/events/form.blade.php`):**
