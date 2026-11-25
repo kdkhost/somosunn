@@ -13,7 +13,7 @@
             @csrf
             @if($coupon->id) @method('PUT') @endif
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-4">
                     <label>Código</label>
                     <div class="input-group">
@@ -38,7 +38,7 @@
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Nome (opcional)</label>
                     <input name="name" class="form-control" value="{{ old('name',$coupon->name) }}" placeholder="Ex: Black Friday 2026">
@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-4">
                     <label>Escopo</label>
                     <select name="applies_to" class="form-control" required>
@@ -90,7 +90,7 @@
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-3">
                     <label>Valor mínimo (opcional)</label>
                     <input name="min_amount" class="form-control" value="{{ old('min_amount',$coupon->min_amount) }}" placeholder="Ex: 100.00">
@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-3">
                     <label>Término (opcional)</label>
                     <input name="ends_at" class="form-control" data-datetime-picker value="{{ old('ends_at', optional($coupon->ends_at)->format('Y-m-d H:i')) }}" placeholder="DD/MM/AAAA HH:MM" autocomplete="off">
@@ -121,7 +121,7 @@
                 </div>
             </div>
 
-            <div class="text-right">
+            <div class="text-end">
                 <button class="btn btn-primary">Salvar</button>
                 <a href="{{ route('admin.coupons.index') }}" class="btn btn-secondary" data-pjax>Cancelar</a>
             </div>

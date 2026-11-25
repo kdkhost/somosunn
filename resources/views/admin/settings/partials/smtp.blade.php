@@ -1,10 +1,10 @@
 <div class="card-body">
     <div class="alert alert-info mb-4">
-        <i class="fas fa-envelope mr-2"></i> Configure o servidor de e-mail (SMTP) para envio de notificações,
+        <i class="fas fa-envelope me-2"></i> Configure o servidor de e-mail (SMTP) para envio de notificações,
         recuperação de senha e boas-vindas.
     </div>
 
-    <h5 class="text-primary mb-3"><i class="fas fa-server mr-2"></i> Configurações do Servidor</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-server me-2"></i> Configurações do Servidor</h5>
     <div class="row">
         <div class="col-md-6 form-group">
             <label>Host SMTP</label>
@@ -41,7 +41,7 @@
 
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-id-card-alt mr-2"></i> Identificação do Remetente</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-id-card-alt me-2"></i> Identificação do Remetente</h5>
     <div class="row">
         <div class="col-md-6 form-group">
             <label>E-mail Remetente (From)</label>
@@ -73,7 +73,7 @@
 
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-tasks mr-2"></i> Regras da Fila de E-mails</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-tasks me-2"></i> Regras da Fila de E-mails</h5>
     <div class="row">
         <div class="col-md-6 form-group">
             <label>Modo de disparo</label>
@@ -124,23 +124,23 @@
         </div>
     </div>
 
-    <div class="custom-control custom-switch mb-3">
+    <div class="form-check form-switch mb-3">
         <input type="hidden" name="email_queue_schedule_enabled" value="0">
-        <input type="checkbox" class="custom-control-input" id="email_queue_schedule_enabled"
+        <input type="checkbox" class="form-check-input" id="email_queue_schedule_enabled"
             name="email_queue_schedule_enabled" value="1" {{ ($settings['email_queue_schedule_enabled'] ?? 1) ? 'checked' : '' }}>
-        <label class="custom-control-label" for="email_queue_schedule_enabled">Ativar processamento automático da fila (scheduler)</label>
+        <label class="form-check-label" for="email_queue_schedule_enabled">Ativar processamento automático da fila (scheduler)</label>
         <small class="form-text text-muted">Funciona com cron do servidor ou com o cron interno do sistema (quando houver tráfego).</small>
     </div>
 
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-paper-plane mr-2"></i> Teste de Envio</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-paper-plane me-2"></i> Teste de Envio</h5>
     <div class="form-group" style="max-width: 500px;">
         <label>Enviar e-mail de teste para:</label>
         <div class="input-group">
             <input type="email" id="smtp_test_email_input" class="form-control" placeholder="seu@email.com">
             <div class="input-group-append">
-                <button type="button" id="btnTestSmtp" class="btn btn-primary"><i class="fas fa-paper-plane mr-1"></i>
+                <button type="button" id="btnTestSmtp" class="btn btn-primary"><i class="fas fa-paper-plane me-1"></i>
                     Testar Configuração</button>
             </div>
         </div>
@@ -148,7 +148,7 @@
     </div>
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-palette mr-2"></i> Design do E-mail</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-palette me-2"></i> Design do E-mail</h5>
     <div class="row">
         <div class="col-md-6 form-group">
             <label>Tipo de Fundo do Cabeçalho</label>

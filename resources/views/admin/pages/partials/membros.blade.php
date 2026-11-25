@@ -4,7 +4,7 @@
 <div class="tab-pane fade" id="sec-hero">
     <div class="card card-outline card-info mb-4">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-users mr-1"></i> Hero</h3>
+            <h3 class="card-title"><i class="fas fa-users me-1"></i> Hero</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -22,11 +22,11 @@
 <div class="tab-pane fade" id="sec-rules">
     <div class="card card-outline card-warning mb-4">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-sliders-h mr-1"></i> Regras de Exibição de Membros</h3>
+            <h3 class="card-title"><i class="fas fa-sliders-h me-1"></i> Regras de Exibição de Membros</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
-                <label class="font-weight-bold">Quem deve aparecer na lista pública de membros?</label>
+                <label class="fw-bold">Quem deve aparecer na lista pública de membros?</label>
                 <select name="members_display_mode" class="form-control">
                     <option value="all" {{ old('members_display_mode', $data['members_display_mode'] ?? 'all') === 'all' ? 'selected' : '' }}>
                         Todos os membros cadastrados ativos (Recomendado para fortalecer a comunidade)
@@ -44,7 +44,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="font-weight-bold">Exibir Administradores na lista pública?</label>
+                        <label class="fw-bold">Exibir Administradores na lista pública?</label>
                         <select name="members_show_admins" class="form-control">
                             <option value="0" {{ old('members_show_admins', $data['members_show_admins'] ?? '0') == '0' ? 'selected' : '' }}>Não (Apenas membros da rede)</option>
                             <option value="1" {{ old('members_show_admins', $data['members_show_admins'] ?? '0') == '1' ? 'selected' : '' }}>Sim (Exibir administradores)</option>
@@ -53,7 +53,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="font-weight-bold">Exibir somente perfis com foto cadastrada?</label>
+                        <label class="fw-bold">Exibir somente perfis com foto cadastrada?</label>
                         <select name="members_only_with_photo" class="form-control">
                             <option value="0" {{ old('members_only_with_photo', $data['members_only_with_photo'] ?? '0') == '0' ? 'selected' : '' }}>Não (Exibir membros com foto ou iniciais)</option>
                             <option value="1" {{ old('members_only_with_photo', $data['members_only_with_photo'] ?? '0') == '1' ? 'selected' : '' }}>Sim (Apenas membros com foto real)</option>
@@ -68,7 +68,7 @@
 <div class="tab-pane fade" id="sec-stats">
     <div class="card card-outline card-primary mb-4">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> Estatísticas</h3>
+            <h3 class="card-title"><i class="fas fa-chart-bar me-1"></i> Estatísticas</h3>
         </div>
         <div class="card-body">
             <div class="row">
@@ -92,7 +92,7 @@
 <div class="tab-pane fade" id="sec-cta">
     <div class="card card-outline card-success mb-4">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+            <h3 class="card-title"><i class="fas fa-bullhorn me-1"></i> CTA Final</h3>
         </div>
         <div class="card-body">
             <div class="form-group">

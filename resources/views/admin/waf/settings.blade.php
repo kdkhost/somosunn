@@ -18,13 +18,13 @@
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">
                 {{ session('success') }}
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         @endif
         @if(session('error'))
             <div class="alert alert-danger alert-dismissible fade show">
                 {{ session('error') }}
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         @endif
 
@@ -75,17 +75,17 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <label>Modo de Operacao</label>
-                                    <div class="custom-control custom-radio">
+                                    <div class="form-check">
                                         <input type="radio" id="mode-detection" name="mode" value="detection-only"
-                                               class="custom-control-input" {{ ($settings['mode'] ?? 'detection-only') === 'detection-only' ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="mode-detection">
+                                               class="form-check-input" {{ ($settings['mode'] ?? 'detection-only') === 'detection-only' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="mode-detection">
                                             <strong>Detection-Only</strong> — Apenas registra eventos, nao bloqueia
                                         </label>
                                     </div>
-                                    <div class="custom-control custom-radio mt-2">
+                                    <div class="form-check mt-2">
                                         <input type="radio" id="mode-enforce" name="mode" value="enforce"
-                                               class="custom-control-input" {{ ($settings['mode'] ?? '') === 'enforce' ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="mode-enforce">
+                                               class="form-check-input" {{ ($settings['mode'] ?? '') === 'enforce' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="mode-enforce">
                                             <strong>Enforce</strong> — Aplica bloqueios e challenges ativamente
                                         </label>
                                     </div>
@@ -93,17 +93,17 @@
 
                                 <div class="form-group mt-4">
                                     <label>Fail Policy (quando o WAF falha internamente)</label>
-                                    <div class="custom-control custom-radio">
+                                    <div class="form-check">
                                         <input type="radio" id="fail-allow" name="fail_policy" value="allow"
-                                               class="custom-control-input" {{ ($settings['fail_policy'] ?? 'allow') === 'allow' ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="fail-allow">
+                                               class="form-check-input" {{ ($settings['fail_policy'] ?? 'allow') === 'allow' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="fail-allow">
                                             <strong>Allow</strong> — Permite a requisicao (fail-open)
                                         </label>
                                     </div>
-                                    <div class="custom-control custom-radio mt-2">
+                                    <div class="form-check mt-2">
                                         <input type="radio" id="fail-block" name="fail_policy" value="block"
-                                               class="custom-control-input" {{ ($settings['fail_policy'] ?? '') === 'block' ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="fail-block">
+                                               class="form-check-input" {{ ($settings['fail_policy'] ?? '') === 'block' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="fail-block">
                                             <strong>Block</strong> — Bloqueia a requisicao (fail-closed)
                                         </label>
                                     </div>

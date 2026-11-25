@@ -18,7 +18,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-primary elevation-1"><i class="fas fa-history"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Total de Registros</span>
+                    <span class="info-box-text fw-bold">Total de Registros</span>
                     <span class="info-box-number">{{ $totalLogs }}</span>
                     <span class="progress-description text-xs">Ações registradas no sistema</span>
                 </div>
@@ -28,7 +28,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-info elevation-1"><i class="fas fa-users"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Usuários Ativos</span>
+                    <span class="info-box-text fw-bold">Usuários Ativos</span>
                     <span class="info-box-number text-info">{{ $uniqueUsers }}</span>
                     <span class="progress-description text-xs">Com atividade registrada</span>
                 </div>
@@ -38,7 +38,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-warning elevation-1"><i class="fas fa-bolt"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Tipos de Ação</span>
+                    <span class="info-box-text fw-bold">Tipos de Ação</span>
                     <span class="info-box-number text-warning">{{ $uniqueActions }}</span>
                     <span class="progress-description text-xs">Categorias distintas</span>
                 </div>
@@ -49,11 +49,11 @@
     {{-- Filtro + Botao Limpar --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header border-0">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-stream mr-2 text-primary"></i>Histórico de Ações
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-stream me-2 text-primary"></i>Histórico de Ações
             </h3>
             <div class="card-tools d-flex align-items-center">
-                <form action="{{ route('admin.activity_logs.index') }}" method="GET" class="mr-3">
+                <form action="{{ route('admin.activity_logs.index') }}" method="GET" class="me-3">
                     <div class="input-group input-group-sm" style="width: 250px;">
                         <input type="text" name="q" class="form-control" placeholder="Buscar..." value="{{ $q ?? '' }}">
                         <div class="input-group-append">
@@ -66,7 +66,7 @@
                 <form action="{{ route('admin.activity_logs.clear') }}" method="POST" id="form-clear-logs" class="d-inline">
                     @csrf
                     <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 elevation-1 btn-clear-logs">
-                        <i class="fas fa-trash-alt mr-1"></i> Limpar Histórico
+                        <i class="fas fa-trash-alt me-1"></i> Limpar Histórico
                     </button>
                 </form>
             </div>
@@ -77,7 +77,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr class="bg-light">
-                            <th class="border-0 pl-4" style="width:15%;">Data/Hora</th>
+                            <th class="border-0 ps-4" style="width:15%;">Data/Hora</th>
                             <th class="border-0" style="width:20%;">Usuário</th>
                             <th class="border-0 text-center" style="width:15%;">Ação</th>
                             <th class="border-0" style="width:12%;">IP</th>
@@ -87,36 +87,36 @@
                     <tbody>
                         @forelse($logs as $log)
                             <tr>
-                                <td class="pl-4">
-                                    <div class="text-sm font-weight-bold">{{ $log->created_at->format('d/m/Y') }}</div>
+                                <td class="ps-4">
+                                    <div class="text-sm fw-bold">{{ $log->created_at->format('d/m/Y') }}</div>
                                     <small class="text-muted">{{ $log->created_at->format('H:i:s') }}</small>
                                 </td>
                                 <td>
                                     @if($log->user)
                                         <div class="d-flex align-items-center">
-                                            <div class="d-flex align-items-center justify-content-center rounded-circle bg-gradient-primary mr-2"
+                                            <div class="d-flex align-items-center justify-content-center rounded-circle bg-gradient-primary me-2"
                                                 style="width:32px; height:32px; flex-shrink:0;">
                                                 <i class="fas fa-user text-white" style="font-size:12px;"></i>
                                             </div>
                                             <div>
-                                                <a href="{{ route('admin.users.edit', $log->user_id) }}" class="font-weight-bold text-sm">
+                                                <a href="{{ route('admin.users.edit', $log->user_id) }}" class="fw-bold text-sm">
                                                     {{ $log->user->name }}
                                                 </a>
                                             </div>
                                         </div>
                                     @else
                                         <div class="d-flex align-items-center">
-                                            <div class="d-flex align-items-center justify-content-center rounded-circle bg-gradient-secondary mr-2"
+                                            <div class="d-flex align-items-center justify-content-center rounded-circle bg-gradient-secondary me-2"
                                                 style="width:32px; height:32px; flex-shrink:0;">
                                                 <i class="fas fa-robot text-white" style="font-size:12px;"></i>
                                             </div>
-                                            <span class="badge badge-secondary px-2 py-1">Sistema / Visitante</span>
+                                            <span class="badge text-bg-secondary px-2 py-1">Sistema / Visitante</span>
                                         </div>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge badge-info px-3 py-2" style="font-size:11px;">
-                                        <i class="fas fa-bolt mr-1" style="font-size:9px;"></i>{{ $log->action }}
+                                    <span class="badge text-bg-info px-3 py-2" style="font-size:11px;">
+                                        <i class="fas fa-bolt me-1" style="font-size:9px;"></i>{{ $log->action }}
                                     </span>
                                 </td>
                                 <td>
@@ -132,7 +132,7 @@
                                     <div class="mb-3">
                                         <i class="fas fa-history fa-3x text-muted"></i>
                                     </div>
-                                    <h5 class="text-muted font-weight-bold">Nenhum registro de atividade</h5>
+                                    <h5 class="text-muted fw-bold">Nenhum registro de atividade</h5>
                                     <p class="text-muted">As ações dos usuários serão registradas automaticamente aqui.</p>
                                 </td>
                             </tr>
@@ -152,28 +152,28 @@
     {{-- Info card --}}
     <div class="card card-outline card-secondary shadow-sm">
         <div class="card-header border-0 py-2">
-            <h3 class="card-title text-sm font-weight-bold"><i class="fas fa-info-circle mr-2 text-info"></i>Sobre os Logs de Atividade</h3>
+            <h3 class="card-title text-sm fw-bold"><i class="fas fa-info-circle me-2 text-info"></i>Sobre os Logs de Atividade</h3>
             <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i class="fas fa-minus"></i></button>
             </div>
         </div>
         <div class="card-body pt-0">
             <div class="row">
                 <div class="col-md-6">
-                    <h6 class="font-weight-bold mb-2">O que é registrado:</h6>
+                    <h6 class="fw-bold mb-2">O que é registrado:</h6>
                     <ul class="list-unstyled mb-0 text-sm text-muted">
-                        <li class="mb-1"><i class="fas fa-check text-success mr-2"></i>Login e logout de usuários</li>
-                        <li class="mb-1"><i class="fas fa-check text-success mr-2"></i>Criação e edição de registros</li>
-                        <li class="mb-1"><i class="fas fa-check text-success mr-2"></i>Exclusão de dados</li>
-                        <li class="mb-1"><i class="fas fa-check text-success mr-2"></i>Alterações de permissões</li>
+                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Login e logout de usuários</li>
+                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Criação e edição de registros</li>
+                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Exclusão de dados</li>
+                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Alterações de permissões</li>
                     </ul>
                 </div>
                 <div class="col-md-6">
-                    <h6 class="font-weight-bold mb-2">Retenção:</h6>
+                    <h6 class="fw-bold mb-2">Retenção:</h6>
                     <ul class="list-unstyled mb-0 text-sm text-muted">
-                        <li class="mb-1"><i class="fas fa-info-circle text-info mr-2"></i>Logs são mantidos indefinidamente</li>
-                        <li class="mb-1"><i class="fas fa-exclamation-triangle text-warning mr-2"></i>Limpar histórico é irreversível</li>
-                        <li class="mb-1"><i class="fas fa-shield-alt text-primary mr-2"></i>IPs são registrados para auditoria</li>
+                        <li class="mb-1"><i class="fas fa-info-circle text-info me-2"></i>Logs são mantidos indefinidamente</li>
+                        <li class="mb-1"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Limpar histórico é irreversível</li>
+                        <li class="mb-1"><i class="fas fa-shield-alt text-primary me-2"></i>IPs são registrados para auditoria</li>
                     </ul>
                 </div>
             </div>
@@ -220,7 +220,7 @@
                                 $('table tbody').html(
                                     '<tr><td colspan="5" class="text-center py-5">' +
                                     '<div class="mb-3"><i class="fas fa-history fa-3x text-muted"></i></div>' +
-                                    '<h5 class="text-muted font-weight-bold">Nenhum registro de atividade</h5>' +
+                                    '<h5 class="text-muted fw-bold">Nenhum registro de atividade</h5>' +
                                     '<p class="text-muted">As ações dos usuários serão registradas automaticamente aqui.</p>' +
                                     '</td></tr>'
                                 );

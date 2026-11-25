@@ -198,7 +198,7 @@
                             <span class="muted">{{ $buyer->buyer_phone }}</span>
                         @endif
                     </td>
-                    <td class="text-right">R$ {{ number_format((float) $buyer->total_amount, 2, ',', '.') }}</td>
+                    <td class="text-end">R$ {{ number_format((float) $buyer->total_amount, 2, ',', '.') }}</td>
                     <td>{{ $buyer->purchased_at ? $buyer->purchased_at->format('d/m/Y H:i') : '-' }}</td>
                     <td class="text-center">{{ (int) $buyer->quantity }}</td>
                     <td>{{ $buyer->purchase_type_label }}</td>

@@ -1,10 +1,10 @@
 <div class="card-body">
     <div class="alert alert-info mb-4">
-        <i class="fas fa-search-plus mr-2"></i> Otimize seu site para buscadores (Google, Bing) e configure scripts de
+        <i class="fas fa-search-plus me-2"></i> Otimize seu site para buscadores (Google, Bing) e configure scripts de
         rastreamento (Analytics, Pixel).
     </div>
 
-    <h5 class="text-primary mb-3"><i class="fas fa-globe mr-2"></i> Metadados (Google & Redes Sociais)</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-globe me-2"></i> Metadados (Google & Redes Sociais)</h5>
 
     <div class="form-group">
         <label>Descrição do Site (Meta Description)</label>
@@ -22,10 +22,10 @@
 
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-share-alt mr-2"></i> Imagens de Compartilhamento (Social Media)</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-share-alt me-2"></i> Imagens de Compartilhamento (Social Media)</h5>
     <div class="row">
         <div class="col-md-6 form-group">
-            <label class="font-weight-bold">OpenGraph (Facebook/WhatsApp/LinkedIn)</label>
+            <label class="fw-bold">OpenGraph (Facebook/WhatsApp/LinkedIn)</label>
             <div class="upload-box" data-remove-input="#remove_seo_og_image"
                 data-existing-url="{{ $getUrl('seo_og_image') }}">
                 <input type="file" name="seo_og_image" class="d-none" accept="image/*">
@@ -50,7 +50,7 @@
             </div>
         </div>
         <div class="col-md-6 form-group">
-            <label class="font-weight-bold">Twitter Card</label>
+            <label class="fw-bold">Twitter Card</label>
             <div class="upload-box" data-remove-input="#remove_seo_twitter_image"
                 data-existing-url="{{ $getUrl('seo_twitter_image') }}">
                 <input type="file" name="seo_twitter_image" class="d-none" accept="image/*">
@@ -78,7 +78,7 @@
 
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-code mr-2"></i> Scripts de Rastreamento</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-code me-2"></i> Scripts de Rastreamento</h5>
     <div class="row">
         <div class="col-md-6 form-group">
             <label>Scripts do Header (&lt;head&gt;)</label>

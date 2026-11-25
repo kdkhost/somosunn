@@ -67,8 +67,8 @@
         {{-- Card: Dados do papel --}}
         <div class="card card-outline card-primary shadow-sm mb-4">
             <div class="card-header border-0">
-                <h3 class="card-title font-weight-bold">
-                    <i class="fas fa-user-shield mr-2 text-primary"></i>
+                <h3 class="card-title fw-bold">
+                    <i class="fas fa-user-shield me-2 text-primary"></i>
                     {{ $role->exists ? 'Editar Papel' : 'Novo Papel' }}
                 </h3>
             </div>
@@ -76,8 +76,8 @@
                 <div class="row">
                     <div class="col-md-5">
                         <div class="form-group">
-                            <label class="font-weight-bold">
-                                <i class="fas fa-tag mr-1 text-muted"></i> Nome (slug)
+                            <label class="fw-bold">
+                                <i class="fas fa-tag me-1 text-muted"></i> Nome (slug)
                             </label>
                             <input name="name" class="form-control" value="{{ old('name', $role->name) }}"
                                 required placeholder="ex: editor" {{ in_array($role->name, ['superadmin', 'admin', 'membro']) ? 'readonly' : '' }}>
@@ -86,8 +86,8 @@
                     </div>
                     <div class="col-md-5">
                         <div class="form-group">
-                            <label class="font-weight-bold">
-                                <i class="fas fa-id-badge mr-1 text-muted"></i> Rótulo
+                            <label class="fw-bold">
+                                <i class="fas fa-id-badge me-1 text-muted"></i> Rótulo
                             </label>
                             <input name="label" class="form-control" value="{{ old('label', $role->label) }}"
                                 placeholder="ex: Editor de conteúdo">
@@ -108,15 +108,15 @@
         {{-- Card: Permissões --}}
         <div class="card card-outline card-success shadow-sm">
             <div class="card-header border-0">
-                <h3 class="card-title font-weight-bold">
-                    <i class="fas fa-key mr-2 text-success"></i> Permissões
+                <h3 class="card-title fw-bold">
+                    <i class="fas fa-key me-2 text-success"></i> Permissões
                 </h3>
                 <div class="card-tools">
-                    <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 mr-1" id="selectAll">
-                        <i class="fas fa-check-double mr-1"></i> Marcar todas
+                    <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 me-1" id="selectAll">
+                        <i class="fas fa-check-double me-1"></i> Marcar todas
                     </button>
                     <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill px-3" id="deselectAll">
-                        <i class="fas fa-times mr-1"></i> Desmarcar todas
+                        <i class="fas fa-times me-1"></i> Desmarcar todas
                     </button>
                 </div>
             </div>
@@ -134,12 +134,12 @@
                         <div class="d-flex align-items-center justify-content-between px-3 py-2"
                             style="background: linear-gradient(135deg, rgba(0,0,0,.02), rgba(0,0,0,.04));">
                             <div class="d-flex align-items-center">
-                                <span class="d-inline-flex align-items-center justify-content-center rounded mr-2"
+                                <span class="d-inline-flex align-items-center justify-content-center rounded me-2"
                                     style="width:30px; height:30px; background:var(--{{ $color }}, #6c757d); opacity:.85;">
                                     <i class="fas {{ $icon }} text-white" style="font-size:12px;"></i>
                                 </span>
                                 <strong style="font-size:13px;">{{ ucfirst($category) }}</strong>
-                                <span class="badge badge-{{ $color }} ml-2 rounded-pill" style="font-size:10px;">
+                                <span class="badge badge-{{ $color }} ms-2 rounded-pill" style="font-size:10px;">
                                     {{ $catPermsCount }}
                                 </span>
                             </div>
@@ -161,11 +161,11 @@
                                         <label class="d-flex align-items-start mb-0 p-2 rounded border cursor-pointer permission-label {{ $role->permissions->contains($p->id) ? 'border-' . $color . ' bg-light' : 'border-transparent' }}"
                                             style="font-size:12px; transition: all .15s ease; cursor:pointer;">
                                             <input type="checkbox" name="permissions[]" value="{{ $p->id }}"
-                                                class="mr-2 mt-1 perm-checkbox" data-category="{{ $category }}"
+                                                class="me-2 mt-1 perm-checkbox" data-category="{{ $category }}"
                                                 {{ $role->permissions->contains($p->id) ? 'checked' : '' }}
                                                 style="accent-color: var(--{{ $color }}, #007bff);">
                                             <span>
-                                                <span class="font-weight-bold d-block text-dark">{{ $p->name }}</span>
+                                                <span class="fw-bold d-block text-dark">{{ $p->name }}</span>
                                                 @if($p->label)
                                                     <small class="text-muted">{{ $p->label }}</small>
                                                 @endif
@@ -181,10 +181,10 @@
 
             <div class="card-footer d-flex justify-content-between align-items-center">
                 <a href="{{ route('admin.permissions.index') }}" class="btn btn-outline-secondary rounded-pill px-4" data-pjax="true">
-                    <i class="fas fa-arrow-left mr-1"></i> Voltar
+                    <i class="fas fa-arrow-left me-1"></i> Voltar
                 </a>
                 <button type="submit" class="btn btn-primary rounded-pill px-4 elevation-1">
-                    <i class="fas fa-save mr-1"></i> Salvar Papel
+                    <i class="fas fa-save me-1"></i> Salvar Papel
                 </button>
             </div>
         </div>

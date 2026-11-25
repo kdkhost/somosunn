@@ -113,9 +113,9 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <h5><i class="icon fas fa-ban mr-1"></i> Erro ao salvar</h5>
-                <ul class="mb-0 pl-3">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                <h5><i class="icon fas fa-ban me-1"></i> Erro ao salvar</h5>
+                <ul class="mb-0 ps-3">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
             </div>
         @endif
 
@@ -127,14 +127,14 @@
                 <div class="card-header p-0 border-bottom-0">
                     <ul class="nav nav-tabs" id="page-tabs" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="tab-seo-link" data-toggle="pill" href="#sec-seo" role="tab">
-                                <i class="fas fa-search mr-1"></i> Geral & SEO
+                            <a class="nav-link active" id="tab-seo-link" data-bs-toggle="pill" href="#sec-seo" role="tab">
+                                <i class="fas fa-search me-1"></i> Geral & SEO
                             </a>
                         </li>
                         @foreach($sections as $anchor => $info)
                             <li class="nav-item">
-                                <a class="nav-link" id="tab-{{ $anchor }}-link" data-toggle="pill" href="#{{ $anchor }}" role="tab">
-                                    <i class="fas {{ $info['icon'] }} mr-1"></i> {{ $info['label'] }}
+                                <a class="nav-link" id="tab-{{ $anchor }}-link" data-bs-toggle="pill" href="#{{ $anchor }}" role="tab">
+                                    <i class="fas {{ $info['icon'] }} me-1"></i> {{ $info['label'] }}
                                 </a>
                             </li>
                         @endforeach
@@ -239,12 +239,12 @@
                                                 <input type="url" name="canonical_url" class="form-control" value="{{ $data['canonical_url'] ?? '' }}">
                                             </div>
                                             @if($siteUrl)
-                                                <a href="{{ $siteUrl }}" target="_blank" class="btn btn-outline-info btn-block">
-                                                    <i class="fas fa-external-link-alt mr-1"></i> Ver página no site
+                                                <a href="{{ $siteUrl }}" target="_blank" class="btn btn-outline-info w-100">
+                                                    <i class="fas fa-external-link-alt me-1"></i> Ver página no site
                                                 </a>
                                             @endif
-                                            <a href="{{ route('admin.pages.index') }}" class="btn btn-outline-secondary btn-block">
-                                                <i class="fas fa-list mr-1"></i> Ver lista de páginas
+                                            <a href="{{ route('admin.pages.index') }}" class="btn btn-outline-secondary w-100">
+                                                <i class="fas fa-list me-1"></i> Ver lista de páginas
                                             </a>
                                         </div>
                                     </div>
@@ -273,12 +273,12 @@
                     <div class="row align-items-center">
                         <div class="col-md-6 mb-2 mb-md-0">
                             <div id="unsaved-alert" class="text-warning d-none">
-                                <i class="fas fa-exclamation-triangle mr-1"></i> Alterações não salvas!
+                                <i class="fas fa-exclamation-triangle me-1"></i> Alterações não salvas!
                             </div>
                         </div>
-                        <div class="col-md-6 text-md-right">
+                        <div class="col-md-6 text-md-end">
                             <button type="submit" class="btn btn-primary btn-lg shadow-sm px-5">
-                                <i class="fas fa-save mr-1"></i> Salvar Todas as Alterações
+                                <i class="fas fa-save me-1"></i> Salvar Todas as Alterações
                             </button>
                         </div>
                     </div>
@@ -316,7 +316,7 @@
                         <div class="card-header p-2 d-flex align-items-center justify-content-between bg-light">
                             <div class="handle cursor-move px-2 text-muted"><i class="fas fa-grip-vertical"></i></div>
                             <div class="text-[10px] font-bold text-muted uppercase">ITEM #${index + 1}</div>
-                            <button type="button" class="btn btn-xs btn-outline-danger btn-remove ml-auto" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
+                            <button type="button" class="btn btn-xs btn-outline-danger btn-remove ms-auto" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
                         </div>
                         <div class="card-body p-3">${template(item, index)}</div>
                     `;
@@ -372,7 +372,7 @@
                 $('#sec-seo').addClass('show active');
             }
 
-            $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+            $('a[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
                 const targetId = e.target.hash;
                 history.replaceState(null, null, targetId);
                 

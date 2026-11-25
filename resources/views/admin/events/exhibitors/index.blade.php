@@ -15,12 +15,12 @@
                 <h1 class="m-0">Áreas para Expositores</h1>
                 <p class="text-muted mb-0">{{ $event->title }}</p>
             </div>
-            <div class="col-sm-4 text-sm-right mt-2 mt-sm-0">
+            <div class="col-sm-4 text-sm-end mt-2 mt-sm-0">
                 <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-outline-secondary text-nowrap">
-                    <i class="fas fa-arrow-left mr-1"></i> Voltar ao evento
+                    <i class="fas fa-arrow-left me-1"></i> Voltar ao evento
                 </a>
                 <a href="{{ route($routePrefix . '.export', $event) }}" class="btn btn-outline-success text-nowrap" id="btn-export-exhibitors">
-                    <i class="fas fa-file-csv mr-1"></i> Exportar CSV
+                    <i class="fas fa-file-csv me-1"></i> Exportar CSV
                 </a>
             </div>
         </div>
@@ -79,7 +79,7 @@
             <div class="col-lg-5">
                 <div class="card card-outline card-primary">
                     <div class="card-header d-flex align-items-center justify-content-between">
-                        <h3 class="card-title mb-0"><i class="fas fa-sliders-h mr-1"></i> Configuração</h3>
+                        <h3 class="card-title mb-0"><i class="fas fa-sliders-h me-1"></i> Configuração</h3>
                         <span class="badge {{ $statusBadge }}" id="exhibitor-status-badge">{{ $status['label'] ?? 'Inativo' }}</span>
                     </div>
                     <form id="exhibitor-settings-form" method="POST" action="{{ route($routePrefix . '.settings', $event) }}" enctype="multipart/form-data">
@@ -91,12 +91,12 @@
                                     <small class="d-block text-muted">Ative ou desative a oferta pública.</small>
                                 </div>
                                 <button type="button" class="btn btn-sm {{ $event->exhibitor_sales_enabled ? 'btn-outline-danger' : 'btn-outline-success' }}" id="btn-toggle-exhibitor">
-                                    <i class="fas {{ $event->exhibitor_sales_enabled ? 'fa-toggle-off' : 'fa-toggle-on' }} mr-1"></i>
+                                    <i class="fas {{ $event->exhibitor_sales_enabled ? 'fa-toggle-off' : 'fa-toggle-on' }} me-1"></i>
                                     {{ $event->exhibitor_sales_enabled ? 'Desativar' : 'Ativar' }}
                                 </button>
                             </div>
 
-                            <div class="form-row">
+                            <div class="row g-2">
                                 <div class="form-group col-md-6">
                                     <label>Quantidade total de áreas</label>
                                     <input type="number" min="0" name="exhibitor_total_slots" class="form-control" value="{{ old('exhibitor_total_slots', $event->exhibitor_total_slots) }}">
@@ -107,18 +107,18 @@
                                 </div>
                             </div>
 
-                            <div class="custom-control custom-switch mb-3">
-                                <input type="checkbox" class="custom-control-input" id="exhibitor_sales_enabled" name="exhibitor_sales_enabled" value="1" {{ $event->exhibitor_sales_enabled ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="exhibitor_sales_enabled">Publicar venda de áreas</label>
+                            <div class="form-check form-switch mb-3">
+                                <input type="checkbox" class="form-check-input" id="exhibitor_sales_enabled" name="exhibitor_sales_enabled" value="1" {{ $event->exhibitor_sales_enabled ? 'checked' : '' }}>
+                                <label class="form-check-label" for="exhibitor_sales_enabled">Publicar venda de áreas</label>
                             </div>
-                            <div class="custom-control custom-switch mb-3">
-                                <input type="checkbox" class="custom-control-input" id="exhibitor_includes_ticket" name="exhibitor_includes_ticket" value="1" {{ $event->exhibitor_includes_ticket ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="exhibitor_includes_ticket">Expositor recebe ingresso incluso</label>
+                            <div class="form-check form-switch mb-3">
+                                <input type="checkbox" class="form-check-input" id="exhibitor_includes_ticket" name="exhibitor_includes_ticket" value="1" {{ $event->exhibitor_includes_ticket ? 'checked' : '' }}>
+                                <label class="form-check-label" for="exhibitor_includes_ticket">Expositor recebe ingresso incluso</label>
                             </div>
-                            <div class="custom-control custom-switch mb-3">
+                            <div class="form-check form-switch mb-3">
                                 <input type="hidden" name="exhibitor_show_publicly" value="0">
-                                <input type="checkbox" class="custom-control-input" id="exhibitor_show_publicly" name="exhibitor_show_publicly" value="1" {{ ($event->exhibitor_show_publicly ?? true) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="exhibitor_show_publicly">Exibir publicamente</label>
+                                <input type="checkbox" class="form-check-input" id="exhibitor_show_publicly" name="exhibitor_show_publicly" value="1" {{ ($event->exhibitor_show_publicly ?? true) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="exhibitor_show_publicly">Exibir publicamente</label>
                             </div>
 
                             <div class="form-group">
@@ -134,19 +134,19 @@
                                 <label>Imagem, planta ou mapa</label>
                                 <x-unn-dropzone name="exhibitor_area_image" accept="image/*" label="Arraste e solte a planta ou mapa" :current-url="$event->exhibitor_area_image_url" :is-image="true" theme="admin-lte" :max-size-mb="10" />
                                 @if($event->exhibitor_area_image)
-                                    <div class="custom-control custom-checkbox mt-2">
-                                        <input type="checkbox" class="custom-control-input" id="remove_exhibitor_area_image" name="remove_exhibitor_area_image" value="1">
-                                        <label class="custom-control-label" for="remove_exhibitor_area_image">Remover imagem atual</label>
+                                    <div class="form-check mt-2">
+                                        <input type="checkbox" class="form-check-input" id="remove_exhibitor_area_image" name="remove_exhibitor_area_image" value="1">
+                                        <label class="form-check-label" for="remove_exhibitor_area_image">Remover imagem atual</label>
                                     </div>
                                 @endif
                             </div>
 
                             <hr>
-                            <h5 class="font-weight-bold mb-3">Lotes para expositor</h5>
+                            <h5 class="fw-bold mb-3">Lotes para expositor</h5>
                             @for($i = 1; $i <= 3; $i++)
                                 <div class="border rounded p-3 mb-3">
                                     <strong>{{ $i }}º lote</strong>
-                                    <div class="form-row mt-2">
+                                    <div class="row g-2 mt-2">
                                         <div class="form-group col-md-4">
                                             <label>Preço</label>
                                             <input type="text" name="exhibitor_batch_{{ $i }}_price" class="form-control js-money" value="{{ old('exhibitor_batch_' . $i . '_price', $event->{'exhibitor_batch_' . $i . '_price'}) }}">
@@ -163,9 +163,9 @@
                                 </div>
                             @endfor
                         </div>
-                        <div class="card-footer text-right">
+                        <div class="card-footer text-end">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save mr-1"></i> Salvar configurações
+                                <i class="fas fa-save me-1"></i> Salvar configurações
                             </button>
                         </div>
                     </form>
@@ -175,10 +175,10 @@
             <div class="col-lg-7">
                 <div class="card card-outline card-info">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-users mr-1"></i> Inscrições de expositores</h3>
+                        <h3 class="card-title"><i class="fas fa-users me-1"></i> Inscrições de expositores</h3>
                     </div>
                     <div class="card-body">
-                        <div class="form-row mb-3">
+                        <div class="row g-2 mb-3">
                             <div class="col-md-4">
                                 <input type="text" class="form-control" id="filter-search" placeholder="Buscar por nome, marca ou e-mail">
                             </div>
@@ -204,7 +204,7 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <button type="button" class="btn btn-outline-primary btn-block" id="btn-filter">
+                                <button type="button" class="btn btn-outline-primary w-100" id="btn-filter">
                                     <i class="fas fa-filter"></i>
                                 </button>
                             </div>
@@ -220,7 +220,7 @@
                                         <th>Qtde.</th>
                                         <th>Total</th>
                                         <th>Status</th>
-                                        <th class="text-right">Ações</th>
+                                        <th class="text-end">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody id="exhibitor-registrations-body">
@@ -238,10 +238,10 @@
                                             <td>{{ (int) $registration->quantity }}</td>
                                             <td>{{ $money($registration->total_price) }}</td>
                                             <td>
-                                                <span class="badge badge-secondary">{{ $registration->status }}</span>
+                                                <span class="badge text-bg-secondary">{{ $registration->status }}</span>
                                                 <small class="d-block text-muted">{{ $registration->payment_status }}</small>
                                             </td>
-                                            <td class="text-right">
+                                            <td class="text-end">
                                                 <div class="btn-group btn-group-sm">
                                                     <button class="btn btn-outline-success js-registration-action" data-action="confirm" data-id="{{ $registration->id }}" title="Confirmar manualmente"><i class="fas fa-check"></i></button>
                                                     <button class="btn btn-outline-warning js-registration-action" data-action="refund" data-id="{{ $registration->id }}" title="Reembolsar"><i class="fas fa-undo"></i></button>
@@ -358,8 +358,8 @@
                 <td>${escapeHtml(row.batch_label || '')}</td>
                 <td>${row.quantity}</td>
                 <td>${money.format(Number(row.total_price || 0))}</td>
-                <td><span class="badge badge-secondary">${escapeHtml(row.status || '')}</span><small class="d-block text-muted">${escapeHtml(row.payment_status || '')}</small></td>
-                <td class="text-right">
+                <td><span class="badge text-bg-secondary">${escapeHtml(row.status || '')}</span><small class="d-block text-muted">${escapeHtml(row.payment_status || '')}</small></td>
+                <td class="text-end">
                     <div class="btn-group btn-group-sm">
                         <button class="btn btn-outline-success js-registration-action" data-action="confirm" data-id="${row.id}" title="Confirmar manualmente"><i class="fas fa-check"></i></button>
                         <button class="btn btn-outline-warning js-registration-action" data-action="refund" data-id="${row.id}" title="Reembolsar"><i class="fas fa-undo"></i></button>

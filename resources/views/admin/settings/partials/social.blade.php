@@ -45,26 +45,26 @@
 @endphp
 
 <div class="card-body">
-    <h5 class="text-primary mb-3"><i class="fas fa-users mr-2"></i>Login Social</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-users me-2"></i>Login Social</h5>
 
     <!-- Toggle Geral de Ativação do Login Social -->
     <div class="card card-outline card-primary mb-4">
         <div class="card-body d-flex align-items-center justify-content-between py-3">
             <div>
-                <h6 class="mb-1 font-weight-bold text-dark">Habilitar Login Social (Global)</h6>
+                <h6 class="mb-1 fw-bold text-dark">Habilitar Login Social (Global)</h6>
                 <p class="text-muted small mb-0">Ativa ou desativa a exibição dos botões de login social nas telas de login e cadastro.</p>
             </div>
-            <div class="custom-control custom-switch">
+            <div class="form-check form-switch">
                 <input type="hidden" name="social_login_enabled" value="0">
-                <input type="checkbox" class="custom-control-input" id="social_login_enabled"
+                <input type="checkbox" class="form-check-input" id="social_login_enabled"
                     name="social_login_enabled" value="1" {{ ($settings['social_login_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
-                <label class="custom-control-label font-weight-bold" for="social_login_enabled">Ativo</label>
+                <label class="form-check-label fw-bold" for="social_login_enabled">Ativo</label>
             </div>
         </div>
     </div>
 
     <div class="alert alert-info">
-        <h6 class="mb-2"><i class="fas fa-info-circle mr-1"></i>Instrucoes rapidas</h6>
+        <h6 class="mb-2"><i class="fas fa-info-circle me-1"></i>Instrucoes rapidas</h6>
         <p class="mb-2">
             Para cada provedor: crie um app OAuth 2.0 no portal oficial, adicione a callback URL e copie o Client/App ID e Secret para os campos abaixo.
         </p>
@@ -75,7 +75,7 @@
                     $isSupported = in_array($key, $supportedProviders, true);
                 @endphp
                 <div class="col-md-6 mb-2">
-                    <label class="small font-weight-bold d-block mb-1">{{ $provider['label'] }}</label>
+                    <label class="small fw-bold d-block mb-1">{{ $provider['label'] }}</label>
                     <div class="input-group input-group-sm">
                         <input type="text" readonly class="form-control" value="{{ $callbackUrl }}">
                         <div class="input-group-append">
@@ -101,24 +101,24 @@
             <div class="card card-outline {{ $provider['outlineClass'] }} social-card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <button type="button" class="btn btn-link py-0 {{ $provider['textClass'] }}" data-toggle="collapse"
-                            data-target="#{{ $collapseId }}" aria-expanded="{{ $expanded ? 'true' : 'false' }}" aria-controls="{{ $collapseId }}">
-                            <i class="{{ $provider['iconClass'] }} mr-1"></i> {{ $provider['label'] }}
+                        <button type="button" class="btn btn-link py-0 {{ $provider['textClass'] }}" data-bs-toggle="collapse"
+                            data-bs-target="#{{ $collapseId }}" aria-expanded="{{ $expanded ? 'true' : 'false' }}" aria-controls="{{ $collapseId }}">
+                            <i class="{{ $provider['iconClass'] }} me-1"></i> {{ $provider['label'] }}
                         </button>
                     </h3>
                     @if($isSupported)
-                        <span class="badge badge-success float-right">Suportado</span>
+                        <span class="badge text-bg-success float-end">Suportado</span>
                     @else
-                        <span class="badge badge-warning float-right">Nao ativo no backend</span>
+                        <span class="badge text-bg-warning float-end">Nao ativo no backend</span>
                     @endif
                 </div>
-                <div id="{{ $collapseId }}" class="collapse {{ $expanded ? 'show' : '' }}" data-parent="#social-accordion">
+                <div id="{{ $collapseId }}" class="collapse {{ $expanded ? 'show' : '' }}" data-bs-parent="#social-accordion">
                     <div class="card-body">
-                        <div class="custom-control custom-switch mb-3">
+                        <div class="form-check form-switch mb-3">
                             <input type="hidden" name="social_{{ $key }}_enabled" value="0">
-                            <input type="checkbox" class="custom-control-input" id="social_{{ $key }}_enabled"
+                            <input type="checkbox" class="form-check-input" id="social_{{ $key }}_enabled"
                                 name="social_{{ $key }}_enabled" value="1" {{ ($settings['social_'.$key.'_enabled'] ?? 0) ? 'checked' : '' }}>
-                            <label class="custom-control-label" for="social_{{ $key }}_enabled">Ativar Login com {{ $provider['label'] }}</label>
+                            <label class="form-check-label" for="social_{{ $key }}_enabled">Ativar Login com {{ $provider['label'] }}</label>
                         </div>
 
                         <div class="alert alert-light border mb-3">
@@ -127,7 +127,7 @@
                                 <a href="{{ $provider['consoleUrl'] }}" target="_blank" rel="noopener">{{ $provider['consoleUrl'] }}</a>
                             </div>
                             <div class="mb-2"><strong>Callback URL:</strong> <code>{{ $callbackUrl }}</code></div>
-                            <ol class="mb-0 pl-3">
+                            <ol class="mb-0 ps-3">
                                 <li>Crie um app OAuth 2.0 (Web).</li>
                                 <li>Adicione a callback URL acima.</li>
                                 <li>Copie {{ $provider['idLabel'] }} e {{ $provider['secretLabel'] }}.</li>
@@ -149,7 +149,7 @@
                         </div>
 
                         <div class="form-group mb-0">
-                            <label class="small font-weight-bold">Callback URL (Redirect URI) customizada (opcional)</label>
+                            <label class="small fw-bold">Callback URL (Redirect URI) customizada (opcional)</label>
                             <input name="social_{{ $key }}_redirect" class="form-control form-control-sm font-monospace"
                                 placeholder="Deixe em branco para usar o padrão da plataforma"
                                 value="{{ $settings['social_'.$key.'_redirect'] ?? '' }}">

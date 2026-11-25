@@ -48,10 +48,10 @@
     {{-- Main Card --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-file-invoice-dollar mr-2"></i>Faturas (PDF)</h3>
+            <h3 class="card-title"><i class="fas fa-file-invoice-dollar me-2"></i>Faturas (PDF)</h3>
             <div class="card-tools">
                 <a href="{{ route('admin.invoices.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1" data-pjax>
-                    <i class="fas fa-plus mr-1"></i> Nova fatura
+                    <i class="fas fa-plus me-1"></i> Nova fatura
                 </a>
             </div>
         </div>
@@ -63,7 +63,7 @@
                     </div>
                     <input name="q" class="form-control" placeholder="Buscar por número, nome ou e-mail" value="{{ $q ?? '' }}">
                     <div class="input-group-append">
-                        <button class="btn btn-primary rounded-right">Buscar</button>
+                        <button class="btn btn-primary rounded-end">Buscar</button>
                     </div>
                 </div>
             </form>
@@ -72,27 +72,27 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th><i class="fas fa-hashtag text-muted mr-1"></i>Número</th>
-                            <th><i class="fas fa-user text-muted mr-1"></i>Cliente</th>
-                            <th><i class="fas fa-shopping-cart text-muted mr-1"></i>Pedido</th>
-                            <th><i class="fas fa-info-circle text-muted mr-1"></i>Status</th>
-                            <th><i class="fas fa-dollar-sign text-muted mr-1"></i>Total</th>
-                            <th><i class="fas fa-calendar text-muted mr-1"></i>Emissão</th>
-                            <th><i class="fas fa-envelope text-muted mr-1"></i>E-mail</th>
-                            <th class="text-right">Ações</th>
+                            <th><i class="fas fa-hashtag text-muted me-1"></i>Número</th>
+                            <th><i class="fas fa-user text-muted me-1"></i>Cliente</th>
+                            <th><i class="fas fa-shopping-cart text-muted me-1"></i>Pedido</th>
+                            <th><i class="fas fa-info-circle text-muted me-1"></i>Status</th>
+                            <th><i class="fas fa-dollar-sign text-muted me-1"></i>Total</th>
+                            <th><i class="fas fa-calendar text-muted me-1"></i>Emissão</th>
+                            <th><i class="fas fa-envelope text-muted me-1"></i>E-mail</th>
+                            <th class="text-end">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($invoices as $inv)
                             <tr>
-                                <td class="font-weight-bold">{{ $inv->number ?: ('#'.$inv->id) }}</td>
+                                <td class="fw-bold">{{ $inv->number ?: ('#'.$inv->id) }}</td>
                                 <td>
-                                    <div class="font-weight-bold">{{ $inv->user?->name ?? '—' }}</div>
+                                    <div class="fw-bold">{{ $inv->user?->name ?? '—' }}</div>
                                     <small class="text-muted">{{ $inv->user?->email ?? '' }}</small>
                                 </td>
                                 <td class="text-muted">
                                     @if($inv->order_id)
-                                        <span class="badge badge-light border">#{{ $inv->order_id }}</span>
+                                        <span class="badge text-bg-light border">#{{ $inv->order_id }}</span>
                                     @else
                                         —
                                     @endif
@@ -118,33 +118,33 @@
                                             default => 'fa-paper-plane',
                                         };
                                     @endphp
-                                    <span class="badge badge-{{ $badge }}"><i class="fas {{ $icon }} mr-1"></i>{{ $label }}</span>
+                                    <span class="badge badge-{{ $badge }}"><i class="fas {{ $icon }} me-1"></i>{{ $label }}</span>
                                 </td>
-                                <td class="font-weight-bold">R$ {{ number_format((float) $inv->total_amount, 2, ',', '.') }}</td>
+                                <td class="fw-bold">R$ {{ number_format((float) $inv->total_amount, 2, ',', '.') }}</td>
                                 <td class="text-muted small">
                                     {{ $inv->issued_at ? $inv->issued_at->format('d/m/Y H:i') : ($inv->created_at?->format('d/m/Y H:i') ?? '—') }}
                                 </td>
                                 <td class="text-muted small">
                                     @if($inv->email_sent_at)
-                                        <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Enviado {{ $inv->email_sent_at->format('d/m/Y H:i') }}</span>
+                                        <span class="badge text-bg-success"><i class="fas fa-check me-1"></i>Enviado {{ $inv->email_sent_at->format('d/m/Y H:i') }}</span>
                                     @elseif($inv->email_queued_at)
-                                        <span class="badge badge-warning"><i class="fas fa-clock mr-1"></i>Enfileirado {{ $inv->email_queued_at->format('d/m/Y H:i') }}</span>
+                                        <span class="badge text-bg-warning"><i class="fas fa-clock me-1"></i>Enfileirado {{ $inv->email_queued_at->format('d/m/Y H:i') }}</span>
                                     @else
                                         <span class="text-muted">—</span>
                                     @endif
                                 </td>
-                                <td class="text-right">
+                                <td class="text-end">
                                     <div class="btn-group">
-                                        <a href="{{ route('admin.invoices.show', $inv) }}" class="btn btn-sm btn-outline-info rounded-pill elevation-1 mr-1" data-pjax title="Ver detalhes">
+                                        <a href="{{ route('admin.invoices.show', $inv) }}" class="btn btn-sm btn-outline-info rounded-pill elevation-1 me-1" data-pjax title="Ver detalhes">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.invoices.pdf', $inv) }}" class="btn btn-sm btn-outline-primary rounded-pill elevation-1 mr-1" target="_blank" title="Baixar PDF">
+                                        <a href="{{ route('admin.invoices.pdf', $inv) }}" class="btn btn-sm btn-outline-primary rounded-pill elevation-1 me-1" target="_blank" title="Baixar PDF">
                                             <i class="fas fa-file-pdf"></i>
                                         </a>
                                         <form method="POST" action="{{ route('admin.invoices.send', $inv) }}" class="d-inline">
                                             @csrf
                                             <input type="hidden" name="force" value="1">
-                                            <button class="btn btn-sm btn-outline-success rounded-pill elevation-1 mr-1" type="submit" title="Enviar por e-mail">
+                                            <button class="btn btn-sm btn-outline-success rounded-pill elevation-1 me-1" type="submit" title="Enviar por e-mail">
                                                 <i class="fas fa-paper-plane"></i>
                                             </button>
                                         </form>
@@ -160,7 +160,7 @@
                                     <i class="fas fa-file-invoice fa-3x text-muted mb-3 d-block"></i>
                                     <p class="text-muted mb-2">Nenhuma fatura encontrada.</p>
                                     <a href="{{ route('admin.invoices.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
-                                        <i class="fas fa-plus mr-1"></i> Criar primeira fatura
+                                        <i class="fas fa-plus me-1"></i> Criar primeira fatura
                                     </a>
                                 </td>
                             </tr>

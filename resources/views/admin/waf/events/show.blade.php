@@ -9,7 +9,7 @@
             <div class="col-sm-6">
                 <h1 class="m-0"><i class="fas fa-search text-primary"></i> Evento WAF #{{ $event->id }}</h1>
             </div>
-            <div class="col-sm-6 text-right">
+            <div class="col-sm-6 text-end">
                 <a href="{{ route('admin.waf.events.index') }}" class="btn btn-sm btn-default">
                     <i class="fas fa-arrow-left"></i> Voltar
                 </a>
@@ -23,13 +23,13 @@
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">
                 {{ session('success') }}
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         @endif
         @if(session('error'))
             <div class="alert alert-danger alert-dismissible fade show">
                 {{ session('error') }}
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         @endif
 
@@ -47,7 +47,7 @@
                             <tr><th>Data</th><td>{{ $event->occurred_at?->format('d/m/Y H:i:s') }}</td></tr>
                             <tr><th>IP</th><td><code>{{ $event->ip }}</code></td></tr>
                             <tr><th>Pais / ASN</th><td>{{ $event->country ?? '-' }} / {{ $event->asn ?? '-' }}</td></tr>
-                            <tr><th>Metodo</th><td><span class="badge badge-secondary">{{ $event->method }}</span></td></tr>
+                            <tr><th>Metodo</th><td><span class="badge text-bg-secondary">{{ $event->method }}</span></td></tr>
                             <tr><th>Rota</th><td><code>{{ $event->route ?? '-' }}</code></td></tr>
                             <tr><th>Path</th><td><code>{{ $event->path ?? '-' }}</code></td></tr>
                             <tr><th>Status HTTP</th><td>{{ $event->status ?? '-' }}</td></tr>
@@ -59,23 +59,23 @@
                             <tr><th>Decisao</th><td>
                                 @switch($event->decision)
                                     @case('blocked')
-                                        <span class="badge badge-danger p-2">BLOCKED</span>
+                                        <span class="badge text-bg-danger p-2">BLOCKED</span>
                                         @break
                                     @case('monitored')
-                                        <span class="badge badge-warning p-2">MONITORED</span>
+                                        <span class="badge text-bg-warning p-2">MONITORED</span>
                                         @break
                                     @case('challenged')
                                         <span class="badge p-2" style="background-color:#6f42c1;color:#fff;">CHALLENGED</span>
                                         @break
                                     @default
-                                        <span class="badge badge-success p-2">ALLOWED</span>
+                                        <span class="badge text-bg-success p-2">ALLOWED</span>
                                 @endswitch
                             </td></tr>
                             <tr><th>User Agent</th><td><small>{{ $event->user_agent ?? '-' }}</small></td></tr>
                             <tr><th>Referrer</th><td><small>{{ $event->referrer ?? '-' }}</small></td></tr>
                             <tr><th>Falso Positivo</th><td>
                                 @if($event->is_false_positive)
-                                    <span class="badge badge-warning"><i class="fas fa-flag"></i> Sim</span>
+                                    <span class="badge text-bg-warning"><i class="fas fa-flag"></i> Sim</span>
                                 @else
                                     <span class="text-muted">Nao</span>
                                 @endif
@@ -111,7 +111,7 @@
                             <div class="col-md-6">
                                 <form method="POST" action="{{ route('admin.waf.events.block-ip', $event->id) }}">
                                     @csrf
-                                    <button type="submit" class="btn btn-danger btn-block btn-sm btn-swal-confirm" data-swal-title="Bloquear IP?" data-swal-text="{{ $event->ip }}">
+                                    <button type="submit" class="btn btn-danger w-100 btn-sm btn-swal-confirm" data-swal-title="Bloquear IP?" data-swal-text="{{ $event->ip }}">
                                         <i class="fas fa-ban"></i> Bloquear IP
                                     </button>
                                 </form>
@@ -119,7 +119,7 @@
                             <div class="col-md-6">
                                 <form method="POST" action="{{ route('admin.waf.events.allow-ip', $event->id) }}">
                                     @csrf
-                                    <button type="submit" class="btn btn-success btn-block btn-sm btn-swal-confirm" data-swal-title="Permitir IP?" data-swal-text="{{ $event->ip }}">
+                                    <button type="submit" class="btn btn-success w-100 btn-sm btn-swal-confirm" data-swal-title="Permitir IP?" data-swal-text="{{ $event->ip }}">
                                         <i class="fas fa-check"></i> Permitir IP
                                     </button>
                                 </form>

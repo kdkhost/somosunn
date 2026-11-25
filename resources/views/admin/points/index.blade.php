@@ -14,10 +14,10 @@
 @section('content')
     <div class="card mb-4">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-coins mr-2"></i>{{ $coinName }} - Tabela de Valores</h3>
+            <h3 class="card-title"><i class="fas fa-coins me-2"></i>{{ $coinName }} - Tabela de Valores</h3>
             <div class="card-tools">
                 <a href="{{ route('admin.points-rules.create') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus mr-1"></i>Nova Regra
+                    <i class="fas fa-plus me-1"></i>Nova Regra
                 </a>
             </div>
         </div>
@@ -29,7 +29,7 @@
                     </p>
                     <form action="{{ route('admin.points-rules.exchange-settings') }}" method="POST">
                         @csrf
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-4">
                                 <label>Lote de referencia</label>
                                 <input type="number" name="base_points" min="1" class="form-control"
@@ -61,7 +61,7 @@
                                 @endif
                             </small>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save mr-1"></i> Atualizar cotacao
+                                <i class="fas fa-save me-1"></i> Atualizar cotacao
                             </button>
                         </div>
                     </form>
@@ -79,14 +79,14 @@
                             <thead>
                                 <tr>
                                     <th>{{ $coinName }}</th>
-                                    <th class="text-right">Valor em reais</th>
+                                    <th class="text-end">Valor em reais</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($valuationTable as $row)
                                     <tr>
                                         <td>{{ number_format((int) $row['units'], 0, ',', '.') }} {{ $coinName }}</td>
-                                        <td class="text-right font-weight-bold">R$ {{ number_format((float) $row['amount'], 2, ',', '.') }}</td>
+                                        <td class="text-end fw-bold">R$ {{ number_format((float) $row['amount'], 2, ',', '.') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -103,8 +103,8 @@
             <div class="card mb-3">
                 <div class="card-header bg-{{ $cat['color'] }} {{ in_array($cat['color'], ['warning', 'light']) ? 'text-dark' : 'text-white' }} py-2">
                     <h3 class="card-title mb-0" style="font-size: 1rem;">
-                        <i class="{{ $cat['icon'] }} mr-2"></i>{{ $cat['label'] }}
-                        <span class="badge badge-light ml-1">{{ $rules->count() }}</span>
+                        <i class="{{ $cat['icon'] }} me-2"></i>{{ $cat['label'] }}
+                        <span class="badge text-bg-light ms-1">{{ $rules->count() }}</span>
                     </h3>
                 </div>
                 <div class="card-body p-0">
@@ -115,7 +115,7 @@
                                     <th>Regra</th>
                                     <th class="text-center">Saldo</th>
                                     <th class="text-center">Status</th>
-                                    <th class="text-right">Acoes</th>
+                                    <th class="text-end">Acoes</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -129,8 +129,8 @@
                                             @endif
                                             @if($r->repeatable)
                                                 <div class="mt-2">
-                                                    <span class="badge badge-info">
-                                                        <i class="fas fa-sync-alt mr-1" aria-hidden="true"></i>
+                                                    <span class="badge text-bg-info">
+                                                        <i class="fas fa-sync-alt me-1" aria-hidden="true"></i>
                                                         Recorrente{{ $r->max_daily ? ' · max ' . $r->max_daily . '/dia' : '' }}
                                                     </span>
                                                 </div>
@@ -143,12 +143,12 @@
                                         </td>
                                         <td class="text-center">
                                             @if($r->active)
-                                                <span class="badge badge-success">Ativa</span>
+                                                <span class="badge text-bg-success">Ativa</span>
                                             @else
-                                                <span class="badge badge-secondary">Inativa</span>
+                                                <span class="badge text-bg-secondary">Inativa</span>
                                             @endif
                                         </td>
-                                        <td class="text-right text-nowrap">
+                                        <td class="text-end text-nowrap">
                                             <a href="{{ route('admin.points-rules.edit', $r) }}" class="btn btn-sm btn-outline-secondary" title="Editar">
                                                 <i class="fas fa-edit"></i>
                                             </a>
@@ -177,7 +177,7 @@
                 <h5 class="text-muted">Nenhuma regra cadastrada</h5>
                 <p class="text-muted mb-3 small">Crie regras para recompensar a participacao dos usuarios com {{ $coinName }}.</p>
                 <a href="{{ route('admin.points-rules.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus mr-1"></i>Criar primeira regra
+                    <i class="fas fa-plus me-1"></i>Criar primeira regra
                 </a>
             </div>
         </div>

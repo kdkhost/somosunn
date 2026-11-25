@@ -1,12 +1,12 @@
 <div class="card card-outline card-primary">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-filter mr-2"></i>Filtrar galeria
+            <i class="fas fa-filter me-2"></i>Filtrar galeria
         </h3>
 
         <div class="card-tools">
             <button type="button" class="btn btn-success btn-sm" onclick="$('#uploadModal').modal('show')">
-                <i class="fas fa-plus mr-1"></i>Adicionar midias
+                <i class="fas fa-plus me-1"></i>Adicionar midias
             </button>
         </div>
     </div>
@@ -17,7 +17,7 @@
                 Selecione um evento para gerenciar a capa do album e moderar a galeria dentro do padrao visual do admin.
             </p>
 
-            <div class="form-row align-items-end">
+            <div class="row g-2 align-items-end">
                 <div class="form-group col-lg-8 mb-lg-0">
                     <label for="gallery-event-filter">Evento</label>
                     <select id="gallery-event-filter" name="event_id" class="form-control select2" style="width: 100%;">
@@ -33,12 +33,12 @@
                 <div class="form-group col-lg-4 mb-0">
                     <div class="d-flex flex-wrap gallery-admin-actions">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search mr-1"></i>Filtrar
+                            <i class="fas fa-search me-1"></i>Filtrar
                         </button>
 
                         @if($selectedEventId > 0)
                             <a href="{{ route('admin.gallery.index') }}" class="btn btn-default">
-                                <i class="fas fa-undo-alt mr-1"></i>Limpar
+                                <i class="fas fa-undo-alt me-1"></i>Limpar
                             </a>
                         @endif
                     </div>

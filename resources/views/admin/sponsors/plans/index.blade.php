@@ -13,7 +13,7 @@
         <div class="container-fluid">
             <div class="card"><div class="card-body p-0">
                 <table class="table table-hover mb-0">
-                    <thead><tr><th>Plano</th><th>Preco</th><th>Banners</th><th>Eventos</th><th>Leads</th><th>Status</th><th class="text-right">Acoes</th></tr></thead>
+                    <thead><tr><th>Plano</th><th>Preco</th><th>Banners</th><th>Eventos</th><th>Leads</th><th>Status</th><th class="text-end">Acoes</th></tr></thead>
                     <tbody>
                     @forelse($plans as $plan)
                         <tr>
@@ -23,7 +23,7 @@
                             <td>{{ $plan->max_events }}</td>
                             <td>{{ $plan->max_leads }}</td>
                             <td><span class="badge badge-{{ $plan->active ? 'success' : 'secondary' }}">{{ $plan->active ? 'Ativo' : 'Inativo' }}</span></td>
-                            <td class="text-right"><a href="{{ route('admin.sponsor-plans.edit', $plan) }}" class="btn btn-sm btn-outline-primary">Editar</a></td>
+                            <td class="text-end"><a href="{{ route('admin.sponsor-plans.edit', $plan) }}" class="btn btn-sm btn-outline-primary">Editar</a></td>
                         </tr>
                     @empty
                         <tr><td colspan="7" class="text-center text-muted py-4">Nenhum plano cadastrado.</td></tr>

@@ -4,11 +4,11 @@
 <div class="tab-pane fade" id="sec-hero">
     <div class="card card-outline card-primary">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title"><i class="fas fa-home mr-1"></i> Hero</h3>
-            <div class="card-tools ml-auto">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-hero" data-section="hero" {{ ($data['hero_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-hero">Visibilidade</label>
+            <h3 class="card-title"><i class="fas fa-home me-1"></i> Hero</h3>
+            <div class="card-tools ms-auto">
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-hero" data-section="hero" {{ ($data['hero_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="toggle-hero">Visibilidade</label>
                 </div>
             </div>
         </div>
@@ -27,7 +27,7 @@
                 <label>Descrição / corpo</label>
                 <textarea name="body" rows="3" class="form-control">{{ old('body', $data['body'] ?? '') }}</textarea>
             </div>
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Botão principal</label>
                     <input type="text" name="hero_cta_text" class="form-control"
@@ -40,7 +40,7 @@
                 </div>
             </div>
             <div class="form-group mb-0">
-                <label class="font-weight-bold">Imagem do Hero</label>
+                <label class="fw-bold">Imagem do Hero</label>
                 @include('admin.components.upload-global', ['name' => 'hero_image', 'accept' => 'image/*'])
             </div>
         </div>
@@ -50,17 +50,17 @@
 <div class="tab-pane fade" id="sec-stats">
     <div class="card card-outline card-info">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> Estatísticas</h3>
-            <div class="card-tools ml-auto">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-stats" data-section="stats" {{ ($data['stats_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-stats">Visibilidade</label>
+            <h3 class="card-title"><i class="fas fa-chart-bar me-1"></i> Estatísticas</h3>
+            <div class="card-tools ms-auto">
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-stats" data-section="stats" {{ ($data['stats_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="toggle-stats">Visibilidade</label>
                 </div>
             </div>
         </div>
         <div class="card-body">
             @foreach ([1, 2, 3, 4] as $i)
-                <div class="form-row">
+                <div class="row g-2">
                     <div class="form-group col-md-4">
                         <label>Número {{ $i }}</label>
                         <input type="text" name="stat_{{ $i }}_value" class="form-control"
@@ -80,16 +80,16 @@
 <div class="tab-pane fade" id="sec-about">
     <div class="card card-outline card-secondary">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title"><i class="fas fa-info-circle mr-1"></i> Seção "O que é a UNN"</h3>
-            <div class="card-tools ml-auto">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-about" data-section="about" {{ ($data['about_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-about">Visibilidade</label>
+            <h3 class="card-title"><i class="fas fa-info-circle me-1"></i> Seção "O que é a UNN"</h3>
+            <div class="card-tools ms-auto">
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-about" data-section="about" {{ ($data['about_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="toggle-about">Visibilidade</label>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Título da seção</label>
                     <input type="text" name="about_title" class="form-control"
@@ -103,7 +103,7 @@
             </div>
             <hr>
             @foreach ([1, 2, 3, 4] as $i)
-                <div class="form-row">
+                <div class="row g-2">
                     <div class="form-group col-md-4">
                         <label>Card {{ $i }} — Título</label>
                         <input type="text" name="about_card_{{ $i }}_title" class="form-control"
@@ -123,16 +123,16 @@
 <div class="tab-pane fade" id="sec-journey">
     <div class="card card-outline card-primary">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title"><i class="fas fa-route mr-1"></i> Seção "Onde o network me levou"</h3>
-            <div class="card-tools ml-auto">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-journey" data-section="journey" {{ ($data['journey_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-journey">Visibilidade</label>
+            <h3 class="card-title"><i class="fas fa-route me-1"></i> Seção "Onde o network me levou"</h3>
+            <div class="card-tools ms-auto">
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-journey" data-section="journey" {{ ($data['journey_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="toggle-journey">Visibilidade</label>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Título da seção</label>
                     <input type="text" name="journey_title" class="form-control"
@@ -146,7 +146,7 @@
             </div>
             <hr>
             @foreach ([1, 2, 3] as $i)
-                <div class="form-row">
+                <div class="row g-2">
                     <div class="form-group col-md-3">
                         <label>Card {{ $i }} — Chamada</label>
                         <input type="text" name="journey_card_{{ $i }}_title" class="form-control"
@@ -171,16 +171,16 @@
 <div class="tab-pane fade" id="sec-events">
     <div class="card card-outline card-secondary">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title"><i class="fas fa-calendar mr-1"></i> Eventos & Mentorias</h3>
-            <div class="card-tools ml-auto">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-events" data-section="events" {{ ($data['events_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-events">Visibilidade</label>
+            <h3 class="card-title"><i class="fas fa-calendar me-1"></i> Eventos & Mentorias</h3>
+            <div class="card-tools ms-auto">
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-events" data-section="events" {{ ($data['events_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="toggle-events">Visibilidade</label>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Eventos — Título</label>
                     <input type="text" name="events_title" class="form-control"
@@ -192,7 +192,7 @@
                         value="{{ old('events_subtitle', $data['events_subtitle'] ?? '') }}">
                 </div>
             </div>
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Mentorias — Título</label>
                     <input type="text" name="mentorships_title" class="form-control"
@@ -211,16 +211,16 @@
 <div class="tab-pane fade" id="sec-ranking">
     <div class="card card-outline card-secondary">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title"><i class="fas fa-trophy mr-1"></i> Ranking & Depoimentos</h3>
-            <div class="card-tools ml-auto">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-ranking" data-section="ranking" {{ ($data['ranking_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-ranking">Visibilidade</label>
+            <h3 class="card-title"><i class="fas fa-trophy me-1"></i> Ranking & Depoimentos</h3>
+            <div class="card-tools ms-auto">
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-ranking" data-section="ranking" {{ ($data['ranking_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="toggle-ranking">Visibilidade</label>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Ranking — Título</label>
                     <input type="text" name="ranking_title" class="form-control"
@@ -238,8 +238,8 @@
                     value="{{ old('testimonials_title', $data['testimonials_title'] ?? '') }}">
             </div>
             <div id="testimonials-repeater-container"></div>
-            <button type="button" id="add-testimonial-btn" class="btn btn-outline-primary btn-block mt-3">
-                <i class="fas fa-plus mr-1"></i> Adicionar Depoimento
+            <button type="button" id="add-testimonial-btn" class="btn btn-outline-primary w-100 mt-3">
+                <i class="fas fa-plus me-1"></i> Adicionar Depoimento
             </button>
             <textarea name="testimonials_json" class="d-none">{{ json_encode($data['testimonials'] ?? []) }}</textarea>
         </div>
@@ -264,18 +264,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                     <div class="col-md-9">
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-8">
-                                <label class="small font-weight-bold">Nome do Autor</label>
+                                <label class="small fw-bold">Nome do Autor</label>
                                 <input type="text" name="testimonials[${index}][name]" value="${item.name || ''}" class="form-control form-control-sm">
                             </div>
                             <div class="form-group col-md-4">
-                                <label class="small font-weight-bold">Estrelas (1-5)</label>
+                                <label class="small fw-bold">Estrelas (1-5)</label>
                                 <input type="number" name="testimonials[${index}][rating]" value="${item.rating || 5}" class="form-control form-control-sm" min="1" max="5">
                             </div>
                         </div>
                         <div class="form-group mb-0">
-                            <label class="small font-weight-bold">Texto do Depoimento</label>
+                            <label class="small fw-bold">Texto do Depoimento</label>
                             <textarea name="testimonials[${index}][text]" rows="3" class="form-control form-control-sm">${item.text || ''}</textarea>
                         </div>
                     </div>
@@ -290,11 +290,11 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="tab-pane fade" id="sec-cta">
     <div class="card card-outline card-success">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
-            <div class="card-tools ml-auto">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-cta" data-section="cta" {{ ($data['cta_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-cta">Visibilidade</label>
+            <h3 class="card-title"><i class="fas fa-bullhorn me-1"></i> CTA Final</h3>
+            <div class="card-tools ms-auto">
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-cta" data-section="cta" {{ ($data['cta_enabled'] ?? true) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="toggle-cta">Visibilidade</label>
                 </div>
             </div>
         </div>
@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <input type="text" name="cta_section_title" class="form-control"
                     value="{{ old('cta_section_title', $data['cta_section_title'] ?? '') }}">
             </div>
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Botão principal</label>
                     <input type="text" name="cta_section_btn_primary" class="form-control"

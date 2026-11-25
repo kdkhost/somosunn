@@ -78,17 +78,17 @@
                 </div>
             </div>
 
-            <div class="custom-control custom-switch">
-                <input type="checkbox" name="active" value="1" class="custom-control-input" id="active"
+            <div class="form-check form-switch">
+                <input type="checkbox" name="active" value="1" class="form-check-input" id="active"
                     {{ old('active', $task->active ?? true) ? 'checked' : '' }}>
-                <label class="custom-control-label" for="active">Tarefa ativa</label>
+                <label class="form-check-label" for="active">Tarefa ativa</label>
             </div>
         </div>
 
         <div class="card-footer d-flex justify-content-between">
             <a href="{{ route('admin.cron.index') }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save mr-1"></i> Salvar
+                <i class="fas fa-save me-1"></i> Salvar
             </button>
         </div>
     </form>

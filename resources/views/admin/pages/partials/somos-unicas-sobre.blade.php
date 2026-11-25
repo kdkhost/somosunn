@@ -4,7 +4,7 @@
 <div class="tab-pane fade" id="sec-identity">
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-palette mr-1"></i> Identidade Visual</h3>
+            <h3 class="card-title"><i class="fas fa-palette me-1"></i> Identidade Visual</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -22,7 +22,7 @@
 <div class="tab-pane fade" id="sec-content">
     <div class="card card-outline card-info">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-file-alt mr-1"></i> Conteúdo Rico</h3>
+            <h3 class="card-title"><i class="fas fa-file-alt me-1"></i> Conteúdo Rico</h3>
         </div>
         <div class="card-body p-0">
             <textarea name="content" class="summernote">{{ old('content', $data['content'] ?? '') }}</textarea>

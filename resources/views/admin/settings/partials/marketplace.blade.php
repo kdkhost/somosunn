@@ -1,9 +1,9 @@
 <div class="card-body">
     <div class="alert alert-info mb-4">
-        <i class="fas fa-info-circle mr-2"></i> Ajustes do marketplace (comissão da plataforma e regras de venda).
+        <i class="fas fa-info-circle me-2"></i> Ajustes do marketplace (comissão da plataforma e regras de venda).
     </div>
 
-    <h5 class="text-primary mb-3"><i class="fas fa-percent mr-2"></i> Taxas da Plataforma</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-percent me-2"></i> Taxas da Plataforma</h5>
     <style>
         .border-dashed { border-style: dashed !important; }
     </style>
@@ -38,11 +38,11 @@
             </div>
 
             <div class="form-group mb-4">
-                <div class="custom-control custom-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
+                <div class="form-check form-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
                     <input type="hidden" name="marketplace_manual_approval_enabled" value="0">
-                    <input type="checkbox" class="custom-control-input" id="marketplace_manual_approval_enabled"
+                    <input type="checkbox" class="form-check-input" id="marketplace_manual_approval_enabled"
                         name="marketplace_manual_approval_enabled" value="1" {{ ($settings['marketplace_manual_approval_enabled'] ?? 1) ? 'checked' : '' }}>
-                    <label class="custom-control-label font-weight-bold" for="marketplace_manual_approval_enabled">Habilitar Aprovação Manual (Permuta)</label>
+                    <label class="form-check-label fw-bold" for="marketplace_manual_approval_enabled">Habilitar Aprovação Manual (Permuta)</label>
                 </div>
                 <small class="text-muted">Permite admins aprovarem pedidos sem pagamento financeiro (ex: negociação direta/permuta).</small>
             </div>
@@ -51,9 +51,9 @@
 
     <hr class="my-4">
     
-    <h5 class="text-primary mb-3"><i class="fas fa-divide mr-2"></i> Divisão de Vendas (Split)</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-divide me-2"></i> Divisão de Vendas (Split)</h5>
     <div class="alert alert-warning mb-4">
-        <i class="fas fa-exclamation-triangle mr-2"></i> A soma das porcentagens deve ser exatamente <strong>100%</strong>.
+        <i class="fas fa-exclamation-triangle me-2"></i> A soma das porcentagens deve ser exatamente <strong>100%</strong>.
     </div>
 
     <div class="row" id="split-settings-container">
@@ -90,8 +90,8 @@
             </div>
         </div>
     </div>
-    <div id="split-total-warning" class="mt-2 text-danger font-weight-bold" style="display: none;">
-        <i class="fas fa-times-circle mr-1"></i> A soma atual é <span id="split-total-value">0</span>%. Ajuste para 100%.
+    <div id="split-total-warning" class="mt-2 text-danger fw-bold" style="display: none;">
+        <i class="fas fa-times-circle me-1"></i> A soma atual é <span id="split-total-value">0</span>%. Ajuste para 100%.
     </div>
 
     <script>
@@ -137,25 +137,25 @@
         $exitImage = isset($getUrl) ? $getUrl('marketplace_exit_banner_image') : '';
     @endphp
 
-    <h5 class="text-primary mb-3"><i class="fas fa-images mr-2"></i> Hero (Banner Rotativo)</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-images me-2"></i> Hero (Banner Rotativo)</h5>
 
     <div class="row">
         <div class="col-lg-6">
             <div class="form-group mb-4">
-                <div class="custom-control custom-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
+                <div class="form-check form-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
                     <input type="hidden" name="marketplace_hero_enabled" value="0">
-                    <input type="checkbox" class="custom-control-input" id="marketplace_hero_enabled"
+                    <input type="checkbox" class="form-check-input" id="marketplace_hero_enabled"
                         name="marketplace_hero_enabled" value="1" {{ ($settings['marketplace_hero_enabled'] ?? 1) ? 'checked' : '' }}>
-                    <label class="custom-control-label font-weight-bold" for="marketplace_hero_enabled">Habilitar banner rotativo</label>
+                    <label class="form-check-label fw-bold" for="marketplace_hero_enabled">Habilitar banner rotativo</label>
                 </div>
             </div>
 
             <div class="form-group mb-3">
-                <div class="custom-control custom-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
+                <div class="form-check form-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
                     <input type="hidden" name="marketplace_hero_autoplay" value="0">
-                    <input type="checkbox" class="custom-control-input" id="marketplace_hero_autoplay"
+                    <input type="checkbox" class="form-check-input" id="marketplace_hero_autoplay"
                         name="marketplace_hero_autoplay" value="1" {{ ($settings['marketplace_hero_autoplay'] ?? 1) ? 'checked' : '' }}>
-                    <label class="custom-control-label font-weight-bold" for="marketplace_hero_autoplay">Autoplay</label>
+                    <label class="form-check-label fw-bold" for="marketplace_hero_autoplay">Autoplay</label>
                 </div>
                 <small class="text-muted">Quando ativo, o banner muda automaticamente.</small>
             </div>
@@ -179,7 +179,7 @@
 
         <div class="col-lg-6">
             <div class="alert alert-secondary">
-                <div class="font-weight-bold mb-1">Como funciona</div>
+                <div class="fw-bold mb-1">Como funciona</div>
                 <div class="small mb-0">
                     Configure até 3 slides. Se um slide ficar sem título e sem imagem, ele não aparece no banner.
                 </div>
@@ -201,9 +201,9 @@
                         'currentValue' => $slide1Image
                     ])
                     @if($slide1Image)
-                        <div class="custom-control custom-switch mb-3">
-                            <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_1_image" name="remove_marketplace_hero_slide_1_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_1_image">Remover desktop</label>
+                        <div class="form-check form-switch mb-3">
+                            <input type="checkbox" class="form-check-input" id="remove_marketplace_hero_slide_1_image" name="remove_marketplace_hero_slide_1_image" value="1">
+                            <label class="form-check-label" for="remove_marketplace_hero_slide_1_image">Remover desktop</label>
                         </div>
                     @endif
 
@@ -215,9 +215,9 @@
                         'currentValue' => $slide1ImageMobile
                     ])
                     @if($slide1ImageMobile)
-                        <div class="custom-control custom-switch mb-3">
-                            <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_1_image_mobile" name="remove_marketplace_hero_slide_1_image_mobile" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_1_image_mobile">Remover mobile</label>
+                        <div class="form-check form-switch mb-3">
+                            <input type="checkbox" class="form-check-input" id="remove_marketplace_hero_slide_1_image_mobile" name="remove_marketplace_hero_slide_1_image_mobile" value="1">
+                            <label class="form-check-label" for="remove_marketplace_hero_slide_1_image_mobile">Remover mobile</label>
                         </div>
                     @endif
 
@@ -265,9 +265,9 @@
                         'currentValue' => $slide2Image
                     ])
                     @if($slide2Image)
-                        <div class="custom-control custom-switch mb-3">
-                            <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_2_image" name="remove_marketplace_hero_slide_2_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_2_image">Remover desktop</label>
+                        <div class="form-check form-switch mb-3">
+                            <input type="checkbox" class="form-check-input" id="remove_marketplace_hero_slide_2_image" name="remove_marketplace_hero_slide_2_image" value="1">
+                            <label class="form-check-label" for="remove_marketplace_hero_slide_2_image">Remover desktop</label>
                         </div>
                     @endif
 
@@ -279,9 +279,9 @@
                         'currentValue' => $slide2ImageMobile
                     ])
                     @if($slide2ImageMobile)
-                        <div class="custom-control custom-switch mb-3">
-                            <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_2_image_mobile" name="remove_marketplace_hero_slide_2_image_mobile" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_2_image_mobile">Remover mobile</label>
+                        <div class="form-check form-switch mb-3">
+                            <input type="checkbox" class="form-check-input" id="remove_marketplace_hero_slide_2_image_mobile" name="remove_marketplace_hero_slide_2_image_mobile" value="1">
+                            <label class="form-check-label" for="remove_marketplace_hero_slide_2_image_mobile">Remover mobile</label>
                         </div>
                     @endif
 
@@ -329,9 +329,9 @@
                         'currentValue' => $slide3Image
                     ])
                     @if($slide3Image)
-                        <div class="custom-control custom-switch mb-3">
-                            <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_3_image" name="remove_marketplace_hero_slide_3_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_3_image">Remover desktop</label>
+                        <div class="form-check form-switch mb-3">
+                            <input type="checkbox" class="form-check-input" id="remove_marketplace_hero_slide_3_image" name="remove_marketplace_hero_slide_3_image" value="1">
+                            <label class="form-check-label" for="remove_marketplace_hero_slide_3_image">Remover desktop</label>
                         </div>
                     @endif
 
@@ -343,9 +343,9 @@
                         'currentValue' => $slide3ImageMobile
                     ])
                     @if($slide3ImageMobile)
-                        <div class="custom-control custom-switch mb-3">
-                            <input type="checkbox" class="custom-control-input" id="remove_marketplace_hero_slide_3_image_mobile" name="remove_marketplace_hero_slide_3_image_mobile" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_hero_slide_3_image_mobile">Remover mobile</label>
+                        <div class="form-check form-switch mb-3">
+                            <input type="checkbox" class="form-check-input" id="remove_marketplace_hero_slide_3_image_mobile" name="remove_marketplace_hero_slide_3_image_mobile" value="1">
+                            <label class="form-check-label" for="remove_marketplace_hero_slide_3_image_mobile">Remover mobile</label>
                         </div>
                     @endif
 
@@ -384,16 +384,16 @@
 
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-bullhorn mr-2"></i> Banner de Saída (Oferta)</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-bullhorn me-2"></i> Banner de Saída (Oferta)</h5>
 
     <div class="row">
         <div class="col-lg-6">
             <div class="form-group mb-4">
-                <div class="custom-control custom-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
+                <div class="form-check form-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
                     <input type="hidden" name="marketplace_exit_enabled" value="0">
-                    <input type="checkbox" class="custom-control-input" id="marketplace_exit_enabled"
+                    <input type="checkbox" class="form-check-input" id="marketplace_exit_enabled"
                         name="marketplace_exit_enabled" value="1" {{ ($settings['marketplace_exit_enabled'] ?? 0) ? 'checked' : '' }}>
-                    <label class="custom-control-label font-weight-bold" for="marketplace_exit_enabled">Habilitar popup de saída</label>
+                    <label class="form-check-label fw-bold" for="marketplace_exit_enabled">Habilitar popup de saída</label>
                 </div>
                 <small class="text-muted">Aparece uma vez por sessão quando o usuário tenta sair da página.</small>
             </div>
@@ -449,9 +449,9 @@
                     ])
 
                     @if($exitImage)
-                        <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="remove_marketplace_exit_banner_image" name="remove_marketplace_exit_banner_image" value="1">
-                            <label class="custom-control-label" for="remove_marketplace_exit_banner_image">Remover imagem existente</label>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="remove_marketplace_exit_banner_image" name="remove_marketplace_exit_banner_image" value="1">
+                            <label class="form-check-label" for="remove_marketplace_exit_banner_image">Remover imagem existente</label>
                         </div>
                     @endif
                 </div>
@@ -461,16 +461,16 @@
 
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-bell mr-2"></i> Pop-up de Eventos</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-bell me-2"></i> Pop-up de Eventos</h5>
 
     <div class="row">
         <div class="col-lg-6">
             <div class="form-group mb-4">
-                <div class="custom-control custom-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
+                <div class="form-check form-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
                     <input type="hidden" name="marketplace_events_popup_enabled" value="0">
-                    <input type="checkbox" class="custom-control-input" id="marketplace_events_popup_enabled"
+                    <input type="checkbox" class="form-check-input" id="marketplace_events_popup_enabled"
                         name="marketplace_events_popup_enabled" value="1" {{ ($settings['marketplace_events_popup_enabled'] ?? 1) ? 'checked' : '' }}>
-                    <label class="custom-control-label font-weight-bold" for="marketplace_events_popup_enabled">Habilitar pop-up de eventos</label>
+                    <label class="form-check-label fw-bold" for="marketplace_events_popup_enabled">Habilitar pop-up de eventos</label>
                 </div>
                 <small class="text-muted">Exibe um toast com sugestões de eventos para quem estiver navegando no marketplace.</small>
             </div>
@@ -492,7 +492,7 @@
 
         <div class="col-lg-6">
             <div class="alert alert-secondary mb-0">
-                <div class="font-weight-bold mb-1">Como funciona</div>
+                <div class="fw-bold mb-1">Como funciona</div>
                 <div class="small mb-0">
                     O pop-up aparece apenas para eventos <strong>publicados</strong> e com data futura. Recomendamos intervalos maiores para não incomodar o visitante.
                 </div>

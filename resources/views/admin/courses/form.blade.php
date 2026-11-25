@@ -168,23 +168,23 @@
                 <div class="card-header p-0 border-bottom-0">
                     <ul class="nav nav-tabs" id="courseTabs" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab"
+                            <a class="nav-link active" id="info-tab" data-bs-toggle="tab" href="#info" role="tab"
                                 aria-controls="info" aria-selected="true">
-                                <i class="fas fa-info-circle mr-1"></i> Informações Básicas
+                                <i class="fas fa-info-circle me-1"></i> Informações Básicas
                             </a>
                         </li>
                         @if($course->exists)
                             <li class="nav-item">
-                                <a class="nav-link" id="lessons-tab" data-toggle="tab" href="#lessons" role="tab"
+                                <a class="nav-link" id="lessons-tab" data-bs-toggle="tab" href="#lessons" role="tab"
                                     aria-controls="lessons" aria-selected="false">
-                                    <i class="fas fa-layer-group mr-1"></i> Conteúdo / Aulas
+                                    <i class="fas fa-layer-group me-1"></i> Conteúdo / Aulas
                                 </a>
                             </li>
                             <li class="nav-item" id="nav-item-cert"
                                 style="{{ $course->is_certificate_enabled ? '' : 'display:none;' }}">
-                                <a class="nav-link" id="cert-tab" data-toggle="tab" href="#certificate" role="tab"
+                                <a class="nav-link" id="cert-tab" data-bs-toggle="tab" href="#certificate" role="tab"
                                     aria-controls="certificate" aria-selected="false">
-                                    <i class="fas fa-certificate mr-1"></i> Certificado
+                                    <i class="fas fa-certificate me-1"></i> Certificado
                                 </a>
                             </li>
                         @endif
@@ -228,7 +228,7 @@
 
                                         <div class="card bg-light mt-4 border-0">
                                             <div class="card-body">
-                                                <label class="mb-2"><i class="fas fa-image mr-1"></i> Imagem de Capa</label>
+                                                <label class="mb-2"><i class="fas fa-image me-1"></i> Imagem de Capa</label>
                                                 <div class="row align-items-center">
                                                     <div class="col-md-4">
                                                         @if($course->thumbnail)
@@ -249,7 +249,7 @@
                                                             role="button" tabindex="0"
                                                             aria-label="Selecionar imagem de capa">
                                                             <div class="dropzone-main">
-                                                                <i class="fas fa-cloud-upload-alt mr-1 text-primary"></i>
+                                                                <i class="fas fa-cloud-upload-alt me-1 text-primary"></i>
                                                                 Arraste e solte a capa aqui ou clique para selecionar
                                                             </div>
                                                             <small class="text-muted mt-1 d-block"
@@ -273,11 +273,11 @@
                                     <div class="col-lg-4">
                                         <div class="card shadow-sm border-0 bg-light">
                                             <div class="card-body">
-                                                <h5 class="text-muted mb-3"><i class="fas fa-cog mr-2"></i>Publicação</h5>
+                                                <h5 class="text-muted mb-3"><i class="fas fa-cog me-2"></i>Publicação</h5>
 
                                                 <div class="form-group mb-3">
                                                     <label>Status</label>
-                                                    <select name="status" class="form-control custom-select">
+                                                    <select name="status" class="form-control form-select">
                                                         <option value="draft" {{ $course->status == 'draft' ? 'selected' : '' }}>Rascunho</option>
                                                         <option value="published" {{ $course->status == 'published' ? 'selected' : '' }}>Publicado</option>
                                                         <option value="archived" {{ $course->status == 'archived' ? 'selected' : '' }}>Arquivado</option>
@@ -292,7 +292,7 @@
                                                             <span class="input-group-text">R$</span>
                                                         </div>
                                                         <input name="price"
-                                                            class="form-control mask-money form-control-lg font-weight-bold"
+                                                            class="form-control mask-money form-control-lg fw-bold"
                                                             value="{{ old('price', $course->price) }}" placeholder="0,00">
                                                     </div>
                                                 </div>
@@ -300,7 +300,7 @@
                                                 <div class="card border-0 shadow-sm mb-3">
                                                     <div class="card-body p-3">
                                                         <h6 class="text-muted mb-3">
-                                                            <i class="fas fa-bolt mr-2"></i> Promoção relâmpago
+                                                            <i class="fas fa-bolt me-2"></i> Promoção relâmpago
                                                         </h6>
 
                                                         <div class="form-group mb-2">
@@ -339,12 +339,12 @@
                                                     <div class="col-md-12">
                                                         <div class="form-group mb-3">
                                                             <div
-                                                                class="custom-control custom-switch custom-switch-off-danger custom-switch-on-primary">
+                                                                class="form-check form-switch">
                                                                 <input type="hidden" name="is_recurring" value="0">
-                                                                <input type="checkbox" class="custom-control-input"
+                                                                <input type="checkbox" class="form-check-input"
                                                                     name="is_recurring" id="is_recurring" value="1" {{ $course->is_recurring ? 'checked' : '' }}
                                                                     onchange="toggleRecurringOptions(this)">
-                                                                <label class="custom-control-label font-weight-bold"
+                                                                <label class="form-check-label fw-bold"
                                                                     for="is_recurring">Venda como Assinatura
                                                                     (Recorrente)</label>
                                                             </div>
@@ -376,16 +376,16 @@
                                                 </div>
 
                                                 <div class="form-group mb-4">
-                                                    <div class="custom-control custom-switch">
-                                                        <input type="checkbox" class="custom-control-input"
+                                                    <div class="form-check form-switch">
+                                                        <input type="checkbox" class="form-check-input"
                                                             name="is_featured" id="is_featured" value="1" {{ $course->is_featured ? 'checked' : '' }}>
-                                                        <label class="custom-control-label font-weight-bold"
+                                                        <label class="form-check-label fw-bold"
                                                             for="is_featured">Destaque na Home</label>
                                                     </div>
                                                 </div>
 
                                                 <div class="form-group mb-4">
-                                                    <label class="font-weight-bold"><i class="fas fa-eye mr-1"></i> Onde Exibir?</label>
+                                                    <label class="fw-bold"><i class="fas fa-eye me-1"></i> Onde Exibir?</label>
                                                     <select name="visibility" class="form-control" style="border-radius: 8px;">
                                                         <option value="ambos" {{ old('visibility', $course->visibility ?? 'ambos') == 'ambos' ? 'selected' : '' }}>Ambos os locais</option>
                                                         <option value="somos_unn" {{ old('visibility', $course->visibility ?? 'ambos') == 'somos_unn' ? 'selected' : '' }}>Somente Somos UNN</option>
@@ -401,13 +401,13 @@
 
                                                 <div class="form-group mb-4">
                                                     <h6 class="text-muted mb-2"><i
-                                                            class="fas fa-play-circle mr-2"></i>Player de Vídeo</h6>
+                                                            class="fas fa-play-circle me-2"></i>Player de Vídeo</h6>
 
-                                                    <div class="custom-control custom-switch">
-                                                        <input type="checkbox" class="custom-control-input"
+                                                    <div class="form-check form-switch">
+                                                        <input type="checkbox" class="form-check-input"
                                                             name="video_block_download" id="video_block_download" value="1"
                                                             {{ $course->video_block_download ? 'checked' : '' }}>
-                                                        <label class="custom-control-label font-weight-bold"
+                                                        <label class="form-check-label fw-bold"
                                                             for="video_block_download">Bloquear download do vídeo</label>
                                                     </div>
                                                     <small class="text-muted d-block mt-1">
@@ -415,19 +415,19 @@
                                                         do navegador).
                                                     </small>
 
-                                                    <div class="custom-control custom-switch mt-3">
-                                                        <input type="checkbox" class="custom-control-input"
+                                                    <div class="form-check form-switch mt-3">
+                                                        <input type="checkbox" class="form-check-input"
                                                             name="video_floating_enabled" id="video_floating_enabled"
                                                             value="1" {{ $course->video_floating_enabled ? 'checked' : '' }}>
-                                                        <label class="custom-control-label font-weight-bold"
+                                                        <label class="form-check-label fw-bold"
                                                             for="video_floating_enabled">Mini player flutuante</label>
                                                     </div>
 
-                                                    <div class="custom-control custom-switch mt-3">
-                                                        <input type="checkbox" class="custom-control-input"
+                                                    <div class="form-check form-switch mt-3">
+                                                        <input type="checkbox" class="form-check-input"
                                                             name="is_certificate_enabled" id="is_certificate_enabled"
                                                             value="1" {{ $course->is_certificate_enabled ? 'checked' : '' }}>
-                                                        <label class="custom-control-label font-weight-bold"
+                                                        <label class="form-check-label fw-bold"
                                                             for="is_certificate_enabled">Habilitar Certificado</label>
                                                     </div>
 
@@ -455,8 +455,8 @@
 
                                                 <hr>
 
-                                                <button class="btn btn-primary btn-block btn-lg shadow-sm">
-                                                    <i class="fas fa-save mr-2"></i> Salvar Informações
+                                                <button class="btn btn-primary w-100 btn-lg shadow-sm">
+                                                    <i class="fas fa-save me-2"></i> Salvar Informações
                                                 </button>
                                             </div>
                                         </div>
@@ -469,7 +469,7 @@
                                             @endphp
                                             <div class="card shadow-sm border-0 mt-3">
                                                 <div class="card-body">
-                                                    <label class="mb-2"><i class="fas fa-link mr-1 text-muted"></i>Link do Curso</label>
+                                                    <label class="mb-2"><i class="fas fa-link me-1 text-muted"></i>Link do Curso</label>
                                                     <div class="input-group mb-2">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text bg-light"><i class="fas fa-globe text-muted"></i></span>
@@ -486,8 +486,8 @@
                                                         </div>
                                                     </div>
                                                     <a href="{{ $courseFullUrl }}"
-                                                        target="_blank" class="btn btn-sm btn-outline-info btn-block">
-                                                        Visualizar Página <i class="fas fa-external-link-alt ml-1"></i>
+                                                        target="_blank" class="btn btn-sm btn-outline-info w-100">
+                                                        Visualizar Página <i class="fas fa-external-link-alt ms-1"></i>
                                                     </a>
                                                 </div>
                                             </div>
@@ -514,8 +514,8 @@
                             <div class="tab-pane fade" id="lessons" role="tabpanel" aria-labelledby="lessons-tab">
                                 <div class="d-flex align-items-center mb-4">
                                     <h4 class="mb-0 text-dark">Grade Curricular</h4>
-                                    <button class="btn btn-success shadow-sm ml-auto" id="btnNovaAula" type="button">
-                                        <i class="fas fa-plus mr-1"></i> Nova Aula
+                                    <button class="btn btn-success shadow-sm ms-auto" id="btnNovaAula" type="button">
+                                        <i class="fas fa-plus me-1"></i> Nova Aula
                                     </button>
                                 </div>
 
@@ -554,13 +554,13 @@
                                                         } else {
                                                             Swal.fire({ icon: 'error', title: 'Erro', text: 'Erro ao salvar curso. Tente novamente.' });
                                                             btnNovaAula.disabled = false;
-                                                            btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
+                                                            btnNovaAula.innerHTML = '<i class="fas fa-plus me-1"></i> Nova Aula';
                                                         }
                                                     })
                                                     .catch(() => {
                                                         Swal.fire({ icon: 'error', title: 'Erro', text: 'Erro ao salvar curso. Tente novamente.' });
                                                         btnNovaAula.disabled = false;
-                                                        btnNovaAula.innerHTML = '<i class="fas fa-plus mr-1"></i> Nova Aula';
+                                                        btnNovaAula.innerHTML = '<i class="fas fa-plus me-1"></i> Nova Aula';
                                                     });
                                             });
                                         });
@@ -571,18 +571,18 @@
                                     @forelse($course->lessons as $lesson)
                                         <div class="lesson-item shadow-sm" data-id="{{ $lesson->id }}">
                                             <div class="d-flex align-items-center">
-                                                <i class="fas fa-grip-vertical text-muted mr-3"
+                                                <i class="fas fa-grip-vertical text-muted me-3"
                                                     style="cursor:move; opacity: 0.5;"></i>
                                                 <div>
-                                                    <div class="font-weight-bold" style="font-size: 1.05rem;">
-                                                        <span class="text-muted mr-1">#{{ $lesson->order }}</span>
+                                                    <div class="fw-bold" style="font-size: 1.05rem;">
+                                                        <span class="text-muted me-1">#{{ $lesson->order }}</span>
                                                         {{ $lesson->title }}
                                                     </div>
                                                     <div class="mt-1">
                                                         <span
-                                                            class="badge badge-light border">{{ gmdate("H:i:s", $lesson->duration) }}</span>
+                                                            class="badge text-bg-light border">{{ gmdate("H:i:s", $lesson->duration) }}</span>
                                                         @if($lesson->is_free_preview)
-                                                            <span class="badge badge-info">
+                                                            <span class="badge text-bg-info">
                                                                 @if(($lesson->free_preview_mode ?? 'full') === 'time' && (int) ($lesson->free_preview_seconds ?? 0) > 0)
                                                                     Preview {{ gmdate('i:s', (int) $lesson->free_preview_seconds) }}
                                                                 @else
@@ -635,7 +635,7 @@
                                                                 <div class="input-group-prepend">
                                                                     <span class="input-group-text">Zoom</span>
                                                                 </div>
-                                                                <select id="cert-zoom" class="custom-select custom-select-sm">
+                                                                <select id="cert-zoom" class="form-select custom-select-sm">
                                                                     <option value="0.5">50%</option>
                                                                     <option value="0.75">75%</option>
                                                                     <option value="1" selected>100%</option>
@@ -692,7 +692,7 @@
 
                                         <div class="col-12 mt-3">
                                             <div class="card shadow-sm border-0">
-                                                <div class="card-header bg-dark text-white font-weight-bold">Configurações</div>
+                                                <div class="card-header bg-dark text-white fw-bold">Configurações</div>
                                                 <div class="card-body">
                                                     <div class="row">
                                                         <div class="col-12 col-xl-6">
@@ -704,7 +704,7 @@
 
                                                             <div class="form-group">
                                                                 <label
-                                                                    class="small text-muted text-uppercase font-weight-bold">Fundo
+                                                                    class="small text-muted text-uppercase fw-bold">Fundo
                                                                     do
                                                                     Certificado</label>
                                                                 <div class="custom-file">
@@ -720,7 +720,7 @@
 
                                                             <div class="form-group">
                                                                 <label
-                                                                    class="small text-muted text-uppercase font-weight-bold">Ajuste
+                                                                    class="small text-muted text-uppercase fw-bold">Ajuste
                                                                     do Fundo</label>
                                                                 <select id="cert-bg-fit" class="form-control form-control-sm">
                                                                     <option value="cover">Cover (cortar)</option>
@@ -732,13 +732,13 @@
 
                                                             <div class="border rounded p-2 mb-3 bg-light">
                                                                 <div
-                                                                    class="small text-muted text-uppercase font-weight-bold mb-2">
+                                                                    class="small text-muted text-uppercase fw-bold mb-2">
                                                                     Ferramentas</div>
 
-                                                                <div class="custom-control custom-switch mb-2">
-                                                                    <input type="checkbox" class="custom-control-input"
+                                                                <div class="form-check form-switch mb-2">
+                                                                    <input type="checkbox" class="form-check-input"
                                                                         id="cert-grid-enabled">
-                                                                    <label class="custom-control-label"
+                                                                    <label class="form-check-label"
                                                                         for="cert-grid-enabled">Mostrar grade</label>
                                                                 </div>
 
@@ -753,10 +753,10 @@
                                                                     </select>
                                                                 </div>
 
-                                                                <div class="custom-control custom-switch mb-2">
-                                                                    <input type="checkbox" class="custom-control-input"
+                                                                <div class="form-check form-switch mb-2">
+                                                                    <input type="checkbox" class="form-check-input"
                                                                         id="cert-snap-enabled" checked>
-                                                                    <label class="custom-control-label"
+                                                                    <label class="form-check-label"
                                                                         for="cert-snap-enabled">Snap na grade</label>
                                                                 </div>
 
@@ -786,7 +786,7 @@
 
                                                             <div class="form-group">
                                                                 <label
-                                                                    class="small text-muted text-uppercase font-weight-bold">Carga
+                                                                    class="small text-muted text-uppercase fw-bold">Carga
                                                                     Horária (automática)</label>
                                                                 <div class="input-group">
                                                                     <input type="text" class="form-control bg-light"
@@ -805,7 +805,7 @@
 
                                                             <div class="form-group">
                                                                 <label
-                                                                    class="small text-muted text-uppercase font-weight-bold">Assinatura
+                                                                    class="small text-muted text-uppercase fw-bold">Assinatura
                                                                     do Instrutor</label>
                                                                 <div class="custom-file">
                                                                     <input type="file" class="custom-file-input"
@@ -833,7 +833,7 @@
 
                                                             <div class="form-group">
                                                                 <label
-                                                                    class="small text-muted text-uppercase font-weight-bold">Título
+                                                                    class="small text-muted text-uppercase fw-bold">Título
                                                                     do Certificado</label>
                                                                 <input type="text" class="form-control" name="certificate_title"
                                                                     id="certificate_title"
@@ -843,7 +843,7 @@
 
                                                             <div class="form-group">
                                                                 <label
-                                                                    class="small text-muted text-uppercase font-weight-bold">Texto
+                                                                    class="small text-muted text-uppercase fw-bold">Texto
                                                                     de
                                                                     Apresentação</label>
                                                                 <textarea class="form-control" name="presentation_text"
@@ -858,101 +858,101 @@
                                                         <div class="col-12 col-xl-6 mt-3 mt-xl-0">
                                                             <hr class="d-xl-none">
 
-                                                            <h6 class="small text-muted text-uppercase font-weight-bold mb-3">
+                                                            <h6 class="small text-muted text-uppercase fw-bold mb-3">
                                                                 Elementos
                                                                 Visíveis</h6>
                                                             <div class="list-group mb-3" id="cert-available-tags">
                                                                 <!-- Checkboxes to toggle visibility of elements -->
                                                                 <div class="list-group-item p-2 border-0">
-                                                                    <div class="custom-control custom-checkbox">
+                                                                    <div class="form-check">
                                                                         <input type="checkbox"
-                                                                            class="custom-control-input cert-toggle"
+                                                                            class="form-check-input cert-toggle"
                                                                             id="toggle-student" data-tag="student_name" checked>
-                                                                        <label class="custom-control-label"
+                                                                        <label class="form-check-label"
                                                                             for="toggle-student">Nome do
                                                                             Aluno</label>
                                                                     </div>
                                                                 </div>
                                                                 <div class="list-group-item p-2 border-0">
-                                                                    <div class="custom-control custom-checkbox">
+                                                                    <div class="form-check">
                                                                         <input type="checkbox"
-                                                                            class="custom-control-input cert-toggle"
+                                                                            class="form-check-input cert-toggle"
                                                                             id="toggle-course" data-tag="course_name" checked>
-                                                                        <label class="custom-control-label"
+                                                                        <label class="form-check-label"
                                                                             for="toggle-course">Nome do
                                                                             Curso</label>
                                                                     </div>
                                                                 </div>
                                                                 <div class="list-group-item p-2 border-0">
-                                                                    <div class="custom-control custom-checkbox">
+                                                                    <div class="form-check">
                                                                         <input type="checkbox"
-                                                                            class="custom-control-input cert-toggle"
+                                                                            class="form-check-input cert-toggle"
                                                                             id="toggle-date" data-tag="completion_date" checked>
-                                                                        <label class="custom-control-label"
+                                                                        <label class="form-check-label"
                                                                             for="toggle-date">Data de
                                                                             Conclusão</label>
                                                                     </div>
                                                                 </div>
                                                                 <div class="list-group-item p-2 border-0">
-                                                                    <div class="custom-control custom-checkbox">
+                                                                    <div class="form-check">
                                                                         <input type="checkbox"
-                                                                            class="custom-control-input cert-toggle"
+                                                                            class="form-check-input cert-toggle"
                                                                             id="toggle-code" data-tag="certificate_code"
                                                                             checked>
-                                                                        <label class="custom-control-label"
+                                                                        <label class="form-check-label"
                                                                             for="toggle-code">Código de
                                                                             Validação</label>
                                                                     </div>
                                                                 </div>
                                                                 <div class="list-group-item p-2 border-0">
-                                                                    <div class="custom-control custom-checkbox">
+                                                                    <div class="form-check">
                                                                         <input type="checkbox"
-                                                                            class="custom-control-input cert-toggle"
+                                                                            class="form-check-input cert-toggle"
                                                                             id="toggle-author" data-tag="author_name" checked>
-                                                                        <label class="custom-control-label"
+                                                                        <label class="form-check-label"
                                                                             for="toggle-author">Nome do
                                                                             Autor</label>
                                                                     </div>
                                                                 </div>
                                                                 <div class="list-group-item p-2 border-0">
-                                                                    <div class="custom-control custom-checkbox">
+                                                                    <div class="form-check">
                                                                         <input type="checkbox"
-                                                                            class="custom-control-input cert-toggle"
+                                                                            class="form-check-input cert-toggle"
                                                                             id="toggle-workload" data-tag="workload_hours"
                                                                             checked>
-                                                                        <label class="custom-control-label"
+                                                                        <label class="form-check-label"
                                                                             for="toggle-workload">Carga
                                                                             Horária</label>
                                                                     </div>
                                                                 </div>
                                                                 <div class="list-group-item p-2 border-0">
-                                                                    <div class="custom-control custom-checkbox">
+                                                                    <div class="form-check">
                                                                         <input type="checkbox"
-                                                                            class="custom-control-input cert-toggle"
+                                                                            class="form-check-input cert-toggle"
                                                                             id="toggle-title" data-tag="title">
-                                                                        <label class="custom-control-label"
+                                                                        <label class="form-check-label"
                                                                             for="toggle-title">Título do
                                                                             Certificado</label>
                                                                     </div>
                                                                 </div>
                                                                 <div class="list-group-item p-2 border-0">
-                                                                    <div class="custom-control custom-checkbox">
+                                                                    <div class="form-check">
                                                                         <input type="checkbox"
-                                                                            class="custom-control-input cert-toggle"
+                                                                            class="form-check-input cert-toggle"
                                                                             id="toggle-presentation"
                                                                             data-tag="presentation_text">
-                                                                        <label class="custom-control-label"
+                                                                        <label class="form-check-label"
                                                                             for="toggle-presentation">Texto de
                                                                             Apresentação</label>
                                                                     </div>
                                                                 </div>
                                                                 <div class="list-group-item p-2 border-0">
-                                                                    <div class="custom-control custom-checkbox">
+                                                                    <div class="form-check">
                                                                         <input type="checkbox"
-                                                                            class="custom-control-input cert-toggle"
+                                                                            class="form-check-input cert-toggle"
                                                                             id="toggle-signature"
                                                                             data-tag="instructor_signature">
-                                                                        <label class="custom-control-label"
+                                                                        <label class="form-check-label"
                                                                             for="toggle-signature">Assinatura do
                                                                             Instrutor</label>
                                                                     </div>
@@ -962,11 +962,11 @@
                                                                     <div
                                                                         class="d-flex align-items-center justify-content-between">
                                                                         <div>
-                                                                            <i class="fas fa-lock mr-2 text-dark"></i>
-                                                                            <span class="font-weight-bold text-dark">Logo da
+                                                                            <i class="fas fa-lock me-2 text-dark"></i>
+                                                                            <span class="fw-bold text-dark">Logo da
                                                                                 Plataforma</span>
                                                                         </div>
-                                                                        <small class="badge badge-dark">OBRIGATÓRIO</small>
+                                                                        <small class="badge text-bg-dark">OBRIGATÓRIO</small>
                                                                     </div>
                                                                     <small class="text-dark d-block mt-1"><i
                                                                             class="fas fa-info-circle"></i> A logo não pode ser
@@ -975,7 +975,7 @@
 
                                                                     <div class="mt-3">
                                                                         <label
-                                                                            class="small text-dark mb-1 font-weight-bold">Tamanho
+                                                                            class="small text-dark mb-1 fw-bold">Tamanho
                                                                             da
                                                                             Logo</label>
                                                                         <div class="row">
@@ -1004,13 +1004,13 @@
 
                                                             <hr>
 
-                                                            <h6 class="small text-muted text-uppercase font-weight-bold mb-3">
+                                                            <h6 class="small text-muted text-uppercase fw-bold mb-3">
                                                                 Camadas</h6>
                                                             <div class="list-group mb-3" id="cert-layers"></div>
 
                                                             <div id="cert-style-controls" style="display:none;"
                                                                 class="bg-light p-3 rounded border">
-                                                                <h6 class="font-weight-bold mb-3" style="font-size: 0.9rem;">
+                                                                <h6 class="fw-bold mb-3" style="font-size: 0.9rem;">
                                                                     Editar:
                                                                     <span id="selected-elem-name" class="text-primary"></span>
                                                                 </h6>
@@ -1032,10 +1032,10 @@
                                                                     </div>
                                                                 </div>
 
-                                                                <div class="custom-control custom-switch mb-2">
-                                                                    <input type="checkbox" class="custom-control-input"
+                                                                <div class="form-check form-switch mb-2">
+                                                                    <input type="checkbox" class="form-check-input"
                                                                         id="style-locked">
-                                                                    <label class="custom-control-label"
+                                                                    <label class="form-check-label"
                                                                         for="style-locked">Bloquear
                                                                         elemento</label>
                                                                 </div>
@@ -1098,9 +1098,9 @@
 
                                                     <input type="hidden" name="certificate_settings"
                                                         id="certificate_settings_input">
-                                                    <button type="submit" class="btn btn-primary btn-block mt-4"
+                                                    <button type="submit" class="btn btn-primary w-100 mt-4"
                                                         id="btn-save-cert">
-                                                        <i class="fas fa-save mr-1"></i> Salvar Certificado
+                                                        <i class="fas fa-save me-1"></i> Salvar Certificado
                                                     </button>
                                                 </div>
                                             </div>
@@ -1122,7 +1122,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="lessonModalTitle">Gerenciar Aula</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
                     <form id="lessonForm">
@@ -1156,11 +1156,11 @@
                             <label>Fonte do Vídeo</label>
                             <ul class="nav nav-pills mb-2" id="video-source-tab" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="pills-url-tab" data-toggle="pill" href="#pills-url"
+                                    <a class="nav-link active" id="pills-url-tab" data-bs-toggle="pill" href="#pills-url"
                                         role="tab">Link Externo (YouTube/Vimeo)</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="pills-file-tab" data-toggle="pill" href="#pills-file"
+                                    <a class="nav-link" id="pills-file-tab" data-bs-toggle="pill" href="#pills-file"
                                         role="tab">Upload de Arquivo (MP4)</a>
                                 </li>
                             </ul>
@@ -1218,9 +1218,9 @@
                         </div>
 
                         <div class="d-flex justify-content-end mt-3">
-                            <button type="button" class="btn btn-primary px-4" id="btnSaveLesson" data-toggle="tooltip"
+                            <button type="button" class="btn btn-primary px-4" id="btnSaveLesson" data-bs-toggle="tooltip"
                                 title="Salvar e fechar modal" style="white-space:nowrap;">
-                                <i class="fas fa-save mr-1"></i> Salvar Dados da Aula
+                                <i class="fas fa-save me-1"></i> Salvar Dados da Aula
                             </button>
                         </div>
                     </form>
@@ -1519,13 +1519,13 @@
                                                                                                                 <div class="d-flex align-items-center">
                                                                                                                     <i class="fas fa-file attachment-icon"></i>
                                                                                                                     <div>
-                                                                                                                        <div class="font-weight-bold" id="att-name-${att.id}">${att.file_name}</div>
+                                                                                                                        <div class="fw-bold" id="att-name-${att.id}">${att.file_name}</div>
                                                                                                                         <small class="text-muted">${size}</small>
                                                                                                                     </div>
                                                                                                                 </div>
                                                                                                                 <div>
-                                                                                                                    <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
-                                                                                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                                                                                    <button class="btn btn-sm btn-outline-secondary" onclick="renameAttachment(${lessonId}, ${att.id}, '${att.file_name}')" data-bs-toggle="tooltip" title="Renomear"><i class="fas fa-pen"></i></button>
+                                                                                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachment(${lessonId}, ${att.id})" data-bs-toggle="tooltip" title="Excluir"><i class="fas fa-trash"></i></button>
                                                                                                                 </div>
                                                                                                             </li>
                                                                                                         `;
@@ -2061,7 +2061,7 @@
                 });
 
                 // Initialize Tooltips
-                $('[data-toggle="tooltip"]').tooltip();
+                $('[data-bs-toggle="tooltip"]').tooltip();
 
                 // Image Preview Logic
                 $('#courseThumbnail').on('change', function (event) {
@@ -2449,7 +2449,7 @@
                     }, 50);
                 }
 
-                $('a[data-toggle="tab"][href="#certificate"]').on('shown.bs.tab', function () {
+                $('a[data-bs-toggle="tab"][href="#certificate"]').on('shown.bs.tab', function () {
                     scheduleFitCanvas();
                 });
                 scheduleFitCanvas();
@@ -2546,13 +2546,13 @@
                         const $right = $('<span>').addClass('d-flex align-items-center');
 
                         if (item.key !== 'platform_logo' && !item.visible) {
-                            $right.append($('<span>').addClass('badge badge-secondary mr-1').text('Oculto'));
+                            $right.append($('<span>').addClass('badge text-bg-secondary me-1').text('Oculto'));
                         }
                         if (item.locked) {
-                            $right.append($('<span>').addClass('badge badge-warning mr-1').text('Lock'));
+                            $right.append($('<span>').addClass('badge text-bg-warning me-1').text('Lock'));
                         }
 
-                        $right.append($('<span>').addClass('badge badge-light border').text('z:' + item.zIndex));
+                        $right.append($('<span>').addClass('badge text-bg-light border').text('z:' + item.zIndex));
 
                         $btn.append($left).append($right);
                         $btn.on('click', function () {

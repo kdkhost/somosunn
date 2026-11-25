@@ -1,10 +1,10 @@
 <div class="card-body">
     <div class="alert alert-info mb-4">
-        <i class="fas fa-info-circle mr-2"></i> Configurações principais do sistema. Essas informações são exibidas no
+        <i class="fas fa-info-circle me-2"></i> Configurações principais do sistema. Essas informações são exibidas no
         rodapé e em e-mails transacionais.
     </div>
 
-    <h5 class="text-primary mb-3"><i class="fas fa-building mr-2"></i> Informações da Empresa</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-building me-2"></i> Informações da Empresa</h5>
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
@@ -58,7 +58,7 @@
 
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-map-marker-alt mr-2"></i> Endereço</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-map-marker-alt me-2"></i> Endereço</h5>
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
@@ -110,10 +110,10 @@
     <hr class="my-4">
 
     {{-- APIs de Localização (busca de estabelecimentos em eventos) --}}
-    <h5 class="text-primary mb-3"><i class="fas fa-map-marked-alt mr-2"></i> APIs de Localização</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-map-marked-alt me-2"></i> APIs de Localização</h5>
     <div class="alert alert-light border mb-3">
         <small class="text-muted">
-            <i class="fas fa-info-circle mr-1"></i>
+            <i class="fas fa-info-circle me-1"></i>
             Usadas na busca de estabelecimentos ao cadastrar eventos. Prioridade automatica: <strong>TomTom</strong> (melhor cobertura de empresas no Brasil) &gt; <strong>Google Places</strong> &gt; <strong>LocationIQ</strong> (fallback).
         </small>
     </div>
@@ -121,7 +121,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label class="text-uppercase text-muted small font-weight-bold">TomTom API Key</label>
+                <label class="text-uppercase text-muted small fw-bold">TomTom API Key</label>
                 <input type="text" name="tomtom_api_key" class="form-control"
                     value="{{ $settings['tomtom_api_key'] ?? '' }}"
                     placeholder="q1Jg... (recomendado)">
@@ -130,7 +130,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="text-uppercase text-muted small font-weight-bold">Google Places API Key</label>
+                <label class="text-uppercase text-muted small fw-bold">Google Places API Key</label>
                 <input type="text" name="google_places_api_key" class="form-control"
                     value="{{ $settings['google_places_api_key'] ?? '' }}"
                     placeholder="AIzaSy... (opcional)">
@@ -139,7 +139,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="text-uppercase text-muted small font-weight-bold">LocationIQ API Key</label>
+                <label class="text-uppercase text-muted small fw-bold">LocationIQ API Key</label>
                 <input type="text" name="locationiq_api_key" class="form-control"
                     value="{{ $settings['locationiq_api_key'] ?? '' }}"
                     placeholder="pk.xxxx... (gratuito)">
@@ -150,7 +150,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label class="text-uppercase text-muted small font-weight-bold">Raio de busca (km)</label>
+                <label class="text-uppercase text-muted small fw-bold">Raio de busca (km)</label>
                 <input type="number" min="10" max="500" name="venue_search_radius_km" class="form-control"
                     value="{{ $settings['venue_search_radius_km'] ?? '150' }}">
                 <small class="text-muted">Distancia maxima para considerar "proximo"</small>
@@ -158,7 +158,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="text-uppercase text-muted small font-weight-bold">Provedor preferido</label>
+                <label class="text-uppercase text-muted small fw-bold">Provedor preferido</label>
                 <select name="venue_search_provider" class="form-control">
                     <option value="auto" {{ ($settings['venue_search_provider'] ?? 'auto') === 'auto' ? 'selected' : '' }}>Automatico (TomTom &gt; Google &gt; LocationIQ)</option>
                     <option value="tomtom" {{ ($settings['venue_search_provider'] ?? '') === 'tomtom' ? 'selected' : '' }}>Apenas TomTom</option>
@@ -169,7 +169,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="text-uppercase text-muted small font-weight-bold">Limite de resultados</label>
+                <label class="text-uppercase text-muted small fw-bold">Limite de resultados</label>
                 <input type="number" min="5" max="40" name="venue_search_limit" class="form-control"
                     value="{{ $settings['venue_search_limit'] ?? '20' }}">
             </div>
@@ -179,17 +179,17 @@
     <hr class="my-4">
 
     {{-- Revistas / Flipbook --}}
-    <h5 class="text-primary mb-3"><i class="fas fa-book-open mr-2"></i> Revistas (Flipbook)</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-book-open me-2"></i> Revistas (Flipbook)</h5>
     <div class="alert alert-light border mb-3">
         <small class="text-muted">
-            <i class="fas fa-info-circle mr-1"></i>
+            <i class="fas fa-info-circle me-1"></i>
             Escolha o plugin de visualizacao das revistas digitais. <strong>DearFlip</strong> e mais leve e rapido com streaming progressivo do PDF. <strong>PDF.js + StPageFlip</strong> usa a biblioteca oficial da Mozilla com efeito de pagina 3D do StPageFlip.
         </small>
     </div>
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label class="text-uppercase text-muted small font-weight-bold">Plugin de visualizacao</label>
+                <label class="text-uppercase text-muted small fw-bold">Plugin de visualizacao</label>
                 <select name="magazine_flipbook_engine" class="form-control">
                     <option value="dearflip" {{ ($settings['magazine_flipbook_engine'] ?? 'dearflip') === 'dearflip' ? 'selected' : '' }}>DearFlip (leve, rapido, controles nativos)</option>
                     <option value="stpageflip" {{ ($settings['magazine_flipbook_engine'] ?? '') === 'stpageflip' ? 'selected' : '' }}>PDF.js + StPageFlip (Mozilla PDF.js com efeito 3D)</option>
@@ -198,7 +198,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="text-uppercase text-muted small font-weight-bold">Revistas por pagina</label>
+                <label class="text-uppercase text-muted small fw-bold">Revistas por pagina</label>
                 <input type="number" min="4" max="50" name="magazines_per_page" class="form-control"
                     value="{{ $settings['magazines_per_page'] ?? '10' }}">
                 <small class="text-muted">Quantidade de revistas exibidas por pagina na banca</small>
@@ -206,7 +206,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="text-uppercase text-muted small font-weight-bold">Opacidade da mascara (texto)</label>
+                <label class="text-uppercase text-muted small fw-bold">Opacidade da mascara (texto)</label>
                 <input type="range" min="30" max="95" step="5" name="magazines_overlay_opacity" class="form-control-range"
                     value="{{ $settings['magazines_overlay_opacity'] ?? '70' }}"
                     oninput="this.nextElementSibling.textContent = this.value + '%'">

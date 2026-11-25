@@ -46,22 +46,22 @@
          TABS PRINCIPAIS: MERCADO PAGO | SUMUP
          ============================================================ --}}
     <div class="mb-4">
-        <button type="button" class="btn btn-lg btn-primary main-gateway-tab mr-2 mb-2" data-target="main-tab-mercadopago" onclick="switchMainGatewayTab(this)">
-            <i class="fas fa-handshake mr-2"></i>Mercado Pago
+        <button type="button" class="btn btn-lg btn-primary main-gateway-tab me-2 mb-2" data-bs-target="main-tab-mercadopago" onclick="switchMainGatewayTab(this)">
+            <i class="fas fa-handshake me-2"></i>Mercado Pago
             @if($gatewayEnabled)
-                <span class="badge badge-success ml-2">Ativo</span>
+                <span class="badge text-bg-success ms-2">Ativo</span>
             @endif
         </button>
-        <button type="button" class="btn btn-lg btn-outline-secondary main-gateway-tab mr-2 mb-2" data-target="main-tab-sumup" onclick="switchMainGatewayTab(this)">
-            <i class="fas fa-credit-card mr-2"></i>SumUp
+        <button type="button" class="btn btn-lg btn-outline-secondary main-gateway-tab me-2 mb-2" data-bs-target="main-tab-sumup" onclick="switchMainGatewayTab(this)">
+            <i class="fas fa-credit-card me-2"></i>SumUp
             @if(($settings['sumup_enabled'] ?? 0))
-                <span class="badge badge-success ml-2">Ativo</span>
+                <span class="badge text-bg-success ms-2">Ativo</span>
             @endif
         </button>
-        <button type="button" class="btn btn-lg btn-outline-secondary main-gateway-tab mb-2" data-target="main-tab-efi" onclick="switchMainGatewayTab(this)">
-            <i class="fas fa-qrcode mr-2"></i>Efi Pro (Pix)
+        <button type="button" class="btn btn-lg btn-outline-secondary main-gateway-tab mb-2" data-bs-target="main-tab-efi" onclick="switchMainGatewayTab(this)">
+            <i class="fas fa-qrcode me-2"></i>Efi Pro (Pix)
             @if(!empty($settings['efi_enabled']))
-                <span class="badge badge-success ml-2">Ativo</span>
+                <span class="badge text-bg-success ms-2">Ativo</span>
             @endif
         </button>
     </div>
@@ -73,49 +73,49 @@
 
     <div class="gateway-top mb-4" id="gatewayHero" data-sandbox-configured="{{ $hasSandbox ? 1 : 0 }}" data-production-configured="{{ $hasProduction ? 1 : 0 }}">
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center">
-            <div class="pr-lg-4 mb-3 mb-lg-0">
-                <div class="text-uppercase font-weight-bold mb-1" style="font-size:.72rem;letter-spacing:.14em;opacity:.8;">Pagamentos</div>
-                <h3 class="mb-2 font-weight-bold">MercadoPago</h3>
+            <div class="pe-lg-4 mb-3 mb-lg-0">
+                <div class="text-uppercase fw-bold mb-1" style="font-size:.72rem;letter-spacing:.14em;opacity:.8;">Pagamentos</div>
+                <h3 class="mb-2 fw-bold">MercadoPago</h3>
                 <p class="mb-3" style="opacity:.86;max-width:720px;">Credenciais, webhook, metodos, cobranca e checkout reunidos em blocos separados para evitar quebra visual no AdminLTE.</p>
                 <div class="d-flex flex-wrap" style="gap:.5rem;">
                     <span class="gateway-badge" id="gatewayEnvBadge"><span class="gateway-dot"></span>{{ $mpEnv === 'production' ? 'Producao' : 'Sandbox' }}</span>
                     <span class="gateway-badge" id="gatewayConfigBadge"><span class="gateway-dot"></span>{{ $isConfigured ? 'Configurado' : 'Pendente' }}</span>
-                    <span class="gateway-badge {{ $gatewayEnabled ? 'badge-success' : 'badge-secondary' }}" id="gatewayEnabledBadge"><span class="gateway-dot"></span>{{ $gatewayEnabled ? 'Gateway ativo' : 'Gateway inativo' }}</span>
+                    <span class="gateway-badge {{ $gatewayEnabled ? 'text-bg-success' : 'text-bg-secondary' }}" id="gatewayEnabledBadge"><span class="gateway-dot"></span>{{ $gatewayEnabled ? 'Gateway ativo' : 'Gateway inativo' }}</span>
                 </div>
             </div>
             <div class="bg-white rounded-lg p-3 text-dark" style="min-width:280px;max-width:320px;width:100%;">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <strong>Status rapido</strong>
-                    <div class="custom-control custom-switch mb-0">
+                    <div class="form-check form-switch mb-0">
                         <input type="hidden" name="mercadopago_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input gateway-enable-toggle" id="mercadopago_enabled" name="mercadopago_enabled" value="1" data-gateway="mercadopago" onchange="handleGatewayEnabledToggle(this)" {{ $gatewayEnabled ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="mercadopago_enabled"></label>
+                        <input type="checkbox" class="form-check-input gateway-enable-toggle" id="mercadopago_enabled" name="mercadopago_enabled" value="1" data-gateway="mercadopago" onchange="handleGatewayEnabledToggle(this)" {{ $gatewayEnabled ? 'checked' : '' }}>
+                        <label class="form-check-label" for="mercadopago_enabled"></label>
                     </div>
                 </div>
                 <small class="text-muted d-block mb-3">Desligue para esconder o MercadoPago como gateway principal da plataforma.</small>
-                <button type="button" class="btn btn-primary btn-block font-weight-bold" id="btn-test-mercadopago" onclick="testGatewayConnection()">
-                    <i class="fas fa-plug mr-1"></i> Testar conexao
+                <button type="button" class="btn btn-primary w-100 fw-bold" id="btn-test-mercadopago" onclick="testGatewayConnection()">
+                    <i class="fas fa-plug me-1"></i> Testar conexao
                 </button>
             </div>
         </div>
     </div>
 
     <div class="mb-4">
-        <button type="button" class="btn btn-primary gateway-tab-btn mr-2 mb-2" data-target="gateway-pane-credentials" onclick="switchGatewayTab(this)">Credenciais</button>
-        <button type="button" class="btn btn-outline-secondary gateway-tab-btn mr-2 mb-2" data-target="gateway-pane-methods" onclick="switchGatewayTab(this)">Metodos</button>
-        <button type="button" class="btn btn-outline-secondary gateway-tab-btn mr-2 mb-2" data-target="gateway-pane-billing" onclick="switchGatewayTab(this)">Cobranca</button>
-        <button type="button" class="btn btn-outline-secondary gateway-tab-btn mr-2 mb-2" data-target="gateway-pane-checkout" onclick="switchGatewayTab(this)">Checkout</button>
-        <button type="button" class="btn btn-outline-secondary gateway-tab-btn mb-2" data-target="gateway-pane-advanced" onclick="switchGatewayTab(this)">Avancado</button>
+        <button type="button" class="btn btn-primary gateway-tab-btn me-2 mb-2" data-bs-target="gateway-pane-credentials" onclick="switchGatewayTab(this)">Credenciais</button>
+        <button type="button" class="btn btn-outline-secondary gateway-tab-btn me-2 mb-2" data-bs-target="gateway-pane-methods" onclick="switchGatewayTab(this)">Metodos</button>
+        <button type="button" class="btn btn-outline-secondary gateway-tab-btn me-2 mb-2" data-bs-target="gateway-pane-billing" onclick="switchGatewayTab(this)">Cobranca</button>
+        <button type="button" class="btn btn-outline-secondary gateway-tab-btn me-2 mb-2" data-bs-target="gateway-pane-checkout" onclick="switchGatewayTab(this)">Checkout</button>
+        <button type="button" class="btn btn-outline-secondary gateway-tab-btn mb-2" data-bs-target="gateway-pane-advanced" onclick="switchGatewayTab(this)">Avancado</button>
     </div>
     <div class="gateway-pane is-active" id="gateway-pane-credentials">
         <div class="row">
             <div class="col-12 col-xl-8">
                 <div class="card card-outline card-primary gateway-section">
-                    <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-key mr-2"></i>Ambiente e chaves</h3></div>
+                    <div class="card-header"><h3 class="card-title fw-bold"><i class="fas fa-key me-2"></i>Ambiente e chaves</h3></div>
                     <div class="card-body">
                         <div class="row mb-4">
                             <div class="col-md-6 form-group mb-0">
-                                <label class="text-uppercase text-muted small font-weight-bold" for="mercadopago_env">Ambiente Mercado Pago</label>
+                                <label class="text-uppercase text-muted small fw-bold" for="mercadopago_env">Ambiente Mercado Pago</label>
                                 <select class="form-control" name="mercadopago_env" id="mercadopago_env" onchange="setGatewayEnvironment(this.value)">
                                     <option value="sandbox" {{ $mpEnv !== 'production' ? 'selected' : '' }}>Sandbox (Testes)</option>
                                     <option value="production" {{ $mpEnv === 'production' ? 'selected' : '' }}>Produção (Real)</option>
@@ -126,11 +126,11 @@
                         <div id="gatewayEnvSandboxPanel" class="{{ $mpEnv === 'production' ? 'd-none' : '' }}">
                             <div class="row">
                                 <div class="col-md-6 form-group">
-                                    <label class="text-uppercase text-muted small font-weight-bold">Public key sandbox</label>
+                                    <label class="text-uppercase text-muted small fw-bold">Public key sandbox</label>
                                     <input type="text" name="mercadopago_sandbox_public_key" value="{{ $settings['mercadopago_sandbox_public_key'] ?? '' }}" class="form-control" placeholder="TEST-xxxxxxxx">
                                 </div>
                                 <div class="col-md-6 form-group">
-                                    <label class="text-uppercase text-muted small font-weight-bold">Access token sandbox</label>
+                                    <label class="text-uppercase text-muted small fw-bold">Access token sandbox</label>
                                     <div class="input-group">
                                         <input type="password" name="mercadopago_sandbox_access_token" id="mercadopago_sandbox_access_token" value="{{ $settings['mercadopago_sandbox_access_token'] ?? '' }}" class="form-control" placeholder="TEST-xxxxxxxx">
                                         <div class="input-group-append">
@@ -144,11 +144,11 @@
                         <div id="gatewayEnvProductionPanel" class="{{ $mpEnv !== 'production' ? 'd-none' : '' }}">
                             <div class="row">
                                 <div class="col-md-6 form-group">
-                                    <label class="text-uppercase text-muted small font-weight-bold">Public key producao</label>
+                                    <label class="text-uppercase text-muted small fw-bold">Public key producao</label>
                                     <input type="text" name="mercadopago_prod_public_key" value="{{ $settings['mercadopago_prod_public_key'] ?? '' }}" class="form-control" placeholder="APP_USR-xxxxxxxx">
                                 </div>
                                 <div class="col-md-6 form-group">
-                                    <label class="text-uppercase text-muted small font-weight-bold">Access token producao</label>
+                                    <label class="text-uppercase text-muted small fw-bold">Access token producao</label>
                                     <div class="input-group">
                                         <input type="password" name="mercadopago_prod_access_token" id="mercadopago_prod_access_token" value="{{ $settings['mercadopago_prod_access_token'] ?? '' }}" class="form-control" placeholder="APP_USR-xxxxxxxx">
                                         <div class="input-group-append">
@@ -163,11 +163,11 @@
 
                         <div class="row">
                             <div class="col-md-6 form-group">
-                                <label class="text-uppercase text-muted small font-weight-bold">Client ID</label>
+                                <label class="text-uppercase text-muted small fw-bold">Client ID</label>
                                 <input type="text" name="mercadopago_client_id" value="{{ $settings['mercadopago_client_id'] ?? '' }}" class="form-control" placeholder="1234567890123456">
                             </div>
                             <div class="col-md-6 form-group mb-0">
-                                <label class="text-uppercase text-muted small font-weight-bold">Client secret</label>
+                                <label class="text-uppercase text-muted small fw-bold">Client secret</label>
                                 <div class="input-group">
                                     <input type="password" name="mercadopago_client_secret" id="mercadopago_client_secret" value="{{ $settings['mercadopago_client_secret'] ?? '' }}" class="form-control" placeholder="Segredo da aplicacao">
                                     <div class="input-group-append">
@@ -181,13 +181,13 @@
             </div>
             <div class="col-12 col-xl-4">
                 <div class="card card-outline card-info gateway-section">
-                    <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-link mr-2"></i>Webhook</h3></div>
+                    <div class="card-header"><h3 class="card-title fw-bold"><i class="fas fa-link me-2"></i>Webhook</h3></div>
                     <div class="card-body">
                         <p class="text-muted">Copie este endereco e cadastre no MercadoPago para confirmacao automatica.</p>
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" id="gatewayWebhookUrl" readonly value="{{ route('api.webhooks.mercadopago') }}">
                             <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button" onclick="copyGatewayWebhook()"><i class="fas fa-copy mr-1"></i>Copiar</button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyGatewayWebhook()"><i class="fas fa-copy me-1"></i>Copiar</button>
                             </div>
                         </div>
                         <small class="text-muted">Tipos recomendados: pagamentos e merchant_order.</small>
@@ -199,7 +199,7 @@
 
     <div class="gateway-pane" id="gateway-pane-methods">
         <div class="card card-outline card-primary gateway-section">
-            <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-credit-card mr-2"></i>Metodos de pagamento</h3></div>
+            <div class="card-header"><h3 class="card-title fw-bold"><i class="fas fa-credit-card me-2"></i>Metodos de pagamento</h3></div>
             <div class="card-body">
                 <div class="row">
                     @foreach($paymentMethods as $method)
@@ -207,16 +207,16 @@
                             <div class="gateway-method-card {{ $method['checked'] ? 'is-enabled' : '' }}" data-method-card>
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div class="d-flex">
-                                        <div class="gateway-method-icon mr-3"><i class="{{ $method['icon'] }}"></i></div>
+                                        <div class="gateway-method-icon me-3"><i class="{{ $method['icon'] }}"></i></div>
                                         <div>
-                                            <div class="font-weight-bold">{{ $method['label'] }}</div>
+                                            <div class="fw-bold">{{ $method['label'] }}</div>
                                             <small class="text-muted">Salvo ao confirmar as alteracoes.</small>
                                         </div>
                                     </div>
-                                    <div class="custom-control custom-switch">
+                                    <div class="form-check form-switch">
                                         <input type="hidden" name="{{ $method['name'] }}" value="0">
-                                        <input type="checkbox" class="custom-control-input" id="{{ $method['name'] }}" name="{{ $method['name'] }}" value="1" onchange="updateGatewayMethodCard(this)" {{ $method['checked'] ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="{{ $method['name'] }}"></label>
+                                        <input type="checkbox" class="form-check-input" id="{{ $method['name'] }}" name="{{ $method['name'] }}" value="1" onchange="updateGatewayMethodCard(this)" {{ $method['checked'] ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="{{ $method['name'] }}"></label>
                                     </div>
                                 </div>
                             </div>
@@ -229,48 +229,48 @@
 
     <div class="gateway-pane" id="gateway-pane-billing">
         <div class="card card-outline card-primary gateway-section">
-            <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-sliders-h mr-2"></i>Regras de cobranca</h3></div>
+            <div class="card-header"><h3 class="card-title fw-bold"><i class="fas fa-sliders-h me-2"></i>Regras de cobranca</h3></div>
             <div class="card-body">
                 <div class="card bg-light border mb-4">
                     <div class="card-body">
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                            <div class="pr-md-3 mb-3 mb-md-0">
+                            <div class="pe-md-3 mb-3 mb-md-0">
                                 <h5 class="mb-1">Checkout transparente</h5>
                                 <p class="text-muted mb-0">Mantem o usuario no site. Desligado, o checkout pode redirecionar para o gateway.</p>
                             </div>
-                            <div class="custom-control custom-switch">
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="gateway_transparent_checkout" value="0">
-                                <input type="checkbox" class="custom-control-input" id="gateway_transparent_checkout" name="gateway_transparent_checkout" value="1" {{ (int) ($settings['gateway_transparent_checkout'] ?? 0) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="gateway_transparent_checkout"></label>
+                                <input type="checkbox" class="form-check-input" id="gateway_transparent_checkout" name="gateway_transparent_checkout" value="1" {{ (int) ($settings['gateway_transparent_checkout'] ?? 0) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="gateway_transparent_checkout"></label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Taxa de Juros por Parcela (%)</label>
+                        <label class="text-uppercase text-muted small fw-bold">Taxa de Juros por Parcela (%)</label>
                         <div class="input-group">
                             <input type="number" step="0.01" min="0" max="99.99" name="mercadopago_installment_tax" class="form-control" value="{{ $settings['mercadopago_installment_tax'] ?? $settings['gateway_installment_tax'] ?? '0.00' }}">
                             <div class="input-group-append"><span class="input-group-text">%</span></div>
                         </div>
                     </div>
                     <div class="col-md-4 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Máximo de Parcelas</label>
+                        <label class="text-uppercase text-muted small fw-bold">Máximo de Parcelas</label>
                         <input type="number" min="1" max="12" name="mercadopago_max_installments" class="form-control" value="{{ $settings['mercadopago_max_installments'] ?? '12' }}">
                     </div>
                     <div class="col-md-4 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Parcelas sem Juros</label>
+                        <label class="text-uppercase text-muted small fw-bold">Parcelas sem Juros</label>
                         <input type="number" min="1" max="12" name="mercadopago_installments_no_interest" class="form-control" value="{{ $settings['mercadopago_installments_no_interest'] ?? '1' }}">
                     </div>
                     <div class="col-md-3 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Repassar taxa ao cliente</label>
+                        <label class="text-uppercase text-muted small fw-bold">Repassar taxa ao cliente</label>
                         <select name="gateway_pass_tax_to_client" class="form-control">
                             <option value="0" {{ (int) ($settings['gateway_pass_tax_to_client'] ?? 0) === 0 ? 'selected' : '' }}>Não - empresa absorve</option>
                             <option value="1" {{ (int) ($settings['gateway_pass_tax_to_client'] ?? 0) === 1 ? 'selected' : '' }}>Sim - cliente paga</option>
                         </select>
                     </div>
                     <div class="col-md-3 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Expiração do PIX (minutos)</label>
+                        <label class="text-uppercase text-muted small fw-bold">Expiração do PIX (minutos)</label>
                         <div class="input-group">
                             <input type="number" name="mercadopago_pix_expiration_minutes" class="form-control" value="{{ $settings['mercadopago_pix_expiration_minutes'] ?? $settings['pix_expiration_minutes'] ?? '10' }}" min="1" max="1440">
                             <div class="input-group-append"><span class="input-group-text">min</span></div>
@@ -285,9 +285,9 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card card-outline card-primary gateway-section">
-                    <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-palette mr-2"></i>Tema do checkout</h3></div>
+                    <div class="card-header"><h3 class="card-title fw-bold"><i class="fas fa-palette me-2"></i>Tema do checkout</h3></div>
                     <div class="card-body">
-                        <label class="text-uppercase text-muted small font-weight-bold">Tema</label>
+                        <label class="text-uppercase text-muted small fw-bold">Tema</label>
                         <select name="gateway_checkout_theme" class="form-control">
                             <option value="default" {{ ($settings['gateway_checkout_theme'] ?? 'default') === 'default' ? 'selected' : '' }}>Padrao do MercadoPago</option>
                             <option value="dark" {{ ($settings['gateway_checkout_theme'] ?? '') === 'dark' ? 'selected' : '' }}>Dark</option>
@@ -299,14 +299,14 @@
             </div>
             <div class="col-md-6">
                 <div class="card card-outline card-primary gateway-section">
-                    <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-brush mr-2"></i>Cor principal</h3></div>
+                    <div class="card-header"><h3 class="card-title fw-bold"><i class="fas fa-brush me-2"></i>Cor principal</h3></div>
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-sm-4 mb-3 mb-sm-0">
                                 <input type="color" name="gateway_checkout_primary_color" id="gateway_checkout_primary_color" class="gateway-color-preview" value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}" oninput="syncGatewayColor(this.value)">
                             </div>
                             <div class="col-sm-8">
-                                <label class="text-uppercase text-muted small font-weight-bold">Hex</label>
+                                <label class="text-uppercase text-muted small fw-bold">Hex</label>
                                 <input type="text" class="form-control" id="gateway_checkout_primary_color_text" value="{{ $settings['gateway_checkout_primary_color'] ?? '#1F5EDB' }}" readonly>
                             </div>
                         </div>
@@ -318,15 +318,15 @@
 
     <div class="gateway-pane" id="gateway-pane-advanced">
         <div class="card card-outline card-secondary gateway-section">
-            <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-fingerprint mr-2"></i>Identificacao da plataforma</h3></div>
+            <div class="card-header"><h3 class="card-title fw-bold"><i class="fas fa-fingerprint me-2"></i>Identificacao da plataforma</h3></div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 form-group">
-                        <label class="text-uppercase text-muted small font-weight-bold">Integrator ID</label>
+                        <label class="text-uppercase text-muted small fw-bold">Integrator ID</label>
                         <input type="text" name="mercadopago_integrator_id" value="{{ $settings['mercadopago_integrator_id'] ?? '' }}" class="form-control" placeholder="dev_1234567890">
                     </div>
                     <div class="col-md-6 form-group mb-0">
-                        <label class="text-uppercase text-muted small font-weight-bold">Platform ID</label>
+                        <label class="text-uppercase text-muted small fw-bold">Platform ID</label>
                         <input type="text" name="mercadopago_platform_id" value="{{ $settings['mercadopago_platform_id'] ?? '' }}" class="form-control" placeholder="plat_1234567890">
                     </div>
                 </div>
@@ -335,7 +335,7 @@
 
         {{-- Permissões por tipo de usuário --}}
         <div class="card card-outline card-info gateway-section mt-3">
-            <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-users mr-2"></i>Permissões por Tipo de Usuário</h3></div>
+            <div class="card-header"><h3 class="card-title fw-bold"><i class="fas fa-users me-2"></i>Permissões por Tipo de Usuário</h3></div>
             <div class="card-body">
                 <div class="row">
                     @foreach([
@@ -347,11 +347,11 @@
                         <div class="col-md-3">
                             <div class="card bg-light border">
                                 <div class="card-body text-center">
-                                    <h6 class="font-weight-bold">{{ $perm['label'] }}</h6>
-                                    <div class="custom-control custom-switch">
+                                    <h6 class="fw-bold">{{ $perm['label'] }}</h6>
+                                    <div class="form-check form-switch">
                                         <input type="hidden" name="{{ $perm['name'] }}" value="0">
-                                        <input type="checkbox" class="custom-control-input" id="{{ $perm['name'] }}" name="{{ $perm['name'] }}" value="1" {{ (int) ($settings[$perm['name']] ?? 1) === 1 ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="{{ $perm['name'] }}"></label>
+                                        <input type="checkbox" class="form-check-input" id="{{ $perm['name'] }}" name="{{ $perm['name'] }}" value="1" {{ (int) ($settings[$perm['name']] ?? 1) === 1 ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="{{ $perm['name'] }}"></label>
                                     </div>
                                 </div>
                             </div>
@@ -363,7 +363,7 @@
 
         {{-- Permissões por tipo de produto --}}
         <div class="card card-outline card-info gateway-section mt-3">
-            <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-shopping-cart mr-2"></i>Permissões por Tipo de Produto</h3></div>
+            <div class="card-header"><h3 class="card-title fw-bold"><i class="fas fa-shopping-cart me-2"></i>Permissões por Tipo de Produto</h3></div>
             <div class="card-body">
                 <div class="row">
                     @foreach([
@@ -377,11 +377,11 @@
                         <div class="col-md-2">
                             <div class="card bg-light border">
                                 <div class="card-body text-center">
-                                    <h6 class="font-weight-bold small">{{ $perm['label'] }}</h6>
-                                    <div class="custom-control custom-switch">
+                                    <h6 class="fw-bold small">{{ $perm['label'] }}</h6>
+                                    <div class="form-check form-switch">
                                         <input type="hidden" name="{{ $perm['name'] }}" value="0">
-                                        <input type="checkbox" class="custom-control-input" id="{{ $perm['name'] }}" name="{{ $perm['name'] }}" value="1" {{ (int) ($settings[$perm['name']] ?? 1) === 1 ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="{{ $perm['name'] }}"></label>
+                                        <input type="checkbox" class="form-check-input" id="{{ $perm['name'] }}" name="{{ $perm['name'] }}" value="1" {{ (int) ($settings[$perm['name']] ?? 1) === 1 ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="{{ $perm['name'] }}"></label>
                                     </div>
                                 </div>
                             </div>
@@ -403,9 +403,9 @@
 
     <div class="gateway-top mb-4" style="border-radius:1rem;background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;padding:1.5rem;box-shadow:0 18px 42px rgba(15,52,96,.2)">
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center">
-            <div class="pr-lg-4 mb-3 mb-lg-0">
-                <div class="text-uppercase font-weight-bold mb-1" style="font-size:.72rem;letter-spacing:.14em;opacity:.8;">Pagamentos</div>
-                <h3 class="mb-2 font-weight-bold">SumUp</h3>
+            <div class="pe-lg-4 mb-3 mb-lg-0">
+                <div class="text-uppercase fw-bold mb-1" style="font-size:.72rem;letter-spacing:.14em;opacity:.8;">Pagamentos</div>
+                <h3 class="mb-2 fw-bold">SumUp</h3>
                 <p class="mb-3" style="opacity:.86;max-width:720px;">Configure as credenciais e opções do gateway SumUp para processar pagamentos.</p>
                 <div class="d-flex flex-wrap" style="gap:.5rem;">
                     @php
@@ -415,21 +415,21 @@
                     @endphp
                     <span class="gateway-badge"><span class="gateway-dot"></span>{{ $sumupEnv === 'production' ? 'Producao' : 'Sandbox' }}</span>
                     <span class="gateway-badge"><span class="gateway-dot"></span>{{ $sumupConfigured ? 'Configurado' : 'Pendente' }}</span>
-                    <span class="gateway-badge {{ $sumupEnabled ? 'badge-success' : 'badge-secondary' }}" id="sumupEnabledBadge"><span class="gateway-dot"></span>{{ $sumupEnabled ? 'Gateway ativo' : 'Gateway inativo' }}</span>
+                    <span class="gateway-badge {{ $sumupEnabled ? 'text-bg-success' : 'text-bg-secondary' }}" id="sumupEnabledBadge"><span class="gateway-dot"></span>{{ $sumupEnabled ? 'Gateway ativo' : 'Gateway inativo' }}</span>
                 </div>
             </div>
             <div class="bg-white rounded-lg p-3 text-dark" style="min-width:280px;max-width:320px;width:100%;">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <strong>Status rapido</strong>
-                    <div class="custom-control custom-switch mb-0">
+                    <div class="form-check form-switch mb-0">
                         <input type="hidden" name="sumup_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input gateway-enable-toggle" id="sumup_enabled" name="sumup_enabled" value="1" data-gateway="sumup" onchange="handleGatewayEnabledToggle(this)" {{ $sumupEnabled ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="sumup_enabled"></label>
+                        <input type="checkbox" class="form-check-input gateway-enable-toggle" id="sumup_enabled" name="sumup_enabled" value="1" data-gateway="sumup" onchange="handleGatewayEnabledToggle(this)" {{ $sumupEnabled ? 'checked' : '' }}>
+                        <label class="form-check-label" for="sumup_enabled"></label>
                     </div>
                 </div>
                 <small class="text-muted d-block mb-3">Desligue para desativar o SumUp como gateway da plataforma.</small>
-                <button type="button" class="btn btn-dark btn-block font-weight-bold" id="btn-test-sumup" onclick="testSumUpConnection()">
-                    <i class="fas fa-plug mr-1"></i> Testar conexao
+                <button type="button" class="btn btn-dark w-100 fw-bold" id="btn-test-sumup" onclick="testSumUpConnection()">
+                    <i class="fas fa-plug me-1"></i> Testar conexao
                 </button>
             </div>
         </div>
@@ -437,16 +437,16 @@
     <div class="card card-outline card-dark gateway-section mb-0">
         <div class="card-header d-flex justify-content-between align-items-center"
              style="background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%);color:#fff;">
-            <h3 class="card-title font-weight-bold mb-0">
-                <i class="fas fa-cog mr-2"></i> Configurações SumUp
+            <h3 class="card-title fw-bold mb-0">
+                <i class="fas fa-cog me-2"></i> Configurações SumUp
             </h3>
         </div>
         <div class="card-body">
             <div class="alert alert-info small">
-                <div class="font-weight-bold mb-2">
-                    <i class="fas fa-info-circle mr-1"></i> Como preencher as credenciais SumUp
+                <div class="fw-bold mb-2">
+                    <i class="fas fa-info-circle me-1"></i> Como preencher as credenciais SumUp
                 </div>
-                <ol class="mb-2 pl-3">
+                <ol class="mb-2 ps-3">
                     <li><strong>API Key:</strong> acesse <a href="https://me.sumup.com" target="_blank" rel="noopener noreferrer">me.sumup.com</a> &gt; perfil &gt; Settings &gt; For Developers &gt; Toolkit &gt; API Keys, crie uma chave secreta e cole aqui. Não use a SumUp Public Key.</li>
                     <li><strong>Merchant Code:</strong> use o código da mesma conta lojista. Se não souber, cole a API Key, clique em Testar Conexão e copie o Merchant Code retornado pela SumUp.</li>
                     <li><strong>Client ID e Client Secret:</strong> opcionais para OAuth. Pegue em For Developers &gt; OAuth Apps &gt; Create client secret e baixe o JSON das credenciais.</li>
@@ -457,15 +457,15 @@
             {{-- Ambiente --}}
             <div class="row mb-4 align-items-end">
                 <div class="col-md-6">
-                    <label class="text-uppercase text-muted small font-weight-bold" for="admin_sumup_env">Ambiente SumUp</label>
+                    <label class="text-uppercase text-muted small fw-bold" for="admin_sumup_env">Ambiente SumUp</label>
                     <select name="sumup_env" id="admin_sumup_env" class="form-control" onchange="syncAdminSumUpEnv(this.value)">
                         <option value="sandbox" {{ ($settings['sumup_env'] ?? 'sandbox') === 'sandbox' ? 'selected' : '' }}>Sandbox (Testes)</option>
                         <option value="production" {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'selected' : '' }}>Produção (Real)</option>
                     </select>
                 </div>
                 <div class="col-md-6 mt-2 mt-md-0">
-                    <div id="admin_sumup_env_badge" class="alert {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'alert-success' : 'alert-warning' }} py-2 px-3 mb-0 small font-weight-bold">
-                        <i class="fas {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'fa-rocket' : 'fa-flask' }} mr-1"></i>
+                    <div id="admin_sumup_env_badge" class="alert {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'alert-success' : 'alert-warning' }} py-2 px-3 mb-0 small fw-bold">
+                        <i class="fas {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'fa-rocket' : 'fa-flask' }} me-1"></i>
                         <span id="admin_sumup_env_text">{{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'Modo Produção ativo — cobranças reais na SumUp do administrador.' : 'Modo Sandbox ativo — utilize chaves de teste da SumUp.' }}</span>
                     </div>
                 </div>
@@ -474,7 +474,7 @@
             {{-- Credenciais básicas --}}
             <div class="row">
                 <div class="col-md-6 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">API Key <span class="text-danger">*</span></label>
+                    <label class="text-uppercase text-muted small fw-bold">API Key <span class="text-danger">*</span></label>
                     <div class="input-group">
                         <input type="password" name="sumup_api_key" id="sumup_api_key" value="{{ $settings['sumup_api_key'] ?? '' }}" class="form-control" placeholder="sup_sk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
                         <div class="input-group-append">
@@ -483,7 +483,7 @@
                     </div>
                 </div>
                 <div class="col-md-6 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Merchant Code <span class="text-danger">*</span></label>
+                    <label class="text-uppercase text-muted small fw-bold">Merchant Code <span class="text-danger">*</span></label>
                     <input type="text" name="sumup_merchant_code" value="{{ $settings['sumup_merchant_code'] ?? '' }}" class="form-control" placeholder="MXXXXXXX">
                 </div>
             </div>
@@ -491,11 +491,11 @@
             {{-- OAuth (opcional) --}}
             <div class="row">
                 <div class="col-md-6 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Client ID (OAuth)</label>
+                    <label class="text-uppercase text-muted small fw-bold">Client ID (OAuth)</label>
                     <input type="text" name="sumup_client_id" value="{{ $settings['sumup_client_id'] ?? '' }}" class="form-control" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
                 </div>
                 <div class="col-md-6 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Client Secret (OAuth)</label>
+                    <label class="text-uppercase text-muted small fw-bold">Client Secret (OAuth)</label>
                     <div class="input-group">
                         <input type="password" name="sumup_client_secret" id="sumup_client_secret" value="{{ $settings['sumup_client_secret'] ?? '' }}" class="form-control" placeholder="••••••••••••••••••••••••••••••••">
                         <div class="input-group-append">
@@ -508,17 +508,17 @@
             {{-- Webhook --}}
             <div class="row">
                 <div class="col-md-8 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Webhook URL</label>
+                    <label class="text-uppercase text-muted small fw-bold">Webhook URL</label>
                     <div class="input-group">
                         <input type="text" class="form-control" readonly value="{{ route('api.webhooks.sumup') }}">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('{{ route('api.webhooks.sumup') }}')"><i class="fas fa-copy mr-1"></i>Copiar</button>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('{{ route('api.webhooks.sumup') }}')"><i class="fas fa-copy me-1"></i>Copiar</button>
                         </div>
                     </div>
                     <small class="text-muted">Cole esta URL no painel SumUp para receber notificações de pagamento.</small>
                 </div>
                 <div class="col-md-4 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Webhook Secret</label>
+                    <label class="text-uppercase text-muted small fw-bold">Webhook Secret</label>
                     <div class="input-group">
                         <input type="password" name="sumup_webhook_secret" id="sumup_webhook_secret" value="{{ $settings['sumup_webhook_secret'] ?? '' }}" class="form-control" placeholder="Opcional">
                         <div class="input-group-append">
@@ -531,25 +531,25 @@
             <hr>
 
             {{-- Métodos de pagamento SumUp --}}
-            <h5 class="font-weight-bold mb-3"><i class="fas fa-credit-card mr-2"></i>Métodos de Pagamento</h5>
+            <h5 class="fw-bold mb-3"><i class="fas fa-credit-card me-2"></i>Métodos de Pagamento</h5>
 
             <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="card bg-light border">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
-                                <div class="mr-3" style="width:40px;height:40px;border-radius:10px;background:#1e40af;display:flex;align-items:center;justify-content:center;">
+                                <div class="me-3" style="width:40px;height:40px;border-radius:10px;background:#1e40af;display:flex;align-items:center;justify-content:center;">
                                     <i class="fas fa-credit-card text-white"></i>
                                 </div>
                                 <div>
-                                    <h6 class="font-weight-bold mb-0">Cartão de Crédito</h6>
+                                    <h6 class="fw-bold mb-0">Cartão de Crédito</h6>
                                     <small class="text-muted">Via SumUp.js (tokenizado)</small>
                                 </div>
                             </div>
-                            <div class="custom-control custom-switch">
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_method_card" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_method_card" name="sumup_method_card" value="1" {{ (int) ($settings['sumup_method_card'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_method_card"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_method_card" name="sumup_method_card" value="1" {{ (int) ($settings['sumup_method_card'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_method_card"></label>
                             </div>
                         </div>
                     </div>
@@ -558,18 +558,18 @@
                     <div class="card bg-light border">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
-                                <div class="mr-3" style="width:40px;height:40px;border-radius:10px;background:#0d9488;display:flex;align-items:center;justify-content:center;">
+                                <div class="me-3" style="width:40px;height:40px;border-radius:10px;background:#0d9488;display:flex;align-items:center;justify-content:center;">
                                     <i class="fa-brands fa-pix text-white"></i>
                                 </div>
                                 <div>
-                                    <h6 class="font-weight-bold mb-0">PIX</h6>
+                                    <h6 class="fw-bold mb-0">PIX</h6>
                                     <small class="text-muted">QR Code inline</small>
                                 </div>
                             </div>
-                            <div class="custom-control custom-switch">
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_method_pix" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_method_pix" name="sumup_method_pix" value="1" {{ (int) ($settings['sumup_method_pix'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_method_pix"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_method_pix" name="sumup_method_pix" value="1" {{ (int) ($settings['sumup_method_pix'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_method_pix"></label>
                             </div>
                         </div>
                     </div>
@@ -579,23 +579,23 @@
             <hr>
 
             {{-- Configurações de cobrança --}}
-            <h5 class="font-weight-bold mb-3"><i class="fas fa-sliders-h mr-2"></i>Configurações de Cobrança</h5>
+            <h5 class="fw-bold mb-3"><i class="fas fa-sliders-h me-2"></i>Configurações de Cobrança</h5>
 
             <div class="row">
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Taxa Percentual (%)</label>
+                    <label class="text-uppercase text-muted small fw-bold">Taxa Percentual (%)</label>
                     <input type="number" step="0.01" name="sumup_fee_percentage" class="form-control" value="{{ $settings['sumup_fee_percentage'] ?? '2.75' }}">
                 </div>
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Taxa Fixa (R$)</label>
+                    <label class="text-uppercase text-muted small fw-bold">Taxa Fixa (R$)</label>
                     <input type="number" step="0.01" name="sumup_fee_fixed" class="form-control" value="{{ $settings['sumup_fee_fixed'] ?? '0.00' }}">
                 </div>
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Máx. Parcelas</label>
+                    <label class="text-uppercase text-muted small fw-bold">Máx. Parcelas</label>
                     <input type="number" min="1" max="12" name="sumup_max_installments" class="form-control" value="{{ $settings['sumup_max_installments'] ?? '12' }}">
                 </div>
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Repassar Taxa</label>
+                    <label class="text-uppercase text-muted small fw-bold">Repassar Taxa</label>
                     <select name="sumup_pass_fee" class="form-control">
                         <option value="0" {{ (int) ($settings['sumup_pass_fee'] ?? 0) === 0 ? 'selected' : '' }}>Não - empresa absorve</option>
                         <option value="1" {{ (int) ($settings['sumup_pass_fee'] ?? 0) === 1 ? 'selected' : '' }}>Sim - cliente paga</option>
@@ -605,24 +605,24 @@
 
             <div class="row">
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Parcelas sem Juros</label>
+                    <label class="text-uppercase text-muted small fw-bold">Parcelas sem Juros</label>
                     <input type="number" min="1" max="12" name="sumup_installments_no_interest" class="form-control"
                         value="{{ $settings['sumup_installments_no_interest'] ?? '1' }}">
                 </div>
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Juros por Parcela (%)</label>
+                    <label class="text-uppercase text-muted small fw-bold">Juros por Parcela (%)</label>
                     <input type="number" step="0.01" name="sumup_installment_tax" class="form-control"
                         value="{{ $settings['sumup_installment_tax'] ?? '0.00' }}">
                 </div>
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Tipo de Cálculo</label>
+                    <label class="text-uppercase text-muted small fw-bold">Tipo de Cálculo</label>
                     <select name="sumup_interest_type" class="form-control">
                         <option value="per_installment" {{ ($settings['sumup_interest_type'] ?? 'per_installment') === 'per_installment' ? 'selected' : '' }}>Por parcela</option>
                         <option value="on_total" {{ ($settings['sumup_interest_type'] ?? '') === 'on_total' ? 'selected' : '' }}>Sobre o total</option>
                     </select>
                 </div>
                 <div class="col-md-3 form-group">
-                    <label class="text-uppercase text-muted small font-weight-bold">Expiração do PIX (minutos)</label>
+                    <label class="text-uppercase text-muted small fw-bold">Expiração do PIX (minutos)</label>
                     <input type="number" min="1" max="1440" name="sumup_pix_expiration_minutes" class="form-control"
                         value="{{ $settings['sumup_pix_expiration_minutes'] ?? '10' }}">
                 </div>
@@ -631,17 +631,17 @@
             <hr>
 
             {{-- Permissões por tipo de usuário --}}
-            <h5 class="font-weight-bold mb-3"><i class="fas fa-users mr-2"></i>Permissões por Tipo de Usuário</h5>
+            <h5 class="fw-bold mb-3"><i class="fas fa-users me-2"></i>Permissões por Tipo de Usuário</h5>
             
             <div class="row">
                 <div class="col-md-3">
                     <div class="card bg-light border">
                         <div class="card-body text-center">
-                            <h6 class="font-weight-bold">Membros</h6>
-                            <div class="custom-control custom-switch">
+                            <h6 class="fw-bold">Membros</h6>
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_allow_members" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_allow_members" name="sumup_allow_members" value="1" {{ (int) ($settings['sumup_allow_members'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_allow_members"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_allow_members" name="sumup_allow_members" value="1" {{ (int) ($settings['sumup_allow_members'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_allow_members"></label>
                             </div>
                         </div>
                     </div>
@@ -649,11 +649,11 @@
                 <div class="col-md-3">
                     <div class="card bg-light border">
                         <div class="card-body text-center">
-                            <h6 class="font-weight-bold">Instrutores</h6>
-                            <div class="custom-control custom-switch">
+                            <h6 class="fw-bold">Instrutores</h6>
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_allow_instructors" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_allow_instructors" name="sumup_allow_instructors" value="1" {{ (int) ($settings['sumup_allow_instructors'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_allow_instructors"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_allow_instructors" name="sumup_allow_instructors" value="1" {{ (int) ($settings['sumup_allow_instructors'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_allow_instructors"></label>
                             </div>
                         </div>
                     </div>
@@ -661,11 +661,11 @@
                 <div class="col-md-3">
                     <div class="card bg-light border">
                         <div class="card-body text-center">
-                            <h6 class="font-weight-bold">Vendedores</h6>
-                            <div class="custom-control custom-switch">
+                            <h6 class="fw-bold">Vendedores</h6>
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_allow_sellers" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_allow_sellers" name="sumup_allow_sellers" value="1" {{ (int) ($settings['sumup_allow_sellers'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_allow_sellers"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_allow_sellers" name="sumup_allow_sellers" value="1" {{ (int) ($settings['sumup_allow_sellers'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_allow_sellers"></label>
                             </div>
                         </div>
                     </div>
@@ -673,11 +673,11 @@
                 <div class="col-md-3">
                     <div class="card bg-light border">
                         <div class="card-body text-center">
-                            <h6 class="font-weight-bold">Mentores</h6>
-                            <div class="custom-control custom-switch">
+                            <h6 class="fw-bold">Mentores</h6>
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_allow_mentors" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_allow_mentors" name="sumup_allow_mentors" value="1" {{ (int) ($settings['sumup_allow_mentors'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_allow_mentors"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_allow_mentors" name="sumup_allow_mentors" value="1" {{ (int) ($settings['sumup_allow_mentors'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_allow_mentors"></label>
                             </div>
                         </div>
                     </div>
@@ -687,17 +687,17 @@
             <hr>
 
             {{-- Permissões por tipo de produto --}}
-            <h5 class="font-weight-bold mb-3"><i class="fas fa-shopping-cart mr-2"></i>Permissões por Tipo de Produto</h5>
+            <h5 class="fw-bold mb-3"><i class="fas fa-shopping-cart me-2"></i>Permissões por Tipo de Produto</h5>
             
             <div class="row">
                 <div class="col-md-2">
                     <div class="card bg-light border">
                         <div class="card-body text-center">
-                            <h6 class="font-weight-bold small">Cursos</h6>
-                            <div class="custom-control custom-switch">
+                            <h6 class="fw-bold small">Cursos</h6>
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_allow_courses" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_allow_courses" name="sumup_allow_courses" value="1" {{ (int) ($settings['sumup_allow_courses'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_allow_courses"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_allow_courses" name="sumup_allow_courses" value="1" {{ (int) ($settings['sumup_allow_courses'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_allow_courses"></label>
                             </div>
                         </div>
                     </div>
@@ -705,11 +705,11 @@
                 <div class="col-md-2">
                     <div class="card bg-light border">
                         <div class="card-body text-center">
-                            <h6 class="font-weight-bold small">Mentorias</h6>
-                            <div class="custom-control custom-switch">
+                            <h6 class="fw-bold small">Mentorias</h6>
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_allow_mentorships" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_allow_mentorships" name="sumup_allow_mentorships" value="1" {{ (int) ($settings['sumup_allow_mentorships'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_allow_mentorships"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_allow_mentorships" name="sumup_allow_mentorships" value="1" {{ (int) ($settings['sumup_allow_mentorships'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_allow_mentorships"></label>
                             </div>
                         </div>
                     </div>
@@ -717,11 +717,11 @@
                 <div class="col-md-2">
                     <div class="card bg-light border">
                         <div class="card-body text-center">
-                            <h6 class="font-weight-bold small">Eventos</h6>
-                            <div class="custom-control custom-switch">
+                            <h6 class="fw-bold small">Eventos</h6>
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_allow_events" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_allow_events" name="sumup_allow_events" value="1" {{ (int) ($settings['sumup_allow_events'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_allow_events"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_allow_events" name="sumup_allow_events" value="1" {{ (int) ($settings['sumup_allow_events'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_allow_events"></label>
                             </div>
                         </div>
                     </div>
@@ -729,11 +729,11 @@
                 <div class="col-md-2">
                     <div class="card bg-light border">
                         <div class="card-body text-center">
-                            <h6 class="font-weight-bold small">Marketplace</h6>
-                            <div class="custom-control custom-switch">
+                            <h6 class="fw-bold small">Marketplace</h6>
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_allow_marketplace" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_allow_marketplace" name="sumup_allow_marketplace" value="1" {{ (int) ($settings['sumup_allow_marketplace'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_allow_marketplace"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_allow_marketplace" name="sumup_allow_marketplace" value="1" {{ (int) ($settings['sumup_allow_marketplace'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_allow_marketplace"></label>
                             </div>
                         </div>
                     </div>
@@ -741,11 +741,11 @@
                 <div class="col-md-2">
                     <div class="card bg-light border">
                         <div class="card-body text-center">
-                            <h6 class="font-weight-bold small">Assinaturas</h6>
-                            <div class="custom-control custom-switch">
+                            <h6 class="fw-bold small">Assinaturas</h6>
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_allow_subscriptions" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_allow_subscriptions" name="sumup_allow_subscriptions" value="1" {{ (int) ($settings['sumup_allow_subscriptions'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_allow_subscriptions"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_allow_subscriptions" name="sumup_allow_subscriptions" value="1" {{ (int) ($settings['sumup_allow_subscriptions'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_allow_subscriptions"></label>
                             </div>
                         </div>
                     </div>
@@ -753,11 +753,11 @@
                 <div class="col-md-2">
                     <div class="card bg-light border">
                         <div class="card-body text-center">
-                            <h6 class="font-weight-bold small">Serviços</h6>
-                            <div class="custom-control custom-switch">
+                            <h6 class="fw-bold small">Serviços</h6>
+                            <div class="form-check form-switch">
                                 <input type="hidden" name="sumup_allow_services" value="0">
-                                <input type="checkbox" class="custom-control-input" id="sumup_allow_services" name="sumup_allow_services" value="1" {{ (int) ($settings['sumup_allow_services'] ?? 1) === 1 ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="sumup_allow_services"></label>
+                                <input type="checkbox" class="form-check-input" id="sumup_allow_services" name="sumup_allow_services" value="1" {{ (int) ($settings['sumup_allow_services'] ?? 1) === 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sumup_allow_services"></label>
                             </div>
                         </div>
                     </div>
@@ -776,14 +776,14 @@
     <div class="main-gateway-pane" id="main-tab-efi">
         <div class="card card-outline card-success gateway-section mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title font-weight-bold">
-                    <i class="fas fa-qrcode mr-2"></i> Efi Pro (Gerencianet Pix)
+                <h3 class="card-title fw-bold">
+                    <i class="fas fa-qrcode me-2"></i> Efi Pro (Gerencianet Pix)
                 </h3>
-                <div class="custom-control custom-switch">
+                <div class="form-check form-switch">
                     <input type="hidden" name="efi_enabled" value="0">
-                    <input type="checkbox" class="custom-control-input" id="efi_enabled" name="efi_enabled" value="1"
+                    <input type="checkbox" class="form-check-input" id="efi_enabled" name="efi_enabled" value="1"
                         {{ !empty($settings['efi_enabled']) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="efi_enabled">Ativar gateway Efi Pro</label>
+                    <label class="form-check-label" for="efi_enabled">Ativar gateway Efi Pro</label>
                 </div>
             </div>
             <div class="card-body">
@@ -811,9 +811,9 @@
                             value="{{ $settings['efi_pix_key'] ?? '' }}" placeholder="EVP, CNPJ, e-mail ou telefone">
                     </div>
                     <div class="col-md-6 form-group">
-                        <label class="font-weight-bold d-flex align-items-center justify-content-between">
-                            <span><i class="fas fa-file-contract text-primary mr-1"></i> Upload do Certificado Efí (.p12 ou .pem)</span>
-                            <span class="badge badge-light text-muted">Arrasta e Solta</span>
+                        <label class="fw-bold d-flex align-items-center justify-content-between">
+                            <span><i class="fas fa-file-contract text-primary me-1"></i> Upload do Certificado Efí (.p12 ou .pem)</span>
+                            <span class="badge text-bg-light text-muted">Arrasta e Solta</span>
                         </label>
                         <x-unn-dropzone name="efi_certificate_file" accept=".p12,.pem,.crt,application/x-pkcs12,application/x-pem-file,application/octet-stream"
                             label="Arraste e solte o certificado Efí (.p12 ou .pem)"
@@ -846,16 +846,16 @@
                     <div class="d-flex align-items-center justify-content-between flex-wrap">
                         <div class="d-flex align-items-center mb-2 mb-md-0">
                             @if(!empty($efiCertInfo) && !empty($efiCertInfo['exists']))
-                                <div class="bg-success text-white rounded-circle p-2 mr-3 d-flex align-items-center justify-center" style="width: 40px; height: 40px;">
+                                <div class="bg-success text-white rounded-circle p-2 me-3 d-flex align-items-center justify-center" style="width: 40px; height: 40px;">
                                     <i class="fas fa-shield-alt fa-lg"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-0 font-weight-bold text-success">
+                                    <h6 class="mb-0 fw-bold text-success">
                                         Certificado Efí Ativo
                                         @if(!empty($efiCertInfo['is_expired']))
-                                            <span class="badge badge-danger ml-2">EXPIRADO</span>
+                                            <span class="badge text-bg-danger ms-2">EXPIRADO</span>
                                         @else
-                                            <span class="badge badge-success ml-2">VÁLIDO</span>
+                                            <span class="badge text-bg-success ms-2">VÁLIDO</span>
                                         @endif
                                     </h6>
                                     <small class="text-muted">
@@ -869,18 +869,18 @@
                                     </small>
                                 </div>
                             @else
-                                <div class="bg-warning text-dark rounded-circle p-2 mr-3 d-flex align-items-center justify-center" style="width: 40px; height: 40px;">
+                                <div class="bg-warning text-dark rounded-circle p-2 me-3 d-flex align-items-center justify-center" style="width: 40px; height: 40px;">
                                     <i class="fas fa-exclamation-triangle fa-lg"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-0 font-weight-bold text-warning">Nenhum Certificado Efí Configurado</h6>
+                                    <h6 class="mb-0 fw-bold text-warning">Nenhum Certificado Efí Configurado</h6>
                                     <small class="text-muted">Faça o upload do arquivo .p12 fornecido no painel da Efí para habilitar o Pix em produção.</small>
                                 </div>
                             @endif
                         </div>
                         <div>
                             @if(!empty($efiCertInfo) && !empty($efiCertInfo['exists']))
-                                <span class="badge badge-pill badge-light border px-3 py-2 text-monospace">{{ $efiCertInfo['path'] }}</span>
+                                <span class="badge rounded-pill text-bg-light border px-3 py-2 text-monospace">{{ $efiCertInfo['path'] }}</span>
                             @endif
                         </div>
                     </div>
@@ -891,14 +891,14 @@
                     <br><span class="text-muted">Processado assincronamente na fila <code>webhooks</code> com protecao mTLS/HMAC.</span>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="custom-control custom-switch">
+                    <div class="form-check form-switch">
                         <input type="hidden" name="efi_mtls_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="efi_mtls_enabled" name="efi_mtls_enabled" value="1"
+                        <input type="checkbox" class="form-check-input" id="efi_mtls_enabled" name="efi_mtls_enabled" value="1"
                             {{ ($settings['efi_mtls_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="efi_mtls_enabled">Exigir certificado mTLS em producao</label>
+                        <label class="form-check-label" for="efi_mtls_enabled">Exigir certificado mTLS em producao</label>
                     </div>
                     <button type="button" class="btn btn-outline-success" id="btn-test-efi" onclick="testEfiConnection()">
-                        <i class="fas fa-plug mr-1"></i> Testar conexao Efi Pro
+                        <i class="fas fa-plug me-1"></i> Testar conexao Efi Pro
                     </button>
                 </div>
             </div>
@@ -913,7 +913,7 @@ function testEfiConnection() {
     const btn = document.getElementById('btn-test-efi');
     const orig = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Testando...';
 
     fetch('{{ route("admin.settings.test_gateway") }}', {
         method: 'POST',
@@ -1057,7 +1057,7 @@ function copyGatewayWebhook() {
     // Show feedback
     const btn = event.target.closest('button');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-check mr-1"></i>Copiado!';
+    btn.innerHTML = '<i class="fas fa-check me-1"></i>Copiado!';
     btn.classList.add('btn-success');
     btn.classList.remove('btn-outline-secondary');
     
@@ -1099,12 +1099,12 @@ function handleGatewayEnabledToggle(checkbox) {
     const badge = document.getElementById(gateway + 'EnabledBadge');
     
     if (checkbox.checked) {
-        badge.classList.remove('badge-secondary');
-        badge.classList.add('badge-success');
+        badge.classList.remove('text-bg-secondary');
+        badge.classList.add('text-bg-success');
         badge.innerHTML = '<span class="gateway-dot"></span>Gateway ativo';
     } else {
-        badge.classList.remove('badge-success');
-        badge.classList.add('badge-secondary');
+        badge.classList.remove('text-bg-success');
+        badge.classList.add('text-bg-secondary');
         badge.innerHTML = '<span class="gateway-dot"></span>Gateway inativo';
     }
 }
@@ -1113,12 +1113,12 @@ function testGatewayConnection() {
     const btn = document.getElementById('btn-test-mercadopago');
     const originalText = btn.innerHTML;
     
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Testando...';
     btn.disabled = true;
     
     // Simulate API call
     setTimeout(() => {
-        btn.innerHTML = '<i class="fas fa-check mr-1"></i> Conexão OK!';
+        btn.innerHTML = '<i class="fas fa-check me-1"></i> Conexão OK!';
         btn.classList.add('btn-success');
         btn.classList.remove('btn-primary');
         
@@ -1135,12 +1135,12 @@ function testSumUpConnection() {
     const btn = document.getElementById('btn-test-sumup');
     const originalText = btn.innerHTML;
     
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Testando...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Testando...';
     btn.disabled = true;
     
     // Simulate API call
     setTimeout(() => {
-        btn.innerHTML = '<i class="fas fa-check mr-1"></i> Conexão OK!';
+        btn.innerHTML = '<i class="fas fa-check me-1"></i> Conexão OK!';
         btn.classList.add('btn-success');
         btn.classList.remove('btn-dark');
         

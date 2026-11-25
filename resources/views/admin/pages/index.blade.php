@@ -17,7 +17,7 @@
 
         @if(isset($pageTableAvailable) && $pageTableAvailable === false)
             <div class="alert alert-warning">
-                <i class="fas fa-exclamation-triangle mr-1"></i>
+                <i class="fas fa-exclamation-triangle me-1"></i>
                 A tabela <code>pages</code> ainda não existe nesta base. O módulo de CMS continua acessível, mas sem páginas carregadas até que a estrutura seja criada.
             </div>
         @endif
@@ -29,7 +29,7 @@
                         <th>Slug</th>
                         <th>Título</th>
                         <th>Última atualização</th>
-                        <th class="text-right">Ações</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,7 +40,7 @@
                             </td>
                             <td>{{ $page->title ?? '—' }}</td>
                             <td>{{ $page->updated_at ? $page->updated_at->format('d/m/Y H:i') : '—' }}</td>
-                            <td class="text-right">
+                            <td class="text-end">
                                 <a href="{{ route('admin.pages.edit', $page) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-edit"></i> Editar
                                 </a>

@@ -42,17 +42,17 @@
                 @if(!$isCreating)
                     <div class="mb-3">
                         @if($testimonial->source === 'google')
-                            <span class="badge badge-info px-3 py-2">
-                                <i class="fab fa-google mr-1"></i> Importado do Google
+                            <span class="badge text-bg-info px-3 py-2">
+                                <i class="fab fa-google me-1"></i> Importado do Google
                             </span>
                         @else
-                            <span class="badge badge-secondary px-3 py-2">
-                                <i class="fas fa-pencil-alt mr-1"></i> Depoimento manual
+                            <span class="badge text-bg-secondary px-3 py-2">
+                                <i class="fas fa-pencil-alt me-1"></i> Depoimento manual
                             </span>
                         @endif
                         @if($testimonial->user_id && $testimonial->user)
-                            <span class="ml-2 text-muted small">
-                                <i class="fas fa-user-circle mr-1"></i>Membro: <strong>{{ $testimonial->user->name }}</strong>
+                            <span class="ms-2 text-muted small">
+                                <i class="fas fa-user-circle me-1"></i>Membro: <strong>{{ $testimonial->user->name }}</strong>
                             </span>
                         @endif
                     </div>
@@ -85,7 +85,7 @@
                         </small>
                     </div>
 
-                    <div class="form-row">
+                    <div class="row g-2">
                         <div class="form-group col-md-6">
                             <label>Nome de exibição</label>
                             <input name="author_name" class="form-control"
@@ -109,7 +109,7 @@
                         @enderror
                     </div>
 
-                    <div class="form-row align-items-center">
+                    <div class="row g-2 align-items-center">
                         {{-- Avaliação em estrelas --}}
                         <div class="form-group col-md-5">
                             <label>Avaliação</label>
@@ -141,24 +141,24 @@
                         {{-- Destaque --}}
                         <div class="form-group col-md-3">
                             <label class="d-block">&nbsp;</label>
-                            <div class="custom-control custom-switch custom-switch-off-secondary custom-switch-on-primary mt-1">
+                            <div class="form-check form-switch mt-1">
                                 <input type="hidden" name="is_featured" value="0">
-                                <input type="checkbox" class="custom-control-input" id="is_featured"
+                                <input type="checkbox" class="form-check-input" id="is_featured"
                                     name="is_featured" value="1"
                                     {{ old('is_featured', $testimonial->is_featured) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="is_featured">Marcar como destaque</label>
+                                <label class="form-check-label" for="is_featured">Marcar como destaque</label>
                             </div>
                         </div>
 
                         {{-- Ativo/inativo --}}
                         <div class="form-group col-md-4">
                             <label class="d-block">&nbsp;</label>
-                            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mt-1">
+                            <div class="form-check form-switch mt-1">
                                 <input type="hidden" name="is_active" value="0">
-                                <input type="checkbox" class="custom-control-input" id="is_active"
+                                <input type="checkbox" class="form-check-input" id="is_active"
                                     name="is_active" value="1"
                                     {{ old('is_active', $testimonial->is_active ?? true) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="is_active">Visível no site</label>
+                                <label class="form-check-label" for="is_active">Visível no site</label>
                             </div>
                         </div>
                     </div>
@@ -167,10 +167,10 @@
 
                     <div class="d-flex justify-content-between">
                         <a href="{{ route('admin.testimonials.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left mr-1"></i> Voltar
+                            <i class="fas fa-arrow-left me-1"></i> Voltar
                         </a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save mr-1"></i> {{ $isCreating ? 'Criar depoimento' : 'Salvar alterações' }}
+                            <i class="fas fa-save me-1"></i> {{ $isCreating ? 'Criar depoimento' : 'Salvar alterações' }}
                         </button>
                     </div>
                 </form>
@@ -203,8 +203,8 @@
                     <div class="card-footer">
                         <form method="POST" action="{{ route('admin.testimonials.approve', $testimonial) }}">
                             @csrf
-                            <button class="btn btn-success btn-sm btn-block">
-                                <i class="fas fa-check mr-1"></i> Aprovar e publicar
+                            <button class="btn btn-success btn-sm w-100">
+                                <i class="fas fa-check me-1"></i> Aprovar e publicar
                             </button>
                         </form>
                     </div>
@@ -215,7 +215,7 @@
         <div class="card card-outline card-info">
             <div class="card-header"><h3 class="card-title">Dicas</h3></div>
             <div class="card-body small text-muted">
-                <ul class="mb-0 pl-3">
+                <ul class="mb-0 ps-3">
                     <li>Vincule ao membro para exibir o avatar automaticamente.</li>
                     <li>Marque como <strong>Destaque</strong> para aparecer primeiro.</li>
                     <li>Depoimentos <strong>inativos</strong> não aparecem no site, mesmo aprovados.</li>

@@ -12,21 +12,21 @@
                     <th>Disco</th>
                     <th>Tamanho</th>
                     <th>Gerado em</th>
-                    <th class="text-right">Acoes</th>
+                    <th class="text-end">Acoes</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($items as $item)
                     <tr>
                         <td>
-                            <div class="font-weight-bold">{{ basename($item['path']) }}</div>
+                            <div class="fw-bold">{{ basename($item['path']) }}</div>
                             <div class="backup-path text-muted">{{ $item['path'] }}</div>
                         </td>
                         <td>
                             @if(($item['disk'] ?? '') === 'local')
-                                <span class="badge badge-info"><i class="fas fa-hdd mr-1"></i> Local</span>
+                                <span class="badge text-bg-info"><i class="fas fa-hdd me-1"></i> Local</span>
                             @else
-                                <span class="badge badge-primary"><i class="fas fa-cloud mr-1"></i> S3</span>
+                                <span class="badge text-bg-primary"><i class="fas fa-cloud me-1"></i> S3</span>
                             @endif
                         </td>
                         <td>{{ $item['size_label'] }}</td>

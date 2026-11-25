@@ -25,7 +25,7 @@
                                 <th>Inicio</th>
                                 <th>Fim</th>
                                 <th>Status</th>
-                                <th class="text-right">Acoes</th>
+                                <th class="text-end">Acoes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -35,8 +35,8 @@
                                     <td>{{ $sponsor->plan?->name ?: '-' }}</td>
                                     <td>{{ optional($sponsor->starts_at)->format('d/m/Y H:i') ?: '-' }}</td>
                                     <td>{{ optional($sponsor->ends_at)->format('d/m/Y H:i') ?: '-' }}</td>
-                                    <td><span class="badge badge-info text-uppercase">{{ $sponsor->status }}</span></td>
-                                    <td class="text-right"><a href="{{ route('admin.sponsors.edit', $sponsor) }}" class="btn btn-sm btn-outline-primary">Editar</a></td>
+                                    <td><span class="badge text-bg-info text-uppercase">{{ $sponsor->status }}</span></td>
+                                    <td class="text-end"><a href="{{ route('admin.sponsors.edit', $sponsor) }}" class="btn btn-sm btn-outline-primary">Editar</a></td>
                                 </tr>
                             @empty
                                 <tr><td colspan="6" class="text-center text-muted py-4">Nenhum patrocinador cadastrado.</td></tr>

@@ -1,16 +1,16 @@
 <div class="card-body">
     <div class="alert alert-info mb-4">
-        <i class="fas fa-ad mr-2"></i> Configure a monetizacao do seu conteudo. Voce pode usar Google AdSense ou codigos
+        <i class="fas fa-ad me-2"></i> Configure a monetizacao do seu conteudo. Voce pode usar Google AdSense ou codigos
         de publicidade personalizados.
     </div>
 
     <div class="form-group mb-4">
-        <div class="custom-control custom-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
+        <div class="form-check form-switch custom-switch-lg custom-switch-off-danger custom-switch-on-success">
             <input type="hidden" name="ads_enabled" value="0">
-            <input type="checkbox" class="custom-control-input" id="ads_enabled" name="ads_enabled" value="1" {{ ($settings['ads_enabled'] ?? 0) ? 'checked' : '' }}>
-            <label class="custom-control-label font-weight-bold" for="ads_enabled">Ativar exibicao de anuncios</label>
+            <input type="checkbox" class="form-check-input" id="ads_enabled" name="ads_enabled" value="1" {{ ($settings['ads_enabled'] ?? 0) ? 'checked' : '' }}>
+            <label class="form-check-label fw-bold" for="ads_enabled">Ativar exibicao de anuncios</label>
         </div>
-        <small class="form-text text-muted ml-5">Quando desativado, nenhum anuncio sera carregado, independentemente das
+        <small class="form-text text-muted ms-5">Quando desativado, nenhum anuncio sera carregado, independentemente das
             configuracoes abaixo.</small>
     </div>
 
@@ -18,7 +18,7 @@
         <div class="col-md-6">
             <div class="card card-outline card-primary h-100">
                 <div class="card-header">
-                    <h3 class="card-title font-weight-bold"><i class="fab fa-google mr-2"></i> Google AdSense</h3>
+                    <h3 class="card-title fw-bold"><i class="fab fa-google me-2"></i> Google AdSense</h3>
                 </div>
                 <div class="card-body">
                     <div class="form-group">
@@ -62,7 +62,7 @@
         <div class="col-md-6">
             <div class="card card-outline card-secondary h-100">
                 <div class="card-header">
-                    <h3 class="card-title font-weight-bold"><i class="fas fa-code mr-2"></i> Codigo personalizado / outras redes</h3>
+                    <h3 class="card-title fw-bold"><i class="fas fa-code me-2"></i> Codigo personalizado / outras redes</h3>
                 </div>
                 <div class="card-body">
                     <div class="form-group">
@@ -80,15 +80,15 @@
 
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-stream mr-2"></i> Anuncios no feed (Comunidade)</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-stream me-2"></i> Anuncios no feed (Comunidade)</h5>
     <div class="row">
         <div class="col-md-12">
             <div class="form-group mb-3">
-                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
                     <input type="hidden" name="ads_inter_feed_enabled" value="0">
-                    <input type="checkbox" class="custom-control-input" id="ads_inter_feed_enabled"
+                    <input type="checkbox" class="form-check-input" id="ads_inter_feed_enabled"
                         name="ads_inter_feed_enabled" value="1" {{ ($settings['ads_inter_feed_enabled'] ?? 0) ? 'checked' : '' }}>
-                    <label class="custom-control-label font-weight-bold" for="ads_inter_feed_enabled">Habilitar anuncios entre postagens</label>
+                    <label class="form-check-label fw-bold" for="ads_inter_feed_enabled">Habilitar anuncios entre postagens</label>
                 </div>
             </div>
         </div>

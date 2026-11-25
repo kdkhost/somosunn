@@ -19,7 +19,7 @@
                 <div class="form-group mb-3"><label>E-mail</label><input name="email" type="email" class="form-control"
                         value="{{ old('email', $user->email) }}" required></div>
 
-                <div class="form-row">
+                <div class="row g-2">
                     <div class="form-group col-md-6">
                         <label>Senha @if($user->exists)<small class="text-muted">(deixe em branco para não alterar)</small>@endif</label>
                         <input name="password" type="password" class="form-control" {{ $user->exists ? '' : 'required' }}>
@@ -30,10 +30,10 @@
                     </div>
 
                     <div class="form-group col-12">
-                        <div class="custom-control custom-switch border rounded p-3 pl-5 bg-light">
-                            <input type="checkbox" class="custom-control-input" id="admin-user-email-verified"
+                        <div class="form-check form-switch border rounded p-3 ps-5 bg-light">
+                            <input type="checkbox" class="form-check-input" id="admin-user-email-verified"
                                 name="email_verified" value="1" {{ old('email_verified', $user->hasVerifiedEmail()) ? 'checked' : '' }}>
-                            <label class="custom-control-label font-weight-bold" for="admin-user-email-verified">
+                            <label class="form-check-label fw-bold" for="admin-user-email-verified">
                                 Criar ou manter este cadastro com o e-mail validado
                             </label>
                             <small class="d-block text-muted mt-1">
@@ -70,7 +70,7 @@
                         </div>
                     @else
                         <div class="form-group col-md-6 d-flex align-items-center mt-4">
-                            <p class="text-muted mb-0"><i class="fas fa-info-circle mr-1"></i> Papel e Nível não podem ser alterados no próprio perfil.</p>
+                            <p class="text-muted mb-0"><i class="fas fa-info-circle me-1"></i> Papel e Nível não podem ser alterados no próprio perfil.</p>
                         </div>
                     @endif
                 </div>
@@ -79,7 +79,7 @@
         @if(auth()->user()->isAdmin())
             <div class="card mt-4 border-info">
                 <div class="card-header bg-info text-white">
-                    <h3 class="card-title"><i class="fas fa-crown mr-1"></i> Gestão de Plano Manual</h3>
+                    <h3 class="card-title"><i class="fas fa-crown me-1"></i> Gestão de Plano Manual</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -114,11 +114,11 @@
 
             <div class="card mt-4 border-success">
                 <div class="card-header bg-success text-white">
-                    <h3 class="card-title"><i class="fas fa-unlock-alt mr-1"></i> Recursos Individuais (Extras)</h3>
+                    <h3 class="card-title"><i class="fas fa-unlock-alt me-1"></i> Recursos Individuais (Extras)</h3>
                 </div>
                 <div class="card-body">
                     <p class="text-muted mb-3">
-                        <i class="fas fa-info-circle mr-1"></i>
+                        <i class="fas fa-info-circle me-1"></i>
                         Libere recursos específicos para este usuário, independente do plano atribuído.
                         Esses recursos se somam aos do plano.
                     </p>
@@ -128,25 +128,25 @@
                     @endphp
 
                     @foreach($featureGroups as $groupName => $groupKeys)
-                        <h6 class="font-weight-bold text-success mb-2 {{ !$loop->first ? 'mt-3' : '' }}">
-                            <i class="fas fa-folder mr-1"></i> {{ $groupName }}
+                        <h6 class="fw-bold text-success mb-2 {{ !$loop->first ? 'mt-3' : '' }}">
+                            <i class="fas fa-folder me-1"></i> {{ $groupName }}
                         </h6>
                         <div class="row mb-2">
                             @foreach($groupKeys as $featureKey)
                                 @if(isset($userFeatures[$featureKey]))
                                     <div class="col-md-4 col-lg-3">
-                                        <div class="custom-control custom-checkbox mb-2">
+                                        <div class="form-check mb-2">
                                             @php
                                                 $hasViaPlan = $user->exists && $user->activePlan() && $user->activePlan()->hasFeature($featureKey);
                                                 $isChecked = in_array($featureKey, $selectedFeatures, true) || $hasViaPlan;
                                             @endphp
-                                            <input type="checkbox" class="custom-control-input" id="extra-feature-{{ $featureKey }}"
+                                            <input type="checkbox" class="form-check-input" id="extra-feature-{{ $featureKey }}"
                                                 name="extra_features[]" value="{{ $featureKey }}"
                                                 {{ $isChecked ? 'checked' : '' }}>
-                                            <label class="custom-control-label font-weight-bold" for="extra-feature-{{ $featureKey }}">
+                                            <label class="form-check-label fw-bold" for="extra-feature-{{ $featureKey }}">
                                                 {{ $userFeatures[$featureKey] }}
                                                 @if($hasViaPlan)
-                                                    <span class="badge badge-success ml-1" style="font-size: 8px;">PLANO</span>
+                                                    <span class="badge text-bg-success ms-1" style="font-size: 8px;">PLANO</span>
                                                 @endif
                                             </label>
                                         </div>

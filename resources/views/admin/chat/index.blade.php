@@ -12,24 +12,24 @@
         <div class="col-12">
             <div class="card card-outline card-primary shadow-sm direct-chat direct-chat-primary h-100" style="min-height: 600px;">
                 <div class="card-header border-bottom py-2.5 px-3">
-                    <h3 class="card-title font-weight-bold m-0" style="font-size: 1rem;">
+                    <h3 class="card-title fw-bold m-0" style="font-size: 1rem;">
                         <i class="far fa-comments text-primary mr-1.5"></i> Central de Mensagens
                     </h3>
                     <div class="card-tools">
-                        <span class="badge badge-primary rounded-pill px-2.5 py-1">{{ $conversations->count() }} conversas</span>
+                        <span class="badge text-bg-primary rounded-pill px-2.5 py-1">{{ $conversations->count() }} conversas</span>
                     </div>
                 </div>
 
                 <div class="card-body p-0">
-                    <div class="row no-gutters h-100" style="min-height: 540px;">
+                    <div class="row g-0 h-100" style="min-height: 540px;">
                         <!-- Coluna da Esquerda: Lista de Conversas -->
-                        <div class="col-md-4 col-12 border-right d-flex flex-column bg-light" style="max-height: 540px;">
+                        <div class="col-md-4 col-12 border-end d-flex flex-column bg-light" style="max-height: 540px;">
                             <div class="p-2 border-bottom bg-white">
                                 <div class="input-group input-group-sm">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text bg-light border-right-0"><i class="fas fa-search text-muted"></i></span>
+                                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
                                     </div>
-                                    <input type="text" id="conversationSearchInput" class="form-control border-left-0" placeholder="Buscar conversa...">
+                                    <input type="text" id="conversationSearchInput" class="form-control border-start-0" placeholder="Buscar conversa...">
                                 </div>
                             </div>
 
@@ -67,7 +67,7 @@
                                                                 {{ $lastMsg ? $lastMsg->body : 'Clique para ver a conversa' }}
                                                             </small>
                                                             @if($conv->unread_count > 0)
-                                                                <span class="badge badge-primary rounded-pill px-2">{{ $conv->unread_count }}</span>
+                                                                <span class="badge text-bg-primary rounded-pill px-2">{{ $conv->unread_count }}</span>
                                                             @endif
                                                         </div>
                                                     </div>
@@ -85,10 +85,10 @@
                                 <div class="mb-3" style="font-size: 3.5rem; color: #cbd5e1;">
                                     <i class="far fa-comments"></i>
                                 </div>
-                                <h5 class="font-weight-bold text-dark mb-1">Selecione uma conversa</h5>
+                                <h5 class="fw-bold text-dark mb-1">Selecione uma conversa</h5>
                                 <p class="small text-muted mb-3">Escolha um membro ou atendimento na lista ao lado para iniciar a conversa.</p>
-                                <span class="badge badge-light border px-3 py-2 text-muted" style="font-size: 0.75rem;">
-                                    <i class="fas fa-lock text-success mr-1"></i> Comunicação direta em tempo real
+                                <span class="badge text-bg-light border px-3 py-2 text-muted" style="font-size: 0.75rem;">
+                                    <i class="fas fa-lock text-success me-1"></i> Comunicação direta em tempo real
                                 </span>
                             </div>
                         </div>
@@ -131,7 +131,7 @@
                                 if (conv.unread_count > 0) {
                                     if (!badge) {
                                         badge = document.createElement('span');
-                                        badge.className = 'badge badge-primary rounded-pill px-2';
+                                        badge.className = 'badge text-bg-primary rounded-pill px-2';
                                         link.querySelector('.d-flex.align-items-center.justify-content-between:last-child').appendChild(badge);
                                     }
                                     badge.textContent = conv.unread_count;

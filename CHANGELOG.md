@@ -1,5 +1,18 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.38] - 2026-11-25 - feat(admin, ui): migracao integral e limpa do painel /admin para AdminLTE 4 nativo (Bootstrap 5.3) sem residuos do AdminLTE 3
+
+- **Migração Integral do Shell `/admin` para AdminLTE 4.0.0-beta3 + Bootstrap 5.3.3 + OverlayScrollbars v2 (`resources/views/admin/layouts/app.blade.php`, `navbar.blade.php`, `sidebar.blade.php`, `footer.blade.php`, `control-sidebar.blade.php`, `quick-upload-modal.blade.php`):**
+  - Removidos 100% dos resíduos do AdminLTE 3.2 e Bootstrap 4.6.2 (incluindo ~3.450 linhas de CSS inline legado que causavam conflito de grid, altura e cores no tema escuro).
+  - Implementada a estrutura nativa AdminLTE 4 (`app-wrapper`, `app-header`, `app-sidebar`, `sidebar-brand`, `sidebar-wrapper`, `sidebar-menu`, `app-main`, `app-content-header`, `app-content`, `app-footer`) com CSS Grid fluido sem espaço vazio antes do rodapé.
+  - Substituído o antigo `control-sidebar` pelo componente nativo **Bootstrap 5 Offcanvas** (`#adminQuickPanelOffcanvas`).
+  - Substituído `summernote-bs4` por `summernote-lite` (independente de Bootstrap 4).
+- **Tema Limpo Dedicado UNN para AdminLTE 4 (`public/css/adminlte4-unn.css`, `public/js/adminlte4-unn.js`):**
+  - CSS leve e sem conflitos com paleta UNN (`#1F5EDB`, `#177FD6`, `#1D3FC4`), Dark Mode nativo `[data-bs-theme="dark"]` + `.dark-mode` sem estouro de cores, e adaptador JS seguro (`$().modal()` &rarr; `bootstrap.Modal.getOrCreateInstance`, `UNNAdminTheme.apply`, OverlayScrollbars v2).
+- **Migração Completa de Todas as Views Administrativas (`resources/views/admin/**/*.blade.php`, `resources/views/components/unn-dropzone.blade.php`):**
+  - 139 views migradas para padrões nativos Bootstrap 5 / AdminLTE 4 (`data-bs-toggle`, `data-bs-target`, `data-bs-dismiss`, `btn-close`, `me-*`, `ms-*`, `pe-*`, `ps-*`, `float-end`, `text-end`, `fw-bold`, `text-bg-*`, `rounded-pill`, `w-100`, `dropdown-menu-end`, `form-select`, `form-check form-switch`, `data-lte-toggle`).
+  - Preservadas todas as funcionalidades (PJAX, SweetAlert2, Toastr, upload rápido, chat flutuante, gaveta global de instruções `?` em todos os campos, alternância dinâmica Sandbox/Produção, máscaras `unn-masks.js` e rotas/permissões dos dois painéis).
+
 ## [2.8.37] - 2026-11-25 - fix(admin, css): remocao definitiva do padding-bottom triplicado (270px) antes do rodape e fundo dark harmonizado
 
 - **Eliminação Definitiva dos 270px de Espaço Vazio Antes do Rodapé (`resources/views/admin/layouts/app.blade.php`):**

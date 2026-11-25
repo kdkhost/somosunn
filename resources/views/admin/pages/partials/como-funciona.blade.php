@@ -4,12 +4,12 @@
 <div class="tab-pane fade" id="sec-header">
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-cogs mr-1"></i> Cabeçalho</h3>
+            <h3 class="card-title"><i class="fas fa-cogs me-1"></i> Cabeçalho</h3>
             <div class="card-tools">
-                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-header" data-section="header"
+                <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-header" data-section="header"
                         {{ ($data['header_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-header">Exibir no site</label>
+                    <label class="form-check-label" for="toggle-header">Exibir no site</label>
                 </div>
             </div>
         </div>
@@ -25,20 +25,20 @@
 <div class="tab-pane fade" id="sec-steps">
     <div class="card card-outline card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-list-ol mr-1"></i> Passos (4 etapas)</h3>
+            <h3 class="card-title"><i class="fas fa-list-ol me-1"></i> Passos (4 etapas)</h3>
             <div class="card-tools d-flex align-items-center">
-                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mr-3">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-steps" data-section="steps"
+                <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success me-3">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-steps" data-section="steps"
                         {{ ($data['steps_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-steps">Exibir no site</label>
+                    <label class="form-check-label" for="toggle-steps">Exibir no site</label>
                 </div>
-                <span class="badge badge-secondary">JSON</span>
+                <span class="badge text-bg-secondary">JSON</span>
             </div>
         </div>
         <div class="card-body">
             <div id="steps-repeater-container"></div>
-            <button type="button" id="add-step-btn" class="btn btn-outline-primary btn-block mt-3">
-                <i class="fas fa-plus mr-1"></i> Adicionar Passo
+            <button type="button" id="add-step-btn" class="btn btn-outline-primary w-100 mt-3">
+                <i class="fas fa-plus me-1"></i> Adicionar Passo
             </button>
             <textarea name="steps_json" class="d-none">{{ json_encode($data['steps'] ?? []) }}</textarea>
         </div>
@@ -57,25 +57,25 @@ document.addEventListener('DOMContentLoaded', function() {
             initialData: {!! json_encode($data['steps'] ?? []) !!},
             template: (item, index) => `
                 <div class="row">
-                    <div class="col-md-6 border-right">
+                    <div class="col-md-6 border-end">
                         <div class="form-group mb-2">
-                            <label class="small font-weight-bold">Direção da Seção</label>
+                            <label class="small fw-bold">Direção da Seção</label>
                             <select name="step[direction]" class="form-control form-control-sm">
                                 <option value="row" ${item.direction === 'row' ? 'selected' : ''}>Normal (Imagem Direita)</option>
                                 <option value="row-reverse" ${item.direction === 'row-reverse' ? 'selected' : ''}>Invertido (Imagem Esquerda)</option>
                             </select>
                         </div>
                         <div class="form-group mb-2">
-                            <label class="small font-weight-bold">Título do Passo</label>
+                            <label class="small fw-bold">Título do Passo</label>
                             <input type="text" name="step[title]" value="${item.title || ''}" class="form-control form-control-sm">
                         </div>
                         <div class="form-group mb-0">
-                            <label class="small font-weight-bold">Texto Descritivo</label>
+                            <label class="small fw-bold">Texto Descritivo</label>
                             <textarea name="step[text]" rows="3" class="form-control form-control-sm">${item.text || ''}</textarea>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="small font-weight-bold">Tópicos / Benefícios (3 itens)</label>
+                        <label class="small fw-bold">Tópicos / Benefícios (3 itens)</label>
                         ${[0,1,2].map(i => `
                             <div class="input-group input-group-sm mb-2">
                                 <div class="input-group-prepend">
@@ -112,12 +112,12 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="tab-pane fade" id="sec-plans">
     <div class="card card-outline card-warning">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-tags mr-1"></i> Seção Planos</h3>
+            <h3 class="card-title"><i class="fas fa-tags me-1"></i> Seção Planos</h3>
             <div class="card-tools">
-                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-plans" data-section="plans"
+                <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-plans" data-section="plans"
                         {{ ($data['plans_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-plans">Exibir no site</label>
+                    <label class="form-check-label" for="toggle-plans">Exibir no site</label>
                 </div>
             </div>
         </div>
@@ -137,12 +137,12 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="tab-pane fade" id="sec-cta">
     <div class="card card-outline card-success">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+            <h3 class="card-title"><i class="fas fa-bullhorn me-1"></i> CTA Final</h3>
             <div class="card-tools">
-                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-cta" data-section="cta"
+                <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-cta" data-section="cta"
                         {{ ($data['cta_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-cta">Exibir no site</label>
+                    <label class="form-check-label" for="toggle-cta">Exibir no site</label>
                 </div>
             </div>
         </div>

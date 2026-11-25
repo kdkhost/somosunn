@@ -17,7 +17,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-primary elevation-1"><i class="fas fa-users"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Total de Usuários</span>
+                    <span class="info-box-text fw-bold">Total de Usuários</span>
                     <span class="info-box-number">{{ $totalUsers }}</span>
                     <span class="progress-description text-xs">Cadastrados na plataforma</span>
                 </div>
@@ -27,7 +27,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-danger elevation-1"><i class="fas fa-user-shield"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Administradores</span>
+                    <span class="info-box-text fw-bold">Administradores</span>
                     <span class="info-box-number text-danger">{{ $totalAdmins }}</span>
                     <span class="progress-description text-xs">Admin e Super Admin</span>
                 </div>
@@ -37,7 +37,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-success elevation-1"><i class="fas fa-user-graduate"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Membros</span>
+                    <span class="info-box-text fw-bold">Membros</span>
                     <span class="info-box-number text-success">{{ $totalMembers }}</span>
                     <span class="progress-description text-xs">Usuários regulares</span>
                 </div>
@@ -48,25 +48,25 @@
     {{-- Responsavel de Marketing --}}
     <div class="card card-outline card-info shadow-sm mb-4">
         <div class="card-header border-0 py-2">
-            <h3 class="card-title font-weight-bold text-info" style="font-size: 0.95rem;">
-                <i class="fas fa-bullhorn mr-2"></i> Responsavel de Marketing da Plataforma
+            <h3 class="card-title fw-bold text-info" style="font-size: 0.95rem;">
+                <i class="fas fa-bullhorn me-2"></i> Responsavel de Marketing da Plataforma
             </h3>
         </div>
         <div class="card-body py-3">
             @if($marketingUser)
                 <div class="d-flex align-items-center justify-content-between flex-wrap">
                     <div>
-                        <span class="badge badge-success px-3 py-2 mr-2" style="font-size: 11px;">
-                            <i class="fas fa-check-circle mr-1"></i> Ativo
+                        <span class="badge text-bg-success px-3 py-2 me-2" style="font-size: 11px;">
+                            <i class="fas fa-check-circle me-1"></i> Ativo
                         </span>
                         <strong>{{ $marketingUser->name }}</strong>
-                        <span class="text-muted ml-2">({{ $marketingUser->email }})</span>
+                        <span class="text-muted ms-2">({{ $marketingUser->email }})</span>
                     </div>
                     <small class="text-muted">Recebe 10% de cada venda concluida (split "traffic")</small>
                 </div>
             @else
                 <p class="text-muted mb-0 small">
-                    <i class="fas fa-info-circle mr-1"></i>
+                    <i class="fas fa-info-circle me-1"></i>
                     Nenhum usuario designado. Clique no icone <i class="fas fa-bullhorn text-info"></i> ao lado de um usuario para definir o responsavel.
                 </p>
             @endif
@@ -75,8 +75,8 @@
 
     @if($isNewUsersTodayView || $createdAtLabel)
         <div class="alert alert-primary shadow-sm d-flex flex-wrap align-items-center justify-content-between mb-4">
-            <div class="pr-3">
-                <strong><i class="fas fa-user-clock mr-2"></i>Filtro ativo:</strong>
+            <div class="pe-3">
+                <strong><i class="fas fa-user-clock me-2"></i>Filtro ativo:</strong>
                 @if($isNewUsersTodayView)
                     exibindo apenas os novos usuários cadastrados hoje.
                 @else
@@ -84,7 +84,7 @@
                 @endif
             </div>
             <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                <i class="fas fa-times mr-1"></i> Limpar filtro
+                <i class="fas fa-times me-1"></i> Limpar filtro
             </a>
         </div>
     @endif
@@ -92,12 +92,12 @@
     {{-- Tabela principal --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header border-0">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-users-cog mr-2 text-primary"></i>Gerenciar Usuários
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-users-cog me-2 text-primary"></i>Gerenciar Usuários
             </h3>
             <div class="card-tools">
                 <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 elevation-1" data-pjax="true">
-                    <i class="fas fa-plus mr-1"></i> Novo Usuário
+                    <i class="fas fa-plus me-1"></i> Novo Usuário
                 </a>
             </div>
         </div>
@@ -107,7 +107,7 @@
                 <table id="example1" class="table table-hover align-middle mb-0">
                     <thead>
                         <tr class="bg-light">
-                            <th class="border-0 pl-4">Nome</th>
+                            <th class="border-0 ps-4">Nome</th>
                             <th class="border-0">E-mail</th>
                             <th class="border-0 text-center">Papel</th>
                             <th class="border-0 text-center">Nível</th>
@@ -118,37 +118,37 @@
                     <tbody>
                         @forelse($users as $user)
                             <tr>
-                                <td class="pl-4">
-                                    <span class="font-weight-bold text-sm">{{ $user->name }}</span>
+                                <td class="ps-4">
+                                    <span class="fw-bold text-sm">{{ $user->name }}</span>
                                 </td>
                                 <td>
                                     <span class="text-muted text-sm">{{ $user->email }}</span>
-                                    <span class="badge d-block mt-1 {{ $user->hasVerifiedEmail() ? 'badge-success' : 'badge-warning' }}" style="width:max-content;">
-                                        <i class="fas {{ $user->hasVerifiedEmail() ? 'fa-check-circle' : 'fa-exclamation-circle' }} mr-1"></i>
+                                    <span class="badge d-block mt-1 {{ $user->hasVerifiedEmail() ? 'text-bg-success' : 'text-bg-warning' }}" style="width:max-content;">
+                                        <i class="fas {{ $user->hasVerifiedEmail() ? 'fa-check-circle' : 'fa-exclamation-circle' }} me-1"></i>
                                         {{ $user->hasVerifiedEmail() ? 'E-mail validado' : 'E-mail pendente' }}
                                     </span>
                                 </td>
                                 <td class="text-center">
                                     @if($user->role === 'superadmin')
-                                        <span class="badge badge-danger px-3 py-2" style="font-size:11px;">
-                                            <i class="fas fa-crown mr-1" style="font-size:9px;"></i>Super Admin
+                                        <span class="badge text-bg-danger px-3 py-2" style="font-size:11px;">
+                                            <i class="fas fa-crown me-1" style="font-size:9px;"></i>Super Admin
                                         </span>
                                     @elseif($user->role === 'admin')
-                                        <span class="badge badge-warning px-3 py-2" style="font-size:11px;">
-                                            <i class="fas fa-user-shield mr-1" style="font-size:9px;"></i>Admin
+                                        <span class="badge text-bg-warning px-3 py-2" style="font-size:11px;">
+                                            <i class="fas fa-user-shield me-1" style="font-size:9px;"></i>Admin
                                         </span>
                                     @else
-                                        <span class="badge badge-secondary px-3 py-2" style="font-size:11px;">
-                                            <i class="fas fa-user mr-1" style="font-size:9px;"></i>Membro
+                                        <span class="badge text-bg-secondary px-3 py-2" style="font-size:11px;">
+                                            <i class="fas fa-user me-1" style="font-size:9px;"></i>Membro
                                         </span>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge badge-light border px-2 py-1">{{ ucfirst($user->level ?? 'Iniciante') }}</span>
+                                    <span class="badge text-bg-light border px-2 py-1">{{ ucfirst($user->level ?? 'Iniciante') }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge badge-info px-2 py-1">
-                                        <i class="fas fa-ticket-alt mr-1" style="font-size:9px;"></i>
+                                    <span class="badge text-bg-info px-2 py-1">
+                                        <i class="fas fa-ticket-alt me-1" style="font-size:9px;"></i>
                                         {{ $user->checked_in_tickets_count }} / {{ $user->total_tickets_count }}
                                     </span>
                                 </td>
@@ -197,7 +197,7 @@
                     </div>
                     <div>
                         <a href="{{ route('admin.users.create') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-pjax="true">
-                            <i class="fas fa-plus mr-1"></i> Novo Usuário
+                            <i class="fas fa-plus me-1"></i> Novo Usuário
                         </a>
                     </div>
                 </div>

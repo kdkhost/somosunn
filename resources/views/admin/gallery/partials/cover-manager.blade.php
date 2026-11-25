@@ -7,7 +7,7 @@
 <div class="card card-outline card-warning">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-image mr-2"></i>Capa do album
+            <i class="fas fa-image me-2"></i>Capa do album
         </h3>
     </div>
 
@@ -64,8 +64,8 @@
                         <small class="form-text text-muted">Tamanho ideal: 1600 x 900 px (16:9). Maximo de 10 MB.</small>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-upload mr-1"></i>Salvar capa personalizada
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-upload me-1"></i>Salvar capa personalizada
                     </button>
                 </form>
 
@@ -73,8 +73,8 @@
                     @csrf
                     @method('DELETE')
 
-                    <button type="submit" class="btn btn-default btn-block" @disabled(!$selectedHasCustomCover)>
-                        <i class="fas fa-undo-alt mr-1"></i>Remover capa personalizada
+                    <button type="submit" class="btn btn-default w-100" @disabled(!$selectedHasCustomCover)>
+                        <i class="fas fa-undo-alt me-1"></i>Remover capa personalizada
                     </button>
                 </form>
 

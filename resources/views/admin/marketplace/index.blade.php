@@ -26,7 +26,7 @@
                 <div class="info-box-content">
                     <span class="info-box-text">Vendas pagas</span>
                     <span class="info-box-number">{{ $paidCount }}</span>
-                    <a href="{{ route('admin.marketplace.sales') }}" class="text-success small font-weight-bold">Ver vendas <i class="fas fa-arrow-circle-right ml-1"></i></a>
+                    <a href="{{ route('admin.marketplace.sales') }}" class="text-success small fw-bold">Ver vendas <i class="fas fa-arrow-circle-right ms-1"></i></a>
                 </div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                 <div class="info-box-content">
                     <span class="info-box-text">Pedidos pendentes</span>
                     <span class="info-box-number">{{ $pendingCount }}</span>
-                    <a href="{{ route('admin.marketplace.sales') }}" class="text-warning small font-weight-bold">Acompanhar <i class="fas fa-arrow-circle-right ml-1"></i></a>
+                    <a href="{{ route('admin.marketplace.sales') }}" class="text-warning small fw-bold">Acompanhar <i class="fas fa-arrow-circle-right ms-1"></i></a>
                 </div>
             </div>
         </div>
@@ -61,41 +61,41 @@
     {{-- Acoes rapidas --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
-            <h3 class="card-title font-weight-bold"><i class="fas fa-store mr-2"></i>Acoes rapidas do marketplace</h3>
+            <h3 class="card-title fw-bold"><i class="fas fa-store me-2"></i>Acoes rapidas do marketplace</h3>
             <div class="mt-3 mt-md-0 d-flex flex-wrap" style="gap: 8px;">
                 @if($canManageOwnMarketplace && $storefrontModuleInstalled)
                     <a href="{{ route('admin.marketplace.store.edit') }}" class="btn btn-sm btn-outline-primary rounded-pill elevation-1">
-                        <i class="fas fa-store-alt mr-1"></i> {{ $isSuperAdmin ? 'Loja da plataforma' : 'Minha loja' }}
+                        <i class="fas fa-store-alt me-1"></i> {{ $isSuperAdmin ? 'Loja da plataforma' : 'Minha loja' }}
                     </a>
                     <a href="{{ route('admin.marketplace.products.index') }}" class="btn btn-sm btn-outline-primary rounded-pill elevation-1">
-                        <i class="fas fa-box-open mr-1"></i> Produtos proprios
+                        <i class="fas fa-box-open me-1"></i> Produtos proprios
                     </a>
                     <a href="{{ route('admin.marketplace.orders.index') }}" class="btn btn-sm btn-outline-primary rounded-pill elevation-1">
-                        <i class="fas fa-truck mr-1"></i> Pedidos da loja
+                        <i class="fas fa-truck me-1"></i> Pedidos da loja
                     </a>
                 @endif
                 @if($canManageOwnMarketplace)
                     <a href="{{ route('admin.marketplace.sales') }}" class="btn btn-sm btn-outline-primary rounded-pill elevation-1">
-                        <i class="fas fa-receipt mr-1"></i> Minhas vendas
+                        <i class="fas fa-receipt me-1"></i> Minhas vendas
                     </a>
                 @endif
                 @if($isAdmin && $storefrontModuleInstalled)
                     <a href="{{ route('admin.marketplace.stores.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill elevation-1">
-                        <i class="fas fa-store-alt-slash mr-1"></i> Lojas marketplace
+                        <i class="fas fa-store-alt-slash me-1"></i> Lojas marketplace
                     </a>
                     <a href="{{ route('admin.marketplace.catalog.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill elevation-1">
-                        <i class="fas fa-boxes-stacked mr-1"></i> Produtos marketplace
+                        <i class="fas fa-boxes-stacked me-1"></i> Produtos marketplace
                     </a>
                 @endif
                 <a href="{{ route('admin.marketplace.payments') }}" class="btn btn-sm btn-primary rounded-pill elevation-1">
-                    <i class="fas fa-credit-card mr-1"></i> Ver pagamentos
+                    <i class="fas fa-credit-card me-1"></i> Ver pagamentos
                 </a>
             </div>
         </div>
         <div class="card-body">
             @if($canManageOwnMarketplace && !$storefrontModuleInstalled)
                 <div class="alert alert-warning">
-                    <div class="font-weight-bold mb-1"><i class="fas fa-exclamation-triangle mr-2"></i>Loja virtual pendente de instalacao</div>
+                    <div class="fw-bold mb-1"><i class="fas fa-exclamation-triangle me-2"></i>Loja virtual pendente de instalacao</div>
                     <div>Os atalhos de Minha loja, Produtos proprios e Pedidos da loja ficam disponiveis somente depois que a migration do modulo for executada neste servidor.</div>
                     <div class="mt-2"><code>php artisan migrate --force</code></div>
                 </div>
@@ -103,11 +103,11 @@
 
             @if($paymentsConfigured)
                 <div class="alert alert-success mb-0">
-                    <i class="fas fa-check-circle mr-2"></i> Pagamentos configurados e habilitados na plataforma.
+                    <i class="fas fa-check-circle me-2"></i> Pagamentos configurados e habilitados na plataforma.
                 </div>
             @else
                 <div class="alert alert-warning mb-0">
-                    <i class="fas fa-exclamation-triangle mr-2"></i> Pagamento indisponivel: o MercadoPago ainda nao foi configurado na plataforma.
+                    <i class="fas fa-exclamation-triangle me-2"></i> Pagamento indisponivel: o MercadoPago ainda nao foi configurado na plataforma.
                 </div>
             @endif
         </div>

@@ -1,16 +1,16 @@
 <div class="card card-outline card-primary premium-upload-box" id="media-uploader">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title mb-0"><i class="fas fa-layer-group mr-2 text-primary"></i>Central de Mídias</h3>
-        <span class="badge badge-info shadow-sm">Máx. 50MB</span>
+        <h3 class="card-title mb-0"><i class="fas fa-layer-group me-2 text-primary"></i>Central de Mídias</h3>
+        <span class="badge text-bg-info shadow-sm">Máx. 50MB</span>
     </div>
     <div class="card-body">
         <div class="drop-zone-area p-5 text-center mb-4 transition-all" id="dropzone">
             <div class="dz-message d-flex flex-column align-items-center">
                 <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3 opacity-50"></i>
-                <h5 class="font-weight-bold mb-1">Arraste seus arquivos para aqui</h5>
+                <h5 class="fw-bold mb-1">Arraste seus arquivos para aqui</h5>
                 <p class="text-muted small">ou clique para explorar seu computador</p>
                 <button class="btn btn-primary btn-sm rounded-pill px-4 mt-2 shadow-sm" id="selectFilesBtn">
-                    <i class="fas fa-search mr-1"></i> Selecionar Arquivos
+                    <i class="fas fa-search me-1"></i> Selecionar Arquivos
                 </button>
             </div>
             <input type="file" id="fileInput" class="d-none" multiple>
@@ -19,7 +19,7 @@
         <div id="uploadList" class="upload-list-container"></div>
     </div>
     <div class="card-footer bg-light py-2">
-        <small class="text-muted"><i class="fas fa-info-circle mr-1"></i> Suporte para Imagens, Vídeos, Áudios e
+        <small class="text-muted"><i class="fas fa-info-circle me-1"></i> Suporte para Imagens, Vídeos, Áudios e
             Documentos (PDF, DOCX, XLSX).</small>
     </div>
 </div>
@@ -28,9 +28,8 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-primary text-white border-0">
-                <h5 class="modal-title font-weight-bold"><i class="fas fa-crop mr-2"></i>Ajustar Imagem</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title fw-bold"><i class="fas fa-crop me-2"></i>Ajustar Imagem</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body p-0 bg-dark d-flex align-items-center justify-content-center"
                 style="min-height: 400px;">
@@ -40,9 +39,9 @@
             </div>
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
-                    data-dismiss="modal">Cancelar</button>
+                    data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm" id="cropConfirmBtn">
-                    <i class="fas fa-check mr-1"></i> Confirmar & Enviar
+                    <i class="fas fa-check me-1"></i> Confirmar & Enviar
                 </button>
             </div>
         </div>
@@ -66,14 +65,14 @@
                 const row = document.createElement('div');
                 row.className = 'upload-item-row mb-3 animate__animated animate__fadeInUp';
                 const isImage = file.type.startsWith('image/');
-                const preview = isImage && previewUrl ? `<img src="${previewUrl}" class="rounded shadow-sm border mr-3" style="width:54px;height:54px;object-fit:cover;" loading="lazy" decoding="async">` : `<div class="rounded border bg-light d-flex align-items-center justify-content-center mr-3" style="width:54px;height:54px;"><i class="fas fa-file-alt text-muted fa-lg"></i></div>`;
+                const preview = isImage && previewUrl ? `<img src="${previewUrl}" class="rounded shadow-sm border me-3" style="width:54px;height:54px;object-fit:cover;" loading="lazy" decoding="async">` : `<div class="rounded border bg-light d-flex align-items-center justify-content-center me-3" style="width:54px;height:54px;"><i class="fas fa-file-alt text-muted fa-lg"></i></div>`;
 
                 row.innerHTML = `
                 <div class="d-flex align-items-center justify-content-between bg-white border rounded shadow-xs p-3 transition-all">
                     <div class="d-flex align-items-center min-w-0" style="flex: 1;">
                         ${preview}
-                        <div class="text-truncate mr-3">
-                            <div class="font-weight-bold text-dark text-truncate small">${file.name}</div>
+                        <div class="text-truncate me-3">
+                            <div class="fw-bold text-dark text-truncate small">${file.name}</div>
                             <div class="text-muted x-small">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
                         </div>
                     </div>

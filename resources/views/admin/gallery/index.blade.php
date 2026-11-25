@@ -69,7 +69,7 @@
             @include('admin.gallery.partials.cover-manager')
         @else
             <div class="callout callout-info">
-                <h5><i class="fas fa-image mr-2"></i>Gerenciamento da capa do album</h5>
+                <h5><i class="fas fa-image me-2"></i>Gerenciamento da capa do album</h5>
                 <p class="mb-0">
                     Selecione um evento acima para enviar uma capa personalizada ou usar uma foto existente como capa oficial.
                     Tamanho ideal para capa: <strong>{{ $albumCoverRecommendation }}</strong>

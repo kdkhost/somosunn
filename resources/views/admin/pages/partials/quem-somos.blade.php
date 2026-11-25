@@ -4,12 +4,12 @@
 <div class="tab-pane fade" id="sec-header">
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-users mr-1"></i> Cabecalho</h3>
+            <h3 class="card-title"><i class="fas fa-users me-1"></i> Cabecalho</h3>
             <div class="card-tools">
-                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                    <input type="checkbox" class="custom-control-input section-toggle" id="toggle-header" data-section="header"
+                <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                    <input type="checkbox" class="form-check-input section-toggle" id="toggle-header" data-section="header"
                         {{ ($data['header_enabled'] ?? true) ? 'checked' : '' }}>
-                    <label class="custom-control-label" for="toggle-header">Exibir no site</label>
+                    <label class="form-check-label" for="toggle-header">Exibir no site</label>
                 </div>
             </div>
         </div>
@@ -19,7 +19,7 @@
                 <input type="text" name="hero_subtitle" class="form-control" value="{{ old('hero_subtitle', $data['hero_subtitle'] ?? '') }}" placeholder="Conheca as pessoas por tras da maior comunidade de networking do Brasil.">
             </div>
             <div class="form-group mb-0">
-                <label class="font-weight-bold">Imagem de capa <small class="text-muted font-weight-normal">(JPG, PNG, WebP - max 6 MB)</small></label>
+                <label class="fw-bold">Imagem de capa <small class="text-muted fw-normal">(JPG, PNG, WebP - max 6 MB)</small></label>
                 @include('admin.components.upload-global', ['name'=>'cover_image', 'accept'=>'image/*'])
             </div>
         </div>
@@ -29,7 +29,7 @@
 <div class="tab-pane fade" id="sec-founders">
     <div class="card card-outline card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-crown mr-1"></i> Fundadores</h3>
+            <h3 class="card-title"><i class="fas fa-crown me-1"></i> Fundadores</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -37,8 +37,8 @@
                 <input type="text" name="founders_title" class="form-control" value="{{ old('founders_title', $data['founders_title'] ?? '') }}" placeholder="Fundadores">
             </div>
             <div id="founders-repeater-container"></div>
-            <button type="button" id="add-founder-btn" class="btn btn-outline-primary btn-block mt-3">
-                <i class="fas fa-plus mr-1"></i> Adicionar Fundador
+            <button type="button" id="add-founder-btn" class="btn btn-outline-primary w-100 mt-3">
+                <i class="fas fa-plus me-1"></i> Adicionar Fundador
             </button>
             <textarea name="founders_json" class="d-none">{{ json_encode($data['founders'] ?? []) }}</textarea>
         </div>
@@ -48,7 +48,7 @@
 <div class="tab-pane fade" id="sec-team">
     <div class="card card-outline card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-user-friends mr-1"></i> Equipe</h3>
+            <h3 class="card-title"><i class="fas fa-user-friends me-1"></i> Equipe</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -56,8 +56,8 @@
                 <input type="text" name="team_title" class="form-control" value="{{ old('team_title', $data['team_title'] ?? '') }}" placeholder="Nossa Equipe">
             </div>
             <div id="team-repeater-container"></div>
-            <button type="button" id="add-team-btn" class="btn btn-outline-primary btn-block mt-3">
-                <i class="fas fa-plus mr-1"></i> Adicionar Membro
+            <button type="button" id="add-team-btn" class="btn btn-outline-primary w-100 mt-3">
+                <i class="fas fa-plus me-1"></i> Adicionar Membro
             </button>
             <textarea name="team_json" class="d-none">{{ json_encode($data['team'] ?? []) }}</textarea>
         </div>
@@ -241,22 +241,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-7">
-                                <label class="small font-weight-bold">Nome</label>
+                                <label class="small fw-bold">Nome</label>
                                 <input type="text" name="founders[${index}][name]" value="${item.name || ''}" class="form-control form-control-sm">
                             </div>
                             <div class="form-group col-md-2">
-                                <label class="small font-weight-bold">Iniciais (Avatar)</label>
+                                <label class="small fw-bold">Iniciais (Avatar)</label>
                                 <input type="text" name="founders[${index}][initials]" value="${item.initials || ''}" class="form-control form-control-sm" maxlength="2" data-founder-initials>
                             </div>
                             <div class="form-group col-md-3">
-                                <label class="small font-weight-bold">Cargo</label>
+                                <label class="small fw-bold">Cargo</label>
                                 <input type="text" name="founders[${index}][role]" value="${item.role || ''}" class="form-control form-control-sm" placeholder="CEO">
                             </div>
                         </div>
                         <div class="form-group mb-0">
-                            <label class="small font-weight-bold">Bio curta</label>
+                            <label class="small fw-bold">Bio curta</label>
                             <textarea name="founders[${index}][bio]" rows="2" class="form-control form-control-sm">${item.bio || ''}</textarea>
                         </div>
                     </div>
@@ -301,18 +301,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-8">
-                                <label class="small font-weight-bold">Nome</label>
+                                <label class="small fw-bold">Nome</label>
                                 <input type="text" name="team[${index}][name]" value="${item.name || ''}" class="form-control form-control-sm">
                             </div>
                             <div class="form-group col-md-4">
-                                <label class="small font-weight-bold">Iniciais</label>
+                                <label class="small fw-bold">Iniciais</label>
                                 <input type="text" name="team[${index}][initials]" value="${item.initials || ''}" class="form-control form-control-sm" maxlength="2" data-team-initials>
                             </div>
                         </div>
                         <div class="form-group mb-0">
-                            <label class="small font-weight-bold">Cargo / Funcao</label>
+                            <label class="small fw-bold">Cargo / Funcao</label>
                             <input type="text" name="team[${index}][role]" value="${item.role || ''}" class="form-control form-control-sm">
                         </div>
                     </div>
@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="tab-pane fade" id="sec-stats">
     <div class="card card-outline card-info">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> UNN em Numeros</h3>
+            <h3 class="card-title"><i class="fas fa-chart-bar me-1"></i> UNN em Numeros</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <hr>
             @foreach ([1,2,3,4] as $i)
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-4">
                     <label>Numero {{ $i }}</label>
                     <input type="text" name="stat_{{ $i }}_value" class="form-control" value="{{ old('stat_'.$i.'_value', $data['stat_'.$i.'_value'] ?? '') }}">
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="tab-pane fade" id="sec-cta">
     <div class="card card-outline card-success">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+            <h3 class="card-title"><i class="fas fa-bullhorn me-1"></i> CTA Final</h3>
         </div>
         <div class="card-body">
             <div class="form-group">

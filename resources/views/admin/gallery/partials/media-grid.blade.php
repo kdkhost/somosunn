@@ -1,10 +1,10 @@
 <div class="card card-outline card-primary">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-photo-video mr-2"></i>{{ $selectedEvent ? 'Mídias do evento filtrado' : 'Todas as mídias' }}
+            <i class="fas fa-photo-video me-2"></i>{{ $selectedEvent ? 'Mídias do evento filtrado' : 'Todas as mídias' }}
         </h3>
         <div class="card-tools">
-            <span class="badge badge-primary">
+            <span class="badge text-bg-primary">
                 <span id="adminGalleryResultCount">{{ $media->total() }}</span> registro(s)
             </span>
         </div>
@@ -46,14 +46,14 @@
 
                                 {{-- Cover badge --}}
                                 @if($isCoverFromMedia)
-                                    <span class="badge badge-warning position-absolute" style="top:4px; left:4px; font-size:10px;">
+                                    <span class="badge text-bg-warning position-absolute" style="top:4px; left:4px; font-size:10px;">
                                         <i class="fas fa-star"></i> Capa
                                     </span>
                                 @endif
 
                                 {{-- Type badge --}}
                                 @if($isVideo)
-                                    <span class="badge badge-dark position-absolute" style="top:4px; right:4px; font-size:9px;">
+                                    <span class="badge text-bg-dark position-absolute" style="top:4px; right:4px; font-size:9px;">
                                         Vídeo
                                     </span>
                                 @endif
@@ -61,7 +61,7 @@
 
                             {{-- Info --}}
                             <div class="card-body p-2">
-                                <p class="mb-0 text-truncate font-weight-bold" style="font-size:11px;" title="{{ $eventTitle }}">
+                                <p class="mb-0 text-truncate fw-bold" style="font-size:11px;" title="{{ $eventTitle }}">
                                     {{ \Illuminate\Support\Str::limit($eventTitle, 20) }}
                                 </p>
                                 <p class="mb-0 text-muted text-truncate" style="font-size:10px;">
@@ -99,7 +99,7 @@
             </div>
         @else
             <div class="callout callout-info mb-0" id="adminGalleryEmptyState">
-                <h5><i class="fas fa-camera mr-2"></i>Nenhuma mídia encontrada</h5>
+                <h5><i class="fas fa-camera me-2"></i>Nenhuma mídia encontrada</h5>
                 <p class="mb-0">Ajuste o filtro ou envie novas imagens para popular a galeria.</p>
             </div>
         @endif

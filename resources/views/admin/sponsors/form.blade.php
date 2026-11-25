@@ -53,7 +53,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer text-right">
+                    <div class="card-footer text-end">
                         <button type="submit" class="btn btn-primary">Salvar patrocinador</button>
                     </div>
                 </div>

@@ -4,7 +4,7 @@
 <div class="tab-pane fade" id="sec-hero">
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-heading mr-1"></i> Hero</h3>
+            <h3 class="card-title"><i class="fas fa-heading me-1"></i> Hero</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -15,7 +15,7 @@
                 <label>Missão / Visão</label>
                 <textarea name="vision" rows="4" class="form-control">{{ old('vision', $data['vision'] ?? '') }}</textarea>
             </div>
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Botão principal</label>
                     <input type="text" name="cta_btn_primary" class="form-control" value="{{ old('cta_btn_primary', $data['cta_btn_primary'] ?? '') }}">
@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div class="form-group mb-0">
-                <label class="font-weight-bold">Imagem do Hero</label>
+                <label class="fw-bold">Imagem do Hero</label>
                 @include('admin.components.upload-global', ['name'=>'hero_image', 'accept'=>'image/*'])
             </div>
         </div>
@@ -36,11 +36,11 @@
 <div class="tab-pane fade" id="sec-stats">
     <div class="card card-outline card-info">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> Estatísticas</h3>
+            <h3 class="card-title"><i class="fas fa-chart-bar me-1"></i> Estatísticas</h3>
         </div>
         <div class="card-body">
             @foreach ([1,2,3,4] as $i)
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-4">
                     <label>Número {{ $i }}</label>
                     <input type="text" name="stat_{{ $i }}_value" class="form-control" value="{{ old('stat_'.$i.'_value', $data['stat_'.$i.'_value'] ?? '') }}">
@@ -58,7 +58,7 @@
 <div class="tab-pane fade" id="sec-history">
     <div class="card card-outline card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-book-open mr-1"></i> Nossa História</h3>
+            <h3 class="card-title"><i class="fas fa-book-open me-1"></i> Nossa História</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -84,7 +84,7 @@
 <div class="tab-pane fade" id="sec-diff">
     <div class="card card-outline card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-star mr-1"></i> Diferenciais</h3>
+            <h3 class="card-title"><i class="fas fa-star me-1"></i> Diferenciais</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -93,7 +93,7 @@
             </div>
             <hr>
             @foreach ([1,2,3] as $i)
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-4">
                     <label>Card {{ $i }} — Título</label>
                     <input type="text" name="diff_card_{{ $i }}_title" class="form-control" value="{{ old('diff_card_'.$i.'_title', $data['diff_card_'.$i.'_title'] ?? '') }}">
@@ -111,7 +111,7 @@
 <div class="tab-pane fade" id="sec-cta">
     <div class="card card-outline card-success">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+            <h3 class="card-title"><i class="fas fa-bullhorn me-1"></i> CTA Final</h3>
         </div>
         <div class="card-body">
             <div class="form-group">

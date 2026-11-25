@@ -18,7 +18,7 @@
             @csrf
             @if($invoice->id) @method('PUT') @endif
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Cliente</label>
                     <select name="user_id" class="form-control" required>
@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-3">
                     <label>Emissão</label>
                     <input type="hidden" name="issued_at" id="issued_at"
@@ -72,11 +72,11 @@
                         value="{{ old('discount_amount', $invoice->discount_amount) }}" placeholder="R$ 0,00">
                 </div>
                 <div class="form-group col-md-3 d-flex align-items-end">
-                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-2">
+                    <div class="form-check form-switch mb-2">
                         <input type="hidden" name="send_email" value="0">
-                        <input type="checkbox" class="custom-control-input" id="send_email" name="send_email" value="1"
+                        <input type="checkbox" class="form-check-input" id="send_email" name="send_email" value="1"
                             {{ old('send_email') ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="send_email">Enviar por e-mail ao salvar</label>
+                        <label class="form-check-label" for="send_email">Enviar por e-mail ao salvar</label>
                     </div>
                 </div>
             </div>
@@ -86,7 +86,7 @@
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h5 class="m-0">Itens</h5>
                 <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddItem">
-                    <i class="fas fa-plus mr-1"></i> Adicionar item
+                    <i class="fas fa-plus me-1"></i> Adicionar item
                 </button>
             </div>
 
@@ -143,11 +143,11 @@
             <button type="submit" name="send_email_type" value="none" class="btn btn-primary">
                 <i class="fas fa-save"></i> Salvar (Sem enviar)
             </button>
-            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"
+            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
-                <span class="sr-only">Toggle Dropdown</span>
+                <span class="visually-hidden">Toggle Dropdown</span>
             </button>
-            <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown-menu dropdown-menu-end">
                 <button type="submit" name="send_email_type" value="queue" class="dropdown-item">
                     <i class="fas fa-clock"></i> Salvar e Enviar na Fila (Cron)
                 </button>

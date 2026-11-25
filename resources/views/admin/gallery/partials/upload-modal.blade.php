@@ -8,11 +8,9 @@
         <div class="modal-content">
             <div class="modal-header bg-primary">
                 <h4 class="modal-title" id="uploadModalLabel">
-                    <i class="fas fa-cloud-upload-alt mr-2"></i>Adicionar midias
+                    <i class="fas fa-cloud-upload-alt me-2"></i>Adicionar midias
                 </h4>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
 
             <div class="modal-body">
@@ -31,30 +29,30 @@
 
                     <div class="form-group">
                         <label>2. Selecione e envie arquivos</label>
-                        <small class="float-right text-muted">Arraste varias imagens e videos com preview, progresso e tempo restante por arquivo.</small>
+                        <small class="float-end text-muted">Arraste varias imagens e videos com preview, progresso e tempo restante por arquivo.</small>
 
                         <div class="gallery-admin-dropzone" id="adminDropzone" role="button" tabindex="0" aria-label="Zona de upload">
-                            <input type="file" name="files[]" multiple accept="image/*,image/heic,image/heif,video/*" id="adminFileInput" class="sr-only">
+                            <input type="file" name="files[]" multiple accept="image/*,image/heic,image/heif,video/*" id="adminFileInput" class="visually-hidden">
 
                             <div id="adminDropzoneEmpty" class="gallery-admin-dropzone-empty text-center p-5">
                                 <div class="mb-3 text-primary">
                                     <i class="fas fa-cloud-upload-alt fa-3x"></i>
                                 </div>
-                                <h5 class="font-weight-bold mb-2">Arraste fotos e videos aqui</h5>
+                                <h5 class="fw-bold mb-2">Arraste fotos e videos aqui</h5>
                                 <p class="text-muted mb-3">ou <a href="#" id="adminFilePicker" class="text-primary">clique para selecionar</a></p>
                                 <div>
-                                    <span class="badge badge-primary">Imagens</span>
-                                    <span class="badge badge-info">Videos</span>
-                                    <span class="badge badge-secondary">JPG PNG WEBP HEIC</span>
-                                    <span class="badge badge-secondary">Ate {{ $galleryUploadPerFileLimitMb }} MB por arquivo</span>
+                                    <span class="badge text-bg-primary">Imagens</span>
+                                    <span class="badge text-bg-info">Videos</span>
+                                    <span class="badge text-bg-secondary">JPG PNG WEBP HEIC</span>
+                                    <span class="badge text-bg-secondary">Ate {{ $galleryUploadPerFileLimitMb }} MB por arquivo</span>
                                 </div>
                             </div>
 
                             <div id="adminDropzonePreview" class="d-none p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="text-muted text-uppercase small font-weight-bold">Preview do lote</span>
+                                    <span class="text-muted text-uppercase small fw-bold">Preview do lote</span>
                                     <button type="button" class="btn btn-outline-primary btn-sm" id="adminAddMoreFiles">
-                                        <i class="fas fa-plus mr-1"></i>Adicionar mais
+                                        <i class="fas fa-plus me-1"></i>Adicionar mais
                                     </button>
                                 </div>
                                 <div class="gallery-admin-inline-preview-grid" id="adminInlinePreviewGrid"></div>
@@ -66,10 +64,10 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center flex-wrap mb-2" style="gap:.5rem;">
                                 <div>
-                                    <p class="text-muted text-uppercase small font-weight-bold mb-1">Arquivos selecionados</p>
-                                    <p id="adminSelectedSummary" class="font-weight-bold mb-0"></p>
+                                    <p class="text-muted text-uppercase small fw-bold mb-1">Arquivos selecionados</p>
+                                    <p id="adminSelectedSummary" class="fw-bold mb-0"></p>
                                 </div>
-                                <span id="adminSelectedSize" class="badge badge-primary"></span>
+                                <span id="adminSelectedSize" class="badge text-bg-primary"></span>
                             </div>
                             <div id="adminSelectedList" class="gallery-admin-selected-list"></div>
                         </div>
@@ -78,8 +76,8 @@
                     <div class="card card-outline card-light">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted text-uppercase small font-weight-bold">Progresso do envio</span>
-                                <span id="adminProgressValue" class="font-weight-bold text-primary">0%</span>
+                                <span class="text-muted text-uppercase small fw-bold">Progresso do envio</span>
+                                <span id="adminProgressValue" class="fw-bold text-primary">0%</span>
                             </div>
                             <div class="progress progress-sm">
                                 <div id="adminProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:0%"></div>
@@ -92,12 +90,12 @@
 
             <div class="modal-footer justify-content-between">
                 <small class="text-muted">
-                    <i class="fas fa-magic mr-1"></i>Marca d'agua automatica aplicada nas imagens quando disponivel.
+                    <i class="fas fa-magic me-1"></i>Marca d'agua automatica aplicada nas imagens quando disponivel.
                 </small>
                 <div>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Fechar</button>
                     <button type="submit" form="adminUploadForm" id="adminSubmitBtn" class="btn btn-primary" disabled>
-                        <i class="fas fa-upload mr-1"></i>Publicar na galeria
+                        <i class="fas fa-upload me-1"></i>Publicar na galeria
                     </button>
                 </div>
             </div>

@@ -107,29 +107,29 @@
     {{-- Main Content --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-tasks text-primary mr-2"></i>Tarefas Agendadas
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-tasks text-primary me-2"></i>Tarefas Agendadas
             </h3>
             <div class="card-tools">
                 @if($isRunning)
-                    <span class="badge badge-success p-2 mr-2 blink_me">
-                        <i class="fas fa-check-circle mr-1"></i> Sincronizado: {{ $lastHeartbeat->format('H:i') }}
+                    <span class="badge text-bg-success p-2 me-2 blink_me">
+                        <i class="fas fa-check-circle me-1"></i> Sincronizado: {{ $lastHeartbeat->format('H:i') }}
                     </span>
                 @else
-                    <span class="badge badge-danger p-2 mr-2">
-                        <i class="fas fa-exclamation-triangle mr-1"></i> Agendador nao detectado
+                    <span class="badge text-bg-danger p-2 me-2">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Agendador nao detectado
                     </span>
                 @endif
                 <a href="{{ route('admin.cron.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
-                    <i class="fas fa-plus mr-1"></i> Nova Tarefa
+                    <i class="fas fa-plus me-1"></i> Nova Tarefa
                 </a>
-                <form action="{{ route('admin.cron.run-all') }}" method="POST" class="d-inline ml-1"
+                <form action="{{ route('admin.cron.run-all') }}" method="POST" class="d-inline ms-1"
                     data-confirm-title="Executar todas as tarefas"
                     data-confirm-text="Executar TODAS as tarefas ativas agora?"
                     data-confirm-button="Executar Todas">
                     @csrf
                     <button type="submit" class="btn btn-success btn-sm rounded-pill elevation-1">
-                        <i class="fas fa-play mr-1"></i> Executar Todas
+                        <i class="fas fa-play me-1"></i> Executar Todas
                     </button>
                 </form>
             </div>
@@ -145,7 +145,7 @@
                             <th class="text-center">Status</th>
                             <th>Última Execução</th>
                             <th>Próxima Execução</th>
-                            <th class="text-right">Ações</th>
+                            <th class="text-end">Ações</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -192,7 +192,7 @@
                     { data: 'status', name: 'active', className: 'text-center' },
                     { data: 'last_run_at', name: 'last_run_at' },
                     { data: 'next_run_at', name: 'next_run_at', orderable: false, searchable: false },
-                    { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-right' }
+                    { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' }
                 ],
                 language: {
                     url: '{{ asset('assets/admin/datatables/pt-BR.json') }}',
@@ -201,7 +201,7 @@
                             <i class="fas fa-clock fa-3x mb-3 d-block"></i>
                             <p class="mb-2">Nenhuma tarefa cadastrada.</p>
                             <a href="{{ route('admin.cron.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
-                                <i class="fas fa-plus mr-1"></i> Criar primeira tarefa
+                                <i class="fas fa-plus me-1"></i> Criar primeira tarefa
                             </a>
                         </div>
                     `

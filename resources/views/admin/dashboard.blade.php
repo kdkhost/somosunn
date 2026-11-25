@@ -25,7 +25,7 @@
                             @endif
                         </div>
                         <div class="col">
-                            <h2 class="h4 font-weight-bold mb-1">Olá, {{ auth()->user()->name }}!</h2>
+                            <h2 class="h4 fw-bold mb-1">Olá, {{ auth()->user()->name }}!</h2>
                             <p class="mb-0 text-light opacity-75">
                                 Bem-vindo ao <strong>SOMOS UNN</strong>.
                                 @if(isset($isAdmin) && $isAdmin)
@@ -35,10 +35,10 @@
                                 @endif
                             </p>
                         </div>
-                        <div class="col-md-auto mt-3 mt-md-0 text-md-right">
+                        <div class="col-md-auto mt-3 mt-md-0 text-md-end">
                             {{-- System Status & Uptime --}}
                             <div class="text-xs text-white-50 mb-1">Status do Sistema</div>
-                            <span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i> Online</span>
+                            <span class="badge text-bg-success"><i class="fas fa-check-circle me-1"></i> Online</span>
                             <small class="d-block text-white-50 mt-1">PHP {{ phpversion() }} • Laravel
                                 {{ app()->version() }}</small>
                         </div>
@@ -112,25 +112,25 @@
                         <div class="card shadow-sm border-0">
                             <div class="card-body p-2 d-flex flex-wrap justify-content-center">
                                 <button type="button" onclick="window.openQuickUploadModal()" class="btn btn-primary btn-sm rounded-pill px-3 m-1 shadow-sm">
-                                    <i class="fas fa-camera-retro mr-1"></i> Registrar Fotos
+                                    <i class="fas fa-camera-retro me-1"></i> Registrar Fotos
                                 </button>
                                 <a href="{{ route('admin.courses.create') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 m-1">
-                                    <i class="fas fa-plus mr-1"></i> Novo Curso
+                                    <i class="fas fa-plus me-1"></i> Novo Curso
                                 </a>
                                 <a href="{{ route('admin.events.create') }}" class="btn btn-outline-success btn-sm rounded-pill px-3 m-1">
-                                    <i class="fas fa-calendar-plus mr-1"></i> Novo Evento
+                                    <i class="fas fa-calendar-plus me-1"></i> Novo Evento
                                 </a>
                                 <a href="{{ route('admin.users.create') }}" class="btn btn-outline-warning btn-sm rounded-pill px-3 m-1">
-                                    <i class="fas fa-user-plus mr-1"></i> Novo Usuário
+                                    <i class="fas fa-user-plus me-1"></i> Novo Usuário
                                 </a>
                                 <a href="{{ $newUsersTodayUrl }}" class="btn btn-outline-info btn-sm rounded-pill px-3 m-1">
-                                    <i class="fas fa-user-clock mr-1"></i> Novos Cadastros
+                                    <i class="fas fa-user-clock me-1"></i> Novos Cadastros
                                 </a>
                                 <a href="{{ route('admin.settings') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 m-1">
-                                    <i class="fas fa-cog mr-1"></i> Configurações
+                                    <i class="fas fa-cog me-1"></i> Configurações
                                 </a>
                                 <a href="{{ route('admin.activity_logs.index') }}" class="btn btn-outline-info btn-sm rounded-pill px-3 m-1">
-                                    <i class="fas fa-history mr-1"></i> Logs do Sistema
+                                    <i class="fas fa-history me-1"></i> Logs do Sistema
                                 </a>
                             </div>
                         </div>
@@ -194,9 +194,9 @@
                     <div class="col-12">
                         <div class="card card-outline card-primary">
                             <div class="card-header border-0">
-                                <h3 class="card-title"><i class="fas fa-satellite-dish mr-2"></i>Rastreio Global de Visitas</h3>
+                                <h3 class="card-title"><i class="fas fa-satellite-dish me-2"></i>Rastreio Global de Visitas</h3>
                                 <div class="card-tools">
-                                    <span class="badge badge-success"><i class="fas fa-circle mr-1"></i>Ao vivo</span>
+                                    <span class="badge text-bg-success"><i class="fas fa-circle me-1"></i>Ao vivo</span>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -247,7 +247,7 @@
                                             'Mentorias' => $serviceVisitSummary['mentoria'] ?? 0,
                                             'Palestras' => $serviceVisitSummary['palestra'] ?? 0,
                                         ] as $label => $value)
-                                            <span class="badge badge-light border px-3 py-2">{{ $label }}: {{ $value }}</span>
+                                            <span class="badge text-bg-light border px-3 py-2">{{ $label }}: {{ $value }}</span>
                                         @endforeach
                                     </div>
 
@@ -259,7 +259,7 @@
                                                         <tr>
                                                             <th>Produto</th>
                                                             <th>Tipo</th>
-                                                            <th class="text-right">Visitas</th>
+                                                            <th class="text-end">Visitas</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="legacy-top-items">
@@ -267,7 +267,7 @@
                                                             <tr>
                                                                 <td>{{ $item['label'] }}</td>
                                                                 <td>{{ $item['type'] }}</td>
-                                                                <td class="text-right font-weight-bold">{{ $item['total'] }}</td>
+                                                                <td class="text-end fw-bold">{{ $item['total'] }}</td>
                                                             </tr>
                                                         @empty
                                                             <tr>
@@ -285,7 +285,7 @@
                                                         <tr>
                                                             <th>Responsável</th>
                                                             <th>Segmentação</th>
-                                                            <th class="text-right">Total</th>
+                                                            <th class="text-end">Total</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="legacy-owner-leaders">
@@ -293,7 +293,7 @@
                                                             <tr>
                                                                 <td>{{ $leader['name'] }}</td>
                                                                 <td class="text-muted">C {{ $leader['curso'] }} • E {{ $leader['evento'] }} • M {{ $leader['mentoria'] }}</td>
-                                                                <td class="text-right font-weight-bold">{{ $leader['total'] }}</td>
+                                                                <td class="text-end fw-bold">{{ $leader['total'] }}</td>
                                                             </tr>
                                                         @empty
                                                             <tr>
@@ -319,7 +319,7 @@
                     <div class="col-lg-8">
                         <div class="card card-outline card-primary">
                             <div class="card-header border-0">
-                                <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Histórico de Vendas (Últimos 6
+                                <h3 class="card-title"><i class="fas fa-chart-line me-2"></i>Histórico de Vendas (Últimos 6
                                     meses)</h3>
                             </div>
                             <div class="card-body">
@@ -334,7 +334,7 @@
                     <div class="col-lg-4">
                         <div class="card card-outline card-info">
                             <div class="card-header border-0">
-                                <h3 class="card-title"><i class="fas fa-chart-pie mr-2"></i>Pedidos por Status</h3>
+                                <h3 class="card-title"><i class="fas fa-chart-pie me-2"></i>Pedidos por Status</h3>
                             </div>
                             <div class="card-body">
                                 <canvas id="ordersStatusChart"
@@ -350,7 +350,7 @@
                     <div class="col-lg-7">
                         <div class="card card-outline card-success">
                             <div class="card-header border-0">
-                                <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Calendário de Eventos</h3>
+                                <h3 class="card-title"><i class="fas fa-calendar-alt me-2"></i>Calendário de Eventos</h3>
                             </div>
                             <div class="card-body p-0">
                                 <div id="calendar" style="width: 100%; min-height: 400px;"></div>
@@ -361,9 +361,9 @@
                     <div class="col-lg-5">
                         <div class="card card-outline card-secondary">
                             <div class="card-header border-0">
-                                <h3 class="card-title"><i class="fas fa-history mr-2"></i>Últimas Atividades</h3>
+                                <h3 class="card-title"><i class="fas fa-history me-2"></i>Últimas Atividades</h3>
                                 <div class="card-tools">
-                                    <span class="badge badge-light">{{ $logsCount ?? 0 }} logs</span>
+                                    <span class="badge text-bg-light">{{ $logsCount ?? 0 }} logs</span>
                                 </div>
                             </div>
                             <div class="card-body p-0">
@@ -381,7 +381,7 @@
                                                 <tr>
                                                     <td class="text-xs text-muted">{{ $log->created_at->format('d/m H:i') }}</td>
                                                     <td><span
-                                                            class="badge badge-info text-xs">{{ Str::limit($log->action, 15) }}</span>
+                                                            class="badge text-bg-info text-xs">{{ Str::limit($log->action, 15) }}</span>
                                                     </td>
                                                     <td class="text-xs">{{ $log->user->name ?? 'Sistema' }}</td>
                                                 </tr>
@@ -403,7 +403,7 @@
                         {{-- Jobs Status Mini Chart --}}
                         <div class="card card-dark mt-3">
                             <div class="card-header border-0 py-2">
-                                <h3 class="card-title text-sm"><i class="fas fa-tasks mr-2"></i>Jobs do Sistema</h3>
+                                <h3 class="card-title text-sm"><i class="fas fa-tasks me-2"></i>Jobs do Sistema</h3>
                             </div>
                             <div class="card-body p-2">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -430,7 +430,7 @@
 
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
-                                    <div class="text-xs font-weight-bold"
+                                    <div class="text-xs fw-bold"
                                         style="color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase;">Business
                                         Vitality</div>
                                     <div class="font-weight-black" style="font-size: 1.2rem; color: #fff;">Saúde do Cliente
@@ -464,9 +464,9 @@
                                 <div class="flex-fill">
                                     <div class="mb-2">
                                         <div class="d-flex justify-content-between mb-1">
-                                            <span style="font-size:0.7rem; color:#94a3b8;"><i class="fas fa-circle mr-1"
+                                            <span style="font-size:0.7rem; color:#94a3b8;"><i class="fas fa-circle me-1"
                                                     style="color:#10b981;"></i>Alta</span>
-                                            <span class="font-weight-bold"
+                                            <span class="fw-bold"
                                                 style="font-size:0.7rem; color:#10b981;">{{ $customerHealth['Alta'] }}</span>
                                         </div>
                                         <div class="rounded-pill" style="height:4px; background:rgba(255,255,255,0.08);">
@@ -478,9 +478,9 @@
                                     <div class="mb-2">
                                         @php $medPerc = $totalHealth > 0 ? round($customerHealth['Média'] / $totalHealth * 100) : 0; @endphp
                                         <div class="d-flex justify-content-between mb-1">
-                                            <span style="font-size:0.7rem; color:#94a3b8;"><i class="fas fa-circle mr-1"
+                                            <span style="font-size:0.7rem; color:#94a3b8;"><i class="fas fa-circle me-1"
                                                     style="color:#f59e0b;"></i>Média</span>
-                                            <span class="font-weight-bold"
+                                            <span class="fw-bold"
                                                 style="font-size:0.7rem; color:#f59e0b;">{{ $customerHealth['Média'] }}</span>
                                         </div>
                                         <div class="rounded-pill" style="height:4px; background:rgba(255,255,255,0.08);">
@@ -492,9 +492,9 @@
                                     <div>
                                         @php $lowPerc = $totalHealth > 0 ? round($customerHealth['Baixa'] / $totalHealth * 100) : 0; @endphp
                                         <div class="d-flex justify-content-between mb-1">
-                                            <span style="font-size:0.7rem; color:#94a3b8;"><i class="fas fa-circle mr-1"
+                                            <span style="font-size:0.7rem; color:#94a3b8;"><i class="fas fa-circle me-1"
                                                     style="color:#ef4444;"></i>Baixa</span>
-                                            <span class="font-weight-bold"
+                                            <span class="fw-bold"
                                                 style="font-size:0.7rem; color:#ef4444;">{{ $customerHealth['Baixa'] }}</span>
                                         </div>
                                         <div class="rounded-pill" style="height:4px; background:rgba(255,255,255,0.08);">
@@ -519,7 +519,7 @@
             <div class="col-12 mt-3">
                 <div class="card card-outline card-dark shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title"><i class="fas fa-server mr-2"></i>Saúde do Sistema</h3>
+                        <h3 class="card-title"><i class="fas fa-server me-2"></i>Saúde do Sistema</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" id="btn-refresh-health" title="Atualizar">
                                 <i class="fas fa-sync-alt"></i>
@@ -528,7 +528,7 @@
                     </div>
                     <div class="card-body" id="system-health-body">
                         <div class="text-center text-muted py-3">
-                            <i class="fas fa-spinner fa-spin mr-2"></i> Carregando informações do sistema...
+                            <i class="fas fa-spinner fa-spin me-2"></i> Carregando informações do sistema...
                         </div>
                     </div>
                 </div>
@@ -556,7 +556,7 @@
                     <div class="col-lg-8">
                         <div class="card card-outline card-primary shadow-sm">
                             <div class="card-header border-0">
-                                <h3 class="card-title"><i class="fas fa-calendar-day mr-2"></i>Meu Calendário</h3>
+                                <h3 class="card-title"><i class="fas fa-calendar-day me-2"></i>Meu Calendário</h3>
                             </div>
                             <div class="card-body p-0">
                                 <div id="calendar" style="width: 100%; min-height: 500px;"></div>
@@ -641,7 +641,7 @@
                                     @if(array_key_exists($key, $myHealthDetails))
                                     <div class="d-flex align-items-center justify-content-between mb-1">
                                         <span style="font-size:0.68rem; color:#94a3b8;">
-                                            <i class="fas {{ $item['icon'] }} mr-1" style="width:12px;"></i>
+                                            <i class="fas {{ $item['icon'] }} me-1" style="width:12px;"></i>
                                             {{ $item['label'] }}
                                         </span>
                                         @if($myHealthDetails[$key])
@@ -662,13 +662,13 @@
                                       transition: background 0.2s;"
                                onmouseover="this.style.background='rgba(255,255,255,0.12)'"
                                onmouseout="this.style.background='rgba(255,255,255,0.06)'">
-                                <i class="fas fa-edit mr-1"></i> Completar meu perfil
+                                <i class="fas fa-edit me-1"></i> Completar meu perfil
                             </a>
                         </div>
 
                         <div class="card card-outline card-info shadow-sm">
                             <div class="card-header border-0">
-                                <h3 class="card-title"><i class="fas fa-bullhorn mr-2"></i>Novidades</h3>
+                                <h3 class="card-title"><i class="fas fa-bullhorn me-2"></i>Novidades</h3>
                             </div>
                             <div class="card-body">
                                 <p class="text-muted">Nenhuma novidade no momento.</p>
@@ -729,7 +729,7 @@
                     ['Eventos', summary.evento || 0],
                     ['Mentorias', summary.mentoria || 0],
                     ['Palestras', summary.palestra || 0],
-                ].map(([label, value]) => `<span class="badge badge-light border px-3 py-2">${label}: ${value}</span>`).join('');
+                ].map(([label, value]) => `<span class="badge text-bg-light border px-3 py-2">${label}: ${value}</span>`).join('');
             }
 
             const topItemsBody = document.getElementById('legacy-top-items');
@@ -739,7 +739,7 @@
                         <tr>
                             <td>${item.label}</td>
                             <td>${item.type}</td>
-                            <td class="text-right font-weight-bold">${item.total}</td>
+                            <td class="text-end fw-bold">${item.total}</td>
                         </tr>
                     `).join('')
                     : '<tr><td colspan="3" class="text-center text-muted">Ainda não há visitas registradas.</td></tr>';
@@ -752,7 +752,7 @@
                         <tr>
                             <td>${leader.name}</td>
                             <td class="text-muted">Cursos: ${leader.curso} • Eventos: ${leader.evento} • Mentorias: ${leader.mentoria}</td>
-                            <td class="text-right font-weight-bold">${leader.total}</td>
+                            <td class="text-end fw-bold">${leader.total}</td>
                         </tr>
                     `).join('')
                     : '<tr><td colspan="3" class="text-center text-muted">Ainda não há responsáveis ranqueados.</td></tr>';
@@ -958,7 +958,7 @@
                             <div class="row">
                                 <div class="col-md-4 col-sm-6 mb-2">
                                     <div class="d-flex align-items-center p-2 rounded bg-light shadow-sm">
-                                        <i class="fas fa-user-clock text-primary mr-2"></i>
+                                        <i class="fas fa-user-clock text-primary me-2"></i>
                                         <div>
                                             <div class="text-xs text-muted">Online agora</div>
                                             <strong>${data.users.online_now}</strong> <small class="text-muted">/ ${data.users.total} total</small>
@@ -967,7 +967,7 @@
                                 </div>
                                 <div class="col-md-4 col-sm-6 mb-2">
                                     <div class="d-flex align-items-center p-2 rounded bg-light shadow-sm">
-                                        <i class="fas fa-shopping-cart text-warning mr-2"></i>
+                                        <i class="fas fa-shopping-cart text-warning me-2"></i>
                                         <div>
                                             <div class="text-xs text-muted">Pedidos Pendentes</div>
                                             <strong>${data.orders_pending}</strong>
@@ -976,7 +976,7 @@
                                 </div>
                                 <div class="col-md-4 col-sm-6 mb-2">
                                     <div class="d-flex align-items-center p-2 rounded bg-light shadow-sm">
-                                        <i class="fas fa-tasks text-info mr-2"></i>
+                                        <i class="fas fa-tasks text-info me-2"></i>
                                         <div>
                                             <div class="text-xs text-muted">Jobs na Fila</div>
                                             <strong>${data.queue.pending_jobs}</strong>
@@ -984,12 +984,12 @@
                                     </div>
                                 </div>
                             </div>
-                            ${hasQuota && diskPercent > 90 ? '<div class="alert alert-danger mt-2 mb-0 py-2"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Atencao:</strong> Conta com ' + diskPercent + '% de uso. Apenas ' + data.disk.free_gb + ' GB livres.</div>' : ''}
-                            ${!data.cron.active ? '<div class="alert alert-warning mt-2 mb-0 py-2"><i class="fas fa-exclamation-circle mr-2"></i><strong>Cron inativo.</strong> Verifique se o middleware RunInternalCron está ativo e se há acessos regulares ao sistema.</div>' : ''}
+                            ${hasQuota && diskPercent > 90 ? '<div class="alert alert-danger mt-2 mb-0 py-2"><i class="fas fa-exclamation-triangle me-2"></i><strong>Atencao:</strong> Conta com ' + diskPercent + '% de uso. Apenas ' + data.disk.free_gb + ' GB livres.</div>' : ''}
+                            ${!data.cron.active ? '<div class="alert alert-warning mt-2 mb-0 py-2"><i class="fas fa-exclamation-circle me-2"></i><strong>Cron inativo.</strong> Verifique se o middleware RunInternalCron está ativo e se há acessos regulares ao sistema.</div>' : ''}
                         `;
                     })
                     .catch(() => {
-                        container.innerHTML = '<div class="alert alert-secondary mb-0"><i class="fas fa-exclamation-circle mr-2"></i>Não foi possível carregar informações do sistema.</div>';
+                        container.innerHTML = '<div class="alert alert-secondary mb-0"><i class="fas fa-exclamation-circle me-2"></i>Não foi possível carregar informações do sistema.</div>';
                     });
                 }
 

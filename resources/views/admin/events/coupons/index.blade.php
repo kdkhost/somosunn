@@ -15,18 +15,18 @@
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header d-flex flex-wrap align-items-center justify-content-between">
             <div>
-                <h3 class="card-title font-weight-bold mb-0">
-                    <i class="fas fa-ticket-alt mr-2"></i>Cupons de gratuidade
+                <h3 class="card-title fw-bold mb-0">
+                    <i class="fas fa-ticket-alt me-2"></i>Cupons de gratuidade
                 </h3>
                 <small class="text-muted d-block">{{ $event->title }}</small>
             </div>
-            <div class="ml-auto">
+            <div class="ms-auto">
                 <a href="{{ route($eventsRoutePrefix . '.edit', ['event' => $event, 'tab' => 'coupons']) }}" class="btn btn-outline-secondary btn-sm rounded-pill" data-pjax>
-                    <i class="fas fa-arrow-left mr-1"></i> Voltar
+                    <i class="fas fa-arrow-left me-1"></i> Voltar
                 </a>
                 @if($canCreateCoupon)
                     <a href="{{ route($routePrefix . '.create', $event) }}" class="btn btn-primary btn-sm rounded-pill" data-pjax>
-                        <i class="fas fa-plus mr-1"></i> Novo cupom
+                        <i class="fas fa-plus me-1"></i> Novo cupom
                     </a>
                 @endif
             </div>
@@ -42,7 +42,7 @@
                             <th>Usos</th>
                             <th>Validade</th>
                             <th>Status</th>
-                            <th class="text-right">Acoes</th>
+                            <th class="text-end">Acoes</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -54,18 +54,18 @@
                                 }
                             @endphp
                             <tr>
-                                <td><span class="badge badge-dark px-3 py-2">{{ $coupon->code }}</span></td>
+                                <td><span class="badge text-bg-dark px-3 py-2">{{ $coupon->code }}</span></td>
                                 <td>
                                     @if($coupon->type === \App\Models\EventCoupon::TYPE_FREE)
-                                        <span class="badge badge-success">Gratuidade total</span>
+                                        <span class="badge text-bg-success">Gratuidade total</span>
                                     @elseif($coupon->type === \App\Models\EventCoupon::TYPE_PERCENT)
-                                        <span class="badge badge-info">{{ number_format((float) $coupon->discount_value, 2, ',', '.') }}%</span>
+                                        <span class="badge text-bg-info">{{ number_format((float) $coupon->discount_value, 2, ',', '.') }}%</span>
                                     @else
-                                        <span class="badge badge-warning">R$ {{ number_format((float) $coupon->discount_value, 2, ',', '.') }}</span>
+                                        <span class="badge text-bg-warning">R$ {{ number_format((float) $coupon->discount_value, 2, ',', '.') }}</span>
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge badge-primary">{{ $coupon->appliesToLabel() }}</span>
+                                    <span class="badge text-bg-primary">{{ $coupon->appliesToLabel() }}</span>
                                 </td>
                                 <td>
                                     <strong>{{ (int) $coupon->used_count }}</strong>
@@ -84,7 +84,7 @@
                                         {{ $coupon->active ? 'Ativo' : 'Inativo' }}
                                     </span>
                                 </td>
-                                <td class="text-right">
+                                <td class="text-end">
                                     <div class="btn-group btn-group-sm">
                                         @if($canToggleCoupon)
                                             <form method="POST" action="{{ route($routePrefix . '.toggle', [$event, $coupon]) }}" class="ajax-form d-inline">
@@ -119,7 +119,7 @@
                                     @if($canCreateCoupon)
                                         <div class="mt-3">
                                             <a href="{{ route($routePrefix . '.create', $event) }}" class="btn btn-primary btn-sm rounded-pill" data-pjax>
-                                                <i class="fas fa-plus mr-1"></i> Criar primeiro cupom
+                                                <i class="fas fa-plus me-1"></i> Criar primeiro cupom
                                             </a>
                                         </div>
                                     @endif

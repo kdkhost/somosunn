@@ -7,11 +7,11 @@
         <div class="container-fluid">
             <div class="row mb-2 align-items-center">
                 <div class="col-sm-6">
-                    <h1 class="m-0"><i class="fas fa-handshake text-primary mr-2"></i>Empresas Parceiras</h1>
+                    <h1 class="m-0"><i class="fas fa-handshake text-primary me-2"></i>Empresas Parceiras</h1>
                 </div>
-                <div class="col-sm-6 text-right">
+                <div class="col-sm-6 text-end">
                     <a href="{{ route('admin.partners.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus mr-1"></i> Novo Parceiro
+                        <i class="fas fa-plus me-1"></i> Novo Parceiro
                     </a>
                 </div>
             </div>
@@ -27,10 +27,10 @@
 
             <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-list mr-1"></i> {{ $partners->count() }} parceiro(s)
+                    <h3 class="card-title"><i class="fas fa-list me-1"></i> {{ $partners->count() }} parceiro(s)
                         cadastrado(s)</h3>
                     <div class="card-tools">
-                        <small class="text-muted"><i class="fas fa-grip-vertical mr-1"></i>Arraste para reordenar</small>
+                        <small class="text-muted"><i class="fas fa-grip-vertical me-1"></i>Arraste para reordenar</small>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -39,7 +39,7 @@
                             <i class="fas fa-handshake fa-3x text-muted mb-3"></i>
                             <p class="text-muted">Nenhum parceiro cadastrado ainda.</p>
                             <a href="{{ route('admin.partners.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus mr-1"></i> Cadastrar primeiro parceiro
+                                <i class="fas fa-plus me-1"></i> Cadastrar primeiro parceiro
                             </a>
                         </div>
                     @else
@@ -52,7 +52,7 @@
                                     <th class="text-center">Cupons</th>
                                     <th class="text-center">Status</th>
                                     <th class="text-center">Ordem</th>
-                                    <th class="text-right">Ações</th>
+                                    <th class="text-end">Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="partners-sortable">
@@ -74,28 +74,28 @@
                                             </div>
                                         </td>
                                         <td class="align-middle">
-                                            <div class="font-weight-bold">{{ $partner->name }}</div>
+                                            <div class="fw-bold">{{ $partner->name }}</div>
                                             @if($partner->website_url)
                                                 <a href="{{ $partner->website_url }}" target="_blank" class="small text-muted">
-                                                    <i class="fas fa-external-link-alt mr-1"></i>{{ $partner->website_url }}
+                                                    <i class="fas fa-external-link-alt me-1"></i>{{ $partner->website_url }}
                                                 </a>
                                             @endif
                                         </td>
                                         <td class="align-middle text-center">
-                                            <span class="badge badge-info">{{ $partner->active_coupons_count ?? 0 }} ativos</span>
-                                            <span class="badge badge-secondary">{{ $partner->coupons_count ?? 0 }} total</span>
+                                            <span class="badge text-bg-info">{{ $partner->active_coupons_count ?? 0 }} ativos</span>
+                                            <span class="badge text-bg-secondary">{{ $partner->coupons_count ?? 0 }} total</span>
                                         </td>
                                         <td class="align-middle text-center">
                                             @if($partner->active)
-                                                <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Ativo</span>
+                                                <span class="badge text-bg-success"><i class="fas fa-check me-1"></i>Ativo</span>
                                             @else
-                                                <span class="badge badge-danger"><i class="fas fa-times mr-1"></i>Inativo</span>
+                                                <span class="badge text-bg-danger"><i class="fas fa-times me-1"></i>Inativo</span>
                                             @endif
                                         </td>
                                         <td class="align-middle text-center">
-                                            <span class="badge badge-light">{{ $partner->order }}</span>
+                                            <span class="badge text-bg-light">{{ $partner->order }}</span>
                                         </td>
-                                        <td class="align-middle text-right">
+                                        <td class="align-middle text-end">
                                             <a href="{{ route('admin.partners.edit', $partner) }}"
                                                 class="btn btn-sm btn-outline-primary" title="Editar Parceiro">
                                                 <i class="fas fa-edit"></i> Editar
@@ -156,7 +156,7 @@
                         showCancelButton: true,
                         confirmButtonColor: '#e3342f',
                         cancelButtonColor: '#6c757d',
-                        confirmButtonText: '<i class="fas fa-trash mr-1"></i> Remover',
+                        confirmButtonText: '<i class="fas fa-trash me-1"></i> Remover',
                         cancelButtonText: 'Cancelar'
                     }).then(result => { if (result.isConfirmed) window.UNNAjaxGlobal.submitForm(form); });
                 });

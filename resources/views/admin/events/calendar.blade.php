@@ -184,8 +184,8 @@
         <div class="col-md-3">
             <div class="card card-outline card-primary shadow-sm">
                 <div class="card-header border-0">
-                    <h4 class="card-title font-weight-bold">
-                        <i class="fas fa-clock-rotate-left mr-2 text-primary"></i>Eventos Recentes
+                    <h4 class="card-title fw-bold">
+                        <i class="fas fa-clock-rotate-left me-2 text-primary"></i>Eventos Recentes
                     </h4>
                 </div>
                 <div class="card-body">
@@ -195,49 +195,49 @@
             @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('events.create'))
                 <div class="card card-outline card-success shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title font-weight-bold">
-                            <i class="fas fa-arrows-alt mr-2 text-success"></i>Eventos Arrastáveis
+                        <h3 class="card-title fw-bold">
+                            <i class="fas fa-arrows-alt me-2 text-success"></i>Eventos Arrastáveis
                         </h3>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted small mb-2"><i class="fas fa-hand-pointer mr-1"></i>Arraste um modelo para o calendário</p>
+                        <p class="text-muted small mb-2"><i class="fas fa-hand-pointer me-1"></i>Arraste um modelo para o calendário</p>
                         <div id="external-events" class="external-events">
                             @foreach($calendarTemplates as $tpl)
                                 <div class="external-event shadow-sm" data-title="{{ $tpl['title'] }}" data-color="{{ $tpl['color'] }}"
                                     style="background:{{ $tpl['color'] }};">
-                                    <i class="fas fa-grip-vertical mr-1"></i>{{ $tpl['title'] }}
+                                    <i class="fas fa-grip-vertical me-1"></i>{{ $tpl['title'] }}
                                 </div>
                             @endforeach
                         </div>
                         <div class="form-check mt-3 p-2 rounded border bg-light">
                             <input type="checkbox" class="form-check-input" id="drop-remove" {{ $defaultRemoveAfterDrop ? 'checked' : '' }}>
-                            <label class="form-check-label small font-weight-bold" for="drop-remove">Remover modelo após soltar</label>
+                            <label class="form-check-label small fw-bold" for="drop-remove">Remover modelo após soltar</label>
                         </div>
                     </div>
                 </div>
                 <div class="card card-outline card-info shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title font-weight-bold">
-                            <i class="fas fa-bolt mr-2 text-info"></i>Criar Evento Rápido
+                        <h3 class="card-title fw-bold">
+                            <i class="fas fa-bolt me-2 text-info"></i>Criar Evento Rápido
                         </h3>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label class="small font-weight-bold text-muted">Título</label>
+                            <label class="small fw-bold text-muted">Título</label>
                             <input type="text" class="form-control" id="new-event-title" placeholder="Digite o título do evento">
                         </div>
-                        <label class="small font-weight-bold text-muted mb-2">Cor do evento</label>
+                        <label class="small fw-bold text-muted mb-2">Cor do evento</label>
                         <div class="color-chooser mb-3" id="new-event-colors">
                             @foreach($calendarQuickColors as $idx => $color)
                                 <span class="color-item {{ $idx === 0 ? 'active' : '' }}" data-color="{{ $color }}"
                                     style="background:{{ $color }};"></span>
                             @endforeach
                         </div>
-                        <button id="add-new-event" class="btn btn-primary btn-block rounded-pill elevation-1">
-                            <i class="fas fa-plus mr-1"></i> Adicionar ao Calendário
+                        <button id="add-new-event" class="btn btn-primary w-100 rounded-pill elevation-1">
+                            <i class="fas fa-plus me-1"></i> Adicionar ao Calendário
                         </button>
-                        <button class="btn btn-outline-secondary btn-block mt-2 rounded-pill" data-toggle="modal" data-target="#eventModal">
-                            <i class="fas fa-pen mr-1"></i> Novo Evento Completo
+                        <button class="btn btn-outline-secondary w-100 mt-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#eventModal">
+                            <i class="fas fa-pen me-1"></i> Novo Evento Completo
                         </button>
                     </div>
                 </div>
@@ -247,13 +247,13 @@
             <div class="card calendar-card shadow-sm">
                 <div class="card-header border-0">
                     <h3 class="card-title">
-                        <i class="fas fa-calendar-alt mr-2 text-primary"></i>Calendário
+                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Calendário
                     </h3>
                     @if(auth()->user()->isAdmin())
                         <div class="card-tools">
-                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 elevation-1" data-toggle="modal"
-                                data-target="#calendarSettingsModal">
-                                <i class="fas fa-sliders-h mr-1"></i> Personalizar
+                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 elevation-1" data-bs-toggle="modal"
+                                data-bs-target="#calendarSettingsModal">
+                                <i class="fas fa-sliders-h me-1"></i> Personalizar
                             </button>
                         </div>
                     @endif
@@ -271,7 +271,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Gerenciar Evento</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <form id="eventForm" enctype="multipart/form-data">
                     @csrf
@@ -421,16 +421,16 @@
                     <input type="hidden" id="event_longitude" name="longitude">
                     <div class="modal-footer justify-content-between">
                         <div>
-                            <a href="#" id="modalEventEdit" class="btn btn-warning"><i class="fas fa-edit mr-1"></i> Editar</a>
-                            <a href="#" id="modalEventScanner" class="btn btn-primary d-none"><i class="fas fa-qrcode mr-1"></i>
+                            <a href="#" id="modalEventEdit" class="btn btn-warning"><i class="fas fa-edit me-1"></i> Editar</a>
+                            <a href="#" id="modalEventScanner" class="btn btn-primary d-none"><i class="fas fa-qrcode me-1"></i>
                                 Ler Ingressos</a>
                         </div>
                         <div>
-                            <button type="submit" class="btn btn-success" id="modalEventSave"><i class="fas fa-save mr-1"></i>
+                            <button type="submit" class="btn btn-success" id="modalEventSave"><i class="fas fa-save me-1"></i>
                                 Salvar</button>
-                            <button type="button" class="btn btn-danger" id="modalEventDelete"><i class="fas fa-trash mr-1"></i>
+                            <button type="button" class="btn btn-danger" id="modalEventDelete"><i class="fas fa-trash me-1"></i>
                                 Excluir</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         </div>
                     </div>
                 </form>
@@ -444,8 +444,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Personalizar calendário</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <form id="calendarSettingsForm" action="{{ route('admin.events.calendar.settings') }}" method="POST">
                     @csrf
@@ -517,18 +516,18 @@
                                 <div class="form-group mb-0">
                                     <label class="d-block">Opções</label>
                                     <input type="hidden" name="weekends" value="0">
-                                    <div class="custom-control custom-checkbox d-inline-block mr-3">
-                                        <input type="checkbox" class="custom-control-input" id="cal-weekends"
+                                    <div class="form-check d-inline-block me-3">
+                                        <input type="checkbox" class="form-check-input" id="cal-weekends"
                                             name="weekends" value="1" {{ $weekends ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="cal-weekends">Mostrar fins de
+                                        <label class="form-check-label" for="cal-weekends">Mostrar fins de
                                             semana</label>
                                     </div>
 
                                     <input type="hidden" name="week_numbers" value="0">
-                                    <div class="custom-control custom-checkbox d-inline-block">
-                                        <input type="checkbox" class="custom-control-input" id="cal-weeknumbers"
+                                    <div class="form-check d-inline-block">
+                                        <input type="checkbox" class="form-check-input" id="cal-weeknumbers"
                                             name="week_numbers" value="1" {{ $weekNumbers ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="cal-weeknumbers">Mostrar número da
+                                        <label class="form-check-label" for="cal-weeknumbers">Mostrar número da
                                             semana</label>
                                     </div>
                                 </div>
@@ -546,12 +545,12 @@
                                 </div>
                                 <div id="quickColorsList">
                                     @foreach($calendarQuickColors as $idx => $color)
-                                        <div class="form-row align-items-center mb-2 calendar-color-row">
+                                        <div class="row g-2 align-items-center mb-2 calendar-color-row">
                                             <div class="col-10">
                                                 <input type="color" class="form-control" name="quick_colors[{{ $idx }}]"
                                                     value="{{ $color }}">
                                             </div>
-                                            <div class="col-2 text-right">
+                                            <div class="col-2 text-end">
                                                 <button type="button"
                                                     class="btn btn-sm btn-outline-danger btnRemoveQuickColor"><i
                                                         class="fas fa-times"></i></button>
@@ -570,7 +569,7 @@
                                 </div>
                                 <div id="templatesList">
                                     @foreach($calendarTemplates as $idx => $tpl)
-                                        <div class="form-row align-items-center mb-2 calendar-template-row">
+                                        <div class="row g-2 align-items-center mb-2 calendar-template-row">
                                             <div class="col-7">
                                                 <input type="text" class="form-control" name="templates[{{ $idx }}][title]"
                                                     value="{{ $tpl['title'] }}" placeholder="Título">
@@ -579,7 +578,7 @@
                                                 <input type="color" class="form-control" name="templates[{{ $idx }}][color]"
                                                     value="{{ $tpl['color'] }}">
                                             </div>
-                                            <div class="col-2 text-right">
+                                            <div class="col-2 text-end">
                                                 <button type="button" class="btn btn-sm btn-outline-danger btnRemoveTemplate"><i
                                                         class="fas fa-times"></i></button>
                                             </div>
@@ -591,7 +590,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Salvar</button>
                     </div>
                 </form>
@@ -1188,7 +1187,7 @@
                             var html = '<ul class="list-unstyled mb-0">';
                             items.slice(0, recentLimit).forEach(function (ev) {
                                 var when = ev.start ? new Date(ev.start).toLocaleDateString('pt-BR') : '';
-                                html += '<li class="mb-2"><span class="badge badge-light mr-2">' + when + '</span>' + ev.title + '</li>';
+                                html += '<li class="mb-2"><span class="badge text-bg-light me-2">' + when + '</span>' + ev.title + '</li>';
                             });
                             html += '</ul>';
                             $('#recent-events').html(html);
@@ -1205,10 +1204,10 @@
                 $('#btnAddTemplate').on('click', function () {
                     var idx = templateIndex++;
                     var row = $(
-                        '<div class="form-row align-items-center mb-2 calendar-template-row">' +
+                        '<div class="row g-2 align-items-center mb-2 calendar-template-row">' +
                         '<div class="col-7"><input type="text" class="form-control" name="templates[' + idx + '][title]" placeholder="Título"></div>' +
                         '<div class="col-3"><input type="color" class="form-control" name="templates[' + idx + '][color]" value="{{ $buttonColor }}"></div>' +
-                        '<div class="col-2 text-right"><button type="button" class="btn btn-sm btn-outline-danger btnRemoveTemplate"><i class="fas fa-times"></i></button></div>' +
+                        '<div class="col-2 text-end"><button type="button" class="btn btn-sm btn-outline-danger btnRemoveTemplate"><i class="fas fa-times"></i></button></div>' +
                         '</div>'
                     );
                     $('#templatesList').append(row);
@@ -1217,9 +1216,9 @@
                 $('#btnAddQuickColor').on('click', function () {
                     var idx = quickColorIndex++;
                     var row = $(
-                        '<div class="form-row align-items-center mb-2 calendar-color-row">' +
+                        '<div class="row g-2 align-items-center mb-2 calendar-color-row">' +
                         '<div class="col-10"><input type="color" class="form-control" name="quick_colors[' + idx + ']" value="{{ $buttonColor }}"></div>' +
-                        '<div class="col-2 text-right"><button type="button" class="btn btn-sm btn-outline-danger btnRemoveQuickColor"><i class="fas fa-times"></i></button></div>' +
+                        '<div class="col-2 text-end"><button type="button" class="btn btn-sm btn-outline-danger btnRemoveQuickColor"><i class="fas fa-times"></i></button></div>' +
                         '</div>'
                     );
                     $('#quickColorsList').append(row);

@@ -76,21 +76,21 @@
 {{-- HEADER --}}
 <div class="card-header bg-gradient-info">
     <div class="d-flex align-items-center">
-        <div class="mr-3">
+        <div class="me-3">
             <i class="fas fa-cloud fa-2x text-white"></i>
         </div>
         <div class="flex-grow-1">
-            <h3 class="card-title font-weight-bold text-white mb-0">Armazenamento</h3>
+            <h3 class="card-title fw-bold text-white mb-0">Armazenamento</h3>
             <p class="text-white-50 mb-0 small">Configure IDrive e2, Wasabi ou AWS S3 (apenas um ativo por vez)</p>
         </div>
         <div>
             @if($isS3Active)
-                <span class="badge badge-success px-3 py-2">
-                    <i class="fas fa-check-circle mr-1"></i> {{ $providerOptions[$activeProvider] }} Ativo
+                <span class="badge text-bg-success px-3 py-2">
+                    <i class="fas fa-check-circle me-1"></i> {{ $providerOptions[$activeProvider] }} Ativo
                 </span>
             @else
-                <span class="badge badge-secondary px-3 py-2">
-                    <i class="fas fa-hdd mr-1"></i> Local
+                <span class="badge text-bg-secondary px-3 py-2">
+                    <i class="fas fa-hdd me-1"></i> Local
                 </span>
             @endif
         </div>
@@ -107,7 +107,7 @@
 
     {{-- DRIVER + PROVEDOR ATIVO num unico select --}}
     <div class="form-group">
-        <label class="font-weight-bold">Driver de Armazenamento</label>
+        <label class="fw-bold">Driver de Armazenamento</label>
         <select name="storage_active_choice" id="storage_active_choice_legacy" class="form-control">
             @foreach ($providerOptions as $key => $label)
                 <option value="{{ $key }}" {{ $activeProvider === $key ? 'selected' : '' }}>{{ $label }}</option>
@@ -126,9 +126,9 @@
     {{-- Setup guide condicional --}}
     @foreach (['idrive', 'wasabi', 'aws'] as $p)
         <div class="alert alert-info storage-provider-help" data-provider="{{ $p }}" style="display: {{ $activeProvider === $p ? 'block' : 'none' }};">
-            <h6 class="font-weight-bold mb-2"><i class="fas fa-info-circle mr-1"></i> {{ $providerOptions[$p] }}</h6>
+            <h6 class="fw-bold mb-2"><i class="fas fa-info-circle me-1"></i> {{ $providerOptions[$p] }}</h6>
             <p class="mb-1 small">{{ $providerHints[$p]['help'] }}</p>
-            <small><a href="{{ $providerHints[$p]['docs_url'] }}" target="_blank" rel="noopener" class="font-weight-bold">Ver documentacao</a></small>
+            <small><a href="{{ $providerHints[$p]['docs_url'] }}" target="_blank" rel="noopener" class="fw-bold">Ver documentacao</a></small>
         </div>
     @endforeach
 
@@ -145,7 +145,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="font-weight-bold">Bucket</label>
+                        <label class="fw-bold">Bucket</label>
                         <input type="text" name="{{ $p }}_bucket" class="form-control"
                             value="{{ $pd['bucket'] }}"
                             placeholder="meu-bucket"
@@ -155,7 +155,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="font-weight-bold">Regiao (Region)</label>
+                        <label class="fw-bold">Regiao (Region)</label>
                         <input type="text" name="{{ $p }}_region" class="form-control"
                             value="{{ $pd['region'] }}"
                             placeholder="{{ $providerHints[$p]['region_placeholder'] }}"
@@ -166,7 +166,7 @@
             </div>
 
             <div class="form-group">
-                <label class="font-weight-bold">Endpoint</label>
+                <label class="fw-bold">Endpoint</label>
                 <input type="text" name="{{ $p }}_endpoint" class="form-control"
                     value="{{ $pd['endpoint'] }}"
                     placeholder="{{ $providerHints[$p]['endpoint_placeholder'] }}"
@@ -177,7 +177,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="font-weight-bold">Access Key</label>
+                        <label class="fw-bold">Access Key</label>
                         <input type="text" name="{{ $p }}_access_key" class="form-control text-monospace"
                             value="{{ $pd['access_key'] }}"
                             placeholder="AKIAIOSFODNN7EXAMPLE"
@@ -187,7 +187,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="font-weight-bold">Secret Key</label>
+                        <label class="fw-bold">Secret Key</label>
                         <div class="input-group">
                             <input type="password" name="{{ $p }}_secret_key" id="{{ $p }}_secret_key_legacy"
                                 class="form-control text-monospace"
@@ -209,7 +209,7 @@
             </div>
 
             <div class="form-group">
-                <label class="font-weight-bold">URL Publica dos Arquivos</label>
+                <label class="fw-bold">URL Publica dos Arquivos</label>
                 <input type="text" name="{{ $p }}_url" class="form-control text-monospace"
                     value="{{ $pd['url'] }}"
                     placeholder="(opcional)"
@@ -220,18 +220,18 @@
 
             <div class="form-group">
                 <input type="hidden" name="{{ $p }}_path_style" value="0">
-                <div class="custom-control custom-checkbox">
+                <div class="form-check">
                     <input type="checkbox" name="{{ $p }}_path_style" value="1" id="{{ $p }}_path_style_legacy"
-                        class="custom-control-input" {{ $pd['path_style'] ? 'checked' : '' }}>
-                    <label class="custom-control-label font-weight-bold" for="{{ $p }}_path_style_legacy">
+                        class="form-check-input" {{ $pd['path_style'] ? 'checked' : '' }}>
+                    <label class="form-check-label fw-bold" for="{{ $p }}_path_style_legacy">
                         Path Style Endpoint
                     </label>
                 </div>
             </div>
 
-            <button type="button" class="btn btn-success btn-block stg-test-btn-legacy"
+            <button type="button" class="btn btn-success w-100 stg-test-btn-legacy"
                     data-provider="{{ $p }}">
-                <i class="fas fa-plug mr-1"></i> Testar Conexao {{ $providerOptions[$p] }}
+                <i class="fas fa-plug me-1"></i> Testar Conexao {{ $providerOptions[$p] }}
             </button>
         </fieldset>
     @endforeach
@@ -240,8 +240,8 @@
     <div id="s3-test-results-legacy" class="mt-3 d-none">
         <div class="card border-info">
             <div class="card-header py-2">
-                <i class="fas fa-circle-notch fa-spin text-info mr-2" id="s3-test-spinner-legacy"></i>
-                <span class="font-weight-bold" id="s3-test-title-legacy">Testando...</span>
+                <i class="fas fa-circle-notch fa-spin text-info me-2" id="s3-test-spinner-legacy"></i>
+                <span class="fw-bold" id="s3-test-title-legacy">Testando...</span>
             </div>
             <div class="card-body py-2" id="s3-test-steps-legacy"></div>
         </div>
@@ -252,21 +252,21 @@
 
     <div class="card border-primary">
         <div class="card-header bg-light">
-            <h5 class="card-title mb-0 font-weight-bold">
-                <i class="fas fa-cloud-upload-alt mr-1 text-primary"></i> Migracao de Arquivos
+            <h5 class="card-title mb-0 fw-bold">
+                <i class="fas fa-cloud-upload-alt me-1 text-primary"></i> Migracao de Arquivos
             </h5>
             <small class="text-muted">Envie arquivos locais para o provedor ativo</small>
         </div>
         <div class="card-body">
-            <button type="button" class="btn btn-primary btn-block" onclick="stgLoadFoldersLegacy()" id="btn-load-folders-legacy">
-                <i class="fas fa-folder-open mr-1"></i> Listar Pastas Disponiveis
+            <button type="button" class="btn btn-primary w-100" onclick="stgLoadFoldersLegacy()" id="btn-load-folders-legacy">
+                <i class="fas fa-folder-open me-1"></i> Listar Pastas Disponiveis
             </button>
 
             <div id="stg-folders-list-legacy" class="d-none mt-3"></div>
 
             <div id="stg-migration-progress-legacy" class="d-none mt-3 alert alert-info">
-                <i class="fas fa-spinner fa-spin mr-2" id="stg-mig-spinner-legacy"></i>
-                <span class="font-weight-bold" id="stg-mig-status-legacy">Migrando...</span>
+                <i class="fas fa-spinner fa-spin me-2" id="stg-mig-spinner-legacy"></i>
+                <span class="fw-bold" id="stg-mig-status-legacy">Migrando...</span>
                 <div class="small mt-1" id="stg-mig-result-legacy"></div>
             </div>
         </div>
@@ -346,7 +346,7 @@
         resultsDiv.classList.remove('d-none');
         stepsDiv.innerHTML = '';
         titleEl.textContent = 'Testando conexao com ' + provider.toUpperCase() + '...';
-        spinnerEl.className = 'fas fa-circle-notch fa-spin text-info mr-2';
+        spinnerEl.className = 'fas fa-circle-notch fa-spin text-info me-2';
 
         var formData = new FormData();
         formData.append('provider', provider);
@@ -374,17 +374,17 @@
         .then(function(data) {
             if (data.success) {
                 titleEl.textContent = data.message || 'Sucesso!';
-                spinnerEl.className = 'fas fa-check-circle text-success mr-2';
+                spinnerEl.className = 'fas fa-check-circle text-success me-2';
             } else {
                 titleEl.textContent = data.message || 'Falha na conexao';
-                spinnerEl.className = 'fas fa-times-circle text-danger mr-2';
+                spinnerEl.className = 'fas fa-times-circle text-danger me-2';
             }
 
             if (data.results && data.results.length > 0) {
                 var html = '<ul class="list-unstyled mb-0 small">';
                 data.results.forEach(function(r) {
                     var iconClass = r.status === 'ok' ? 'fa-check text-success' : (r.status === 'aviso' ? 'fa-exclamation-triangle text-warning' : 'fa-times text-danger');
-                    html += '<li class="mb-1"><i class="fas ' + iconClass + ' mr-2"></i><strong>' + r.step + ':</strong> ' + r.detail + '</li>';
+                    html += '<li class="mb-1"><i class="fas ' + iconClass + ' me-2"></i><strong>' + r.step + ':</strong> ' + r.detail + '</li>';
                 });
                 html += '</ul>';
                 stepsDiv.innerHTML = html;
@@ -392,7 +392,7 @@
         })
         .catch(function(err) {
             titleEl.textContent = 'Erro: ' + err.message;
-            spinnerEl.className = 'fas fa-times-circle text-danger mr-2';
+            spinnerEl.className = 'fas fa-times-circle text-danger me-2';
         })
         .finally(function() {
             btn.disabled = false;
@@ -460,7 +460,7 @@
         })
         .finally(function() {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-folder-open mr-1"></i> Listar Pastas Disponiveis';
+            btn.innerHTML = '<i class="fas fa-folder-open me-1"></i> Listar Pastas Disponiveis';
         });
     };
 
@@ -489,7 +489,7 @@
         var resultDiv = document.getElementById('stg-mig-result-legacy');
 
         progressDiv.classList.remove('d-none');
-        spinner.className = 'fas fa-spinner fa-spin mr-2';
+        spinner.className = 'fas fa-spinner fa-spin me-2';
         status.textContent = 'Migrando ' + folder + '...';
         resultDiv.textContent = '';
 
@@ -513,20 +513,20 @@
         })
         .then(function(data) {
             if (data.success) {
-                spinner.className = 'fas fa-check-circle text-success mr-2';
+                spinner.className = 'fas fa-check-circle text-success me-2';
                 status.textContent = 'Concluido!';
                 resultDiv.textContent = data.message;
                 if (typeof toastr !== 'undefined') toastr.success(data.message);
                 setTimeout(stgLoadFoldersLegacy, 1500);
             } else {
-                spinner.className = 'fas fa-times-circle text-danger mr-2';
+                spinner.className = 'fas fa-times-circle text-danger me-2';
                 status.textContent = 'Falha';
                 resultDiv.textContent = data.message;
                 if (typeof toastr !== 'undefined') toastr.error(data.message);
             }
         })
         .catch(function(err) {
-            spinner.className = 'fas fa-times-circle text-danger mr-2';
+            spinner.className = 'fas fa-times-circle text-danger me-2';
             status.textContent = 'Erro de conexao';
             resultDiv.textContent = err.message;
         });

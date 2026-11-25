@@ -25,7 +25,7 @@
                 @method('PUT')
             @endif
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-5">
                     <label>Nome do plano</label>
                     <input name="name" class="form-control" value="{{ old('name', $plan->name) }}" required>
@@ -45,7 +45,7 @@
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-4">
                     <label>Slug (URL)</label>
                     <input name="slug" class="form-control" value="{{ old('slug', $plan->slug) }}" placeholder="ex: pro, elite">
@@ -79,12 +79,12 @@
                                         $priceValue = old('price_periods.' . $periodKey, $pricePeriods[$periodKey] ?? ($periodKey === 'mensal' ? $plan->price : ''));
                                     @endphp
                                     <tr>
-                                        <td class="align-middle font-weight-bold">{{ $label }}</td>
+                                        <td class="align-middle fw-bold">{{ $label }}</td>
                                         <td class="align-middle">
                                             <input type="hidden" name="period_settings[{{ $periodKey }}][enabled]" value="0">
-                                            <div class="custom-control custom-switch">
-                                                <input type="checkbox" class="custom-control-input js-period-toggle" id="period_enabled_{{ $periodKey }}" name="period_settings[{{ $periodKey }}][enabled]" value="1" {{ $enabled ? 'checked' : '' }}>
-                                                <label class="custom-control-label" for="period_enabled_{{ $periodKey }}">Ativo</label>
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" class="form-check-input js-period-toggle" id="period_enabled_{{ $periodKey }}" name="period_settings[{{ $periodKey }}][enabled]" value="1" {{ $enabled ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="period_enabled_{{ $periodKey }}">Ativo</label>
                                             </div>
                                         </td>
                                         <td>
@@ -108,43 +108,43 @@
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-3">
-                    <div class="custom-control custom-switch mt-4">
+                    <div class="form-check form-switch mt-4">
                         <input type="hidden" name="highlight" value="0">
-                        <input type="checkbox" class="custom-control-input" id="highlight" name="highlight" value="1" {{ old('highlight', $plan->highlight) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="highlight">Destacar plano</label>
+                        <input type="checkbox" class="form-check-input" id="highlight" name="highlight" value="1" {{ old('highlight', $plan->highlight) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="highlight">Destacar plano</label>
                     </div>
                 </div>
                 <div class="form-group col-md-3">
-                    <div class="custom-control custom-switch mt-4">
+                    <div class="form-check form-switch mt-4">
                         <input type="hidden" name="coupons_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="coupons_enabled" name="coupons_enabled" value="1" {{ old('coupons_enabled', $plan->coupons_enabled) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="coupons_enabled">Permitir cupons</label>
+                        <input type="checkbox" class="form-check-input" id="coupons_enabled" name="coupons_enabled" value="1" {{ old('coupons_enabled', $plan->coupons_enabled) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="coupons_enabled">Permitir cupons</label>
                     </div>
                 </div>
                 <div class="form-group col-md-3">
-                    <div class="custom-control custom-switch mt-4">
+                    <div class="form-check form-switch mt-4">
                         <input type="hidden" name="is_active" value="0">
-                        <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1" {{ old('is_active', $plan->is_active ?? true) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="is_active">Plano ativo</label>
+                        <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1" {{ old('is_active', $plan->is_active ?? true) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="is_active">Plano ativo</label>
                     </div>
                 </div>
                 <div class="form-group col-md-3">
-                    <div class="custom-control custom-switch mt-4">
+                    <div class="form-check form-switch mt-4">
                         <input type="hidden" name="is_free" value="0">
-                        <input type="checkbox" class="custom-control-input" id="is_free" name="is_free" value="1" {{ old('is_free', $plan->is_free ?? false) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="is_free">Plano gratuito padrao</label>
+                        <input type="checkbox" class="form-check-input" id="is_free" name="is_free" value="1" {{ old('is_free', $plan->is_free ?? false) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="is_free">Plano gratuito padrao</label>
                     </div>
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-3">
-                    <div class="custom-control custom-switch mt-4">
+                    <div class="form-check form-switch mt-4">
                         <input type="hidden" name="is_recurring" value="0">
-                        <input type="checkbox" class="custom-control-input" id="is_recurring" name="is_recurring" value="1" {{ old('is_recurring', $plan->is_recurring) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="is_recurring">Assinatura recorrente</label>
+                        <input type="checkbox" class="form-check-input" id="is_recurring" name="is_recurring" value="1" {{ old('is_recurring', $plan->is_recurring) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="is_recurring">Assinatura recorrente</label>
                     </div>
                 </div>
                 <div class="form-group col-md-3" id="billing_cycle_group" style="{{ old('is_recurring', $plan->is_recurring) ? '' : 'display:none' }}">
@@ -153,7 +153,7 @@
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Imagem do plano</label>
                     <input type="hidden" name="remove_image" value="0">
@@ -178,7 +178,7 @@
                     <h3 class="card-title">Campos comparativos opcionais</h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-row">
+                    <div class="row g-2">
                         <div class="form-group col-md-4">
                             <label>Conexoes por mes</label>
                             <input name="comparison[connections_per_month]" class="form-control" value="{{ old('comparison.connections_per_month', data_get($plan->comparison, 'connections_per_month')) }}">
@@ -192,10 +192,10 @@
                             <input name="comparison[individual_mentorship]" class="form-control" value="{{ old('comparison.individual_mentorship', data_get($plan->comparison, 'individual_mentorship')) }}">
                         </div>
                     </div>
-                    <div class="custom-control custom-switch">
+                    <div class="form-check form-switch">
                         <input type="hidden" name="comparison[priority_support]" value="0">
-                        <input type="checkbox" class="custom-control-input" id="priority_support" name="comparison[priority_support]" value="1" {{ old('comparison.priority_support', (bool) data_get($plan->comparison, 'priority_support')) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="priority_support">Suporte prioritario</label>
+                        <input type="checkbox" class="form-check-input" id="priority_support" name="comparison[priority_support]" value="1" {{ old('comparison.priority_support', (bool) data_get($plan->comparison, 'priority_support')) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="priority_support">Suporte prioritario</label>
                     </div>
                 </div>
             </div>
@@ -206,14 +206,14 @@
                 </div>
                 <div class="card-body">
                     @foreach($planFeatureGroups as $groupName => $groupKeys)
-                        <h6 class="font-weight-bold text-primary {{ $loop->first ? '' : 'mt-3' }}">{{ $groupName }}</h6>
+                        <h6 class="fw-bold text-primary {{ $loop->first ? '' : 'mt-3' }}">{{ $groupName }}</h6>
                         <div class="row mb-2">
                             @foreach($groupKeys as $featureKey)
                                 @if(isset($planFeatures[$featureKey]))
                                     <div class="col-md-4 col-lg-3">
-                                        <div class="custom-control custom-checkbox mb-2">
-                                            <input type="checkbox" class="custom-control-input" id="feature_{{ str_replace('.', '_', $featureKey) }}" name="permissions[]" value="{{ $featureKey }}" {{ in_array($featureKey, $selectedFeatures, true) ? 'checked' : '' }}>
-                                            <label class="custom-control-label" for="feature_{{ str_replace('.', '_', $featureKey) }}">{{ $planFeatures[$featureKey] }}</label>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="feature_{{ str_replace('.', '_', $featureKey) }}" name="permissions[]" value="{{ $featureKey }}" {{ in_array($featureKey, $selectedFeatures, true) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="feature_{{ str_replace('.', '_', $featureKey) }}">{{ $planFeatures[$featureKey] }}</label>
                                         </div>
                                     </div>
                                 @endif
@@ -223,7 +223,7 @@
                 </div>
             </div>
 
-            <div class="text-right">
+            <div class="text-end">
                 <button class="btn btn-primary">Salvar</button>
                 <a href="{{ route('admin.plans.index') }}" class="btn btn-secondary" data-pjax>Cancelar</a>
             </div>

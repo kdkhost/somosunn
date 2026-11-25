@@ -38,18 +38,18 @@
     {{-- Main Content --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-font text-primary mr-2"></i>Gerenciar Fontes
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-font text-primary me-2"></i>Gerenciar Fontes
             </h3>
             <div class="card-tools">
-                <button class="btn btn-primary btn-sm rounded-pill elevation-1" data-toggle="modal" data-target="#fontModal">
-                    <i class="fas fa-plus mr-1"></i> Nova Fonte
+                <button class="btn btn-primary btn-sm rounded-pill elevation-1" data-bs-toggle="modal" data-bs-target="#fontModal">
+                    <i class="fas fa-plus me-1"></i> Nova Fonte
                 </button>
             </div>
         </div>
         <div class="card-body">
             <p class="text-muted mb-3">
-                <i class="fas fa-info-circle mr-1"></i>
+                <i class="fas fa-info-circle me-1"></i>
                 Gerencie as fontes disponiveis para uso nos certificados da plataforma. As fontes adicionadas ficam
                 disponiveis globalmente para todos os cursos.
             </p>
@@ -62,7 +62,7 @@
                             <th class="d-none d-lg-table-cell">Tipo</th>
                             <th class="d-none d-lg-table-cell">Carregado por</th>
                             <th class="d-none d-md-table-cell">Data</th>
-                            <th class="text-right">Acoes</th>
+                            <th class="text-end">Acoes</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -79,16 +79,16 @@
                                 </td>
                                 <td class="d-none d-lg-table-cell">
                                     @if($font->type === 'google_link')
-                                        <span class="badge badge-info"><i class="fab fa-google mr-1"></i>Google</span>
+                                        <span class="badge text-bg-info"><i class="fab fa-google me-1"></i>Google</span>
                                     @else
-                                        <span class="badge badge-success"><i class="fas fa-file mr-1"></i>Arquivo</span>
+                                        <span class="badge text-bg-success"><i class="fas fa-file me-1"></i>Arquivo</span>
                                     @endif
                                 </td>
                                 <td class="d-none d-lg-table-cell">{{ optional($font->uploader)->name ?? 'Sistema' }}</td>
                                 <td class="d-none d-md-table-cell">
                                     <small>{{ $font->created_at->format('d/m/Y') }}</small>
                                 </td>
-                                <td class="text-right">
+                                <td class="text-end">
                                     <button class="btn btn-sm btn-outline-danger rounded-pill btn-delete-font" data-id="{{ $font->id }}"
                                         data-name="{{ $font->name }}">
                                         <i class="fas fa-trash"></i>
@@ -114,8 +114,8 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-plus-circle mr-2"></i>Adicionar Nova Fonte</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Adicionar Nova Fonte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <form id="fontForm">
                     @csrf
@@ -145,7 +145,7 @@
                         <!-- Google Fonts Option -->
                         <div id="google-font-section" style="display: none;">
                             <div class="alert alert-info">
-                                <i class="fas fa-info-circle mr-1"></i>
+                                <i class="fas fa-info-circle me-1"></i>
                                 <strong>Como obter:</strong> Acesse <a href="https://fonts.google.com"
                                     target="_blank">Google Fonts</a>,
                                 escolha uma fonte e copie o link do tipo <code>&lt;link href="..."&gt;</code>.
@@ -160,7 +160,7 @@
                         <!-- File Upload Option -->
                         <div id="file-font-section" style="display: none;">
                             <div class="alert alert-info">
-                                <i class="fas fa-info-circle mr-1"></i>
+                                <i class="fas fa-info-circle me-1"></i>
                                 <strong>Formatos aceitos:</strong> TTF, OTF, WOFF, WOFF2 (max: 5MB)
                             </div>
                             <div class="form-group">
@@ -174,9 +174,9 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary rounded-pill elevation-1" id="btn-save-font">
-                            <i class="fas fa-save mr-1"></i>Adicionar Fonte
+                            <i class="fas fa-save me-1"></i>Adicionar Fonte
                         </button>
                     </div>
                 </form>
@@ -277,7 +277,7 @@
 
                 const $btn = $('#btn-save-font');
                 const originalText = $btn.html();
-                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Salvando...');
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Salvando...');
 
                 const formData = new FormData(this);
 

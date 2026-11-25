@@ -1,25 +1,25 @@
 <div class="card-body">
     <div class="alert alert-info">
-        <i class="fas fa-mobile-alt mr-2"></i> Transforme seu site em um aplicativo instalável (PWA). Usuários poderão
+        <i class="fas fa-mobile-alt me-2"></i> Transforme seu site em um aplicativo instalável (PWA). Usuários poderão
         instalar o site direto da barra de endereço ou menu do navegador.
     </div>
 
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <div class="custom-control custom-switch custom-switch-lg">
-                    <input type="checkbox" class="custom-control-input" id="pwa_enabled" name="pwa_enabled" value="1" {{ ($settings['pwa_enabled'] ?? 0) ? 'checked' : '' }}>
-                    <label class="custom-control-label font-weight-bold" for="pwa_enabled">Ativar Progressive Web App
+                <div class="form-check form-switch custom-switch-lg">
+                    <input type="checkbox" class="form-check-input" id="pwa_enabled" name="pwa_enabled" value="1" {{ ($settings['pwa_enabled'] ?? 0) ? 'checked' : '' }}>
+                    <label class="form-check-label fw-bold" for="pwa_enabled">Ativar Progressive Web App
                         (PWA)</label>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <div class="custom-control custom-switch custom-switch-lg">
-                    <input type="checkbox" class="custom-control-input" id="pwa_prompt_enabled"
+                <div class="form-check form-switch custom-switch-lg">
+                    <input type="checkbox" class="form-check-input" id="pwa_prompt_enabled"
                         name="pwa_prompt_enabled" value="1" {{ ($settings['pwa_prompt_enabled'] ?? 1) ? 'checked' : '' }}>
-                    <label class="custom-control-label font-weight-bold" for="pwa_prompt_enabled">Permitir Banner de
+                    <label class="form-check-label fw-bold" for="pwa_prompt_enabled">Permitir Banner de
                         Instalação</label>
                 </div>
                 <small class="form-text text-muted">Exibe um modal convidando o usuário a instalar o App.</small>
@@ -94,7 +94,7 @@
 
     <hr>
 
-    <h5 class="mb-3"><i class="fas fa-images mr-2 text-muted"></i> Ícones e Imagens</h5>
+    <h5 class="mb-3"><i class="fas fa-images me-2 text-muted"></i> Ícones e Imagens</h5>
     <div class="row">
         <div class="col-md-3 col-sm-6">
             <div class="form-group text-center">

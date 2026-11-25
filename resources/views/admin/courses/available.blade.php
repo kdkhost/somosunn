@@ -123,25 +123,25 @@
                             @endif
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="badge badge-primary">
-                                        <i class="fas fa-check-circle mr-1"></i> Acesso liberado
+                                    <span class="badge text-bg-primary">
+                                        <i class="fas fa-check-circle me-1"></i> Acesso liberado
                                     </span>
                                     <span class="text-xs text-muted text-uppercase">{{ $author }}</span>
                                 </div>
 
-                                <h3 class="h6 font-weight-bold mb-2 text-dark">{{ $item->title }}</h3>
+                                <h3 class="h6 fw-bold mb-2 text-dark">{{ $item->title }}</h3>
                                 <p class="text-muted small">
                                     {{ \Illuminate\Support\Str::limit(strip_tags((string) $item->short_description), 140) }}
                                 </p>
 
                                 <div class="bg-light rounded p-2 text-center">
                                     <small class="d-block text-muted text-uppercase">Duracao</small>
-                                    <span class="font-weight-bold">{{ $item->duration ?: '---' }}</span>
+                                    <span class="fw-bold">{{ $item->duration ?: '---' }}</span>
                                 </div>
                             </div>
                             <div class="card-footer bg-white">
-                                <a href="{{ route('courses.show', $showParam) }}" class="btn btn-primary btn-block">
-                                    <i class="fas fa-play-circle mr-1"></i> Acessar curso
+                                <a href="{{ route('courses.show', $showParam) }}" class="btn btn-primary w-100">
+                                    <i class="fas fa-play-circle me-1"></i> Acessar curso
                                 </a>
                             </div>
                         </div>

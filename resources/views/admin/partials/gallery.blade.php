@@ -10,7 +10,7 @@
     <div class="card-header">
         <h3 class="card-title">Galeria de Fotos e Vídeos</h3>
         <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+            <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
                 <i class="fas fa-minus"></i>
             </button>
         </div>
@@ -37,7 +37,7 @@
                 </div>
                 <div class="d-flex justify-content-between mt-1">
                     <span class="upload-status small text-muted">Enviando...</span>
-                    <span class="upload-percentage small font-weight-bold">0%</span>
+                    <span class="upload-percentage small fw-bold">0%</span>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
                         
                         <div class="position-absolute" style="top: 10px; left: 10px;">
                             <span class="badge badge-{{ $item->type === 'image' ? 'info' : 'warning' }} shadow-sm">
-                                <i class="fas {{ $mediaTypeIcons[$item->type] }} mr-1"></i>
+                                <i class="fas {{ $mediaTypeIcons[$item->type] }} me-1"></i>
                                 {{ ucfirst($item->type) }}
                             </span>
                         </div>

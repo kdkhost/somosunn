@@ -13,7 +13,7 @@
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-user mr-2"></i> Envio Individual
+                        <i class="fas fa-user me-2"></i> Envio Individual
                     </h3>
                 </div>
                 <div class="card-body">
@@ -26,9 +26,9 @@
                             <input type="hidden" name="user_id" id="user-id" required>
                             <div id="user-results" class="list-group mt-2 hidden" style="max-height: 200px; overflow-y: auto;"></div>
                             <div id="user-selected" class="mt-2 hidden">
-                                <span class="badge badge-info">
+                                <span class="badge text-bg-info">
                                     <span id="selected-name"></span>
-                                    <button type="button" onclick="clearUser()" class="ml-2 text-white">
+                                    <button type="button" onclick="clearUser()" class="ms-2 text-white">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </span>
@@ -46,14 +46,14 @@
                         </div>
 
                         <div class="form-group">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="send_email" id="send-email-individual" value="1" class="custom-control-input">
-                                <label for="send-email-individual" class="custom-control-label">Enviar também por e-mail</label>
+                            <div class="form-check">
+                                <input type="checkbox" name="send_email" id="send-email-individual" value="1" class="form-check-input">
+                                <label for="send-email-individual" class="form-check-label">Enviar também por e-mail</label>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-paper-plane mr-2"></i> Enviar Mensagem
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-paper-plane me-2"></i> Enviar Mensagem
                         </button>
                     </form>
                 </div>
@@ -64,7 +64,7 @@
             <div class="card card-warning card-outline">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-users mr-2"></i> Envio em Massa
+                        <i class="fas fa-users me-2"></i> Envio em Massa
                     </h3>
                 </div>
                 <div class="card-body">
@@ -104,8 +104,8 @@
                             </div>
                         </div>
 
-                        <button type="button" onclick="openRecipientsModal()" class="btn btn-light btn-block mb-3">
-                            <i class="fas fa-users mr-2"></i> Selecionar Destinatários
+                        <button type="button" onclick="openRecipientsModal()" class="btn btn-light w-100 mb-3">
+                            <i class="fas fa-users me-2"></i> Selecionar Destinatários
                         </button>
 
                         <p class="text-center small text-muted">
@@ -125,14 +125,14 @@
                         </div>
 
                         <div class="form-group">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="send_email" id="send-email-bulk" value="1" class="custom-control-input">
-                                <label for="send-email-bulk" class="custom-control-label">Enviar também por e-mail</label>
+                            <div class="form-check">
+                                <input type="checkbox" name="send_email" id="send-email-bulk" value="1" class="form-check-input">
+                                <label for="send-email-bulk" class="form-check-label">Enviar também por e-mail</label>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-warning btn-block">
-                            <i class="fas fa-bullhorn mr-2"></i> Enviar para Todos
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="fas fa-bullhorn me-2"></i> Enviar para Todos
                         </button>
                     </form>
                 </div>
@@ -191,7 +191,7 @@
                                 const div = document.createElement('a');
                                 div.className = 'list-group-item list-group-item-action';
                                 div.href = '#';
-                                div.innerHTML = `<div class="font-weight-bold">${user.name}</div><small class="text-muted">${user.email}</small>`;
+                                div.innerHTML = `<div class="fw-bold">${user.name}</div><small class="text-muted">${user.email}</small>`;
                                 div.onclick = (e) => {
                                     e.preventDefault();
                                     selectUser(user.id, user.name, user.email);
@@ -241,7 +241,7 @@
                     if (data.users && data.users.length > 0) {
                         listDiv.innerHTML = data.users.map(u => `
                             <label class="d-flex align-items-center p-2 bg-light rounded mb-1" style="cursor: pointer;">
-                                <input type="checkbox" class="recipient-checkbox mr-2" value="${u.id}" checked>
+                                <input type="checkbox" class="recipient-checkbox me-2" value="${u.id}" checked>
                                 <span class="small">${u.name} (${u.email})</span>
                             </label>
                         `).join('');
@@ -294,9 +294,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Selecionar Destinatários</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeRecipientsModal()">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -309,7 +307,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" onclick="closeRecipientsModal()">
-                        <i class="fas fa-check mr-2"></i> Confirmar Seleção
+                        <i class="fas fa-check me-2"></i> Confirmar Seleção
                     </button>
                 </div>
             </div>

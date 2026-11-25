@@ -10,8 +10,8 @@
 @endphp
 
 <hr class="my-4">
-<h5 class="font-weight-bold mb-3"><i class="fas fa-id-card mr-2 text-primary"></i>Dados pessoais e profissionais</h5>
-<div class="form-row">
+<h5 class="fw-bold mb-3"><i class="fas fa-id-card me-2 text-primary"></i>Dados pessoais e profissionais</h5>
+<div class="row g-2">
     <div class="form-group col-md-3">
         <label>Tipo de pessoa</label>
         <select name="person_type" id="admin-user-person-type" class="form-control">
@@ -76,10 +76,10 @@
             data-marketing-manager="{{ $isMarketingManager ? '1' : '0' }}"
             style="{{ $platformFeeExemptRole ? 'display:none;' : '' }}">
             <input type="hidden" name="platform_fee_enabled" value="0">
-            <div class="custom-control custom-switch border rounded p-3 pl-5 bg-light">
-                <input type="checkbox" class="custom-control-input" id="admin-user-platform-fee-enabled"
+            <div class="form-check form-switch border rounded p-3 ps-5 bg-light">
+                <input type="checkbox" class="form-check-input" id="admin-user-platform-fee-enabled"
                     name="platform_fee_enabled" value="1" {{ $platformFeeEnabled ? 'checked' : '' }}>
-                <label class="custom-control-label font-weight-bold" for="admin-user-platform-fee-enabled">
+                <label class="form-check-label fw-bold" for="admin-user-platform-fee-enabled">
                     Cobrar taxa da plataforma deste membro
                 </label>
                 <small class="d-block text-muted mt-1">
@@ -95,8 +95,8 @@
 </div>
 
 <hr class="my-4">
-<h5 class="font-weight-bold mb-3"><i class="fas fa-map-marker-alt mr-2 text-primary"></i>Endereço</h5>
-<div class="form-row">
+<h5 class="fw-bold mb-3"><i class="fas fa-map-marker-alt me-2 text-primary"></i>Endereço</h5>
+<div class="row g-2">
     <div class="form-group col-md-3">
         <label>CEP</label>
         <input name="cep" id="admin-user-cep" class="form-control" inputmode="numeric"
@@ -130,8 +130,8 @@
 </div>
 
 <hr class="my-4">
-<h5 class="font-weight-bold mb-3"><i class="fas fa-share-alt mr-2 text-primary"></i>Site, redes sociais e privacidade</h5>
-<div class="form-row">
+<h5 class="fw-bold mb-3"><i class="fas fa-share-alt me-2 text-primary"></i>Site, redes sociais e privacidade</h5>
+<div class="row g-2">
     @foreach([
         'website' => 'Site',
         'instagram' => 'Instagram',
@@ -146,7 +146,7 @@
         </div>
     @endforeach
 </div>
-<div class="form-row">
+<div class="row g-2">
     @foreach([
         'show_email_public' => 'Exibir e-mail no perfil público',
         'show_phone_public' => 'Exibir telefone no perfil público',
@@ -154,10 +154,10 @@
         'hide_profile' => 'Ocultar perfil da comunidade',
     ] as $field => $label)
         <div class="form-group col-md-3">
-            <div class="custom-control custom-switch mt-2">
-                <input type="checkbox" class="custom-control-input" id="admin-user-{{ $field }}" name="{{ $field }}" value="1"
+            <div class="form-check form-switch mt-2">
+                <input type="checkbox" class="form-check-input" id="admin-user-{{ $field }}" name="{{ $field }}" value="1"
                     {{ old($field, (bool) $user->{$field}) ? 'checked' : '' }}>
-                <label class="custom-control-label" for="admin-user-{{ $field }}">{{ $label }}</label>
+                <label class="form-check-label" for="admin-user-{{ $field }}">{{ $label }}</label>
             </div>
         </div>
     @endforeach

@@ -11,7 +11,7 @@
         <div class="col-md-10 mx-auto">
             <div class="card card-primary">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-pencil-alt mr-2"></i>{{ $vacancy->exists ? 'Editar' : 'Nova' }}
+                    <h3 class="card-title"><i class="fas fa-pencil-alt me-2"></i>{{ $vacancy->exists ? 'Editar' : 'Nova' }}
                         Vaga</h3>
                 </div>
 
@@ -32,7 +32,7 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="type">Tipo de Contrato <span class="text-danger">*</span></label>
-                                    <select name="type" id="type" class="form-control custom-select">
+                                    <select name="type" id="type" class="form-control form-select">
                                         <option value="CLT" @selected(old('type', $vacancy->type) == 'CLT')>CLT</option>
                                         <option value="PJ" @selected(old('type', $vacancy->type) == 'PJ')>PJ</option>
                                         <option value="Freelance" @selected(old('type', $vacancy->type) == 'Freelance')>
@@ -45,7 +45,7 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="level">Nível <span class="text-danger">*</span></label>
-                                    <select name="level" id="level" class="form-control custom-select">
+                                    <select name="level" id="level" class="form-control form-select">
                                         <option value="Junior" @selected(old('level', $vacancy->level) == 'Junior')>Junior
                                         </option>
                                         <option value="Pleno" @selected(old('level', $vacancy->level) == 'Pleno')>Pleno
@@ -96,7 +96,7 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="visibility">Visibilidade <span class="text-danger">*</span></label>
-                                    <select name="visibility" id="visibility" class="form-control custom-select">
+                                    <select name="visibility" id="visibility" class="form-control form-select">
                                         <option value="internal" @selected(old('visibility', $vacancy->visibility) == 'internal')>Comunidade</option>
                                         <option value="external" @selected(old('visibility', $vacancy->visibility) == 'external')>Público</option>
                                         <option value="both" @selected(old('visibility', $vacancy->visibility) == 'both' || !$vacancy->exists)>Ambos</option>
@@ -127,10 +127,10 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Opções Adicionais</label>
-                                    <div class="custom-control custom-switch pt-2">
-                                        <input type="checkbox" class="custom-control-input" id="is_demo" name="is_demo"
+                                    <div class="form-check form-switch pt-2">
+                                        <input type="checkbox" class="form-check-input" id="is_demo" name="is_demo"
                                             value="1" @checked(old('is_demo', $vacancy->is_demo))>
-                                        <label class="custom-control-label" for="is_demo">Esta é uma vaga fictícia
+                                        <label class="form-check-label" for="is_demo">Esta é uma vaga fictícia
                                             (Demonstração)?</label>
                                     </div>
                                     <small class="text-muted">Se ativado, aparecerá uma etiqueta de "Demonstração" na
@@ -164,18 +164,18 @@
                         </div>
 
                         <div class="form-group">
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input" id="is_active" name="is_active"
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="is_active" name="is_active"
                                     value="1" @checked(old('is_active', $vacancy->is_active ?? true))>
-                                <label class="custom-control-label" for="is_active">Vaga Ativa</label>
+                                <label class="form-check-label" for="is_active">Vaga Ativa</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card-footer text-right">
+                    <div class="card-footer text-end">
                         <a href="{{ route('admin.jobs.index') }}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-success ml-2">
-                            <i class="fas fa-save mr-1"></i> {{ $vacancy->exists ? 'Atualizar' : 'Salvar' }} Vaga
+                        <button type="submit" class="btn btn-success ms-2">
+                            <i class="fas fa-save me-1"></i> {{ $vacancy->exists ? 'Atualizar' : 'Salvar' }} Vaga
                         </button>
                     </div>
                 </form>

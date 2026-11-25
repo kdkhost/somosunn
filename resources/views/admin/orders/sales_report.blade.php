@@ -115,7 +115,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-primary elevation-1"><i class="fas fa-boxes-stacked"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Itens com venda</span>
+                    <span class="info-box-text fw-bold">Itens com venda</span>
                     <span class="info-box-number">{{ (int) ($summary['catalog_items_count'] ?? 0) }}</span>
                 </div>
             </div>
@@ -124,7 +124,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Unidades vendidas</span>
+                    <span class="info-box-text fw-bold">Unidades vendidas</span>
                     <span class="info-box-number">{{ (int) ($summary['total_units_sold'] ?? 0) }}</span>
                 </div>
             </div>
@@ -133,7 +133,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-info elevation-1"><i class="fas fa-users"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Compradores</span>
+                    <span class="info-box-text fw-bold">Compradores</span>
                     <span class="info-box-number">{{ (int) ($summary['total_buyers_count'] ?? 0) }}</span>
                 </div>
             </div>
@@ -142,7 +142,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-warning elevation-1"><i class="fas fa-dollar-sign"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Faturamento liquido</span>
+                    <span class="info-box-text fw-bold">Faturamento liquido</span>
                     <span class="info-box-number">R$ {{ number_format((float) ($summary['total_revenue'] ?? 0), 2, ',', '.') }}</span>
                 </div>
             </div>
@@ -151,21 +151,21 @@
 
     <div class="card card-outline card-primary shadow-sm mb-4">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold"><i class="fas fa-filter mr-2 text-primary"></i>Filtros do relatorio</h3>
+            <h3 class="card-title fw-bold"><i class="fas fa-filter me-2 text-primary"></i>Filtros do relatorio</h3>
             <div class="card-tools">
                 <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
-                    <i class="fas fa-arrow-left mr-1"></i> Voltar para vendas
+                    <i class="fas fa-arrow-left me-1"></i> Voltar para vendas
                 </a>
             </div>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('admin.orders.sales-report') }}" class="row">
                 <div class="col-md-4 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Busca</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Busca</label>
                     <input type="text" name="search" value="{{ $search }}" class="form-control" placeholder="Titulo do item">
                 </div>
                 <div class="col-md-2 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Tipo</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Tipo</label>
                     <select name="sale_type" class="form-control">
                         <option value="">Todos</option>
                         @foreach($saleTypeLabels as $key => $label)
@@ -174,7 +174,7 @@
                     </select>
                 </div>
                 <div class="col-md-2 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Periodo</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Periodo</label>
                     <select name="period" class="form-control">
                         <option value="monthly" {{ $periodValue === 'monthly' ? 'selected' : '' }}>Mensal</option>
                         <option value="bimonthly" {{ $periodValue === 'bimonthly' ? 'selected' : '' }}>Bimestral</option>
@@ -185,16 +185,16 @@
                     </select>
                 </div>
                 <div class="col-md-2 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">De</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">De</label>
                     <input type="date" name="date_from" value="{{ $dateFrom }}" class="form-control">
                 </div>
                 <div class="col-md-2 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Ate</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Ate</label>
                     <input type="date" name="date_to" value="{{ $dateTo }}" class="form-control">
                 </div>
                 <div class="col-12 mt-2 d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary rounded-pill px-4">
-                        <i class="fas fa-search mr-1"></i> Atualizar relatorio
+                        <i class="fas fa-search me-1"></i> Atualizar relatorio
                     </button>
                 </div>
             </form>
@@ -203,7 +203,7 @@
 
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold"><i class="fas fa-chart-bar mr-2 text-primary"></i>Itens vendidos</h3>
+            <h3 class="card-title fw-bold"><i class="fas fa-chart-bar me-2 text-primary"></i>Itens vendidos</h3>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -215,8 +215,8 @@
                             <th class="text-center">Vendidos</th>
                             <th class="text-center">Pedidos</th>
                             <th class="text-center">Compradores</th>
-                            <th class="text-right">Faturamento liquido</th>
-                            <th class="text-right">Acoes</th>
+                            <th class="text-end">Faturamento liquido</th>
+                            <th class="text-end">Acoes</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -229,21 +229,21 @@
                             @endphp
                             <tr>
                                 <td>
-                                    <div class="font-weight-bold">{{ $row->title }}</div>
+                                    <div class="fw-bold">{{ $row->title }}</div>
                                     <small class="text-muted">ID {{ $row->item_id }}</small>
                                 </td>
-                                <td><span class="badge badge-primary">{{ $saleTypeLabels[$row->item_type] ?? ucfirst($row->item_type) }}</span></td>
-                                <td class="text-center font-weight-bold">{{ (int) $row->units_sold }}</td>
+                                <td><span class="badge text-bg-primary">{{ $saleTypeLabels[$row->item_type] ?? ucfirst($row->item_type) }}</span></td>
+                                <td class="text-center fw-bold">{{ (int) $row->units_sold }}</td>
                                 <td class="text-center">{{ (int) $row->orders_count }}</td>
                                 <td class="text-center">{{ (int) $row->buyers_count }}</td>
-                                <td class="text-right font-weight-bold">R$ {{ number_format((float) $row->net_revenue, 2, ',', '.') }}</td>
-                                <td class="text-right">
+                                <td class="text-end fw-bold">R$ {{ number_format((float) $row->net_revenue, 2, ',', '.') }}</td>
+                                <td class="text-end">
                                     <button type="button"
                                             class="btn btn-sm btn-outline-primary rounded-pill js-sales-report-buyers"
                                             data-url="{{ route('admin.orders.sales-report.buyers', $buyerRouteParams) }}"
                                             data-print-url="{{ route('admin.orders.sales-report.buyers.print', $buyerRouteParams) }}"
                                             data-pdf-url="{{ route('admin.orders.sales-report.buyers.pdf', $buyerRouteParams) }}">
-                                        <i class="fas fa-users mr-1"></i> Lista
+                                        <i class="fas fa-users me-1"></i> Lista
                                     </button>
                                 </td>
                             </tr>
@@ -267,24 +267,22 @@
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title font-weight-bold" id="salesReportBuyersModalLabel">
-                        <i class="fas fa-users mr-2 text-primary"></i>Compradores do item
+                    <h5 class="modal-title fw-bold" id="salesReportBuyersModalLabel">
+                        <i class="fas fa-users me-2 text-primary"></i>Compradores do item
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body" id="salesReportBuyersBody">
                     <div class="text-center text-muted py-4">Carregando...</div>
                 </div>
                 <div class="modal-footer">
                     <a href="#" target="_blank" rel="noopener" class="btn btn-outline-secondary rounded-pill disabled" id="salesReportBuyersPrint" data-no-ajax="true">
-                        <i class="fas fa-print mr-1"></i> Imprimir A4
+                        <i class="fas fa-print me-1"></i> Imprimir A4
                     </a>
                     <a href="#" target="_blank" rel="noopener" class="btn btn-primary rounded-pill disabled" id="salesReportBuyersPdf" data-no-ajax="true">
-                        <i class="fas fa-file-pdf mr-1"></i> PDF
+                        <i class="fas fa-file-pdf me-1"></i> PDF
                     </a>
-                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
         </div>

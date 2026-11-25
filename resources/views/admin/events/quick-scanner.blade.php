@@ -16,20 +16,20 @@
                 <div class="card card-primary card-outline shadow-sm">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <i class="fas fa-qrcode mr-2 text-primary"></i>Leitura rápida para todos os eventos
+                            <i class="fas fa-qrcode me-2 text-primary"></i>Leitura rápida para todos os eventos
                         </h3>
                         <div class="card-tools">
                             <a href="{{ route('admin.events.list') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                <i class="fas fa-list mr-1"></i> Lista de eventos
+                                <i class="fas fa-list me-1"></i> Lista de eventos
                             </a>
                             <a href="{{ route('admin.events.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                                <i class="fas fa-calendar-alt mr-1"></i> Calendário
+                                <i class="fas fa-calendar-alt me-1"></i> Calendário
                             </a>
                         </div>
                     </div>
                     <div class="card-body py-2">
                         <p class="text-muted mb-0 small">
-                            <i class="fas fa-info-circle mr-1"></i>
+                            <i class="fas fa-info-circle me-1"></i>
                             Valide qualquer ingresso ativo. Se o evento usar geocerca, a regra do próprio evento será aplicada automaticamente.
                         </p>
                     </div>
@@ -53,9 +53,9 @@
                                 <p class="text-muted mb-4" style="max-width: 520px;">
                                     O leitor abre com um toque. A camera sera iniciada imediatamente e o GPS so entra na validacao quando o evento exigir localizacao exata ou raio configurado.
                                 </p>
-                                <button id="start-scanner-btn" type="button" class="btn btn-primary btn-lg px-5 font-weight-bold"
+                                <button id="start-scanner-btn" type="button" class="btn btn-primary btn-lg px-5 fw-bold"
                                     onclick="initializeScanner()">
-                                    <i class="fas fa-play mr-2"></i> Ativar scanner
+                                    <i class="fas fa-play me-2"></i> Ativar scanner
                                 </button>
                             </div>
 
@@ -71,9 +71,9 @@
                                     <i id="overlay-icon" class="fas fa-spinner fa-spin" style="font-size: 36px;"></i>
                                 </div>
                                 <h4 id="overlay-status" class="font-weight-black mb-2">Processando...</h4>
-                                <p id="overlay-detail" class="text-muted font-weight-bold mb-0"></p>
+                                <p id="overlay-detail" class="text-muted fw-bold mb-0"></p>
                                 <button id="resume-btn" type="button" class="btn btn-dark mt-4 d-none" onclick="resumeScanning()">
-                                    <i class="fas fa-sync-alt mr-1"></i> Ler proximo ingresso
+                                    <i class="fas fa-sync-alt me-1"></i> Ler proximo ingresso
                                 </button>
                             </div>
                         </div>
@@ -81,13 +81,13 @@
                         <div class="row mt-4">
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <div class="alert alert-info h-100 mb-0">
-                                    <strong><i class="fas fa-map-marked-alt mr-1"></i> Geocerca configuravel</strong><br>
+                                    <strong><i class="fas fa-map-marked-alt me-1"></i> Geocerca configuravel</strong><br>
                                     Cada evento pode exigir localizacao exata, margem em metros ou km, ou leitura livre sem restricao.
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="alert alert-secondary h-100 mb-0">
-                                    <strong><i class="fas fa-shield-alt mr-1"></i> Auditoria</strong><br>
+                                    <strong><i class="fas fa-shield-alt me-1"></i> Auditoria</strong><br>
                                     Toda leitura com sucesso ou erro fica registrada para rastreabilidade e seguranca.
                                 </div>
                             </div>
@@ -95,10 +95,10 @@
 
                         <div class="mt-4 pt-4 border-top">
                             <form id="manual-ticket-form" class="form-inline d-flex flex-column flex-md-row align-items-stretch align-items-md-center">
-                                <input type="text" id="manual-ticket-input" class="form-control flex-fill mr-md-2 mb-2 mb-md-0"
+                                <input type="text" id="manual-ticket-input" class="form-control flex-fill me-md-2 mb-2 mb-md-0"
                                     placeholder="Digite o codigo do ingresso manualmente" required>
-                                <button type="submit" class="btn btn-dark font-weight-bold">
-                                    <i class="fas fa-keyboard mr-1"></i> Validar manualmente
+                                <button type="submit" class="btn btn-dark fw-bold">
+                                    <i class="fas fa-keyboard me-1"></i> Validar manualmente
                                 </button>
                             </form>
                         </div>
@@ -109,7 +109,7 @@
             <div class="col-xl-5">
                 <div class="card shadow-sm">
                     <div class="card-header">
-                        <h3 class="card-title font-weight-bold">Eventos liberados para leitura</h3>
+                        <h3 class="card-title fw-bold">Eventos liberados para leitura</h3>
                     </div>
                     <div class="card-body p-3">
                         @if($todayEvents->isEmpty())
@@ -125,14 +125,14 @@
                                             ? 'Sem restricao'
                                             : ($mode === \App\Models\Event::SCANNER_RESTRICTION_EXACT ? 'Localizacao exata' : 'Raio ' . $event->scannerFormattedRadius());
                                         $modeClass = $mode === \App\Models\Event::SCANNER_RESTRICTION_DISABLED
-                                            ? 'badge-secondary'
-                                            : ($mode === \App\Models\Event::SCANNER_RESTRICTION_EXACT ? 'badge-warning' : 'badge-info');
+                                            ? 'text-bg-secondary'
+                                            : ($mode === \App\Models\Event::SCANNER_RESTRICTION_EXACT ? 'text-bg-warning' : 'text-bg-info');
                                     @endphp
                                     <div class="border rounded-lg p-3">
                                         <div class="d-flex align-items-start justify-content-between" style="gap: 12px;">
-                                            <div class="pr-2">
+                                            <div class="pe-2">
                                                 <h4 class="h6 font-weight-black mb-1">{{ $event->title }}</h4>
-                                                <div class="text-muted small font-weight-bold">
+                                                <div class="text-muted small fw-bold">
                                                     {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y H:i') }}
                                                 </div>
                                             </div>
@@ -170,7 +170,7 @@
             const originalText = startBtn.innerHTML;
 
             startBtn.disabled = true;
-            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Iniciando...';
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Iniciando...';
 
             try {
                 await initializeAudio();

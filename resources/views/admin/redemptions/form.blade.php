@@ -25,8 +25,8 @@
         <div class="col-md-10 mx-auto">
             <div class="card card-primary card-outline">
                 <div class="card-header">
-                    <h3 class="card-title font-weight-bold">
-                        <i class="fas fa-gift mr-2"></i>{{ $item->exists ? 'Editar' : 'Cadastrar' }} Item para Resgate
+                    <h3 class="card-title fw-bold">
+                        <i class="fas fa-gift me-2"></i>{{ $item->exists ? 'Editar' : 'Cadastrar' }} Item para Resgate
                     </h3>
                 </div>
 
@@ -136,18 +136,18 @@
                         </div>
 
                         <div class="form-group">
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input" id="is_active" name="is_active"
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="is_active" name="is_active"
                                     value="1" @checked(old('is_active', $item->is_active ?? true))>
-                                <label class="custom-control-label" for="is_active">Item Disponivel para Resgate</label>
+                                <label class="form-check-label" for="is_active">Item Disponivel para Resgate</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card-footer text-right">
-                        <a href="{{ route('admin.redemptions.index') }}" class="btn btn-secondary mr-2">Cancelar</a>
+                    <div class="card-footer text-end">
+                        <a href="{{ route('admin.redemptions.index') }}" class="btn btn-secondary me-2">Cancelar</a>
                         <button type="submit" class="btn btn-primary px-4">
-                            <i class="fas fa-save mr-1"></i> Salvar Item
+                            <i class="fas fa-save me-1"></i> Salvar Item
                         </button>
                     </div>
                 </form>

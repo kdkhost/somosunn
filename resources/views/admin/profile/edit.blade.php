@@ -16,7 +16,7 @@
                             <img class="profile-user-img img-fluid img-circle" src="{{ asset($user->photo) }}" alt="Avatar"
                                 id="current-photo" style="width: 100px; height: 100px; object-fit: cover;" loading="lazy" decoding="async">
                         @else
-                            <div class="profile-user-img img-fluid img-circle d-flex align-items-center justify-content-center bg-light text-primary font-weight-bold"
+                            <div class="profile-user-img img-fluid img-circle d-flex align-items-center justify-content-center bg-light text-primary fw-bold"
                                 style="width:100px;height:100px;font-size:2rem;margin:0 auto;border:3px solid #adb5bd;"
                                 id="current-photo">
                                 {{ substr($user->name, 0, 1) }}
@@ -31,11 +31,11 @@
 
                     <ul class="list-group list-group-unbordered mb-3">
                         <li class="list-group-item">
-                            <b>Pontos</b> <a class="float-right">{{ number_format($user->points ?? 0, 0, ',', '.') }}</a>
+                            <b>Pontos</b> <a class="float-end">{{ number_format($user->points ?? 0, 0, ',', '.') }}</a>
                         </li>
                         <li class="list-group-item">
                             <b>Nível</b> <a
-                                class="float-right badge badge-info">{{ ucfirst($user->level ?? 'Iniciante') }}</a>
+                                class="float-end badge text-bg-info">{{ ucfirst($user->level ?? 'Iniciante') }}</a>
                         </li>
                     </ul>
                 </div>
@@ -48,27 +48,27 @@
                 <div class="card-header p-2">
                     <ul class="nav nav-pills" id="profileTabs" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="personal-tab" data-toggle="pill" href="#personal" role="tab"
+                            <a class="nav-link active" id="personal-tab" data-bs-toggle="pill" href="#personal" role="tab"
                                 aria-controls="personal" aria-selected="true">
-                                <i class="fas fa-user mr-1"></i> Dados Pessoais
+                                <i class="fas fa-user me-1"></i> Dados Pessoais
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="address-tab" data-toggle="pill" href="#address" role="tab"
+                            <a class="nav-link" id="address-tab" data-bs-toggle="pill" href="#address" role="tab"
                                 aria-controls="address" aria-selected="false">
-                                <i class="fas fa-map-marker-alt mr-1"></i> Endereço
+                                <i class="fas fa-map-marker-alt me-1"></i> Endereço
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="social-tab" data-toggle="pill" href="#social" role="tab"
+                            <a class="nav-link" id="social-tab" data-bs-toggle="pill" href="#social" role="tab"
                                 aria-controls="social" aria-selected="false">
-                                <i class="fas fa-share-alt mr-1"></i> Redes Sociais
+                                <i class="fas fa-share-alt me-1"></i> Redes Sociais
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="privacy-tab" data-toggle="pill" href="#privacy" role="tab"
+                            <a class="nav-link" id="privacy-tab" data-bs-toggle="pill" href="#privacy" role="tab"
                                 aria-controls="privacy" aria-selected="false">
-                                <i class="fas fa-lock mr-1"></i> Privacidade
+                                <i class="fas fa-lock me-1"></i> Privacidade
                             </a>
                         </li>
                     </ul>
@@ -213,7 +213,7 @@
                                 @if($user->canManageReceivingPixKey())
                                 <div class="form-group row">
                                     <label for="inputPix"
-                                        class="col-sm-3 col-form-label text-primary font-weight-bold">Chave PIX
+                                        class="col-sm-3 col-form-label text-primary fw-bold">Chave PIX
                                         (Split)</label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control border-primary" id="inputPix" name="pix_key"
@@ -226,7 +226,7 @@
                                 <hr>
 
                                 <div class="alert alert-light border">
-                                    <i class="fas fa-lock mr-2 text-warning"></i>
+                                    <i class="fas fa-lock me-2 text-warning"></i>
                                     <span class="text-muted">Deixe os campos de senha em branco para manter a atual.</span>
                                 </div>
 
@@ -273,7 +273,7 @@
                                             value="{{ $user->number }}">
                                     </div>
                                     <label for="inputComplement"
-                                        class="col-sm-2 col-form-label text-right">Complemento</label>
+                                        class="col-sm-2 col-form-label text-end">Complemento</label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="inputComplement" name="complement"
                                             value="{{ $user->complement }}" placeholder="Apto, Bloco...">
@@ -294,7 +294,7 @@
                                         <input type="text" class="form-control" id="inputCity" name="city"
                                             value="{{ $user->city }}">
                                     </div>
-                                    <label for="inputState" class="col-sm-1 col-form-label text-right">UF</label>
+                                    <label for="inputState" class="col-sm-1 col-form-label text-end">UF</label>
                                     <div class="col-sm-2">
                                         <input type="text" class="form-control text-uppercase" id="inputState" name="state"
                                             value="{{ $user->state }}" maxlength="2">
@@ -311,7 +311,7 @@
 
                                 <div class="form-group row">
                                     <label for="inputWebsite" class="col-sm-3 col-form-label"><i
-                                            class="fas fa-globe mr-2"></i>Website</label>
+                                            class="fas fa-globe me-2"></i>Website</label>
                                     <div class="col-sm-9">
                                         <input type="url" class="form-control" id="inputWebsite" name="website"
                                             value="{{ $user->website }}" placeholder="https://seusite.com">
@@ -320,7 +320,7 @@
 
                                 <div class="form-group row">
                                     <label for="inputFacebook" class="col-sm-3 col-form-label"><i
-                                            class="fab fa-facebook mr-2 text-primary"></i>Facebook</label>
+                                            class="fab fa-facebook me-2 text-primary"></i>Facebook</label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control" id="inputFacebook" name="facebook"
                                             value="{{ $user->facebook }}" placeholder="facebook.com/seuperfil">
@@ -329,7 +329,7 @@
 
                                 <div class="form-group row">
                                     <label for="inputInstagram" class="col-sm-3 col-form-label"><i
-                                            class="fab fa-instagram mr-2 text-danger"></i>Instagram</label>
+                                            class="fab fa-instagram me-2 text-danger"></i>Instagram</label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control" id="inputInstagram" name="instagram"
                                             value="{{ $user->instagram }}" placeholder="@seuusuario">
@@ -338,7 +338,7 @@
 
                                 <div class="form-group row">
                                     <label for="inputTwitter" class="col-sm-3 col-form-label"><i
-                                            class="fab fa-twitter mr-2 text-info"></i>Twitter</label>
+                                            class="fab fa-twitter me-2 text-info"></i>Twitter</label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control" id="inputTwitter" name="twitter"
                                             value="{{ $user->twitter }}" placeholder="@seuusuario">
@@ -347,7 +347,7 @@
 
                                 <div class="form-group row">
                                     <label for="inputLinkedin" class="col-sm-3 col-form-label"><i
-                                            class="fab fa-linkedin mr-2 text-primary"></i>LinkedIn</label>
+                                            class="fab fa-linkedin me-2 text-primary"></i>LinkedIn</label>
                                     <div class="col-sm-9">
                                         <input type="url" class="form-control" id="inputLinkedin" name="linkedin"
                                             value="{{ $user->linkedin }}" placeholder="linkedin.com/in/seuusuario">
@@ -356,7 +356,7 @@
 
                                 <div class="form-group row">
                                     <label for="inputYoutube" class="col-sm-3 col-form-label"><i
-                                            class="fab fa-youtube mr-2 text-danger"></i>YouTube</label>
+                                            class="fab fa-youtube me-2 text-danger"></i>YouTube</label>
                                     <div class="col-sm-9">
                                         <input type="url" class="form-control" id="inputYoutube" name="youtube"
                                             value="{{ $user->youtube }}" placeholder="youtube.com/c/seucanal">
@@ -372,10 +372,10 @@
                                 </p>
 
                                 <div class="form-group">
-                                    <div class="custom-control custom-switch custom-switch-lg">
-                                        <input type="checkbox" class="custom-control-input" id="hideProfile"
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="hideProfile"
                                             name="hide_profile" {{ $user->hide_profile ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="hideProfile">
+                                        <label class="form-check-label" for="hideProfile">
                                             <strong>Restringir perfil apenas para contatos</strong>
                                             <small class="d-block text-muted">Nao conectado vera somente uma mensagem de
                                                 perfil restrito</small>
@@ -384,10 +384,10 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <div class="custom-control custom-switch custom-switch-lg">
-                                        <input type="checkbox" class="custom-control-input" id="showEmail"
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="showEmail"
                                             name="show_email_public" {{ $user->show_email_public ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="showEmail">
+                                        <label class="form-check-label" for="showEmail">
                                             <strong>Exibir e-mail publicamente</strong>
                                             <small class="d-block text-muted">Outros membros poderão ver seu endereço de
                                                 e-mail</small>
@@ -396,10 +396,10 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <div class="custom-control custom-switch custom-switch-lg">
-                                        <input type="checkbox" class="custom-control-input" id="showPhone"
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="showPhone"
                                             name="show_phone_public" {{ $user->show_phone_public ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="showPhone">
+                                        <label class="form-check-label" for="showPhone">
                                             <strong>Exibir telefone publicamente</strong>
                                             <small class="d-block text-muted">Outros membros poderão ver seu número de
                                                 telefone</small>
@@ -408,10 +408,10 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <div class="custom-control custom-switch custom-switch-lg">
-                                        <input type="checkbox" class="custom-control-input" id="showAddress"
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="showAddress"
                                             name="show_address_public" {{ $user->show_address_public ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="showAddress">
+                                        <label class="form-check-label" for="showAddress">
                                             <strong>Exibir endereço publicamente</strong>
                                             <small class="d-block text-muted">Outros membros poderão ver sua cidade e
                                                 estado</small>
@@ -420,7 +420,7 @@
                                 </div>
 
                                 <div class="alert alert-warning">
-                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
                                     <strong>Atenção:</strong> Suas redes sociais sempre serão públicas quando preenchidas.
                                 </div>
                             </div>
@@ -429,9 +429,9 @@
                         <hr>
 
                         <div class="form-group row">
-                            <div class="col-sm-12 text-right">
+                            <div class="col-sm-12 text-end">
                                 <button type="submit" class="btn btn-primary btn-lg px-5" id="btn-save">
-                                    <i class="fas fa-save mr-2"></i>Salvar Alterações
+                                    <i class="fas fa-save me-2"></i>Salvar Alterações
                                 </button>
                             </div>
                         </div>
@@ -532,7 +532,7 @@
 
                 const $btn = $('#btn-save');
                 const originalText = $btn.html();
-                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Salvando...');
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Salvando...');
 
                 const formData = new FormData(this);
                 const hasPhoto = $('#photo-upload').get(0).files.length > 0;

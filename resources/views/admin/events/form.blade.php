@@ -31,7 +31,7 @@
             // Se há ?tab= na URL, forçar a tab correta e ignorar o localStorage
             var urlTab = new URLSearchParams(location.search).get('tab');
             if (urlTab) {
-                var $target = $('a[data-toggle="tab"][href="#legacy-' + urlTab + '"]');
+                var $target = $('a[data-bs-toggle="tab"][href="#legacy-' + urlTab + '"]');
                 if ($target.length) {
                     // Remove active de todas as tabs/panes primeiro
                     $('#event-tabs .nav-link').removeClass('active');
@@ -69,19 +69,19 @@
     @if($event->exists && ($event->type ?? 'event') !== 'album')
         <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
             <div class="mb-2 mb-md-0">
-                <h5 class="mb-0 font-weight-bold">
-                    <i class="fas fa-calendar-check text-primary mr-2"></i>{{ $event->title }}
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-calendar-check text-primary me-2"></i>{{ $event->title }}
                 </h5>
             </div>
             <div class="d-flex flex-wrap" style="gap: 10px;">
                 @if($canManageEventCoupons)
                     <a href="#legacy-coupons" class="btn btn-success rounded-pill elevation-1" data-event-tab-target="#coupons-tab">
-                        <i class="fas fa-ticket-alt mr-2"></i>Cupons gratuitos
+                        <i class="fas fa-ticket-alt me-2"></i>Cupons gratuitos
                     </a>
                 @endif
                 @if($canManageGroupLink)
-                    <a href="#legacy-general" class="btn btn-outline-success rounded-pill elevation-1" data-toggle="tab">
-                        <i class="fab fa-whatsapp mr-2"></i>Link do WhatsApp
+                    <a href="#legacy-general" class="btn btn-outline-success rounded-pill elevation-1" data-bs-toggle="tab">
+                        <i class="fab fa-whatsapp me-2"></i>Link do WhatsApp
                     </a>
                 @endif
             </div>
@@ -91,23 +91,23 @@
         <div class="card-header p-0 pt-1 border-bottom-0">
             <ul class="nav nav-tabs" id="event-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link {{ $activeEventTab === 'general' ? 'active' : '' }}" id="general-tab" data-toggle="tab" href="#legacy-general" role="tab"
+                    <a class="nav-link {{ $activeEventTab === 'general' ? 'active' : '' }}" id="general-tab" data-bs-toggle="tab" href="#legacy-general" role="tab"
                         aria-controls="legacy-general" aria-selected="{{ $activeEventTab === 'general' ? 'true' : 'false' }}">Dados Gerais</a>
                 </li>
                 <li class="nav-item event-only-field">
-                    <a class="nav-link {{ $activeEventTab === 'certificate' ? 'active' : '' }}" id="cert-tab" data-toggle="tab" href="#legacy-certificate" role="tab"
+                    <a class="nav-link {{ $activeEventTab === 'certificate' ? 'active' : '' }}" id="cert-tab" data-bs-toggle="tab" href="#legacy-certificate" role="tab"
                         aria-controls="legacy-certificate" aria-selected="{{ $activeEventTab === 'certificate' ? 'true' : 'false' }}">Certificado</a>
                 </li>
                 @if($event->exists)
                 <li class="nav-item">
-                    <a class="nav-link {{ $activeEventTab === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-toggle="tab" href="#legacy-gallery" role="tab"
+                    <a class="nav-link {{ $activeEventTab === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-bs-toggle="tab" href="#legacy-gallery" role="tab"
                         aria-controls="legacy-gallery" aria-selected="{{ $activeEventTab === 'gallery' ? 'true' : 'false' }}">Galeria de Fotos</a>
                 </li>
                 @if($isEditableEventRecord && $canManageEventCoupons)
                     <li class="nav-item event-only-field">
-                        <a class="nav-link {{ $activeEventTab === 'coupons' ? 'active' : '' }}" id="coupons-tab" data-toggle="tab" href="#legacy-coupons" role="tab"
+                        <a class="nav-link {{ $activeEventTab === 'coupons' ? 'active' : '' }}" id="coupons-tab" data-bs-toggle="tab" href="#legacy-coupons" role="tab"
                             aria-controls="legacy-coupons" aria-selected="{{ $activeEventTab === 'coupons' ? 'true' : 'false' }}">
-                            <i class="fas fa-ticket-alt mr-1"></i> Cupons
+                            <i class="fas fa-ticket-alt me-1"></i> Cupons
                         </a>
                     </li>
                 @endif
@@ -124,7 +124,7 @@
                         @if($event->exists) @method('PUT') @endif
 
                         <div class="card card-outline card-info mb-3">
-                            <div class="card-header"><h3 class="card-title font-weight-bold">Configurações do Registro</h3></div>
+                            <div class="card-header"><h3 class="card-title fw-bold">Configurações do Registro</h3></div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -176,7 +176,7 @@
                         </div>
                         
                         <div class="card card-outline card-secondary my-3 event-only-field">
-                            <div class="card-header"><h3 class="card-title font-weight-bold">Preços por Lote</h3></div>
+                            <div class="card-header"><h3 class="card-title fw-bold">Preços por Lote</h3></div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -258,7 +258,7 @@
                                     </div>
                                     <div id="venueResults" class="list-group mt-1 shadow-sm" style="position:absolute;z-index:1050;width:calc(100% - 30px);max-height:250px;overflow-y:auto;display:none;"></div>
                                     <small class="text-muted d-block mt-1">
-                                        <i class="fas fa-info-circle mr-1"></i>
+                                        <i class="fas fa-info-circle me-1"></i>
                                         Digite o nome do local e clique em <i class="fas fa-map-marker-alt text-info"></i> para buscar. Prioridade: seu estado.
                                     </small>
                                 </div>
@@ -268,7 +268,7 @@
                                     <input type="checkbox" class="form-check-input" id="eventOutOfState" name="event_out_of_state" value="1"
                                         {{ old('event_out_of_state', $event->event_out_of_state ?? false) ? 'checked' : '' }}>
                                     <label class="form-check-label text-sm" for="eventOutOfState">
-                                        <i class="fas fa-plane-departure mr-1 text-muted"></i>
+                                        <i class="fas fa-plane-departure me-1 text-muted"></i>
                                         Evento fora do meu estado
                                     </label>
                                 </div>
@@ -290,15 +290,15 @@
                                 <div class="form-check mb-3">
                                     <input type="checkbox" name="published" value="1" class="form-check-input" id="publishedCheck"
                                         {{ old('published', $event->published) ? 'checked' : '' }}>
-                                    <label class="form-check-label font-weight-bold" for="publishedCheck">
-                                        <i class="fas fa-eye mr-1 text-success"></i> Evento Publicado
+                                    <label class="form-check-label fw-bold" for="publishedCheck">
+                                        <i class="fas fa-eye me-1 text-success"></i> Evento Publicado
                                     </label>
                                     <small class="d-block text-muted">Desmarque para ocultar o evento do site. Eventos sem imagem de capa ficam automaticamente como rascunho.</small>
                                 </div>
                                 @if($canManageGroupLink)
                                     <div class="form-group mb-3">
-                                        <label class="font-weight-bold">
-                                            <i class="fab fa-whatsapp text-success mr-1"></i> Link do grupo do WhatsApp
+                                        <label class="fw-bold">
+                                            <i class="fab fa-whatsapp text-success me-1"></i> Link do grupo do WhatsApp
                                         </label>
                                         <input type="url" name="whatsapp_group_link" class="form-control"
                                             value="{{ old('whatsapp_group_link', $event->whatsapp_group_link) }}"
@@ -316,13 +316,13 @@
 
                         <div class="form-check mb-2 mt-4 event-only-field">
                                     <input type="checkbox" name="is_ticket_enabled" value="1" class="form-check-input" {{ old('is_ticket_enabled', $event->is_ticket_enabled) ? 'checked' : '' }}>
-                                    <label class="form-check-label font-weight-bold" style="color:#007bff;"><i class="fas fa-qrcode mr-1"></i> Habilitar Validação de Entrada por QR Code</label>
+                                    <label class="form-check-label fw-bold" style="color:#007bff;"><i class="fas fa-qrcode me-1"></i> Habilitar Validação de Entrada por QR Code</label>
                                     <small class="d-block text-muted">Quando ativo, o sistema criará um ingresso com QR Code e pontuará organizador e participante após validação.</small>
                                 </div>
                                 <div class="card card-outline card-info mb-3 event-only-field">
                                     <div class="card-body">
                                         <div class="form-group mb-3">
-                                            <label class="font-weight-bold"><i class="fas fa-map-marked-alt mr-1"></i> Restricao de leitura do QR Code</label>
+                                            <label class="fw-bold"><i class="fas fa-map-marked-alt me-1"></i> Restricao de leitura do QR Code</label>
                                             <select name="scanner_restriction_mode" id="scannerRestrictionMode" class="form-control">
                                                 <option value="disabled" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'disabled' ? 'selected' : '' }}>Sem restricao de localizacao</option>
                                                 <option value="exact" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'exact' ? 'selected' : '' }}>Localizacao exata do evento</option>
@@ -349,14 +349,14 @@
                                         </div>
 
                                         <hr class="my-3">
-                                        <h6 class="font-weight-bold mb-2"><i class="fas fa-clock mr-1"></i> Janela de validação do ingresso</h6>
+                                        <h6 class="fw-bold mb-2"><i class="fas fa-clock me-1"></i> Janela de validação do ingresso</h6>
                                         <p class="text-muted small mb-3">
                                             Configure quanto tempo antes do início e depois do término do evento o scanner aceita ingressos. Útil para permitir entrada antecipada e atrasados.
                                         </p>
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <label class="small font-weight-bold">
-                                                    <i class="fas fa-door-open text-success mr-1"></i> Abrir scanner antes (minutos)
+                                                <label class="small fw-bold">
+                                                    <i class="fas fa-door-open text-success me-1"></i> Abrir scanner antes (minutos)
                                                 </label>
                                                 <div class="input-group">
                                                     <input type="number" min="0" max="1440" step="5" name="scanner_early_minutes" class="form-control"
@@ -368,8 +368,8 @@
                                                 <small class="text-muted">Ex: 120 = scanner abre 2h antes do evento</small>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="small font-weight-bold">
-                                                    <i class="fas fa-hourglass-end text-warning mr-1"></i> Aceitar após o fim (minutos)
+                                                <label class="small fw-bold">
+                                                    <i class="fas fa-hourglass-end text-warning me-1"></i> Aceitar após o fim (minutos)
                                                 </label>
                                                 <div class="input-group">
                                                     <input type="number" min="0" max="1440" step="5" name="scanner_late_minutes" class="form-control"
@@ -383,13 +383,13 @@
                                         </div>
 
                                         <div class="alert alert-secondary mt-3 mb-0">
-                                            <i class="fas fa-info-circle mr-1"></i>
+                                            <i class="fas fa-info-circle me-1"></i>
                                             Toda leitura, com sucesso ou erro, fica registrada no sistema para auditoria.
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label class="font-weight-bold"><i class="fas fa-eye mr-1"></i> Onde Exibir?</label>
+                                    <label class="fw-bold"><i class="fas fa-eye me-1"></i> Onde Exibir?</label>
                                     <select name="visibility" class="form-control" style="border-radius: 8px;">
                                         <option value="ambos" {{ old('visibility', $event->visibility ?? 'ambos') == 'ambos' ? 'selected' : '' }}>Ambos os locais</option>
                                         <option value="somos_unn" {{ old('visibility', $event->visibility ?? 'ambos') == 'somos_unn' ? 'selected' : '' }}>Somente Somos UNN</option>
@@ -405,7 +405,7 @@
                 <div class="tab-pane event-only-field {{ $activeEventTab === 'certificate' ? 'show active' : '' }}" id="legacy-certificate" role="tabpanel" aria-labelledby="cert-tab">
                     @if(!$event->exists)
                         <div class="alert alert-info border-0 shadow-sm">
-                            <i class="fas fa-info-circle mr-2"></i> Você poderá configurar o certificado após salvar o evento
+                            <i class="fas fa-info-circle me-2"></i> Você poderá configurar o certificado após salvar o evento
                             pela primeira vez.
                         </div>
                     @else
@@ -425,7 +425,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text">Zoom</span>
                                                         </div>
-                                                        <select id="cert-zoom" class="custom-select custom-select-sm">
+                                                        <select id="cert-zoom" class="form-select custom-select-sm">
                                                             <option value="0.5">50%</option>
                                                             <option value="0.75">75%</option>
                                                             <option value="1" selected>100%</option>
@@ -474,19 +474,19 @@
 
                                 <div class="col-12 mt-3">
                                     <div class="card shadow-sm certificate-settings-card">
-                                        <div class="card-header certificate-settings-header font-weight-bold">Configurações</div>
+                                        <div class="card-header certificate-settings-header fw-bold">Configurações</div>
                                         <div class="card-body certificate-settings-body">
                                             <div class="row">
                                                 <div class="col-12 col-xl-6">
-                                            <div class="form-group custom-control custom-switch mb-4">
-                                                <input type="checkbox" class="custom-control-input" id="is_certificate_enabled"
+                                            <div class="form-group form-check form-switch mb-4">
+                                                <input type="checkbox" class="form-check-input" id="is_certificate_enabled"
                                                     name="is_certificate_enabled" value="1" {{ $event->is_certificate_enabled ? 'checked' : '' }}>
-                                                <label class="custom-control-label font-weight-bold"
+                                                <label class="form-check-label fw-bold"
                                                     for="is_certificate_enabled">Habilitar Certificado</label>
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="small text-muted text-uppercase font-weight-bold">Fundo do
+                                                <label class="small text-muted text-uppercase fw-bold">Fundo do
                                                     Certificado</label>
                                                 <div class="custom-file">
                                                     <input type="file" class="custom-file-input" name="certificate_bg"
@@ -497,7 +497,7 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="small text-muted text-uppercase font-weight-bold">Ajuste do
+                                                <label class="small text-muted text-uppercase fw-bold">Ajuste do
                                                     Fundo</label>
                                                 <select id="cert-bg-fit" class="form-control form-control-sm">
                                                     <option value="cover">Cover (cortar)</option>
@@ -526,7 +526,7 @@
                                             @endphp
 
                                             <div class="form-group">
-                                                <label class="small text-muted text-uppercase font-weight-bold">Título do
+                                                <label class="small text-muted text-uppercase fw-bold">Título do
                                                     Certificado</label>
                                                 <input type="text" class="form-control" name="certificate_title"
                                                     id="certificate_title"
@@ -535,7 +535,7 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="small text-muted text-uppercase font-weight-bold">Texto de
+                                                <label class="small text-muted text-uppercase fw-bold">Texto de
                                                     Apresentação</label>
                                                 <textarea class="form-control" name="presentation_text" id="presentation_text"
                                                     rows="2"
@@ -544,7 +544,7 @@
                                             </div>
 
                                             <div class="form-group mt-3">
-                                                <label class="small text-muted text-uppercase font-weight-bold">Assinatura do
+                                                <label class="small text-muted text-uppercase fw-bold">Assinatura do
                                                     Organizador</label>
                                                 @if($event->instructor_signature)
                                                     <div class="mb-2 text-center border p-2 rounded certificate-signature-preview">
@@ -561,11 +561,11 @@
 
                                             <hr>
 
-                                            <h6 class="small text-muted text-uppercase font-weight-bold mb-2">Ferramentas</h6>
+                                            <h6 class="small text-muted text-uppercase fw-bold mb-2">Ferramentas</h6>
                                             <div class="p-3 rounded border mb-3 cert-tool-box">
-                                                <div class="custom-control custom-switch mb-2">
-                                                    <input type="checkbox" class="custom-control-input" id="cert-grid-enabled">
-                                                    <label class="custom-control-label" for="cert-grid-enabled">Mostrar
+                                                <div class="form-check form-switch mb-2">
+                                                    <input type="checkbox" class="form-check-input" id="cert-grid-enabled">
+                                                    <label class="form-check-label" for="cert-grid-enabled">Mostrar
                                                         grade</label>
                                                 </div>
                                                 <div class="form-group mb-2">
@@ -579,10 +579,10 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="custom-control custom-switch mb-2">
-                                                    <input type="checkbox" class="custom-control-input" id="cert-snap-enabled"
+                                                <div class="form-check form-switch mb-2">
+                                                    <input type="checkbox" class="form-check-input" id="cert-snap-enabled"
                                                         checked>
-                                                    <label class="custom-control-label" for="cert-snap-enabled">Snap na
+                                                    <label class="form-check-label" for="cert-snap-enabled">Snap na
                                                         grade</label>
                                                 </div>
                                                 <div class="form-group mb-2">
@@ -609,13 +609,13 @@
                                                 <div class="col-12 col-xl-6 mt-3 mt-xl-0">
                                                     <hr class="d-xl-none">
 
-                                                    <h6 class="small text-muted text-uppercase font-weight-bold mb-2">Camadas</h6>
+                                                    <h6 class="small text-muted text-uppercase fw-bold mb-2">Camadas</h6>
                                             <div class="list-group mb-3" id="cert-layers"></div>
 
                                             <div id="cert-style-controls" style="display:none;">
-                                                <label class="small text-muted text-uppercase font-weight-bold mb-2">Editar:
+                                                <label class="small text-muted text-uppercase fw-bold mb-2">Editar:
                                                     <span id="selected-elem-name" class="text-primary"></span></label>
-                                                <div class="form-row">
+                                                <div class="row g-2">
                                                     <div class="col-6">
                                                         <div class="form-group mb-2">
                                                             <label class="small mb-1">X (%)</label>
@@ -631,9 +631,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="custom-control custom-switch mb-2">
-                                                    <input type="checkbox" class="custom-control-input" id="style-locked">
-                                                    <label class="custom-control-label" for="style-locked">Bloquear
+                                                <div class="form-check form-switch mb-2">
+                                                    <input type="checkbox" class="form-check-input" id="style-locked">
+                                                    <label class="form-check-label" for="style-locked">Bloquear
                                                         elemento</label>
                                                 </div>
                                                 <div class="form-group mb-2">
@@ -668,7 +668,7 @@
                                                         <option value="'Courier New', monospace">Courier New</option>
                                                     </select>
                                                 </div>
-                                                <div id="logo-dims" class="form-row" style="display:none;">
+                                                <div id="logo-dims" class="row g-2" style="display:none;">
                                                     <div class="col-6">
                                                         <label class="small mb-1">Largura</label>
                                                         <input type="number" id="logo-width"
@@ -684,16 +684,16 @@
 
                                             <div class="mt-4">
                                                 <label
-                                                    class="small text-muted text-uppercase font-weight-bold mb-2">Visibilidade</label>
+                                                    class="small text-muted text-uppercase fw-bold mb-2">Visibilidade</label>
                                                 <div class="list-group list-group-flush border rounded overflow-hidden cert-visibility-list">
                                                     @foreach(['student_name' => 'Nome do Participante', 'course_name' => 'Nome do Evento', 'completion_date' => 'Data do Evento', 'certificate_code' => 'Cód. Validação', 'author_name' => 'Organizador', 'workload_hours' => 'Carga Horária', 'title' => 'Título do Certificado', 'presentation_text' => 'Texto de Apresentação', 'instructor_signature' => 'Assinatura do Organizador', 'platform_logo' => 'Logo UNN'] as $tag => $label)
                                                         <div
                                                             class="list-group-item py-2 px-3 d-flex justify-content-between align-items-center cert-visibility-item">
-                                                            <span class="small font-weight-bold">{{ $label }}</span>
-                                                            <div class="custom-control custom-switch">
-                                                                <input type="checkbox" class="custom-control-input cert-toggle"
+                                                            <span class="small fw-bold">{{ $label }}</span>
+                                                            <div class="form-check form-switch">
+                                                                <input type="checkbox" class="form-check-input cert-toggle"
                                                                     id="toggle-{{ $tag }}" data-tag="{{ $tag }}" checked>
-                                                                <label class="custom-control-label" for="toggle-{{ $tag }}"></label>
+                                                                <label class="form-check-label" for="toggle-{{ $tag }}"></label>
                                                             </div>
                                                         </div>
                                                     @endforeach
@@ -704,8 +704,8 @@
                                             </div>
 
                                             <input type="hidden" name="certificate_settings" id="certificate_settings_input">
-                                            <button type="submit" class="btn btn-primary btn-block mt-4" id="btn-save-cert">
-                                                <i class="fas fa-save mr-1"></i> Salvar Certificado
+                                            <button type="submit" class="btn btn-primary w-100 mt-4" id="btn-save-cert">
+                                                <i class="fas fa-save me-1"></i> Salvar Certificado
                                             </button>
                                         </div>
                                     </div>
@@ -725,15 +725,15 @@
 
                             {{-- Input real oculto, acionado via JS ao clicar na drop-zone --}}
                             <div class="alert alert-light border d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 event-gallery-toolbar">
-                                <div class="pr-md-4 mb-3 mb-md-0 event-gallery-toolbar__content">
-                                    <div class="font-weight-bold text-dark">Armazenamento e gestao rapida</div>
+                                <div class="pe-md-4 mb-3 mb-md-0 event-gallery-toolbar__content">
+                                    <div class="fw-bold text-dark">Armazenamento e gestao rapida</div>
                                     <small class="text-muted d-block">
                                         As imagens ficam em <code>storage/app/public/events/{{ $event->id }}/gallery</code> e os videos em <code>storage/app/public/events/{{ $event->id }}/gallery/videos</code>.
                                     </small>
                                 </div>
                                 <a href="{{ route('admin.gallery.index', ['event_id' => $event->id]) }}?tab=gallery"
-                                    class="btn event-gallery-toolbar__action rounded-pill px-4 py-2 font-weight-bold">
-                                    <i class="fas fa-images mr-2"></i> Abrir galeria completa do evento
+                                    class="btn event-gallery-toolbar__action rounded-pill px-4 py-2 fw-bold">
+                                    <i class="fas fa-images me-2"></i> Abrir galeria completa do evento
                                 </a>
                             </div>
 
@@ -744,11 +744,11 @@
                                     role="button" tabindex="0" aria-label="Selecionar fotos e vídeos do evento">
                                     <div class="drop-zone-content">
                                         <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3 d-block"></i>
-                                        <h5 class="font-weight-bold">Arraste fotos e vídeos aqui</h5>
+                                        <h5 class="fw-bold">Arraste fotos e vídeos aqui</h5>
                                         <p class="text-muted mb-3">ou <span class="text-primary" style="text-decoration:underline;">clique para selecionar</span> do seu dispositivo</p>
                                         <div class="d-flex justify-content-center flex-wrap gap-2 mb-2">
-                                            <span class="badge badge-pill badge-primary px-3">Imagens (JPG, PNG)</span>
-                                            <span class="badge badge-pill badge-info px-3">Vídeos (MP4)</span>
+                                            <span class="badge rounded-pill text-bg-primary px-3">Imagens (JPG, PNG)</span>
+                                            <span class="badge rounded-pill text-bg-info px-3">Vídeos (MP4)</span>
                                         </div>
                                         <small class="text-secondary">As imagens receberão marca d'água automaticamente</small>
                                     </div>
@@ -757,8 +757,8 @@
                                 <!-- Progresso de Upload -->
                                 <div id="eventUploadProgress" class="mt-3 d-none">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="small font-weight-bold text-primary" id="eventUploadStatus">Enviando arquivos...</span>
-                                        <span class="small font-weight-bold" id="eventUploadPercent">0%</span>
+                                        <span class="small fw-bold text-primary" id="eventUploadStatus">Enviando arquivos...</span>
+                                        <span class="small fw-bold" id="eventUploadPercent">0%</span>
                                     </div>
                                     <div class="progress" style="height: 10px; border-radius: 5px;">
                                         <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" id="eventUploadProgressBar" role="progressbar" style="width: 0%"></div>
@@ -810,14 +810,14 @@
                     <div class="card shadow-sm border-0 mt-3 event-coupons-panel">
                         <div class="card-header d-flex flex-wrap align-items-center justify-content-between">
                             <div>
-                                <h3 class="card-title font-weight-bold mb-0">
-                                    <i class="fas fa-ticket-alt mr-2"></i>Cupons de gratuidade
+                                <h3 class="card-title fw-bold mb-0">
+                                    <i class="fas fa-ticket-alt me-2"></i>Cupons de gratuidade
                                 </h3>
                                 <small class="text-muted d-block">{{ $event->title }}</small>
                             </div>
                             @if($canCreateEventCoupon)
-                                <a href="{{ route('admin.events.coupons.create', $event) }}" class="btn btn-primary btn-sm rounded-pill ml-auto" data-pjax>
-                                    <i class="fas fa-plus mr-1"></i> Novo cupom
+                                <a href="{{ route('admin.events.coupons.create', $event) }}" class="btn btn-primary btn-sm rounded-pill ms-auto" data-pjax>
+                                    <i class="fas fa-plus me-1"></i> Novo cupom
                                 </a>
                             @endif
                         </div>
@@ -831,20 +831,20 @@
                                             <th>Usos</th>
                                             <th>Validade</th>
                                             <th>Status</th>
-                                            <th class="text-right">Ações</th>
+                                            <th class="text-end">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($eventCoupons as $coupon)
                                             <tr>
-                                                <td><span class="badge badge-dark px-3 py-2">{{ $coupon->code }}</span></td>
+                                                <td><span class="badge text-bg-dark px-3 py-2">{{ $coupon->code }}</span></td>
                                                 <td>
                                                     @if($coupon->type === \App\Models\EventCoupon::TYPE_FREE)
-                                                        <span class="badge badge-success">Gratuidade total</span>
+                                                        <span class="badge text-bg-success">Gratuidade total</span>
                                                     @elseif($coupon->type === \App\Models\EventCoupon::TYPE_PERCENT)
-                                                        <span class="badge badge-info">{{ number_format((float) $coupon->discount_value, 2, ',', '.') }}%</span>
+                                                        <span class="badge text-bg-info">{{ number_format((float) $coupon->discount_value, 2, ',', '.') }}%</span>
                                                     @else
-                                                        <span class="badge badge-warning">R$ {{ number_format((float) $coupon->discount_value, 2, ',', '.') }}</span>
+                                                        <span class="badge text-bg-warning">R$ {{ number_format((float) $coupon->discount_value, 2, ',', '.') }}</span>
                                                     @endif
                                                 </td>
                                                 <td>
@@ -861,7 +861,7 @@
                                                         {{ $coupon->active ? 'Ativo' : 'Inativo' }}
                                                     </span>
                                                 </td>
-                                                <td class="text-right">
+                                                <td class="text-end">
                                                     <div class="btn-group btn-group-sm">
                                                         @if($canToggleEventCoupon)
                                                             <form method="POST" action="{{ route('admin.events.coupons.toggle', [$event, $coupon]) }}" class="ajax-form d-inline">
@@ -896,7 +896,7 @@
                                                     @if($canCreateEventCoupon)
                                                         <div class="mt-3">
                                                             <a href="{{ route('admin.events.coupons.create', $event) }}" class="btn btn-primary btn-sm rounded-pill" data-pjax>
-                                                                <i class="fas fa-plus mr-1"></i> Criar primeiro cupom
+                                                                <i class="fas fa-plus me-1"></i> Criar primeiro cupom
                                                             </a>
                                                         </div>
                                                     @endif
@@ -1292,7 +1292,7 @@
             syncRegistryType();
 
             // Reforço drástico para o comportamento das abas do Bootstrap 4
-            $('a[data-toggle="tab"]').on('shown.bs.tab click', function (e) {
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab click', function (e) {
                 const target = $(this).attr('href');
                 if(!target || !target.startsWith('#legacy-')) return;
                 
@@ -1566,7 +1566,7 @@ async function setAsCover(mediaId) {
             setTimeout(initMap, 100);
 
             // Re-invalidar mapa quando tab é mostrada
-            $('a[data-toggle="tab"], a[data-toggle="pill"]').on('shown.bs.tab', function () {
+            $('a[data-bs-toggle="tab"], a[data-bs-toggle="pill"]').on('shown.bs.tab', function () {
                 if (map) setTimeout(function () { map.invalidateSize(); }, 50);
             });
 
@@ -1646,7 +1646,7 @@ async function setAsCover(mediaId) {
                     var text = locationInput.value.trim();
                     if (text.length < 3) { venueResults.style.display = 'none'; return; }
 
-                    venueResults.innerHTML = '<div class="list-group-item text-center py-3"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando estabelecimentos...</div>';
+                    venueResults.innerHTML = '<div class="list-group-item text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i>Buscando estabelecimentos...</div>';
                     venueResults.style.display = 'block';
 
                     var outOfState = outOfStateCheck && outOfStateCheck.checked;
@@ -1675,16 +1675,16 @@ async function setAsCover(mediaId) {
                     })
                     .catch(function(err) {
                         console.error('Venue search error:', err);
-                        venueResults.innerHTML = '<div class="list-group-item text-danger text-center py-3"><i class="fas fa-exclamation-triangle mr-1"></i>Erro na busca. Tente novamente.</div>';
+                        venueResults.innerHTML = '<div class="list-group-item text-danger text-center py-3"><i class="fas fa-exclamation-triangle me-1"></i>Erro na busca. Tente novamente.</div>';
                     });
                 }
                 function renderVenueResults(data) {
                     if (!data || data.length === 0) {
-                        venueResults.innerHTML = '<div class="list-group-item text-muted text-center py-3"><i class="fas fa-search mr-1"></i>Nenhum resultado. Tente outro nome ou digite o endereco.</div>';
+                        venueResults.innerHTML = '<div class="list-group-item text-muted text-center py-3"><i class="fas fa-search me-1"></i>Nenhum resultado. Tente outro nome ou digite o endereco.</div>';
                         return;
                     }
                     var items = data.slice(0, 20);
-                    var html = '<div class="list-group-item bg-light py-2 px-3 text-xs font-weight-bold text-muted"><i class="fas fa-list mr-1"></i>' + Math.min(data.length, 20) + ' de ' + data.length + ' resultados' + (data.length > 20 ? ' (refine sua busca)' : '') + '</div>';
+                    var html = '<div class="list-group-item bg-light py-2 px-3 text-xs fw-bold text-muted"><i class="fas fa-list me-1"></i>' + Math.min(data.length, 20) + ' de ' + data.length + ' resultados' + (data.length > 20 ? ' (refine sua busca)' : '') + '</div>';
                     items.forEach(function(item, idx) {
                         var itemLon = item.lon || item.lng || '';
                         html += '<a href="#" class="list-group-item list-group-item-action venue-result py-2 px-3" '
@@ -1692,7 +1692,7 @@ async function setAsCover(mediaId) {
                             + 'data-name="' + (item.name || '').replace(/"/g, '&quot;') + '" '
                             + 'data-address="' + (item.address || '').replace(/"/g, '&quot;') + '">'
                             + '<div class="d-flex align-items-start gap-2">'
-                            + '<span class="font-weight-bold text-primary" style="min-width:20px">' + (idx + 1) + '.</span>'
+                            + '<span class="fw-bold text-primary" style="min-width:20px">' + (idx + 1) + '.</span>'
                             + '<div class="flex-1"><strong class="d-block text-sm">' + (item.name || '') + '</strong>'
                             + '<small class="text-muted d-block">' + (item.address || 'Endereco nao disponivel') + '</small>'
                             + '</div></div></a>';
@@ -1908,7 +1908,7 @@ async function setAsCover(mediaId) {
                 }, 50);
             }
 
-            $('a[data-toggle="tab"][href="#certificate"]').on('shown.bs.tab', function () {
+            $('a[data-bs-toggle="tab"][href="#certificate"]').on('shown.bs.tab', function () {
                 scheduleFitCanvas();
             });
             scheduleFitCanvas();
@@ -2034,13 +2034,13 @@ async function setAsCover(mediaId) {
                     const $right = $('<span>').addClass('d-flex align-items-center');
 
                     if (item.key !== 'platform_logo' && !item.visible) {
-                        $right.append($('<span>').addClass('badge badge-secondary mr-1').text('Oculto'));
+                        $right.append($('<span>').addClass('badge text-bg-secondary me-1').text('Oculto'));
                     }
                     if (item.locked) {
-                        $right.append($('<span>').addClass('badge badge-warning mr-1').text('Lock'));
+                        $right.append($('<span>').addClass('badge text-bg-warning me-1').text('Lock'));
                     }
 
-                    $right.append($('<span>').addClass('badge badge-light border').text('z:' + item.zIndex));
+                    $right.append($('<span>').addClass('badge text-bg-light border').text('z:' + item.zIndex));
 
                     $btn.append($left).append($right);
                     $btn.on('click', function () {

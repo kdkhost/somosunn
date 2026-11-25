@@ -17,7 +17,7 @@
     data-upload-max-size="{{ $maxSizeBytes }}"
     data-upload-chunk-size="{{ $chunkSizeBytes }}">
     @if($label)
-        <label class="font-weight-bold mb-2 d-block">{{ $label }}</label>
+        <label class="fw-bold mb-2 d-block">{{ $label }}</label>
     @endif
 
     <div class="upload-drop-area @if($previewUrl) d-none @endif" data-upload-drop-area>
@@ -38,7 +38,7 @@
 
     {{-- Progresso --}}
     <div class="upload-progress-container d-none mt-3" data-upload-progress-container>
-        <div class="d-flex justify-content-between mb-1 small font-weight-bold">
+        <div class="d-flex justify-content-between mb-1 small fw-bold">
             <span class="text-primary" data-upload-status>Enviando...</span>
             <span class="text-muted" data-upload-percent>0%</span>
         </div>
@@ -79,11 +79,11 @@
             </div>
 
             <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded">
-                <div class="text-truncate small pr-3" data-upload-filename>
+                <div class="text-truncate small pe-3" data-upload-filename>
                     {{ $existingPath ? basename($existingPath) : 'Arquivo enviado' }}
                 </div>
                 <button type="button" class="btn btn-xs btn-danger" data-upload-clear title="Remover">
-                    <i class="fas fa-trash-alt mr-1"></i> Remover
+                    <i class="fas fa-trash-alt me-1"></i> Remover
                 </button>
             </div>
         </div>

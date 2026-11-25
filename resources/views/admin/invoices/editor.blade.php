@@ -4,13 +4,13 @@
 
 @section('content_header')
     <div class="d-flex justify-content-between align-items-center">
-        <h1><i class="fas fa-file-invoice mr-2"></i>Editor Visual de Faturas</h1>
+        <h1><i class="fas fa-file-invoice me-2"></i>Editor Visual de Faturas</h1>
         <div>
             <button type="button" class="btn btn-success btn-sm" id="btn-save">
-                <i class="fas fa-save mr-1"></i> Salvar Configurações
+                <i class="fas fa-save me-1"></i> Salvar Configurações
             </button>
-            <button type="button" class="btn btn-outline-secondary btn-sm ml-2" id="btn-refresh-preview">
-                <i class="fas fa-sync-alt mr-1"></i> Atualizar Preview
+            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="btn-refresh-preview">
+                <i class="fas fa-sync-alt me-1"></i> Atualizar Preview
             </button>
         </div>
     </div>
@@ -24,27 +24,27 @@
             <div class="card-header p-0">
                 <ul class="nav nav-tabs" id="editor-tabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#tab-cores" role="tab">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#tab-cores" role="tab">
                             <i class="fas fa-palette"></i> Cores
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#tab-logo" role="tab">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab-logo" role="tab">
                             <i class="fas fa-image"></i> Logo
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#tab-layout" role="tab">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab-layout" role="tab">
                             <i class="fas fa-th-large"></i> Layout
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#tab-dados" role="tab">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab-dados" role="tab">
                             <i class="fas fa-building"></i> Dados
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#tab-avancado" role="tab">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab-avancado" role="tab">
                             <i class="fas fa-code"></i> Avançado
                         </a>
                     </li>
@@ -143,7 +143,7 @@
                     </div>
 
                     <div class="callout callout-info">
-                        <small><i class="fas fa-info-circle mr-1"></i>O logo utilizado é o configurado nas Configurações Globais do sistema (logo da plataforma).</small>
+                        <small><i class="fas fa-info-circle me-1"></i>O logo utilizado é o configurado nas Configurações Globais do sistema (logo da plataforma).</small>
                     </div>
                 </div>
 
@@ -151,53 +151,53 @@
                 <div class="tab-pane fade" id="tab-layout" role="tabpanel">
                     <h6 class="text-muted text-uppercase mb-3">Visibilidade</h6>
 
-                    <div class="custom-control custom-switch mb-2">
-                        <input type="checkbox" class="custom-control-input invoice-setting"
+                    <div class="form-check form-switch mb-2">
+                        <input type="checkbox" class="form-check-input invoice-setting"
                             id="invoice_show_company_address" name="invoice_show_company_address"
                             {{ $settings['invoice_show_company_address'] ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="invoice_show_company_address">Mostrar endereço da empresa</label>
+                        <label class="form-check-label" for="invoice_show_company_address">Mostrar endereço da empresa</label>
                     </div>
 
-                    <div class="custom-control custom-switch mb-2">
-                        <input type="checkbox" class="custom-control-input invoice-setting"
+                    <div class="form-check form-switch mb-2">
+                        <input type="checkbox" class="form-check-input invoice-setting"
                             id="invoice_show_company_phone" name="invoice_show_company_phone"
                             {{ $settings['invoice_show_company_phone'] ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="invoice_show_company_phone">Mostrar telefone</label>
+                        <label class="form-check-label" for="invoice_show_company_phone">Mostrar telefone</label>
                     </div>
 
-                    <div class="custom-control custom-switch mb-2">
-                        <input type="checkbox" class="custom-control-input invoice-setting"
+                    <div class="form-check form-switch mb-2">
+                        <input type="checkbox" class="form-check-input invoice-setting"
                             id="invoice_show_company_email" name="invoice_show_company_email"
                             {{ $settings['invoice_show_company_email'] ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="invoice_show_company_email">Mostrar e-mail</label>
+                        <label class="form-check-label" for="invoice_show_company_email">Mostrar e-mail</label>
                     </div>
 
-                    <div class="custom-control custom-switch mb-2">
-                        <input type="checkbox" class="custom-control-input invoice-setting"
+                    <div class="form-check form-switch mb-2">
+                        <input type="checkbox" class="form-check-input invoice-setting"
                             id="invoice_show_due_date" name="invoice_show_due_date"
                             {{ $settings['invoice_show_due_date'] ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="invoice_show_due_date">Mostrar data de vencimento</label>
+                        <label class="form-check-label" for="invoice_show_due_date">Mostrar data de vencimento</label>
                     </div>
 
-                    <div class="custom-control custom-switch mb-2">
-                        <input type="checkbox" class="custom-control-input invoice-setting"
+                    <div class="form-check form-switch mb-2">
+                        <input type="checkbox" class="form-check-input invoice-setting"
                             id="invoice_show_status_badge" name="invoice_show_status_badge"
                             {{ $settings['invoice_show_status_badge'] ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="invoice_show_status_badge">Mostrar badge de status</label>
+                        <label class="form-check-label" for="invoice_show_status_badge">Mostrar badge de status</label>
                     </div>
 
-                    <div class="custom-control custom-switch mb-2">
-                        <input type="checkbox" class="custom-control-input invoice-setting"
+                    <div class="form-check form-switch mb-2">
+                        <input type="checkbox" class="form-check-input invoice-setting"
                             id="invoice_show_notes" name="invoice_show_notes"
                             {{ $settings['invoice_show_notes'] ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="invoice_show_notes">Mostrar observações</label>
+                        <label class="form-check-label" for="invoice_show_notes">Mostrar observações</label>
                     </div>
 
-                    <div class="custom-control custom-switch mb-3">
-                        <input type="checkbox" class="custom-control-input invoice-setting"
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" class="form-check-input invoice-setting"
                             id="invoice_show_footer" name="invoice_show_footer"
                             {{ $settings['invoice_show_footer'] ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="invoice_show_footer">Mostrar rodapé</label>
+                        <label class="form-check-label" for="invoice_show_footer">Mostrar rodapé</label>
                     </div>
 
                     <hr>
@@ -231,7 +231,7 @@
                 {{-- Aba Dados --}}
                 <div class="tab-pane fade" id="tab-dados" role="tabpanel">
                     <div class="callout callout-warning">
-                        <small><i class="fas fa-exclamation-triangle mr-1"></i>Estes dados são compartilhados com outras áreas do sistema. Alterações aqui afetam todo o sistema.</small>
+                        <small><i class="fas fa-exclamation-triangle me-1"></i>Estes dados são compartilhados com outras áreas do sistema. Alterações aqui afetam todo o sistema.</small>
                     </div>
 
                     <div class="form-group">
@@ -305,8 +305,8 @@
                             value="{{ $companyData['company_email'] }}">
                     </div>
 
-                    <button type="button" class="btn btn-primary btn-block" id="btn-save-company">
-                        <i class="fas fa-save mr-1"></i> Salvar Dados da Empresa
+                    <button type="button" class="btn btn-primary w-100" id="btn-save-company">
+                        <i class="fas fa-save me-1"></i> Salvar Dados da Empresa
                     </button>
                 </div>
 
@@ -323,8 +323,8 @@
 
                     <hr>
 
-                    <button type="button" class="btn btn-outline-danger btn-block" id="btn-reset-defaults">
-                        <i class="fas fa-undo mr-1"></i> Restaurar Padrões
+                    <button type="button" class="btn btn-outline-danger w-100" id="btn-reset-defaults">
+                        <i class="fas fa-undo me-1"></i> Restaurar Padrões
                     </button>
                     <small class="text-muted d-block text-center mt-2">Isso irá reverter todas as configurações visuais para os valores originais.</small>
                 </div>
@@ -336,9 +336,9 @@
     <div class="col-md-8">
         <div class="card card-primary card-outline">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-eye mr-2"></i>Preview da Fatura</h3>
+                <h3 class="card-title"><i class="fas fa-eye me-2"></i>Preview da Fatura</h3>
                 <div class="card-tools">
-                    <span class="badge badge-info" id="preview-status">Atualizado</span>
+                    <span class="badge text-bg-info" id="preview-status">Atualizado</span>
                 </div>
             </div>
             <div class="card-body p-0">
@@ -384,7 +384,7 @@ $(function() {
 
     // Debounce para preview
     function schedulePreview() {
-        $('#preview-status').text('Pendente...').removeClass('badge-info').addClass('badge-warning');
+        $('#preview-status').text('Pendente...').removeClass('text-bg-info').addClass('text-bg-warning');
         if (previewTimer) clearTimeout(previewTimer);
         previewTimer = setTimeout(function() {
             refreshPreview();
@@ -394,7 +394,7 @@ $(function() {
     // Atualizar preview
     function refreshPreview() {
         $('#preview-loading').css('display', 'flex');
-        $('#preview-status').text('Carregando...').removeClass('badge-warning badge-info').addClass('badge-secondary');
+        $('#preview-status').text('Carregando...').removeClass('text-bg-warning text-bg-info').addClass('text-bg-secondary');
 
         // Primeiro salvar, depois carregar HTML direto no iframe (sem reload)
         var data = collectSettings();
@@ -408,12 +408,12 @@ $(function() {
                     var iframe = document.getElementById('preview-iframe');
                     iframe.srcdoc = html;
                     $('#preview-loading').hide();
-                    $('#preview-status').text('Atualizado').removeClass('badge-warning badge-secondary').addClass('badge-info');
+                    $('#preview-status').text('Atualizado').removeClass('text-bg-warning text-bg-secondary').addClass('text-bg-info');
                 });
             },
             error: function() {
                 $('#preview-loading').hide();
-                $('#preview-status').text('Erro').removeClass('badge-warning badge-secondary badge-info').addClass('badge-danger');
+                $('#preview-status').text('Erro').removeClass('text-bg-warning text-bg-secondary text-bg-info').addClass('text-bg-danger');
             }
         });
     }
@@ -454,7 +454,7 @@ $(function() {
     $('#btn-save').on('click', function() {
         var data = collectSettings();
         var $btn = $(this);
-        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Salvando...');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Salvando...');
 
         $.ajax({
             url: saveUrl,
@@ -462,7 +462,7 @@ $(function() {
             data: data,
             headers: { 'X-CSRF-TOKEN': csrfToken },
             success: function(res) {
-                $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Salvar Configurações');
+                $btn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Salvar Configurações');
                 Swal.fire({
                     icon: 'success',
                     title: 'Salvo!',
@@ -472,7 +472,7 @@ $(function() {
                 });
             },
             error: function(xhr) {
-                $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Salvar Configurações');
+                $btn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Salvar Configurações');
                 var msg = 'Erro ao salvar configurações.';
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     msg = xhr.responseJSON.message;
@@ -521,7 +521,7 @@ $(function() {
     // Botão Salvar Dados da Empresa
     $('#btn-save-company').on('click', function() {
         var $btn = $(this);
-        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Salvando...');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Salvando...');
 
         var companyData = {};
         $('.company-field').each(function() {
@@ -534,7 +534,7 @@ $(function() {
             data: companyData,
             headers: { 'X-CSRF-TOKEN': csrfToken },
             success: function() {
-                $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Salvar Dados da Empresa');
+                $btn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Salvar Dados da Empresa');
                 Swal.fire({
                     icon: 'success',
                     title: 'Salvo!',
@@ -545,7 +545,7 @@ $(function() {
                 refreshPreview();
             },
             error: function() {
-                $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Salvar Dados da Empresa');
+                $btn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Salvar Dados da Empresa');
                 Swal.fire({ icon: 'error', title: 'Erro', text: 'Erro ao salvar dados da empresa.' });
             }
         });

@@ -22,22 +22,22 @@
                 {{-- Header Padrão do Card AdminLTE --}}
                 <div class="card-header border-bottom py-2 px-3 d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
-                        <a href="{{ route('admin.chat.index') }}" class="btn btn-sm btn-outline-secondary d-md-none mr-2 rounded-circle" style="width: 34px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Voltar às conversas">
+                        <a href="{{ route('admin.chat.index') }}" class="btn btn-sm btn-outline-secondary d-md-none me-2 rounded-circle" style="width: 34px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Voltar às conversas">
                             <i class="fas fa-arrow-left"></i>
                         </a>
-                        <img src="{{ $chatOtherUserPhoto }}" class="img-circle mr-2 shadow-xs" style="width: 36px; height: 36px; object-fit: cover;" alt="{{ $chatOtherUserName }}" loading="lazy" decoding="async">
+                        <img src="{{ $chatOtherUserPhoto }}" class="img-circle me-2 shadow-xs" style="width: 36px; height: 36px; object-fit: cover;" alt="{{ $chatOtherUserName }}" loading="lazy" decoding="async">
                         <div>
-                            <h3 class="card-title font-weight-bold d-inline-block m-0" style="font-size: 1rem;">{{ $chatOtherUserName }}</h3>
+                            <h3 class="card-title fw-bold d-inline-block m-0" style="font-size: 1rem;">{{ $chatOtherUserName }}</h3>
                             <div class="d-flex align-items-center gap-2 mt-0.5">
-                                <span class="badge badge-light border text-muted" style="font-size: 0.6875rem;">{{ $chatOtherUserRole }}</span>
-                                <span class="text-success small font-weight-bold ml-1"><i class="fas fa-circle mr-1" style="font-size: 0.45rem;"></i>Online</span>
+                                <span class="badge text-bg-light border text-muted" style="font-size: 0.6875rem;">{{ $chatOtherUserRole }}</span>
+                                <span class="text-success small fw-bold ms-1"><i class="fas fa-circle me-1" style="font-size: 0.45rem;"></i>Online</span>
                             </div>
                         </div>
                     </div>
                     <div class="card-tools d-flex align-items-center" style="gap: 6px;">
                         @if($chatOtherUser && Route::has('admin.users.edit'))
                             <a href="{{ route('admin.users.edit', $chatOtherUser->id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 d-none d-sm-inline-flex align-items-center" title="Ver Perfil">
-                                <i class="fas fa-user-circle mr-1"></i> Perfil
+                                <i class="fas fa-user-circle me-1"></i> Perfil
                             </a>
                         @endif
                         <button type="button" class="btn btn-tool" onclick="refreshMessages()" title="Atualizar mensagens">
@@ -48,15 +48,15 @@
 
                 {{-- Corpo do Chat: Lista de Conversas + Área de Mensagens --}}
                 <div class="card-body p-0">
-                    <div class="row no-gutters h-100" style="min-height: 540px;">
+                    <div class="row g-0 h-100" style="min-height: 540px;">
                         <!-- Coluna da Esquerda: Lista de Conversas (Escondida no Mobile na tela da conversa) -->
-                        <div class="col-md-4 border-right d-none d-md-flex flex-column bg-light" style="max-height: 540px;">
+                        <div class="col-md-4 border-end d-none d-md-flex flex-column bg-light" style="max-height: 540px;">
                             <div class="p-2 border-bottom bg-white">
                                 <div class="input-group input-group-sm">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text bg-light border-right-0"><i class="fas fa-search text-muted"></i></span>
+                                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
                                     </div>
-                                    <input type="text" id="conversationSearchInput" class="form-control border-left-0" placeholder="Buscar conversa...">
+                                    <input type="text" id="conversationSearchInput" class="form-control border-start-0" placeholder="Buscar conversa...">
                                 </div>
                             </div>
                             <div class="flex-grow-1 overflow-auto" id="conversations-list-sidebar" style="height: 480px;">
@@ -87,7 +87,7 @@
                                                             {{ $lastMsg ? $lastMsg->body : 'Clique para ver a conversa' }}
                                                         </small>
                                                         @if($conv->unread_count > 0)
-                                                            <span class="badge badge-danger rounded-pill px-2">{{ $conv->unread_count }}</span>
+                                                            <span class="badge text-bg-danger rounded-pill px-2">{{ $conv->unread_count }}</span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -110,7 +110,7 @@
                                     @endphp
                                     <div class="direct-chat-msg {{ $isMe ? 'right' : '' }} mb-3">
                                         <div class="direct-chat-infos clearfix mb-1">
-                                            <span class="direct-chat-name float-{{ $isMe ? 'right' : 'left' }} font-weight-bold small">{{ $senderName }}</span>
+                                            <span class="direct-chat-name float-{{ $isMe ? 'right' : 'left' }} fw-bold small">{{ $senderName }}</span>
                                             <span class="direct-chat-timestamp float-{{ $isMe ? 'left' : 'right' }} text-muted small">{{ $msgTime }}</span>
                                         </div>
                                         <img class="direct-chat-img" src="{{ $senderPhoto }}" alt="{{ $senderName }}" loading="lazy" decoding="async">
@@ -128,7 +128,7 @@
                                         <input type="text" id="message-input" name="message" placeholder="Digite sua mensagem para {{ $chatOtherUserName }}..." class="form-control" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="submit" id="btnSendMessage" class="btn btn-primary px-3">
-                                                <i class="fas fa-paper-plane mr-1"></i> Enviar
+                                                <i class="fas fa-paper-plane me-1"></i> Enviar
                                             </button>
                                         </div>
                                     </div>
@@ -226,8 +226,8 @@
                 const html = `
                     <div class="direct-chat-msg right mb-3">
                         <div class="direct-chat-infos clearfix mb-1">
-                            <span class="direct-chat-name float-right font-weight-bold small">Você</span>
-                            <span class="direct-chat-timestamp float-left text-muted small">${time}</span>
+                            <span class="direct-chat-name float-end fw-bold small">Você</span>
+                            <span class="direct-chat-timestamp float-start text-muted small">${time}</span>
                         </div>
                         <img class="direct-chat-img" src="${myPhoto}" alt="Você" loading="lazy" decoding="async">
                         <div class="direct-chat-text bg-primary text-white border-0 shadow-xs">

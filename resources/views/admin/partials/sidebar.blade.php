@@ -1,78 +1,41 @@
 @php
     $is = fn($patterns) => request()->routeIs($patterns) ? 'active' : '';
     $open = fn($patterns) => request()->routeIs($patterns) ? 'menu-open' : '';
-@endphp
-@php
     $brandLogo = \App\Models\Setting::getUrl('logo_admin') ?: \App\Models\Setting::getUrl('logo_image') ?: asset('img/logo.svg');
     $brandFavicon = \App\Models\Setting::getUrl('favicon_image') ?: asset('img/logo.svg');
 @endphp
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center justify-content-center p-0"
-        style="height:60px; overflow:hidden;">
-        <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img"
-            style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
-        <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img"
-            style="max-height: 44px; width: auto; max-width: 80%; object-fit: contain;">
-    </a>
-    <style>
-        /* Estado Padrão (Aberto): Logo Visível, Favicon Oculto */
-        .brand-link .brand-logo-img {
-            display: block !important;
-        }
 
-        .brand-link .brand-favicon-img {
-            display: none !important;
-        }
+<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+    {{-- Sidebar Brand --}}
+    <div class="sidebar-brand">
+        <a href="{{ route('admin.dashboard') }}" class="brand-link">
+            <img src="{{ $brandLogo }}" alt="UNN" class="brand-logo-img"
+                style="max-height: 40px; width: auto; max-width: 85%; object-fit: contain;">
+            <img src="{{ $brandFavicon }}" alt="UNN" class="brand-favicon-img"
+                style="max-height: 34px; width: auto; max-width: 85%; object-fit: contain;">
+        </a>
+    </div>
 
-        /* Estado Fechado (.sidebar-collapse no body): Logo Oculto, Favicon Visível */
-        body.sidebar-collapse .brand-link .brand-logo-img {
-            display: none !important;
-        }
-
-        body.sidebar-collapse .brand-link .brand-favicon-img {
-            display: block !important;
-        }
-
-        /* Estado Hover no Mini (Passar mouse quando fechado): Logo Volta, Favicon Some */
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-logo-img {
-            display: block !important;
-        }
-
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-favicon-img {
-            display: none !important;
-        }
-
-        /* Estado Aberto em Mobile (.sidebar-open no body) */
-        body.sidebar-open .brand-link .brand-logo-img {
-            display: block !important;
-        }
-
-        body.sidebar-open .brand-link .brand-favicon-img {
-            display: none !important;
-        }
-    </style>
-    <div class="sidebar" style="padding-bottom: 1.5rem;">
-        {{-- User Panel with Plan --}}
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
-            <div class="image mr-2">
-                <img src="{{ auth()->user()->photo ? asset(auth()->user()->photo) : asset('img/user.png') }}"
-                    class="img-circle elevation-2 border border-blue-200" alt="User Image"
-                    style="width: 38px; height: 38px; object-fit: cover;" loading="lazy" decoding="async">
-            </div>
-            <div class="info">
-                <a href="{{ route('admin.profile.edit') }}" class="d-block text-wrap"
-                    style="max-width: 160px;">{{ auth()->user()->name }}</a>
-                <span class="text-muted small"><i
-                        class="fas fa-crown text-warning mr-1"></i>{{ auth()->user()->activePlan() ? auth()->user()->activePlan()->name : 'Acesso Limitado' }}</span>
+    {{-- Sidebar Wrapper --}}
+    <div class="sidebar-wrapper">
+        {{-- User Panel --}}
+        <div class="sidebar-user-panel">
+            <img src="{{ auth()->user()->photo ? asset(auth()->user()->photo) : asset('img/user.png') }}"
+                class="rounded-circle object-fit-cover flex-shrink-0 border border-primary-subtle" alt="Avatar"
+                style="width: 38px; height: 38px;" loading="lazy" decoding="async">
+            <div class="user-info overflow-hidden">
+                <a href="{{ route('admin.profile.edit') }}" class="d-block text-white text-decoration-none fw-semibold text-truncate"
+                    style="font-size: 0.9rem;">{{ auth()->user()->name }}</a>
+                <span class="text-secondary small d-block text-truncate">
+                    <i class="fas fa-crown text-warning me-1"></i>{{ auth()->user()->activePlan() ? auth()->user()->activePlan()->name : 'Acesso Limitado' }}
+                </span>
             </div>
         </div>
 
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" data-accordion="true"
-                id="sidebar-tree" role="menu" style="gap: 2px;">
+            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="true" id="sidebar-tree">
                 <li class="nav-item">
-                    <a href="{{ route('admin.dashboard') }}"
-                        class="nav-link {{ $is('admin.dashboard') }} rounded-lg font-semibold">
+                    <a href="{{ route('admin.dashboard') }}" class="nav-link {{ $is('admin.dashboard') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
                     </a>
@@ -92,44 +55,39 @@
 
                 @if($canAccessMarketplace)
                     <li class="nav-header">MARKETPLACE</li>
-                    <li class="nav-item has-treeview {{ $open(['admin.marketplace.*', 'admin.splits.*']) }}">
+                    <li class="nav-item {{ $open(['admin.marketplace.*', 'admin.splits.*']) }}">
                         <a href="#" class="nav-link {{ $is(['admin.marketplace.*', 'admin.splits.*']) }}">
                             <i class="nav-icon fas fa-store"></i>
-                            <p>Marketplace<i class="right fas fa-angle-left"></i></p>
+                            <p>Marketplace <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
+                        <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('admin.marketplace.index') }}"
-                                    class="nav-link {{ $is('admin.marketplace.index') }}">
+                                <a href="{{ route('admin.marketplace.index') }}" class="nav-link {{ $is('admin.marketplace.index') }}">
                                     <i class="fas fa-chart-line nav-icon"></i>
                                     <p>Painel</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.marketplace.payments') }}"
-                                    class="nav-link {{ $is('admin.marketplace.payments') }}">
+                                <a href="{{ route('admin.marketplace.payments') }}" class="nav-link {{ $is('admin.marketplace.payments') }}">
                                     <i class="fas fa-credit-card nav-icon"></i>
                                     <p>Pagamentos</p>
                                 </a>
                             </li>
                             @if($canManageOwnMarketplace && $storefrontModuleInstalled)
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.marketplace.store.edit') }}"
-                                        class="nav-link {{ $is('admin.marketplace.store.*') }}">
+                                    <a href="{{ route('admin.marketplace.store.edit') }}" class="nav-link {{ $is('admin.marketplace.store.*') }}">
                                         <i class="fas fa-store-alt nav-icon"></i>
                                         <p>{{ auth()->user()->isSuperAdmin() ? 'Loja da plataforma' : 'Minha loja' }}</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.marketplace.products.index') }}"
-                                        class="nav-link {{ $is('admin.marketplace.products.*') }}">
+                                    <a href="{{ route('admin.marketplace.products.index') }}" class="nav-link {{ $is('admin.marketplace.products.*') }}">
                                         <i class="fas fa-box-open nav-icon"></i>
-                                        <p>Produtos proprios</p>
+                                        <p>Produtos próprios</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.marketplace.orders.index') }}"
-                                        class="nav-link {{ $is('admin.marketplace.orders.*') }}">
+                                    <a href="{{ route('admin.marketplace.orders.index') }}" class="nav-link {{ $is('admin.marketplace.orders.*') }}">
                                         <i class="fas fa-truck nav-icon"></i>
                                         <p>Pedidos da loja</p>
                                     </a>
@@ -137,8 +95,7 @@
                             @endif
                             @if($canManageOwnMarketplace)
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.marketplace.sales') }}"
-                                        class="nav-link {{ $is('admin.marketplace.sales') }}">
+                                    <a href="{{ route('admin.marketplace.sales') }}" class="nav-link {{ $is('admin.marketplace.sales') }}">
                                         <i class="fas fa-receipt nav-icon"></i>
                                         <p>Minhas vendas</p>
                                     </a>
@@ -146,33 +103,27 @@
                             @endif
                             @if(auth()->user()->isAdmin() && $storefrontModuleInstalled)
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.marketplace.stores.index') }}"
-                                        class="nav-link {{ $is('admin.marketplace.stores.*') }}">
+                                    <a href="{{ route('admin.marketplace.stores.index') }}" class="nav-link {{ $is('admin.marketplace.stores.*') }}">
                                         <i class="fas fa-store-alt-slash nav-icon"></i>
                                         <p>Lojas marketplace</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.marketplace.catalog.index') }}"
-                                        class="nav-link {{ $is('admin.marketplace.catalog.*') }}">
+                                    <a href="{{ route('admin.marketplace.catalog.index') }}" class="nav-link {{ $is('admin.marketplace.catalog.*') }}">
                                         <i class="fas fa-boxes-stacked nav-icon"></i>
-                                        <p>Catalogo produtos</p>
+                                        <p>Catálogo produtos</p>
                                     </a>
                                 </li>
                             @endif
                             @if(auth()->user()->isAdmin())
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.buyer-communication.index') }}"
-                                        class="nav-link {{ $is('admin.buyer-communication.*') }}">
+                                    <a href="{{ route('admin.buyer-communication.index') }}" class="nav-link {{ $is('admin.buyer-communication.*') }}">
                                         <i class="fas fa-envelope-open-text nav-icon"></i>
                                         <p>Comunicação com compradores</p>
                                     </a>
                                 </li>
-                            @endif
-                            @if(auth()->user()->isAdmin())
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.splits.index') }}"
-                                        class="nav-link {{ $is('admin.splits.*') }}">
+                                    <a href="{{ route('admin.splits.index') }}" class="nav-link {{ $is('admin.splits.*') }}">
                                         <i class="fas fa-money-bill-wave nav-icon text-success"></i>
                                         <p>Contabilidade de Rateios</p>
                                     </a>
@@ -182,65 +133,75 @@
                     </li>
                 @endif
 
-                {{-- Menu para Membros --}}
-                {{-- Menu para Membros (Removido: Portal e Comunidade) --}}
-
-                {{-- Itens disponíveis para todos (Membros e Admins) --}}
+                {{-- Cursos --}}
                 @if(auth()->user()->canAccessFeature('courses') || auth()->user()->hasPurchasedCourses())
-                    <li class="nav-item has-treeview {{ $open('admin.courses.*') }}">
+                    <li class="nav-item {{ $open('admin.courses.*') }}">
                         <a href="#" class="nav-link {{ $is('admin.courses.*') }}">
                             <i class="nav-icon fas fa-graduation-cap"></i>
-                            <p>Cursos<i class="right fas fa-angle-left"></i></p>
+                            <p>Cursos <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.courses.available') }}" class="nav-link {{ $is('admin.courses.available') }}"><i
-                                        class="fas fa-list nav-icon"></i>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.courses.available') }}" class="nav-link {{ $is('admin.courses.available') }}">
+                                    <i class="fas fa-list nav-icon"></i>
                                     <p>Meus Cursos</p>
-                                </a></li>
+                                </a>
+                            </li>
                             @if(auth()->user()->isAdmin())
-                                <li class="nav-item"><a href="{{ route('admin.courses.index') }}"
-                                        class="nav-link {{ $is('admin.courses.index') }}"><i class="fas fa-cog nav-icon"></i>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.courses.index') }}" class="nav-link {{ $is('admin.courses.index') }}">
+                                        <i class="fas fa-cog nav-icon"></i>
                                         <p>Gerenciar</p>
-                                    </a></li>
-                                <li class="nav-item"><a href="{{ route('admin.courses.create') }}"
-                                        class="nav-link {{ $is('admin.courses.create') }}"><i class="fas fa-plus nav-icon"></i>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.courses.create') }}" class="nav-link {{ $is('admin.courses.create') }}">
+                                        <i class="fas fa-plus nav-icon"></i>
                                         <p>Novo</p>
-                                    </a></li>
+                                    </a>
+                                </li>
                             @endif
                         </ul>
                     </li>
                 @endif
 
+                {{-- Eventos --}}
                 @if(auth()->user()->canAccessFeature('events'))
-                    <li class="nav-item has-treeview {{ $open(['admin.events.*', 'admin.quick-scanner']) }}">
+                    <li class="nav-item {{ $open(['admin.events.*', 'admin.quick-scanner']) }}">
                         <a href="#" class="nav-link {{ $is(['admin.events.*', 'admin.quick-scanner']) }}">
                             <i class="nav-icon fas fa-calendar"></i>
-                            <p>Eventos<i class="right fas fa-angle-left"></i></p>
+                            <p>Eventos <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.events.index') }}" data-pjax="false"
-                                    class="nav-link {{ $is('admin.events.index') }}"><i
-                                        class="fas fa-calendar-alt nav-icon"></i>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.events.index') }}" data-pjax="false" class="nav-link {{ $is('admin.events.index') }}">
+                                    <i class="fas fa-calendar-alt nav-icon"></i>
                                     <p>Calendário</p>
-                                </a></li>
-                            <li class="nav-item"><a href="{{ route('admin.events.list') }}"
-                                    class="nav-link {{ $is('admin.events.list') }}"><i class="fas fa-list nav-icon"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.events.list') }}" class="nav-link {{ $is('admin.events.list') }}">
+                                    <i class="fas fa-list nav-icon"></i>
                                     <p>Gerenciar</p>
-                                </a></li>
-                            <li class="nav-item"><a href="{{ route('admin.quick-scanner') }}"
-                                    class="nav-link {{ $is('admin.quick-scanner') }}"><i class="fas fa-qrcode nav-icon"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.quick-scanner') }}" class="nav-link {{ $is('admin.quick-scanner') }}">
+                                    <i class="fas fa-qrcode nav-icon"></i>
                                     <p>Scanner universal</p>
-                                </a></li>
-                            <li class="nav-item"><a href="{{ route('admin.events.create') }}"
-                                    class="nav-link {{ $is('admin.events.create') }}"><i class="fas fa-plus nav-icon"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.events.create') }}" class="nav-link {{ $is('admin.events.create') }}">
+                                    <i class="fas fa-plus nav-icon"></i>
                                     <p>Novo</p>
-                                </a></li>
+                                </a>
+                            </li>
                         </ul>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ route('admin.events.acervo') }}"
-                            class="nav-link {{ $is('admin.events.acervo') }} rounded-lg font-semibold">
+                        <a href="{{ route('admin.events.acervo') }}" class="nav-link {{ $is('admin.events.acervo') }}">
                             <i class="nav-icon fas fa-photo-video"></i>
                             <p>Acervo de Mídia</p>
                         </a>
@@ -249,37 +210,40 @@
 
                 @if(auth()->user()->isAdmin() || auth()->user()->canAccessFeature('courses'))
                     <li class="nav-item">
-                        <a href="{{ route('admin.certificates.index') }}"
-                            class="nav-link {{ $is('admin.certificates.*') }}">
+                        <a href="{{ route('admin.certificates.index') }}" class="nav-link {{ $is('admin.certificates.*') }}">
                             <i class="nav-icon fas fa-certificate"></i>
                             <p>Certificados</p>
                         </a>
                     </li>
                 @endif
 
+                {{-- Mentorias --}}
                 @if(auth()->user()->canAccessFeature('mentorships'))
-                    <li class="nav-item has-treeview {{ $open('admin.mentorships.*') }}">
+                    <li class="nav-item {{ $open('admin.mentorships.*') }}">
                         <a href="#" class="nav-link {{ $is('admin.mentorships.*') }}">
                             <i class="nav-icon fas fa-chalkboard-teacher"></i>
-                            <p>Mentorias<i class="right fas fa-angle-left"></i></p>
+                            <p>Mentorias <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item"><a href="{{ route('admin.mentorships.available') }}"
-                                    class="nav-link {{ $is('admin.mentorships.available') }}"><i
-                                        class="fas fa-list nav-icon"></i>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.mentorships.available') }}" class="nav-link {{ $is('admin.mentorships.available') }}">
+                                    <i class="fas fa-list nav-icon"></i>
                                     <p>Disponíveis</p>
-                                </a></li>
+                                </a>
+                            </li>
                             @if(auth()->user()->isAdmin())
-                                <li class="nav-item"><a href="{{ route('admin.mentorships.index') }}"
-                                        class="nav-link {{ $is('admin.mentorships.index') }}"><i
-                                            class="fas fa-cog nav-icon"></i>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.mentorships.index') }}" class="nav-link {{ $is('admin.mentorships.index') }}">
+                                        <i class="fas fa-cog nav-icon"></i>
                                         <p>Gerenciar</p>
-                                    </a></li>
-                                <li class="nav-item"><a href="{{ route('admin.mentorships.create') }}"
-                                        class="nav-link {{ $is('admin.mentorships.create') }}"><i
-                                            class="fas fa-plus nav-icon"></i>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.mentorships.create') }}" class="nav-link {{ $is('admin.mentorships.create') }}">
+                                        <i class="fas fa-plus nav-icon"></i>
                                         <p>Novo</p>
-                                    </a></li>
+                                    </a>
+                                </li>
                             @endif
                         </ul>
                     </li>
@@ -297,12 +261,12 @@
                         || ($currentUser && \App\Models\Magazine::userHasNewsInterest($currentUser));
                 @endphp
                 @if($magazinesVisible)
-                    <li class="nav-item has-treeview {{ $open('admin.magazines.*') }}">
+                    <li class="nav-item {{ $open('admin.magazines.*') }}">
                         <a href="#" class="nav-link {{ $is('admin.magazines.*') }}">
                             <i class="nav-icon fas fa-book-open"></i>
-                            <p>Revistas<i class="right fas fa-angle-left"></i></p>
+                            <p>Revistas <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
+                        <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="{{ route('magazines.index') }}" target="_blank" class="nav-link">
                                     <i class="fas fa-eye nav-icon"></i>
@@ -331,356 +295,108 @@
                 @if(auth()->user()->isAdmin())
                     @php
                         $marketingPatterns = [
-                            'admin.plans.*',
-                            'admin.orders.*',
-                            'admin.invoices.*',
-                            'admin.invoices.editor*',
-                            'admin.coupons.*',
-                            'admin.redemptions.*',
-                            'admin.referrals.*',
+                            'admin.plans.*', 'admin.orders.*', 'admin.invoices.*',
+                            'admin.invoices.editor*', 'admin.coupons.*', 'admin.redemptions.*', 'admin.referrals.*',
                         ];
-
                         $contentPatterns = [
-                            'admin.partners.*',
-                            'admin.companies.*',
-                            'admin.sponsors.*',
-                            'admin.sponsor-plans.*',
-                            'admin.sponsor-banners.*',
-                            'admin.jobs.*',
-                            'admin.fonts.*',
-                            'admin.faqs.*',
-                            'admin.pages.*',
-                            'admin.gallery.*',
+                            'admin.partners.*', 'admin.companies.*', 'admin.sponsors.*',
+                            'admin.sponsor-plans.*', 'admin.sponsor-banners.*', 'admin.jobs.*',
+                            'admin.fonts.*', 'admin.faqs.*', 'admin.pages.*', 'admin.gallery.*',
                         ];
-
                         $systemPatterns = [
-                            'admin.users.*',
-                            'admin.permissions.*',
-                            'admin.points-rules.*',
-                            'admin.mailtemplates.*',
-                            'admin.cron.*',
-                            'admin.punishments.*',
+                            'admin.users.*', 'admin.permissions.*', 'admin.points-rules.*',
+                            'admin.mailtemplates.*', 'admin.cron.*', 'admin.punishments.*',
                         ];
-
-                        $settingsPatterns = [
-                            'admin.settings*',
-                        ];
+                        $settingsPatterns = ['admin.settings*', 'admin.backups.*'];
                     @endphp
 
                     <li class="nav-header">ADMINISTRAÇÃO</li>
 
-                    {{-- 1. Marketing & Vendas --}}
-                    <li class="nav-item has-treeview {{ $open($marketingPatterns) }}">
+                    {{-- 1. Gestão & Vendas --}}
+                    <li class="nav-item {{ $open($marketingPatterns) }}">
                         <a href="#" class="nav-link {{ $is($marketingPatterns) }}">
                             <i class="nav-icon fas fa-bullhorn"></i>
-                            <p>Gestão & Vendas<i class="right fas fa-angle-left"></i></p>
+                            <p>Gestão &amp; Vendas <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item">
-                                <a href="{{ route('admin.plans.index') }}" class="nav-link {{ $is('admin.plans.*') }}">
-                                    <i class="fas fa-tags nav-icon"></i>
-                                    <p>Planos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.orders.index') }}" class="nav-link {{ $is('admin.orders.*') }}">
-                                    <i class="fas fa-shopping-cart nav-icon"></i>
-                                    <p>Vendas</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.orders.sales-report') }}" class="nav-link {{ $is('admin.orders.sales-report') }}">
-                                    <i class="fas fa-chart-bar nav-icon"></i>
-                                    <p>Relat&oacute;rio por item</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.invoices.index') }}"
-                                    class="nav-link {{ $is('admin.invoices.*') }}">
-                                    <i class="fas fa-file-invoice nav-icon"></i>
-                                    <p>Faturas</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.invoices.editor') }}"
-                                    class="nav-link {{ $is('admin.invoices.editor*') }}">
-                                    <i class="fas fa-paint-brush nav-icon"></i>
-                                    <p>Editor de Faturas</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.coupons.index') }}" class="nav-link {{ $is('admin.coupons.*') }}">
-                                    <i class="fas fa-ticket-alt nav-icon"></i>
-                                    <p>Cupons</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.redemptions.index') }}"
-                                    class="nav-link {{ $is('admin.redemptions.*') }}">
-                                    <i class="fas fa-gift nav-icon"></i>
-                                    <p>Itens de Resgate</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.referrals.index') }}"
-                                    class="nav-link {{ $is('admin.referrals.*') }}">
-                                    <i class="fas fa-share-alt nav-icon"></i>
-                                    <p>Afiliados</p>
-                                </a>
-                            </li>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item"><a href="{{ route('admin.plans.index') }}" class="nav-link {{ $is('admin.plans.*') }}"><i class="fas fa-tags nav-icon"></i><p>Planos</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.orders.index') }}" class="nav-link {{ $is('admin.orders.*') }}"><i class="fas fa-shopping-cart nav-icon"></i><p>Vendas</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.orders.sales-report') }}" class="nav-link {{ $is('admin.orders.sales-report') }}"><i class="fas fa-chart-bar nav-icon"></i><p>Relatório por item</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.invoices.index') }}" class="nav-link {{ $is('admin.invoices.*') }}"><i class="fas fa-file-invoice nav-icon"></i><p>Faturas</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.invoices.editor') }}" class="nav-link {{ $is('admin.invoices.editor*') }}"><i class="fas fa-paint-brush nav-icon"></i><p>Editor de Faturas</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.coupons.index') }}" class="nav-link {{ $is('admin.coupons.*') }}"><i class="fas fa-ticket-alt nav-icon"></i><p>Cupons</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.redemptions.index') }}" class="nav-link {{ $is('admin.redemptions.*') }}"><i class="fas fa-gift nav-icon"></i><p>Itens de Resgate</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.referrals.index') }}" class="nav-link {{ $is('admin.referrals.*') }}"><i class="fas fa-share-alt nav-icon"></i><p>Afiliados</p></a></li>
                         </ul>
                     </li>
 
                     {{-- 2. Conteúdo do Portal --}}
-                    <li class="nav-item has-treeview {{ $open($contentPatterns) }}">
+                    <li class="nav-item {{ $open($contentPatterns) }}">
                         <a href="#" class="nav-link {{ $is($contentPatterns) }}">
                             <i class="nav-icon fas fa-photo-video"></i>
-                            <p>Conteúdo do Portal<i class="right fas fa-angle-left"></i></p>
+                            <p>Conteúdo do Portal <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item">
-                                <a href="{{ route('admin.partners.index') }}"
-                                    class="nav-link {{ $is('admin.partners.*') }}">
-                                    <i class="fas fa-handshake nav-icon"></i>
-                                    <p>Parceiros</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.companies.index') }}"
-                                    class="nav-link {{ $is('admin.companies.*') }}">
-                                    <i class="fas fa-building nav-icon"></i>
-                                    <p>Empresas</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.sponsors.index') }}"
-                                    class="nav-link {{ $is('admin.sponsors.*') }}">
-                                    <i class="fas fa-bullhorn nav-icon"></i>
-                                    <p>Patrocinadores</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.sponsor-plans.index') }}"
-                                    class="nav-link {{ $is('admin.sponsor-plans.*') }}">
-                                    <i class="fas fa-medal nav-icon"></i>
-                                    <p>Planos de patrocinio</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.sponsor-banners.index') }}"
-                                    class="nav-link {{ $is('admin.sponsor-banners.*') }}">
-                                    <i class="fas fa-image nav-icon"></i>
-                                    <p>Banners patrocinados</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.jobs.index') }}" class="nav-link {{ $is('admin.jobs.*') }}">
-                                    <i class="fas fa-briefcase nav-icon"></i>
-                                    <p>Mural de Vagas</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.fonts.index') }}" class="nav-link {{ $is('admin.fonts.*') }}">
-                                    <i class="fas fa-font nav-icon"></i>
-                                    <p>Fontes</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.faqs.index') }}" class="nav-link {{ $is('admin.faqs.*') }}">
-                                    <i class="fas fa-question-circle nav-icon"></i>
-                                    <p>FAQ</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.pages.index') }}" class="nav-link {{ $is('admin.pages.*') }}">
-                                    <i class="fas fa-file-alt nav-icon"></i>
-                                    <p>Páginas do Site</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.gallery.index') }}"
-                                    class="nav-link {{ $is('admin.gallery.*') }}">
-                                    <i class="fas fa-images nav-icon"></i>
-                                    <p>Galeria de Fotos</p>
-                                </a>
-                            </li>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item"><a href="{{ route('admin.partners.index') }}" class="nav-link {{ $is('admin.partners.*') }}"><i class="fas fa-handshake nav-icon"></i><p>Parceiros</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.companies.index') }}" class="nav-link {{ $is('admin.companies.*') }}"><i class="fas fa-building nav-icon"></i><p>Empresas</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.sponsors.index') }}" class="nav-link {{ $is('admin.sponsors.*') }}"><i class="fas fa-bullhorn nav-icon"></i><p>Patrocinadores</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.sponsor-plans.index') }}" class="nav-link {{ $is('admin.sponsor-plans.*') }}"><i class="fas fa-medal nav-icon"></i><p>Planos de patrocínio</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.sponsor-banners.index') }}" class="nav-link {{ $is('admin.sponsor-banners.*') }}"><i class="fas fa-image nav-icon"></i><p>Banners patrocinados</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.jobs.index') }}" class="nav-link {{ $is('admin.jobs.*') }}"><i class="fas fa-briefcase nav-icon"></i><p>Mural de Vagas</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.fonts.index') }}" class="nav-link {{ $is('admin.fonts.*') }}"><i class="fas fa-font nav-icon"></i><p>Fontes</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.faqs.index') }}" class="nav-link {{ $is('admin.faqs.*') }}"><i class="fas fa-question-circle nav-icon"></i><p>FAQ</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.pages.index') }}" class="nav-link {{ $is('admin.pages.*') }}"><i class="fas fa-file-alt nav-icon"></i><p>Páginas do Site</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.gallery.index') }}" class="nav-link {{ $is('admin.gallery.*') }}"><i class="fas fa-images nav-icon"></i><p>Galeria de Fotos</p></a></li>
                         </ul>
                     </li>
 
                     {{-- 3. Sistema e Acessos --}}
-                    <li class="nav-item has-treeview {{ $open($systemPatterns) }}">
+                    <li class="nav-item {{ $open($systemPatterns) }}">
                         <a href="#" class="nav-link {{ $is($systemPatterns) }}">
                             <i class="nav-icon fas fa-cogs"></i>
-                            <p>Sistema e Acessos<i class="right fas fa-angle-left"></i></p>
+                            <p>Sistema e Acessos <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item">
-                                <a href="{{ route('admin.users.index') }}" class="nav-link {{ $is('admin.users.*') }}">
-                                    <i class="fas fa-users-cog nav-icon"></i>
-                                    <p>Usuários</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.permissions.index') }}"
-                                    class="nav-link {{ $is('admin.permissions.*') }}">
-                                    <i class="fas fa-user-shield nav-icon"></i>
-                                    <p>Permissões</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.points-rules.index') }}"
-                                    class="nav-link {{ $is('admin.points-rules.*') }}">
-                                    <i class="fas fa-star nav-icon"></i>
-                                    <p>Regras de Pontos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.mailtemplates.index') }}"
-                                    class="nav-link {{ $is('admin.mailtemplates.*') }}">
-                                    <i class="fas fa-envelope nav-icon"></i>
-                                    <p>E-mails Automáticos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ url('admin/activity-logs') }}"
-                                    class="nav-link {{ request()->is('admin/activity-logs*') ? 'active' : '' }}">
-                                    <i class="fas fa-history nav-icon"></i>
-                                    <p>Logs de Atividade</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.cron.index') }}" class="nav-link no-pjax {{ $is('admin.cron.*') }}" data-no-pjax="true">
-                                    <i class="fas fa-clock nav-icon"></i>
-                                    <p>Cron Jobs</p>
-                                </a>
-                            </li>
-                            <li class="nav-item has-treeview {{ $open('admin.punishments.*') }}">
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item"><a href="{{ route('admin.users.index') }}" class="nav-link {{ $is('admin.users.*') }}"><i class="fas fa-users-cog nav-icon"></i><p>Usuários</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.permissions.index') }}" class="nav-link {{ $is('admin.permissions.*') }}"><i class="fas fa-user-shield nav-icon"></i><p>Permissões</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.points-rules.index') }}" class="nav-link {{ $is('admin.points-rules.*') }}"><i class="fas fa-star nav-icon"></i><p>Regras de Pontos</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.mailtemplates.index') }}" class="nav-link {{ $is('admin.mailtemplates.*') }}"><i class="fas fa-envelope nav-icon"></i><p>E-mails Automáticos</p></a></li>
+                            <li class="nav-item"><a href="{{ url('admin/activity-logs') }}" class="nav-link {{ request()->is('admin/activity-logs*') ? 'active' : '' }}"><i class="fas fa-history nav-icon"></i><p>Logs de Atividade</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.cron.index') }}" class="nav-link no-pjax {{ $is('admin.cron.*') }}" data-no-pjax="true"><i class="fas fa-clock nav-icon"></i><p>Cron Jobs</p></a></li>
+                            <li class="nav-item {{ $open('admin.punishments.*') }}">
                                 <a href="#" class="nav-link {{ $is('admin.punishments.*') }}">
                                     <i class="fas fa-gavel nav-icon text-danger"></i>
-                                    <p>Punicoes<i class="right fas fa-angle-left"></i></p>
+                                    <p>Punições <i class="nav-arrow fas fa-angle-right"></i></p>
                                 </a>
-                                <ul class="nav nav-treeview pl-3">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.punishments.index') }}" class="nav-link {{ $is('admin.punishments.index') }}">
-                                            <i class="fas fa-list nav-icon"></i>
-                                            <p>Lista de Punicoes</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.punishments.settings') }}" class="nav-link {{ $is('admin.punishments.settings') }}">
-                                            <i class="fas fa-cog nav-icon"></i>
-                                            <p>Configuracoes</p>
-                                        </a>
-                                    </li>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item"><a href="{{ route('admin.punishments.index') }}" class="nav-link {{ $is('admin.punishments.index') }}"><i class="fas fa-list nav-icon"></i><p>Lista de Punições</p></a></li>
+                                    <li class="nav-item"><a href="{{ route('admin.punishments.settings') }}" class="nav-link {{ $is('admin.punishments.settings') }}"><i class="fas fa-cog nav-icon"></i><p>Configurações</p></a></li>
                                 </ul>
                             </li>
                         </ul>
                     </li>
 
                     {{-- 4. Configurações Globais --}}
-                    <li class="nav-item has-treeview {{ $open($settingsPatterns) }}">
+                    <li class="nav-item {{ $open($settingsPatterns) }}">
                         <a href="#" class="nav-link {{ $is($settingsPatterns) }}">
                             <i class="nav-icon fas fa-tools"></i>
-                            <p>Configurações Globais<i class="right fas fa-angle-left"></i></p>
+                            <p>Configurações Globais <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'general']) }}"
-                                    class="nav-link {{ request()->route('group') == 'general' || !request()->route('group') && request()->routeIs('admin.settings') ? 'active' : '' }}">
-                                    <i class="fas fa-info-circle nav-icon"></i>
-                                    <p>Geral</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'appearance']) }}"
-                                    class="nav-link {{ request()->route('group') == 'appearance' ? 'active' : '' }}">
-                                    <i class="fas fa-paint-brush nav-icon"></i>
-                                    <p>Aparência</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'images']) }}"
-                                    class="nav-link {{ request()->route('group') == 'images' ? 'active' : '' }}">
-                                    <i class="fas fa-images nav-icon"></i>
-                                    <p>Imagens</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'player']) }}"
-                                    class="nav-link {{ request()->route('group') == 'player' ? 'active' : '' }}">
-                                    <i class="fas fa-play-circle nav-icon"></i>
-                                    <p>Player</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'ads']) }}"
-                                    class="nav-link {{ request()->route('group') == 'ads' ? 'active' : '' }}">
-                                    <i class="fas fa-ad nav-icon"></i>
-                                    <p>Anúncios</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'pwa']) }}"
-                                    class="nav-link {{ request()->route('group') == 'pwa' ? 'active' : '' }}">
-                                    <i class="fas fa-mobile-alt nav-icon"></i>
-                                    <p>PWA</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'marketplace']) }}"
-                                    class="nav-link {{ request()->route('group') == 'marketplace' ? 'active' : '' }}">
-                                    <i class="fas fa-store nav-icon"></i>
-                                    <p>Marketplace</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'gateway']) }}"
-                                    class="nav-link {{ request()->route('group') == 'gateway' ? 'active' : '' }}">
-                                    <i class="fas fa-credit-card nav-icon"></i>
-                                    <p>Pagamentos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'smtp']) }}"
-                                    class="nav-link {{ request()->route('group') == 'smtp' ? 'active' : '' }}">
-                                    <i class="fas fa-envelope nav-icon"></i>
-                                    <p>SMTP</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'social']) }}"
-                                    class="nav-link {{ request()->route('group') == 'social' ? 'active' : '' }}">
-                                    <i class="fas fa-users nav-icon"></i>
-                                    <p>Social</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'seo']) }}"
-                                    class="nav-link {{ request()->route('group') == 'seo' ? 'active' : '' }}">
-                                    <i class="fas fa-search nav-icon"></i>
-                                    <p>SEO</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'storage']) }}"
-                                    class="nav-link {{ request()->route('group') == 'storage' ? 'active' : '' }}">
-                                    <i class="fas fa-cloud nav-icon"></i>
-                                    <p>Armazenamento</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.settings', ['group' => 'system']) }}"
-                                    class="nav-link {{ request()->route('group') == 'system' ? 'active' : '' }}">
-                                    <i class="fas fa-server nav-icon"></i>
-                                    <p>Sistema</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.backups.index') }}" class="nav-link {{ request()->routeIs('admin.backups.*') ? 'active' : '' }}" data-pjax="false">
-                                    <i class="fas fa-database nav-icon"></i>
-                                    <p>Backups</p>
-                                </a>
-                            </li>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'general']) }}" class="nav-link {{ request()->route('group') == 'general' || (!request()->route('group') && request()->routeIs('admin.settings')) ? 'active' : '' }}"><i class="fas fa-info-circle nav-icon"></i><p>Geral</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'appearance']) }}" class="nav-link {{ request()->route('group') == 'appearance' ? 'active' : '' }}"><i class="fas fa-paint-brush nav-icon"></i><p>Aparência</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'images']) }}" class="nav-link {{ request()->route('group') == 'images' ? 'active' : '' }}"><i class="fas fa-images nav-icon"></i><p>Imagens</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'player']) }}" class="nav-link {{ request()->route('group') == 'player' ? 'active' : '' }}"><i class="fas fa-play-circle nav-icon"></i><p>Player</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'ads']) }}" class="nav-link {{ request()->route('group') == 'ads' ? 'active' : '' }}"><i class="fas fa-ad nav-icon"></i><p>Anúncios</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'pwa']) }}" class="nav-link {{ request()->route('group') == 'pwa' ? 'active' : '' }}"><i class="fas fa-mobile-alt nav-icon"></i><p>PWA</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'marketplace']) }}" class="nav-link {{ request()->route('group') == 'marketplace' ? 'active' : '' }}"><i class="fas fa-store nav-icon"></i><p>Marketplace</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'gateway']) }}" class="nav-link {{ request()->route('group') == 'gateway' ? 'active' : '' }}"><i class="fas fa-credit-card nav-icon"></i><p>Pagamentos</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'smtp']) }}" class="nav-link {{ request()->route('group') == 'smtp' ? 'active' : '' }}"><i class="fas fa-envelope nav-icon"></i><p>SMTP</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'social']) }}" class="nav-link {{ request()->route('group') == 'social' ? 'active' : '' }}"><i class="fas fa-users nav-icon"></i><p>Social</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'seo']) }}" class="nav-link {{ request()->route('group') == 'seo' ? 'active' : '' }}"><i class="fas fa-search nav-icon"></i><p>SEO</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'storage']) }}" class="nav-link {{ request()->route('group') == 'storage' ? 'active' : '' }}"><i class="fas fa-cloud nav-icon"></i><p>Armazenamento</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.settings', ['group' => 'system']) }}" class="nav-link {{ request()->route('group') == 'system' ? 'active' : '' }}"><i class="fas fa-server nav-icon"></i><p>Sistema</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.backups.index') }}" class="nav-link {{ request()->routeIs('admin.backups.*') ? 'active' : '' }}" data-pjax="false"><i class="fas fa-database nav-icon"></i><p>Backups</p></a></li>
                         </ul>
                     </li>
                 @endif
@@ -689,54 +405,19 @@
 
                 {{-- WAF - Segurança (apenas superadmin) --}}
                 @if(auth()->user()->isSuperAdmin())
-                    <li class="nav-item has-treeview {{ request()->routeIs('admin.waf.*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs('admin.waf.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-shield-alt" style="color: #1F5EDB;"></i>
-                            <p>Segurança (WAF)<i class="right fas fa-angle-left"></i></p>
+                    <li class="nav-item {{ request()->routeIs('admin.waf.*', 'admin.security*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('admin.waf.*', 'admin.security*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-shield-alt text-primary"></i>
+                            <p>Segurança (WAF) <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
-                        <ul class="nav nav-treeview pl-4">
-                            <li class="nav-item">
-                                <a href="{{ route('admin.waf.dashboard') }}" class="nav-link {{ request()->routeIs('admin.waf.dashboard') ? 'active' : '' }}">
-                                    <i class="fas fa-tachometer-alt nav-icon"></i>
-                                    <p>Dashboard</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.waf.events.index') }}" class="nav-link {{ request()->routeIs('admin.waf.events.*') ? 'active' : '' }}">
-                                    <i class="fas fa-list-alt nav-icon"></i>
-                                    <p>Eventos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.waf.rules.index') }}" class="nav-link {{ request()->routeIs('admin.waf.rules.*') ? 'active' : '' }}">
-                                    <i class="fas fa-gavel nav-icon"></i>
-                                    <p>Regras</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.waf.blocklist.index') }}" class="nav-link {{ request()->routeIs('admin.waf.blocklist.*') ? 'active' : '' }}">
-                                    <i class="fas fa-ban nav-icon text-danger"></i>
-                                    <p>IP Blocklist</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.waf.allowlist.index') }}" class="nav-link {{ request()->routeIs('admin.waf.allowlist.*') ? 'active' : '' }}">
-                                    <i class="fas fa-check-circle nav-icon text-success"></i>
-                                    <p>IP Allowlist</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.security') }}" class="nav-link {{ request()->routeIs('admin.security*', 'admin.waf.settings*') ? 'active' : '' }}">
-                                    <i class="fas fa-cog nav-icon"></i>
-                                    <p>Configuracoes</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.waf.alerts.index') }}" class="nav-link {{ request()->routeIs('admin.waf.alerts.*') ? 'active' : '' }}">
-                                    <i class="fas fa-bell nav-icon"></i>
-                                    <p>Alertas</p>
-                                </a>
-                            </li>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item"><a href="{{ route('admin.waf.dashboard') }}" class="nav-link {{ request()->routeIs('admin.waf.dashboard') ? 'active' : '' }}"><i class="fas fa-tachometer-alt nav-icon"></i><p>Dashboard</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.waf.events.index') }}" class="nav-link {{ request()->routeIs('admin.waf.events.*') ? 'active' : '' }}"><i class="fas fa-list-alt nav-icon"></i><p>Eventos</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.waf.rules.index') }}" class="nav-link {{ request()->routeIs('admin.waf.rules.*') ? 'active' : '' }}"><i class="fas fa-gavel nav-icon"></i><p>Regras</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.waf.blocklist.index') }}" class="nav-link {{ request()->routeIs('admin.waf.blocklist.*') ? 'active' : '' }}"><i class="fas fa-ban nav-icon text-danger"></i><p>IP Blocklist</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.waf.allowlist.index') }}" class="nav-link {{ request()->routeIs('admin.waf.allowlist.*') ? 'active' : '' }}"><i class="fas fa-check-circle nav-icon text-success"></i><p>IP Allowlist</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.security') }}" class="nav-link {{ request()->routeIs('admin.security*', 'admin.waf.settings*') ? 'active' : '' }}"><i class="fas fa-cog nav-icon"></i><p>Configurações</p></a></li>
+                            <li class="nav-item"><a href="{{ route('admin.waf.alerts.index') }}" class="nav-link {{ request()->routeIs('admin.waf.alerts.*') ? 'active' : '' }}"><i class="fas fa-bell nav-icon"></i><p>Alertas</p></a></li>
                         </ul>
                     </li>
                 @endif
@@ -750,12 +431,12 @@
 
                 @if(auth()->user()->hasPermission('testimonials.view') || auth()->user()->hasPermission('testimonials.moderate') || auth()->user()->hasPermission('testimonials.delete'))
                     <li class="nav-item">
-                        <a href="{{ route('admin.testimonials.index') }}"
-                            class="nav-link {{ $is('admin.testimonials.*') }}">
+                        <a href="{{ route('admin.testimonials.index') }}" class="nav-link {{ $is('admin.testimonials.*') }}">
                             <i class="nav-icon fas fa-quote-left"></i>
-                            <p>Depoimentos
+                            <p>
+                                Depoimentos
                                 @if(isset($pendingTestimonialsCount) && $pendingTestimonialsCount > 0)
-                                    <span class="badge badge-success right">{{ $pendingTestimonialsCount }}</span>
+                                    <span class="nav-badge badge text-bg-success me-2">{{ $pendingTestimonialsCount }}</span>
                                 @endif
                             </p>
                         </a>
@@ -766,24 +447,24 @@
                     <li class="nav-item">
                         <a href="{{ route('admin.reviews.index') }}" class="nav-link {{ $is('admin.reviews.*') }}">
                             <i class="nav-icon fas fa-star-half-alt"></i>
-                            <p>Avaliações
+                            <p>
+                                Avaliações
                                 @if(isset($pendingReviewsCount) && $pendingReviewsCount > 0)
-                                    <span class="badge badge-info right">{{ $pendingReviewsCount }}</span>
+                                    <span class="nav-badge badge text-bg-info me-2">{{ $pendingReviewsCount }}</span>
                                 @endif
                             </p>
                         </a>
                     </li>
                 @endif
 
-                <!-- Comunidade -->
                 @if(auth()->user()->canAccessFeature('community'))
                     <li class="nav-item">
-                        {{-- Usa rota do feed se disponível, senão admin.social --}}
                         <a href="{{ route('admin.social.feed.internal') }}" class="nav-link {{ $is('admin.social.*') }}">
                             <i class="nav-icon fas fa-comments"></i>
-                            <p>Comunidade
+                            <p>
+                                Comunidade
                                 @if(isset($pendingConnectionsCount) && $pendingConnectionsCount > 0)
-                                    <span class="badge badge-warning right">{{ $pendingConnectionsCount }}</span>
+                                    <span class="nav-badge badge text-bg-warning me-2">{{ $pendingConnectionsCount }}</span>
                                 @endif
                             </p>
                         </a>
@@ -794,17 +475,16 @@
                     <li class="nav-item">
                         <a href="{{ route('admin.chat.index') }}" class="nav-link {{ $is('admin.chat.*') }}">
                             <i class="nav-icon fas fa-comment-dots"></i>
-                            <p>Chat
+                            <p>
+                                Chat
                                 @if(isset($unreadMessagesCount) && $unreadMessagesCount > 0)
-                                    <span class="badge badge-danger right">{{ $unreadMessagesCount }}</span>
+                                    <span class="nav-badge badge text-bg-danger me-2">{{ $unreadMessagesCount }}</span>
                                 @endif
                             </p>
                         </a>
                     </li>
                 @endif
-
             </ul>
         </nav>
-        {{-- Remove custom color overrides so AdminLTE default styles apply --}}
     </div>
 </aside>

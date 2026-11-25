@@ -23,7 +23,7 @@
             {{-- Dados básicos --}}
             <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-book-open mr-2"></i>{{ $isEdit ? 'Editar Revista' : 'Nova Revista' }}</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-book-open me-2"></i>{{ $isEdit ? 'Editar Revista' : 'Nova Revista' }}</h3>
                 </div>
                 <div class="card-body">
                     @if($errors->any())
@@ -40,7 +40,7 @@
                             placeholder="Ex.: Revista Manchete - Edição 7">
                     </div>
 
-                    <div class="form-row">
+                    <div class="row g-2">
                         <div class="form-group col-md-6">
                             <label>Categoria</label>
                             <input type="text" name="category" class="form-control"
@@ -77,10 +77,10 @@
             {{-- Arquivos --}}
             <div class="card card-outline card-info">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-cloud-upload-alt mr-2"></i>Arquivos</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-cloud-upload-alt me-2"></i>Arquivos</h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-row">
+                    <div class="row g-2">
                         <div class="form-group col-md-6">
                             <label>Capa da revista <small class="text-muted">(proporção 3:4 recomendada)</small></label>
                             <x-unn-dropzone
@@ -120,7 +120,7 @@
             {{-- Publicação --}}
             <div class="card card-outline card-success">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-rocket mr-2"></i>Publicação</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-rocket me-2"></i>Publicação</h3>
                 </div>
                 <div class="card-body">
                     <div class="form-group">
@@ -152,23 +152,23 @@
             {{-- Opções --}}
             <div class="card card-outline card-secondary">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-cog mr-2"></i>Opções</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-cog me-2"></i>Opções</h3>
                 </div>
                 <div class="card-body">
-                    <div class="custom-control custom-switch mb-3">
+                    <div class="form-check form-switch mb-3">
                         <input type="hidden" name="is_featured" value="0">
-                        <input type="checkbox" class="custom-control-input" id="sw-featured" name="is_featured" value="1" @checked(old('is_featured', $magazine->is_featured))>
-                        <label class="custom-control-label" for="sw-featured"><i class="fas fa-star text-warning mr-1"></i>Destaque na vitrine</label>
+                        <input type="checkbox" class="form-check-input" id="sw-featured" name="is_featured" value="1" @checked(old('is_featured', $magazine->is_featured))>
+                        <label class="form-check-label" for="sw-featured"><i class="fas fa-star text-warning me-1"></i>Destaque na vitrine</label>
                     </div>
-                    <div class="custom-control custom-switch mb-3">
+                    <div class="form-check form-switch mb-3">
                         <input type="hidden" name="allow_download" value="0">
-                        <input type="checkbox" class="custom-control-input" id="sw-download" name="allow_download" value="1" @checked(old('allow_download', $magazine->exists ? $magazine->allow_download : true))>
-                        <label class="custom-control-label" for="sw-download"><i class="fas fa-download text-info mr-1"></i>Permitir baixar o PDF</label>
+                        <input type="checkbox" class="form-check-input" id="sw-download" name="allow_download" value="1" @checked(old('allow_download', $magazine->exists ? $magazine->allow_download : true))>
+                        <label class="form-check-label" for="sw-download"><i class="fas fa-download text-info me-1"></i>Permitir baixar o PDF</label>
                     </div>
-                    <div class="custom-control custom-switch">
+                    <div class="form-check form-switch">
                         <input type="hidden" name="enable_sound" value="0">
-                        <input type="checkbox" class="custom-control-input" id="sw-sound" name="enable_sound" value="1" @checked(old('enable_sound', $magazine->exists ? $magazine->enable_sound : true))>
-                        <label class="custom-control-label" for="sw-sound"><i class="fas fa-volume-high text-success mr-1"></i>Som de virar página</label>
+                        <input type="checkbox" class="form-check-input" id="sw-sound" name="enable_sound" value="1" @checked(old('enable_sound', $magazine->exists ? $magazine->enable_sound : true))>
+                        <label class="form-check-label" for="sw-sound"><i class="fas fa-volume-high text-success me-1"></i>Som de virar página</label>
                     </div>
                 </div>
             </div>
@@ -176,10 +176,10 @@
             {{-- Ações --}}
             <div class="card">
                 <div class="card-body">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">
-                        <i class="fas fa-save mr-1"></i> Salvar Revista
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-save me-1"></i> Salvar Revista
                     </button>
-                    <a href="{{ route('admin.magazines.index') }}" class="btn btn-default btn-block mt-2">
+                    <a href="{{ route('admin.magazines.index') }}" class="btn btn-default w-100 mt-2">
                         Cancelar
                     </a>
                 </div>

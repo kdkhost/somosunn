@@ -22,9 +22,9 @@
                     <div class="col-md-4 form-group"><label>Inicio</label><input type="datetime-local" name="starts_at" class="form-control" value="{{ old('starts_at', optional($banner->starts_at)->format('Y-m-d\TH:i')) }}"></div>
                     <div class="col-md-4 form-group"><label>Fim</label><input type="datetime-local" name="ends_at" class="form-control" value="{{ old('ends_at', optional($banner->ends_at)->format('Y-m-d\TH:i')) }}"></div>
                     <div class="col-md-4 form-group"><label>Imagem</label><input type="file" name="image" class="form-control-file"></div>
-                    <div class="col-md-12"><div class="custom-control custom-switch"><input type="checkbox" class="custom-control-input" id="active" name="active" value="1" @checked(old('active', $banner->active ?? true))><label class="custom-control-label" for="active">Banner ativo</label></div></div>
+                    <div class="col-md-12"><div class="form-check form-switch"><input type="checkbox" class="form-check-input" id="active" name="active" value="1" @checked(old('active', $banner->active ?? true))><label class="form-check-label" for="active">Banner ativo</label></div></div>
                 </div>
-            </div><div class="card-footer text-right"><button type="submit" class="btn btn-primary">Salvar banner</button></div></div>
+            </div><div class="card-footer text-end"><button type="submit" class="btn btn-primary">Salvar banner</button></div></div>
         </form>
     </div></section>
 @endsection

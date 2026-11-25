@@ -48,11 +48,11 @@
         <div class="col-12 d-flex flex-wrap justify-content-between align-items-center" style="gap:12px;">
             <div class="d-flex flex-wrap" style="gap:10px;">
                 <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary rounded-pill">
-                    <i class="fas fa-arrow-left mr-1"></i> Voltar para vendas
+                    <i class="fas fa-arrow-left me-1"></i> Voltar para vendas
                 </a>
                 @if($order->invoice)
                     <a href="{{ route('admin.invoices.show', $order->invoice) }}" class="btn btn-outline-info rounded-pill" data-pjax>
-                        <i class="fas fa-file-invoice mr-1"></i> Abrir fatura
+                        <i class="fas fa-file-invoice me-1"></i> Abrir fatura
                     </a>
                 @endif
             </div>
@@ -65,7 +65,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-primary elevation-1"><i class="fas fa-wallet"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Valor bruto</span>
+                    <span class="info-box-text fw-bold">Valor bruto</span>
                     <span class="info-box-number">R$ {{ number_format($grossAmount, 2, ',', '.') }}</span>
                 </div>
             </div>
@@ -74,7 +74,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-success elevation-1"><i class="fas fa-cash-register"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Total liquido</span>
+                    <span class="info-box-text fw-bold">Total liquido</span>
                     <span class="info-box-number">R$ {{ number_format($netAmount, 2, ',', '.') }}</span>
                 </div>
             </div>
@@ -83,7 +83,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-warning elevation-1"><i class="fas fa-tags"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Desconto</span>
+                    <span class="info-box-text fw-bold">Desconto</span>
                     <span class="info-box-number">{{ $discountAmount > 0 ? 'R$ ' . number_format($discountAmount, 2, ',', '.') : 'Sem desconto' }}</span>
                 </div>
             </div>
@@ -92,7 +92,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-danger elevation-1"><i class="fas fa-undo"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Saldo reembolsavel</span>
+                    <span class="info-box-text fw-bold">Saldo reembolsavel</span>
                     <span class="info-box-number">R$ {{ number_format($remainingRefundableAmount, 2, ',', '.') }}</span>
                 </div>
             </div>
@@ -103,25 +103,25 @@
         <div class="col-lg-4">
             <div class="card card-outline card-primary shadow-sm">
                 <div class="card-header">
-                    <h3 class="card-title font-weight-bold"><i class="fas fa-user mr-2 text-primary"></i>Cliente</h3>
+                    <h3 class="card-title fw-bold"><i class="fas fa-user me-2 text-primary"></i>Cliente</h3>
                 </div>
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <img src="{{ $avatarUrl }}" alt="Cliente" class="img-circle elevation-2 mr-3"
+                        <img src="{{ $avatarUrl }}" alt="Cliente" class="img-circle elevation-2 me-3"
                             style="width:64px; height:64px; object-fit:cover;"
                             onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                         <div class="min-w-0">
-                            <div class="font-weight-bold text-lg">{{ $user->name ?? 'Usuario removido' }}</div>
+                            <div class="fw-bold text-lg">{{ $user->name ?? 'Usuario removido' }}</div>
                             <div class="text-muted text-sm">{{ $user->email ?? 'Sem e-mail' }}</div>
                             @if(!empty($user->phone))
-                                <div class="text-muted text-sm"><i class="fas fa-phone mr-1"></i>{{ $user->phone }}</div>
+                                <div class="text-muted text-sm"><i class="fas fa-phone me-1"></i>{{ $user->phone }}</div>
                             @endif
                         </div>
                     </div>
 
                     @if($order->buyerAddress())
                         <div class="alert alert-light border mt-3 mb-0">
-                            <strong><i class="fas fa-map-marker-alt mr-1 text-danger"></i>Endereco</strong>
+                            <strong><i class="fas fa-map-marker-alt me-1 text-danger"></i>Endereco</strong>
                             <div class="small mt-1">{{ $order->buyerAddress() }}</div>
                         </div>
                     @endif
@@ -130,7 +130,7 @@
 
             <div class="card card-outline card-secondary shadow-sm">
                 <div class="card-header">
-                    <h3 class="card-title font-weight-bold"><i class="fas fa-receipt mr-2 text-secondary"></i>Resumo da venda</h3>
+                    <h3 class="card-title fw-bold"><i class="fas fa-receipt me-2 text-secondary"></i>Resumo da venda</h3>
                 </div>
                 <div class="card-body p-0">
                     <ul class="list-group list-group-flush">
@@ -173,7 +173,7 @@
                         @if($transactionId !== '')
                             <li class="list-group-item d-flex justify-content-between align-items-start">
                                 <span>Transacao</span>
-                                <strong class="d-block ml-3 text-right text-info text-break" style="max-width:68%; overflow-wrap:anywhere;">
+                                <strong class="d-block ms-3 text-end text-info text-break" style="max-width:68%; overflow-wrap:anywhere;">
                                     {{ $transactionId }}
                                 </strong>
                             </li>
@@ -184,26 +184,26 @@
 
             <div class="card card-outline card-info shadow-sm">
                 <div class="card-header">
-                    <h3 class="card-title font-weight-bold"><i class="fas fa-file-invoice mr-2 text-info"></i>Fatura</h3>
+                    <h3 class="card-title fw-bold"><i class="fas fa-file-invoice me-2 text-info"></i>Fatura</h3>
                 </div>
                 <div class="card-body">
                     @if($order->invoice)
                         <div class="mb-3">
                             <div class="text-muted text-sm">Numero</div>
-                            <div class="font-weight-bold">{{ $order->invoice->number ?: ('#' . $order->invoice->id) }}</div>
+                            <div class="fw-bold">{{ $order->invoice->number ?: ('#' . $order->invoice->id) }}</div>
                         </div>
                         <div class="d-flex flex-wrap" style="gap:8px;">
                             <a href="{{ route('admin.invoices.show', $order->invoice) }}" class="btn btn-outline-secondary btn-sm" data-pjax>
-                                <i class="fas fa-eye mr-1"></i> Ver
+                                <i class="fas fa-eye me-1"></i> Ver
                             </a>
                             <a href="{{ route('admin.invoices.pdf', $order->invoice) }}" class="btn btn-outline-primary btn-sm" target="_blank">
-                                <i class="fas fa-file-pdf mr-1"></i> PDF
+                                <i class="fas fa-file-pdf me-1"></i> PDF
                             </a>
                             <form method="POST" action="{{ route('admin.invoices.send', $order->invoice) }}" class="d-inline">
                                 @csrf
                                 <input type="hidden" name="force" value="1">
                                 <button class="btn btn-outline-success btn-sm" type="submit">
-                                    <i class="fas fa-paper-plane mr-1"></i> Enviar e-mail
+                                    <i class="fas fa-paper-plane me-1"></i> Enviar e-mail
                                 </button>
                             </form>
                         </div>
@@ -212,7 +212,7 @@
                         <form method="POST" action="{{ route('admin.orders.invoice', $order) }}">
                             @csrf
                             <button class="btn btn-primary btn-sm">
-                                <i class="fas fa-file-invoice mr-1"></i> Emitir e enviar fatura
+                                <i class="fas fa-file-invoice me-1"></i> Emitir e enviar fatura
                             </button>
                         </form>
                     @endif
@@ -221,15 +221,15 @@
 
             <div class="card card-outline {{ $isPaid ? 'card-danger' : ($isPending ? 'card-warning' : 'card-light') }} shadow-sm">
                 <div class="card-header">
-                    <h3 class="card-title font-weight-bold"><i class="fas fa-tools mr-2"></i>Acoes</h3>
+                    <h3 class="card-title fw-bold"><i class="fas fa-tools me-2"></i>Acoes</h3>
                 </div>
                 <div class="card-body">
                     @if($isPaid && $remainingRefundableAmount > 0)
                         <form action="{{ route('admin.orders.refund', $order->id) }}" method="POST"
                             onsubmit="return confirmAction(event, 'Estorno total?', 'Esta acao vai devolver todo o valor restante no gateway. Deseja continuar?');">
                             @csrf
-                            <button type="submit" class="btn btn-danger btn-block">
-                                <i class="fas fa-undo mr-1"></i> Estorno total
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="fas fa-undo me-1"></i> Estorno total
                             </button>
                         </form>
 
@@ -243,8 +243,8 @@
                                         max="{{ number_format($remainingRefundableAmount, 2, '.', '') }}"
                                         placeholder="Max. {{ number_format($remainingRefundableAmount, 2, ',', '.') }}">
                                     <div class="input-group-append">
-                                        <button type="submit" class="btn btn-warning font-weight-bold">
-                                            <i class="fas fa-coins mr-1"></i> Estorno parcial
+                                        <button type="submit" class="btn btn-warning fw-bold">
+                                            <i class="fas fa-coins me-1"></i> Estorno parcial
                                         </button>
                                     </div>
                                 </div>
@@ -255,8 +255,8 @@
                         <form action="{{ route('admin.orders.cancel', $order->id) }}" method="POST" class="mt-3"
                             onsubmit="return confirmAction(event, 'Cancelar pedido?', 'Deseja realmente cancelar este pedido pago?');">
                             @csrf
-                            <button type="submit" class="btn btn-outline-warning btn-block">
-                                <i class="fas fa-times mr-1"></i> Cancelar pedido
+                            <button type="submit" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-times me-1"></i> Cancelar pedido
                             </button>
                         </form>
                     @elseif($isPending)
@@ -264,21 +264,21 @@
                             <form action="{{ route('admin.orders.approve', $order->id) }}" method="POST"
                                 onsubmit="return confirmAction(event, 'Aprovar manualmente?', 'A compra sera aprovada sem pagamento em gateway, com baixa da fatura e envio de e-mails.');">
                                 @csrf
-                                <button type="submit" class="btn btn-success btn-block font-weight-bold">
-                                    <i class="fas fa-check mr-1"></i> Aprovar manualmente
+                                <button type="submit" class="btn btn-success w-100 fw-bold">
+                                    <i class="fas fa-check me-1"></i> Aprovar manualmente
                                 </button>
                             </form>
                         @else
-                            <button type="button" class="btn btn-secondary btn-block font-weight-bold" disabled>
-                                <i class="fas fa-lock mr-1"></i> Aprovacao manual desabilitada
+                            <button type="button" class="btn btn-secondary w-100 fw-bold" disabled>
+                                <i class="fas fa-lock me-1"></i> Aprovacao manual desabilitada
                             </button>
                         @endif
 
                         <form action="{{ route('admin.orders.cancel', $order->id) }}" method="POST" class="mt-3"
                             onsubmit="return confirmAction(event, 'Cancelar pedido?', 'Deseja realmente cancelar este pedido?');">
                             @csrf
-                            <button type="submit" class="btn btn-warning btn-block">
-                                <i class="fas fa-times mr-1"></i> Cancelar pedido
+                            <button type="submit" class="btn btn-warning w-100">
+                                <i class="fas fa-times me-1"></i> Cancelar pedido
                             </button>
                         </form>
                     @else
@@ -291,7 +291,7 @@
         <div class="col-lg-8">
             @if($order->is_partially_refunded)
                 <div class="alert alert-warning">
-                    <h5><i class="fas fa-coins mr-1"></i> Estorno parcial registrado</h5>
+                    <h5><i class="fas fa-coins me-1"></i> Estorno parcial registrado</h5>
                     Ja foram estornados R$ {{ number_format($refundedAmount, 2, ',', '.') }}.
                     Ainda restam R$ {{ number_format($remainingRefundableAmount, 2, ',', '.') }} disponiveis.
                     @if($order->last_refund_at)
@@ -300,19 +300,19 @@
                 </div>
             @elseif($order->refunded_at)
                 <div class="alert alert-danger">
-                    <h5><i class="fas fa-ban mr-1"></i> Venda reembolsada</h5>
+                    <h5><i class="fas fa-ban me-1"></i> Venda reembolsada</h5>
                     Este pedido foi reembolsado em {{ $order->refunded_at->format('d/m/Y H:i') }}.
                 </div>
             @elseif((string) $order->status === 'cancelled')
                 <div class="alert alert-secondary">
-                    <h5><i class="fas fa-times-circle mr-1"></i> Venda cancelada</h5>
+                    <h5><i class="fas fa-times-circle me-1"></i> Venda cancelada</h5>
                     Esta venda foi cancelada e nao possui novas acoes operacionais.
                 </div>
             @endif
 
             <div class="card card-outline card-primary shadow-sm">
                 <div class="card-header">
-                    <h3 class="card-title font-weight-bold"><i class="fas fa-box-open mr-2 text-primary"></i>Itens da venda</h3>
+                    <h3 class="card-title fw-bold"><i class="fas fa-box-open me-2 text-primary"></i>Itens da venda</h3>
                 </div>
                 <div class="card-body p-0 table-responsive">
                     <table class="table table-hover mb-0">
@@ -321,9 +321,9 @@
                                 <th>Item</th>
                                 <th>Tipo</th>
                                 <th class="text-center">Qtd.</th>
-                                <th class="text-right">Unitario bruto</th>
-                                <th class="text-right">Total bruto</th>
-                                <th class="text-right">Total liquido</th>
+                                <th class="text-end">Unitario bruto</th>
+                                <th class="text-end">Total bruto</th>
+                                <th class="text-end">Total liquido</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -336,26 +336,26 @@
                                 @endphp
                                 <tr>
                                     <td>
-                                        <div class="font-weight-bold">{{ $item->title }}</div>
+                                        <div class="fw-bold">{{ $item->title }}</div>
                                         @if($couponCode !== '' && $discountAmount > 0)
                                             <div class="small text-success">Cupom aplicado: {{ $couponCode }}</div>
                                         @endif
                                     </td>
                                     <td>{{ $order->saleTypeLabel() }}</td>
                                     <td class="text-center">{{ $quantity }}</td>
-                                    <td class="text-right">R$ {{ number_format($itemGrossUnit, 2, ',', '.') }}</td>
-                                    <td class="text-right">R$ {{ number_format($itemGrossLine, 2, ',', '.') }}</td>
-                                    <td class="text-right font-weight-bold">R$ {{ number_format($itemNetLine, 2, ',', '.') }}</td>
+                                    <td class="text-end">R$ {{ number_format($itemGrossUnit, 2, ',', '.') }}</td>
+                                    <td class="text-end">R$ {{ number_format($itemGrossLine, 2, ',', '.') }}</td>
+                                    <td class="text-end fw-bold">R$ {{ number_format($itemNetLine, 2, ',', '.') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                         <tfoot class="bg-light">
                             <tr>
-                                <th colspan="4" class="text-right">Resumo</th>
-                                <th class="text-right">R$ {{ number_format($grossAmount, 2, ',', '.') }}</th>
-                                <th class="text-right">
+                                <th colspan="4" class="text-end">Resumo</th>
+                                <th class="text-end">R$ {{ number_format($grossAmount, 2, ',', '.') }}</th>
+                                <th class="text-end">
                                     @if($discountAmount > 0)
-                                        <div class="text-success font-weight-bold">- R$ {{ number_format($discountAmount, 2, ',', '.') }}</div>
+                                        <div class="text-success fw-bold">- R$ {{ number_format($discountAmount, 2, ',', '.') }}</div>
                                     @endif
                                     <div>R$ {{ number_format($netAmount, 2, ',', '.') }}</div>
                                 </th>

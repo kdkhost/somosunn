@@ -15,7 +15,7 @@
         </div>
 
         <form method="GET" action="{{ route('admin.faqs.index') }}" class="mb-3">
-            <div class="form-row align-items-end">
+            <div class="row g-2 align-items-end">
                 <div class="form-group col-md-3">
                     <label class="mb-1">Contexto</label>
                     <select name="context" class="form-control">
@@ -38,7 +38,7 @@
                     <input type="text" name="q" class="form-control" value="{{ $q }}" placeholder="Pergunta ou resposta">
                 </div>
                 <div class="form-group col-md-2">
-                    <button class="btn btn-secondary btn-block">Filtrar</button>
+                    <button class="btn btn-secondary w-100">Filtrar</button>
                 </div>
             </div>
         </form>
@@ -51,18 +51,18 @@
                         <th>Contexto</th>
                         <th>Ordem</th>
                         <th>Status</th>
-                        <th class="text-right">Ações</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($faqs as $faq)
                         <tr>
                             <td>
-                                <div class="font-weight-bold">{{ $faq->question }}</div>
+                                <div class="fw-bold">{{ $faq->question }}</div>
                                 <div class="text-muted small">{{ \Illuminate\Support\Str::limit($faq->answer, 120) }}</div>
                             </td>
                             <td>
-                                <span class="badge badge-info">
+                                <span class="badge text-bg-info">
                                     {{ $contexts[$faq->context] ?? $faq->context }}
                                 </span>
                             </td>
@@ -72,7 +72,7 @@
                                     {{ $faq->is_active ? 'Ativo' : 'Inativo' }}
                                 </span>
                             </td>
-                            <td class="text-right">
+                            <td class="text-end">
                                 <a href="{{ route('admin.faqs.edit', $faq) }}" class="btn btn-sm btn-secondary" data-pjax>Editar</a>
                                 <a href="#" class="btn btn-sm btn-danger btn-delete" data-action="{{ route('admin.faqs.destroy', $faq) }}">Excluir</a>
                             </td>

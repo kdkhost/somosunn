@@ -18,13 +18,13 @@
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">
                 {{ session('success') }}
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         @endif
         @if(session('error'))
             <div class="alert alert-danger alert-dismissible fade show">
                 {{ session('error') }}
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         @endif
 
@@ -59,7 +59,7 @@
                                     <input type="datetime-local" name="expires_at" class="form-control form-control-sm" value="{{ old('expires_at') }}">
                                     <small class="text-muted">Deixe vazio para bloqueio permanente.</small>
                                 </div>
-                                <button type="submit" class="btn btn-danger btn-sm btn-block">
+                                <button type="submit" class="btn btn-danger btn-sm w-100">
                                     <i class="fas fa-ban"></i> Bloquear
                                 </button>
                             </form>
@@ -103,9 +103,9 @@
                                             <td>{{ $entry->expires_at ? $entry->expires_at->format('d/m/Y H:i') : 'Permanente' }}</td>
                                             <td>
                                                 @if($entry->isActive())
-                                                    <span class="badge badge-danger">Ativo</span>
+                                                    <span class="badge text-bg-danger">Ativo</span>
                                                 @else
-                                                    <span class="badge badge-secondary">Expirado</span>
+                                                    <span class="badge text-bg-secondary">Expirado</span>
                                                 @endif
                                             </td>
                                             <td>{{ $entry->created_at?->format('d/m/Y H:i') }}</td>

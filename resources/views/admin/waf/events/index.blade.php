@@ -9,7 +9,7 @@
             <div class="col-sm-6">
                 <h1 class="m-0"><i class="fas fa-list-alt text-primary"></i> WAF - Eventos</h1>
             </div>
-            <div class="col-sm-6 text-right">
+            <div class="col-sm-6 text-end">
                 <a href="{{ route('admin.waf.events.export', request()->query()) }}&format=csv" class="btn btn-sm btn-outline-secondary">
                     <i class="fas fa-file-csv"></i> Exportar CSV
                 </a>
@@ -34,7 +34,7 @@
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-filter"></i> Filtros</h3>
                     <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                        <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i class="fas fa-plus"></i></button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -110,7 +110,7 @@
                             <div class="col-md-4 d-flex align-items-end">
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-search"></i> Filtrar</button>
-                                    <a href="{{ route('admin.waf.events.index') }}" class="btn btn-sm btn-default ml-1">Limpar</a>
+                                    <a href="{{ route('admin.waf.events.index') }}" class="btn btn-sm btn-default ms-1">Limpar</a>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +139,7 @@
                                 <tr>
                                     <td class="text-nowrap">{{ $event->occurred_at?->format('d/m/Y H:i') }}</td>
                                     <td><code>{{ $event->ip }}</code></td>
-                                    <td><span class="badge badge-secondary">{{ $event->method }}</span></td>
+                                    <td><span class="badge text-bg-secondary">{{ $event->method }}</span></td>
                                     <td><small>{{ \Illuminate\Support\Str::limit($event->route ?? $event->path, 40) }}</small></td>
                                     <td>
                                         <span class="badge badge-{{ $event->risk_score >= 80 ? 'danger' : ($event->risk_score >= 50 ? 'warning' : 'info') }}">
@@ -149,19 +149,19 @@
                                     <td>
                                         @switch($event->decision)
                                             @case('blocked')
-                                                <span class="badge badge-danger">Blocked</span>
+                                                <span class="badge text-bg-danger">Blocked</span>
                                                 @break
                                             @case('monitored')
-                                                <span class="badge badge-warning">Monitored</span>
+                                                <span class="badge text-bg-warning">Monitored</span>
                                                 @break
                                             @case('challenged')
                                                 <span class="badge" style="background-color:#6f42c1;color:#fff;">Challenged</span>
                                                 @break
                                             @default
-                                                <span class="badge badge-success">Allowed</span>
+                                                <span class="badge text-bg-success">Allowed</span>
                                         @endswitch
                                         @if($event->is_false_positive)
-                                            <span class="badge badge-light" title="Falso Positivo"><i class="fas fa-flag"></i></span>
+                                            <span class="badge text-bg-light" title="Falso Positivo"><i class="fas fa-flag"></i></span>
                                         @endif
                                     </td>
                                     <td>{{ $event->country ?? '-' }}</td>

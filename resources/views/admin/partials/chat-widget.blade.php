@@ -5,7 +5,7 @@
         class="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center"
         style="width: 60px; height: 60px; border-radius: 50%; transition: transform 0.2s;" onclick="toggleChatWidget()">
         <i class="fas fa-comments fa-2x"></i>
-        <span id="chat-unread-badge" class="badge badge-danger navbar-badge"
+        <span id="chat-unread-badge" class="badge text-bg-danger navbar-badge"
             style="position: absolute; top: 0; right: 0; display: none;">0</span>
     </button>
 
@@ -16,7 +16,7 @@
         <!-- Header -->
         <div class="card-header bg-primary text-white p-2 d-flex justify-content-between align-items-center"
             style="cursor: pointer;" onclick="toggleChatWidget()">
-            <h6 class="mb-0 font-weight-bold"><i class="fas fa-comments mr-2"></i> Mensagens</h6>
+            <h6 class="mb-0 fw-bold"><i class="fas fa-comments me-2"></i> Mensagens</h6>
             <button class="btn btn-sm text-white"><i class="fas fa-chevron-down"></i></button>
         </div>
 
@@ -38,12 +38,12 @@
                 style="top: 0; left: 0; transform: translateX(100%); transition: transform 0.3s ease;">
 
                 <div class="p-2 border-bottom bg-light d-flex align-items-center">
-                    <button class="btn btn-sm btn-link mr-2" onclick="showChatList()"><i
+                    <button class="btn btn-sm btn-link me-2" onclick="showChatList()"><i
                             class="fas fa-arrow-left"></i></button>
                     <div class="d-flex align-items-center">
-                        <img id="chat-current-avatar" src="" class="rounded-circle mr-2"
+                        <img id="chat-current-avatar" src="" class="rounded-circle me-2"
                             style="width: 30px; height: 30px; object-fit: cover;" loading="lazy" decoding="async">
-                        <span id="chat-current-name" class="font-weight-bold text-truncate"
+                        <span id="chat-current-name" class="fw-bold text-truncate"
                             style="max-width: 180px;">User</span>
                     </div>
                 </div>
@@ -148,10 +148,10 @@
                     item.onclick = () => openChatConversation(conv.id, otherUser.name, avatar);
                     item.innerHTML = `
                         <div class="d-flex align-items-center">
-                            <img src="${avatar}" class="rounded-circle mr-3" style="width: 40px; height: 40px; object-fit: cover;" loading="lazy" decoding="async">
+                            <img src="${avatar}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;" loading="lazy" decoding="async">
                             <div class="flex-grow-1 overflow-hidden">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0 text-truncate font-weight-bold" style="font-size: 0.95rem;">${otherUser.name}</h6>
+                                    <h6 class="mb-0 text-truncate fw-bold" style="font-size: 0.95rem;">${otherUser.name}</h6>
                                     <small class="text-muted" style="font-size: 0.75rem;">${new Date(conv.updated_at).toLocaleDateString()}</small>
                                 </div>
                                 <small class="text-muted text-truncate d-block">${lastMsg}</small>

@@ -24,7 +24,7 @@
             $quickLinks[] = ['label' => 'Pagamentos', 'icon' => 'fas fa-credit-card', 'route' => route('admin.marketplace.payments')];
             if ($canManageOwnMarketplace && $storefrontModuleInstalled) {
                 $quickLinks[] = ['label' => $user->isSuperAdmin() ? 'Loja da plataforma' : 'Minha loja', 'icon' => 'fas fa-store-alt', 'route' => route('admin.marketplace.store.edit')];
-                $quickLinks[] = ['label' => 'Produtos proprios', 'icon' => 'fas fa-box-open', 'route' => route('admin.marketplace.products.index')];
+                $quickLinks[] = ['label' => 'Produtos próprios', 'icon' => 'fas fa-box-open', 'route' => route('admin.marketplace.products.index')];
                 $quickLinks[] = ['label' => 'Pedidos da loja', 'icon' => 'fas fa-truck', 'route' => route('admin.marketplace.orders.index')];
             }
             if ($canManageOwnMarketplace) {
@@ -38,46 +38,49 @@
     }
 @endphp
 
-<aside class="control-sidebar control-sidebar-dark">
-    <div class="p-3">
-        <h5 class="mb-2">Painel rápido</h5>
-        <p class="text-muted small mb-3">Ajustes de layout e atalhos para reduzir o tamanho do menu lateral.</p>
+{{-- Painel Rápido (Offcanvas nativo Bootstrap 5 / AdminLTE 4) --}}
+<div class="offcanvas offcanvas-end" tabindex="-1" id="adminQuickPanelOffcanvas" aria-labelledby="adminQuickPanelLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-bold" id="adminQuickPanelLabel">
+            <i class="fas fa-sliders-h me-2 text-primary"></i>Painel rápido
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+    </div>
+    <div class="offcanvas-body">
+        <p class="text-secondary small mb-3">Ajustes de layout e atalhos rápidos do painel administrativo.</p>
 
-        <!-- Atalho de Upload Rápido -->
+        {{-- Atalho de Upload Rápido --}}
         <div class="mb-4">
-            <button type="button" class="btn btn-primary btn-block btn-lg shadow-sm rounded-pill font-weight-bold"
-                onclick="window.openQuickUploadModal()">
-                <i class="fas fa-camera-retro mr-2"></i> Registrar Fotos
+            <button type="button" class="btn btn-primary w-100 btn-lg shadow-sm rounded-pill fw-bold"
+                data-bs-dismiss="offcanvas" onclick="window.openQuickUploadModal()">
+                <i class="fas fa-camera-retro me-2"></i> Registrar Fotos
             </button>
         </div>
 
         <div class="mb-4">
-            <div class="custom-control custom-switch mb-2">
-                <input type="checkbox" class="custom-control-input" id="unn_toggle_nav_compact">
-                <label class="custom-control-label" for="unn_toggle_nav_compact">Menu compacto</label>
+            <div class="form-check form-switch mb-2">
+                <input type="checkbox" class="form-check-input" id="unn_toggle_nav_compact">
+                <label class="form-check-label" for="unn_toggle_nav_compact">Interface compacta</label>
             </div>
-            <div class="custom-control custom-switch mb-2">
-                <input type="checkbox" class="custom-control-input" id="unn_toggle_sidebar_collapse">
-                <label class="custom-control-label" for="unn_toggle_sidebar_collapse">Recolher sidebar</label>
+            <div class="form-check form-switch mb-2">
+                <input type="checkbox" class="form-check-input" id="unn_toggle_sidebar_collapse">
+                <label class="form-check-label" for="unn_toggle_sidebar_collapse">Recolher menu lateral</label>
             </div>
         </div>
 
         @if(!empty($quickLinks))
-            <h6 class="text-uppercase text-muted small mb-2">Atalhos</h6>
-            <ul class="nav nav-pills nav-sidebar flex-column">
+            <h6 class="text-uppercase text-secondary small fw-bold mb-2">Atalhos</h6>
+            <div class="list-group list-group-flush">
                 @foreach($quickLinks as $link)
-                    <li class="nav-item">
-                        <a href="{{ $link['route'] }}" class="nav-link" data-pjax="true">
-                            <i class="nav-icon {{ $link['icon'] }}"></i>
-                            <p>{{ $link['label'] }}</p>
-                        </a>
-                    </li>
+                    <a href="{{ $link['route'] }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 rounded-2 border-0" data-pjax="true">
+                        <i class="{{ $link['icon'] }} text-primary" style="width: 18px; text-align: center;"></i>
+                        <span>{{ $link['label'] }}</span>
+                    </a>
                 @endforeach
-            </ul>
+            </div>
         @endif
     </div>
-</aside>
-<div class="control-sidebar-bg"></div>
+</div>
 
 @push('scripts')
     <script>
@@ -91,14 +94,13 @@
                     if (typeof stored.navCompact === 'boolean') state.navCompact = stored.navCompact;
                     if (typeof stored.sidebarCollapsed === 'boolean') state.sidebarCollapsed = stored.sidebarCollapsed;
                 }
-            } catch (e) { /* ignore */ }
+            } catch (e) { }
 
             function persist() {
-                try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch (e) { /* ignore */ }
+                try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch (e) { }
             }
 
             function applyNavCompact() {
-                // AdminLTE: `text-sm` reduz espaçamentos e tipografia (mais compacto)
                 document.body.classList.toggle('text-sm', !!state.navCompact);
                 const input = document.getElementById('unn_toggle_nav_compact');
                 if (input) input.checked = !!state.navCompact;
@@ -114,7 +116,7 @@
                 const isCollapsed = document.body.classList.contains('sidebar-collapse');
                 if (state.sidebarCollapsed === isCollapsed) return;
 
-                const btn = document.querySelector('[data-widget="pushmenu"]');
+                const btn = document.querySelector('[data-lte-toggle="sidebar"]');
                 if (btn) {
                     btn.click();
                     return;
@@ -123,11 +125,9 @@
                 document.body.classList.toggle('sidebar-collapse', state.sidebarCollapsed);
             }
 
-            // initial apply
             applyNavCompact();
             setSidebarCollapsed(state.sidebarCollapsed);
 
-            // bind
             const navCompactToggle = document.getElementById('unn_toggle_nav_compact');
             if (navCompactToggle) {
                 navCompactToggle.addEventListener('change', function () {

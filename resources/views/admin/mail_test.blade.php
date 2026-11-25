@@ -6,7 +6,7 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title mb-0">
-                <i class="fas fa-envelope mr-1"></i> Enviar teste por template
+                <i class="fas fa-envelope me-1"></i> Enviar teste por template
             </h3>
         </div>
         <form method="POST" action="{{ route('admin.mailtest.send') }}">
@@ -40,9 +40,9 @@
                     <small class="text-muted">Assunto e conteúdo devem ser editados em Templates de E-mail.</small>
                 </div>
             </div>
-            <div class="card-footer text-right">
+            <div class="card-footer text-end">
                 <button class="btn btn-primary">
-                    <i class="fas fa-paper-plane mr-1"></i> Enviar teste
+                    <i class="fas fa-paper-plane me-1"></i> Enviar teste
                 </button>
             </div>
         </form>

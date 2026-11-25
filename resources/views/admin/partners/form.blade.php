@@ -8,14 +8,14 @@
             <div class="row mb-2 align-items-center">
                 <div class="col">
                     <h1 class="m-0">
-                        <i class="fas fa-handshake text-primary mr-2"></i>
+                        <i class="fas fa-handshake text-primary me-2"></i>
                         {{ isset($partner->id) ? 'Editar: ' . $partner->name : 'Novo Parceiro' }}
                     </h1>
                 </div>
                 <div class="col-auto">
                     <a href="{{ route('admin.partners.index') }}" class="btn btn-outline-secondary"
                         title="Voltar para a listagem">
-                        <i class="fas fa-arrow-left mr-1"></i> Voltar
+                        <i class="fas fa-arrow-left me-1"></i> Voltar
                     </a>
                 </div>
             </div>
@@ -32,7 +32,7 @@
                 <div class="col-lg-7">
                     <div class="card card-outline card-primary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-building mr-1"></i> Dados do Parceiro</h3>
+                            <h3 class="card-title"><i class="fas fa-building me-1"></i> Dados do Parceiro</h3>
                         </div>
                         <form method="POST"
                             action="{{ isset($partner->id) ? route('admin.partners.update', $partner) : route('admin.partners.store') }}"
@@ -63,10 +63,10 @@
                                         3MB</small>
                                     @if(isset($partner->id) && $partner->logo_url)
                                         <div class="mt-2">
-                                            <div class="custom-control custom-switch">
-                                                <input type="checkbox" class="custom-control-input" id="remove_logo"
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" class="form-check-input" id="remove_logo"
                                                     name="remove_logo" value="1">
-                                                <label class="custom-control-label text-danger" for="remove_logo">Remover logo
+                                                <label class="form-check-label text-danger" for="remove_logo">Remover logo
                                                     atual</label>
                                             </div>
                                         </div>
@@ -138,11 +138,11 @@
                                         <div class="form-group">
                                             <label>&nbsp;</label><br>
                                             <div
-                                                class="custom-control custom-switch custom-switch-lg custom-switch-on-success custom-switch-off-danger">
+                                                class="form-check form-switch">
                                                 <input type="hidden" name="active" value="0">
-                                                <input type="checkbox" class="custom-control-input" id="active"
+                                                <input type="checkbox" class="form-check-input" id="active"
                                                     name="active" value="1" {{ old('active', $partner->active ?? true) ? 'checked' : '' }}>
-                                                <label class="custom-control-label font-weight-bold" for="active">Parceiro
+                                                <label class="form-check-label fw-bold" for="active">Parceiro
                                                     Ativo</label>
                                             </div>
                                             <small class="text-muted d-block mt-1">Aparece no carrossel público</small>
@@ -151,10 +151,10 @@
                                 </div>
 
                             </div>
-                            <div class="card-footer text-right">
+                            <div class="card-footer text-end">
                                 <button type="submit" class="btn btn-primary"
                                     title="{{ isset($partner->id) ? 'Salvar alterações do parceiro' : 'Salvar e cadastrar parceiro' }}">
-                                    <i class="fas fa-save mr-1"></i>
+                                    <i class="fas fa-save me-1"></i>
                                     {{ isset($partner->id) ? 'Salvar Alterações' : 'Criar Parceiro' }}
                                 </button>
                             </div>
@@ -167,9 +167,9 @@
                     <div class="col-lg-5">
                         <div class="card card-outline card-success">
                             <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-ticket-alt mr-1"></i> Cupons de Desconto</h3>
+                                <h3 class="card-title"><i class="fas fa-ticket-alt me-1"></i> Cupons de Desconto</h3>
                                 <div class="card-tools">
-                                    <button class="btn btn-sm btn-success" data-toggle="collapse" data-target="#new-coupon-form"
+                                    <button class="btn btn-sm btn-success" data-bs-toggle="collapse" data-bs-target="#new-coupon-form"
                                         title="Abrir formulário de novo cupom">
                                         <i class="fas fa-plus"></i> Novo Cupom
                                     </button>
@@ -184,7 +184,7 @@
                                         <div class="row">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Código <span
+                                                    <label class="small fw-bold">Código <span
                                                             class="text-danger">*</span></label>
                                                     <input type="text" name="code" class="form-control form-control-sm" required
                                                         placeholder="EX: UNN20">
@@ -192,7 +192,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Título <span
+                                                    <label class="small fw-bold">Título <span
                                                             class="text-danger">*</span></label>
                                                     <input type="text" name="title" class="form-control form-control-sm"
                                                         required placeholder="Ex: 20% de desconto">
@@ -200,7 +200,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Tipo de desconto</label>
+                                                    <label class="small fw-bold">Tipo de desconto</label>
                                                     <select name="discount_type" class="form-control form-control-sm">
                                                         <option value="percent">Percentual (%)</option>
                                                         <option value="fixed">Valor fixo (R$)</option>
@@ -209,14 +209,14 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Valor</label>
+                                                    <label class="small fw-bold">Valor</label>
                                                     <input type="number" name="discount_value"
                                                         class="form-control form-control-sm" min="0" step="0.01" value="0">
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Compra mínima (R$)</label>
+                                                    <label class="small fw-bold">Compra mínima (R$)</label>
                                                     <input type="number" name="min_purchase"
                                                         class="form-control form-control-sm" min="0" step="0.01"
                                                         placeholder="Sem mínimo">
@@ -224,28 +224,28 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Válido até</label>
+                                                    <label class="small fw-bold">Válido até</label>
                                                     <input type="date" name="expires_at" class="form-control form-control-sm">
                                                 </div>
                                             </div>
                                             <div class="col-12">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Descrição</label>
+                                                    <label class="small fw-bold">Descrição</label>
                                                     <textarea name="description" class="form-control form-control-sm" rows="2"
                                                         placeholder="Detalhes do cupom..."></textarea>
                                                 </div>
                                             </div>
                                             <div class="col-12">
-                                                <div class="custom-control custom-switch d-inline-block mr-3">
+                                                <div class="form-check form-switch d-inline-block me-3">
                                                     <input type="hidden" name="active" value="1">
-                                                    <input type="checkbox" class="custom-control-input" id="new_coupon_active"
+                                                    <input type="checkbox" class="form-check-input" id="new_coupon_active"
                                                         name="active" value="1" checked>
-                                                    <label class="custom-control-label small"
+                                                    <label class="form-check-label small"
                                                         for="new_coupon_active">Ativo</label>
                                                 </div>
-                                                <button type="submit" class="btn btn-sm btn-success float-right"
+                                                <button type="submit" class="btn btn-sm btn-success float-end"
                                                     title="Confirmar e adicionar cupom">
-                                                    <i class="fas fa-plus mr-1"></i> Adicionar Cupom
+                                                    <i class="fas fa-plus me-1"></i> Adicionar Cupom
                                                 </button>
                                             </div>
                                         </div>
@@ -258,18 +258,18 @@
                                         @foreach($coupons as $coupon)
                                             <div class="list-group-item py-2 px-3">
                                                 <div class="d-flex align-items-center justify-content-between">
-                                                    <div class="flex-grow-1 mr-2">
+                                                    <div class="flex-grow-1 me-2">
                                                         <div class="d-flex align-items-center gap-2 mb-1">
                                                             <span
-                                                                class="badge badge-{{ $coupon->discount_type === 'percent' ? 'success' : 'info' }} font-size-sm px-2 py-1 mr-2">
+                                                                class="badge badge-{{ $coupon->discount_type === 'percent' ? 'success' : 'info' }} font-size-sm px-2 py-1 me-2">
                                                                 {{ $coupon->formatted_discount }}
                                                             </span>
-                                                            <code class="text-primary font-weight-bold">{{ $coupon->code }}</code>
+                                                            <code class="text-primary fw-bold">{{ $coupon->code }}</code>
                                                             @if(!$coupon->active)
-                                                                <span class="badge badge-secondary ml-1">Inativo</span>
+                                                                <span class="badge text-bg-secondary ms-1">Inativo</span>
                                                             @endif
                                                             @if($coupon->isExpired())
-                                                                <span class="badge badge-danger ml-1">Expirado</span>
+                                                                <span class="badge text-bg-danger ms-1">Expirado</span>
                                                             @endif
                                                         </div>
                                                         <div class="small text-muted">
@@ -319,27 +319,27 @@
                                 <form id="editCouponForm" method="POST">
                                     @csrf @method('PUT')
                                     <div class="modal-header">
-                                        <h5 class="modal-title"><i class="fas fa-edit mr-2"></i>Editar Cupom</h5>
-                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Editar Cupom</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="row">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Código</label>
+                                                    <label class="small fw-bold">Código</label>
                                                     <input type="text" name="code" id="edit_code" class="form-control" required>
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Título</label>
+                                                    <label class="small fw-bold">Título</label>
                                                     <input type="text" name="title" id="edit_title" class="form-control"
                                                         required>
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Tipo</label>
+                                                    <label class="small fw-bold">Tipo</label>
                                                     <select name="discount_type" id="edit_discount_type" class="form-control">
                                                         <option value="percent">Percentual (%)</option>
                                                         <option value="fixed">Valor fixo (R$)</option>
@@ -348,46 +348,46 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Valor</label>
+                                                    <label class="small fw-bold">Valor</label>
                                                     <input type="number" name="discount_value" id="edit_discount_value"
                                                         class="form-control" min="0" step="0.01">
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Compra mínima (R$)</label>
+                                                    <label class="small fw-bold">Compra mínima (R$)</label>
                                                     <input type="number" name="min_purchase" id="edit_min_purchase"
                                                         class="form-control" min="0" step="0.01">
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Válido até</label>
+                                                    <label class="small fw-bold">Válido até</label>
                                                     <input type="date" name="expires_at" id="edit_expires_at"
                                                         class="form-control">
                                                 </div>
                                             </div>
                                             <div class="col-12">
                                                 <div class="form-group">
-                                                    <label class="small font-weight-bold">Descrição</label>
+                                                    <label class="small fw-bold">Descrição</label>
                                                     <textarea name="description" id="edit_description" class="form-control"
                                                         rows="2"></textarea>
                                                 </div>
                                             </div>
                                             <div class="col-12">
-                                                <div class="custom-control custom-switch">
+                                                <div class="form-check form-switch">
                                                     <input type="hidden" name="active" value="0">
-                                                    <input type="checkbox" class="custom-control-input" id="edit_active"
+                                                    <input type="checkbox" class="form-check-input" id="edit_active"
                                                         name="active" value="1">
-                                                    <label class="custom-control-label" for="edit_active">Ativo</label>
+                                                    <label class="form-check-label" for="edit_active">Ativo</label>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                         <button type="submit" class="btn btn-primary"><i
-                                                class="fas fa-save mr-1"></i>Salvar</button>
+                                                class="fas fa-save me-1"></i>Salvar</button>
                                     </div>
                                 </form>
                             </div>

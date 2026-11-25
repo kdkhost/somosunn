@@ -12,7 +12,7 @@
                     {{ $rule ? 'Editar Regra: ' . $rule->name : 'Nova Regra WAF' }}
                 </h1>
             </div>
-            <div class="col-sm-6 text-right">
+            <div class="col-sm-6 text-end">
                 <a href="{{ route('admin.waf.rules.index') }}" class="btn btn-sm btn-default">
                     <i class="fas fa-arrow-left"></i> Voltar
                 </a>
@@ -117,7 +117,7 @@
                                         <label for="score">Score (0-100) <span class="text-danger">*</span></label>
                                         <input type="range" name="score" id="score" class="custom-range" min="0" max="100"
                                                value="{{ old('score', $rule->score ?? 50) }}" oninput="document.getElementById('score-val').textContent=this.value">
-                                        <span class="badge badge-info" id="score-val">{{ old('score', $rule->score ?? 50) }}</span>
+                                        <span class="badge text-bg-info" id="score-val">{{ old('score', $rule->score ?? 50) }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -143,11 +143,11 @@
                             </div>
 
                             <div class="form-group">
-                                <div class="custom-control custom-switch">
+                                <div class="form-check form-switch">
                                     <input type="hidden" name="is_active" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1"
+                                    <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1"
                                            {{ old('is_active', $rule->is_active ?? true) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="is_active">Regra Ativa</label>
+                                    <label class="form-check-label" for="is_active">Regra Ativa</label>
                                 </div>
                             </div>
                         </div>
@@ -170,7 +170,7 @@
                                 <label>Payload de Teste</label>
                                 <textarea id="test-sample" class="form-control" rows="3" placeholder="Digite um payload para testar..."></textarea>
                             </div>
-                            <button type="button" id="btn-test-rule" class="btn btn-sm btn-outline-primary btn-block">
+                            <button type="button" id="btn-test-rule" class="btn btn-sm btn-outline-primary w-100">
                                 <i class="fas fa-play"></i> Testar
                             </button>
                             <div id="test-result" class="mt-3" style="display:none;">

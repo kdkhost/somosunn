@@ -9,7 +9,7 @@
             <div class="card card-outline card-primary">
                 <div class="card-header d-flex align-items-center">
                     <h3 class="card-title">Nova publicacao</h3>
-                    <div class="card-tools ml-auto">
+                    <div class="card-tools ms-auto">
                         <button type="button" class="btn btn-tool" title="Opcoes" onclick="togglePanel('admin-post-options')">
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
@@ -35,7 +35,7 @@
                             <div class="border rounded p-3 bg-light d-flex flex-column gap-2">
                                 <div class="d-flex align-items-center justify-content-between flex-wrap">
                                     <div class="text-muted">
-                                        <i class="fas fa-image mr-1"></i> Arraste e solte imagens
+                                        <i class="fas fa-image me-1"></i> Arraste e solte imagens
                                     </div>
                                     <button type="button" class="btn btn-sm btn-outline-primary" id="admin-post-select">
                                         Selecionar imagens
@@ -43,7 +43,7 @@
                                 </div>
                                 <div class="text-muted small" id="admin-upload-name">Nenhuma imagem selecionada</div>
                                 <div id="admin-preview-inline" class="d-none align-items-center">
-                                    <img id="admin-preview-inline-img" src="" alt="Preview" class="mr-2 rounded border" style="width:44px;height:44px;object-fit:cover;" loading="lazy" decoding="async">
+                                    <img id="admin-preview-inline-img" src="" alt="Preview" class="me-2 rounded border" style="width:44px;height:44px;object-fit:cover;" loading="lazy" decoding="async">
                                     <span class="text-muted small" id="admin-preview-inline-name"></span>
                                 </div>
                             </div>
@@ -85,7 +85,7 @@
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
                         <div class="d-flex align-items-center">
-                            <div class="mr-3">
+                            <div class="me-3">
                                 <img src="{{ $post->user?->profile_photo_url ?? asset('img/default-user.svg') }}"
                                     alt="Avatar" class="img-circle" style="width:40px;height:40px;object-fit:cover;" loading="lazy" decoding="async">
                             </div>
@@ -94,24 +94,24 @@
                                 <div class="text-muted text-sm">{{ $post->created_at->diffForHumans() }}</div>
                             </div>
                         </div>
-                        <div class="card-tools ml-auto">
+                        <div class="card-tools ms-auto">
                             <div class="dropdown">
-                                <button type="button" class="btn btn-tool" data-toggle="dropdown" aria-expanded="false" title="Mais opções">
+                                <button type="button" class="btn btn-tool" data-bs-toggle="dropdown" aria-expanded="false" title="Mais opções">
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
-                                <div class="dropdown-menu dropdown-menu-right">
+                                <div class="dropdown-menu dropdown-menu-end">
                                     @if(auth()->user()->isAdmin() || $post->user_id === auth()->id())
                                         <form action="{{ route('social.post.destroy', $post) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button" class="dropdown-item text-danger" data-confirm-delete>
-                                                <i class="fas fa-trash mr-2"></i> Remover
+                                                <i class="fas fa-trash me-2"></i> Remover
                                             </button>
                                         </form>
                                         <form action="{{ route('social.post.unpublish', $post) }}" method="POST" class="d-inline">
                                             @csrf
                                             <button type="submit" class="dropdown-item">
-                                                <i class="fas fa-eye-slash mr-2"></i> Despublicar
+                                                <i class="fas fa-eye-slash me-2"></i> Despublicar
                                             </button>
                                         </form>
                                         <div class="dropdown-divider"></div>
@@ -119,12 +119,12 @@
                                     <form action="{{ route('social.post.hide', $post) }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="dropdown-item">
-                                            <i class="fas fa-eye mr-2"></i> Ocultar postagem
+                                            <i class="fas fa-eye me-2"></i> Ocultar postagem
                                         </button>
                                     </form>
                                     @if(!(auth()->user()->isAdmin() || $post->user_id === auth()->id()))
-                                        <button type="button" class="dropdown-item text-danger" data-toggle="modal" data-target="#reportModal-{{ $post->id }}">
-                                            <i class="fas fa-flag mr-2"></i> Denunciar
+                                        <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#reportModal-{{ $post->id }}">
+                                            <i class="fas fa-flag me-2"></i> Denunciar
                                         </button>
                                     @endif
                                 </div>
@@ -154,7 +154,7 @@
                                     <button type="button" class="btn btn-light btn-sm position-absolute" style="top:50%;right:8px;transform:translateY(-50%);" data-next>
                                         <i class="fas fa-chevron-right"></i>
                                     </button>
-                                    <span class="badge badge-dark position-absolute" style="right:8px;bottom:8px;" data-counter>1/{{ $mediaCount }}</span>
+                                    <span class="badge text-bg-dark position-absolute" style="right:8px;bottom:8px;" data-counter>1/{{ $mediaCount }}</span>
                                 </div>
                             @endif
                         @endif
@@ -174,9 +174,7 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="reportModalLabel-{{ $post->id }}">Denunciar publicação</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                                 </div>
                                 <form action="{{ route('social.post.report', $post) }}" method="POST">
                                     @csrf
@@ -187,7 +185,7 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                         <button type="submit" class="btn btn-danger">Denunciar</button>
                                     </div>
                                 </form>
@@ -237,13 +235,13 @@
                                 @endphp
                                 <li class="d-flex align-items-center justify-content-between py-2">
                                     <div class="d-flex align-items-center">
-                                        <a class="mr-2" href="{{ route('social.profile', $user->id) }}">
+                                        <a class="me-2" href="{{ route('social.profile', $user->id) }}">
                                             <img src="{{ $user->profile_photo_url }}" alt="Avatar" class="img-circle"
                                                 style="width:36px;height:36px;object-fit:cover;"
                                                 onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                         </a>
                                         <div>
-                                            <a href="{{ route('social.profile', $user->id) }}" class="text-sm font-weight-bold text-dark">
+                                            <a href="{{ route('social.profile', $user->id) }}" class="text-sm fw-bold text-dark">
                                                 {{ $user->name }}
                                             </a>
                                             <div class="text-muted text-xs">
@@ -263,7 +261,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-end">
                                         @if($isConnected)
                                             <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
                                                 Conectado

@@ -36,13 +36,13 @@
     @endphp
 
     <div class="alert alert-info mb-4">
-        <i class="fas fa-cogs mr-2"></i> Configurações globais do sistema, segurança e armazenamento de arquivos.
+        <i class="fas fa-cogs me-2"></i> Configurações globais do sistema, segurança e armazenamento de arquivos.
     </div>
 
     {{-- SEGURANÇA --}}
     <div class="card card-outline card-danger mb-4">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold"><i class="fas fa-shield-alt mr-2"></i> Segurança (Google reCAPTCHA
+            <h3 class="card-title fw-bold"><i class="fas fa-shield-alt me-2"></i> Segurança (Google reCAPTCHA
                 v3)</h3>
         </div>
         <div class="card-body">
@@ -75,7 +75,7 @@
     </div>
 
     {{-- LIMITES --}}
-    <h5 class="text-primary mb-3"><i class="fas fa-server mr-2"></i> Limites e Uploads</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-server me-2"></i> Limites e Uploads</h5>
     <div class="row">
         <div class="col-md-6">
             <div class="info-box bg-light">
@@ -122,7 +122,7 @@
     {{-- ARMAZENAMENTO --}}
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold"><i class="fas fa-hdd mr-2"></i> Armazenamento (Filesystem)</h3>
+            <h3 class="card-title fw-bold"><i class="fas fa-hdd me-2"></i> Armazenamento (Filesystem)</h3>
         </div>
         <div class="card-body">
             <div class="alert alert-info mb-0">
@@ -135,34 +135,34 @@
     {{-- MANUTENCAO --}}
     <div class="card card-outline card-warning mt-4">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h3 class="card-title font-weight-bold mb-0">
-                <i class="fas fa-tools mr-2"></i> Modo de manutencao
+            <h3 class="card-title fw-bold mb-0">
+                <i class="fas fa-tools me-2"></i> Modo de manutencao
             </h3>
             @if($maintenanceEffective)
-                <span class="badge badge-warning px-3 py-2">ATIVO NO SITE</span>
+                <span class="badge text-bg-warning px-3 py-2">ATIVO NO SITE</span>
             @else
-                <span class="badge badge-success px-3 py-2">DESATIVADO</span>
+                <span class="badge text-bg-success px-3 py-2">DESATIVADO</span>
             @endif
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="border rounded p-3 mb-3 h-100">
-                        <h6 class="font-weight-bold">Ativacao manual imediata</h6>
+                        <h6 class="fw-bold">Ativacao manual imediata</h6>
                         <p class="text-muted small mb-3">Forca o site inteiro para manutencao agora.</p>
-                        <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                        <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success mb-3">
                             <input type="hidden" name="maintenance_enabled" value="0">
-                            <input type="checkbox" class="custom-control-input" id="maintenance_enabled" name="maintenance_enabled"
+                            <input type="checkbox" class="form-check-input" id="maintenance_enabled" name="maintenance_enabled"
                                 value="1" {{ $maintenanceManualEnabled ? 'checked' : '' }}>
-                            <label class="custom-control-label" for="maintenance_enabled">Ativar manutencao manual</label>
+                            <label class="form-check-label" for="maintenance_enabled">Ativar manutencao manual</label>
                         </div>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-warning btn-sm mr-2 mb-2" data-maintenance-action="manual-on">
-                                <i class="fas fa-power-off mr-1"></i> Ativar agora
+                            <button type="button" class="btn btn-warning btn-sm me-2 mb-2" data-maintenance-action="manual-on">
+                                <i class="fas fa-power-off me-1"></i> Ativar agora
                             </button>
                             <button type="button" class="btn btn-success btn-sm mb-2" data-maintenance-action="manual-off">
-                                <i class="fas fa-check-circle mr-1"></i> Desativar agora
+                                <i class="fas fa-check-circle me-1"></i> Desativar agora
                             </button>
                         </div>
                     </div>
@@ -170,13 +170,13 @@
 
                 <div class="col-lg-6">
                     <div class="border rounded p-3 mb-3 h-100">
-                        <h6 class="font-weight-bold">Ativacao automatica agendada</h6>
+                        <h6 class="fw-bold">Ativacao automatica agendada</h6>
                         <p class="text-muted small mb-3">Define uma janela para ativar e desativar automaticamente.</p>
-                        <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success mb-3">
+                        <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success mb-3">
                             <input type="hidden" name="maintenance_auto_enabled" value="0">
-                            <input type="checkbox" class="custom-control-input" id="maintenance_auto_enabled" name="maintenance_auto_enabled"
+                            <input type="checkbox" class="form-check-input" id="maintenance_auto_enabled" name="maintenance_auto_enabled"
                                 value="1" {{ $maintenanceAutoEnabled ? 'checked' : '' }}>
-                            <label class="custom-control-label" for="maintenance_auto_enabled">Habilitar agendamento automatico</label>
+                            <label class="form-check-label" for="maintenance_auto_enabled">Habilitar agendamento automatico</label>
                         </div>
 
                         <div class="row">
@@ -191,11 +191,11 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-primary btn-sm mr-2 mb-2" data-maintenance-action="auto-on">
-                                <i class="fas fa-clock mr-1"></i> Habilitar automatico
+                            <button type="button" class="btn btn-primary btn-sm me-2 mb-2" data-maintenance-action="auto-on">
+                                <i class="fas fa-clock me-1"></i> Habilitar automatico
                             </button>
                             <button type="button" class="btn btn-secondary btn-sm mb-2" data-maintenance-action="auto-off">
-                                <i class="fas fa-ban mr-1"></i> Desabilitar automatico
+                                <i class="fas fa-ban me-1"></i> Desabilitar automatico
                             </button>
                         </div>
                     </div>
@@ -204,7 +204,7 @@
 
             <hr class="my-4">
 
-            <h5 class="text-primary mb-3"><i class="fas fa-paint-brush mr-2"></i> Personalizacao da pagina de manutencao</h5>
+            <h5 class="text-primary mb-3"><i class="fas fa-paint-brush me-2"></i> Personalizacao da pagina de manutencao</h5>
             <div class="row">
                 <div class="col-md-6 form-group">
                     <label>Titulo da pagina</label>
@@ -239,7 +239,7 @@
 
             <hr class="my-4">
 
-            <h5 class="text-primary mb-3"><i class="fas fa-shield-alt mr-2"></i> Liberacao por IP e Dispositivo Autorizado</h5>
+            <h5 class="text-primary mb-3"><i class="fas fa-shield-alt me-2"></i> Liberacao por IP e Dispositivo Autorizado</h5>
             <div class="row">
                 <div class="col-md-6 form-group">
                     <label for="maintenance_allowed_ips">IPs ou faixas CIDR liberados (um por linha ou separados por virgula)</label>
@@ -247,7 +247,7 @@
                         placeholder="Ex.: 187.10.20.30&#10;192.168.1.0/24">{{ $settings['maintenance_allowed_ips'] ?? '' }}</textarea>
                     <small class="form-text text-muted">
                         Seu IP atual detectado: <code>{{ request()->header('CF-Connecting-IP') ?: request()->ip() }}</code>
-                        <button type="button" class="btn btn-xs btn-outline-info ml-2" id="btnAddCurrentIpAdmin">Usar meu IP</button>
+                        <button type="button" class="btn btn-xs btn-outline-info ms-2" id="btnAddCurrentIpAdmin">Usar meu IP</button>
                     </small>
                 </div>
                 <div class="col-md-6 form-group">
@@ -258,7 +258,7 @@
                             value="{{ $settings['maintenance_bypass_token'] ?? '' }}">
                         <div class="input-group-append">
                             <button type="button" class="btn btn-outline-primary" id="btnAuthorizeMaintenanceDeviceAdmin">
-                                <i class="fas fa-laptop-medical mr-1"></i> Autorizar este dispositivo
+                                <i class="fas fa-laptop-medical me-1"></i> Autorizar este dispositivo
                             </button>
                         </div>
                     </div>
@@ -273,36 +273,36 @@
     {{-- SUBDOMINIOS, CACHE DE BORDA & CDN --}}
     <div class="card card-outline card-primary mb-4">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-network-wired mr-2"></i> Subdominios, CDN e Cache Publico (Cloudflare/LiteSpeed)
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-network-wired me-2"></i> Subdominios, CDN e Cache Publico (Cloudflare/LiteSpeed)
             </h3>
         </div>
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-md-4">
-                    <div class="custom-control custom-switch">
+                    <div class="form-check form-switch">
                         <input type="hidden" name="domain_routing_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="domain_routing_enabled" name="domain_routing_enabled" value="1"
+                        <input type="checkbox" class="form-check-input" id="domain_routing_enabled" name="domain_routing_enabled" value="1"
                             {{ !empty($settings['domain_routing_enabled']) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="domain_routing_enabled">Ativar isolamento estrito por subdominio</label>
+                        <label class="form-check-label" for="domain_routing_enabled">Ativar isolamento estrito por subdominio</label>
                     </div>
                     <small class="text-muted d-block mt-1">Redireciona /admin, /painel e auth para o subdominio App em producao.</small>
                 </div>
                 <div class="col-md-4">
-                    <div class="custom-control custom-switch">
+                    <div class="form-check form-switch">
                         <input type="hidden" name="cdn_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="cdn_enabled" name="cdn_enabled" value="1"
+                        <input type="checkbox" class="form-check-input" id="cdn_enabled" name="cdn_enabled" value="1"
                             {{ !empty($settings['cdn_enabled']) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="cdn_enabled">Ativar subdominio CDN sem cookies</label>
+                        <label class="form-check-label" for="cdn_enabled">Ativar subdominio CDN sem cookies</label>
                     </div>
                     <small class="text-muted d-block mt-1">Serve imagens, CSS/JS e uploads via dominio estatico.</small>
                 </div>
                 <div class="col-md-4">
-                    <div class="custom-control custom-switch">
+                    <div class="form-check form-switch">
                         <input type="hidden" name="public_page_cache_enabled" value="0">
-                        <input type="checkbox" class="custom-control-input" id="public_page_cache_enabled" name="public_page_cache_enabled" value="1"
+                        <input type="checkbox" class="form-check-input" id="public_page_cache_enabled" name="public_page_cache_enabled" value="1"
                             {{ ($settings['public_page_cache_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="public_page_cache_enabled">Cache de borda para visitantes anonimos</label>
+                        <label class="form-check-label" for="public_page_cache_enabled">Cache de borda para visitantes anonimos</label>
                     </div>
                     <small class="text-muted d-block mt-1">Remove cookies nas paginas publicas para cache no Cloudflare/LSCache.</small>
                 </div>
@@ -341,15 +341,15 @@
     {{-- GOOGLE MEU NEGÓCIO --}}
     <div class="card card-outline card-info mb-4">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold">
-                <i class="fab fa-google mr-2"></i> Google Meu Negócio (Depoimentos)
+            <h3 class="card-title fw-bold">
+                <i class="fab fa-google me-2"></i> Google Meu Negócio (Depoimentos)
             </h3>
         </div>
         <div class="card-body">
             <p class="text-muted mb-3">
                 Configure o ID do local e a chave da API do Google para importar automaticamente os reviews
                 do Google Meu Negócio na seção de <strong>Depoimentos</strong>.
-                <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener" class="ml-1">
+                <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener" class="ms-1">
                     <i class="fas fa-external-link-alt fa-xs"></i> Como encontrar o Place ID
                 </a>
             </p>
@@ -381,7 +381,7 @@
                 </div>
             </div>
             <div class="alert alert-warning py-2 mb-0 small">
-                <i class="fas fa-exclamation-triangle mr-1"></i>
+                <i class="fas fa-exclamation-triangle me-1"></i>
                 A API pública do Google Places retorna os <strong>5 reviews mais recentes</strong>.
                 Após salvar as configurações, vá em <strong>Depoimentos → Importar do Google</strong>.
             </div>

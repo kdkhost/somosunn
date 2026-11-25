@@ -2,11 +2,11 @@
 
 <div class="card card-outline card-dark">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-newspaper mr-2"></i>Feed Social</h3>
+        <h3 class="card-title"><i class="fas fa-newspaper me-2"></i>Feed Social</h3>
     </div>
     <div class="card-body">
         <div class="callout callout-info">
-            <h5><i class="fas fa-info-circle mr-1"></i> Sobre esta página</h5>
+            <h5><i class="fas fa-info-circle me-1"></i> Sobre esta página</h5>
             <p class="mb-0">
                 A página do Feed Social é gerada dinamicamente com o conteúdo publicado pela comunidade.<br>
                 Não há seções de conteúdo estático editáveis além dos campos de SEO disponíveis na barra lateral direita.

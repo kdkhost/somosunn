@@ -18,7 +18,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-primary elevation-1"><i class="fas fa-graduation-cap"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Total de Cursos</span>
+                    <span class="info-box-text fw-bold">Total de Cursos</span>
                     <span class="info-box-number">{{ $totalCourses }}</span>
                     <span class="progress-description text-xs">Cadastrados na plataforma</span>
                 </div>
@@ -28,7 +28,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-success elevation-1"><i class="fas fa-check-circle"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Publicados</span>
+                    <span class="info-box-text fw-bold">Publicados</span>
                     <span class="info-box-number text-success">{{ $publishedCount }}</span>
                     <div class="progress progress-xs mt-2">
                         <div class="progress-bar bg-success" style="width: {{ $totalCourses > 0 ? round(($publishedCount / $totalCourses) * 100) : 0 }}%"></div>
@@ -41,7 +41,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-warning elevation-1"><i class="fas fa-pencil-alt"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Rascunhos</span>
+                    <span class="info-box-text fw-bold">Rascunhos</span>
                     <span class="info-box-number text-warning">{{ $draftCount }}</span>
                     <div class="progress progress-xs mt-2">
                         <div class="progress-bar bg-warning" style="width: {{ $totalCourses > 0 ? round(($draftCount / $totalCourses) * 100) : 0 }}%"></div>
@@ -55,13 +55,13 @@
     {{-- Tabela principal --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header border-0">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-book-open mr-2 text-primary"></i>Listagem de Cursos
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-book-open me-2 text-primary"></i>Listagem de Cursos
             </h3>
             <div class="card-tools">
                 @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('courses.create'))
                     <a href="{{ route('admin.courses.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 elevation-1">
-                        <i class="fas fa-plus mr-1"></i> Novo Curso
+                        <i class="fas fa-plus me-1"></i> Novo Curso
                     </a>
                 @endif
             </div>
@@ -72,9 +72,9 @@
                 <table id="example1" class="table table-hover align-middle mb-0">
                     <thead>
                         <tr class="bg-light">
-                            <th class="border-0 pl-4" style="width:80px;">Capa</th>
+                            <th class="border-0 ps-4" style="width:80px;">Capa</th>
                             <th class="border-0">Título</th>
-                            <th class="border-0 text-right">Preço</th>
+                            <th class="border-0 text-end">Preço</th>
                             <th class="border-0 text-center">Vendas / Inscritos</th>
                             <th class="border-0 text-center">Status</th>
                             <th class="border-0 text-center" style="width:150px;">Ações</th>
@@ -83,7 +83,7 @@
                     <tbody>
                         @forelse($courses as $c)
                             <tr>
-                                <td class="pl-4">
+                                <td class="ps-4">
                                     @if($c->thumbnail)
                                         <img src="{{ $c->thumbnail_url }}" alt="Capa" class="img-circle elevation-2"
                                             style="width: 46px; height: 46px; object-fit: cover;" loading="lazy" decoding="async">
@@ -95,28 +95,28 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="font-weight-bold text-sm">{{ $c->title }}</span>
+                                    <span class="fw-bold text-sm">{{ $c->title }}</span>
                                 </td>
-                                <td class="text-right">
-                                    <span class="font-weight-bold" style="font-size:14px;">R$ {{ number_format($c->price, 2, ',', '.') }}</span>
+                                <td class="text-end">
+                                    <span class="fw-bold" style="font-size:14px;">R$ {{ number_format($c->price, 2, ',', '.') }}</span>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column">
-                                        <span class="font-weight-bold">{{ (int) ($c->sales_count ?? 0) }} venda(s)</span>
+                                        <span class="fw-bold">{{ (int) ($c->sales_count ?? 0) }} venda(s)</span>
                                         <small class="text-muted">{{ (int) ($c->enrollments_count ?? 0) }} inscrito(s)</small>
                                     </div>
                                 </td>
                                 <td class="text-center">
                                     @if($c->status === 'published')
-                                        <span class="badge badge-success px-3 py-2" style="font-size:11px;">
-                                            <i class="fas fa-check-circle mr-1"></i>Publicado
+                                        <span class="badge text-bg-success px-3 py-2" style="font-size:11px;">
+                                            <i class="fas fa-check-circle me-1"></i>Publicado
                                         </span>
                                     @elseif($c->status === 'draft')
-                                        <span class="badge badge-warning px-3 py-2" style="font-size:11px;">
-                                            <i class="fas fa-pencil-alt mr-1"></i>Rascunho
+                                        <span class="badge text-bg-warning px-3 py-2" style="font-size:11px;">
+                                            <i class="fas fa-pencil-alt me-1"></i>Rascunho
                                         </span>
                                     @else
-                                        <span class="badge badge-secondary px-3 py-2" style="font-size:11px;">{{ ucfirst($c->status) }}</span>
+                                        <span class="badge text-bg-secondary px-3 py-2" style="font-size:11px;">{{ ucfirst($c->status) }}</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
@@ -145,11 +145,11 @@
                                     <div class="mb-3">
                                         <i class="fas fa-graduation-cap fa-3x text-muted"></i>
                                     </div>
-                                    <h5 class="text-muted font-weight-bold">Nenhum curso cadastrado</h5>
+                                    <h5 class="text-muted fw-bold">Nenhum curso cadastrado</h5>
                                     <p class="text-muted">Crie o primeiro curso para começar a oferecer conteúdo.</p>
                                     @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('courses.create'))
                                         <a href="{{ route('admin.courses.create') }}" class="btn btn-primary rounded-pill px-4 elevation-1">
-                                            <i class="fas fa-plus mr-1"></i> Novo Curso
+                                            <i class="fas fa-plus me-1"></i> Novo Curso
                                         </a>
                                     @endif
                                 </td>

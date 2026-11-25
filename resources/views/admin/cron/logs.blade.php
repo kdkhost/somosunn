@@ -15,7 +15,7 @@
                     <h3 class="card-title">Logs da Tarefa: <code>{{ $task->command }}</code></h3>
                     <div class="card-tools">
                         <a href="{{ route('admin.cron.index') }}" class="btn btn-tool text-white">
-                            <i class="fas fa-arrow-left mr-1"></i> Voltar
+                            <i class="fas fa-arrow-left me-1"></i> Voltar
                         </a>
                     </div>
                 </div>
@@ -32,7 +32,7 @@
                             @forelse($logs as $log)
                                 <tr>
                                     <td>{{ $log->executed_at->format('d/m/Y H:i:s') }}</td>
-                                    <td>{!! $log->success ? '<span class="badge badge-success">Sim</span>' : '<span class="badge badge-danger">Não</span>' !!}
+                                    <td>{!! $log->success ? '<span class="badge text-bg-success">Sim</span>' : '<span class="badge text-bg-danger">Não</span>' !!}
                                     </td>
                                     <td>
                                         <pre style="max-width:400px;white-space:pre-wrap;">{{ $log->output }}</pre>

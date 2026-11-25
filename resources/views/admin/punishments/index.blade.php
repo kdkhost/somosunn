@@ -4,9 +4,9 @@
 
 @section('content_header')
     <div class="d-flex justify-content-between align-items-center">
-        <h1><i class="fas fa-gavel text-danger mr-2"></i>Gestao de Punicoes</h1>
+        <h1><i class="fas fa-gavel text-danger me-2"></i>Gestao de Punicoes</h1>
         <div>
-            <a href="{{ route('admin.punishments.settings') }}" class="btn btn-outline-secondary btn-sm mr-2">
+            <a href="{{ route('admin.punishments.settings') }}" class="btn btn-outline-secondary btn-sm me-2">
                 <i class="fas fa-cog"></i> Configuracoes
             </a>
             <button type="button" class="btn btn-danger btn-sm" id="btn-apply-punishment">
@@ -47,7 +47,7 @@
                     <td>
                         <div class="d-flex align-items-center">
                             <img src="{{ $user->photo ? asset($user->photo) : asset('img/user.png') }}"
-                                 class="img-circle mr-2" style="width:32px;height:32px;object-fit:cover;" alt="" loading="lazy" decoding="async">
+                                 class="img-circle me-2" style="width:32px;height:32px;object-fit:cover;" alt="" loading="lazy" decoding="async">
                             <div>
                                 <strong>{{ $user->name }}</strong><br>
                                 <small class="text-muted">{{ $user->email }}</small>
@@ -56,14 +56,14 @@
                     </td>
                     <td>
                         @if($user->punishment_status === 'ambos')
-                            <span class="badge badge-danger">Bloqueado</span>
-                            <span class="badge badge-warning">Suspenso</span>
+                            <span class="badge text-bg-danger">Bloqueado</span>
+                            <span class="badge text-bg-warning">Suspenso</span>
                         @elseif($user->punishment_status === 'bloqueado')
-                            <span class="badge badge-danger">Bloqueado</span>
+                            <span class="badge text-bg-danger">Bloqueado</span>
                         @elseif($user->punishment_status === 'suspenso')
-                            <span class="badge badge-warning">Suspenso</span>
+                            <span class="badge text-bg-warning">Suspenso</span>
                         @else
-                            <span class="badge badge-success">Livre</span>
+                            <span class="badge text-bg-success">Livre</span>
                         @endif
                     </td>
                     <td>{{ $user->block_reason ?? '-' }}</td>
@@ -76,7 +76,7 @@
                     </td>
                     <td>
                         @if((int)$user->events_suspension_remaining > 0)
-                            <span class="badge badge-warning">{{ $user->events_suspension_remaining }} evento(s)</span>
+                            <span class="badge text-bg-warning">{{ $user->events_suspension_remaining }} evento(s)</span>
                         @else
                             <span class="text-muted">0</span>
                         @endif
@@ -165,16 +165,16 @@ $(function() {
             if (res.success) {
                 var u = res.user;
                 var statusBadge = '';
-                if (u.status === 'ambos') statusBadge = '<span class="badge badge-danger">Bloqueado</span> <span class="badge badge-warning">Suspenso</span>';
-                else if (u.status === 'bloqueado') statusBadge = '<span class="badge badge-danger">Bloqueado</span>';
-                else if (u.status === 'suspenso') statusBadge = '<span class="badge badge-warning">Suspenso</span>';
-                else statusBadge = '<span class="badge badge-success">Livre</span>';
+                if (u.status === 'ambos') statusBadge = '<span class="badge text-bg-danger">Bloqueado</span> <span class="badge text-bg-warning">Suspenso</span>';
+                else if (u.status === 'bloqueado') statusBadge = '<span class="badge text-bg-danger">Bloqueado</span>';
+                else if (u.status === 'suspenso') statusBadge = '<span class="badge text-bg-warning">Suspenso</span>';
+                else statusBadge = '<span class="badge text-bg-success">Livre</span>';
 
                 Swal.fire({
                     title: 'Detalhes da Punicao',
-                    html: '<div class="text-left">' +
+                    html: '<div class="text-start">' +
                         '<div class="d-flex align-items-center mb-3">' +
-                        '<img src="' + u.photo + '" class="img-circle mr-3" style="width:48px;height:48px;object-fit:cover;" loading="lazy" decoding="async">' +
+                        '<img src="' + u.photo + '" class="img-circle me-3" style="width:48px;height:48px;object-fit:cover;" loading="lazy" decoding="async">' +
                         '<div><strong>' + u.name + '</strong><br><small>' + u.email + '</small></div>' +
                         '</div>' +
                         '<table class="table table-sm table-bordered">' +
@@ -201,16 +201,16 @@ $(function() {
             Swal.fire({
                 title: 'Editar Punicao - ' + u.name,
                 html:
-                    '<div class="form-group text-left">' +
+                    '<div class="form-group text-start">' +
                     '<label>Duracao do bloqueio (horas a partir de agora)</label>' +
                     '<input type="number" id="swal-edit-hours" class="form-control" value="0" min="0">' +
                     '<small class="text-muted">0 = remover bloqueio de tempo</small>' +
                     '</div>' +
-                    '<div class="form-group text-left">' +
+                    '<div class="form-group text-start">' +
                     '<label>Motivo</label>' +
                     '<textarea id="swal-edit-reason" class="form-control" rows="2">' + (u.block_reason || '') + '</textarea>' +
                     '</div>' +
-                    '<div class="form-group text-left">' +
+                    '<div class="form-group text-start">' +
                     '<label>Eventos suspensos</label>' +
                     '<input type="number" id="swal-edit-events" class="form-control" value="' + u.events_suspension_remaining + '" min="0">' +
                     '</div>',
@@ -288,27 +288,27 @@ $(function() {
         Swal.fire({
             title: 'Aplicar Punicao Manual',
             html:
-                '<div class="form-group text-left">' +
+                '<div class="form-group text-start">' +
                 '<label>Usuario (nome ou email)</label>' +
                 '<input type="text" id="swal-user-search" class="form-control" placeholder="Buscar usuario...">' +
                 '<select id="swal-user-id" class="form-control mt-2" style="display:none;"></select>' +
                 '</div>' +
-                '<div class="form-group text-left">' +
+                '<div class="form-group text-start">' +
                 '<label>Duracao do bloqueio (horas)</label>' +
                 '<input type="number" id="swal-block-hours" class="form-control" value="48" min="0">' +
                 '</div>' +
-                '<div class="form-group text-left">' +
+                '<div class="form-group text-start">' +
                 '<label>Motivo</label>' +
                 '<textarea id="swal-reason" class="form-control" rows="2" placeholder="Motivo da punicao..."></textarea>' +
                 '</div>' +
-                '<div class="form-group text-left">' +
+                '<div class="form-group text-start">' +
                 '<label>Eventos suspensos</label>' +
                 '<input type="number" id="swal-events" class="form-control" value="2" min="0">' +
                 '</div>' +
-                '<div class="form-group text-left">' +
-                '<div class="custom-control custom-checkbox">' +
-                '<input type="checkbox" class="custom-control-input" id="swal-notify" checked>' +
-                '<label class="custom-control-label" for="swal-notify">Notificar usuario por email</label>' +
+                '<div class="form-group text-start">' +
+                '<div class="form-check">' +
+                '<input type="checkbox" class="form-check-input" id="swal-notify" checked>' +
+                '<label class="form-check-label" for="swal-notify">Notificar usuario por email</label>' +
                 '</div>' +
                 '</div>',
             showCancelButton: true,

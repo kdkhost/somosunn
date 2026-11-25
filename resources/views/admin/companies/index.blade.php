@@ -7,7 +7,7 @@
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <h1 class="m-0">Empresas</h1>
             <a href="{{ route('admin.companies.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus mr-1"></i> Nova empresa
+                <i class="fas fa-plus me-1"></i> Nova empresa
             </a>
         </div>
     </div>
@@ -23,14 +23,14 @@
                                 <th class="text-center">Membros</th>
                                 <th class="text-center">Patrocinios</th>
                                 <th class="text-center">Status</th>
-                                <th class="text-right">Acoes</th>
+                                <th class="text-end">Acoes</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($companies as $company)
                                 <tr>
                                     <td>
-                                        <div class="font-weight-bold">{{ $company->name }}</div>
+                                        <div class="fw-bold">{{ $company->name }}</div>
                                         <div class="small text-muted">{{ $company->slug }}</div>
                                     </td>
                                     <td>{{ trim(($company->city ? $company->city . ' / ' : '') . $company->state) ?: '-' }}</td>
@@ -39,7 +39,7 @@
                                     <td class="text-center">
                                         <span class="badge badge-{{ $company->active ? 'success' : 'secondary' }}">{{ $company->active ? 'Ativa' : 'Inativa' }}</span>
                                     </td>
-                                    <td class="text-right">
+                                    <td class="text-end">
                                         <a href="{{ route('companies.show', $company->slug) }}" target="_blank" class="btn btn-sm btn-outline-info">Publico</a>
                                         <a href="{{ route('admin.companies.edit', $company) }}" class="btn btn-sm btn-outline-primary">Editar</a>
                                     </td>

@@ -12,7 +12,7 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
-                    <i class="fas fa-star mr-2"></i>
+                    <i class="fas fa-star me-2"></i>
                     {{ $rule->id ? 'Editar Regra de Pontuação' : 'Nova Regra de Pontuação' }}
                 </h3>
             </div>
@@ -128,10 +128,10 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <div class="custom-control custom-switch">
-                                    <input type="checkbox" name="active" id="active" class="custom-control-input" 
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" name="active" id="active" class="form-check-input" 
                                         {{ old('active', $rule->active ?? true) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="active">
+                                    <label class="form-check-label" for="active">
                                         <strong>Regra ativa</strong>
                                         <br><small class="text-muted">Desative para pausar temporariamente</small>
                                     </label>
@@ -140,10 +140,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <div class="custom-control custom-switch">
-                                    <input type="checkbox" name="repeatable" id="repeatable" class="custom-control-input" 
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" name="repeatable" id="repeatable" class="form-check-input" 
                                         {{ old('repeatable', $rule->repeatable ?? false) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="repeatable">
+                                    <label class="form-check-label" for="repeatable">
                                         <strong>Repetível</strong>
                                         <br><small class="text-muted">Pode ser ganho múltiplas vezes</small>
                                     </label>
@@ -154,10 +154,10 @@
                     @else
                     {{-- Versão simples sem campos avançados --}}
                     <div class="form-group">
-                        <div class="custom-control custom-switch">
-                            <input type="checkbox" name="active" id="active" class="custom-control-input" 
+                        <div class="form-check form-switch">
+                            <input type="checkbox" name="active" id="active" class="form-check-input" 
                                 {{ old('active', $rule->active ?? true) ? 'checked' : '' }}>
-                            <label class="custom-control-label" for="active">
+                            <label class="form-check-label" for="active">
                                 <strong>Regra ativa</strong>
                             </label>
                         </div>
@@ -168,10 +168,10 @@
 
                     <div class="d-flex justify-content-between">
                         <a href="{{ route('admin.points-rules.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left mr-1"></i>Voltar
+                            <i class="fas fa-arrow-left me-1"></i>Voltar
                         </a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save mr-1"></i>{{ $rule->id ? 'Salvar alterações' : 'Criar regra' }}
+                            <i class="fas fa-save me-1"></i>{{ $rule->id ? 'Salvar alterações' : 'Criar regra' }}
                         </button>
                     </div>
                 </form>
@@ -182,10 +182,10 @@
     <div class="col-lg-4">
         <div class="card">
             <div class="card-header bg-info text-white">
-                <h3 class="card-title mb-0"><i class="fas fa-lightbulb mr-2"></i>Dicas</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-lightbulb me-2"></i>Dicas</h3>
             </div>
             <div class="card-body">
-                <h6><i class="fas fa-key mr-2"></i>Chaves sugeridas:</h6>
+                <h6><i class="fas fa-key me-2"></i>Chaves sugeridas:</h6>
                 <ul class="small text-muted mb-3">
                     <li><code>signup</code> - Cadastro na plataforma</li>
                     <li><code>daily_login</code> - Login diário</li>
@@ -199,7 +199,7 @@
                     <li><code>review</code> - Avaliar conteúdo</li>
                 </ul>
 
-                <h6><i class="fas fa-palette mr-2"></i>Ícones populares:</h6>
+                <h6><i class="fas fa-palette me-2"></i>Ícones populares:</h6>
                 <div class="small text-muted">
                     <code>fas fa-star</code><br>
                     <code>fas fa-trophy</code><br>

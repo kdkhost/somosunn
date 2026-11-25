@@ -4,7 +4,7 @@
 <div class="tab-pane fade" id="sec-hero">
     <div class="card card-outline card-warning">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-graduation-cap mr-1"></i> Hero</h3>
+            <h3 class="card-title"><i class="fas fa-graduation-cap me-1"></i> Hero</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -22,7 +22,7 @@
                 <textarea name="hero_subtitle" rows="2" class="form-control summernote-sm">{{ old('hero_subtitle', $data['hero_subtitle'] ?? '') }}</textarea>
             </div>
             <div class="form-group mb-0">
-                <label class="font-weight-bold">Imagem de destaque</label>
+                <label class="fw-bold">Imagem de destaque</label>
                 @include('admin.components.upload-global', ['name' => 'hero_image', 'accept' => 'image/*'])
             </div>
         </div>

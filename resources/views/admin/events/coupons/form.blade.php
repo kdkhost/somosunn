@@ -7,17 +7,17 @@
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header d-flex flex-wrap align-items-center justify-content-between">
             <div>
-                <h3 class="card-title font-weight-bold mb-0">
-                    <i class="fas fa-ticket-alt mr-2"></i>{{ $coupon->exists ? 'Editar cupom' : 'Novo cupom' }}
+                <h3 class="card-title fw-bold mb-0">
+                    <i class="fas fa-ticket-alt me-2"></i>{{ $coupon->exists ? 'Editar cupom' : 'Novo cupom' }}
                 </h3>
                 <small class="text-muted d-block">{{ $event->title }}</small>
             </div>
-            <div class="ml-auto">
+            <div class="ms-auto">
                 <a href="{{ route($eventsRoutePrefix . '.edit', $event) }}" class="btn btn-outline-secondary btn-sm rounded-pill" data-pjax>
-                    <i class="fas fa-calendar-check mr-1"></i> Evento
+                    <i class="fas fa-calendar-check me-1"></i> Evento
                 </a>
                 <a href="{{ route($eventsRoutePrefix . '.edit', ['event' => $event, 'tab' => 'coupons']) }}" class="btn btn-outline-primary btn-sm rounded-pill" data-pjax>
-                    <i class="fas fa-arrow-left mr-1"></i> Cupons
+                    <i class="fas fa-arrow-left me-1"></i> Cupons
                 </a>
             </div>
         </div>
@@ -119,7 +119,7 @@
             </div>
             <div class="card-footer d-flex justify-content-between">
                 <a href="{{ route($eventsRoutePrefix . '.edit', ['event' => $event, 'tab' => 'coupons']) }}" class="btn btn-outline-secondary rounded-pill" data-pjax>Cancelar</a>
-                <button class="btn btn-primary rounded-pill"><i class="fas fa-save mr-1"></i> Salvar cupom</button>
+                <button class="btn btn-primary rounded-pill"><i class="fas fa-save me-1"></i> Salvar cupom</button>
             </div>
         </form>
     </div>

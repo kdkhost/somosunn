@@ -14,11 +14,11 @@
         <div class="card-header p-0 pt-1 border-bottom-0">
             <ul class="nav nav-tabs" id="mentorship-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="general-tab" data-toggle="pill" href="#general" role="tab"
+                    <a class="nav-link active" id="general-tab" data-bs-toggle="pill" href="#general" role="tab"
                         aria-controls="general" aria-selected="true">Dados Gerais</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="cert-tab" data-toggle="pill" href="#certificate" role="tab"
+                    <a class="nav-link" id="cert-tab" data-bs-toggle="pill" href="#certificate" role="tab"
                         aria-controls="certificate" aria-selected="false">Certificado</a>
                 </li>
             </ul>
@@ -43,7 +43,7 @@
                             @method('PUT')
                         @endif
 
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-8">
                                 <label for="title">Titulo</label>
                                 <input id="title" name="title" class="form-control @error('title') is-invalid @enderror"
@@ -69,7 +69,7 @@
                         </div>
 
                         <div class="form-group mb-4">
-                            <label class="font-weight-bold"><i class="fas fa-eye mr-1"></i> Onde Exibir?</label>
+                            <label class="fw-bold"><i class="fas fa-eye me-1"></i> Onde Exibir?</label>
                             <select name="visibility" class="form-control" style="border-radius: 8px;">
                                 <option value="ambos" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'ambos' ? 'selected' : '' }}>Ambos os locais</option>
                                 <option value="somos_unn" {{ old('visibility', $mentorship->visibility ?? 'ambos') == 'somos_unn' ? 'selected' : '' }}>Somente Somos UNN</option>
@@ -78,7 +78,7 @@
                             <small class="text-muted">Selecione onde esta mentoria deve ser exibida.</small>
                         </div>
 
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-6">
                                 <label for="price">Preco (R$)</label>
                                 <input id="price" name="price" type="number" step="0.01" min="0"
@@ -101,8 +101,8 @@
 
                         <div class="card bg-light border-0 mb-4">
                             <div class="card-body">
-                                <h6 class="text-muted mb-3"><i class="fas fa-bolt mr-2"></i> Promoção relâmpago</h6>
-                                <div class="form-row">
+                                <h6 class="text-muted mb-3"><i class="fas fa-bolt me-2"></i> Promoção relâmpago</h6>
+                                <div class="row g-2">
                                     <div class="form-group col-md-6">
                                         <label for="flash_sale_price">Preço promocional (R$)</label>
                                         <input id="flash_sale_price" name="flash_sale_price" type="number" step="0.01" min="0"
@@ -138,7 +138,7 @@
 
                         <div class="card bg-light border-0 mb-4">
                             <div class="card-body">
-                                <label class="mb-2"><i class="fas fa-image mr-1"></i> Foto de Capa</label>
+                                <label class="mb-2"><i class="fas fa-image me-1"></i> Foto de Capa</label>
                                 <div class="row align-items-center">
                                     <div class="col-md-4">
                                         @if($mentorship->image)
@@ -163,9 +163,9 @@
                                         @enderror
 
                                         @if($mentorship->image)
-                                            <div class="custom-control custom-switch mt-2">
-                                                <input type="checkbox" class="custom-control-input" id="remove_image" name="remove_image" value="1">
-                                                <label class="custom-control-label" for="remove_image">Remover imagem atual</label>
+                                            <div class="form-check form-switch mt-2">
+                                                <input type="checkbox" class="form-check-input" id="remove_image" name="remove_image" value="1">
+                                                <label class="form-check-label" for="remove_image">Remover imagem atual</label>
                                             </div>
                                         @endif
                                     </div>
@@ -173,7 +173,7 @@
                             </div>
                         </div>
 
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-4">
                                 <label for="type">Tipo</label>
                                 <select id="type" name="type" class="form-control @error('type') is-invalid @enderror">
@@ -227,7 +227,7 @@
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('admin.mentorships.index') }}" class="btn btn-outline-secondary">Voltar</a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save mr-1"></i> Salvar mentoria
+                                <i class="fas fa-save me-1"></i> Salvar mentoria
                             </button>
                         </div>
                     </form>
@@ -237,7 +237,7 @@
                 <div class="tab-pane fade" id="certificate" role="tabpanel" aria-labelledby="cert-tab">
                     @if(!$mentorship->exists)
                         <div class="alert alert-info border-0 shadow-sm">
-                            <i class="fas fa-info-circle mr-2"></i> Você poderá configurar o certificado após salvar a mentoria
+                            <i class="fas fa-info-circle me-2"></i> Você poderá configurar o certificado após salvar a mentoria
                             pela primeira vez.
                         </div>
                     @else
@@ -257,7 +257,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text">Zoom</span>
                                                         </div>
-                                                        <select id="cert-zoom" class="custom-select custom-select-sm">
+                                                        <select id="cert-zoom" class="form-select custom-select-sm">
                                                             <option value="0.5">50%</option>
                                                             <option value="0.75">75%</option>
                                                             <option value="1" selected>100%</option>
@@ -306,19 +306,19 @@
 
                                 <div class="col-12 mt-3">
                                     <div class="card shadow-sm border-0">
-                                        <div class="card-header bg-dark text-white font-weight-bold">Configurações</div>
+                                        <div class="card-header bg-dark text-white fw-bold">Configurações</div>
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-12 col-xl-6">
-                                            <div class="form-group custom-control custom-switch mb-4">
-                                                <input type="checkbox" class="custom-control-input" id="is_certificate_enabled"
+                                            <div class="form-group form-check form-switch mb-4">
+                                                <input type="checkbox" class="form-check-input" id="is_certificate_enabled"
                                                     name="is_certificate_enabled" value="1" {{ $mentorship->is_certificate_enabled ? 'checked' : '' }}>
-                                                <label class="custom-control-label font-weight-bold"
+                                                <label class="form-check-label fw-bold"
                                                     for="is_certificate_enabled">Habilitar Certificado</label>
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="small text-muted text-uppercase font-weight-bold">Fundo do
+                                                <label class="small text-muted text-uppercase fw-bold">Fundo do
                                                     Certificado</label>
                                                 <div class="custom-file">
                                                     <input type="file" class="custom-file-input" name="certificate_bg"
@@ -329,7 +329,7 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="small text-muted text-uppercase font-weight-bold">Ajuste do
+                                                <label class="small text-muted text-uppercase fw-bold">Ajuste do
                                                     Fundo</label>
                                                 <select id="cert-bg-fit" class="form-control form-control-sm">
                                                     <option value="cover">Cover (cortar)</option>
@@ -358,7 +358,7 @@
                                             @endphp
 
                                             <div class="form-group">
-                                                <label class="small text-muted text-uppercase font-weight-bold">Título do
+                                                <label class="small text-muted text-uppercase fw-bold">Título do
                                                     Certificado</label>
                                                 <input type="text" class="form-control" name="certificate_title"
                                                     id="certificate_title"
@@ -367,7 +367,7 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="small text-muted text-uppercase font-weight-bold">Texto de
+                                                <label class="small text-muted text-uppercase fw-bold">Texto de
                                                     Apresentação</label>
                                                 <textarea class="form-control" name="presentation_text" id="presentation_text"
                                                     rows="2"
@@ -376,7 +376,7 @@
                                             </div>
 
                                             <div class="form-group mt-3">
-                                                <label class="small text-muted text-uppercase font-weight-bold">Assinatura do
+                                                <label class="small text-muted text-uppercase fw-bold">Assinatura do
                                                     Mentor</label>
                                                 @if($mentorship->instructor_signature)
                                                     <div class="mb-2 text-center border p-2 bg-light rounded">
@@ -393,11 +393,11 @@
 
                                             <hr>
 
-                                            <h6 class="small text-muted text-uppercase font-weight-bold mb-2">Ferramentas</h6>
+                                            <h6 class="small text-muted text-uppercase fw-bold mb-2">Ferramentas</h6>
                                             <div class="bg-light p-2 rounded border mb-3">
-                                                <div class="custom-control custom-switch mb-2">
-                                                    <input type="checkbox" class="custom-control-input" id="cert-grid-enabled">
-                                                    <label class="custom-control-label" for="cert-grid-enabled">Mostrar
+                                                <div class="form-check form-switch mb-2">
+                                                    <input type="checkbox" class="form-check-input" id="cert-grid-enabled">
+                                                    <label class="form-check-label" for="cert-grid-enabled">Mostrar
                                                         grade</label>
                                                 </div>
                                                 <div class="form-group mb-2">
@@ -411,10 +411,10 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="custom-control custom-switch mb-2">
-                                                    <input type="checkbox" class="custom-control-input" id="cert-snap-enabled"
+                                                <div class="form-check form-switch mb-2">
+                                                    <input type="checkbox" class="form-check-input" id="cert-snap-enabled"
                                                         checked>
-                                                    <label class="custom-control-label" for="cert-snap-enabled">Snap na
+                                                    <label class="form-check-label" for="cert-snap-enabled">Snap na
                                                         grade</label>
                                                 </div>
                                                 <div class="form-group mb-2">
@@ -441,13 +441,13 @@
                                                 <div class="col-12 col-xl-6 mt-3 mt-xl-0">
                                                     <hr class="d-xl-none">
 
-                                                    <h6 class="small text-muted text-uppercase font-weight-bold mb-2">Camadas</h6>
+                                                    <h6 class="small text-muted text-uppercase fw-bold mb-2">Camadas</h6>
                                             <div class="list-group mb-3" id="cert-layers"></div>
 
                                             <div id="cert-style-controls" style="display:none;">
-                                                <label class="small text-muted text-uppercase font-weight-bold mb-2">Editar:
+                                                <label class="small text-muted text-uppercase fw-bold mb-2">Editar:
                                                     <span id="selected-elem-name" class="text-primary"></span></label>
-                                                <div class="form-row">
+                                                <div class="row g-2">
                                                     <div class="col-6">
                                                         <div class="form-group mb-2">
                                                             <label class="small mb-1">X (%)</label>
@@ -463,9 +463,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="custom-control custom-switch mb-2">
-                                                    <input type="checkbox" class="custom-control-input" id="style-locked">
-                                                    <label class="custom-control-label" for="style-locked">Bloquear
+                                                <div class="form-check form-switch mb-2">
+                                                    <input type="checkbox" class="form-check-input" id="style-locked">
+                                                    <label class="form-check-label" for="style-locked">Bloquear
                                                         elemento</label>
                                                 </div>
                                                 <div class="form-group mb-2">
@@ -500,7 +500,7 @@
                                                         <option value="'Courier New', monospace">Courier New</option>
                                                     </select>
                                                 </div>
-                                                <div id="logo-dims" class="form-row" style="display:none;">
+                                                <div id="logo-dims" class="row g-2" style="display:none;">
                                                     <div class="col-6">
                                                         <label class="small mb-1">Largura</label>
                                                         <input type="number" id="logo-width"
@@ -516,16 +516,16 @@
 
                                             <div class="mt-4">
                                                 <label
-                                                    class="small text-muted text-uppercase font-weight-bold mb-2">Visibilidade</label>
+                                                    class="small text-muted text-uppercase fw-bold mb-2">Visibilidade</label>
                                                 <div class="list-group list-group-flush border rounded overflow-hidden">
                                                     @foreach(['student_name' => 'Nome do Aluno', 'course_name' => 'Nome da Mentoria', 'completion_date' => 'Data Conclusão', 'certificate_code' => 'Cód. Validação', 'author_name' => 'Nome do Mentor', 'workload_hours' => 'Horas', 'title' => 'Título do Certificado', 'presentation_text' => 'Texto de Apresentação', 'instructor_signature' => 'Assinatura do Mentor', 'platform_logo' => 'Logo UNN'] as $tag => $label)
                                                         <div
                                                             class="list-group-item py-2 px-3 d-flex justify-content-between align-items-center bg-light">
-                                                            <span class="small font-weight-bold">{{ $label }}</span>
-                                                            <div class="custom-control custom-switch">
-                                                                <input type="checkbox" class="custom-control-input cert-toggle"
+                                                            <span class="small fw-bold">{{ $label }}</span>
+                                                            <div class="form-check form-switch">
+                                                                <input type="checkbox" class="form-check-input cert-toggle"
                                                                     id="toggle-{{ $tag }}" data-tag="{{ $tag }}" checked>
-                                                                <label class="custom-control-label" for="toggle-{{ $tag }}"></label>
+                                                                <label class="form-check-label" for="toggle-{{ $tag }}"></label>
                                                             </div>
                                                         </div>
                                                     @endforeach
@@ -536,8 +536,8 @@
                                             </div>
 
                                             <input type="hidden" name="certificate_settings" id="certificate_settings_input">
-                                            <button type="submit" class="btn btn-primary btn-block mt-4" id="btn-save-cert">
-                                                <i class="fas fa-save mr-1"></i> Salvar Certificado
+                                            <button type="submit" class="btn btn-primary w-100 mt-4" id="btn-save-cert">
+                                                <i class="fas fa-save me-1"></i> Salvar Certificado
                                             </button>
                                         </div>
                                     </div>
@@ -744,7 +744,7 @@
                 }, 50);
             }
 
-            $('a[data-toggle="tab"][href="#certificate"]').on('shown.bs.tab', function () {
+            $('a[data-bs-toggle="tab"][href="#certificate"]').on('shown.bs.tab', function () {
                 scheduleFitCanvas();
             });
             scheduleFitCanvas();
@@ -836,13 +836,13 @@
                     const $right = $('<span>').addClass('d-flex align-items-center');
 
                     if (item.key !== 'platform_logo' && !item.visible) {
-                        $right.append($('<span>').addClass('badge badge-secondary mr-1').text('Oculto'));
+                        $right.append($('<span>').addClass('badge text-bg-secondary me-1').text('Oculto'));
                     }
                     if (item.locked) {
-                        $right.append($('<span>').addClass('badge badge-warning mr-1').text('Lock'));
+                        $right.append($('<span>').addClass('badge text-bg-warning me-1').text('Lock'));
                     }
 
-                    $right.append($('<span>').addClass('badge badge-light border').text('z:' + item.zIndex));
+                    $right.append($('<span>').addClass('badge text-bg-light border').text('z:' + item.zIndex));
 
                     $btn.append($left).append($right);
                     $btn.on('click', function () {

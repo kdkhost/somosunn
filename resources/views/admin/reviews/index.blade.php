@@ -47,13 +47,13 @@
     {{-- Main Content --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-star text-warning mr-2"></i>Avaliacoes (cursos e mentorias)
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-star text-warning me-2"></i>Avaliacoes (cursos e mentorias)
             </h3>
         </div>
         <div class="card-body">
             <form method="GET" class="mb-3">
-                <div class="form-row">
+                <div class="row g-2">
                     <div class="col-md-3 mb-2">
                         <select name="status" class="form-control form-control-sm">
                             <option value="">Todos os status</option>
@@ -74,8 +74,8 @@
                             placeholder="Buscar por item, usuario ou comentario">
                     </div>
                     <div class="col-md-2 mb-2">
-                        <button class="btn btn-primary btn-sm btn-block rounded-pill elevation-1">
-                            <i class="fas fa-search mr-1"></i>Filtrar
+                        <button class="btn btn-primary btn-sm w-100 rounded-pill elevation-1">
+                            <i class="fas fa-search me-1"></i>Filtrar
                         </button>
                     </div>
                 </div>
@@ -90,7 +90,7 @@
                             <th>Avaliacao</th>
                             <th>Comentario</th>
                             <th>Status</th>
-                            <th class="text-right">Acoes</th>
+                            <th class="text-end">Acoes</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -104,15 +104,15 @@
                             @endphp
                             <tr>
                                 <td>
-                                    <div class="font-weight-bold">{{ $reviewTitle }}</div>
-                                    <span class="badge badge-light border"><i class="fas fa-tag mr-1"></i>{{ $reviewType }}</span>
+                                    <div class="fw-bold">{{ $reviewTitle }}</div>
+                                    <span class="badge text-bg-light border"><i class="fas fa-tag me-1"></i>{{ $reviewType }}</span>
                                 </td>
                                 <td>
-                                    <div class="font-weight-bold">{{ $review->user->name ?? 'Usuario removido' }}</div>
+                                    <div class="fw-bold">{{ $review->user->name ?? 'Usuario removido' }}</div>
                                     <div class="text-muted small">{{ $review->user->email ?? '-' }}</div>
                                 </td>
                                 <td>
-                                    <div class="font-weight-bold">{{ $review->rating }}/5</div>
+                                    <div class="fw-bold">{{ $review->rating }}/5</div>
                                     <div class="text-warning" style="letter-spacing: 1px;">
                                         @for($i = 1; $i <= 5; $i++)
                                             <i class="{{ $i <= $review->rating ? 'fas' : 'far' }} fa-star"></i>
@@ -123,19 +123,19 @@
                                     {{ \Illuminate\Support\Str::limit($review->comment, 140) }}
                                     @if($review->moderation_notes)
                                         <div class="small text-danger mt-1">
-                                            <i class="fas fa-comment-dots mr-1"></i>{{ $review->moderation_notes }}
+                                            <i class="fas fa-comment-dots me-1"></i>{{ $review->moderation_notes }}
                                         </div>
                                     @endif
                                 </td>
                                 <td>
                                     <span class="badge badge-{{ $statusClass }}">
-                                        <i class="fas {{ $statusIcon }} mr-1"></i>{{ $statusName }}
+                                        <i class="fas {{ $statusIcon }} me-1"></i>{{ $statusName }}
                                     </span>
                                     @if($review->moderator)
                                         <div class="text-muted small mt-1">por {{ $review->moderator->name }}</div>
                                     @endif
                                 </td>
-                                <td class="text-right" style="white-space:nowrap">
+                                <td class="text-end" style="white-space:nowrap">
                                     @if($review->status !== 'approved')
                                         <form method="POST" action="{{ route('admin.reviews.approve', $review) }}" class="d-inline">
                                             @csrf

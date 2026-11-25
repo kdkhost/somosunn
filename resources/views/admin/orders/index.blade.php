@@ -23,7 +23,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-info elevation-1"><i class="fas fa-chart-line"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Receita Contabilizada</span>
+                    <span class="info-box-text fw-bold">Receita Contabilizada</span>
                     <span class="info-box-number text-info">R$ {{ number_format((float) ($accountedRevenue ?? 0), 2, ',', '.') }}</span>
                     <span class="progress-description text-xs">{{ (int) ($accountedCount ?? 0) }} pedidos pagos reais</span>
                 </div>
@@ -33,7 +33,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-warning elevation-1"><i class="fas fa-handshake"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Aprovações Manuais</span>
+                    <span class="info-box-text fw-bold">Aprovações Manuais</span>
                     <span class="info-box-number text-warning">R$ {{ number_format((float) ($manualRevenue ?? 0), 2, ',', '.') }}</span>
                     <span class="progress-description text-xs">{{ (int) ($manualCount ?? 0) }} pedidos por permuta/manual</span>
                 </div>
@@ -43,7 +43,7 @@
             <div class="info-box shadow-sm elevation-1">
                 <span class="info-box-icon bg-gradient-secondary elevation-1"><i class="fas fa-users"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text font-weight-bold">Usuários Manual</span>
+                    <span class="info-box-text fw-bold">Usuários Manual</span>
                     <span class="info-box-number">{{ (int) ($manualUsersCount ?? 0) }}</span>
                     <span class="progress-description text-xs">Separados do financeiro contabilizado</span>
                 </div>
@@ -51,34 +51,34 @@
         </div>
     </div>
 
-    <div class="mb-3 text-right">
+    <div class="mb-3 text-end">
         <a href="{{ route('admin.orders.sales-report', request()->query()) }}" class="btn btn-outline-primary rounded-pill px-4">
-            <i class="fas fa-chart-bar mr-1"></i> Relatorio por item
+            <i class="fas fa-chart-bar me-1"></i> Relatorio por item
         </a>
     </div>
 
     {{-- Filtro --}}
     <div class="card card-outline card-primary shadow-sm mb-4">
         <div class="card-header border-0 py-2">
-            <h3 class="card-title text-sm font-weight-bold"><i class="fas fa-filter mr-2 text-primary"></i>Filtro Financeiro e Relatório</h3>
+            <h3 class="card-title text-sm fw-bold"><i class="fas fa-filter me-2 text-primary"></i>Filtro Financeiro e Relatório</h3>
             <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i class="fas fa-minus"></i></button>
             </div>
         </div>
         <div class="card-body pt-2">
             <form action="{{ route('admin.orders.index') }}" method="GET" class="row">
                 <div class="col-md-3 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Busca</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Busca</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
-                            <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-muted"></i></span>
+                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                         </div>
-                        <input type="text" name="search" class="form-control border-left-0" placeholder="ID, transação, cliente"
+                        <input type="text" name="search" class="form-control border-start-0" placeholder="ID, transação, cliente"
                             value="{{ request('search') }}">
                     </div>
                 </div>
                 <div class="col-md-2 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Status</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Status</label>
                     <select name="status" class="form-control">
                         <option value="">Todos</option>
                         <option value="paid" {{ $statusValue === 'paid' ? 'selected' : '' }}>Pago</option>
@@ -89,7 +89,7 @@
                     </select>
                 </div>
                 <div class="col-md-2 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Tipo</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Tipo</label>
                     <select name="sale_type" class="form-control">
                         <option value="">Todos</option>
                         @foreach($saleTypeLabels ?? [] as $key => $label)
@@ -98,7 +98,7 @@
                     </select>
                 </div>
                 <div class="col-md-2 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Escopo da Lista</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Escopo da Lista</label>
                     <select name="payment_scope" class="form-control">
                         <option value="all" {{ $paymentScope === 'all' ? 'selected' : '' }}>Todos</option>
                         <option value="accounted" {{ $paymentScope === 'accounted' ? 'selected' : '' }}>Contabilizado</option>
@@ -106,7 +106,7 @@
                     </select>
                 </div>
                 <div class="col-md-2 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Período</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Período</label>
                     <select name="period" class="form-control">
                         <option value="monthly" {{ $periodValue === 'monthly' ? 'selected' : '' }}>Mensal</option>
                         <option value="bimonthly" {{ $periodValue === 'bimonthly' ? 'selected' : '' }}>Bimestral</option>
@@ -117,15 +117,15 @@
                     </select>
                 </div>
                 <div class="col-md-1 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">De</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">De</label>
                     <input type="date" name="date_from" class="form-control" value="{{ $dateFrom }}">
                 </div>
                 <div class="col-md-1 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Até</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Até</label>
                     <input type="date" name="date_to" class="form-control" value="{{ $dateTo }}">
                 </div>
                 <div class="col-md-2 mb-2">
-                    <label class="mb-1 text-xs font-weight-bold text-muted">Escopo do Relatório</label>
+                    <label class="mb-1 text-xs fw-bold text-muted">Escopo do Relatório</label>
                     <select name="report_scope" class="form-control">
                         <option value="accounted" {{ $reportScope === 'accounted' ? 'selected' : '' }}>Somente contabilizado</option>
                         <option value="manual" {{ $reportScope === 'manual' ? 'selected' : '' }}>Somente manual</option>
@@ -134,49 +134,49 @@
                 </div>
                 <div class="col-md-12 mb-2 d-flex align-items-end" style="gap:8px;">
                     <button type="submit" class="btn btn-primary rounded-pill px-4 elevation-1">
-                        <i class="fas fa-filter mr-1"></i> Aplicar
+                        <i class="fas fa-filter me-1"></i> Aplicar
                     </button>
                     <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary rounded-pill px-3">
-                        <i class="fas fa-times mr-1"></i> Limpar
+                        <i class="fas fa-times me-1"></i> Limpar
                     </a>
                 </div>
             </form>
         </div>
         <div class="card-footer bg-light d-flex flex-wrap align-items-center" style="gap:8px;">
-            <span class="font-weight-bold text-sm mr-2"><i class="fas fa-file-export mr-1 text-muted"></i>Exportar:</span>
+            <span class="fw-bold text-sm me-2"><i class="fas fa-file-export me-1 text-muted"></i>Exportar:</span>
             <a href="{{ route('admin.orders.report.export', array_merge(['format' => 'pdf'], $exportParams)) }}"
                 class="btn btn-sm btn-danger rounded-pill px-3 elevation-1">
-                <i class="fas fa-file-pdf mr-1"></i> PDF
+                <i class="fas fa-file-pdf me-1"></i> PDF
             </a>
             <a href="{{ route('admin.orders.report.export', array_merge(['format' => 'xml'], $exportParams)) }}"
                 class="btn btn-sm btn-info rounded-pill px-3 elevation-1">
-                <i class="fas fa-file-code mr-1"></i> XML
+                <i class="fas fa-file-code me-1"></i> XML
             </a>
             <a href="{{ route('admin.orders.report.export', array_merge(['format' => 'csv'], $exportParams)) }}"
                 class="btn btn-sm btn-success rounded-pill px-3 elevation-1">
-                <i class="fas fa-file-csv mr-1"></i> CSV
+                <i class="fas fa-file-csv me-1"></i> CSV
             </a>
             <a href="{{ route('admin.orders.report.export', array_merge(['format' => 'doc'], $exportParams)) }}"
                 class="btn btn-sm btn-primary rounded-pill px-3 elevation-1">
-                <i class="fas fa-file-word mr-1"></i> DOC
+                <i class="fas fa-file-word me-1"></i> DOC
             </a>
             <a href="{{ route('admin.orders.report.export', array_merge(['format' => 'html'], $exportParams)) }}"
                 class="btn btn-sm btn-secondary rounded-pill px-3 elevation-1">
-                <i class="fas fa-file-code mr-1"></i> HTML
+                <i class="fas fa-file-code me-1"></i> HTML
             </a>
-            <span class="text-muted ml-auto text-sm">{{ $period['label'] ?? '' }}</span>
+            <span class="text-muted ms-auto text-sm">{{ $period['label'] ?? '' }}</span>
         </div>
     </div>
 
     {{-- Tabela principal --}}
     <div class="card card-outline card-dark shadow-sm">
         <div class="card-header border-0">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-shopping-cart mr-2 text-primary"></i>Listagem de Pedidos
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-shopping-cart me-2 text-primary"></i>Listagem de Pedidos
             </h3>
             <div class="card-tools">
-                <span class="badge badge-light border px-3 py-2">
-                    <i class="fas fa-list-ol mr-1"></i> Total de registros carregados
+                <span class="badge text-bg-light border px-3 py-2">
+                    <i class="fas fa-list-ol me-1"></i> Total de registros carregados
                 </span>
             </div>
         </div>
@@ -186,12 +186,12 @@
                 <table id="orders-table" class="table table-hover align-middle mb-0">
                     <thead>
                         <tr class="bg-light">
-                            <th class="border-0 pl-4">ID</th>
+                            <th class="border-0 ps-4">ID</th>
                             <th class="border-0">Tipo</th>
                             <th class="border-0">Cliente</th>
                             <th class="border-0">Telefone</th>
-                            <th class="border-0 text-right">Valor</th>
-                            <th class="border-0 text-right">Desconto</th>
+                            <th class="border-0 text-end">Valor</th>
+                            <th class="border-0 text-end">Desconto</th>
                             <th class="border-0">Pagamento</th>
                             <th class="border-0 text-center">Origem</th>
                             <th class="border-0 text-center">Status</th>
@@ -212,19 +212,19 @@
                                 $couponCode = $order->coupon_code;
                             @endphp
                             <tr>
-                                <td class="pl-4" data-order="{{ (int) $order->id }}">
-                                    <span class="font-weight-bold text-primary">#{{ $order->id }}</span>
+                                <td class="ps-4" data-order="{{ (int) $order->id }}">
+                                    <span class="fw-bold text-primary">#{{ $order->id }}</span>
                                 </td>
                                 <td>
-                                    <span class="badge badge-light border px-2 py-1 text-xs">{{ $order->saleTypeLabel() }}</span>
+                                    <span class="badge text-bg-light border px-2 py-1 text-xs">{{ $order->saleTypeLabel() }}</span>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="{{ $avatarUrl }}" class="img-circle elevation-1 mr-2"
+                                        <img src="{{ $avatarUrl }}" class="img-circle elevation-1 me-2"
                                             style="width:34px;height:34px;object-fit:cover"
                                             onerror="this.onerror=null;this.src='{{ asset('img/default-user.svg') }}';" loading="lazy" decoding="async">
                                         <div>
-                                            <div class="font-weight-bold text-sm">{{ $order->user->name ?? 'Usuário removido' }}</div>
+                                            <div class="fw-bold text-sm">{{ $order->user->name ?? 'Usuário removido' }}</div>
                                             <small class="text-muted">{{ $order->user->email ?? '' }}</small>
                                         </div>
                                     </div>
@@ -232,10 +232,10 @@
                                 <td>
                                     <div class="text-sm order-phone-value">{{ $order->user->phone ?? '-' }}</div>
                                 </td>
-                                <td class="text-right order-amount-cell" data-order="{{ $grossAmount }}">
+                                <td class="text-end order-amount-cell" data-order="{{ $grossAmount }}">
                                     <div class="order-amount-main">R$ {{ number_format($grossAmount, 2, ',', '.') }}</div>
                                 </td>
-                                <td class="text-right order-discount-cell" data-order="{{ $discountAmount }}">
+                                <td class="text-end order-discount-cell" data-order="{{ $discountAmount }}">
                                     @if($discountAmount > 0)
                                         <div class="order-coupon-line" title="Cupom {{ $couponCode ?: '-' }}">
                                             <span class="order-discount-value">- R$ {{ number_format($discountAmount, 2, ',', '.') }}</span>
@@ -249,27 +249,27 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge badge-info px-2 py-1">{{ ucfirst($order->gateway ?: 'manual') }}</span>
+                                    <span class="badge text-bg-info px-2 py-1">{{ ucfirst($order->gateway ?: 'manual') }}</span>
                                     <div class="text-xs text-muted mt-1">{{ $order->payment_method ?: 'não informado' }}</div>
                                 </td>
                                 <td class="text-center">
                                     @if($order->is_manual_approval)
-                                        <span class="badge badge-warning px-2 py-1"><i class="fas fa-hand-paper mr-1" style="font-size:9px;"></i>Manual</span>
+                                        <span class="badge text-bg-warning px-2 py-1"><i class="fas fa-hand-paper me-1" style="font-size:9px;"></i>Manual</span>
                                     @else
-                                        <span class="badge badge-success px-2 py-1"><i class="fas fa-check mr-1" style="font-size:9px;"></i>Contabilizado</span>
+                                        <span class="badge text-bg-success px-2 py-1"><i class="fas fa-check me-1" style="font-size:9px;"></i>Contabilizado</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
                                     @if($order->status == 'paid')
-                                        <span class="badge badge-success px-3 py-2" style="font-size:11px;"><i class="fas fa-check-circle mr-1"></i>Pago</span>
+                                        <span class="badge text-bg-success px-3 py-2" style="font-size:11px;"><i class="fas fa-check-circle me-1"></i>Pago</span>
                                     @elseif($order->status == 'pending')
-                                        <span class="badge badge-warning px-3 py-2" style="font-size:11px;"><i class="fas fa-clock mr-1"></i>Pendente</span>
+                                        <span class="badge text-bg-warning px-3 py-2" style="font-size:11px;"><i class="fas fa-clock me-1"></i>Pendente</span>
                                     @elseif($order->status == 'refunded')
-                                        <span class="badge badge-danger px-3 py-2" style="font-size:11px;"><i class="fas fa-undo mr-1"></i>Reembolsado</span>
+                                        <span class="badge text-bg-danger px-3 py-2" style="font-size:11px;"><i class="fas fa-undo me-1"></i>Reembolsado</span>
                                     @elseif($order->status == 'cancelled')
-                                        <span class="badge badge-secondary px-3 py-2" style="font-size:11px;"><i class="fas fa-ban mr-1"></i>Cancelado</span>
+                                        <span class="badge text-bg-secondary px-3 py-2" style="font-size:11px;"><i class="fas fa-ban me-1"></i>Cancelado</span>
                                     @else
-                                        <span class="badge badge-secondary px-3 py-2" style="font-size:11px;">{{ $order->status }}</span>
+                                        <span class="badge text-bg-secondary px-3 py-2" style="font-size:11px;">{{ $order->status }}</span>
                                     @endif
                                 </td>
                                 <td data-order="{{ $financialDate ? $financialDate->timestamp : 0 }}">

@@ -54,11 +54,11 @@
     {{-- Pending Redemptions --}}
     <div class="card card-outline card-warning shadow-sm mb-4">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-clock text-warning mr-2"></i>Solicitacoes Pendentes
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-clock text-warning me-2"></i>Solicitacoes Pendentes
             </h3>
             <div class="card-tools">
-                <span class="badge badge-warning">{{ $pendingRedemptions->count() }} pendente(s)</span>
+                <span class="badge text-bg-warning">{{ $pendingRedemptions->count() }} pendente(s)</span>
             </div>
         </div>
         <div class="card-body p-0">
@@ -72,32 +72,32 @@
                                 <th>Tipo</th>
                                 <th>{{ $coinName }}</th>
                                 <th>Data</th>
-                                <th class="text-right">Acoes</th>
+                                <th class="text-end">Acoes</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($pendingRedemptions as $redemption)
                                 <tr>
-                                    <td><div class="font-weight-bold">{{ $redemption->user->name }}</div></td>
+                                    <td><div class="fw-bold">{{ $redemption->user->name }}</div></td>
                                     <td>{{ $redemption->item->name }}</td>
-                                    <td><span class="badge badge-light border">{{ $redemption->item_type_label }}</span></td>
+                                    <td><span class="badge text-bg-light border">{{ $redemption->item_type_label }}</span></td>
                                     <td>
-                                        <span class="badge badge-warning">
-                                            <i class="fas fa-coins mr-1"></i>{{ number_format((int) $redemption->points_spent, 0, ',', '.') }} {{ $coinName }}
+                                        <span class="badge text-bg-warning">
+                                            <i class="fas fa-coins me-1"></i>{{ number_format((int) $redemption->points_spent, 0, ',', '.') }} {{ $coinName }}
                                         </span>
                                     </td>
                                     <td><small>{{ $redemption->created_at->format('d/m/Y H:i') }}</small></td>
-                                    <td class="text-right" style="white-space:nowrap">
+                                    <td class="text-end" style="white-space:nowrap">
                                         <form action="{{ route('admin.redemptions.approve', $redemption) }}" method="POST" class="d-inline">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-outline-success rounded-pill js-confirm-action" data-text="Deseja confirmar a entrega deste item?">
-                                                <i class="fas fa-check mr-1"></i> Aprovar
+                                                <i class="fas fa-check me-1"></i> Aprovar
                                             </button>
                                         </form>
                                         <form action="{{ route('admin.redemptions.cancel', $redemption) }}" method="POST" class="d-inline">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill js-confirm-action" data-text="O saldo em {{ $coinName }} sera devolvido ao usuario. Continuar?">
-                                                <i class="fas fa-times mr-1"></i> Cancelar
+                                                <i class="fas fa-times me-1"></i> Cancelar
                                             </button>
                                         </form>
                                     </td>
@@ -118,12 +118,12 @@
     {{-- Redemption Items --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-gift text-primary mr-2"></i>Itens para Resgate
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-gift text-primary me-2"></i>Itens para Resgate
             </h3>
             <div class="card-tools">
                 <a href="{{ route('admin.redemptions.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
-                    <i class="fas fa-plus mr-1"></i> Novo Item
+                    <i class="fas fa-plus me-1"></i> Novo Item
                 </a>
             </div>
         </div>
@@ -140,7 +140,7 @@
                                 <th>Estoque</th>
                                 <th>Resgates</th>
                                 <th class="text-center">Status</th>
-                                <th class="text-right">Acoes</th>
+                                <th class="text-end">Acoes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -149,40 +149,40 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             @if($item->image)
-                                                <img src="{{ \App\Support\UploadStorage::url($item->image) }}" alt="{{ $item->name }}" class="img-circle img-size-32 mr-2" loading="lazy" decoding="async">
+                                                <img src="{{ \App\Support\UploadStorage::url($item->image) }}" alt="{{ $item->name }}" class="img-circle img-size-32 me-2" loading="lazy" decoding="async">
                                             @else
-                                                <div class="img-circle img-size-32 mr-2 bg-secondary d-inline-flex align-items-center justify-content-center">
+                                                <div class="img-circle img-size-32 me-2 bg-secondary d-inline-flex align-items-center justify-content-center">
                                                     <i class="fas fa-gift text-xs text-white"></i>
                                                 </div>
                                             @endif
-                                            <span class="font-weight-bold">{{ $item->name }}</span>
+                                            <span class="fw-bold">{{ $item->name }}</span>
                                         </div>
                                     </td>
-                                    <td><span class="badge badge-light border">{{ $item->item_type_label }}</span></td>
+                                    <td><span class="badge text-bg-light border">{{ $item->item_type_label }}</span></td>
                                     <td>{{ $item->provider_label }}</td>
                                     <td>
-                                        <span class="badge badge-info">
-                                            <i class="fas fa-coins mr-1"></i>{{ number_format((int) $item->points_cost, 0, ',', '.') }}
+                                        <span class="badge text-bg-info">
+                                            <i class="fas fa-coins me-1"></i>{{ number_format((int) $item->points_cost, 0, ',', '.') }}
                                         </span>
                                     </td>
                                     <td>
                                         @if($item->stock < 0)
-                                            <span class="badge badge-success"><i class="fas fa-infinity mr-1"></i>Ilimitado</span>
+                                            <span class="badge text-bg-success"><i class="fas fa-infinity me-1"></i>Ilimitado</span>
                                         @elseif($item->stock < 5)
-                                            <span class="badge badge-danger font-weight-bold"><i class="fas fa-exclamation-triangle mr-1"></i>{{ $item->stock }}</span>
+                                            <span class="badge text-bg-danger fw-bold"><i class="fas fa-exclamation-triangle me-1"></i>{{ $item->stock }}</span>
                                         @else
-                                            <span class="badge badge-light border">{{ $item->stock }}</span>
+                                            <span class="badge text-bg-light border">{{ $item->stock }}</span>
                                         @endif
                                     </td>
-                                    <td><span class="badge badge-secondary">{{ $item->redemptions_count }}</span></td>
+                                    <td><span class="badge text-bg-secondary">{{ $item->redemptions_count }}</span></td>
                                     <td class="text-center">
                                         @if($item->is_active)
-                                            <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Ativo</span>
+                                            <span class="badge text-bg-success"><i class="fas fa-check me-1"></i>Ativo</span>
                                         @else
-                                            <span class="badge badge-secondary"><i class="fas fa-pause mr-1"></i>Inativo</span>
+                                            <span class="badge text-bg-secondary"><i class="fas fa-pause me-1"></i>Inativo</span>
                                         @endif
                                     </td>
-                                    <td class="text-right">
+                                    <td class="text-end">
                                         <a href="{{ route('admin.redemptions.edit', $item) }}" class="btn btn-sm btn-outline-primary rounded-pill" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
@@ -197,7 +197,7 @@
                     <i class="fas fa-gift fa-3x text-muted mb-3"></i>
                     <p class="text-muted mb-1">Nenhum item de resgate cadastrado.</p>
                     <a href="{{ route('admin.redemptions.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1 mt-2">
-                        <i class="fas fa-plus mr-1"></i> Criar primeiro item
+                        <i class="fas fa-plus me-1"></i> Criar primeiro item
                     </a>
                 </div>
             @endif

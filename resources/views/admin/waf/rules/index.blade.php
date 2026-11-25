@@ -9,14 +9,14 @@
             <div class="col-sm-6">
                 <h1 class="m-0"><i class="fas fa-gavel text-primary"></i> WAF - Regras</h1>
             </div>
-            <div class="col-sm-6 text-right">
+            <div class="col-sm-6 text-end">
                 <a href="{{ route('admin.waf.rules.create') }}" class="btn btn-sm btn-primary">
                     <i class="fas fa-plus"></i> Nova Regra
                 </a>
                 <a href="{{ route('admin.waf.rules.export') }}" class="btn btn-sm btn-outline-secondary">
                     <i class="fas fa-download"></i> Exportar
                 </a>
-                <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#importModal">
+                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#importModal">
                     <i class="fas fa-upload"></i> Importar
                 </button>
             </div>
@@ -29,7 +29,7 @@
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">
                 {{ session('success') }}
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         @endif
 
@@ -44,7 +44,7 @@
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-filter"></i> Filtros</h3>
                     <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                        <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse"><i class="fas fa-plus"></i></button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -106,42 +106,42 @@
                                 <tr>
                                     <td>{{ $rule->name }}</td>
                                     <td><code>{{ $rule->attack_pattern }}</code></td>
-                                    <td><span class="badge badge-secondary">{{ $rule->matcher_type }}</span></td>
+                                    <td><span class="badge text-bg-secondary">{{ $rule->matcher_type }}</span></td>
                                     <td>{{ $rule->score }}</td>
                                     <td>
                                         @switch($rule->severity)
                                             @case('critical')
-                                                <span class="badge badge-danger">Critical</span>
+                                                <span class="badge text-bg-danger">Critical</span>
                                                 @break
                                             @case('high')
-                                                <span class="badge badge-warning">High</span>
+                                                <span class="badge text-bg-warning">High</span>
                                                 @break
                                             @case('medium')
-                                                <span class="badge badge-info">Medium</span>
+                                                <span class="badge text-bg-info">Medium</span>
                                                 @break
                                             @case('low')
-                                                <span class="badge badge-secondary">Low</span>
+                                                <span class="badge text-bg-secondary">Low</span>
                                                 @break
                                             @default
-                                                <span class="badge badge-light">Info</span>
+                                                <span class="badge text-bg-light">Info</span>
                                         @endswitch
                                     </td>
                                     <td>
                                         @switch($rule->action)
                                             @case('block')
-                                                <span class="badge badge-danger">Block</span>
+                                                <span class="badge text-bg-danger">Block</span>
                                                 @break
                                             @case('challenge')
                                                 <span class="badge" style="background-color:#6f42c1;color:#fff;">Challenge</span>
                                                 @break
                                             @default
-                                                <span class="badge badge-warning">Monitor</span>
+                                                <span class="badge text-bg-warning">Monitor</span>
                                         @endswitch
                                     </td>
                                     <td>
-                                        <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input toggle-rule" id="toggle-{{ $rule->id }}" data-id="{{ $rule->id }}" {{ $rule->is_active ? 'checked' : '' }}>
-                                            <label class="custom-control-label" for="toggle-{{ $rule->id }}"></label>
+                                        <div class="form-check form-switch">
+                                            <input type="checkbox" class="form-check-input toggle-rule" id="toggle-{{ $rule->id }}" data-id="{{ $rule->id }}" {{ $rule->is_active ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="toggle-{{ $rule->id }}"></label>
                                         </div>
                                     </td>
                                     <td class="text-nowrap">
@@ -183,7 +183,7 @@
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Importar Regras (JSON)</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -193,7 +193,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Importar</button>
                 </div>
             </form>

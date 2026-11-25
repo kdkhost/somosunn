@@ -26,13 +26,13 @@
         </div>
         <div class="d-flex align-items-center flex-wrap gap-2">
             <a href="{{ route('admin.marketplace.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-none btn-top-nav">
-                <i class="fas fa-arrow-left mr-1"></i> Voltar ao Hub
+                <i class="fas fa-arrow-left me-1"></i> Voltar ao Hub
             </a>
             <a href="{{ route('admin.marketplace.stores.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-none btn-top-nav">
-                <i class="fas fa-store mr-1"></i> Lojas Parceiras
+                <i class="fas fa-store me-1"></i> Lojas Parceiras
             </a>
             <a href="{{ route('marketplace.index') }}" target="_blank" class="btn btn-primary btn-sm rounded-pill px-3 text-white shadow-none">
-                <i class="fas fa-external-link-alt mr-1"></i> Ver no Site
+                <i class="fas fa-external-link-alt me-1"></i> Ver no Site
             </a>
         </div>
     </div>
@@ -45,8 +45,8 @@
                 <div class="card h-100 shadow-sm kpi-card kpi-card-total transition-all hover-lift {{ $currentStatus === '' ? 'ring-active' : '' }}">
                     <div class="card-body p-3.5 d-flex align-items-center justify-content-between">
                         <div>
-                            <span class="text-uppercase kpi-title font-weight-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Total de Produtos</span>
-                            <h3 class="font-weight-bold mb-0 kpi-number kpi-number-total" id="kpi-total">{{ $stats['total'] }}</h3>
+                            <span class="text-uppercase kpi-title fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Total de Produtos</span>
+                            <h3 class="fw-bold mb-0 kpi-number kpi-number-total" id="kpi-total">{{ $stats['total'] }}</h3>
                             <small class="kpi-subtitle">No catálogo geral</small>
                         </div>
                         <div class="rounded-circle d-flex align-items-center justify-content-center kpi-icon kpi-icon-total" style="width: 48px; height: 48px;">
@@ -63,8 +63,8 @@
                 <div class="card h-100 shadow-sm kpi-card kpi-card-published transition-all hover-lift {{ $currentStatus === 'published' ? 'ring-active' : '' }}">
                     <div class="card-body p-3.5 d-flex align-items-center justify-content-between">
                         <div>
-                            <span class="text-uppercase kpi-title font-weight-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Publicados e Ativos</span>
-                            <h3 class="font-weight-bold mb-0 kpi-number kpi-number-published" id="kpi-published">{{ $stats['published'] }}</h3>
+                            <span class="text-uppercase kpi-title fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Publicados e Ativos</span>
+                            <h3 class="fw-bold mb-0 kpi-number kpi-number-published" id="kpi-published">{{ $stats['published'] }}</h3>
                             <small class="kpi-subtitle">Visíveis aos clientes</small>
                         </div>
                         <div class="rounded-circle d-flex align-items-center justify-content-center kpi-icon kpi-icon-published" style="width: 48px; height: 48px;">
@@ -81,8 +81,8 @@
                 <div class="card h-100 shadow-sm kpi-card kpi-card-draft transition-all hover-lift {{ $currentStatus === 'draft' ? 'ring-active' : '' }}">
                     <div class="card-body p-3.5 d-flex align-items-center justify-content-between">
                         <div>
-                            <span class="text-uppercase kpi-title font-weight-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Em Rascunho</span>
-                            <h3 class="font-weight-bold mb-0 kpi-number kpi-number-draft" id="kpi-draft">{{ $stats['draft'] }}</h3>
+                            <span class="text-uppercase kpi-title fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Em Rascunho</span>
+                            <h3 class="fw-bold mb-0 kpi-number kpi-number-draft" id="kpi-draft">{{ $stats['draft'] }}</h3>
                             <small class="kpi-subtitle">Aguardando publicação</small>
                         </div>
                         <div class="rounded-circle d-flex align-items-center justify-content-center kpi-icon kpi-icon-draft" style="width: 48px; height: 48px;">
@@ -99,8 +99,8 @@
                 <div class="card h-100 shadow-sm kpi-card kpi-card-blocked transition-all hover-lift {{ $currentStatus === 'blocked' ? 'ring-active' : '' }}">
                     <div class="card-body p-3.5 d-flex align-items-center justify-content-between">
                         <div>
-                            <span class="text-uppercase kpi-title font-weight-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Bloqueados</span>
-                            <h3 class="font-weight-bold mb-0 kpi-number kpi-number-blocked" id="kpi-blocked">{{ $stats['blocked'] }}</h3>
+                            <span class="text-uppercase kpi-title fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">Bloqueados</span>
+                            <h3 class="fw-bold mb-0 kpi-number kpi-number-blocked" id="kpi-blocked">{{ $stats['blocked'] }}</h3>
                             <small class="kpi-subtitle">Restritos por moderação</small>
                         </div>
                         <div class="rounded-circle d-flex align-items-center justify-content-center kpi-icon kpi-icon-blocked" style="width: 48px; height: 48px;">
@@ -121,19 +121,19 @@
                 <div class="d-flex flex-wrap align-items-center gap-1.5">
                     <a href="{{ route('admin.marketplace.catalog.index', array_merge(request()->except(['status', 'page']))) }}" 
                        class="btn btn-sm rounded-pill px-3 filter-pill {{ $currentStatus === '' ? 'filter-pill-active-total' : '' }}">
-                        Todos <span class="badge filter-pill-badge ml-1">{{ $stats['total'] }}</span>
+                        Todos <span class="badge filter-pill-badge ms-1">{{ $stats['total'] }}</span>
                     </a>
                     <a href="{{ route('admin.marketplace.catalog.index', array_merge(request()->except('page'), ['status' => 'published'])) }}" 
                        class="btn btn-sm rounded-pill px-3 filter-pill {{ $currentStatus === 'published' ? 'filter-pill-active-published' : '' }}">
-                        <i class="fas fa-check-circle mr-1"></i> Publicados <span class="badge filter-pill-badge ml-1">{{ $stats['published'] }}</span>
+                        <i class="fas fa-check-circle me-1"></i> Publicados <span class="badge filter-pill-badge ms-1">{{ $stats['published'] }}</span>
                     </a>
                     <a href="{{ route('admin.marketplace.catalog.index', array_merge(request()->except('page'), ['status' => 'draft'])) }}" 
                        class="btn btn-sm rounded-pill px-3 filter-pill {{ $currentStatus === 'draft' ? 'filter-pill-active-draft' : '' }}">
-                        <i class="fas fa-pen-ruler mr-1"></i> Rascunhos <span class="badge filter-pill-badge ml-1">{{ $stats['draft'] }}</span>
+                        <i class="fas fa-pen-ruler me-1"></i> Rascunhos <span class="badge filter-pill-badge ms-1">{{ $stats['draft'] }}</span>
                     </a>
                     <a href="{{ route('admin.marketplace.catalog.index', array_merge(request()->except('page'), ['status' => 'blocked'])) }}" 
                        class="btn btn-sm rounded-pill px-3 filter-pill {{ $currentStatus === 'blocked' ? 'filter-pill-active-blocked' : '' }}">
-                        <i class="fas fa-ban mr-1"></i> Bloqueados <span class="badge filter-pill-badge ml-1">{{ $stats['blocked'] }}</span>
+                        <i class="fas fa-ban me-1"></i> Bloqueados <span class="badge filter-pill-badge ms-1">{{ $stats['blocked'] }}</span>
                     </a>
                 </div>
 
@@ -146,7 +146,7 @@
                         @if($currentSearch !== '')
                             <input type="hidden" name="q" value="{{ $currentSearch }}">
                         @endif
-                        <select name="type" class="custom-select custom-select-sm rounded-pill type-selector" style="height: 36px; font-size: 0.8125rem; min-width: 145px;" onchange="this.form.submit()">
+                        <select name="type" class="form-select custom-select-sm rounded-pill type-selector" style="height: 36px; font-size: 0.8125rem; min-width: 145px;" onchange="this.form.submit()">
                             <option value="">Todos os Tipos</option>
                             <option value="physical" {{ $currentType === 'physical' ? 'selected' : '' }}>Físico</option>
                             <option value="digital" {{ $currentType === 'digital' ? 'selected' : '' }}>Digital</option>
@@ -156,7 +156,7 @@
 
                     @if($currentStatus !== '' || $currentType !== '' || $currentSearch !== '')
                         <a href="{{ route('admin.marketplace.catalog.index') }}" class="btn btn-sm btn-clear-filters rounded-pill px-2.5" title="Limpar todos os filtros">
-                            <i class="fas fa-times-circle mr-1"></i> Limpar
+                            <i class="fas fa-times-circle me-1"></i> Limpar
                         </a>
                     @endif
                 </div>
@@ -175,16 +175,16 @@
                 <div class="col-md-9 col-sm-8 mb-2 mb-sm-0">
                     <div class="input-group">
                         <div class="input-group-prepend">
-                            <span class="input-group-text border-right-0" style="border-radius: 0.625rem 0 0 0.625rem;">
+                            <span class="input-group-text border-end-0" style="border-radius: 0.625rem 0 0 0.625rem;">
                                 <i class="fas fa-search text-muted"></i>
                             </span>
                         </div>
-                        <input type="text" name="q" value="{{ $currentSearch }}" class="form-control border-left-0 pl-0" placeholder="Buscar por título do produto, código SKU, nome ou slug da loja..." style="border-radius: 0 0.625rem 0.625rem 0;">
+                        <input type="text" name="q" value="{{ $currentSearch }}" class="form-control border-start-0 ps-0" placeholder="Buscar por título do produto, código SKU, nome ou slug da loja..." style="border-radius: 0 0.625rem 0.625rem 0;">
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-4 d-flex gap-2">
                     <button type="submit" class="btn btn-primary rounded-pill px-3 w-100 text-white font-weight-600 shadow-none">
-                        <i class="fas fa-filter mr-1"></i> Filtrar
+                        <i class="fas fa-filter me-1"></i> Filtrar
                     </button>
                     @if($currentSearch !== '')
                         <a href="{{ route('admin.marketplace.catalog.index', array_merge(request()->except(['q', 'page']))) }}" class="btn btn-outline-secondary rounded-pill px-3 shadow-none btn-top-nav" title="Limpar busca">
@@ -207,7 +207,7 @@
                             <th style="min-width: 130px;" class="text-center">Preço</th>
                             <th style="min-width: 120px;" class="text-center">Vendas</th>
                             <th style="min-width: 140px;">Status</th>
-                            <th style="min-width: 190px;" class="text-right">Moderar Status</th>
+                            <th style="min-width: 190px;" class="text-end">Moderar Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y">
@@ -243,7 +243,7 @@
                                 {{-- Produto / Foto / SKU --}}
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="product-thumbnail mr-3 position-relative flex-shrink-0">
+                                        <div class="product-thumbnail me-3 position-relative flex-shrink-0">
                                             @if($product->cover_url)
                                                 <img src="{{ $product->cover_url }}" alt="{{ $product->title }}" class="rounded shadow-xs object-cover" style="width: 52px; height: 52px; object-fit: cover;">
                                             @else
@@ -252,11 +252,11 @@
                                                 </div>
                                             @endif
                                             @if($hasDiscount)
-                                                <span class="badge badge-danger position-absolute" style="top: -6px; right: -6px; font-size: 0.6rem; padding: 2px 4px;">PROMO</span>
+                                                <span class="badge text-bg-danger position-absolute" style="top: -6px; right: -6px; font-size: 0.6rem; padding: 2px 4px;">PROMO</span>
                                             @endif
                                         </div>
                                         <div class="min-w-0">
-                                            <div class="font-weight-bold product-title-text text-truncate mb-0.5" style="font-size: 0.9rem;" title="{{ $product->title }}">
+                                            <div class="fw-bold product-title-text text-truncate mb-0.5" style="font-size: 0.9rem;" title="{{ $product->title }}">
                                                 {{ $product->title }}
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap gap-1 small text-muted">
@@ -264,7 +264,7 @@
                                                     <span class="badge sku-tag px-1.5 py-0.5" style="font-size: 0.7rem; font-family: monospace;">SKU: {{ $product->sku }}</span>
                                                 @endif
                                                 @if($product->isPhysical())
-                                                    <span class="text-xs {{ (int) $product->stock <= 5 ? 'text-danger font-weight-bold' : 'text-muted' }}">
+                                                    <span class="text-xs {{ (int) $product->stock <= 5 ? 'text-danger fw-bold' : 'text-muted' }}">
                                                         <i class="fas fa-warehouse mr-0.5"></i> Estoque: {{ $product->stock ?? 0 }}
                                                     </span>
                                                 @endif
@@ -277,14 +277,14 @@
                                 <td>
                                     @if($product->store)
                                         <div class="font-weight-600 store-name-text mb-0.5">
-                                            <i class="fas fa-store text-primary mr-1"></i> {{ $product->store->brand_name }}
+                                            <i class="fas fa-store text-primary me-1"></i> {{ $product->store->brand_name }}
                                         </div>
                                     @else
-                                        <span class="text-muted font-italic">Loja não vinculada</span>
+                                        <span class="text-muted fst-italic">Loja não vinculada</span>
                                     @endif
                                     @if($product->user)
                                         <div class="small text-muted text-truncate" title="{{ $product->user->email }}">
-                                            <i class="fas fa-user mr-1 text-secondary"></i> {{ $product->user->name }}
+                                            <i class="fas fa-user me-1 text-secondary"></i> {{ $product->user->name }}
                                         </div>
                                     @endif
                                 </td>
@@ -292,7 +292,7 @@
                                 {{-- Tipo & Canal --}}
                                 <td>
                                     <span class="badge {{ $typeBadge['class'] }} mb-1">
-                                        <i class="fas {{ $typeBadge['icon'] }} mr-1"></i> {{ $typeBadge['label'] }}
+                                        <i class="fas {{ $typeBadge['icon'] }} me-1"></i> {{ $typeBadge['label'] }}
                                     </span>
                                     <div class="small text-muted">
                                         {{ $product->salesChannelLabel() }}
@@ -305,11 +305,11 @@
                                         <div class="text-muted small text-decoration-line-through">
                                             R$ {{ number_format((float) $product->price, 2, ',', '.') }}
                                         </div>
-                                        <div class="font-weight-bold text-success price-value" style="font-size: 0.95rem;">
+                                        <div class="fw-bold text-success price-value" style="font-size: 0.95rem;">
                                             R$ {{ number_format((float) $product->sale_price, 2, ',', '.') }}
                                         </div>
                                     @else
-                                        <div class="font-weight-bold price-value" style="font-size: 0.95rem;">
+                                        <div class="fw-bold price-value" style="font-size: 0.95rem;">
                                             R$ {{ number_format((float) ($product->price ?: 0), 2, ',', '.') }}
                                         </div>
                                     @endif
@@ -318,8 +318,8 @@
                                 {{-- Vendas & Clientes --}}
                                 <td class="text-center">
                                     <div class="d-flex flex-column align-items-center">
-                                        <span class="font-weight-bold sales-count-text" style="font-size: 0.95rem;">
-                                            <i class="fas fa-bag-shopping text-primary mr-1"></i> {{ (int) ($product->sales_count ?? 0) }}
+                                        <span class="fw-bold sales-count-text" style="font-size: 0.95rem;">
+                                            <i class="fas fa-bag-shopping text-primary me-1"></i> {{ (int) ($product->sales_count ?? 0) }}
                                         </span>
                                         <small class="text-muted">{{ (int) ($product->buyers_count ?? 0) }} clientes</small>
                                     </div>
@@ -334,9 +334,9 @@
                                 </td>
 
                                 {{-- Ações e Moderação Instantânea (AJAX) --}}
-                                <td class="text-right">
+                                <td class="text-end">
                                     <div class="d-flex align-items-center justify-content-end gap-1.5">
-                                        <select class="custom-select custom-select-sm status-selector rounded-pill shadow-none" 
+                                        <select class="form-select custom-select-sm status-selector rounded-pill shadow-none" 
                                                 data-product-id="{{ $product->id }}" 
                                                 data-product-title="{{ $product->title }}"
                                                 data-current-status="{{ $product->status }}"
@@ -357,11 +357,11 @@
                                         <div class="rounded-circle d-inline-flex align-items-center justify-content-center border mb-3 product-placeholder" style="width: 70px; height: 70px;">
                                             <i class="fas fa-boxes text-muted" style="font-size: 2rem;"></i>
                                         </div>
-                                        <h5 class="font-weight-bold empty-title mb-1">Nenhum produto encontrado</h5>
+                                        <h5 class="fw-bold empty-title mb-1">Nenhum produto encontrado</h5>
                                         <p class="text-muted small mb-3">Tente ajustar os filtros ou a palavra-chave pesquisada.</p>
                                         @if($currentStatus !== '' || $currentType !== '' || $currentSearch !== '')
                                             <a href="{{ route('admin.marketplace.catalog.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                                <i class="fas fa-eraser mr-1"></i> Limpar filtros aplicados
+                                                <i class="fas fa-eraser me-1"></i> Limpar filtros aplicados
                                             </a>
                                         @endif
                                     </div>
@@ -898,7 +898,7 @@ $(document).ready(function() {
                     showCancelButton: true,
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#64748b',
-                    confirmButtonText: '<i class="fas fa-ban mr-1"></i> Sim, bloquear',
+                    confirmButtonText: '<i class="fas fa-ban me-1"></i> Sim, bloquear',
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {

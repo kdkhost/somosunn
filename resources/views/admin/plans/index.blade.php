@@ -48,19 +48,19 @@
     {{-- Main Card --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-layer-group mr-2"></i>Planos / Pacotes</h3>
+            <h3 class="card-title"><i class="fas fa-layer-group me-2"></i>Planos / Pacotes</h3>
             <div class="card-tools d-flex align-items-center">
-                <span id="kanban-saving" class="kanban-saving mr-3">
+                <span id="kanban-saving" class="kanban-saving me-3">
                     <i class="fas fa-circle-notch fa-spin"></i> Salvando ordem...
                 </span>
                 <a href="{{ route('admin.plans.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
-                    <i class="fas fa-plus mr-1"></i> Novo plano
+                    <i class="fas fa-plus me-1"></i> Novo plano
                 </a>
             </div>
         </div>
         <div class="card-body">
-            <div class="alert alert-light border-left border-primary highlight-note mb-3">
-                <i class="fas fa-arrows-alt text-primary mr-1"></i>
+            <div class="alert alert-light border-start border-primary highlight-note mb-3">
+                <i class="fas fa-arrows-alt text-primary me-1"></i>
                 <strong>Arraste</strong> para reordenar os cards. O plano com <i class="fas fa-star" style="color:#f59e0b"></i> <strong>Destaque</strong> sempre ficará <strong>centralizado</strong> na página pública independente da posição aqui.
             </div>
 
@@ -75,13 +75,13 @@
 
                     <div class="plan-header">
                         <span class="plan-drag-handle" title="Arrastar"><i class="fas fa-grip-vertical"></i></span>
-                        <div class="font-weight-bold flex-grow-1 text-truncate small" title="{{ $plan->name }}">
+                        <div class="fw-bold flex-grow-1 text-truncate small" title="{{ $plan->name }}">
                             {{ $plan->name }}
                             @if($plan->highlight || $plan->is_featured)
-                                <i class="fas fa-star ml-1" title="Destaque" style="color:#fbbf24;font-size:10px"></i>
+                                <i class="fas fa-star ms-1" title="Destaque" style="color:#fbbf24;font-size:10px"></i>
                             @endif
                         </div>
-                        <span class="badge plan-badge js-plan-status {{ $plan->is_active ? 'badge-success' : 'badge-secondary' }}">
+                        <span class="badge plan-badge js-plan-status {{ $plan->is_active ? 'text-bg-success' : 'text-bg-secondary' }}">
                             {{ $plan->is_active ? 'Ativo' : 'Oculto' }}
                         </span>
                     </div>
@@ -139,7 +139,7 @@
                     <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
                     <p class="text-muted mb-2">Nenhum plano cadastrado ainda.</p>
                     <a href="{{ route('admin.plans.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
-                        <i class="fas fa-plus mr-1"></i> Criar primeiro plano
+                        <i class="fas fa-plus me-1"></i> Criar primeiro plano
                     </a>
                 </div>
                 @endforelse
@@ -312,11 +312,11 @@ $(function () {
                     const $badge = $card.find('.js-plan-status');
                     $btn.data('active', newActive ? 1 : 0);
                     if (newActive) {
-                        $badge.removeClass('badge-secondary').addClass('badge-success').text('Ativo');
+                        $badge.removeClass('text-bg-secondary').addClass('text-bg-success').text('Ativo');
                         $btn.removeClass('btn-outline-success').addClass('btn-outline-warning')
                             .html('<i class="fas fa-eye-slash"></i>').attr('title','Ocultar');
                     } else {
-                        $badge.removeClass('badge-success').addClass('badge-secondary').text('Oculto');
+                        $badge.removeClass('text-bg-success').addClass('text-bg-secondary').text('Oculto');
                         $btn.removeClass('btn-outline-warning').addClass('btn-outline-success')
                             .html('<i class="fas fa-eye"></i>').attr('title','Ativar');
                     }

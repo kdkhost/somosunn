@@ -1,15 +1,15 @@
 <div class="card-body">
     <div class="alert alert-info mb-4">
-        <i class="fas fa-info-circle mr-2"></i> Gerencie os logotipos e imagens de fundo do seu sistema. Recomenda-se
+        <i class="fas fa-info-circle me-2"></i> Gerencie os logotipos e imagens de fundo do seu sistema. Recomenda-se
         usar imagens otimizadas (WebP ou PNG transparente).
     </div>
 
-    <h5 class="text-primary mb-3"><i class="fas fa-id-card mr-2"></i> Identidade Visual</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-id-card me-2"></i> Identidade Visual</h5>
     <div class="row">
         <!-- Logo Site (Frontend) -->
         <div class="col-md-3 col-sm-6">
             <div class="form-group text-center">
-                <label class="font-weight-bold d-block mb-3">Logo Site (Frontend)</label>
+                <label class="fw-bold d-block mb-3">Logo Site (Frontend)</label>
                 <div class="upload-box premium-upload-box" data-remove-input="#remove_logo_front"
                     data-preview-image-class="img-fluid rounded shadow-sm border"
                     data-preview-image-style="max-height: 80px;" data-existing-url="{{ $getUrl('logo_front') }}">
@@ -23,14 +23,14 @@
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
                                 <i class="fas fa-home fa-2x mb-2 text-primary opacity-50"></i>
-                                <span class="small font-weight-bold">Logo Front</span>
+                                <span class="small fw-bold">Logo Front</span>
                             </div>
                         @endif
                     </div>
 
                     <div class="upload-actions d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3">
-                            <i class="fas fa-sync-alt mr-1"></i> Alterar
+                            <i class="fas fa-sync-alt me-1"></i> Alterar
                         </button>
                         <button type="button"
                             class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ $getUrl('logo_front') ? '' : 'd-none' }}">
@@ -44,7 +44,7 @@
         <!-- Logo Principal -->
         <div class="col-md-3 col-sm-6">
             <div class="form-group text-center">
-                <label class="font-weight-bold d-block mb-3">Logo Principal (Header)</label>
+                <label class="fw-bold d-block mb-3">Logo Principal (Header)</label>
                 <div class="upload-box premium-upload-box" data-remove-input="#remove_logo_image"
                     data-preview-image-class="img-fluid rounded shadow-sm border"
                     data-preview-image-style="max-height: 80px;" data-existing-url="{{ $getUrl('logo_image') }}">
@@ -58,14 +58,14 @@
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
                                 <i class="fas fa-cloud-upload-alt fa-2x mb-2 text-primary opacity-50"></i>
-                                <span class="small font-weight-bold">Logo Site</span>
+                                <span class="small fw-bold">Logo Site</span>
                             </div>
                         @endif
                     </div>
 
                     <div class="upload-actions d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3">
-                            <i class="fas fa-sync-alt mr-1"></i> Alterar
+                            <i class="fas fa-sync-alt me-1"></i> Alterar
                         </button>
                         <button type="button"
                             class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ $getUrl('logo_image') ? '' : 'd-none' }}">
@@ -79,7 +79,7 @@
         <!-- Logo Somos Únicas -->
         <div class="col-md-3 col-sm-6">
             <div class="form-group text-center">
-                <label class="font-weight-bold d-block mb-3">Logo Somos Únicas (Pink)</label>
+                <label class="fw-bold d-block mb-3">Logo Somos Únicas (Pink)</label>
                 <div class="upload-box premium-upload-box" data-remove-input="#remove_logo_somos_unicas"
                     data-preview-image-class="img-fluid rounded shadow-sm border"
                     data-preview-image-style="max-height: 80px;" data-existing-url="{{ $getUrl('logo_somos_unicas') }}">
@@ -93,14 +93,14 @@
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
                                 <i class="fas fa-venus fa-2x mb-2 text-primary opacity-50"></i>
-                                <span class="small font-weight-bold">Logo Unicas</span>
+                                <span class="small fw-bold">Logo Unicas</span>
                             </div>
                         @endif
                     </div>
 
                     <div class="upload-actions d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3">
-                            <i class="fas fa-sync-alt mr-1"></i> Alterar
+                            <i class="fas fa-sync-alt me-1"></i> Alterar
                         </button>
                         <button type="button"
                             class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ $getUrl('logo_somos_unicas') ? '' : 'd-none' }}">
@@ -114,7 +114,7 @@
         <!-- Favicon -->
         <div class="col-md-3 col-sm-6">
             <div class="form-group text-center">
-                <label class="font-weight-bold d-block mb-3">Favicon (Navegador)</label>
+                <label class="fw-bold d-block mb-3">Favicon (Navegador)</label>
                 <div class="upload-box premium-upload-box" data-remove-input="#remove_favicon_image"
                     data-preview-image-class="img-fluid rounded shadow-sm border"
                     data-preview-image-style="width: 32px; height: 32px;"
@@ -130,14 +130,14 @@
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
                                 <i class="fas fa-globe-americas fa-2x mb-2 text-primary opacity-50"></i>
-                                <span class="small font-weight-bold">Favicon</span>
+                                <span class="small fw-bold">Favicon</span>
                             </div>
                         @endif
                     </div>
 
                     <div class="upload-actions d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3">
-                            <i class="fas fa-sync-alt mr-1"></i> Alterar
+                            <i class="fas fa-sync-alt me-1"></i> Alterar
                         </button>
                         <button type="button"
                             class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ $getUrl('favicon_image') ? '' : 'd-none' }}">
@@ -151,7 +151,7 @@
         <!-- Logo Admin -->
         <div class="col-md-3 col-sm-6">
             <div class="form-group text-center">
-                <label class="font-weight-bold d-block mb-3">Logo Admin (Sidebar)</label>
+                <label class="fw-bold d-block mb-3">Logo Admin (Sidebar)</label>
                 <div class="upload-box premium-upload-box" data-remove-input="#remove_logo_admin"
                     data-preview-image-class="img-fluid rounded shadow-sm border"
                     data-preview-image-style="max-height: 80px; background: #343a40; padding: 5px;"
@@ -167,14 +167,14 @@
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
                                 <i class="fas fa-user-shield fa-2x mb-2 text-primary opacity-50"></i>
-                                <span class="small font-weight-bold">Logo Admin</span>
+                                <span class="small fw-bold">Logo Admin</span>
                             </div>
                         @endif
                     </div>
 
                     <div class="upload-actions d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3">
-                            <i class="fas fa-sync-alt mr-1"></i> Alterar
+                            <i class="fas fa-sync-alt me-1"></i> Alterar
                         </button>
                         <button type="button"
                             class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ $getUrl('logo_admin') ? '' : 'd-none' }}">
@@ -188,7 +188,7 @@
         <!-- Logo Auth -->
         <div class="col-md-3 col-sm-6">
             <div class="form-group text-center">
-                <label class="font-weight-bold d-block mb-3">Logo Login/Auth</label>
+                <label class="fw-bold d-block mb-3">Logo Login/Auth</label>
                 <div class="upload-box premium-upload-box" data-remove-input="#remove_logo_auth"
                     data-preview-image-class="img-fluid rounded shadow-sm border"
                     data-preview-image-style="max-height: 80px;" data-existing-url="{{ $getUrl('logo_auth') }}">
@@ -202,14 +202,14 @@
                             <div class="text-muted p-4 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center"
                                 style="min-height: 100px;">
                                 <i class="fas fa-lock fa-2x mb-2 text-primary opacity-50"></i>
-                                <span class="small font-weight-bold">Logo Auth</span>
+                                <span class="small fw-bold">Logo Auth</span>
                             </div>
                         @endif
                     </div>
 
                     <div class="upload-actions d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-xs btn-primary upload-btn rounded-pill px-3">
-                            <i class="fas fa-sync-alt mr-1"></i> Alterar
+                            <i class="fas fa-sync-alt me-1"></i> Alterar
                         </button>
                         <button type="button"
                             class="btn btn-xs btn-danger upload-remove rounded-pill px-2 {{ $getUrl('logo_auth') ? '' : 'd-none' }}">
@@ -223,11 +223,11 @@
 
     <hr class="my-4">
 
-    <h5 class="text-primary mb-3"><i class="fas fa-laptop-code mr-2"></i> Backgrounds e Capas</h5>
+    <h5 class="text-primary mb-3"><i class="fas fa-laptop-code me-2"></i> Backgrounds e Capas</h5>
     <div class="row">
         <!-- Hero Image -->
         <div class="col-md-6 form-group">
-            <label class="font-weight-bold d-block mb-3">Hero Image (Home)</label>
+            <label class="fw-bold d-block mb-3">Hero Image (Home)</label>
             <div class="upload-box premium-upload-box" 
                 data-remove-input="#remove_hero_image"
                 data-preview-image-class="img-fluid rounded shadow-sm border"
@@ -243,7 +243,7 @@
                     @else
                         <div class="text-muted p-5 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center" style="min-height: 150px;">
                             <i class="fas fa-image fa-3x mb-3 text-primary opacity-50"></i>
-                            <span class="font-weight-bold">Banner Principal (1920x600)</span>
+                            <span class="fw-bold">Banner Principal (1920x600)</span>
                             <span class="small opacity-75">Arraste e solte ou clique para selecionar</span>
                         </div>
                     @endif
@@ -251,10 +251,10 @@
                 
                 <div class="text-center">
                     <button type="button" class="btn btn-sm btn-primary upload-btn rounded-pill px-4 shadow-sm">
-                        <i class="fas fa-images mr-1"></i> Selecionar Imagem
+                        <i class="fas fa-images me-1"></i> Selecionar Imagem
                     </button>
                     <button type="button" class="btn btn-sm btn-danger upload-remove rounded-pill px-3 shadow-sm {{ $getUrl('hero_image') ? '' : 'd-none' }}">
-                        <i class="fas fa-trash mr-1"></i> Remover
+                        <i class="fas fa-trash me-1"></i> Remover
                     </button>
                 </div>
             </div>
@@ -262,7 +262,7 @@
 
         <!-- Site Background -->
         <div class="col-md-6 form-group">
-            <label class="font-weight-bold d-block mb-3">Background Geral do Site</label>
+            <label class="fw-bold d-block mb-3">Background Geral do Site</label>
             <div class="upload-box premium-upload-box" 
                 data-remove-input="#remove_site_bg_image"
                 data-preview-image-class="img-fluid rounded shadow-sm border"
@@ -278,7 +278,7 @@
                     @else
                         <div class="text-muted p-5 border-2 border-dashed rounded bg-light d-flex flex-column align-items-center justify-content-center" style="min-height: 150px;">
                             <i class="fas fa-fill-drip fa-3x mb-3 text-primary opacity-50"></i>
-                            <span class="font-weight-bold">Fundo Padrão (Pattern/Imagem)</span>
+                            <span class="fw-bold">Fundo Padrão (Pattern/Imagem)</span>
                             <span class="small opacity-75">Arraste e solte ou clique para selecionar</span>
                         </div>
                     @endif
@@ -286,10 +286,10 @@
                 
                 <div class="text-center">
                     <button type="button" class="btn btn-sm btn-primary upload-btn rounded-pill px-4 shadow-sm">
-                        <i class="fas fa-images mr-1"></i> Selecionar Imagem
+                        <i class="fas fa-images me-1"></i> Selecionar Imagem
                     </button>
                     <button type="button" class="btn btn-sm btn-danger upload-remove rounded-pill px-3 shadow-sm {{ $getUrl('site_bg_image') ? '' : 'd-none' }}">
-                        <i class="fas fa-trash mr-1"></i> Remover
+                        <i class="fas fa-trash me-1"></i> Remover
                     </button>
                 </div>
             </div>

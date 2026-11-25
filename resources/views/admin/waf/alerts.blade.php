@@ -18,13 +18,13 @@
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">
                 {{ session('success') }}
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         @endif
         @if(session('error'))
             <div class="alert alert-danger alert-dismissible fade show">
                 {{ session('error') }}
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         @endif
 
@@ -72,7 +72,7 @@
                                               placeholder='{"count": 10, "window_minutes": 5}'>{{ old('threshold') }}</textarea>
                                     <small class="text-muted">Configuracao de limiar em JSON.</small>
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-sm btn-block">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
                                     <i class="fas fa-plus"></i> Criar Alerta
                                 </button>
                             </form>
@@ -111,23 +111,23 @@
                                             <td>
                                                 @switch($alert->trigger)
                                                     @case('block_spike')
-                                                        <span class="badge badge-danger">Pico Bloqueios</span>
+                                                        <span class="badge text-bg-danger">Pico Bloqueios</span>
                                                         @break
                                                     @case('auto_block')
-                                                        <span class="badge badge-warning">Auto-Block</span>
+                                                        <span class="badge text-bg-warning">Auto-Block</span>
                                                         @break
                                                     @case('critical_finding')
                                                         <span class="badge" style="background-color:#6f42c1;color:#fff;">Critico</span>
                                                         @break
                                                     @default
-                                                        <span class="badge badge-info">IP Reputation</span>
+                                                        <span class="badge text-bg-info">IP Reputation</span>
                                                 @endswitch
                                             </td>
                                             <td>
                                                 @if($alert->is_active)
-                                                    <span class="badge badge-success">Sim</span>
+                                                    <span class="badge text-bg-success">Sim</span>
                                                 @else
-                                                    <span class="badge badge-secondary">Nao</span>
+                                                    <span class="badge text-bg-secondary">Nao</span>
                                                 @endif
                                             </td>
                                             <td>{{ $alert->created_at?->format('d/m/Y') }}</td>

@@ -125,19 +125,19 @@
                 </h1>
                 <small class="text-muted">Administracao exclusiva do superadmin em /admin</small>
             </div>
-            <div class="col-sm-5 text-sm-right mt-2 mt-sm-0">
+            <div class="col-sm-5 text-sm-end mt-2 mt-sm-0">
                 <form action="{{ route('admin.backups.run') }}" method="POST" class="d-inline backup-run-form">
                     @csrf
                     <input type="hidden" name="type" value="database">
                     <button type="submit" class="btn btn-primary btn-sm">
-                        <i class="fas fa-play mr-1"></i> Gerar backup do banco
+                        <i class="fas fa-play me-1"></i> Gerar backup do banco
                     </button>
                 </form>
                 <form action="{{ route('admin.backups.run') }}" method="POST" class="d-inline backup-run-form">
                     @csrf
                     <input type="hidden" name="type" value="config">
                     <button type="submit" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-file-archive mr-1"></i> Gerar backup de configuracoes
+                        <i class="fas fa-file-archive me-1"></i> Gerar backup de configuracoes
                     </button>
                 </form>
             </div>
@@ -148,10 +148,10 @@
 <section class="content">
     <div class="container-fluid">
         @if(session('success'))
-            <div class="alert alert-success"><i class="fas fa-check-circle mr-1"></i>{{ session('success') }}</div>
+            <div class="alert alert-success"><i class="fas fa-check-circle me-1"></i>{{ session('success') }}</div>
         @endif
         @if(session('error'))
-            <div class="alert alert-danger"><i class="fas fa-exclamation-triangle mr-1"></i>{{ session('error') }}</div>
+            <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-1"></i>{{ session('error') }}</div>
         @endif
 
         <div class="row mb-3">
@@ -191,13 +191,13 @@
                     <div class="card-header p-0 pt-2">
                         <ul class="nav nav-tabs backup-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" data-toggle="tab" href="#tab-db" role="tab">
-                                    <i class="fas fa-database mr-1"></i> Banco de dados
+                                <a class="nav-link active" data-bs-toggle="tab" href="#tab-db" role="tab">
+                                    <i class="fas fa-database me-1"></i> Banco de dados
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#tab-config" role="tab">
-                                    <i class="fas fa-file-archive mr-1"></i> Configuracoes
+                                <a class="nav-link" data-bs-toggle="tab" href="#tab-config" role="tab">
+                                    <i class="fas fa-file-archive me-1"></i> Configuracoes
                                 </a>
                             </li>
                         </ul>
@@ -218,7 +218,7 @@
             <div class="col-lg-4">
                 <div class="card backup-card mb-3">
                     <div class="card-header">
-                        <h3 class="card-title mb-0"><i class="fas fa-sliders-h mr-1"></i> Configuracoes</h3>
+                        <h3 class="card-title mb-0"><i class="fas fa-sliders-h me-1"></i> Configuracoes</h3>
                     </div>
                     <form action="{{ route('admin.backups.settings') }}" method="POST">
                         @csrf
@@ -237,18 +237,18 @@
                                     <div class="input-group-append"><span class="input-group-text">arquivos</span></div>
                                 </div>
                             </div>
-                            <div class="custom-control custom-switch mb-3">
-                                <input type="checkbox" name="backup_database_enabled" value="1" class="custom-control-input" id="backup_database_enabled" {{ old('backup_database_enabled', $backupSettings['backup_database_enabled']) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="backup_database_enabled">Backup automatico do banco</label>
+                            <div class="form-check form-switch mb-3">
+                                <input type="checkbox" name="backup_database_enabled" value="1" class="form-check-input" id="backup_database_enabled" {{ old('backup_database_enabled', $backupSettings['backup_database_enabled']) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="backup_database_enabled">Backup automatico do banco</label>
                             </div>
                             <div class="form-group">
                                 <label>Horario do backup do banco</label>
                                 <input type="time" name="backup_database_time" class="form-control" value="{{ old('backup_database_time', $backupSettings['backup_database_time']) }}" required>
                                 <small class="text-muted">Executado no fuso America/Sao_Paulo.</small>
                             </div>
-                            <div class="custom-control custom-switch mb-3">
-                                <input type="checkbox" name="backup_config_enabled" value="1" class="custom-control-input" id="backup_config_enabled" {{ old('backup_config_enabled', $backupSettings['backup_config_enabled']) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="backup_config_enabled">Backup automatico de configuracoes</label>
+                            <div class="form-check form-switch mb-3">
+                                <input type="checkbox" name="backup_config_enabled" value="1" class="form-check-input" id="backup_config_enabled" {{ old('backup_config_enabled', $backupSettings['backup_config_enabled']) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="backup_config_enabled">Backup automatico de configuracoes</label>
                             </div>
                             <div class="form-group">
                                 <label>Dia do backup de configuracoes</label>
@@ -262,14 +262,14 @@
                                 <label>Horario do backup de configuracoes</label>
                                 <input type="time" name="backup_config_time" class="form-control" value="{{ old('backup_config_time', $backupSettings['backup_config_time']) }}" required>
                             </div>
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" name="backup_notify_success" value="1" class="custom-control-input" id="backup_notify_success" {{ old('backup_notify_success', $backupSettings['backup_notify_success']) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="backup_notify_success">Enviar e-mail quando o backup concluir com sucesso</label>
+                            <div class="form-check form-switch">
+                                <input type="checkbox" name="backup_notify_success" value="1" class="form-check-input" id="backup_notify_success" {{ old('backup_notify_success', $backupSettings['backup_notify_success']) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="backup_notify_success">Enviar e-mail quando o backup concluir com sucesso</label>
                             </div>
                         </div>
-                        <div class="card-footer text-right">
+                        <div class="card-footer text-end">
                             <button type="submit" class="btn btn-primary btn-sm">
-                                <i class="fas fa-save mr-1"></i> Salvar configuracoes
+                                <i class="fas fa-save me-1"></i> Salvar configuracoes
                             </button>
                         </div>
                     </form>
@@ -277,14 +277,14 @@
 
                 <div class="card backup-card">
                     <div class="card-header">
-                        <h3 class="card-title mb-0"><i class="fas fa-cloud mr-1"></i> Armazenamento remoto</h3>
+                        <h3 class="card-title mb-0"><i class="fas fa-cloud me-1"></i> Armazenamento remoto</h3>
                     </div>
                     <div class="card-body">
                         @if($s3Status['configured'])
-                            <span class="badge badge-success mb-2"><i class="fas fa-check mr-1"></i> S3 configurado</span>
+                            <span class="badge text-bg-success mb-2"><i class="fas fa-check me-1"></i> S3 configurado</span>
                             <p class="text-muted mb-0">O sistema tentara gravar no S3 antes de usar o fallback local.</p>
                         @else
-                            <span class="badge badge-warning mb-2"><i class="fas fa-exclamation-triangle mr-1"></i> S3 incompleto</span>
+                            <span class="badge text-bg-warning mb-2"><i class="fas fa-exclamation-triangle me-1"></i> S3 incompleto</span>
                             <p class="text-muted mb-2">Enquanto a configuracao remota estiver incompleta, os backups serao salvos localmente.</p>
                             <small class="d-block text-muted">Pendentes: {{ implode(', ', $s3Status['missing']) }}</small>
                         @endif

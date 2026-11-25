@@ -21,11 +21,11 @@
     <div class="row mb-3">
         <div class="col-12 d-flex flex-wrap justify-content-between align-items-center">
             <div>
-                <h4 class="mb-1 font-weight-bold">{{ $product->exists ? 'Editar produto' : 'Novo produto' }}</h4>
+                <h4 class="mb-1 fw-bold">{{ $product->exists ? 'Editar produto' : 'Novo produto' }}</h4>
                 <p class="text-muted mb-0">Cadastre o produto uma vez e defina se ele vende na loja, troca por {{ $coinName }} ou encaminha para um site externo.</p>
             </div>
             <a href="{{ route('admin.marketplace.products.index') }}" class="btn btn-outline-secondary mt-3 mt-md-0">
-                <i class="fas fa-arrow-left mr-1"></i> Voltar
+                <i class="fas fa-arrow-left me-1"></i> Voltar
             </a>
         </div>
     </div>
@@ -40,10 +40,10 @@
             <div class="col-xl-8">
                 <div class="card card-outline card-primary shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title font-weight-bold"><i class="fas fa-edit mr-2 text-primary"></i>Dados principais</h3>
+                        <h3 class="card-title fw-bold"><i class="fas fa-edit me-2 text-primary"></i>Dados principais</h3>
                     </div>
                     <div class="card-body">
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-12">
                                 <label for="title">Titulo</label>
                                 <input type="text" name="title" id="title" value="{{ old('title', $product->title) }}" class="form-control @error('title') is-invalid @enderror">
@@ -99,7 +99,7 @@
                             </div>
                             <div class="form-group col-md-6 seller-product-points-box">
                                 <label for="seller-product-points-preview">Custo estimado em {{ $coinName }}</label>
-                                <input type="text" id="seller-product-points-preview" value="" readonly class="form-control font-weight-bold bg-light">
+                                <input type="text" id="seller-product-points-preview" value="" readonly class="form-control fw-bold bg-light">
                                 <small class="form-text text-muted">Conversao baseada na cotacao configurada pela plataforma.</small>
                             </div>
                             <div class="form-group col-md-6">
@@ -126,10 +126,10 @@
                                 @error('description')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             </div>
                             <div class="form-group col-md-12 mb-0">
-                                <div class="custom-control custom-checkbox">
+                                <div class="form-check">
                                     <input type="hidden" name="is_featured" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="is_featured" name="is_featured" value="1" @checked(old('is_featured', $product->is_featured))>
-                                    <label class="custom-control-label" for="is_featured">Destacar produto na vitrine</label>
+                                    <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" value="1" @checked(old('is_featured', $product->is_featured))>
+                                    <label class="form-check-label" for="is_featured">Destacar produto na vitrine</label>
                                 </div>
                             </div>
                         </div>
@@ -138,10 +138,10 @@
 
                 <div class="card card-outline card-secondary shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title font-weight-bold"><i class="fas fa-shipping-fast mr-2 text-secondary"></i>Entrega e logística</h3>
+                        <h3 class="card-title fw-bold"><i class="fas fa-shipping-fast me-2 text-secondary"></i>Entrega e logística</h3>
                     </div>
                     <div class="card-body">
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-6 seller-product-physical-box">
                                 <label for="stock">Estoque</label>
                                 <input type="number" min="0" name="stock" id="stock" value="{{ old('stock', $product->stock) }}" class="form-control @error('stock') is-invalid @enderror">
@@ -181,10 +181,10 @@
                                 <div class="form-group col-md-12 seller-product-digital-box seller-product-store-box">
                                     <div class="alert alert-secondary mb-0">
                                         Arquivo atual: <strong>{{ $product->digital_file_name }}</strong>
-                                        <div class="custom-control custom-checkbox mt-2">
+                                        <div class="form-check mt-2">
                                             <input type="hidden" name="remove_digital_file" value="0">
-                                            <input type="checkbox" class="custom-control-input" id="remove_digital_file" name="remove_digital_file" value="1">
-                                            <label class="custom-control-label" for="remove_digital_file">Remover arquivo atual</label>
+                                            <input type="checkbox" class="form-check-input" id="remove_digital_file" name="remove_digital_file" value="1">
+                                            <label class="form-check-label" for="remove_digital_file">Remover arquivo atual</label>
                                         </div>
                                     </div>
                                 </div>
@@ -203,7 +203,7 @@
             <div class="col-xl-4">
                 <div class="card card-outline card-primary shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title font-weight-bold"><i class="fas fa-image mr-2 text-primary"></i>Capa do produto</h3>
+                        <h3 class="card-title fw-bold"><i class="fas fa-image me-2 text-primary"></i>Capa do produto</h3>
                     </div>
                     <div class="card-body">
                         @if($product->cover_url)
@@ -213,7 +213,7 @@
                             <input type="file" name="cover" accept="image/*" class="dropzone-input" id="cover-input">
                             <div class="dropzone-placeholder">
                                 <i class="fas fa-cloud-upload-alt text-primary mb-2" style="font-size:2rem;"></i>
-                                <p class="font-weight-bold mb-1">Arraste a imagem aqui</p>
+                                <p class="fw-bold mb-1">Arraste a imagem aqui</p>
                                 <p class="text-muted small mb-0">ou clique para selecionar (JPG, PNG, WEBP)</p>
                             </div>
                             <div class="dropzone-preview d-none">
@@ -223,10 +223,10 @@
                         </div>
                         @error('cover')<div class="text-danger small mt-2">{{ $message }}</div>@enderror
                         @if($product->cover_url)
-                            <div class="custom-control custom-checkbox mt-2">
+                            <div class="form-check mt-2">
                                 <input type="hidden" name="remove_cover" value="0">
-                                <input type="checkbox" class="custom-control-input" id="remove_cover" name="remove_cover" value="1">
-                                <label class="custom-control-label" for="remove_cover">Remover capa atual</label>
+                                <input type="checkbox" class="form-check-input" id="remove_cover" name="remove_cover" value="1">
+                                <label class="form-check-label" for="remove_cover">Remover capa atual</label>
                             </div>
                         @endif
                     </div>
@@ -234,14 +234,14 @@
 
                 <div class="card card-outline card-primary shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title font-weight-bold"><i class="fas fa-images mr-2 text-primary"></i>Galeria</h3>
+                        <h3 class="card-title fw-bold"><i class="fas fa-images me-2 text-primary"></i>Galeria</h3>
                     </div>
                     <div class="card-body">
                         <div class="dropzone-area" id="gallery-dropzone">
                             <input type="file" name="gallery[]" multiple accept="image/*,video/*" class="dropzone-input" id="gallery-input">
                             <div class="dropzone-placeholder">
                                 <i class="fas fa-photo-video text-info mb-2" style="font-size:2rem;"></i>
-                                <p class="font-weight-bold mb-1">Arraste imagens ou vídeos</p>
+                                <p class="fw-bold mb-1">Arraste imagens ou vídeos</p>
                                 <p class="text-muted small mb-0">Múltiplos arquivos permitidos</p>
                             </div>
                             <div class="dropzone-preview d-none">
@@ -252,14 +252,14 @@
                         @error('gallery.*')<div class="text-danger small mt-2">{{ $message }}</div>@enderror
                         @if($product->exists && $product->media->isNotEmpty())
                             <hr class="my-3">
-                            <p class="text-muted small font-weight-bold mb-2">Mídias atuais:</p>
+                            <p class="text-muted small fw-bold mb-2">Mídias atuais:</p>
                             <div class="row">
                                 @foreach($product->media as $media)
                                     <div class="col-4 mb-2">
                                         <div class="border rounded overflow-hidden position-relative" style="aspect-ratio:1;">
                                             @if($media->media_type === 'video')
                                                 <video src="{{ $media->file_url }}" class="w-100 h-100" style="object-fit:cover;" muted></video>
-                                                <span class="position-absolute badge badge-dark" style="top:4px;right:4px;font-size:9px;"><i class="fas fa-play"></i></span>
+                                                <span class="position-absolute badge text-bg-dark" style="top:4px;right:4px;font-size:9px;"><i class="fas fa-play"></i></span>
                                             @else
                                                 <img src="{{ $media->file_url }}" alt="Mídia" class="w-100 h-100" style="object-fit:cover;" loading="lazy" decoding="async">
                                             @endif
@@ -280,12 +280,12 @@
 
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title font-weight-bold">Distribuicao do produto</h3>
+                        <h3 class="card-title fw-bold">Distribuicao do produto</h3>
                     </div>
                     <div class="card-body">
                         <div class="alert alert-light mb-3">
-                            <p class="font-weight-bold mb-2">Como esse produto pode operar</p>
-                            <ul class="mb-0 pl-3">
+                            <p class="fw-bold mb-2">Como esse produto pode operar</p>
+                            <ul class="mb-0 ps-3">
                                 <li><strong>Troca de pontos:</strong> gera ou atualiza o item de resgate do vendedor.</li>
                                 <li><strong>Loja virtual:</strong> habilita compra direta com carrinho e checkout do marketplace.</li>
                                 <li><strong>Site externo:</strong> usa um botao de compra apontando para sua URL externa.</li>
@@ -304,16 +304,16 @@
         <div class="row mt-3">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <a href="{{ route('admin.marketplace.products.index') }}" class="btn btn-outline-secondary rounded-pill px-4">
-                    <i class="fas fa-arrow-left mr-1"></i> Voltar
+                    <i class="fas fa-arrow-left me-1"></i> Voltar
                 </a>
                 <div>
                     @if($product->exists)
-                        <button type="submit" formaction="{{ route('admin.marketplace.products.destroy', $product) }}" formmethod="POST" onclick="event.preventDefault(); const form = this.closest('form'); const runDel = () => { const temp = document.createElement('input'); temp.type='hidden'; temp.name='_method'; temp.value='DELETE'; temp.setAttribute('formaction', '{{ route('admin.marketplace.products.destroy', $product) }}'); form.action = '{{ route('admin.marketplace.products.destroy', $product) }}'; form.method = 'POST'; form.appendChild(temp); form.submit(); }; if (typeof Swal !== 'undefined') { Swal.fire({ icon: 'warning', title: 'Remover produto?', text: 'Deseja remover este produto?', showCancelButton: true, confirmButtonText: 'Sim, remover', cancelButtonText: 'Cancelar', confirmButtonColor: '#dc3545' }).then(r => { if (r.isConfirmed) runDel(); }); }" class="btn btn-outline-danger rounded-pill px-4 mr-2">
-                            <i class="fas fa-trash mr-1"></i> Excluir
+                        <button type="submit" formaction="{{ route('admin.marketplace.products.destroy', $product) }}" formmethod="POST" onclick="event.preventDefault(); const form = this.closest('form'); const runDel = () => { const temp = document.createElement('input'); temp.type='hidden'; temp.name='_method'; temp.value='DELETE'; temp.setAttribute('formaction', '{{ route('admin.marketplace.products.destroy', $product) }}'); form.action = '{{ route('admin.marketplace.products.destroy', $product) }}'; form.method = 'POST'; form.appendChild(temp); form.submit(); }; if (typeof Swal !== 'undefined') { Swal.fire({ icon: 'warning', title: 'Remover produto?', text: 'Deseja remover este produto?', showCancelButton: true, confirmButtonText: 'Sim, remover', cancelButtonText: 'Cancelar', confirmButtonColor: '#dc3545' }).then(r => { if (r.isConfirmed) runDel(); }); }" class="btn btn-outline-danger rounded-pill px-4 me-2">
+                            <i class="fas fa-trash me-1"></i> Excluir
                         </button>
                     @endif
                     <button type="submit" class="btn btn-primary rounded-pill px-4 elevation-1">
-                        <i class="fas fa-save mr-1"></i> Salvar produto
+                        <i class="fas fa-save me-1"></i> Salvar produto
                     </button>
                 </div>
             </div>

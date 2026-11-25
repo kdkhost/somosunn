@@ -87,12 +87,12 @@
     {{-- Card principal: Papéis --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header border-0">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-user-shield mr-2 text-primary"></i>Papéis do Sistema
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-user-shield me-2 text-primary"></i>Papéis do Sistema
             </h3>
             <div class="card-tools">
                 <a href="{{ route('admin.permissions.create') }}" class="btn btn-primary btn-sm elevation-1" data-pjax="true">
-                    <i class="fas fa-plus mr-1"></i> Novo Papel
+                    <i class="fas fa-plus me-1"></i> Novo Papel
                 </a>
             </div>
         </div>
@@ -107,17 +107,17 @@
                                 style="width:42px; height:42px; flex-shrink:0;">
                                 <i class="fas fa-shield-alt text-white"></i>
                             </div>
-                            <div class="ml-3">
+                            <div class="ms-3">
                                 <div class="d-flex align-items-center gap-2">
-                                    <h6 class="mb-0 font-weight-bold">{{ $role->label ?: $role->name }}</h6>
-                                    <code class="ml-2 text-muted" style="font-size:11px;">{{ $role->name }}</code>
+                                    <h6 class="mb-0 fw-bold">{{ $role->label ?: $role->name }}</h6>
+                                    <code class="ms-2 text-muted" style="font-size:11px;">{{ $role->name }}</code>
                                     @if(in_array($role->name, ['superadmin', 'admin', 'membro']))
-                                        <span class="badge badge-light border ml-2" style="font-size:9px;">SISTEMA</span>
+                                        <span class="badge text-bg-light border ms-2" style="font-size:9px;">SISTEMA</span>
                                     @endif
                                 </div>
                                 <div class="mt-1">
                                     <span class="text-muted" style="font-size:12px;">
-                                        <i class="fas fa-key mr-1"></i>{{ $role->permissions->count() }} permissão(ões)
+                                        <i class="fas fa-key me-1"></i>{{ $role->permissions->count() }} permissão(ões)
                                     </span>
                                 </div>
                             </div>
@@ -127,7 +127,7 @@
                         <div class="d-flex align-items-center gap-2">
                             <a href="{{ route('admin.permissions.edit', $role) }}"
                                 class="btn btn-sm btn-outline-primary rounded-pill px-3" data-pjax="true">
-                                <i class="fas fa-edit mr-1"></i> Editar
+                                <i class="fas fa-edit me-1"></i> Editar
                             </a>
                             @if(!in_array($role->name, ['superadmin', 'admin', 'membro']))
                                 <button class="btn btn-sm btn-outline-danger rounded-pill px-3 btn-delete"
@@ -143,25 +143,25 @@
                         @php
                             $rolePermsByCategory = $role->permissions->groupBy(fn($p) => $p->category ?? explode('.', $p->name)[0] ?? 'Outros');
                         @endphp
-                        <div class="mt-3 ml-5 pl-3">
+                        <div class="mt-3 ms-5 ps-3">
                             <div class="d-flex flex-wrap gap-2" style="gap:6px;">
                                 @foreach($rolePermsByCategory as $category => $perms)
                                     @php
                                         $color = $categoryColors[$category] ?? 'secondary';
                                         $icon = $categoryIcons[$category] ?? 'fa-folder';
                                     @endphp
-                                    <div class="d-inline-flex align-items-center rounded-pill border px-2 py-1 mr-1 mb-1"
+                                    <div class="d-inline-flex align-items-center rounded-pill border px-2 py-1 me-1 mb-1"
                                         style="background:rgba(0,0,0,.02); font-size:11px;">
-                                        <i class="fas {{ $icon }} text-{{ $color }} mr-1" style="font-size:10px;"></i>
-                                        <span class="font-weight-bold text-{{ $color }}">{{ ucfirst($category) }}</span>
-                                        <span class="badge badge-{{ $color }} ml-1 rounded-pill" style="font-size:9px; min-width:18px;">{{ $perms->count() }}</span>
+                                        <i class="fas {{ $icon }} text-{{ $color }} me-1" style="font-size:10px;"></i>
+                                        <span class="fw-bold text-{{ $color }}">{{ ucfirst($category) }}</span>
+                                        <span class="badge badge-{{ $color }} ms-1 rounded-pill" style="font-size:9px; min-width:18px;">{{ $perms->count() }}</span>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
                     @else
-                        <div class="mt-2 ml-5 pl-3">
-                            <small class="text-muted"><i class="fas fa-info-circle mr-1"></i>Nenhuma permissão atribuída</small>
+                        <div class="mt-2 ms-5 ps-3">
+                            <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Nenhuma permissão atribuída</small>
                         </div>
                     @endif
                 </div>
@@ -173,7 +173,7 @@
                     <h5 class="text-muted">Nenhum papel cadastrado</h5>
                     <p class="text-muted">Crie o primeiro papel para começar a gerenciar permissões.</p>
                     <a href="{{ route('admin.permissions.create') }}" class="btn btn-primary" data-pjax="true">
-                        <i class="fas fa-plus mr-1"></i> Criar Papel
+                        <i class="fas fa-plus me-1"></i> Criar Papel
                     </a>
                 </div>
             @endforelse
@@ -189,11 +189,11 @@
     {{-- Card de referência: Todas as permissões por categoria --}}
     <div class="card card-outline card-secondary shadow-sm">
         <div class="card-header border-0">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-key mr-2 text-secondary"></i>Mapa de Permissões
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-key me-2 text-secondary"></i>Mapa de Permissões
             </h3>
             <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
                     <i class="fas fa-minus"></i>
                 </button>
             </div>
@@ -209,19 +209,19 @@
                         $icon = $categoryIcons[$category] ?? 'fa-folder';
                     @endphp
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <div class="card border-left border-{{ $color }} h-100 mb-0" style="border-left-width:3px !important;">
+                        <div class="card border-start border-{{ $color }} h-100 mb-0" style="border-left-width:3px !important;">
                             <div class="card-body p-3">
                                 <div class="d-flex align-items-center mb-2">
-                                    <span class="d-inline-flex align-items-center justify-content-center rounded bg-{{ $color }} mr-2"
+                                    <span class="d-inline-flex align-items-center justify-content-center rounded bg-{{ $color }} me-2"
                                         style="width:28px; height:28px;">
                                         <i class="fas {{ $icon }} text-white" style="font-size:12px;"></i>
                                     </span>
                                     <strong class="text-{{ $color }}" style="font-size:13px;">{{ ucfirst($category) }}</strong>
-                                    <span class="badge badge-light border ml-auto" style="font-size:10px;">{{ $perms->count() }}</span>
+                                    <span class="badge text-bg-light border ms-auto" style="font-size:10px;">{{ $perms->count() }}</span>
                                 </div>
                                 <div class="d-flex flex-wrap" style="gap:4px;">
                                     @foreach($perms as $p)
-                                        <span class="badge badge-light border" style="font-size:10px; font-weight:500;" title="{{ $p->label }}">
+                                        <span class="badge text-bg-light border" style="font-size:10px; font-weight:500;" title="{{ $p->label }}">
                                             {{ $p->name }}
                                         </span>
                                     @endforeach

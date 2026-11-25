@@ -10,17 +10,17 @@
         <div class="card-header p-0 pt-1 border-bottom-0">
             <ul class="nav nav-tabs" id="certificate-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="tabs-issued-tab" data-toggle="pill" href="#tabs-issued" role="tab"
+                    <a class="nav-link active" id="tabs-issued-tab" data-bs-toggle="pill" href="#tabs-issued" role="tab"
                         aria-controls="tabs-issued" aria-selected="true">
-                        <i class="fas fa-check-circle mr-1"></i> Emitidos
+                        <i class="fas fa-check-circle me-1"></i> Emitidos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="tabs-pending-tab" data-toggle="pill" href="#tabs-pending" role="tab"
+                    <a class="nav-link" id="tabs-pending-tab" data-bs-toggle="pill" href="#tabs-pending" role="tab"
                         aria-controls="tabs-pending" aria-selected="false">
-                        <i class="fas fa-clock mr-1"></i> Pendentes
+                        <i class="fas fa-clock me-1"></i> Pendentes
                         @if($pendingEnrollments->count() > 0)
-                            <span class="badge badge-warning ml-1">{{ $pendingEnrollments->count() }}</span>
+                            <span class="badge text-bg-warning ms-1">{{ $pendingEnrollments->count() }}</span>
                         @endif
                     </a>
                 </li>
@@ -52,7 +52,7 @@
                                         {{ $cert->issued_at->format('d/m/Y H:i') }}
                                     </td>
                                     <td>{{ optional($cert->user)->name ?? 'Usuário removido' }}</td>
-                                    <td><span class="badge badge-info">{{ $type }}</span></td>
+                                    <td><span class="badge text-bg-info">{{ $type }}</span></td>
                                     <td>{{ $cert->content_title }}</td>
                                     <td><small>{{ $cert->cert_hash }}</small></td>
                                     </td>
@@ -105,7 +105,7 @@
                 <div class="tab-pane fade" id="tabs-pending" role="tabpanel" aria-labelledby="tabs-pending-tab">
                     @if($pendingEnrollments->isEmpty())
                         <div class="alert alert-success">
-                            <i class="fas fa-check mr-2"></i> Todos os alunos que concluíram cursos/mentorias/eventos já possuem
+                            <i class="fas fa-check me-2"></i> Todos os alunos que concluíram cursos/mentorias/eventos já possuem
                             certificados emitidos.
                         </div>
                     @else
@@ -128,7 +128,7 @@
                                     <tr>
                                         <td>{{ $enrollment->completed_at ? $enrollment->completed_at->format('d/m/Y') : '-' }}</td>
                                         <td>{{ optional($enrollment->user)->name ?? 'Usuário removido' }}</td>
-                                        <td><span class="badge badge-secondary">{{ $typeLabel }}</span></td>
+                                        <td><span class="badge text-bg-secondary">{{ $typeLabel }}</span></td>
                                         <td>{{ $enrollment->content_title }}</td>
                                         <td>
                                             <form action="{{ route('admin.certificates.generate') }}" method="POST"
@@ -145,7 +145,7 @@
                                                 @endif
 
                                                 <button type="submit" class="btn btn-sm btn-success">
-                                                    <i class="fas fa-certificate mr-1"></i> Emitir Certificado
+                                                    <i class="fas fa-certificate me-1"></i> Emitir Certificado
                                                 </button>
                                             </form>
                                         </td>
@@ -166,11 +166,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="certificateModalLabel">
-                        <i class="fas fa-certificate mr-2"></i> Visualizar Certificado
+                        <i class="fas fa-certificate me-2"></i> Visualizar Certificado
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body p-0"
                     style="background: #f5f5f5; height: 80vh; display: flex; align-items: center; justify-content: center; overflow: hidden;">
@@ -180,9 +178,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     <a id="btnDownloadCert" href="#" class="btn btn-primary" target="_blank">
-                        <i class="fas fa-download mr-1"></i> Baixar PDF
+                        <i class="fas fa-download me-1"></i> Baixar PDF
                     </a>
                 </div>
             </div>

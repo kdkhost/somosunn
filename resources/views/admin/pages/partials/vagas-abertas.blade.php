@@ -3,12 +3,12 @@
 
 <div id="sec-hero" class="card card-outline card-success">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-briefcase mr-1"></i> Hero</h3>
+        <h3 class="card-title"><i class="fas fa-briefcase me-1"></i> Hero</h3>
         <div class="card-tools">
-            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-hero" data-section="hero"
+            <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="form-check-input section-toggle" id="toggle-hero" data-section="hero"
                     {{ ($data['hero_enabled'] ?? true) ? 'checked' : '' }}>
-                <label class="custom-control-label" for="toggle-hero">Exibir no site</label>
+                <label class="form-check-label" for="toggle-hero">Exibir no site</label>
             </div>
         </div>
     </div>

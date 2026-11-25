@@ -59,13 +59,13 @@
 
     {{-- Ações --}}
     <div class="mb-3 d-flex flex-wrap justify-content-between align-items-center">
-        <h5 class="font-weight-bold mb-0"><i class="fas fa-receipt mr-2 text-primary"></i>Meus Pedidos</h5>
+        <h5 class="fw-bold mb-0"><i class="fas fa-receipt me-2 text-primary"></i>Meus Pedidos</h5>
         <div class="d-flex" style="gap:8px;">
             <a href="{{ route('admin.marketplace.products.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 elevation-1">
-                <i class="fas fa-box-open mr-1"></i> Produtos
+                <i class="fas fa-box-open me-1"></i> Produtos
             </a>
             <a href="{{ route('admin.marketplace.store.edit') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 elevation-1">
-                <i class="fas fa-store mr-1"></i> Minha Loja
+                <i class="fas fa-store me-1"></i> Minha Loja
             </a>
         </div>
     </div>
@@ -105,29 +105,29 @@
 
                     {{-- Col 2: Cliente --}}
                     <div class="col-md-3 col-9">
-                        <div class="font-weight-bold">{{ $order->user->name ?? 'Cliente removido' }}</div>
+                        <div class="fw-bold">{{ $order->user->name ?? 'Cliente removido' }}</div>
                         <div class="text-muted small">{{ $order->user->email ?? '' }}</div>
                         <div class="mt-1">
                             @foreach($order->items->take(3) as $item)
-                                <span class="badge badge-light border mr-1 mb-1" style="font-size:10px;">{{ \Illuminate\Support\Str::limit($item->title, 20) }}</span>
+                                <span class="badge text-bg-light border me-1 mb-1" style="font-size:10px;">{{ \Illuminate\Support\Str::limit($item->title, 20) }}</span>
                             @endforeach
                             @if($order->items->count() > 3)
-                                <span class="badge badge-light border mb-1" style="font-size:10px;">+{{ $order->items->count() - 3 }}</span>
+                                <span class="badge text-bg-light border mb-1" style="font-size:10px;">+{{ $order->items->count() - 3 }}</span>
                             @endif
                         </div>
                     </div>
 
                     {{-- Col 3: Valor + Status --}}
                     <div class="col-md-2 col-6 mt-2 mt-md-0">
-                        <div class="font-weight-bold" style="font-size:16px;">R$ {{ number_format($grossAmount, 2, ',', '.') }}</div>
+                        <div class="fw-bold" style="font-size:16px;">R$ {{ number_format($grossAmount, 2, ',', '.') }}</div>
                         @if($discountAmount > 0)
-                            <div class="text-success font-weight-bold" style="font-size:10px;">
+                            <div class="text-success fw-bold" style="font-size:10px;">
                                 Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
                             </div>
                             <div class="text-muted" style="font-size:10px;">Líquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
                         @endif
                         <span class="badge badge-{{ $statusColor }} mt-1">
-                            <i class="fas fa-circle mr-1" style="font-size:6px;"></i>{{ $statusLabel }}
+                            <i class="fas fa-circle me-1" style="font-size:6px;"></i>{{ $statusLabel }}
                         </span>
                     </div>
 
@@ -152,18 +152,18 @@
                                     </div>
                                     <div class="align-self-end">
                                         <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 elevation-1">
-                                            <i class="fas fa-save mr-1"></i> Salvar
+                                            <i class="fas fa-save me-1"></i> Salvar
                                         </button>
                                     </div>
                                 </div>
                             </form>
                         @else
                             <div class="d-flex align-items-center text-muted">
-                                <div class="d-flex align-items-center justify-content-center rounded-circle bg-light mr-2" style="width:32px;height:32px;">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle bg-light me-2" style="width:32px;height:32px;">
                                     <i class="fas fa-cloud-download-alt text-info"></i>
                                 </div>
                                 <div>
-                                    <div class="font-weight-bold text-sm">Entrega digital</div>
+                                    <div class="fw-bold text-sm">Entrega digital</div>
                                     <div style="font-size:10px;">Acesso liberado automaticamente após pagamento</div>
                                 </div>
                             </div>
@@ -178,10 +178,10 @@
                 <div class="mb-3">
                     <i class="fas fa-shopping-bag fa-3x text-muted"></i>
                 </div>
-                <h5 class="font-weight-bold text-muted">Nenhum pedido recebido</h5>
+                <h5 class="fw-bold text-muted">Nenhum pedido recebido</h5>
                 <p class="text-muted mb-3">Quando seus produtos forem vendidos, os pedidos aparecerão aqui com opções de rastreio.</p>
                 <a href="{{ route('admin.marketplace.products.index') }}" class="btn btn-primary rounded-pill px-4 elevation-1">
-                    <i class="fas fa-box-open mr-1"></i> Ver meus produtos
+                    <i class="fas fa-box-open me-1"></i> Ver meus produtos
                 </a>
             </div>
         </div>

@@ -95,8 +95,8 @@ $(function () {
         const hasFiles = queue.length > 0;
         $submitBtn.prop('disabled', !hasEvent || !hasFiles || isUploading);
         $submitBtn.html(isUploading
-            ? '<i class="fas fa-spinner fa-spin mr-1"></i> Enviando...'
-            : '<i class="fas fa-upload mr-1"></i>Publicar na galeria');
+            ? '<i class="fas fa-spinner fa-spin me-1"></i> Enviando...'
+            : '<i class="fas fa-upload me-1"></i>Publicar na galeria');
         $dropzone.toggleClass('is-disabled', isUploading);
         const $addMore = $('#adminAddMoreFiles');
         $addMore.prop('disabled', isUploading);
@@ -104,10 +104,10 @@ $(function () {
 
     /* ── render queue ── */
     function itemMeta(item) {
-        if (item.state==='uploading') return {badge:'badge-primary',label:'enviando',bar:'bg-primary progress-bar-striped progress-bar-animated'};
-        if (item.state==='done')      return {badge:'badge-success',label:'concluido',bar:'bg-success'};
-        if (item.state==='error')     return {badge:'badge-danger', label:'falhou',   bar:'bg-danger'};
-        return {badge: item.kind==='video'?'badge-info':'badge-secondary', label: item.kind==='video'?'video':'imagem', bar:'bg-secondary'};
+        if (item.state==='uploading') return {badge:'text-bg-primary',label:'enviando',bar:'bg-primary progress-bar-striped progress-bar-animated'};
+        if (item.state==='done')      return {badge:'text-bg-success',label:'concluido',bar:'bg-success'};
+        if (item.state==='error')     return {badge:'text-bg-danger', label:'falhou',   bar:'bg-danger'};
+        return {badge: item.kind==='video'?'text-bg-info':'text-bg-secondary', label: item.kind==='video'?'video':'imagem', bar:'bg-secondary'};
     }
     function previewMarkup(item) {
         if (item.kind==='image' && item.previewUrl) return `<img src="${item.previewUrl}" alt="${esc(item.file.name)}" loading="lazy" decoding="async">`;
@@ -138,11 +138,11 @@ $(function () {
                         <div class="gallery-admin-selected-preview ${item.kind==='video'?'is-video':''}">
                             ${previewMarkup(item)}
                         </div>
-                        <div class="flex-grow-1 ml-3">
+                        <div class="flex-grow-1 ms-3">
                             <div class="d-flex justify-content-between align-items-start mb-1">
                                 <div>
-                                    <span class="badge ${meta.badge} text-uppercase mr-1">${meta.label}</span>
-                                    <span class="font-weight-bold text-break">${esc(item.file.name)}</span>
+                                    <span class="badge ${meta.badge} text-uppercase me-1">${meta.label}</span>
+                                    <span class="fw-bold text-break">${esc(item.file.name)}</span>
                                     <p class="small text-muted mb-0">${fmtBytes(item.file.size||0)}</p>
                                 </div>
                                 <button type="button" class="btn btn-link text-danger p-0 admin-remove-file" data-id="${item.id}" ${isUploading?'disabled':''}>
@@ -265,48 +265,48 @@ $(function () {
                         ${isVideo
                             ? `<a href="${assetUrl}" target="_blank" rel="noopener" class="gallery-admin-video-link">
                                 <video src="${assetUrl}" muted playsinline preload="metadata"></video>
-                                <span class="gallery-admin-video-overlay"><i class="fas fa-play-circle fa-2x mb-2"></i><span class="font-weight-bold">Abrir video</span></span>
+                                <span class="gallery-admin-video-overlay"><i class="fas fa-play-circle fa-2x mb-2"></i><span class="fw-bold">Abrir video</span></span>
                                </a>`
                             : `<a href="${assetUrl}" target="_blank" rel="noopener"><img src="${assetUrl}" alt="${eventTitle}" loading="lazy" decoding="async"></a>`
                         }
                     </div>
                     <div class="card-body d-flex flex-column">
                         <div class="d-flex align-items-center mb-3">
-                            <div class="gallery-admin-avatar mr-2">${avatarMarkup(item)}</div>
+                            <div class="gallery-admin-avatar me-2">${avatarMarkup(item)}</div>
                             <div class="flex-grow-1">
-                                <div class="font-weight-bold text-truncate">${ownerName}</div>
+                                <div class="fw-bold text-truncate">${ownerName}</div>
                                 <small class="text-muted">Enviado em ${uploadedAt}</small>
                             </div>
                         </div>
-                        <h3 class="h6 font-weight-bold mb-2">${eventTitle}</h3>
+                        <h3 class="h6 fw-bold mb-2">${eventTitle}</h3>
                         <div class="mb-3">
-                            ${isCover?'<span class="badge badge-warning mr-1"><i class="fas fa-star mr-1"></i>Capa do album</span>':''}
-                            ${item.watermarked?'<span class="badge badge-primary">Watermark</span>':''}
-                            <span class="badge badge-secondary">${isVideo?'Video':'Imagem'}</span>
+                            ${isCover?'<span class="badge text-bg-warning me-1"><i class="fas fa-star me-1"></i>Capa do album</span>':''}
+                            ${item.watermarked?'<span class="badge text-bg-primary">Watermark</span>':''}
+                            <span class="badge text-bg-secondary">${isVideo?'Video':'Imagem'}</span>
                         </div>
                         <div class="mt-auto">
                             <div class="row">
                                 ${!isVideo
-                                    ? `<div class="col-8 pr-1">
+                                    ? `<div class="col-8 pe-1">
                                             <form action="${esc(item.set_cover_url||'')}" method="POST" class="mb-0 gallery-cover-form">
                                                 @csrf
-                                                <button type="submit" class="btn ${isCover?'btn-warning':'btn-outline-warning'} btn-sm btn-block">
-                                                    <i class="fas fa-star mr-1"></i>${isCover?'Capa ativa':'Definir capa'}
+                                                <button type="submit" class="btn ${isCover?'btn-warning':'btn-outline-warning'} btn-sm w-100">
+                                                    <i class="fas fa-star me-1"></i>${isCover?'Capa ativa':'Definir capa'}
                                                 </button>
                                             </form>
                                        </div>
-                                       <div class="col-4 pl-1">
+                                       <div class="col-4 ps-1">
                                             <form action="${esc(item.delete_url||'')}" method="POST" class="delete-form mb-0" data-confirm-title="Remover da galeria?" data-confirm-text="Esta midia sera excluida permanentemente.">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger btn-sm btn-block"><i class="fas fa-trash"></i></button>
+                                                <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="fas fa-trash"></i></button>
                                             </form>
                                        </div>`
                                     : `<div class="col-12">
                                             <form action="${esc(item.delete_url||'')}" method="POST" class="delete-form mb-0" data-confirm-title="Remover da galeria?" data-confirm-text="Esta midia sera excluida permanentemente.">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger btn-sm btn-block"><i class="fas fa-trash mr-1"></i>Remover video</button>
+                                                <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="fas fa-trash me-1"></i>Remover video</button>
                                             </form>
                                        </div>`
                                 }

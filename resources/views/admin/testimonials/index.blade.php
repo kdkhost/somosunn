@@ -73,21 +73,21 @@
     {{-- Main Content --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-comments text-primary mr-2"></i>Depoimentos
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-comments text-primary me-2"></i>Depoimentos
             </h3>
             <div class="card-tools">
-                <a href="{{ route('admin.testimonials.import-google') }}" class="btn btn-outline-secondary btn-sm rounded-pill elevation-1 mr-1">
-                    <i class="fab fa-google mr-1"></i> Importar do Google
+                <a href="{{ route('admin.testimonials.import-google') }}" class="btn btn-outline-secondary btn-sm rounded-pill elevation-1 me-1">
+                    <i class="fab fa-google me-1"></i> Importar do Google
                 </a>
                 <a href="{{ route('admin.testimonials.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
-                    <i class="fas fa-plus mr-1"></i> Novo depoimento
+                    <i class="fas fa-plus me-1"></i> Novo depoimento
                 </a>
             </div>
         </div>
         <div class="card-body">
             <form method="GET" class="mb-3">
-                <div class="form-row">
+                <div class="row g-2">
                     <div class="col-md-2 mb-2">
                         <select name="status" class="form-control form-control-sm">
                             <option value="">Status (todos)</option>
@@ -114,8 +114,8 @@
                         <input name="q" class="form-control form-control-sm" placeholder="Buscar por nome, titulo ou texto..." value="{{ $q ?? '' }}">
                     </div>
                     <div class="col-md-2 mb-2">
-                        <button class="btn btn-primary btn-sm btn-block rounded-pill elevation-1">
-                            <i class="fas fa-search mr-1"></i>Filtrar
+                        <button class="btn btn-primary btn-sm w-100 rounded-pill elevation-1">
+                            <i class="fas fa-search me-1"></i>Filtrar
                         </button>
                     </div>
                 </div>
@@ -123,19 +123,19 @@
 
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
                     {{ session('success') }}
                 </div>
             @endif
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
                     {{ session('error') }}
                 </div>
             @endif
             @if(session('info'))
                 <div class="alert alert-info alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
                     {{ session('info') }}
                 </div>
             @endif
@@ -151,7 +151,7 @@
                             <th>Origem</th>
                             <th>Status</th>
                             <th>Ativo</th>
-                            <th class="text-right">Acoes</th>
+                            <th class="text-end">Acoes</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -175,10 +175,10 @@
 
                                 {{-- Autor --}}
                                 <td>
-                                    <div class="font-weight-bold">{{ $displayName }}</div>
+                                    <div class="fw-bold">{{ $displayName }}</div>
                                     <div class="text-muted small">{{ $t->author_title ?: '—' }}</div>
                                     @if($t->user_id)
-                                        <div class="text-muted small"><i class="fas fa-user-circle mr-1"></i>Membro vinculado</div>
+                                        <div class="text-muted small"><i class="fas fa-user-circle me-1"></i>Membro vinculado</div>
                                     @endif
                                 </td>
 
@@ -187,11 +187,11 @@
                                     {{ \Illuminate\Support\Str::limit($t->content, 140) }}
                                     @if($t->moderation_notes)
                                         <div class="small text-danger mt-1">
-                                            <i class="fas fa-comment-dots mr-1"></i>{{ $t->moderation_notes }}
+                                            <i class="fas fa-comment-dots me-1"></i>{{ $t->moderation_notes }}
                                         </div>
                                     @endif
                                     @if($t->is_featured)
-                                        <span class="badge badge-primary"><i class="fas fa-star mr-1"></i>Destaque</span>
+                                        <span class="badge text-bg-primary"><i class="fas fa-star me-1"></i>Destaque</span>
                                     @endif
                                 </td>
 
@@ -207,16 +207,16 @@
                                 {{-- Origem --}}
                                 <td>
                                     @if($t->source === 'google')
-                                        <span class="badge badge-info"><i class="fab fa-google mr-1"></i>Google</span>
+                                        <span class="badge text-bg-info"><i class="fab fa-google me-1"></i>Google</span>
                                     @else
-                                        <span class="badge badge-secondary"><i class="fas fa-pencil-alt mr-1"></i>Manual</span>
+                                        <span class="badge text-bg-secondary"><i class="fas fa-pencil-alt me-1"></i>Manual</span>
                                     @endif
                                 </td>
 
                                 {{-- Status --}}
                                 <td>
                                     <span class="badge badge-{{ $badge }}">
-                                        <i class="fas {{ $badgeIcon }} mr-1"></i>{{ $st === 'approved' ? 'Aprovado' : ($st === 'rejected' ? 'Recusado' : 'Pendente') }}
+                                        <i class="fas {{ $badgeIcon }} me-1"></i>{{ $st === 'approved' ? 'Aprovado' : ($st === 'rejected' ? 'Recusado' : 'Pendente') }}
                                     </span>
                                 </td>
 
@@ -225,18 +225,18 @@
                                     <form method="POST" action="{{ route('admin.testimonials.toggle', $t) }}" class="d-inline">
                                         @csrf
                                         @method('PATCH')
-                                        <div class="custom-control custom-switch">
+                                        <div class="form-check form-switch">
                                             <input type="hidden" name="__toggle" value="1">
-                                            <input type="checkbox" class="custom-control-input js-toggle-submit"
+                                            <input type="checkbox" class="form-check-input js-toggle-submit"
                                                 id="active-{{ $t->id }}"
                                                 {{ $t->is_active ? 'checked' : '' }}>
-                                            <label class="custom-control-label" for="active-{{ $t->id }}"></label>
+                                            <label class="form-check-label" for="active-{{ $t->id }}"></label>
                                         </div>
                                     </form>
                                 </td>
 
                                 {{-- Acoes --}}
-                                <td class="text-right" style="white-space:nowrap">
+                                <td class="text-end" style="white-space:nowrap">
                                     <a href="{{ route('admin.testimonials.edit', $t) }}" class="btn btn-sm btn-outline-primary rounded-pill" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>

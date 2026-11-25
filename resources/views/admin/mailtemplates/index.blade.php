@@ -46,10 +46,10 @@
     {{-- Main Card --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-mail-bulk mr-2"></i>Modelos de E-mail</h3>
+            <h3 class="card-title"><i class="fas fa-mail-bulk me-2"></i>Modelos de E-mail</h3>
             <div class="card-tools">
                 <a href="{{ route($routePrefix . '.mailtemplates.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
-                    <i class="fas fa-plus mr-1"></i> Novo Modelo
+                    <i class="fas fa-plus me-1"></i> Novo Modelo
                 </a>
             </div>
         </div>
@@ -58,36 +58,36 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th><i class="fas fa-tag text-muted mr-1"></i>Nome</th>
-                            <th><i class="fas fa-code text-muted mr-1"></i>Slug</th>
-                            <th><i class="fas fa-folder text-muted mr-1"></i>Categoria</th>
-                            <th><i class="fas fa-heading text-muted mr-1"></i>Assunto</th>
-                            <th><i class="fas fa-toggle-on text-muted mr-1"></i>Ativo</th>
-                            <th class="text-right">Ações</th>
+                            <th><i class="fas fa-tag text-muted me-1"></i>Nome</th>
+                            <th><i class="fas fa-code text-muted me-1"></i>Slug</th>
+                            <th><i class="fas fa-folder text-muted me-1"></i>Categoria</th>
+                            <th><i class="fas fa-heading text-muted me-1"></i>Assunto</th>
+                            <th><i class="fas fa-toggle-on text-muted me-1"></i>Ativo</th>
+                            <th class="text-end">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($templates as $t)
                             <tr>
-                                <td class="font-weight-bold">{{ $t->name }}</td>
+                                <td class="fw-bold">{{ $t->name }}</td>
                                 <td><code class="text-muted">{{ $t->slug }}</code></td>
                                 <td>
-                                    <span class="badge badge-info"><i class="fas fa-folder-open mr-1"></i>{{ ucfirst($t->category) }}</span>
+                                    <span class="badge text-bg-info"><i class="fas fa-folder-open me-1"></i>{{ ucfirst($t->category) }}</span>
                                 </td>
                                 <td class="text-muted">{{ Str::limit($t->subject, 50) }}</td>
                                 <td>
                                     @if($t->is_active)
-                                        <span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i>Sim</span>
+                                        <span class="badge text-bg-success"><i class="fas fa-check-circle me-1"></i>Sim</span>
                                     @else
-                                        <span class="badge badge-secondary"><i class="fas fa-times-circle mr-1"></i>Não</span>
+                                        <span class="badge text-bg-secondary"><i class="fas fa-times-circle me-1"></i>Não</span>
                                     @endif
                                 </td>
-                                <td class="text-right">
+                                <td class="text-end">
                                     <a href="{{ route($routePrefix . '.mailtemplates.edit', $t) }}"
-                                        class="btn btn-sm btn-outline-info rounded-pill elevation-1 mr-1" title="Editar">
+                                        class="btn btn-sm btn-outline-info rounded-pill elevation-1 me-1" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button type="button" onclick="preview({{ $t->id }})" class="btn btn-sm btn-outline-primary rounded-pill elevation-1 mr-1" title="Pré-visualizar">
+                                    <button type="button" onclick="preview({{ $t->id }})" class="btn btn-sm btn-outline-primary rounded-pill elevation-1 me-1" title="Pré-visualizar">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <form action="{{ route($routePrefix . '.mailtemplates.destroy', $t) }}" method="POST"
@@ -107,7 +107,7 @@
                                     <i class="fas fa-envelope-open fa-3x text-muted mb-3 d-block"></i>
                                     <p class="text-muted mb-2">Nenhum modelo de e-mail cadastrado.</p>
                                     <a href="{{ route($routePrefix . '.mailtemplates.create') }}" class="btn btn-primary btn-sm rounded-pill elevation-1">
-                                        <i class="fas fa-plus mr-1"></i> Criar primeiro modelo
+                                        <i class="fas fa-plus me-1"></i> Criar primeiro modelo
                                     </a>
                                 </td>
                             </tr>
@@ -126,8 +126,8 @@
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header bg-gradient-primary">
-                    <h5 class="modal-title text-white"><i class="fas fa-eye mr-2"></i>Pré-visualização</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title text-white"><i class="fas fa-eye me-2"></i>Pré-visualização</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body p-0" id="previewBody" style="overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;"></div>
                 <div class="modal-footer">
@@ -137,7 +137,7 @@
                         </div>
                         <input type="email" id="previewEmail" class="form-control" placeholder="Enviar para e-mail de teste">
                         <div class="input-group-append">
-                            <button class="btn btn-primary rounded-right" id="sendPreviewBtn"><i class="fas fa-paper-plane mr-1"></i>Enviar</button>
+                            <button class="btn btn-primary rounded-end" id="sendPreviewBtn"><i class="fas fa-paper-plane me-1"></i>Enviar</button>
                         </div>
                     </div>
                 </div>

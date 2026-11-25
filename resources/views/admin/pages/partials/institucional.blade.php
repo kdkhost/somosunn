@@ -9,7 +9,7 @@
 <div class="tab-pane fade" id="sec-identity">
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title text-capitalize"><i class="fas fa-heading mr-1"></i> {{ str_replace('-', ' ', $page->slug) }} - Cabecalho</h3>
+            <h3 class="card-title text-capitalize"><i class="fas fa-heading me-1"></i> {{ str_replace('-', ' ', $page->slug) }} - Cabecalho</h3>
         </div>
         <div class="card-body py-4 bg-light">
             <div class="row justify-content-center">
@@ -36,7 +36,7 @@
 <div class="tab-pane fade" id="sec-content">
     <div class="card card-outline card-info">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-file-alt mr-1"></i> Conteudo da Pagina</h3>
+            <h3 class="card-title"><i class="fas fa-file-alt me-1"></i> Conteudo da Pagina</h3>
         </div>
         <div class="card-body p-0">
             <textarea name="{{ $contentField }}" class="summernote" id="editor-institucional">{{ $contentValue }}</textarea>

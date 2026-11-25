@@ -61,7 +61,7 @@
     <div class="callout callout-info shadow-sm mb-4">
         <div class="d-flex flex-wrap align-items-center justify-content-between">
             <div>
-                <h6 class="font-weight-bold mb-1"><i class="fas fa-chart-pie mr-2"></i>Resumo Financeiro</h6>
+                <h6 class="fw-bold mb-1"><i class="fas fa-chart-pie me-2"></i>Resumo Financeiro</h6>
                 <p class="mb-0 text-muted">
                     Bruto <strong>R$ {{ number_format($paidTotal, 2, ',', '.') }}</strong>
                     &minus; Descontos <strong>R$ {{ number_format($discountTotal, 2, ',', '.') }}</strong>
@@ -71,7 +71,7 @@
                 </p>
             </div>
             <a href="{{ route('admin.marketplace.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 mt-2 mt-md-0">
-                <i class="fas fa-arrow-left mr-1"></i> Voltar ao Marketplace
+                <i class="fas fa-arrow-left me-1"></i> Voltar ao Marketplace
             </a>
         </div>
     </div>
@@ -79,11 +79,11 @@
     {{-- Lista de vendas --}}
     <div class="card card-outline card-dark shadow-sm">
         <div class="card-header border-0">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-receipt mr-2 text-primary"></i>Histórico de Vendas
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-receipt me-2 text-primary"></i>Histórico de Vendas
             </h3>
             <div class="card-tools">
-                <span class="badge badge-light border px-3 py-2">
+                <span class="badge text-bg-light border px-3 py-2">
                     {{ method_exists($orders, 'total') ? $orders->total() : count($orders) }} venda(s)
                 </span>
             </div>
@@ -125,17 +125,17 @@
 
                         {{-- Comprador --}}
                         <div class="col-md-3 col-9">
-                            <div class="font-weight-bold">{{ $order->user->name ?? '—' }}</div>
+                            <div class="fw-bold">{{ $order->user->name ?? '—' }}</div>
                             <div class="text-muted small">{{ $order->user->email ?? '' }}</div>
                         </div>
 
                         {{-- Itens --}}
                         <div class="col-md-3 col-12 mt-1 mt-md-0">
                             @foreach($items->take(2) as $item)
-                                <span class="badge badge-light border mr-1" style="font-size:10px;">{{ \Illuminate\Support\Str::limit($item->title, 22) }}</span>
+                                <span class="badge text-bg-light border me-1" style="font-size:10px;">{{ \Illuminate\Support\Str::limit($item->title, 22) }}</span>
                             @endforeach
                             @if($items->count() > 2)
-                                <span class="badge badge-light border" style="font-size:10px;">+{{ $items->count() - 2 }}</span>
+                                <span class="badge text-bg-light border" style="font-size:10px;">+{{ $items->count() - 2 }}</span>
                             @endif
                             @if($items->isEmpty())
                                 <span class="text-muted small">—</span>
@@ -144,9 +144,9 @@
 
                         {{-- Valor --}}
                         <div class="col-md-2 col-4 mt-1 mt-md-0">
-                            <div class="font-weight-bold" style="font-size:15px;">R$ {{ number_format($grossAmount, 2, ',', '.') }}</div>
+                            <div class="fw-bold" style="font-size:15px;">R$ {{ number_format($grossAmount, 2, ',', '.') }}</div>
                             @if($discountAmount > 0)
-                                <div class="text-success font-weight-bold" style="font-size:10px;">
+                                <div class="text-success fw-bold" style="font-size:10px;">
                                     Cupom {{ $couponCode ?: '-' }}: - R$ {{ number_format($discountAmount, 2, ',', '.') }}
                                 </div>
                                 <div class="text-muted" style="font-size:10px;">Líquido: R$ {{ number_format((float) $order->total_amount, 2, ',', '.') }}</div>
@@ -158,12 +158,12 @@
                         {{-- Status --}}
                         <div class="col-md-2 col-4 mt-1 mt-md-0">
                             <span class="badge badge-{{ $statusColor }} px-2 py-1">
-                                <i class="fas fa-circle mr-1" style="font-size:6px;"></i>{{ $statusLabel }}
+                                <i class="fas fa-circle me-1" style="font-size:6px;"></i>{{ $statusLabel }}
                             </span>
                         </div>
 
                         {{-- Hora --}}
-                        <div class="col-md-1 col-4 mt-1 mt-md-0 text-right">
+                        <div class="col-md-1 col-4 mt-1 mt-md-0 text-end">
                             <span class="text-muted" style="font-size:11px;">{{ $order->created_at?->format('H:i') }}</span>
                         </div>
                     </div>
@@ -173,10 +173,10 @@
                     <div class="mb-3">
                         <i class="fas fa-receipt fa-3x text-muted"></i>
                     </div>
-                    <h5 class="font-weight-bold text-muted">Nenhuma venda registrada</h5>
+                    <h5 class="fw-bold text-muted">Nenhuma venda registrada</h5>
                     <p class="text-muted mb-3">Suas vendas aparecerão aqui quando forem realizadas pelos compradores.</p>
                     <a href="{{ route('admin.marketplace.products.index') }}" class="btn btn-primary rounded-pill px-4 elevation-1">
-                        <i class="fas fa-box-open mr-1"></i> Ver meus produtos
+                        <i class="fas fa-box-open me-1"></i> Ver meus produtos
                     </a>
                 </div>
             @endforelse

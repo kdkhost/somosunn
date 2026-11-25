@@ -88,13 +88,13 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="badge badge-success">
+                                    <span class="badge text-bg-success">
                                         R$ {{ number_format((float) $item->price, 2, ',', '.') }}
                                     </span>
                                     <span class="text-xs text-muted text-uppercase">{{ $item->mentor?->name ?? 'Mentor UNN' }}</span>
                                 </div>
 
-                                <h3 class="h6 font-weight-bold mb-2 text-dark">{{ $item->title }}</h3>
+                                <h3 class="h6 fw-bold mb-2 text-dark">{{ $item->title }}</h3>
                                 <p class="text-muted small">
                                     {{ \Illuminate\Support\Str::limit(strip_tags((string) $item->description), 140) }}
                                 </p>
@@ -103,20 +103,20 @@
                                     <div class="col-6">
                                         <div class="bg-light rounded p-2 text-center">
                                             <small class="d-block text-muted text-uppercase">Vagas</small>
-                                            <span class="font-weight-bold">{{ $item->slots ?: 'Ilimitadas' }}</span>
+                                            <span class="fw-bold">{{ $item->slots ?: 'Ilimitadas' }}</span>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="bg-light rounded p-2 text-center">
                                             <small class="d-block text-muted text-uppercase">Formato</small>
-                                            <span class="font-weight-bold">Premium</span>
+                                            <span class="fw-bold">Premium</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-footer bg-white">
-                                <a href="{{ route('mentorships.show', $item->id) }}" class="btn btn-primary btn-block">
-                                    <i class="fas fa-external-link-alt mr-1"></i> Ver Detalhes
+                                <a href="{{ route('mentorships.show', $item->id) }}" class="btn btn-primary w-100">
+                                    <i class="fas fa-external-link-alt me-1"></i> Ver Detalhes
                                 </a>
                             </div>
                         </div>

@@ -2,14 +2,14 @@
     <div class="col-12 mb-4" id="sec-identity">
         <div class="card card-outline card-pink shadow-sm">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h3 class="card-title text-pink font-weight-bold mb-0">
-                    <i class="fas fa-palette mr-2"></i> Identidade Visual
+                <h3 class="card-title text-pink fw-bold mb-0">
+                    <i class="fas fa-palette me-2"></i> Identidade Visual
                 </h3>
                 <div class="card-tools">
-                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                        <input type="checkbox" class="custom-control-input section-toggle" id="toggle-identity"
+                    <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                        <input type="checkbox" class="form-check-input section-toggle" id="toggle-identity"
                             data-section="identity" {{ ($data['identity_enabled'] ?? true) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="toggle-identity">Ativo</label>
+                        <label class="form-check-label" for="toggle-identity">Ativo</label>
                     </div>
                 </div>
             </div>
@@ -17,7 +17,7 @@
                 <div class="row">
                     <div class="col-lg-4 border-lg-right mb-4 mb-lg-0">
                         <div class="form-group mb-0">
-                            <label class="font-weight-bold" for="theme_color">Cor do Tema</label>
+                            <label class="fw-bold" for="theme_color">Cor do Tema</label>
                             <input type="color" id="theme_color" name="theme_color"
                                 class="form-control form-control-color w-100"
                                 value="{{ old('theme_color', $data['theme_color'] ?? '#db2777') }}"
@@ -30,8 +30,8 @@
                     <div class="col-lg-8">
                         <div class="alert alert-light border mb-0 h-100 d-flex align-items-center">
                             <div>
-                                <div class="font-weight-bold text-pink mb-1">
-                                    <i class="fas fa-info-circle mr-1"></i> Imagem da secao Comunidade
+                                <div class="fw-bold text-pink mb-1">
+                                    <i class="fas fa-info-circle me-1"></i> Imagem da secao Comunidade
                                 </div>
                                 <div class="text-muted small mb-0">
                                     A imagem institucional da secao Comunidade da pagina
@@ -49,14 +49,14 @@
     <div class="col-12 mb-4" id="sec-hero">
         <div class="card card-outline card-purple shadow-sm">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h3 class="card-title text-purple font-weight-bold mb-0">
-                    <i class="fas fa-star mr-2"></i> Hero Principal
+                <h3 class="card-title text-purple fw-bold mb-0">
+                    <i class="fas fa-star me-2"></i> Hero Principal
                 </h3>
                 <div class="card-tools">
-                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                        <input type="checkbox" class="custom-control-input section-toggle" id="toggle-hero"
+                    <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                        <input type="checkbox" class="form-check-input section-toggle" id="toggle-hero"
                             data-section="hero" {{ ($data['hero_enabled'] ?? true) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="toggle-hero">Ativo</label>
+                        <label class="form-check-label" for="toggle-hero">Ativo</label>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,7 @@
                 <div class="row">
                     <div class="col-xl-7">
                         <div class="form-group">
-                            <label class="font-weight-bold" for="hero_title">Titulo principal</label>
+                            <label class="fw-bold" for="hero_title">Titulo principal</label>
                             <input type="text" name="hero_title" id="hero_title"
                                 class="form-control @error('hero_title') is-invalid @enderror"
                                 value="{{ old('hero_title', $data['hero_title'] ?? '') }}"
@@ -75,7 +75,7 @@
                         </div>
 
                         <div class="form-group mb-0">
-                            <label class="font-weight-bold" for="hero_subtitle">Subtitulo / Introducao</label>
+                            <label class="fw-bold" for="hero_subtitle">Subtitulo / Introducao</label>
                             <textarea name="hero_subtitle" id="hero_subtitle"
                                 class="form-control summernote-sm @error('hero_subtitle') is-invalid @enderror" rows="5"
                                 placeholder="Explique o posicionamento da area Somos Unicas...">{{ old('hero_subtitle', $data['hero_subtitle'] ?? '') }}</textarea>
@@ -87,7 +87,7 @@
 
                     <div class="col-xl-5 mt-4 mt-xl-0">
                         <div class="border rounded p-3 bg-light h-100">
-                            <label class="font-weight-bold d-block mb-3" for="hero_image">Imagem do Hero</label>
+                            <label class="fw-bold d-block mb-3" for="hero_image">Imagem do Hero</label>
                             @include('admin.components.upload-global', [
                                 'name' => 'hero_image',
                                 'path' => $data['hero_image'] ?? null,
@@ -111,14 +111,14 @@
     <div class="col-12 mb-4" id="sec-headers">
         <div class="card card-outline card-primary shadow-sm">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h3 class="card-title text-primary font-weight-bold mb-0">
-                    <i class="fas fa-heading mr-2"></i> Titulos das Vitrines
+                <h3 class="card-title text-primary fw-bold mb-0">
+                    <i class="fas fa-heading me-2"></i> Titulos das Vitrines
                 </h3>
                 <div class="card-tools">
-                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                        <input type="checkbox" class="custom-control-input section-toggle" id="toggle-headers"
+                    <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                        <input type="checkbox" class="form-check-input section-toggle" id="toggle-headers"
                             data-section="headers" {{ ($data['headers_enabled'] ?? true) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="toggle-headers">Ativo</label>
+                        <label class="form-check-label" for="toggle-headers">Ativo</label>
                     </div>
                 </div>
             </div>
@@ -126,9 +126,9 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="border rounded p-3 h-100 bg-light">
-                            <h4 class="font-weight-bold text-pink mb-3">Cursos</h4>
+                            <h4 class="fw-bold text-pink mb-3">Cursos</h4>
                             <div class="form-group">
-                                <label class="font-weight-bold" for="courses_title">Titulo</label>
+                                <label class="fw-bold" for="courses_title">Titulo</label>
                                 <input type="text" name="courses_title" id="courses_title"
                                     class="form-control @error('courses_title') is-invalid @enderror"
                                     value="{{ old('courses_title', $data['courses_title'] ?? '') }}"
@@ -138,7 +138,7 @@
                                 @enderror
                             </div>
                             <div class="form-group mb-0">
-                                <label class="font-weight-bold" for="courses_subtitle">Subtitulo</label>
+                                <label class="fw-bold" for="courses_subtitle">Subtitulo</label>
                                 <input type="text" name="courses_subtitle" id="courses_subtitle"
                                     class="form-control @error('courses_subtitle') is-invalid @enderror"
                                     value="{{ old('courses_subtitle', $data['courses_subtitle'] ?? '') }}"
@@ -152,9 +152,9 @@
 
                     <div class="col-lg-4 mt-4 mt-lg-0">
                         <div class="border rounded p-3 h-100 bg-light">
-                            <h4 class="font-weight-bold text-purple mb-3">Eventos</h4>
+                            <h4 class="fw-bold text-purple mb-3">Eventos</h4>
                             <div class="form-group">
-                                <label class="font-weight-bold" for="events_title">Titulo</label>
+                                <label class="fw-bold" for="events_title">Titulo</label>
                                 <input type="text" name="events_title" id="events_title"
                                     class="form-control @error('events_title') is-invalid @enderror"
                                     value="{{ old('events_title', $data['events_title'] ?? '') }}"
@@ -164,7 +164,7 @@
                                 @enderror
                             </div>
                             <div class="form-group mb-0">
-                                <label class="font-weight-bold" for="events_subtitle">Subtitulo</label>
+                                <label class="fw-bold" for="events_subtitle">Subtitulo</label>
                                 <input type="text" name="events_subtitle" id="events_subtitle"
                                     class="form-control @error('events_subtitle') is-invalid @enderror"
                                     value="{{ old('events_subtitle', $data['events_subtitle'] ?? '') }}"
@@ -178,9 +178,9 @@
 
                     <div class="col-lg-4 mt-4 mt-lg-0">
                         <div class="border rounded p-3 h-100 bg-light">
-                            <h4 class="font-weight-bold text-primary mb-3">Mentorias</h4>
+                            <h4 class="fw-bold text-primary mb-3">Mentorias</h4>
                             <div class="form-group">
-                                <label class="font-weight-bold" for="mentorships_title">Titulo</label>
+                                <label class="fw-bold" for="mentorships_title">Titulo</label>
                                 <input type="text" name="mentorships_title" id="mentorships_title"
                                     class="form-control @error('mentorships_title') is-invalid @enderror"
                                     value="{{ old('mentorships_title', $data['mentorships_title'] ?? '') }}"
@@ -190,7 +190,7 @@
                                 @enderror
                             </div>
                             <div class="form-group mb-0">
-                                <label class="font-weight-bold" for="mentorships_subtitle">Subtitulo</label>
+                                <label class="fw-bold" for="mentorships_subtitle">Subtitulo</label>
                                 <input type="text" name="mentorships_subtitle" id="mentorships_subtitle"
                                     class="form-control @error('mentorships_subtitle') is-invalid @enderror"
                                     value="{{ old('mentorships_subtitle', $data['mentorships_subtitle'] ?? '') }}"
@@ -209,20 +209,20 @@
     <div class="col-12" id="sec-empty">
         <div class="card card-outline card-warning shadow-sm">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h3 class="card-title text-warning font-weight-bold mb-0">
-                    <i class="fas fa-ghost mr-2"></i> Estado Vazio
+                <h3 class="card-title text-warning fw-bold mb-0">
+                    <i class="fas fa-ghost me-2"></i> Estado Vazio
                 </h3>
                 <div class="card-tools">
-                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                        <input type="checkbox" class="custom-control-input section-toggle" id="toggle-empty"
+                    <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                        <input type="checkbox" class="form-check-input section-toggle" id="toggle-empty"
                             data-section="empty" {{ ($data['empty_enabled'] ?? true) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="toggle-empty">Ativo</label>
+                        <label class="form-check-label" for="toggle-empty">Ativo</label>
                     </div>
                 </div>
             </div>
             <div class="card-body">
                 <div class="form-group">
-                    <label class="font-weight-bold" for="empty_title">Titulo de fallback</label>
+                    <label class="fw-bold" for="empty_title">Titulo de fallback</label>
                     <input type="text" name="empty_title" id="empty_title"
                         class="form-control @error('empty_title') is-invalid @enderror"
                         value="{{ old('empty_title', $data['empty_title'] ?? '') }}"
@@ -232,7 +232,7 @@
                     @enderror
                 </div>
                 <div class="form-group mb-0">
-                    <label class="font-weight-bold" for="empty_description">Descricao de fallback</label>
+                    <label class="fw-bold" for="empty_description">Descricao de fallback</label>
                     <textarea name="empty_description" id="empty_description" rows="4"
                         class="form-control @error('empty_description') is-invalid @enderror"
                         placeholder="Mensagem exibida quando ainda nao houver cursos, eventos ou mentorias cadastrados.">{{ old('empty_description', $data['empty_description'] ?? '') }}</textarea>

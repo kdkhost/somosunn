@@ -4,10 +4,10 @@
 <div class="tab-pane fade" id="sec-hero">
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-fist-raised mr-1"></i> Hero</h3>
+            <h3 class="card-title"><i class="fas fa-fist-raised me-1"></i> Hero</h3>
         </div>
         <div class="card-body">
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-6">
                     <label>Título (parte 1)</label>
                     <input type="text" name="hero_title" class="form-control" value="{{ old('hero_title', $data['hero_title'] ?? '') }}">
@@ -28,7 +28,7 @@
 <div class="tab-pane fade" id="sec-sections">
     <div class="card card-outline card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-list mr-1"></i> Seções do Manifesto</h3>
+            <h3 class="card-title"><i class="fas fa-list me-1"></i> Seções do Manifesto</h3>
         </div>
         <div class="card-body">
             @foreach ([1,2,3,4,5] as $i)
@@ -49,7 +49,7 @@
 <div class="tab-pane fade" id="sec-quote">
     <div class="card card-outline card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-quote-right mr-1"></i> Citação Final</h3>
+            <h3 class="card-title"><i class="fas fa-quote-right me-1"></i> Citação Final</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -67,14 +67,14 @@
 <div class="tab-pane fade" id="sec-pillars">
     <div class="card card-outline card-warning">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-columns mr-1"></i> Pilares</h3>
+            <h3 class="card-title"><i class="fas fa-columns me-1"></i> Pilares</h3>
         </div>
         <div class="card-body">
             <div class="form-group">
                 <label>Título da seção</label>
                 <input type="text" name="pillars_title" class="form-control" value="{{ old('pillars_title', $data['pillars_title'] ?? '') }}">
             </div>
-            <div class="form-row">
+            <div class="row g-2">
                 @foreach ([1,2,3,4] as $i)
                 <div class="form-group col-md-6">
                     <label>Pilar {{ $i }}</label>
@@ -89,7 +89,7 @@
 <div class="tab-pane fade" id="sec-cta">
     <div class="card card-outline card-success">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-bullhorn mr-1"></i> CTA Final</h3>
+            <h3 class="card-title"><i class="fas fa-bullhorn me-1"></i> CTA Final</h3>
         </div>
         <div class="card-body">
             <div class="form-group">

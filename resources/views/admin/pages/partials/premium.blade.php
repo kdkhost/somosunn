@@ -3,12 +3,12 @@
 {{-- ===== HERO ===== --}}
 <div class="card card-outline card-danger">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-crown mr-2"></i>Hero / Cabecalho</h3>
+        <h3 class="card-title"><i class="fas fa-crown me-2"></i>Hero / Cabecalho</h3>
         <div class="card-tools">
-            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-hero" data-section="hero"
+            <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="form-check-input section-toggle" id="toggle-hero" data-section="hero"
                     {{ ($data['hero_enabled'] ?? true) ? 'checked' : '' }}>
-                <label class="custom-control-label" for="toggle-hero">Exibir no site</label>
+                <label class="form-check-label" for="toggle-hero">Exibir no site</label>
             </div>
         </div>
     </div>
@@ -61,7 +61,7 @@
                         style="max-height:160px;" loading="lazy" decoding="async">
                     <div class="mt-1">
                         <input type="checkbox" name="remove_hero_image" value="1" id="remove_premium_hero_image">
-                        <label for="remove_premium_hero_image" class="text-danger ml-1">Remover imagem atual</label>
+                        <label for="remove_premium_hero_image" class="text-danger ms-1">Remover imagem atual</label>
                     </div>
                 </div>
             @endif
@@ -72,12 +72,12 @@
 {{-- ===== SECAO DE PLANOS ===== --}}
 <div class="card card-outline card-warning">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-tags mr-2"></i>Secao de Planos</h3>
+        <h3 class="card-title"><i class="fas fa-tags me-2"></i>Secao de Planos</h3>
         <div class="card-tools">
-            <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                <input type="checkbox" class="custom-control-input section-toggle" id="toggle-plans"
+            <div class="form-check form-switch custom-switch-off-danger custom-switch-on-success">
+                <input type="checkbox" class="form-check-input section-toggle" id="toggle-plans"
                     data-section="plans" {{ ($data['plans_enabled'] ?? true) ? 'checked' : '' }}>
-                <label class="custom-control-label" for="toggle-plans">Exibir no site</label>
+                <label class="form-check-label" for="toggle-plans">Exibir no site</label>
             </div>
         </div>
     </div>

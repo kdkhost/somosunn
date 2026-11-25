@@ -47,8 +47,8 @@
     {{-- Main Content --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header">
-            <h3 class="card-title font-weight-bold">
-                <i class="fas fa-trophy text-warning mr-2"></i>Top Usuários
+            <h3 class="card-title fw-bold">
+                <i class="fas fa-trophy text-warning me-2"></i>Top Usuários
             </h3>
         </div>
         <div class="card-body p-0">
@@ -59,7 +59,7 @@
                             <tr>
                                 <th style="width:60px" class="text-center">Pos.</th>
                                 <th>Usuário</th>
-                                <th class="text-right">Pontos</th>
+                                <th class="text-end">Pontos</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -67,21 +67,21 @@
                                 <tr>
                                     <td class="text-center">
                                         @if($i === 0)
-                                            <span class="badge badge-warning px-2 py-1"><i class="fas fa-crown mr-1"></i>1º</span>
+                                            <span class="badge text-bg-warning px-2 py-1"><i class="fas fa-crown me-1"></i>1º</span>
                                         @elseif($i === 1)
-                                            <span class="badge badge-secondary px-2 py-1"><i class="fas fa-medal mr-1"></i>2º</span>
+                                            <span class="badge text-bg-secondary px-2 py-1"><i class="fas fa-medal me-1"></i>2º</span>
                                         @elseif($i === 2)
-                                            <span class="badge badge-info px-2 py-1"><i class="fas fa-medal mr-1"></i>3º</span>
+                                            <span class="badge text-bg-info px-2 py-1"><i class="fas fa-medal me-1"></i>3º</span>
                                         @else
-                                            <span class="text-muted font-weight-bold">{{ $i + 1 }}º</span>
+                                            <span class="text-muted fw-bold">{{ $i + 1 }}º</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="font-weight-bold">{{ $u->name }}</div>
+                                        <div class="fw-bold">{{ $u->name }}</div>
                                     </td>
-                                    <td class="text-right">
-                                        <span class="badge badge-success px-2 py-1">
-                                            <i class="fas fa-coins mr-1"></i>{{ number_format($u->points) }}
+                                    <td class="text-end">
+                                        <span class="badge text-bg-success px-2 py-1">
+                                            <i class="fas fa-coins me-1"></i>{{ number_format($u->points) }}
                                         </span>
                                     </td>
                                 </tr>

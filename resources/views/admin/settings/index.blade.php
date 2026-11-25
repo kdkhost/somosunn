@@ -70,9 +70,9 @@
             @include('admin.settings.partials.' . $group, ['settings' => $settings, 'getUrl' => $getUrl])
 
             <div class="card-footer d-flex justify-content-between align-items-center">
-                <small class="text-muted"><i class="fas fa-circle-question mr-1"></i>Clique no ícone <strong>?</strong> ao lado de qualquer campo para abrir o passo a passo.</small>
-                <button type="submit" id="btn-save-settings" class="btn btn-primary font-weight-bold px-4">
-                    <i class="fas fa-save mr-1"></i> <span id="btn-save-label">Salvar Alterações</span>
+                <small class="text-muted"><i class="fas fa-circle-question me-1"></i>Clique no ícone <strong>?</strong> ao lado de qualquer campo para abrir o passo a passo.</small>
+                <button type="submit" id="btn-save-settings" class="btn btn-primary fw-bold px-4">
+                    <i class="fas fa-save me-1"></i> <span id="btn-save-label">Salvar Alterações</span>
                 </button>
             </div>
         </div>

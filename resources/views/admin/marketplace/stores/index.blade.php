@@ -48,9 +48,9 @@
     {{-- Main content --}}
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
-            <h3 class="card-title font-weight-bold"><i class="fas fa-store-alt mr-2"></i>Lojas do marketplace</h3>
+            <h3 class="card-title fw-bold"><i class="fas fa-store-alt me-2"></i>Lojas do marketplace</h3>
             <a href="{{ route('admin.marketplace.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill elevation-1">
-                <i class="fas fa-arrow-left mr-1"></i> Voltar
+                <i class="fas fa-arrow-left me-1"></i> Voltar
             </a>
         </div>
         <div class="card-body">
@@ -64,7 +64,7 @@
                     </div>
                     <input type="text" name="q" value="{{ $search }}" class="form-control" placeholder="Buscar por marca, slug ou vendedor">
                     <div class="input-group-append">
-                        <button type="submit" class="btn btn-primary rounded-pill elevation-1"><i class="fas fa-search mr-1"></i> Buscar</button>
+                        <button type="submit" class="btn btn-primary rounded-pill elevation-1"><i class="fas fa-search me-1"></i> Buscar</button>
                     </div>
                 </div>
             </form>
@@ -78,34 +78,34 @@
                             <th>Slug</th>
                             <th>Vendedor</th>
                             <th>Status</th>
-                            <th class="text-right">Acao</th>
+                            <th class="text-end">Acao</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($stores as $store)
                             <tr>
-                                <td class="font-weight-bold">{{ $store->brand_name }}</td>
+                                <td class="fw-bold">{{ $store->brand_name }}</td>
                                 <td><code>{{ $store->slug ?: '-' }}</code></td>
                                 <td>
-                                    <div class="font-weight-bold">{{ $store->user->name ?? '-' }}</div>
+                                    <div class="fw-bold">{{ $store->user->name ?? '-' }}</div>
                                     @if($store->user->email ?? null)
                                         <div class="text-muted small">{{ $store->user->email }}</div>
                                     @endif
                                 </td>
                                 <td>
                                     @php
-                                        $statusBadge = $store->is_blocked ? 'badge-danger' : ($store->is_published ? 'badge-success' : 'badge-warning');
+                                        $statusBadge = $store->is_blocked ? 'text-bg-danger' : ($store->is_published ? 'text-bg-success' : 'text-bg-warning');
                                         $statusIcon = $store->is_blocked ? 'fa-ban' : ($store->is_published ? 'fa-check-circle' : 'fa-pen');
                                         $statusLabel = $store->is_blocked ? 'Bloqueada' : ($store->is_published ? 'Publicada' : 'Rascunho');
                                     @endphp
-                                    <span class="badge {{ $statusBadge }}"><i class="fas {{ $statusIcon }} mr-1"></i>{{ $statusLabel }}</span>
+                                    <span class="badge {{ $statusBadge }}"><i class="fas {{ $statusIcon }} me-1"></i>{{ $statusLabel }}</span>
                                 </td>
-                                <td class="text-right">
+                                <td class="text-end">
                                     <form action="{{ route('admin.marketplace.stores.toggle', ['store' => $store->id]) }}" method="POST" class="d-inline-block">
                                         @csrf
                                         <input type="hidden" name="is_blocked" value="{{ $store->is_blocked ? 0 : 1 }}">
                                         <button type="submit" class="btn btn-sm {{ $store->is_blocked ? 'btn-outline-success' : 'btn-outline-danger' }} rounded-pill elevation-1">
-                                            <i class="fas {{ $store->is_blocked ? 'fa-unlock' : 'fa-lock' }} mr-1"></i>{{ $store->is_blocked ? 'Desbloquear' : 'Bloquear' }}
+                                            <i class="fas {{ $store->is_blocked ? 'fa-unlock' : 'fa-lock' }} me-1"></i>{{ $store->is_blocked ? 'Desbloquear' : 'Bloquear' }}
                                         </button>
                                     </form>
                                 </td>
@@ -115,7 +115,7 @@
                                 <td colspan="5" class="text-center py-5">
                                     <div class="text-muted">
                                         <i class="fas fa-store-alt-slash mb-3" style="font-size: 3rem;"></i>
-                                        <h5 class="font-weight-bold">Nenhuma loja encontrada</h5>
+                                        <h5 class="fw-bold">Nenhuma loja encontrada</h5>
                                         <p class="mb-0">Quando vendedores criarem suas lojas, elas aparecerao aqui.</p>
                                     </div>
                                 </td>

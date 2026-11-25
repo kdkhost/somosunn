@@ -17,7 +17,7 @@
         <div class="card-body p-4">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
-                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-white mr-3" style="width:50px;height:50px;">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-white me-3" style="width:50px;height:50px;">
                         @if($store->logo_url)
                             <img src="{{ $store->logo_url }}" alt="Logo" class="rounded-circle" style="width:44px;height:44px;object-fit:cover;" loading="lazy" decoding="async">
                         @else
@@ -25,7 +25,7 @@
                         @endif
                     </div>
                     <div>
-                        <h4 class="font-weight-bold text-white mb-0">{{ $store->brand_name ?: ($isPlatformStore ? 'Loja Oficial' : 'Minha Loja') }}</h4>
+                        <h4 class="fw-bold text-white mb-0">{{ $store->brand_name ?: ($isPlatformStore ? 'Loja Oficial' : 'Minha Loja') }}</h4>
                         <p class="text-light mb-0 small opacity-75">
                             {{ $isPlatformStore ? 'Loja institucional vinculada à plataforma' : 'Configure identidade, slug e publique sua vitrine' }}
                         </p>
@@ -34,11 +34,11 @@
                 <div class="d-flex flex-wrap mt-3 mt-md-0" style="gap:8px;">
                     @if($storeUrl)
                         <a href="{{ $storeUrl }}" target="_blank" class="btn btn-light btn-sm rounded-pill px-3 elevation-1">
-                            <i class="fas fa-external-link-alt mr-1"></i> Ver loja
+                            <i class="fas fa-external-link-alt me-1"></i> Ver loja
                         </a>
                     @endif
-                    <span class="badge {{ $store->is_published ? 'badge-success' : 'badge-warning' }} px-3 py-2 align-self-center">
-                        <i class="fas {{ $store->is_published ? 'fa-check-circle' : 'fa-pen' }} mr-1"></i>
+                    <span class="badge {{ $store->is_published ? 'text-bg-success' : 'text-bg-warning' }} px-3 py-2 align-self-center">
+                        <i class="fas {{ $store->is_published ? 'fa-check-circle' : 'fa-pen' }} me-1"></i>
                         {{ $store->is_published ? 'Publicada' : 'Rascunho' }}
                     </span>
                 </div>
@@ -55,24 +55,24 @@
                 {{-- Identidade --}}
                 <div class="card card-outline card-primary shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title font-weight-bold"><i class="fas fa-palette mr-2 text-primary"></i>Identidade da Marca</h3>
+                        <h3 class="card-title fw-bold"><i class="fas fa-palette me-2 text-primary"></i>Identidade da Marca</h3>
                     </div>
                     <div class="card-body">
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-8">
-                                <label class="font-weight-bold"><i class="fas fa-tag mr-1 text-muted"></i> Nome da marca</label>
+                                <label class="fw-bold"><i class="fas fa-tag me-1 text-muted"></i> Nome da marca</label>
                                 <input type="text" name="brand_name" id="brand_name" value="{{ old('brand_name', $store->brand_name) }}" class="form-control @error('brand_name') is-invalid @enderror" placeholder="Ex: Minha Marca Premium">
                                 @error('brand_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="form-group col-md-4 d-flex align-items-end">
-                                <div class="custom-control custom-switch mb-2 w-100">
+                                <div class="form-check form-switch mb-2 w-100">
                                     <input type="hidden" name="is_published" value="0">
-                                    <input type="checkbox" class="custom-control-input" id="is_published" name="is_published" value="1" @checked(old('is_published', $store->is_published))>
-                                    <label class="custom-control-label font-weight-bold" for="is_published">Publicar loja</label>
+                                    <input type="checkbox" class="form-check-input" id="is_published" name="is_published" value="1" @checked(old('is_published', $store->is_published))>
+                                    <label class="form-check-label fw-bold" for="is_published">Publicar loja</label>
                                 </div>
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="font-weight-bold"><i class="fas fa-link mr-1 text-muted"></i> Slug público</label>
+                                <label class="fw-bold"><i class="fas fa-link me-1 text-muted"></i> Slug público</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text bg-light">/loja/</span>
@@ -83,22 +83,22 @@
                                 @error('slug')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="font-weight-bold"><i class="fas fa-quote-left mr-1 text-muted"></i> Slogan</label>
+                                <label class="fw-bold"><i class="fas fa-quote-left me-1 text-muted"></i> Slogan</label>
                                 <input type="text" name="tagline" id="tagline" value="{{ old('tagline', $store->tagline) }}" class="form-control" placeholder="Frase de impacto da sua marca">
                             </div>
                         </div>
 
                         {{-- Cores --}}
                         <hr class="my-3">
-                        <h6 class="font-weight-bold mb-3"><i class="fas fa-swatchbook mr-1 text-muted"></i> Paleta de cores</h6>
-                        <div class="form-row">
+                        <h6 class="fw-bold mb-3"><i class="fas fa-swatchbook me-1 text-muted"></i> Paleta de cores</h6>
+                        <div class="row g-2">
                             <div class="form-group col-md-6">
                                 <div class="d-flex align-items-center p-3 rounded border" id="store_primary_color_card">
-                                    <span id="store_primary_color_swatch" class="rounded mr-3 border" style="width:40px;height:40px;background-color:{{ $primaryColor }};flex-shrink:0;"></span>
+                                    <span id="store_primary_color_swatch" class="rounded me-3 border" style="width:40px;height:40px;background-color:{{ $primaryColor }};flex-shrink:0;"></span>
                                     <div class="flex-grow-1">
-                                        <div class="text-muted small font-weight-bold">PRIMÁRIA</div>
+                                        <div class="text-muted small fw-bold">PRIMÁRIA</div>
                                         <div class="input-group input-group-sm mt-1">
-                                            <input type="text" id="store_primary_color_input" name="primary_color" value="{{ $primaryColor }}" class="form-control text-uppercase font-weight-bold">
+                                            <input type="text" id="store_primary_color_input" name="primary_color" value="{{ $primaryColor }}" class="form-control text-uppercase fw-bold">
                                             <div class="input-group-append">
                                                 <span id="store_primary_color_chip" class="input-group-text text-white px-3" style="background-color:{{ $primaryColor }};">
                                                     <i class="fas fa-circle"></i>
@@ -106,17 +106,17 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <input type="color" id="store_primary_color_picker" value="{{ $primaryColor }}" class="ml-2 border-0" style="width:36px;height:36px;cursor:pointer;">
+                                    <input type="color" id="store_primary_color_picker" value="{{ $primaryColor }}" class="ms-2 border-0" style="width:36px;height:36px;cursor:pointer;">
                                 </div>
                                 <div id="store_primary_color_label" class="d-none">{{ $primaryColor }}</div>
                             </div>
                             <div class="form-group col-md-6">
                                 <div class="d-flex align-items-center p-3 rounded border" id="store_accent_color_card">
-                                    <span id="store_accent_color_swatch" class="rounded mr-3 border" style="width:40px;height:40px;background-color:{{ $accentColor }};flex-shrink:0;"></span>
+                                    <span id="store_accent_color_swatch" class="rounded me-3 border" style="width:40px;height:40px;background-color:{{ $accentColor }};flex-shrink:0;"></span>
                                     <div class="flex-grow-1">
-                                        <div class="text-muted small font-weight-bold">DESTAQUE</div>
+                                        <div class="text-muted small fw-bold">DESTAQUE</div>
                                         <div class="input-group input-group-sm mt-1">
-                                            <input type="text" id="store_accent_color_input" name="accent_color" value="{{ $accentColor }}" class="form-control text-uppercase font-weight-bold">
+                                            <input type="text" id="store_accent_color_input" name="accent_color" value="{{ $accentColor }}" class="form-control text-uppercase fw-bold">
                                             <div class="input-group-append">
                                                 <span id="store_accent_color_chip" class="input-group-text text-white px-3" style="background-color:{{ $accentColor }};">
                                                     <i class="fas fa-circle"></i>
@@ -124,7 +124,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <input type="color" id="store_accent_color_picker" value="{{ $accentColor }}" class="ml-2 border-0" style="width:36px;height:36px;cursor:pointer;">
+                                    <input type="color" id="store_accent_color_picker" value="{{ $accentColor }}" class="ms-2 border-0" style="width:36px;height:36px;cursor:pointer;">
                                 </div>
                                 <div id="store_accent_color_label" class="d-none">{{ $accentColor }}</div>
                             </div>
@@ -132,7 +132,7 @@
 
                         {{-- Bio --}}
                         <hr class="my-3">
-                        <h6 class="font-weight-bold mb-3"><i class="fas fa-align-left mr-1 text-muted"></i> Sobre a loja</h6>
+                        <h6 class="fw-bold mb-3"><i class="fas fa-align-left me-1 text-muted"></i> Sobre a loja</h6>
                         <textarea name="bio" id="store_bio" rows="6" class="form-control store-bio-editor">{{ old('bio', $store->bio) }}</textarea>
                         <small class="form-text text-muted">Apresente sua marca, diferenciais e o que o cliente encontra na loja.</small>
                     </div>
@@ -141,36 +141,36 @@
                 {{-- Contato --}}
                 <div class="card card-outline card-secondary shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title font-weight-bold"><i class="fas fa-address-book mr-2 text-secondary"></i>Contato e Redes Sociais</h3>
+                        <h3 class="card-title fw-bold"><i class="fas fa-address-book me-2 text-secondary"></i>Contato e Redes Sociais</h3>
                     </div>
                     <div class="card-body">
-                        <div class="form-row">
+                        <div class="row g-2">
                             <div class="form-group col-md-6">
-                                <label><i class="fas fa-envelope mr-1 text-muted"></i> E-mail</label>
+                                <label><i class="fas fa-envelope me-1 text-muted"></i> E-mail</label>
                                 <input type="email" name="support_email" value="{{ old('support_email', $store->support_email) }}" class="form-control" placeholder="contato@suamarca.com">
                             </div>
                             <div class="form-group col-md-6">
-                                <label><i class="fas fa-phone mr-1 text-muted"></i> Telefone</label>
+                                <label><i class="fas fa-phone me-1 text-muted"></i> Telefone</label>
                                 <input type="text" name="support_phone" value="{{ old('support_phone', $store->support_phone) }}" class="form-control" placeholder="(11) 99999-9999">
                             </div>
                             <div class="form-group col-md-6">
-                                <label><i class="fab fa-whatsapp mr-1 text-success"></i> WhatsApp</label>
+                                <label><i class="fab fa-whatsapp me-1 text-success"></i> WhatsApp</label>
                                 <input type="text" name="whatsapp" value="{{ old('whatsapp', $store->whatsapp) }}" class="form-control" placeholder="5511999999999">
                             </div>
                             <div class="form-group col-md-6">
-                                <label><i class="fas fa-globe mr-1 text-muted"></i> Site</label>
+                                <label><i class="fas fa-globe me-1 text-muted"></i> Site</label>
                                 <input type="url" name="website_url" value="{{ old('website_url', $store->website_url) }}" class="form-control" placeholder="https://suamarca.com">
                             </div>
                             <div class="form-group col-md-4">
-                                <label><i class="fab fa-instagram mr-1 text-danger"></i> Instagram</label>
+                                <label><i class="fab fa-instagram me-1 text-danger"></i> Instagram</label>
                                 <input type="url" name="instagram_url" value="{{ old('instagram_url', $store->instagram_url) }}" class="form-control" placeholder="https://instagram.com/...">
                             </div>
                             <div class="form-group col-md-4">
-                                <label><i class="fab fa-facebook mr-1 text-primary"></i> Facebook</label>
+                                <label><i class="fab fa-facebook me-1 text-primary"></i> Facebook</label>
                                 <input type="url" name="facebook_url" value="{{ old('facebook_url', $store->facebook_url) }}" class="form-control" placeholder="https://facebook.com/...">
                             </div>
                             <div class="form-group col-md-4">
-                                <label><i class="fab fa-youtube mr-1 text-danger"></i> YouTube</label>
+                                <label><i class="fab fa-youtube me-1 text-danger"></i> YouTube</label>
                                 <input type="url" name="youtube_url" value="{{ old('youtube_url', $store->youtube_url) }}" class="form-control" placeholder="https://youtube.com/...">
                             </div>
                         </div>
@@ -183,7 +183,7 @@
                 {{-- Logo com drag-drop --}}
                 <div class="card card-outline card-primary shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title font-weight-bold"><i class="fas fa-image mr-2 text-primary"></i>Logo</h3>
+                        <h3 class="card-title fw-bold"><i class="fas fa-image me-2 text-primary"></i>Logo</h3>
                     </div>
                     <div class="card-body">
                         @if($store->logo_url)
@@ -191,11 +191,11 @@
                                 <img src="{{ $store->logo_url }}" alt="Logo" class="rounded border" style="max-height:120px; max-width:100%;" loading="lazy" decoding="async">
                             </div>
                         @endif
-                        <div class="store-dropzone" data-target="logo-input">
+                        <div class="store-dropzone" data-bs-target="logo-input">
                             <input type="file" name="logo" accept="image/*" class="store-dropzone-input" id="logo-input">
                             <div class="store-dropzone-placeholder">
                                 <i class="fas fa-cloud-upload-alt text-primary" style="font-size:1.8rem;"></i>
-                                <p class="font-weight-bold mb-0 mt-2" style="font-size:12px;">Arraste a logo aqui</p>
+                                <p class="fw-bold mb-0 mt-2" style="font-size:12px;">Arraste a logo aqui</p>
                                 <p class="text-muted mb-0" style="font-size:10px;">PNG, JPG ou SVG (máx. 2MB)</p>
                             </div>
                             <div class="store-dropzone-preview d-none">
@@ -204,10 +204,10 @@
                             </div>
                         </div>
                         @if($store->logo_url)
-                            <div class="custom-control custom-checkbox mt-2">
+                            <div class="form-check mt-2">
                                 <input type="hidden" name="remove_logo" value="0">
-                                <input type="checkbox" class="custom-control-input" id="remove_logo" name="remove_logo" value="1">
-                                <label class="custom-control-label small" for="remove_logo">Remover logo atual</label>
+                                <input type="checkbox" class="form-check-input" id="remove_logo" name="remove_logo" value="1">
+                                <label class="form-check-label small" for="remove_logo">Remover logo atual</label>
                             </div>
                         @endif
                     </div>
@@ -216,7 +216,7 @@
                 {{-- Banner com drag-drop --}}
                 <div class="card card-outline card-primary shadow-sm">
                     <div class="card-header border-0">
-                        <h3 class="card-title font-weight-bold"><i class="fas fa-panorama mr-2 text-primary"></i>Banner</h3>
+                        <h3 class="card-title fw-bold"><i class="fas fa-panorama me-2 text-primary"></i>Banner</h3>
                     </div>
                     <div class="card-body">
                         @if($store->banner_url)
@@ -224,11 +224,11 @@
                                 <img src="{{ $store->banner_url }}" alt="Banner" class="img-fluid rounded border" style="max-height:120px; width:100%; object-fit:cover;" loading="lazy" decoding="async">
                             </div>
                         @endif
-                        <div class="store-dropzone" data-target="banner-input">
+                        <div class="store-dropzone" data-bs-target="banner-input">
                             <input type="file" name="banner" accept="image/*" class="store-dropzone-input" id="banner-input">
                             <div class="store-dropzone-placeholder">
                                 <i class="fas fa-image text-info" style="font-size:1.8rem;"></i>
-                                <p class="font-weight-bold mb-0 mt-2" style="font-size:12px;">Arraste o banner aqui</p>
+                                <p class="fw-bold mb-0 mt-2" style="font-size:12px;">Arraste o banner aqui</p>
                                 <p class="text-muted mb-0" style="font-size:10px;">Recomendado: 1200x400px</p>
                             </div>
                             <div class="store-dropzone-preview d-none">
@@ -237,10 +237,10 @@
                             </div>
                         </div>
                         @if($store->banner_url)
-                            <div class="custom-control custom-checkbox mt-2">
+                            <div class="form-check mt-2">
                                 <input type="hidden" name="remove_banner" value="0">
-                                <input type="checkbox" class="custom-control-input" id="remove_banner" name="remove_banner" value="1">
-                                <label class="custom-control-label small" for="remove_banner">Remover banner atual</label>
+                                <input type="checkbox" class="form-check-input" id="remove_banner" name="remove_banner" value="1">
+                                <label class="form-check-label small" for="remove_banner">Remover banner atual</label>
                             </div>
                         @endif
                     </div>
@@ -250,18 +250,18 @@
                 <div class="card shadow-sm border-0 overflow-hidden" id="store_live_preview" style="background: linear-gradient(135deg, {{ $primaryColor }}, {{ $accentColor }});">
                     <div class="card-body text-white">
                         <div class="d-flex align-items-center mb-3">
-                            <i class="fas fa-eye mr-2 opacity-50"></i>
-                            <span class="text-uppercase font-weight-bold" style="font-size:10px; letter-spacing:1px; opacity:.6;">Preview ao vivo</span>
+                            <i class="fas fa-eye me-2 opacity-50"></i>
+                            <span class="text-uppercase fw-bold" style="font-size:10px; letter-spacing:1px; opacity:.6;">Preview ao vivo</span>
                         </div>
-                        <h4 id="store_preview_brand_name" class="font-weight-bold mb-1">{{ old('brand_name', $store->brand_name) ?: 'Sua marca' }}</h4>
+                        <h4 id="store_preview_brand_name" class="fw-bold mb-1">{{ old('brand_name', $store->brand_name) ?: 'Sua marca' }}</h4>
                         <p id="store_preview_tagline" class="mb-3 small" style="opacity:.7;">{{ old('tagline', $store->tagline) ?: 'Slogan da sua loja' }}</p>
                         <div class="d-flex flex-wrap" style="gap:6px;">
-                            <span id="store_preview_primary_badge" class="badge badge-pill px-3 py-2 text-white" style="background-color:{{ $primaryColor }};">Primária</span>
-                            <span id="store_preview_accent_badge" class="badge badge-pill px-3 py-2 text-white" style="background-color:{{ $accentColor }};">Destaque</span>
+                            <span id="store_preview_primary_badge" class="badge rounded-pill px-3 py-2 text-white" style="background-color:{{ $primaryColor }};">Primária</span>
+                            <span id="store_preview_accent_badge" class="badge rounded-pill px-3 py-2 text-white" style="background-color:{{ $accentColor }};">Destaque</span>
                         </div>
                         <div class="mt-3 d-flex flex-wrap" style="gap:6px;">
-                            <span id="store_preview_button_primary" class="badge badge-pill px-3 py-2" style="background-color:{{ $primaryColor }};">Botão primário</span>
-                            <span id="store_preview_button_accent" class="badge badge-pill px-3 py-2" style="background-color:{{ $accentColor }};">Botão destaque</span>
+                            <span id="store_preview_button_primary" class="badge rounded-pill px-3 py-2" style="background-color:{{ $primaryColor }};">Botão primário</span>
+                            <span id="store_preview_button_accent" class="badge rounded-pill px-3 py-2" style="background-color:{{ $accentColor }};">Botão destaque</span>
                         </div>
                     </div>
                 </div>
@@ -272,10 +272,10 @@
         <div class="row mt-3">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <a href="{{ route('admin.marketplace.index') }}" class="btn btn-outline-secondary rounded-pill px-4">
-                    <i class="fas fa-arrow-left mr-1"></i> Voltar
+                    <i class="fas fa-arrow-left me-1"></i> Voltar
                 </a>
                 <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 elevation-2">
-                    <i class="fas fa-save mr-2"></i> Salvar Loja
+                    <i class="fas fa-save me-2"></i> Salvar Loja
                 </button>
             </div>
         </div>

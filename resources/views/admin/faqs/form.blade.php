@@ -13,7 +13,7 @@
             @csrf
             @if($faq->id) @method('PUT') @endif
 
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-4">
                     <label>Contexto</label>
                     <select name="context" class="form-control" required>
@@ -52,7 +52,7 @@
                 <small class="text-muted">Dica: quebras de linha são mantidas no site.</small>
             </div>
 
-            <div class="text-right">
+            <div class="text-end">
                 <button class="btn btn-primary">Salvar</button>
                 <a href="{{ route('admin.faqs.index') }}" class="btn btn-secondary" data-pjax>Cancelar</a>
             </div>

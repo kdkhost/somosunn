@@ -22,9 +22,9 @@
                         <div class="col-md-2 form-group"><label>Eventos</label><input type="number" name="max_events" class="form-control" value="{{ old('max_events', $plan->max_events ?? 0) }}" required></div>
                         <div class="col-md-2 form-group"><label>Leads</label><input type="number" name="max_leads" class="form-control" value="{{ old('max_leads', $plan->max_leads ?? 0) }}" required></div>
                         <div class="col-md-2 form-group"><label>Prioridade</label><input type="number" name="priority" class="form-control" value="{{ old('priority', $plan->priority ?? 0) }}" required></div>
-                        <div class="col-md-10 d-flex align-items-center"><div class="custom-control custom-switch mt-4"><input type="checkbox" class="custom-control-input" id="active" name="active" value="1" @checked(old('active', $plan->active ?? true))><label class="custom-control-label" for="active">Plano ativo</label></div></div>
+                        <div class="col-md-10 d-flex align-items-center"><div class="form-check form-switch mt-4"><input type="checkbox" class="form-check-input" id="active" name="active" value="1" @checked(old('active', $plan->active ?? true))><label class="form-check-label" for="active">Plano ativo</label></div></div>
                     </div>
-                </div><div class="card-footer text-right"><button type="submit" class="btn btn-primary">Salvar plano</button></div></div>
+                </div><div class="card-footer text-end"><button type="submit" class="btn btn-primary">Salvar plano</button></div></div>
             </form>
         </div>
     </section>

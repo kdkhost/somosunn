@@ -40,11 +40,11 @@
                 </h1>
                 <small class="text-muted">Monitoramento de seguranca em tempo real</small>
             </div>
-            <div class="col-sm-6 text-right">
+            <div class="col-sm-6 text-end">
                 <span class="waf-mode-badge {{ $wafSettings->isEnforce() ? 'waf-mode-enforce' : 'waf-mode-detection' }}">
                     {{ $wafSettings->isEnforce() ? 'MODO ENFORCE' : 'MODO DETECCAO' }}
                 </span>
-                <button class="btn btn-sm btn-outline-primary ml-2" id="btn-toggle-mode" data-current="{{ $wafSettings->mode }}" style="border-radius:20px; font-size:.75rem; padding:4px 14px;">
+                <button class="btn btn-sm btn-outline-primary ms-2" id="btn-toggle-mode" data-current="{{ $wafSettings->mode }}" style="border-radius:20px; font-size:.75rem; padding:4px 14px;">
                     <i class="fas fa-exchange-alt"></i> Alternar
                 </button>
             </div>
@@ -98,7 +98,7 @@
             <div class="col-lg-8 mb-3">
                 <div class="card waf-card">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-chart-area mr-1"></i> Linha do Tempo (24h)</h3>
+                        <h3 class="card-title"><i class="fas fa-chart-area me-1"></i> Linha do Tempo (24h)</h3>
                     </div>
                     <div class="card-body" style="padding:12px;">
                         <canvas id="waf-timeline-chart" height="180"></canvas>
@@ -108,7 +108,7 @@
             <div class="col-lg-4 mb-3">
                 <div class="card waf-card">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-chart-pie mr-1"></i> Tipos de Ataque</h3>
+                        <h3 class="card-title"><i class="fas fa-chart-pie me-1"></i> Tipos de Ataque</h3>
                     </div>
                     <div class="card-body" style="padding:12px;">
                         <canvas id="waf-pattern-chart" height="180"></canvas>
@@ -122,11 +122,11 @@
             <div class="col-lg-6 mb-3">
                 <div class="card waf-card">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-crosshairs mr-1 text-danger"></i> Top 10 IPs Atacantes</h3>
+                        <h3 class="card-title"><i class="fas fa-crosshairs me-1 text-danger"></i> Top 10 IPs Atacantes</h3>
                     </div>
                     <div class="card-body p-0">
                         <table class="table table-sm table-hover mb-0" id="waf-top-ips">
-                            <thead class="thead-light"><tr><th>IP</th><th>Pais</th><th class="text-right">Eventos</th></tr></thead>
+                            <thead class="thead-light"><tr><th>IP</th><th>Pais</th><th class="text-end">Eventos</th></tr></thead>
                             <tbody></tbody>
                         </table>
                     </div>
@@ -135,11 +135,11 @@
             <div class="col-lg-6 mb-3">
                 <div class="card waf-card">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-route mr-1 text-warning"></i> Top 10 Rotas Atacadas</h3>
+                        <h3 class="card-title"><i class="fas fa-route me-1 text-warning"></i> Top 10 Rotas Atacadas</h3>
                     </div>
                     <div class="card-body p-0">
                         <table class="table table-sm table-hover mb-0" id="waf-top-routes">
-                            <thead class="thead-light"><tr><th>Rota</th><th class="text-right">Eventos</th></tr></thead>
+                            <thead class="thead-light"><tr><th>Rota</th><th class="text-end">Eventos</th></tr></thead>
                             <tbody></tbody>
                         </table>
                     </div>
@@ -218,7 +218,7 @@
     function updateTopIps(ips) {
         var html = '';
         (ips || []).forEach(function(ip, i) {
-            html += '<tr><td><code class="text-dark">' + ip.ip + '</code></td><td>' + (ip.country || '—') + '</td><td class="text-right"><span class="badge badge-danger">' + ip.count + '</span></td></tr>';
+            html += '<tr><td><code class="text-dark">' + ip.ip + '</code></td><td>' + (ip.country || '—') + '</td><td class="text-end"><span class="badge text-bg-danger">' + ip.count + '</span></td></tr>';
         });
         $('#waf-top-ips tbody').html(html || '<tr><td colspan="3" class="text-center text-muted py-3"><i class="fas fa-check-circle text-success"></i> Nenhum ataque registrado</td></tr>');
     }
@@ -226,7 +226,7 @@
     function updateTopRoutes(routes) {
         var html = '';
         (routes || []).forEach(function(r) {
-            html += '<tr><td><code class="text-dark">' + r.route + '</code></td><td class="text-right"><span class="badge badge-warning">' + r.count + '</span></td></tr>';
+            html += '<tr><td><code class="text-dark">' + r.route + '</code></td><td class="text-end"><span class="badge text-bg-warning">' + r.count + '</span></td></tr>';
         });
         $('#waf-top-routes tbody').html(html || '<tr><td colspan="2" class="text-center text-muted py-3"><i class="fas fa-check-circle text-success"></i> Nenhum ataque registrado</td></tr>');
     }

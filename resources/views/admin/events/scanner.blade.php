@@ -56,10 +56,10 @@
 
                 <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <h3 class="card-title mb-0">
-                        <i class="fas fa-qrcode mr-2"></i>{{ $event->title }}
+                        <i class="fas fa-qrcode me-2"></i>{{ $event->title }}
                     </h3>
                     <a href="{{ route('admin.events.show', $event) }}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-arrow-left mr-1"></i>Voltar ao Evento
+                        <i class="fas fa-arrow-left me-1"></i>Voltar ao Evento
                     </a>
                 </div>
 
@@ -67,13 +67,13 @@
 
                     {{-- Date --}}
                     <p class="text-muted mb-3">
-                        <i class="fas fa-calendar-alt mr-1"></i>
+                        <i class="fas fa-calendar-alt me-1"></i>
                         {{ \Carbon\Carbon::parse($event->start_at)->format('d/m/Y \à\s H:i') }}
                     </p>
 
                     {{-- Scanner status --}}
                     <div class="alert {{ $scannerOpen ? 'alert-success' : 'alert-danger' }} mb-3">
-                        <i class="fas {{ $scannerOpen ? 'fa-check-circle' : 'fa-ban' }} mr-1"></i>
+                        <i class="fas {{ $scannerOpen ? 'fa-check-circle' : 'fa-ban' }} me-1"></i>
                         <strong>{{ $scannerStatusMessage }}</strong>
                     </div>
 
@@ -81,14 +81,14 @@
                     <div class="row mb-4">
                         <div class="col-md-6 mb-2 mb-md-0">
                             <div class="alert alert-info h-100 mb-0">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
+                                <i class="fas fa-map-marker-alt me-1"></i>
                                 <strong>Regra de localização:</strong><br>
                                 {{ $event->scannerLocationMessage() }}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="alert alert-secondary h-100 mb-0">
-                                <i class="fas fa-shield-alt mr-1"></i>
+                                <i class="fas fa-shield-alt me-1"></i>
                                 <strong>Auditoria:</strong><br>
                                 Toda tentativa de validação fica registrada no sistema.
                             </div>
@@ -108,18 +108,18 @@
                                 <i id="overlay-icon" class="fas fa-check"></i>
                             </div>
 
-                            <h5 id="overlay-message" class="font-weight-bold mb-1">Analisando...</h5>
+                            <h5 id="overlay-message" class="fw-bold mb-1">Analisando...</h5>
                             <p  id="overlay-sub" class="text-muted mb-3 small"></p>
 
                             <button id="btn-scan-again" class="btn btn-primary d-none" onclick="resumeScanning()">
-                                <i class="fas fa-sync-alt mr-1"></i>Ler próximo ingresso
+                                <i class="fas fa-sync-alt me-1"></i>Ler próximo ingresso
                             </button>
                         </div>
                     </div>
 
                     @if($scannerOpen)
                     <div class="alert alert-info text-center mb-0">
-                        <i class="fas fa-info-circle mr-1"></i>
+                        <i class="fas fa-info-circle me-1"></i>
                         Aponte a câmera para o QR Code do ingresso.
                     </div>
                     @endif
@@ -242,7 +242,7 @@
             spinner.style.display = 'block';
             iconWrap.classList.remove('is-visible');
             btn.classList.add('d-none');
-            msgEl.className = 'font-weight-bold mb-1 text-primary';
+            msgEl.className = 'fw-bold mb-1 text-primary';
             return;
         }
 
@@ -253,13 +253,13 @@
         if (state === 'success') {
             iconWrap.style.cssText = 'display:flex;background:#d1fae5;color:#059669;';
             icon.className = 'fas fa-check';
-            msgEl.className = 'font-weight-bold mb-1 text-success';
+            msgEl.className = 'fw-bold mb-1 text-success';
             return;
         }
 
         iconWrap.style.cssText = 'display:flex;background:#fee2e2;color:#dc2626;';
         icon.className = 'fas fa-times';
-        msgEl.className = 'font-weight-bold mb-1 text-danger';
+        msgEl.className = 'fw-bold mb-1 text-danger';
     }
 
     function resumeScanning() {

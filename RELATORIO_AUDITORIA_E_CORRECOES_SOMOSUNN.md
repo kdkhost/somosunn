@@ -2,6 +2,19 @@
 
 ## Painéis Administrativos
 
+### Atualização aplicada em 25/11/2026 - migração integral e limpa de `/admin` para AdminLTE 4 (Bootstrap 5.3) sem resíduos do AdminLTE 3
+
+- **Recursos existentes e compartilhados entre os dois painéis:**
+  - `/admin` (agora 100% **AdminLTE 4.0.0-beta3 + Bootstrap 5.3.3 + OverlayScrollbars v2**, sem resíduos de AdminLTE 3.2 / Bootstrap 4.6) e `/painel/admin` (Tailwind) mantêm 100% de paridade funcional, compartilhando todos os controllers, services, policies, middlewares, permissões, gaveta lateral de instruções (`partials.help-drawer` + `public/js/unn-help-catalog.js`) e regras de negócio.
+- **Arquitetura limpa do shell `/admin`:**
+  - Removido o bloco legado de ~3.450 linhas de CSS inline de AdminLTE 3 em `resources/views/admin/layouts/app.blade.php` e criado o tema dedicado `public/css/adminlte4-unn.css` + runtime `public/js/adminlte4-unn.js`.
+  - Shell reconstruído com classes nativas AdminLTE 4 (`app-wrapper`, `app-header`, `app-sidebar`, `app-main`, `app-content-header`, `app-content`, `app-footer`) e painel rápido convertido para Bootstrap 5 Offcanvas (`#adminQuickPanelOffcanvas`).
+  - 139 views em `resources/views/admin/` e `x-unn-dropzone` migradas integralmente para Bootstrap 5 (`data-bs-*`, `btn-close`, `me-*/ms-*`, `text-bg-*`, `form-select`, `form-check form-switch`, `data-lte-toggle`).
+- **Rotas, permissões e validações:**
+  - Todas as rotas de `/admin` e `/painel/admin` preservadas intactas (validado com `php artisan route:list`).
+  - Compilação de todas as views Blade validada com `php artisan view:cache && php artisan view:clear`, além de `check-no-bom.php` e `check-text-encoding.php`.
+  - Diferenças visuais mantidas de forma coerente: AdminLTE 4 nativo em `/admin` e Tailwind moderno em `/painel`.
+
 ### Atualização aplicada em 25/11/2026 - automação de comissões (Opção C + gaveta lateral de instruções e harmonia dark/light)
 
 - **Recursos existentes e compartilhados entre os dois painéis:**

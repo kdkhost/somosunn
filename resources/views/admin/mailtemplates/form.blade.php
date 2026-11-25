@@ -14,7 +14,7 @@
             @if($template->id)
                 @method('PUT')
             @endif
-        <div class="form-row">
+        <div class="row g-2">
             <div class="form-group col-md-4">
                 <label>Nome</label>
                 <input type="text" name="name" id="tpl_name" class="form-control" value="{{ old('name', $template->name) }}" required>
@@ -28,7 +28,7 @@
                 <input type="text" name="subject" class="form-control" value="{{ old('subject', $template->subject) }}" required>
             </div>
         </div>
-            <div class="form-row">
+            <div class="row g-2">
                 <div class="form-group col-md-3">
                     <label>Categoria</label>
                     <select name="category" class="form-control">
@@ -49,11 +49,11 @@
                     <input type="text" name="locale" class="form-control" value="{{ old('locale', $template->locale ?? 'pt-BR') }}">
                 </div>
                 <div class="form-group col-md-3 d-flex align-items-end">
-                    <button type="button" id="btnSendTest" class="btn btn-outline-primary btn-block" data-url="{{ route('admin.mailtemplates.sendpreview', $template->id ?: 0) }}">Enviar teste</button>
+                    <button type="button" id="btnSendTest" class="btn btn-outline-primary w-100" data-url="{{ route('admin.mailtemplates.sendpreview', $template->id ?: 0) }}">Enviar teste</button>
                 </div>
             </div>
 
-        <div class="form-row">
+        <div class="row g-2">
             <div class="col-lg-8">
                 <div class="form-group">
                     <label>Corpo (HTML)</label>
@@ -94,7 +94,7 @@
                     <div class="row">
                         @foreach($vars as [$v,$d])
                             <div class="col-sm-6 col-md-4 mb-2">
-                                <button type="button" class="btn btn-sm btn-outline-secondary insert-var w-100 text-left" data-var="{{ $v }}">
+                                <button type="button" class="btn btn-sm btn-outline-secondary insert-var w-100 text-start" data-var="{{ $v }}">
                                     <strong>{{ $v }}</strong><br><small class="text-muted">{{ $d }}</small>
                                 </button>
                             </div>
@@ -110,7 +110,7 @@
             </div>
         </div>
 
-        <div class="text-right">
+        <div class="text-end">
             <button class="btn btn-primary">Salvar</button>
             <a href="{{ route('admin.mailtemplates.index') }}" class="btn btn-secondary" data-pjax>Cancelar</a>
         </div>

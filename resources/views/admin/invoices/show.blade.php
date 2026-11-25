@@ -35,7 +35,7 @@
                         @if($company['logo_url'])
                             <img src="{{ $company['logo_url'] }}" alt="Logo" class="img-fluid mb-2" style="max-height: 50px;" loading="lazy" decoding="async">
                         @else
-                            <h3 class="text-primary font-weight-bold">{{ $company['name'] }}</h3>
+                            <h3 class="text-primary fw-bold">{{ $company['name'] }}</h3>
                         @endif
                         <h4 class="mb-2">{{ $invoice->number ?: ('#' . $invoice->id) }}</h4>
                         <span class="badge badge-{{ $badge }}">{{ $label }}</span>
@@ -44,7 +44,7 @@
                     <hr>
 
                     <div class="small text-muted">Cliente</div>
-                    <div class="font-weight-bold">{{ $invoice->user?->name ?? '—' }}</div>
+                    <div class="fw-bold">{{ $invoice->user?->name ?? '—' }}</div>
                     <div class="text-muted">{{ $invoice->user?->email ?? '' }}</div>
 
                     <hr>
@@ -57,7 +57,7 @@
                         <span class="text-muted">Desconto{{ $invoiceCouponCode !== '' ? ' - cupom ' . $invoiceCouponCode : '' }}</span>
                         <span>R$ {{ number_format((float) $invoice->discount_amount, 2, ',', '.') }}</span>
                     </div>
-                    <div class="d-flex justify-content-between font-weight-bold">
+                    <div class="d-flex justify-content-between fw-bold">
                         <span>Total</span>
                         <span>R$ {{ number_format((float) $invoice->total_amount, 2, ',', '.') }}</span>
                     </div>
@@ -84,23 +84,23 @@
 
                     <div class="d-flex flex-wrap gap-2">
                         <a href="{{ route('admin.invoices.edit', $invoice) }}" class="btn btn-sm btn-secondary" data-pjax>
-                            <i class="fas fa-edit mr-1"></i> Editar
+                            <i class="fas fa-edit me-1"></i> Editar
                         </a>
                         <a href="{{ route('admin.invoices.pdf', $invoice) }}" class="btn btn-sm btn-outline-primary"
                             target="_blank">
-                            <i class="fas fa-file-pdf mr-1"></i> PDF
+                            <i class="fas fa-file-pdf me-1"></i> PDF
                         </a>
                         <form method="POST" action="{{ route('admin.invoices.send', $invoice) }}" class="d-inline">
                             @csrf
                             <input type="hidden" name="force" value="1">
                             <button class="btn btn-sm btn-outline-success" type="submit">
-                                <i class="fas fa-paper-plane mr-1"></i> Enviar e-mail
+                                <i class="fas fa-paper-plane me-1"></i> Enviar e-mail
                             </button>
                         </form>
                         <a href="#" class="btn btn-sm btn-danger btn-delete"
                             data-action="{{ route('admin.invoices.destroy', $invoice) }}"
                             data-redirect="{{ route('admin.invoices.index') }}">
-                            <i class="fas fa-trash mr-1"></i> Excluir
+                            <i class="fas fa-trash me-1"></i> Excluir
                         </a>
                     </div>
                 </div>
@@ -117,24 +117,24 @@
                         <thead>
                             <tr>
                                 <th>Descrição</th>
-                                <th class="text-right">Qtd</th>
-                                <th class="text-right">Valor</th>
-                                <th class="text-right">Total</th>
+                                <th class="text-end">Qtd</th>
+                                <th class="text-end">Valor</th>
+                                <th class="text-end">Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($invoice->items->sortBy('sort_order') as $item)
                                 <tr>
                                     <td>
-                                        <div class="font-weight-bold">{{ $item->description }}</div>
+                                        <div class="fw-bold">{{ $item->description }}</div>
                                         @if($item->item_type)
                                             <div class="text-muted small">Tipo: {{ $item->item_type }}@if($item->item_id)
                                             #{{ $item->item_id }}@endif</div>
                                         @endif
                                     </td>
-                                    <td class="text-right">{{ (int) $item->quantity }}</td>
-                                    <td class="text-right">R$ {{ number_format((float) $item->unit_price, 2, ',', '.') }}</td>
-                                    <td class="text-right">R$ {{ number_format((float) $item->total_price, 2, ',', '.') }}</td>
+                                    <td class="text-end">{{ (int) $item->quantity }}</td>
+                                    <td class="text-end">R$ {{ number_format((float) $item->unit_price, 2, ',', '.') }}</td>
+                                    <td class="text-end">R$ {{ number_format((float) $item->total_price, 2, ',', '.') }}</td>
                                 </tr>
                             @empty
                                 <tr>

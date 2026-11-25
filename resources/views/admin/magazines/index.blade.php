@@ -102,15 +102,15 @@
 
 <div class="card card-outline card-primary">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title mb-0"><i class="fas fa-book-open mr-2"></i>Revistas digitais</h3>
+        <h3 class="card-title mb-0"><i class="fas fa-book-open me-2"></i>Revistas digitais</h3>
         <a href="{{ route('admin.magazines.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus mr-1"></i> Nova Revista
+            <i class="fas fa-plus me-1"></i> Nova Revista
         </a>
     </div>
 
     <div class="card-body">
         @if(session('success'))
-            <div class="alert alert-success"><i class="fas fa-check-circle mr-1"></i> {{ session('success') }}</div>
+            <div class="alert alert-success"><i class="fas fa-check-circle me-1"></i> {{ session('success') }}</div>
         @endif
 
         <form method="GET" class="form-inline mb-3">
@@ -143,7 +143,7 @@
                         <th class="magazines-column-visibility">Visibilidade</th>
                         <th class="magazines-column-views">Visualizações</th>
                         <th class="text-center">Destaque</th>
-                        <th class="text-right">Ações</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -171,20 +171,20 @@
                             <td class="magazines-column-category">{{ $m->category ?: '-' }}</td>
                             <td class="magazines-column-visibility">
                                 @if($m->status === 'published')
-                                    <span class="badge badge-success">Publicada</span>
+                                    <span class="badge text-bg-success">Publicada</span>
                                 @elseif($m->status === 'draft')
-                                    <span class="badge badge-warning">Rascunho</span>
+                                    <span class="badge text-bg-warning">Rascunho</span>
                                 @else
-                                    <span class="badge badge-secondary">Arquivada</span>
+                                    <span class="badge text-bg-secondary">Arquivada</span>
                                 @endif
                             </td>
                             <td>
                                 @if($m->visibility === 'public')
-                                    <span class="text-success"><i class="fas fa-globe mr-1"></i>Público</span>
+                                    <span class="text-success"><i class="fas fa-globe me-1"></i>Público</span>
                                 @elseif($m->visibility === 'members')
-                                    <span class="text-info"><i class="fas fa-users mr-1"></i>Membros</span>
+                                    <span class="text-info"><i class="fas fa-users me-1"></i>Membros</span>
                                 @else
-                                    <span class="text-purple"><i class="fas fa-newspaper mr-1"></i>Interessados</span>
+                                    <span class="text-purple"><i class="fas fa-newspaper me-1"></i>Interessados</span>
                                 @endif
                             </td>
                             <td class="magazines-column-views">{{ number_format($m->views_count, 0, ',', '.') }}</td>
@@ -198,10 +198,10 @@
                                     aria-pressed="{{ $m->is_featured ? 'true' : 'false' }}"
                                     title="{{ $m->is_featured ? 'Remover dos destaques' : 'Adicionar aos destaques' }}">
                                     <i class="{{ $m->is_featured ? 'fas' : 'far' }} fa-star" aria-hidden="true"></i>
-                                    <span class="sr-only">Alterar destaque</span>
+                                    <span class="visually-hidden">Alterar destaque</span>
                                 </button>
                             </td>
-                            <td class="text-right magazines-table-actions">
+                            <td class="text-end magazines-table-actions">
                                 <a href="{{ route('magazines.show', $m->slug) }}" target="_blank" class="btn btn-sm btn-default" title="Visualizar">
                                     <i class="fas fa-eye"></i>
                                 </a>
@@ -222,7 +222,7 @@
                                 <i class="fas fa-book-open fa-3x mb-2 opacity-25 d-block"></i>
                                 Nenhuma revista cadastrada ainda.<br>
                                 <a href="{{ route('admin.magazines.create') }}" class="btn btn-primary btn-sm mt-2">
-                                    <i class="fas fa-plus mr-1"></i> Publicar a primeira edição
+                                    <i class="fas fa-plus me-1"></i> Publicar a primeira edição
                                 </a>
                             </td>
                         </tr>

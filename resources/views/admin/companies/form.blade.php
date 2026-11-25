@@ -105,18 +105,18 @@
                                 </div>
                             @endforeach
                             <div class="col-md-12">
-                                <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="verified" name="verified" value="1" @checked(old('verified', $company->verified))>
-                                    <label class="custom-control-label" for="verified">Empresa verificada</label>
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" class="form-check-input" id="verified" name="verified" value="1" @checked(old('verified', $company->verified))>
+                                    <label class="form-check-label" for="verified">Empresa verificada</label>
                                 </div>
-                                <div class="custom-control custom-switch mt-2">
-                                    <input type="checkbox" class="custom-control-input" id="active" name="active" value="1" @checked(old('active', $company->active ?? true))>
-                                    <label class="custom-control-label" for="active">Empresa ativa</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input type="checkbox" class="form-check-input" id="active" name="active" value="1" @checked(old('active', $company->active ?? true))>
+                                    <label class="form-check-label" for="active">Empresa ativa</label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer text-right">
+                    <div class="card-footer text-end">
                         <button type="submit" class="btn btn-primary">Salvar empresa</button>
                     </div>
                 </div>
