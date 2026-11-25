@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.57] - 2026-11-25 - feat(admin, dashboard): reformulacao visual completa da pagina principal /admin no padrao executivo AdminLTE 4 + React/SaaS
+
+- **Novo Dashboard Executivo (`resources/views/admin/dashboard.blade.php`):**
+  - **Hero Banner Executivo:** saudação dinâmica por horário, avatar com indicador online, pílulas de status (*Sistema Online*, data atual, PHP/Laravel) e botões de ação rápida.
+  - **Hierarquia Visual Organizada:** KPIs principais `.small-box` (Receita Total, Receita de Hoje, Usuários Totais e Novos Hoje), barra de **Ações Rápidas** em pílulas modernas e **Inventário de Conteúdo** clicável (Cursos, Mentorias, Eventos e Certificados).
+  - **Gráficos & Visitas em Tempo Real:** gráficos `Chart.js` com gradiente UNN, tooltips formatados em `R$`, compatibilidade completa com Light/Dark Mode e reinicialização segura em navegação PJAX; painel de **Rastreio Global de Visitas** e **Saúde do Sistema** 100% adaptativos ao modo escuro (removendo blocos `bg-light` fixos).
+  - **Agenda, Operações & Vitality Score:** FullCalendar 6 estilizado para o tema UNN, tabela limpa de Últimas Atividades, card premium *Business Vitality* (Saúde do Cliente), fila de Jobs e painel do membro igualmente modernizados.
+
 ## [2.8.56] - 2026-11-25 - feat(ads, sponsors): patrocinadores e banners demo com artes SVG profissionais + reformulacao completa de /admin/sponsor-plans, /admin/sponsors e /admin/sponsor-banners
 
 - **Patrocinadores & Banners Demo (`database/seeders/SponsorDemoSeeder.php`, `public/uploads/sponsors/banners/demo-*.svg`):**
