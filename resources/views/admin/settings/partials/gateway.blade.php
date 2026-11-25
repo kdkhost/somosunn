@@ -32,6 +32,10 @@
     .gateway-shell .gateway-method-icon{width:46px;height:46px;border-radius:.9rem;background:#eff6ff;color:#1d4ed8;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
     .gateway-shell .gateway-section{border-radius:1rem;overflow:hidden;box-shadow:0 10px 28px rgba(15,23,42,.06)}
     .gateway-shell .gateway-color-preview{width:100%;min-height:54px;border:1px solid #d8dee9;border-radius:.85rem}
+    .dark-mode .gateway-shell .gateway-method-card{background:#0f172a;border-color:#334155;color:#e2e8f0}
+    .dark-mode .gateway-shell .gateway-method-card.is-enabled{background:rgba(37,99,235,.14);border-color:rgba(96,165,250,.45)}
+    .dark-mode .gateway-shell .gateway-method-icon{background:rgba(37,99,235,.22);color:#93c5fd}
+    .dark-mode .gateway-shell .gateway-color-preview{border-color:#334155}
     @media (max-width:767.98px){.gateway-shell .gateway-tab-btn{width:100%;margin-bottom:.5rem}}
 </style>
 @endpush

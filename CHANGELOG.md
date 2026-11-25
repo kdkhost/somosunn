@@ -1,5 +1,15 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.36] - 2026-11-25 - fix(admin, ux): eliminacao do espaco vazio antes do rodape, organizacao das configuracoes e gaveta de instrucoes universal
+
+- **Eliminação do Espaço Vazio Gigante Antes do Rodapé (`resources/views/admin/layouts/app.blade.php`):**
+  - Aplicado layout flex vertical no `.wrapper` com `min-height: calc(100vh - 3.5rem - 3.25rem) !important; height: auto !important;` no `.content-wrapper`, impedindo o cálculo excessivo de altura inline do AdminLTE 3.2 e eliminando o espaço em branco antes do rodapé.
+- **Organização Visual das Páginas de Configuração e Harmonia Dark/Light (`resources/views/admin/settings/index.blade.php`, `resources/views/admin/settings/partials/gateway.blade.php`, `resources/views/admin/layouts/app.blade.php`):**
+  - Removido o aninhamento duplicado de `.content-header` e `.content > .container-fluid` em `admin/settings/index.blade.php`, corrigido o título `text-dark` invisível no Dark Mode e adicionada barra superior de abas rápidas entre todos os grupos de configuração.
+  - Harmonizadas as classes `.bg-white`, `.text-dark`, `.input-group-text`, `.alert-*` e `.gateway-method-card` no modo escuro (`.dark-mode`) para eliminar cores estourando.
+- **Gaveta de Instruções Universal em Todas as Páginas Administrativas (`resources/views/partials/help-drawer.blade.php`):**
+  - Expandido `UNNHelpDrawer.autoAttach()` para injetar automaticamente o ícone `?` alinhado ao `<label>` em **todos os campos de formulário** nas páginas de `/admin/*` e `/painel/*` — usando o catálogo detalhado com links oficiais quando catalogado e gerando instruções inteligentes automaticamente a partir do label, placeholder e dicas do campo para os demais.
+
 ## [2.8.35] - 2026-11-25 - feat(ux, settings): gaveta global de instrucoes automatica em todo o sistema e alternancia dinamica Sandbox/Producao no select
 
 - **Gaveta Lateral de Instruções Global e Automática (`resources/views/partials/help-drawer.blade.php`, `public/js/unn-help-catalog.js`):**

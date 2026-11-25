@@ -20,6 +20,11 @@
 @endphp
 
 @section('title', 'Configurações - ' . $currentLabel)
+@section('page_title', 'Configurações — ' . $currentLabel)
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('admin.settings', ['group' => 'general']) }}">Configurações</a></li>
+    <li class="breadcrumb-item active">{{ $currentLabel }}</li>
+@endsection
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css') }}">
@@ -31,44 +36,47 @@
             display: inline-block;
             cursor: pointer;
         }
+        .settings-nav-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 1rem;
+        }
+        .settings-nav-pills .btn {
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.35rem 0.85rem;
+        }
     </style>
 @endpush
 
 @section('content')
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">Configurações <small class="text-muted">&gt; {{ $currentLabel }}</small></h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active">Configurações</li>
-                    </ol>
-                </div>
+    {{-- Navegação rápida e organizada entre todos os grupos de configuração --}}
+    <div class="settings-nav-pills">
+        @foreach($groupLabels as $slug => $label)
+            <a href="{{ route('admin.settings', ['group' => $slug]) }}"
+                class="btn btn-sm {{ $group === $slug ? 'btn-primary shadow-sm' : 'btn-outline-secondary' }}">
+                {{ $label }}
+            </a>
+        @endforeach
+    </div>
+
+    <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" novalidate autocomplete="off">
+        @csrf
+        <input type="hidden" name="current_group" value="{{ $group }}">
+
+        <div class="card card-outline card-primary shadow-sm mb-0">
+            @include('admin.settings.partials.' . $group, ['settings' => $settings, 'getUrl' => $getUrl])
+
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <small class="text-muted"><i class="fas fa-circle-question mr-1"></i>Clique no ícone <strong>?</strong> ao lado de qualquer campo para abrir o passo a passo.</small>
+                <button type="submit" id="btn-save-settings" class="btn btn-primary font-weight-bold px-4">
+                    <i class="fas fa-save mr-1"></i> <span id="btn-save-label">Salvar Alterações</span>
+                </button>
             </div>
         </div>
-    </div>
-
-    <div class="content">
-        <div class="container-fluid">
-            <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" novalidate autocomplete="off">
-                @csrf
-                <input type="hidden" name="current_group" value="{{ $group }}">
-
-                <div class="card card-outline card-primary">
-                    @include('admin.settings.partials.' . $group, ['settings' => $settings, 'getUrl' => $getUrl])
-
-                    <div class="card-footer">
-                        <button type="submit" id="btn-save-settings" class="btn btn-primary">
-                            <i class="fas fa-save mr-1"></i> <span id="btn-save-label">Salvar Alterações</span>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+    </form>
 @endsection
 
 @push('scripts')

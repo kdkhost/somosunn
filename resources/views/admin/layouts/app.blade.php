@@ -3441,7 +3441,60 @@
             color: #f1f5f9 !important;
         }
 
+        /* Correção definitiva: elimina espaço vazio gigante antes do rodapé */
+        body.layout-fixed .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        body.layout-fixed .content-wrapper {
+            flex: 1 0 auto;
+            min-height: calc(100vh - 3.5rem - 3.25rem) !important;
+            height: auto !important;
+            padding-bottom: 1.25rem;
+        }
+
         /* Harmonia Global Dark/Light — evita cores estourando no tema escuro */
+        .dark-mode .bg-white {
+            background-color: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+
+        .dark-mode .text-dark {
+            color: #f1f5f9 !important;
+        }
+
+        .dark-mode .input-group-text {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
+        .dark-mode .alert-info {
+            background-color: rgba(37, 99, 235, 0.16) !important;
+            border-color: rgba(59, 130, 246, 0.35) !important;
+            color: #bfdbfe !important;
+        }
+
+        .dark-mode .alert-warning {
+            background-color: rgba(245, 158, 11, 0.16) !important;
+            border-color: rgba(245, 158, 11, 0.35) !important;
+            color: #fde68a !important;
+        }
+
+        .dark-mode .alert-success {
+            background-color: rgba(16, 185, 129, 0.16) !important;
+            border-color: rgba(16, 185, 129, 0.35) !important;
+            color: #a7f3d0 !important;
+        }
+
+        .dark-mode .alert-danger {
+            background-color: rgba(239, 68, 68, 0.16) !important;
+            border-color: rgba(239, 68, 68, 0.35) !important;
+            color: #fecaca !important;
+        }
+
         .dark-mode .bg-light,
         .dark-mode tr.bg-light,
         .dark-mode thead tr.bg-light th {

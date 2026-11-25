@@ -470,14 +470,20 @@
             if (explicitLabel) return explicitLabel;
         }
 
-        const container = field.closest('.form-group, div');
-        if (container) {
-            const directLabel = container.querySelector(':scope > label');
+        const formGroup = field.closest('.form-group');
+        if (formGroup) {
+            const groupLabel = formGroup.querySelector(':scope > label');
+            if (groupLabel) return groupLabel;
+        }
+
+        const directBox = field.closest('div');
+        if (directBox) {
+            const directLabel = directBox.querySelector(':scope > label');
             if (directLabel) return directLabel;
 
-            const parentContainer = container.parentElement;
-            if (parentContainer) {
-                const parentLabel = parentContainer.querySelector(':scope > label');
+            const parentBox = directBox.parentElement;
+            if (parentBox && !parentBox.classList.contains('row')) {
+                const parentLabel = parentBox.querySelector(':scope > label');
                 if (parentLabel) return parentLabel;
             }
         }
@@ -485,22 +491,85 @@
         return null;
     }
 
+    function buildSmartFallbackConfig(field, label) {
+        const cleanLabel = (label.textContent || '').replace(/\*/g, '').trim();
+        const placeholder = (field.getAttribute('placeholder') || '').trim();
+        const container = field.closest('.form-group') || field.parentElement;
+        let helperText = '';
+
+        if (container) {
+            const hintEl = container.querySelector('small.form-text, small.text-muted, p.text-xs, .help-block');
+            if (hintEl) {
+                helperText = (hintEl.textContent || '').trim();
+            }
+        }
+
+        const isSelect = field.tagName === 'SELECT';
+        const steps = [];
+
+        if (isSelect) {
+            steps.push('Clique no seletor de "' + cleanLabel + '" e escolha a opção desejada.');
+        } else if (placeholder) {
+            steps.push('Preencha "' + cleanLabel + '" seguindo o formato de exemplo: ' + placeholder + '.');
+        } else {
+            steps.push('Informe o valor correspondente ao campo "' + cleanLabel + '".');
+        }
+
+        if (helperText) {
+            steps.push(helperText);
+        }
+
+        steps.push('Ao terminar os ajustes desta seção, clique no botão "Salvar" no rodapé da tela.');
+
+        return {
+            badge: 'Ajuda do Campo',
+            title: cleanLabel || 'Instruções do Campo',
+            summary: helperText || ('Configure o campo "' + cleanLabel + '" de acordo com as necessidades da sua plataforma.'),
+            steps: steps,
+            tip: 'Todas as alterações podem ser ajustadas novamente a qualquer momento.'
+        };
+    }
+
+    function shouldSkipField(field) {
+        const type = (field.getAttribute('type') || '').toLowerCase();
+        const name = (field.getAttribute('name') || '').toLowerCase();
+        if (['hidden', 'submit', 'button', 'reset', 'search', 'radio'].includes(type)) return true;
+        if (type === 'checkbox' && field.closest('.custom-switch')) return false;
+        if (type === 'checkbox') return true;
+        if (field.hasAttribute('readonly') || field.disabled) return true;
+        if (['search', 'q', '_token', '_method', 'current_group', 'status', 'receiver_type'].includes(name)) return true;
+        if (field.closest('.dataTables_filter, .dataTables_length')) return true;
+        return false;
+    }
+
     function autoAttach(root) {
         const scope = root || document;
-        const fields = scope.querySelectorAll('input[name]:not([type="hidden"]), select[name], textarea[name]');
+        const isAdminOrPanel = window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/painel');
+        const fields = scope.querySelectorAll('input[name], select[name], textarea[name]');
 
         fields.forEach(function (field) {
+            if (shouldSkipField(field)) return;
+
             const rawName = (field.getAttribute('name') || '').replace(/\[\]$/, '').trim();
-            if (!rawName || !registry[rawName]) return;
+            if (!rawName) return;
+
+            const hasCatalog = Boolean(registry[rawName]);
+            if (!hasCatalog && !isAdminOrPanel) return;
 
             const label = findLabelForField(field);
             if (!label) return;
             if (label.querySelector('.unn-help-trigger')) return;
+            if ((label.textContent || '').trim() === '') return;
+
+            const key = hasCatalog ? rawName : ('__auto_' + rawName + '_' + Math.random().toString(36).slice(2, 7));
+            if (!hasCatalog) {
+                registry[key] = buildSmartFallbackConfig(field, label);
+            }
 
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'unn-help-trigger';
-            btn.setAttribute('data-help-drawer', rawName);
+            btn.setAttribute('data-help-drawer', key);
             btn.setAttribute('title', 'Ver instruções passo a passo');
             btn.setAttribute('aria-label', 'Ver instruções de ' + rawName);
             btn.innerHTML = '<i class="fas fa-question"></i>';
