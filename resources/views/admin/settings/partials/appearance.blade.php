@@ -482,7 +482,7 @@
                 </div>
             </div>
             <div id="preloaderLiveStage" class="preloader-live-stage unn-style-{{ $preloaderStyleVal }} unn-exit-{{ $preloaderExitVal }}"
-                style="--unn-pre-accent: {{ $preloaderAccentVal }};">
+                style="--unn-pre-accent: {{ $preloaderAccentVal }}; --unn-pre-accent-2: #29ABE2;">
                 <div class="unn-preloader-glow"></div>
                 <div class="unn-preloader-content">
                     <div class="unn-orbital-wrapper">
@@ -510,8 +510,11 @@
 
 <style>
     .preloader-live-stage {
+        --unn-pre-accent: #1F5EDB;
+        --unn-pre-accent-2: #29ABE2;
         position: relative;
-        min-height: 250px;
+        min-height: 270px;
+        padding: 2rem 1.5rem;
         border-radius: 1rem;
         border: 1px solid var(--bs-border-color);
         background: #ffffff;

@@ -93,9 +93,12 @@
         /* ==========================================================================
            ESTILOS DO PRELOADER MODERNO SOMOS UNN (5 MODELOS + 4 ANIMAÇÕES DE SAÍDA)
            ========================================================================== */
-        #unn-preloader {
+        :root {
             --unn-pre-accent: #1F5EDB;
             --unn-pre-accent-2: #29ABE2;
+        }
+
+        #unn-preloader {
             position: fixed;
             inset: 0;
             z-index: 999999;

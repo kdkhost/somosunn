@@ -1,5 +1,10 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.48] - 2026-11-25 - fix(admin, preloader): correcao da fidelidade visual 100% do palco de preview do Preloader (variavel --unn-pre-accent-2 no :root)
+
+- **Preview do Preloader 100% Idêntico ao Real (`resources/views/partials/modern-preloader.blade.php`, `resources/views/admin/settings/partials/appearance.blade.php`):**
+  - Movidas as variáveis CSS `--unn-pre-accent` e `--unn-pre-accent-2` para `:root` e `.preloader-live-stage`, restaurando o anel orbital cônico brilhante (`.unn-ring-outer`), a tipografia metálica shimmer (`.unn-brand-text`) e a barra de progresso azul (`.unn-progress-bar`) dentro do palco de preview em tempo real.
+
 ## [2.8.47] - 2026-11-25 - fix(ux, help-drawer): correcao da abertura da gaveta de instrucoes ao clicar em qualquer icone de ajuda (captura de clique, PJAX jQuery, switches BS5 e fallback inteligente)
 
 - **Gaveta Lateral de Instruções (`resources/views/partials/help-drawer.blade.php`):**
