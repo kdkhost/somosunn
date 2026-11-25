@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.37] - 2026-11-25 - fix(admin, css): remocao definitiva do padding-bottom triplicado (270px) antes do rodape e fundo dark harmonizado
+
+- **Eliminação Definitiva dos 270px de Espaço Vazio Antes do Rodapé (`resources/views/admin/layouts/app.blade.php`):**
+  - Identificada e corrigida a regra CSS que aplicava `padding-bottom: 90px !important` simultaneamente nos 3 elementos aninhados `.content-wrapper`, `section.content` e `#pjax-container` (somando 270px no desktop e 345px no mobile).
+  - Zerado o `padding-bottom` de `.content-wrapper` e `section.content`, mantendo apenas `24px` limpos no `#pjax-container` (`48px` no mobile).
+  - Harmonizado o fundo de `.dark-mode .content-wrapper` para `#0b1120`, eliminando a faixa cinza `#454d55` desalinhada com a paleta escura do painel.
+
 ## [2.8.36] - 2026-11-25 - fix(admin, ux): eliminacao do espaco vazio antes do rodape, organizacao das configuracoes e gaveta de instrucoes universal
 
 - **Eliminação do Espaço Vazio Gigante Antes do Rodapé (`resources/views/admin/layouts/app.blade.php`):**

@@ -2715,11 +2715,18 @@
             box-sizing: border-box !important;
         }
 
-        /* Garante que o conteúdo role além dos botões flutuantes para que nenhum card/botão inferior fique encoberto */
+        /* Espaçamento inferior limpo (apenas no container interno, sem triplicar padding) */
         .content-wrapper,
-        #pjax-container,
         section.content {
-            padding-bottom: 90px !important;
+            padding-bottom: 0 !important;
+        }
+
+        #pjax-container {
+            padding-bottom: 24px !important;
+        }
+
+        .dark-mode .content-wrapper {
+            background-color: #0b1120 !important;
         }
 
         /* Auto-responsividade universal de tabelas em cards */
@@ -2763,9 +2770,12 @@
         /* Quebras Inteligentes para Mobile e Telas Estreitas (< 768px) */
         @media (max-width: 767.98px) {
             .content-wrapper,
-            #pjax-container,
             section.content {
-                padding-bottom: 115px !important;
+                padding-bottom: 0 !important;
+            }
+
+            #pjax-container {
+                padding-bottom: 48px !important;
             }
 
             .container-fluid {
@@ -3452,7 +3462,7 @@
             flex: 1 0 auto;
             min-height: calc(100vh - 3.5rem - 3.25rem) !important;
             height: auto !important;
-            padding-bottom: 1.25rem;
+            padding-bottom: 0 !important;
         }
 
         /* Harmonia Global Dark/Light — evita cores estourando no tema escuro */
