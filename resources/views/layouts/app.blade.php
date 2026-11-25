@@ -836,6 +836,7 @@
 
 <body class="bg-slate-50 min-h-screen">
     @include('partials.modern-preloader')
+    @include('partials.help-drawer')
     @if($trackingBody !== '')
         {!! $trackingBody !!}
     @endif

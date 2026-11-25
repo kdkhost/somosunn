@@ -3440,6 +3440,94 @@
             border-color: #334155 !important;
             color: #f1f5f9 !important;
         }
+
+        /* Harmonia Global Dark/Light — evita cores estourando no tema escuro */
+        .dark-mode .bg-light,
+        .dark-mode tr.bg-light,
+        .dark-mode thead tr.bg-light th {
+            background-color: #1e293b !important;
+            color: #cbd5e1 !important;
+            border-color: #334155 !important;
+        }
+
+        .dark-mode code,
+        .dark-mode code.bg-light {
+            background-color: #0f172a !important;
+            color: #93c5fd !important;
+            border-color: #334155 !important;
+        }
+
+        .dark-mode .card {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+
+        .dark-mode .card-header,
+        .dark-mode .card-footer {
+            background-color: rgba(15, 23, 42, 0.45) !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        .dark-mode .info-box {
+            background-color: #1e293b !important;
+            border: 1px solid #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
+        .dark-mode .info-box .info-box-text {
+            color: #94a3b8 !important;
+        }
+
+        .dark-mode .form-control,
+        .dark-mode select.form-control,
+        .dark-mode .custom-select {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
+        .dark-mode .form-control::placeholder {
+            color: #64748b !important;
+        }
+
+        .dark-mode .form-control:focus,
+        .dark-mode select.form-control:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.2) !important;
+        }
+
+        .dark-mode .border-top,
+        .dark-mode .border-bottom,
+        .dark-mode .border {
+            border-color: #334155 !important;
+        }
+
+        .dark-mode .table td,
+        .dark-mode .table th {
+            border-color: #334155 !important;
+        }
+
+        .dark-mode .table-hover tbody tr:hover {
+            background-color: rgba(51, 65, 85, 0.4) !important;
+        }
+
+        .dark-mode .text-muted {
+            color: #94a3b8 !important;
+        }
+
+        .unn-section-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1rem 1.15rem;
+            background: #f8fafc;
+        }
+
+        .dark-mode .unn-section-box {
+            border-color: #334155;
+            background: rgba(15, 23, 42, 0.55);
+        }
     </style>
     @stack('styles')
 </head>
@@ -3447,6 +3535,7 @@
 <body
     class="{{ $isAdmin ? 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}">
     @include('partials.modern-preloader')
+    @include('partials.help-drawer')
     {{-- Badge de Impersonation - Flutuante discreto --}}
     @if(session()->has('impersonator_id'))
         <div id="impersonation-badge"

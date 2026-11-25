@@ -1,5 +1,18 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.33] - 2026-11-25 - feat(admin, ux): gaveta lateral de instrucoes em cada input, reorganizacao intuitiva dos repasses e harmonia dark/light
+
+- **Gaveta Lateral Global de Instruções (`resources/views/partials/help-drawer.blade.php`):**
+  - Criado componente reutilizável de gaveta deslizante da direita para a esquerda (`translateX(100%) -> translateX(0)`) integrado globalmente em `resources/views/admin/layouts/app.blade.php` e `resources/views/layouts/app.blade.php` (cobrindo `/admin` e `/painel`).
+  - Suporte nativo e harmonizado aos temas **Dark** (`.dark-mode` e `.dark`) e **Light**, com fechamento via botão `X`, clique fora ou tecla `ESC`.
+  - Criado catálogo compartilhado de instruções (`resources/views/partials/splits-help-registry.blade.php`) com explicação clara, passo a passo numerado, dica de segurança e links diretos oficiais para o Painel de Desenvolvedores do Mercado Pago, Documentação de Customers & Cards, Painel Efí Pay, Painel SumUp e Configurações de Pagamentos.
+- **Reorganização Prática e Intuitiva nos Dois Painéis (`resources/views/admin/splits/index.blade.php`, `resources/views/panel/admin/splits/index.blade.php`):**
+  - Adicionada barra de acesso rápido no topo (*Minhas Comissões*, *Pedidos*, *Configurações de Pagamentos* e *Guia Completo*).
+  - Formulário de automação dividido em blocos organizados com exibição dinâmica conforme o modo de liquidação escolhido (evitando poluição visual).
+  - Adicionado ícone interativo de ajuda (`?`) ao lado de **cada input**, abrindo a gaveta lateral com as instruções daquele campo específico.
+- **Harmonia Visual Dark / Light no `/admin` (`resources/views/admin/layouts/app.blade.php`):**
+  - Adicionadas regras globais para eliminar estouros de cor no tema escuro em `.bg-light`, `thead tr.bg-light`, `code.bg-light`, `.info-box`, `.card`, `.card-header`, `.form-control`, `select`, bordas e hover de tabelas.
+
 ## [2.8.32] - 2026-11-25 - feat(splits, mercadopago): opcao C de cobranca automatica no Mercado Pago a cada venda na SumUp
 
 - **Cobrança Automática no Mercado Pago a cada Venda (`app/Services/SuperadminCommissionBillingService.php`):**

@@ -1,8 +1,8 @@
 @extends('admin.layouts.app')
-@section('title', 'Controle de Repasses')
-@section('page_title', 'Controle de Repasses')
+@section('title', 'Controle de Repasses e Comissões')
+@section('page_title', 'Controle de Repasses e Comissões')
 @section('breadcrumb')
-    <li class="breadcrumb-item active">Splits</li>
+    <li class="breadcrumb-item active">Repasses &amp; Comissões</li>
 @endsection
 
 @section('content')
@@ -15,10 +15,29 @@
         ];
     @endphp
 
+    {{-- Barra de Acesso Rápido --}}
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3" style="gap: 8px;">
+        <div class="d-flex flex-wrap align-items-center" style="gap: 8px;">
+            <a href="{{ route('admin.splits.index', ['receiver_type' => 'superadmin']) }}" class="btn btn-sm {{ $receiverType === 'superadmin' ? 'btn-primary' : 'btn-outline-primary' }}">
+                <i class="fas fa-user-shield mr-1"></i>Minhas Comissões (Superadmin)
+            </a>
+            <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-receipt mr-1"></i>Pedidos
+            </a>
+            <a href="{{ route('admin.settings', ['group' => 'gateway']) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-credit-card mr-1"></i>Configurações de Pagamentos
+            </a>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-info font-weight-bold" data-help-drawer="splits_overview">
+            <i class="fas fa-book-open mr-1"></i>Guia Completo de Automação
+        </button>
+    </div>
+
+    {{-- Indicadores KPI --}}
     <div class="row mb-4">
         <div class="col-lg-3 col-sm-6">
             <div class="info-box shadow-sm">
-                <span class="info-box-icon bg-gradient-success"><i class="fas fa-circle-check"></i></span>
+                <span class="info-box-icon bg-success"><i class="fas fa-circle-check"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text font-weight-bold">Liquidado</span>
                     <span class="info-box-number text-success">R$ {{ number_format($summary['paid'], 2, ',', '.') }}</span>
@@ -27,7 +46,7 @@
         </div>
         <div class="col-lg-3 col-sm-6">
             <div class="info-box shadow-sm">
-                <span class="info-box-icon bg-gradient-warning"><i class="fas fa-hourglass-half"></i></span>
+                <span class="info-box-icon bg-warning"><i class="fas fa-hourglass-half"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text font-weight-bold">Aguardando repasse</span>
                     <span class="info-box-number text-warning">R$ {{ number_format($summary['pending'], 2, ',', '.') }}</span>
@@ -37,7 +56,7 @@
         </div>
         <div class="col-lg-3 col-sm-6">
             <div class="info-box shadow-sm">
-                <span class="info-box-icon bg-gradient-danger"><i class="fas fa-exclamation-triangle"></i></span>
+                <span class="info-box-icon bg-danger"><i class="fas fa-exclamation-triangle"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text font-weight-bold">Falha registrada</span>
                     <span class="info-box-number text-danger">R$ {{ number_format($summary['failed'], 2, ',', '.') }}</span>
@@ -47,7 +66,7 @@
         </div>
         <div class="col-lg-3 col-sm-6">
             <div class="info-box shadow-sm">
-                <span class="info-box-icon bg-gradient-primary"><i class="fas fa-chart-pie"></i></span>
+                <span class="info-box-icon bg-primary"><i class="fas fa-chart-pie"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text font-weight-bold">Volume total</span>
                     <span class="info-box-number">R$ {{ number_format($summary['total'], 2, ',', '.') }}</span>
@@ -57,85 +76,153 @@
         </div>
     </div>
 
+    {{-- Card de Automação (exclusivo Superadmin) --}}
     @if(!empty($automation['is_superadmin']))
-        <div class="card card-outline card-info shadow-sm mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title font-weight-bold mb-0">
-                    <i class="fas fa-robot mr-2 text-info"></i>Automação de Comissões (SumUp &rarr; Mercado Pago)
-                </h3>
-                <span class="badge badge-{{ $automation['enabled'] ? 'success' : 'secondary' }} px-2 py-1">
-                    {{ $automation['enabled'] ? 'Automação Ativa' : 'Automação Desativada' }}
-                </span>
+        <div class="card card-outline card-primary shadow-sm mb-4">
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center" style="gap: 10px;">
+                <div>
+                    <h3 class="card-title font-weight-bold mb-0">
+                        <i class="fas fa-robot mr-2 text-primary"></i>Automação de Comissões (SumUp &rarr; Mercado Pago)
+                    </h3>
+                </div>
+                <div class="d-flex align-items-center" style="gap: 8px;">
+                    <span class="badge badge-{{ $automation['enabled'] ? 'success' : 'secondary' }} px-2 py-1">
+                        {{ $automation['enabled'] ? 'Automação Ativa' : 'Automação Desativada' }}
+                    </span>
+                    <button type="button" class="btn btn-xs btn-outline-primary" data-help-drawer="splits_overview">
+                        <i class="fas fa-question-circle mr-1"></i>Como configurar
+                    </button>
+                </div>
             </div>
             <div class="card-body">
                 <p class="text-muted text-sm mb-3">
-                    Vendas criadas ou divulgadas pelo administrador são <strong>isentas automaticamente</strong>.
-                    Para vendas de membros, mentores e produtores pagas na SumUp, o sistema agenda e dispara o Pix automático via Efí Pay direto para sua chave Pix do Mercado Pago.
+                    Vendas criadas ou divulgadas pelo administrador são <strong>100% isentas automaticamente</strong>.
+                    Clique no ícone <span class="unn-help-trigger" style="pointer-events:none;"><i class="fas fa-question"></i></span> ao lado de qualquer campo para abrir o passo a passo com link direto para as credenciais.
                 </p>
-                <form id="js-split-automation-form" action="{{ route('admin.splits.automation_settings') }}" method="POST" class="row">
+
+                <form id="js-split-automation-form" action="{{ route('admin.splits.automation_settings') }}" method="POST">
                     @csrf
-                    <div class="col-md-3 mb-3">
-                        <label class="font-weight-bold text-sm">Modo de Liquidação</label>
-                        <select name="payout_mode" class="form-control">
-                            <option value="mp_auto_billing" @selected($automation['mode'] === 'mp_auto_billing')>100% SumUp + Cobrança Automática no MP (a cada venda)</option>
-                            <option value="efi_pix_out" @selected($automation['mode'] === 'efi_pix_out')>100% SumUp + Pix Automático (Efí &rarr; MP)</option>
-                            <option value="mp_routing" @selected($automation['mode'] === 'mp_routing')>Roteamento Inteligente (Terceiros no MP)</option>
-                            <option value="manual" @selected($automation['mode'] === 'manual')>Apenas Controle (Repasse Manual)</option>
-                        </select>
+
+                    {{-- Bloco 1: Regras Gerais --}}
+                    <div class="unn-section-box mb-3">
+                        <div class="text-xs font-weight-bold text-uppercase text-muted mb-3">
+                            <i class="fas fa-sliders-h mr-1"></i> 1. Regras Gerais da Comissão
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5 mb-3 mb-md-0">
+                                <label class="font-weight-bold text-sm">
+                                    Modo de Liquidação
+                                    <button type="button" class="unn-help-trigger" data-help-drawer="payout_mode" title="Ver instruções"><i class="fas fa-question"></i></button>
+                                </label>
+                                <select name="payout_mode" id="js-admin-payout-mode" class="form-control">
+                                    <option value="mp_auto_billing" @selected($automation['mode'] === 'mp_auto_billing')>100% SumUp + Cobrança Automática no MP (a cada venda)</option>
+                                    <option value="efi_pix_out" @selected($automation['mode'] === 'efi_pix_out')>100% SumUp + Pix Automático (Efí &rarr; MP)</option>
+                                    <option value="mp_routing" @selected($automation['mode'] === 'mp_routing')>Roteamento Inteligente (Terceiros no MP)</option>
+                                    <option value="manual" @selected($automation['mode'] === 'manual')>Apenas Controle (Repasse Manual)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 mb-3 mb-md-0">
+                                <label class="font-weight-bold text-sm">
+                                    Comissão (%)
+                                    <button type="button" class="unn-help-trigger" data-help-drawer="percent" title="Ver instruções"><i class="fas fa-question"></i></button>
+                                </label>
+                                <input type="number" step="0.01" min="0" max="100" name="percent" class="form-control" value="{{ $automation['percent'] }}">
+                            </div>
+                            <div class="col-md-2 mb-3 mb-md-0">
+                                <label class="font-weight-bold text-sm">
+                                    Mínimo (R$)
+                                    <button type="button" class="unn-help-trigger" data-help-drawer="min_payout" title="Ver instruções"><i class="fas fa-question"></i></button>
+                                </label>
+                                <input type="number" step="0.01" min="0.01" name="min_payout" class="form-control" value="{{ number_format($automation['min_payout'], 2, '.', '') }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="font-weight-bold text-sm">
+                                    E-mail Financeiro Admin
+                                    <button type="button" class="unn-help-trigger" data-help-drawer="admin_email" title="Ver instruções"><i class="fas fa-question"></i></button>
+                                </label>
+                                <input type="email" name="admin_email" class="form-control" value="{{ $automation['admin_email'] ?? '' }}" placeholder="financeiro@empresa.com">
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="font-weight-bold text-sm">Access Token do seu Mercado Pago</label>
-                        <input type="password" name="mp_access_token" class="form-control" value=""
-                            placeholder="{{ !empty($automation['mp_has_token']) ? '•••••••• (já configurado — preencha para trocar)' : 'APP_USR-...' }}">
+
+                    {{-- Bloco 2A: Credenciais Mercado Pago (Opção C) --}}
+                    <div class="unn-section-box mb-3 js-mode-panel" data-mode-panel="mp_auto_billing">
+                        <div class="text-xs font-weight-bold text-uppercase text-muted mb-3">
+                            <i class="fas fa-wallet mr-1"></i> 2. Credenciais da Sua Conta Mercado Pago (Cobrança a cada venda)
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <label class="font-weight-bold text-sm">
+                                    Access Token do seu Mercado Pago
+                                    <button type="button" class="unn-help-trigger" data-help-drawer="mp_access_token" title="Ver instruções"><i class="fas fa-question"></i></button>
+                                </label>
+                                <input type="password" name="mp_access_token" class="form-control" value=""
+                                    placeholder="{{ !empty($automation['mp_has_token']) ? '•••••••• (já salvo — preencha para trocar)' : 'APP_USR-...' }}">
+                            </div>
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <label class="font-weight-bold text-sm">
+                                    Customer ID MP do Admin (Cartão Auto)
+                                    <button type="button" class="unn-help-trigger" data-help-drawer="mp_customer_id" title="Ver instruções"><i class="fas fa-question"></i></button>
+                                </label>
+                                <input type="text" name="mp_customer_id" class="form-control" value="{{ $automation['mp_customer_id'] ?? '' }}"
+                                    placeholder="Opcional — sem cartão gera Pix automático">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="font-weight-bold text-sm">
+                                    Card Token MP do Admin
+                                    <button type="button" class="unn-help-trigger" data-help-drawer="mp_card_token" title="Ver instruções"><i class="fas fa-question"></i></button>
+                                </label>
+                                <input type="password" name="mp_card_token" class="form-control" value=""
+                                    placeholder="{{ !empty($automation['mp_has_card_token']) ? '•••••••• (cartão salvo)' : 'Opcional para débito automático' }}">
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="font-weight-bold text-sm">Comissão (%)</label>
-                        <input type="number" step="0.01" min="0" max="100" name="percent" class="form-control" value="{{ $automation['percent'] }}">
+
+                    {{-- Bloco 2B: Credenciais Efí Pay (Opção B) --}}
+                    <div class="unn-section-box mb-3 js-mode-panel" data-mode-panel="efi_pix_out">
+                        <div class="text-xs font-weight-bold text-uppercase text-muted mb-3">
+                            <i class="fas fa-bolt mr-1"></i> 2. Recebimento Pix Automático (Efí Pay &rarr; Mercado Pago)
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8 mb-3 mb-md-0">
+                                <label class="font-weight-bold text-sm">
+                                    Sua Chave Pix do Mercado Pago
+                                    <button type="button" class="unn-help-trigger" data-help-drawer="pix_key" title="Ver instruções"><i class="fas fa-question"></i></button>
+                                </label>
+                                <input type="text" name="pix_key" class="form-control" value="{{ $automation['pix_key'] }}"
+                                    placeholder="CPF, CNPJ, e-mail ou chave aleatória do Mercado Pago">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="font-weight-bold text-sm">
+                                    Carência SumUp (D+dias)
+                                    <button type="button" class="unn-help-trigger" data-help-drawer="delay_days" title="Ver instruções"><i class="fas fa-question"></i></button>
+                                </label>
+                                <input type="number" min="0" max="30" name="delay_days" class="form-control" value="{{ $automation['delay_days'] }}">
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="font-weight-bold text-sm">E-mail Financeiro Admin</label>
-                        <input type="email" name="admin_email" class="form-control" value="{{ $automation['admin_email'] ?? '' }}"
-                            placeholder="financeiro@empresa.com">
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="font-weight-bold text-sm">Valor Mínimo (R$)</label>
-                        <input type="number" step="0.01" min="0.01" name="min_payout" class="form-control" value="{{ number_format($automation['min_payout'], 2, '.', '') }}">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="font-weight-bold text-sm">Customer ID MP do Admin (Cartão Auto)</label>
-                        <input type="text" name="mp_customer_id" class="form-control" value="{{ $automation['mp_customer_id'] ?? '' }}"
-                            placeholder="Opcional — sem cartão gera Pix automático">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="font-weight-bold text-sm">Card Token MP do Admin</label>
-                        <input type="password" name="mp_card_token" class="form-control" value=""
-                            placeholder="{{ !empty($automation['mp_has_card_token']) ? '•••••••• (salvo)' : 'Opcional para débito automático' }}">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="font-weight-bold text-sm">Sua Chave Pix Mercado Pago (Modo Efí)</label>
-                        <input type="text" name="pix_key" class="form-control" value="{{ $automation['pix_key'] }}"
-                            placeholder="CPF, CNPJ, e-mail ou chave aleatória do MP">
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="font-weight-bold text-sm">Carência Efí (D+dias)</label>
-                        <input type="number" min="0" max="30" name="delay_days" class="form-control" value="{{ $automation['delay_days'] }}">
-                    </div>
-                    <div class="col-12 d-flex flex-wrap justify-content-between align-items-center pt-2 border-top">
+
+                    {{-- Rodapé de Ativação e Salvamento --}}
+                    <div class="d-flex flex-wrap justify-content-between align-items-center pt-2 border-top" style="gap: 12px;">
                         <div class="custom-control custom-switch">
                             <input type="checkbox" class="custom-control-input" id="admin_auto_enabled" name="auto_enabled" value="1" @checked($automation['enabled'])>
                             <label class="custom-control-label font-weight-bold" for="admin_auto_enabled">
-                                Ativar envio automático sem interação humana
+                                Ativar envio/cobrança automática sem interação humana
+                                <button type="button" class="unn-help-trigger" data-help-drawer="auto_enabled" title="Ver instruções"><i class="fas fa-question"></i></button>
                             </label>
-                            <small class="d-block text-muted">
-                                Status Efí Pay:
-                                @if($automation['efi_enabled'] && $automation['efi_has_cert'])
-                                    <span class="text-success font-weight-bold">Conectada e com certificado ativo</span>
-                                @else
-                                    <span class="text-warning font-weight-bold">Configure as credenciais e certificado Efí Pay em Configurações &gt; Pagamentos</span>
-                                @endif
+                            <small class="d-block text-muted mt-1">
+                                Mercado Pago:
+                                <span class="font-weight-bold {{ !empty($automation['mp_has_token']) ? 'text-success' : 'text-warning' }}">
+                                    {{ !empty($automation['mp_has_token']) ? 'Access Token conectado' : 'Access Token pendente' }}
+                                </span>
+                                &nbsp;|&nbsp;
+                                Efí Pay:
+                                <span class="font-weight-bold {{ ($automation['efi_enabled'] && $automation['efi_has_cert']) ? 'text-success' : 'text-muted' }}">
+                                    {{ ($automation['efi_enabled'] && $automation['efi_has_cert']) ? 'Conectada' : 'Opcional (não ativa)' }}
+                                </span>
                             </small>
                         </div>
-                        <button type="submit" class="btn btn-info font-weight-bold mt-2 mt-md-0">
+                        <button type="submit" class="btn btn-primary font-weight-bold px-4">
                             <i class="fas fa-save mr-1"></i>Salvar Automação
                         </button>
                     </div>
@@ -144,45 +231,48 @@
         </div>
     @endif
 
-    <div class="card card-outline card-primary shadow-sm mb-4">
-        <div class="card-body">
-            <form action="{{ route('admin.splits.index') }}" method="GET" class="row">
-                <div class="col-lg-4 mb-2">
+    {{-- Filtros --}}
+    <div class="card card-outline card-secondary shadow-sm mb-4">
+        <div class="card-body py-3">
+            <form action="{{ route('admin.splits.index') }}" method="GET" class="row align-items-center">
+                <div class="col-lg-4 mb-2 mb-lg-0">
                     <input type="text" name="search" class="form-control" value="{{ $search }}"
                         placeholder="Buscar pedido, nome ou e-mail">
                 </div>
-                <div class="col-lg-2 mb-2">
+                <div class="col-lg-2 mb-2 mb-lg-0">
                     <select name="status" class="form-control">
-                        <option value="">Todos os repasses</option>
+                        <option value="">Todos os status</option>
                         <option value="pending" @selected($status === 'pending')>Pendentes</option>
+                        <option value="processing" @selected($status === 'processing')>Processando</option>
                         <option value="paid" @selected($status === 'paid')>Liquidados</option>
                         <option value="failed" @selected($status === 'failed')>Com falha</option>
                     </select>
                 </div>
-                <div class="col-lg-2 mb-2">
+                <div class="col-lg-3 mb-2 mb-lg-0">
                     <select name="receiver_type" class="form-control">
-                        <option value="">Todos os destinatarios</option>
+                        <option value="">Todos os destinatários</option>
                         @foreach($typeConfig as $value => $cfg)
                             <option value="{{ $value }}" @selected($receiverType === $value)>{{ $cfg['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-lg-4 mb-2 d-flex">
-                    <button type="submit" class="btn btn-primary mr-2">
+                <div class="col-lg-3 d-flex" style="gap: 8px;">
+                    <button type="submit" class="btn btn-primary flex-fill">
                         <i class="fas fa-filter mr-1"></i> Filtrar
                     </button>
                     <a href="{{ route('admin.splits.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-rotate-left mr-1"></i> Limpar
+                        <i class="fas fa-rotate-left"></i>
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
+    {{-- Tabela de Repasses --}}
     <div class="card card-outline card-dark shadow-sm">
         <div class="card-header">
             <h3 class="card-title font-weight-bold">
-                <i class="fas fa-money-bill-wave mr-2 text-primary"></i>Repasse por rateio
+                <i class="fas fa-money-bill-wave mr-2 text-primary"></i>Repasses por rateio
             </h3>
         </div>
         <div class="card-body p-0">
@@ -198,8 +288,8 @@
                                 <th class="text-center">%</th>
                                 <th>Chave PIX</th>
                                 <th>Repasse</th>
-                                <th>Operacao</th>
-                                <th class="text-center">Acao</th>
+                                <th>Operação</th>
+                                <th class="text-center">Ação</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -216,7 +306,7 @@
                                         <div class="text-xs text-muted">{{ $split->created_at?->format('d/m/Y H:i') }}</div>
                                     </td>
                                     <td class="align-middle">
-                                        <div class="font-weight-bold">{{ $split->receiver?->name ?? 'Nao vinculado' }}</div>
+                                        <div class="font-weight-bold">{{ $split->receiver?->name ?? 'Não vinculado' }}</div>
                                         <div class="text-xs text-muted">{{ $split->receiver?->email }}</div>
                                     </td>
                                     <td class="align-middle">
@@ -238,6 +328,8 @@
                                             <span class="badge badge-success px-2 py-1">Liquidado</span>
                                         @elseif($payoutStatus === 'failed')
                                             <span class="badge badge-danger px-2 py-1">Falhou</span>
+                                        @elseif($payoutStatus === 'processing')
+                                            <span class="badge badge-info px-2 py-1">Processando</span>
                                         @else
                                             <span class="badge badge-warning px-2 py-1">Pendente</span>
                                         @endif
@@ -255,7 +347,7 @@
                                         <div class="text-xs">
                                             <div><strong>Tentativas:</strong> {{ (int) ($payout?->attempts ?? 0) }}</div>
                                             @if(!empty($payout?->external_id))
-                                                <div class="text-info mt-1"><strong>E2E:</strong> <code>{{ \Illuminate\Support\Str::limit($payout->external_id, 24) }}</code></div>
+                                                <div class="text-info mt-1"><strong>ID/E2E:</strong> <code>{{ \Illuminate\Support\Str::limit($payout->external_id, 24) }}</code></div>
                                             @endif
                                             @if(!empty($payout?->last_error))
                                                 <div class="text-danger mt-1">{{ $payout->last_error }}</div>
@@ -269,7 +361,7 @@
                                         </div>
                                     </td>
                                     <td class="align-middle text-center">
-                                        @if($payoutStatus !== 'paid' && $split->pix_key)
+                                        @if($payoutStatus !== 'paid')
                                             <div class="btn-group">
                                                 @if($split->receiver_type === 'superadmin' && (!empty($automation['mp_has_token']) || !empty($automation['efi_enabled'])))
                                                     <button type="button"
@@ -281,21 +373,21 @@
                                                         <i class="fas fa-bolt mr-1"></i>Processar Auto
                                                     </button>
                                                 @endif
-                                                <button type="button"
-                                                    class="btn btn-sm btn-success js-confirm-payout"
-                                                    data-url="{{ route('admin.splits.pay', $split) }}"
-                                                    data-receiver="{{ $split->receiver?->name ?? $cfg['label'] }}"
-                                                    data-amount="R$ {{ number_format((float) $split->amount, 2, ',', '.') }}">
-                                                    <i class="fas fa-check mr-1"></i>Confirmar
-                                                </button>
-                                                <button type="button"
-                                                    class="btn btn-sm btn-outline-danger js-fail-payout"
-                                                    data-url="{{ route('admin.splits.fail', $split) }}">
-                                                    <i class="fas fa-triangle-exclamation"></i>
-                                                </button>
+                                                @if($split->pix_key)
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-success js-confirm-payout"
+                                                        data-url="{{ route('admin.splits.pay', $split) }}"
+                                                        data-receiver="{{ $split->receiver?->name ?? $cfg['label'] }}"
+                                                        data-amount="R$ {{ number_format((float) $split->amount, 2, ',', '.') }}">
+                                                        <i class="fas fa-check mr-1"></i>Confirmar
+                                                    </button>
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-outline-danger js-fail-payout"
+                                                        data-url="{{ route('admin.splits.fail', $split) }}">
+                                                        <i class="fas fa-triangle-exclamation"></i>
+                                                    </button>
+                                                @endif
                                             </div>
-                                        @elseif($payoutStatus !== 'paid')
-                                            <span class="text-danger text-xs font-weight-bold">Cadastre o PIX</span>
                                         @else
                                             <span class="text-success"><i class="fas fa-check-double"></i></span>
                                         @endif
@@ -309,7 +401,7 @@
                 <div class="text-center py-5">
                     <i class="fas fa-money-bill-wave fa-3x text-muted mb-3"></i>
                     <h5 class="text-muted font-weight-bold">Nenhum repasse encontrado</h5>
-                    <p class="text-muted mb-0">Os repasses sao preparados automaticamente quando um pedido pago gera rateios.</p>
+                    <p class="text-muted mb-0">Os repasses são preparados automaticamente quando um pedido pago gera rateios.</p>
                 </div>
             @endif
         </div>
@@ -323,7 +415,24 @@
 @endsection
 
 @push('scripts')
+@include('partials.splits-help-registry', ['settingsPaymentsUrl' => route('admin.settings', ['group' => 'gateway'])])
 <script>
+    (function () {
+        const modeSelect = document.getElementById('js-admin-payout-mode');
+        function syncModePanels() {
+            if (!modeSelect) return;
+            const current = modeSelect.value;
+            document.querySelectorAll('.js-mode-panel').forEach(function (panel) {
+                const target = panel.getAttribute('data-mode-panel');
+                panel.style.display = (target === current) ? 'block' : 'none';
+            });
+        }
+        if (modeSelect) {
+            modeSelect.addEventListener('change', syncModePanels);
+            syncModePanels();
+        }
+    })();
+
     async function postJson(url, payload) {
         const response = await fetch(url, {
             method: 'POST',
@@ -337,7 +446,7 @@
 
         const data = await response.json();
         if (!response.ok) {
-            throw new Error(data.message || 'Nao foi possivel concluir a operacao.');
+            throw new Error(data.message || 'Não foi possível concluir a operação.');
         }
 
         return data;
@@ -378,24 +487,22 @@
     document.querySelectorAll('.js-process-auto-payout').forEach(function (button) {
         button.addEventListener('click', async function () {
             const confirmed = await Swal.fire({
-                title: 'Disparar Pix automático agora?',
-                text: 'O sistema enviará ' + button.dataset.amount + ' via Efí Pay para a chave Pix de ' + button.dataset.receiver + '.',
+                title: 'Processar repasse automático agora?',
+                text: 'O sistema processará automaticamente ' + button.dataset.amount + ' referente à comissão de ' + button.dataset.receiver + '.',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Sim, enviar Pix',
+                confirmButtonText: 'Sim, processar agora',
                 cancelButtonText: 'Cancelar'
             });
 
-            if (!confirmed.isConfirmed) {
-                return;
-            }
+            if (!confirmed.isConfirmed) return;
 
             try {
                 const data = await postJson(button.dataset.url);
                 await Swal.fire('Processado', data.message, 'success');
                 window.location.reload();
             } catch (error) {
-                await Swal.fire('Erro no envio', error.message, 'error');
+                await Swal.fire('Erro no processamento', error.message, 'error');
             }
         });
     });
@@ -404,20 +511,18 @@
         button.addEventListener('click', async function () {
             const confirmed = await Swal.fire({
                 title: 'Confirmar repasse?',
-                text: 'Use esta acao somente depois de realizar a transferencia para ' + button.dataset.receiver + ' no valor de ' + button.dataset.amount + '.',
+                text: 'Use esta ação somente depois de realizar a transferência para ' + button.dataset.receiver + ' no valor de ' + button.dataset.amount + '.',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Sim, confirmar',
                 cancelButtonText: 'Cancelar'
             });
 
-            if (!confirmed.isConfirmed) {
-                return;
-            }
+            if (!confirmed.isConfirmed) return;
 
             try {
                 const data = await postJson(button.dataset.url);
-                await Swal.fire('Concluido', data.message, 'success');
+                await Swal.fire('Concluído', data.message, 'success');
                 window.location.reload();
             } catch (error) {
                 await Swal.fire('Erro', error.message, 'error');
@@ -431,7 +536,7 @@
                 title: 'Registrar falha',
                 input: 'text',
                 inputLabel: 'Motivo da falha do repasse',
-                inputPlaceholder: 'Ex.: chave PIX recusada, conta indisponivel, divergencia de valor',
+                inputPlaceholder: 'Ex.: chave PIX recusada, conta indisponível, divergência de valor',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Registrar falha',
@@ -443,9 +548,7 @@
                 }
             });
 
-            if (!result.isConfirmed) {
-                return;
-            }
+            if (!result.isConfirmed) return;
 
             try {
                 const data = await postJson(button.dataset.url, { message: result.value });

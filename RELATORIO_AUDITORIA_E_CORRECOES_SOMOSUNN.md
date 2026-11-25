@@ -2,11 +2,11 @@
 
 ## Painéis Administrativos
 
-### Atualização aplicada em 25/11/2026 - automação de comissões do superadmin (SumUp -> Mercado Pago via Pix Out Efí Pay)
+### Atualização aplicada em 25/11/2026 - automação de comissões (Opção C + gaveta lateral de instruções e harmonia dark/light)
 
 - **Recursos existentes e compartilhados entre os dois painéis:**
-  - `/admin/splits` (AdminLTE 3.2) e `/painel/admin/splits` (Tailwind) agora compartilham 100% da lógica via herança (`Panel\Admin\SplitController extends Admin\SplitController`) e dos serviços `OrderSplitService`, `OrderSplitPayoutService`, `Payment\EfiService` e `Payment\PaymentGatewayRouterService`.
-  - Ambos os painéis exibem o painel exclusivo do `superadmin` para configurar chave Pix do Mercado Pago, modo de liquidação (`efi_pix_out`, `mp_routing`, `manual`), percentual de comissão, prazo de carência `D+N`, valor mínimo e ativação do envio automático sem interação humana, além de status detalhado (`E2E`, data agendada, provedor) e disparo imediato via AJAX (SweetAlert2 + Toastr).
+  - `/admin/splits` (AdminLTE 3.2) e `/painel/admin/splits` (Tailwind) compartilham 100% da lógica via herança (`Panel\Admin\SplitController extends Admin\SplitController`) e dos serviços `OrderSplitService`, `OrderSplitPayoutService`, `SuperadminCommissionBillingService`, `Payment\EfiService` e `Payment\PaymentGatewayRouterService`.
+  - Ambos os painéis exibem barra de acesso rápido, formulário organizado por blocos dinâmicos (exibindo apenas os campos do modo selecionado), ícone `?` em cada input abrindo a gaveta lateral global `partials.help-drawer` (deslizando da direita para a esquerda com passo a passo e links diretos para credenciais) e harmonia total entre os temas Dark e Light sem estouros de cor.
 - **Rotas preservadas e adicionadas:**
   - Preservadas: `admin.splits.index`, `admin.splits.pay`, `admin.splits.fail`, `panel.admin.splits.index`, `panel.admin.splits.pay`, `panel.admin.splits.fail`, `panel.splits.index`.
   - Adicionadas: `admin.splits.automation_settings`, `admin.splits.process_auto`, `panel.admin.splits.automation_settings`, `panel.admin.splits.process_auto`.
