@@ -617,6 +617,54 @@ label,
     transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
 }
 
+/* Padronização global de TODOS os <select> no /admin (igual ao site público) */
+select.form-control,
+select.form-select,
+.form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2.35rem !important;
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.82rem center;
+    background-size: 14px 14px;
+    cursor: pointer;
+}
+
+select.form-control:hover,
+select.form-select:hover,
+.form-select:hover {
+    border-color: #94a3b8;
+}
+
+select.form-control option,
+select.form-select option,
+.form-select option {
+    background-color: #ffffff;
+    color: #0f172a;
+    padding: 0.45rem 0.65rem;
+}
+
+[data-bs-theme="dark"] select.form-control,
+[data-bs-theme="dark"] select.form-select,
+[data-bs-theme="dark"] .form-select {
+    background-color: #0b1120 !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.82rem center !important;
+    background-size: 14px 14px !important;
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] select.form-control option,
+[data-bs-theme="dark"] select.form-select option,
+[data-bs-theme="dark"] .form-select option {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
 .form-control:focus,
 .form-select:focus {
     border-color: var(--unn-azul-1);
@@ -955,20 +1003,128 @@ label,
 }
 
 /* ==========================================================================
-   7. Botões Flutuantes (Chat + Back-to-Top)
+   7. Botões Flutuantes (Chat + Back-to-Top com Anel Animado — acima do rodapé)
    ========================================================================== */
 #chat-widget-container {
     position: fixed !important;
-    bottom: 20px !important;
+    bottom: 66px !important;
     right: 20px !important;
     z-index: 1040 !important;
 }
 
 .admin-back-to-top {
     position: fixed !important;
-    bottom: 84px !important;
-    right: 24px !important;
+    bottom: 132px !important;
+    right: 22px !important;
+    width: 48px !important;
+    height: 48px !important;
     z-index: 1045 !important;
+    overflow: visible !important;
+}
+
+.admin-back-to-top .unn-btt-ring {
+    position: absolute;
+    inset: -5px;
+    width: calc(100% + 10px);
+    height: calc(100% + 10px);
+    transform: rotate(-90deg);
+    pointer-events: none;
+}
+
+.admin-back-to-top .unn-btt-ring-track {
+    fill: none;
+    stroke: rgba(31, 94, 219, 0.20);
+    stroke-width: 3;
+}
+
+.admin-back-to-top .unn-btt-ring-progress {
+    fill: none;
+    stroke: #38bdf8;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.1s linear;
+    filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.75));
+}
+
+@media (max-width: 768px) {
+    #chat-widget-container {
+        bottom: 62px !important;
+        right: 14px !important;
+    }
+    .admin-back-to-top {
+        bottom: 124px !important;
+        right: 16px !important;
+        width: 44px !important;
+        height: 44px !important;
+    }
+}
+
+/* ==========================================================================
+   7.5. Hover com Detalhes de Arquivo em Todos os Campos Arrasta-e-Solta
+   ========================================================================== */
+.upload-box,
+.unn-dz-wrap {
+    position: relative;
+}
+
+.unn-upload-hover-card {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 10px);
+    transform: translateX(-50%) translateY(6px);
+    min-width: 220px;
+    max-width: 300px;
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.75rem;
+    background: rgba(15, 23, 42, 0.94);
+    color: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.26);
+    box-shadow: 0 16px 36px -8px rgba(2, 6, 23, 0.45);
+    backdrop-filter: blur(12px);
+    font-size: 0.76rem;
+    line-height: 1.45;
+    text-align: left;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 1055;
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+}
+
+.unn-upload-hover-card::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(15, 23, 42, 0.94);
+}
+
+.upload-box:hover > .unn-upload-hover-card.has-details,
+.unn-dz-wrap:hover > .unn-upload-hover-card.has-details {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.unn-upload-hover-title {
+    font-weight: 700;
+    color: #93c5fd;
+    margin-bottom: 0.3rem;
+    word-break: break-word;
+}
+
+.unn-upload-hover-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.15rem 0.65rem;
+    color: #cbd5e1;
+}
+
+.unn-upload-hover-grid strong {
+    color: #ffffff;
+    font-weight: 600;
 }
 
 /* ==========================================================================

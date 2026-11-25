@@ -481,18 +481,40 @@
     </style>
 
     <button type="button" id="adminBackToTop" class="admin-back-to-top" aria-label="Voltar ao topo" title="Voltar ao topo">
+        <svg class="unn-btt-ring" viewBox="0 0 58 58" aria-hidden="true">
+            <circle class="unn-btt-ring-track" cx="29" cy="29" r="25"></circle>
+            <circle class="unn-btt-ring-progress" id="adminBackToTopRing" cx="29" cy="29" r="25"></circle>
+        </svg>
         <i class="fas fa-chevron-up"></i>
     </button>
     <script>
         (function () {
             const button = document.getElementById('adminBackToTop');
+            const ring = document.getElementById('adminBackToTopRing');
             if (!button) return;
+
+            const radius = 25;
+            const circumference = 2 * Math.PI * radius;
+            if (ring) {
+                ring.style.strokeDasharray = circumference + ' ' + circumference;
+                ring.style.strokeDashoffset = circumference;
+            }
+
             const onScroll = function () {
-                button.classList.toggle('is-visible', window.scrollY > 420);
+                const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+                const docHeight = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+                const progress = Math.min(1, Math.max(0, scrollY / docHeight));
+
+                button.classList.toggle('is-visible', scrollY > 240);
+                if (ring) {
+                    ring.style.strokeDashoffset = circumference * (1 - progress);
+                }
             };
+
             button.addEventListener('click', function () {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
+
             window.addEventListener('scroll', onScroll, { passive: true });
             onScroll();
         })();

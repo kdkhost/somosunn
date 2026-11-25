@@ -253,6 +253,161 @@
         });
     }
 
+    // 6.5. Hover com detalhes reais (nome, peso, dimensões px, formato) em todos os campos arrasta-e-solta
+    const headSizeCache = new Map();
+
+    function formatFileWeight(bytes) {
+        const n = Number(bytes || 0);
+        if (!Number.isFinite(n) || n <= 0) return null;
+        const units = ['B', 'KB', 'MB', 'GB'];
+        const exp = Math.min(Math.floor(Math.log(n) / Math.log(1024)), units.length - 1);
+        const val = n / Math.pow(1024, exp);
+        return val.toFixed(val >= 100 || exp === 0 ? 0 : 2) + ' ' + units[exp];
+    }
+
+    function escapeHtml(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function ensureHoverCard(container) {
+        let card = container.querySelector(':scope > .unn-upload-hover-card');
+        if (!card) {
+            card = document.createElement('div');
+            card.className = 'unn-upload-hover-card';
+            container.appendChild(card);
+        }
+        return card;
+    }
+
+    function renderHoverCard(container, info) {
+        const card = ensureHoverCard(container);
+        if (!info || (!info.name && !info.dimensions && !info.size)) {
+            card.classList.remove('has-details');
+            card.innerHTML = '';
+            return;
+        }
+
+        const rows = [];
+        if (info.dimensions) rows.push('<span>Dimensões:</span><strong>' + escapeHtml(info.dimensions) + '</strong>');
+        if (info.size) rows.push('<span>Peso:</span><strong>' + escapeHtml(info.size) + '</strong>');
+        if (info.type) rows.push('<span>Formato:</span><strong>' + escapeHtml(info.type) + '</strong>');
+
+        card.innerHTML =
+            '<div class="unn-upload-hover-title"><i class="fas fa-circle-info me-1"></i>' + escapeHtml(info.name || 'Arquivo carregado') + '</div>' +
+            '<div class="unn-upload-hover-grid">' + rows.join('') + '</div>';
+        card.classList.add('has-details');
+    }
+
+    function inspectExistingUrl(container, url) {
+        if (!url) {
+            renderHoverCard(container, null);
+            return;
+        }
+
+        const cleanUrl = String(url).split('?')[0].split('#')[0];
+        const fileName = cleanUrl.split('/').pop() || 'Arquivo atual';
+        const ext = (fileName.includes('.') ? fileName.split('.').pop() : '').toUpperCase();
+        const info = { name: fileName, type: ext || 'Arquivo', size: null, dimensions: null };
+
+        // Dimensões via <img> já renderizada ou preload leve
+        const imgEl = container.querySelector('.upload-preview img, .unn-dz-preview-img, .unn-dz-current img');
+        if (imgEl && imgEl.naturalWidth > 0) {
+            info.dimensions = imgEl.naturalWidth + ' × ' + imgEl.naturalHeight + ' px';
+            renderHoverCard(container, info);
+        } else if (/\.(png|jpe?g|gif|webp|svg|ico)$/i.test(cleanUrl)) {
+            const probe = new Image();
+            probe.onload = function () {
+                if (probe.naturalWidth > 0) {
+                    info.dimensions = probe.naturalWidth + ' × ' + probe.naturalHeight + ' px';
+                    renderHoverCard(container, info);
+                }
+            };
+            probe.src = url;
+        }
+
+        // Peso real via HEAD Content-Length (com cache em memória)
+        if (headSizeCache.has(url)) {
+            info.size = headSizeCache.get(url);
+            renderHoverCard(container, info);
+        } else if (typeof window.fetch === 'function') {
+            fetch(url, { method: 'HEAD', credentials: 'same-origin' })
+                .then(function (resp) {
+                    const len = resp.headers.get('Content-Length');
+                    const formatted = len ? formatFileWeight(parseInt(len, 10)) : null;
+                    headSizeCache.set(url, formatted);
+                    if (formatted) {
+                        info.size = formatted;
+                        renderHoverCard(container, info);
+                    }
+                })
+                .catch(function () { /* ignora CORS/erro silenciosamente */ });
+        }
+
+        renderHoverCard(container, info);
+    }
+
+    function inspectLocalFile(container, file) {
+        if (!file) return;
+        const ext = (file.name && file.name.includes('.') ? file.name.split('.').pop() : '').toUpperCase();
+        const info = {
+            name: file.name,
+            size: formatFileWeight(file.size),
+            type: file.type || ext || 'Arquivo',
+            dimensions: null
+        };
+        renderHoverCard(container, info);
+
+        if (file.type && file.type.startsWith('image/')) {
+            const objUrl = URL.createObjectURL(file);
+            const img = new Image();
+            img.onload = function () {
+                if (img.naturalWidth > 0) {
+                    info.dimensions = img.naturalWidth + ' × ' + img.naturalHeight + ' px';
+                    renderHoverCard(container, info);
+                }
+                URL.revokeObjectURL(objUrl);
+            };
+            img.onerror = function () { URL.revokeObjectURL(objUrl); };
+            img.src = objUrl;
+        }
+    }
+
+    function initUploadHoverDetails(root) {
+        const scope = root || document;
+        scope.querySelectorAll('.upload-box, .unn-dz-wrap').forEach(function (container) {
+            if (container.dataset.unnHoverBound === '1') return;
+            container.dataset.unnHoverBound = '1';
+
+            const existingUrl = container.getAttribute('data-existing-url')
+                || container.querySelector('.unn-dz-current-link')?.getAttribute('href')
+                || container.querySelector('.upload-preview img')?.getAttribute('src')
+                || '';
+
+            if (existingUrl) {
+                inspectExistingUrl(container, existingUrl);
+            }
+
+            const input = container.querySelector('input[type="file"]');
+            if (input) {
+                input.addEventListener('change', function () {
+                    const f = this.files && this.files[0] ? this.files[0] : null;
+                    if (f) inspectLocalFile(container, f);
+                });
+            }
+
+            const removeBtn = container.querySelector('.upload-remove, .unn-dz-remove');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function () {
+                    renderHoverCard(container, null);
+                });
+            }
+        });
+    }
+
     // API pública para refresh em PJAX ou carregamentos dinâmicos
     window.UNNAdminMotion = {
         refresh: function (root) {
@@ -260,6 +415,7 @@
             initKpiCounters(root);
             initChartAnimations(root);
             initBootstrapTooltips(root);
+            initUploadHoverDetails(root);
         }
     };
 

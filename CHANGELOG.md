@@ -1,5 +1,18 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.46] - 2026-11-25 - feat(admin, ux): preview embutido do Preloader e Cores em tempo real, selects padronizados, hover de dimensoes/peso nos dropzones e anel animado no Voltar ao Topo
+
+- **Preview Ao Vivo Embutido no Painel (`resources/views/admin/settings/partials/appearance.blade.php`):**
+  - Adicionado **Palco de Preview ao Vivo do Preloader** (com alternância Claro/Escuro e botão *Simular Saída*) para aprovar modelo, animação, cor, texto, barra de progresso e imagem antes de salvar.
+  - Adicionado **Preview Dinâmico em Tempo Real de Cores & Hero** mostrando exatamente onde cada cor (`site_bg_gradient_start`, `site_color_primary`, `site_color_secondary`) e opacidade são aplicadas na interface.
+- **Selects Padronizados Globalmente (`public/css/adminlte4-unn.css`):**
+  - Todos os `<select>` em `/admin` padronizados com seta SVG moderna, padding consistente e contraste calibrado para `<option>` nos modos Claro e Escuro.
+- **Hover com Detalhes em Todos os Campos Arrasta-e-Solta (`public/js/adminlte4-unn.js`, `public/css/adminlte4-unn.css`):**
+  - Ao passar o mouse sobre qualquer `.upload-box` ou `x-unn-dropzone`, exibe tooltip glass com **nome do arquivo, dimensões reais (`L × A px`), peso (`KB/MB`) e formato**, tanto para arquivos já salvos quanto recém-selecionados.
+- **Botão Voltar ao Topo com Anel Animado + Posição Elevada Acima do Rodapé (`resources/views/admin/layouts/app.blade.php`, `public/css/adminlte4-unn.css`):**
+  - Adicionado anel circular SVG de progresso ao redor de `#adminBackToTop` sincronizado com a rolagem da página.
+  - Elevados `#chat-widget-container` (`bottom: 66px`) e `#adminBackToTop` (`bottom: 132px`) para nunca cobrirem o texto **Versão** no rodapé.
+
 ## [2.8.45] - 2026-11-25 - feat(settings, preloader): central completa do Preloader em /admin/settings/appearance e /painel/admin/settings/appearance com 5 modelos, 4 animacoes e controle opcional para o painel admin
 
 - **Preloader Configurável com Padrão Atual Preservado (`resources/views/partials/modern-preloader.blade.php`):**
