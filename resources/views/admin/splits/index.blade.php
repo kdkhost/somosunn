@@ -77,27 +77,48 @@
                     <div class="col-md-3 mb-3">
                         <label class="font-weight-bold text-sm">Modo de Liquidação</label>
                         <select name="payout_mode" class="form-control">
+                            <option value="mp_auto_billing" @selected($automation['mode'] === 'mp_auto_billing')>100% SumUp + Cobrança Automática no MP (a cada venda)</option>
                             <option value="efi_pix_out" @selected($automation['mode'] === 'efi_pix_out')>100% SumUp + Pix Automático (Efí &rarr; MP)</option>
                             <option value="mp_routing" @selected($automation['mode'] === 'mp_routing')>Roteamento Inteligente (Terceiros no MP)</option>
                             <option value="manual" @selected($automation['mode'] === 'manual')>Apenas Controle (Repasse Manual)</option>
                         </select>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <label class="font-weight-bold text-sm">Sua Chave Pix (Mercado Pago)</label>
-                        <input type="text" name="pix_key" class="form-control" value="{{ $automation['pix_key'] }}"
-                            placeholder="CPF, CNPJ, e-mail ou chave aleatória do MP">
+                        <label class="font-weight-bold text-sm">Access Token do seu Mercado Pago</label>
+                        <input type="password" name="mp_access_token" class="form-control" value=""
+                            placeholder="{{ !empty($automation['mp_has_token']) ? '•••••••• (já configurado — preencha para trocar)' : 'APP_USR-...' }}">
                     </div>
                     <div class="col-md-2 mb-3">
                         <label class="font-weight-bold text-sm">Comissão (%)</label>
                         <input type="number" step="0.01" min="0" max="100" name="percent" class="form-control" value="{{ $automation['percent'] }}">
                     </div>
                     <div class="col-md-2 mb-3">
-                        <label class="font-weight-bold text-sm">Carência SumUp (D+dias)</label>
-                        <input type="number" min="0" max="30" name="delay_days" class="form-control" value="{{ $automation['delay_days'] }}">
+                        <label class="font-weight-bold text-sm">E-mail Financeiro Admin</label>
+                        <input type="email" name="admin_email" class="form-control" value="{{ $automation['admin_email'] ?? '' }}"
+                            placeholder="financeiro@empresa.com">
                     </div>
                     <div class="col-md-2 mb-3">
                         <label class="font-weight-bold text-sm">Valor Mínimo (R$)</label>
                         <input type="number" step="0.01" min="0.01" name="min_payout" class="form-control" value="{{ number_format($automation['min_payout'], 2, '.', '') }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold text-sm">Customer ID MP do Admin (Cartão Auto)</label>
+                        <input type="text" name="mp_customer_id" class="form-control" value="{{ $automation['mp_customer_id'] ?? '' }}"
+                            placeholder="Opcional — sem cartão gera Pix automático">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold text-sm">Card Token MP do Admin</label>
+                        <input type="password" name="mp_card_token" class="form-control" value=""
+                            placeholder="{{ !empty($automation['mp_has_card_token']) ? '•••••••• (salvo)' : 'Opcional para débito automático' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold text-sm">Sua Chave Pix Mercado Pago (Modo Efí)</label>
+                        <input type="text" name="pix_key" class="form-control" value="{{ $automation['pix_key'] }}"
+                            placeholder="CPF, CNPJ, e-mail ou chave aleatória do MP">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="font-weight-bold text-sm">Carência Efí (D+dias)</label>
+                        <input type="number" min="0" max="30" name="delay_days" class="form-control" value="{{ $automation['delay_days'] }}">
                     </div>
                     <div class="col-12 d-flex flex-wrap justify-content-between align-items-center pt-2 border-top">
                         <div class="custom-control custom-switch">
@@ -223,6 +244,7 @@
                                         <div class="text-xs text-muted mt-1">
                                             @switch($provider)
                                                 @case('internal') Interno @break
+                                                @case('mp_auto_billing') Cobrança Auto (MP) @break
                                                 @case('efi_pix_out') Pix Auto (Efí) @break
                                                 @case('mercadopago_split') Split Mercado Pago @break
                                                 @default Manual
@@ -249,14 +271,14 @@
                                     <td class="align-middle text-center">
                                         @if($payoutStatus !== 'paid' && $split->pix_key)
                                             <div class="btn-group">
-                                                @if($split->receiver_type === 'superadmin' && !empty($automation['efi_enabled']))
+                                                @if($split->receiver_type === 'superadmin' && (!empty($automation['mp_has_token']) || !empty($automation['efi_enabled'])))
                                                     <button type="button"
                                                         class="btn btn-sm btn-info js-process-auto-payout"
                                                         data-url="{{ route('admin.splits.process_auto', $split) }}"
                                                         data-receiver="{{ $split->receiver?->name ?? $cfg['label'] }}"
                                                         data-amount="R$ {{ number_format((float) $split->amount, 2, ',', '.') }}"
-                                                        title="Disparar Pix automático via Efí Pay agora">
-                                                        <i class="fas fa-bolt mr-1"></i>Enviar Pix
+                                                        title="Disparar cobrança/repasse automático agora">
+                                                        <i class="fas fa-bolt mr-1"></i>Processar Auto
                                                     </button>
                                                 @endif
                                                 <button type="button"
@@ -332,7 +354,11 @@
                 pix_key: formData.get('pix_key'),
                 percent: formData.get('percent'),
                 delay_days: formData.get('delay_days'),
-                min_payout: formData.get('min_payout')
+                min_payout: formData.get('min_payout'),
+                mp_access_token: formData.get('mp_access_token'),
+                mp_customer_id: formData.get('mp_customer_id'),
+                mp_card_token: formData.get('mp_card_token'),
+                admin_email: formData.get('admin_email')
             };
 
             try {

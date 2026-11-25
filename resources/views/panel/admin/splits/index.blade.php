@@ -56,40 +56,61 @@
                     </span>
                 </div>
 
-                <form id="js-panel-split-automation-form" action="{{ route('panel.admin.splits.automation_settings') }}" method="POST" class="mt-4 grid gap-4 md:grid-cols-5">
+                <form id="js-panel-split-automation-form" action="{{ route('panel.admin.splits.automation_settings') }}" method="POST" class="mt-4 grid gap-4 md:grid-cols-6">
                     @csrf
                     <div class="md:col-span-2">
                         <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Modo de Liquidação</label>
                         <select name="payout_mode" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                            <option value="mp_auto_billing" @selected($automation['mode'] === 'mp_auto_billing')>100% SumUp + Cobrança Automática no MP (a cada venda)</option>
                             <option value="efi_pix_out" @selected($automation['mode'] === 'efi_pix_out')>100% SumUp + Pix Automático (Efí &rarr; MP)</option>
                             <option value="mp_routing" @selected($automation['mode'] === 'mp_routing')>Roteamento Inteligente (Terceiros no MP)</option>
                             <option value="manual" @selected($automation['mode'] === 'manual')>Apenas Controle (Repasse Manual)</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Sua Chave Pix (Mercado Pago)</label>
-                        <input type="text" name="pix_key" value="{{ $automation['pix_key'] }}" placeholder="CPF, CNPJ, e-mail ou aleatória"
+                    <div class="md:col-span-2">
+                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Access Token do seu Mercado Pago</label>
+                        <input type="password" name="mp_access_token" value=""
+                            placeholder="{{ !empty($automation['mp_has_token']) ? '•••••••• (já configurado — preencha para trocar)' : 'APP_USR-...' }}"
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Comissão (%)</label>
-                            <input type="number" step="0.01" min="0" max="100" name="percent" value="{{ $automation['percent'] }}"
-                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
-                        </div>
-                        <div>
-                            <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Prazo D+N</label>
-                            <input type="number" min="0" max="30" name="delay_days" value="{{ $automation['delay_days'] }}"
-                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
-                        </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Comissão (%)</label>
+                        <input type="number" step="0.01" min="0" max="100" name="percent" value="{{ $automation['percent'] }}"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
                     </div>
                     <div>
                         <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Valor Mínimo (R$)</label>
                         <input type="number" step="0.01" min="0.01" name="min_payout" value="{{ number_format($automation['min_payout'], 2, '.', '') }}"
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
                     </div>
+                    <div class="md:col-span-2">
+                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Customer ID MP do Admin (Cartão Auto)</label>
+                        <input type="text" name="mp_customer_id" value="{{ $automation['mp_customer_id'] ?? '' }}" placeholder="Opcional — sem cartão gera Pix automático"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Card Token MP do Admin</label>
+                        <input type="password" name="mp_card_token" value=""
+                            placeholder="{{ !empty($automation['mp_has_card_token']) ? '•••••••• (salvo)' : 'Opcional para débito automático' }}"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">E-mail Admin</label>
+                        <input type="email" name="admin_email" value="{{ $automation['admin_email'] ?? '' }}" placeholder="financeiro@empresa.com"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Carência Efí (D+N)</label>
+                        <input type="number" min="0" max="30" name="delay_days" value="{{ $automation['delay_days'] }}"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                    </div>
+                    <div class="md:col-span-6">
+                        <label class="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">Sua Chave Pix do Mercado Pago (para modo Efí ou registro)</label>
+                        <input type="text" name="pix_key" value="{{ $automation['pix_key'] }}" placeholder="CPF, CNPJ, e-mail ou chave aleatória do MP"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+                    </div>
 
-                    <div class="md:col-span-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+                    <div class="md:col-span-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
                         <div>
                             <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm font-bold text-slate-800 dark:text-white">
                                 <input type="checkbox" name="auto_enabled" value="1" @checked($automation['enabled'])
@@ -181,6 +202,7 @@
                                     <div class="mt-1 text-[11px] text-slate-400">
                                         @switch($provider)
                                             @case('internal') Interno @break
+                                            @case('mp_auto_billing') Cobrança Auto (MP) @break
                                             @case('efi_pix_out') Pix Auto (Efí) @break
                                             @case('mercadopago_split') Split Mercado Pago @break
                                             @default Manual
@@ -205,12 +227,12 @@
                                 <td class="px-5 py-4 text-right">
                                     @if($payoutStatus !== 'paid' && $split->pix_key)
                                         <div class="flex justify-end gap-2">
-                                            @if($split->receiver_type === 'superadmin' && !empty($automation['efi_enabled']))
+                                            @if($split->receiver_type === 'superadmin' && (!empty($automation['mp_has_token']) || !empty($automation['efi_enabled'])))
                                                 <button type="button" data-auto-url="{{ route('panel.admin.splits.process_auto', $split) }}"
                                                     data-receiver="{{ $split->receiver?->name ?? ($typeLabels[$split->receiver_type] ?? 'Destinatario') }}"
                                                     data-amount="R$ {{ number_format((float) $split->amount, 2, ',', '.') }}"
                                                     class="js-auto-split rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700">
-                                                    <i class="fas fa-bolt mr-1"></i>Enviar Pix
+                                                    <i class="fas fa-bolt mr-1"></i>Processar Auto
                                                 </button>
                                             @endif
                                             <button type="button" data-pay-url="{{ route('panel.admin.splits.pay', $split) }}"
@@ -280,7 +302,11 @@ if (panelAutoForm) {
             pix_key: formData.get('pix_key'),
             percent: formData.get('percent'),
             delay_days: formData.get('delay_days'),
-            min_payout: formData.get('min_payout')
+            min_payout: formData.get('min_payout'),
+            mp_access_token: formData.get('mp_access_token'),
+            mp_customer_id: formData.get('mp_customer_id'),
+            mp_card_token: formData.get('mp_card_token'),
+            admin_email: formData.get('admin_email')
         };
 
         try {

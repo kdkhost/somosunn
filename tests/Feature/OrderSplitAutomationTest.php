@@ -203,6 +203,49 @@ class OrderSplitAutomationTest extends TestCase
         $this->assertTrue($payout->scheduled_for->isFuture());
     }
 
+    public function test_option_c_auto_billing_charges_saved_card_on_every_member_sumup_sale(): void
+    {
+        $buyer = $this->makeUser('member', 'comprador4@teste.com');
+        $memberSeller = $this->makeUser('member', 'vendedor4@teste.com', 'pix-vendedor4');
+        $admin = $this->makeUser('admin', 'admin4@teste.com', 'pix-admin4');
+        $superadmin = $this->makeUser('superadmin', 'superadmin4@teste.com', 'pix-mp-dev4');
+
+        Setting::set('marketplace_split_superadmin_percent', '10');
+        Setting::set('superadmin_commission_auto_enabled', '1');
+        Setting::set('superadmin_commission_payout_mode', 'mp_auto_billing');
+        Setting::set('superadmin_commission_mp_access_token', 'APP_USR-FAKE-SUPERADMIN-TOKEN');
+        Setting::set('superadmin_commission_mp_customer_id', 'CUST-123456');
+        Setting::set('superadmin_commission_mp_card_token', 'CARD-TOKEN-789');
+        Setting::set('superadmin_commission_admin_email', 'financeiro@empresa.com');
+
+        Http::fake([
+            'https://api.mercadopago.com/v1/payments' => Http::response([
+                'id' => 987654321,
+                'status' => 'approved',
+                'status_detail' => 'accredited',
+            ], 201),
+        ]);
+
+        $order = Order::create([
+            'user_id' => $buyer->id,
+            'seller_id' => $memberSeller->id,
+            'status' => 'paid',
+            'total_amount' => 250,
+            'currency' => 'BRL',
+            'gateway' => 'sumup',
+        ]);
+
+        app(OrderSplitService::class)->syncForPaidOrder($order);
+        $superSplit = OrderSplit::where('order_id', $order->id)->where('receiver_type', 'superadmin')->firstOrFail();
+
+        $payout = app(\App\Services\SuperadminCommissionBillingService::class)->chargeSplit($superSplit);
+
+        $this->assertSame('paid', $payout->status);
+        $this->assertSame('mp_auto_billing', $payout->provider);
+        $this->assertSame('987654321', $payout->external_id);
+        $this->assertSame('paid', $superSplit->fresh()->status);
+    }
+
     private function makeUser(string $role, string $email, ?string $pixKey = null): User
     {
         return User::create([

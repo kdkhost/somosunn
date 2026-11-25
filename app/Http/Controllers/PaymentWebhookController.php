@@ -325,6 +325,13 @@ class PaymentWebhookController extends Controller
 
             $response = Http::withToken($token)->get('https://api.mercadopago.com/v1/payments/' . $paymentId);
             if (!$response->successful()) {
+                $commissionToken = trim((string) Setting::get('superadmin_commission_mp_access_token', ''));
+                if ($commissionToken !== '' && $commissionToken !== $token) {
+                    $response = Http::withToken($commissionToken)->get('https://api.mercadopago.com/v1/payments/' . $paymentId);
+                }
+            }
+
+            if (!$response->successful()) {
                 Log::warning('MP Webhook: failed to fetch payment', [
                     'payment_id' => $paymentId,
                     'status' => $response->status(),
@@ -338,6 +345,16 @@ class PaymentWebhookController extends Controller
             $status = (string) ($data['status'] ?? '');
 
             if (!$orderId) {
+                return response('OK', 200);
+            }
+
+            if (str_starts_with((string) $orderId, 'COMMISSION_SPLIT_')) {
+                app(\App\Services\SuperadminCommissionBillingService::class)->reconcileMercadoPagoWebhook(
+                    (string) $paymentId,
+                    $status,
+                    (array) $data
+                );
+
                 return response('OK', 200);
             }
 

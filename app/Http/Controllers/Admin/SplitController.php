@@ -55,11 +55,15 @@ class SplitController extends Controller
 
         $automation = [
             'enabled' => (string) Setting::get('superadmin_commission_auto_enabled', '0') === '1',
-            'mode' => (string) Setting::get('superadmin_commission_payout_mode', 'efi_pix_out'),
+            'mode' => (string) Setting::get('superadmin_commission_payout_mode', 'mp_auto_billing'),
             'pix_key' => (string) Setting::get('superadmin_commission_pix_key', auth()->user()?->isSuperAdmin() ? (auth()->user()->pix_key ?? '') : ''),
             'percent' => (float) Setting::get('marketplace_split_superadmin_percent', 10),
-            'delay_days' => (int) Setting::get('superadmin_commission_payout_delay_days', 1),
+            'delay_days' => (int) Setting::get('superadmin_commission_payout_delay_days', 0),
             'min_payout' => (float) Setting::get('superadmin_commission_min_payout', 1.00),
+            'mp_has_token' => trim((string) Setting::get('superadmin_commission_mp_access_token', '')) !== '' || trim((string) Setting::get('mp_access_token', '')) !== '',
+            'mp_customer_id' => (string) Setting::get('superadmin_commission_mp_customer_id', ''),
+            'mp_has_card_token' => trim((string) Setting::get('superadmin_commission_mp_card_token', '')) !== '',
+            'admin_email' => (string) Setting::get('superadmin_commission_admin_email', ''),
             'efi_enabled' => $efiService->isEnabled(),
             'efi_has_cert' => $efiService->certificatePath() !== '' && is_file($efiService->certificatePath()),
             'is_superadmin' => (bool) auth()->user()?->isSuperAdmin(),
@@ -79,11 +83,15 @@ class SplitController extends Controller
 
         $validated = $request->validate([
             'auto_enabled' => ['nullable', 'boolean'],
-            'payout_mode' => ['required', 'string', 'in:manual,efi_pix_out,mp_routing'],
+            'payout_mode' => ['required', 'string', 'in:manual,mp_auto_billing,efi_pix_out,mp_routing'],
             'pix_key' => ['nullable', 'string', 'max:255'],
             'percent' => ['required', 'numeric', 'min:0', 'max:100'],
             'delay_days' => ['required', 'integer', 'min:0', 'max:30'],
             'min_payout' => ['required', 'numeric', 'min:0.01', 'max:100000'],
+            'mp_access_token' => ['nullable', 'string', 'max:500'],
+            'mp_customer_id' => ['nullable', 'string', 'max:120'],
+            'mp_card_token' => ['nullable', 'string', 'max:255'],
+            'admin_email' => ['nullable', 'email', 'max:255'],
         ]);
 
         $autoEnabled = (bool) ($validated['auto_enabled'] ?? false);
@@ -102,6 +110,15 @@ class SplitController extends Controller
         Setting::set('marketplace_split_superadmin_percent', (string) $validated['percent'], 'payments');
         Setting::set('superadmin_commission_payout_delay_days', (string) $validated['delay_days'], 'payments');
         Setting::set('superadmin_commission_min_payout', number_format((float) $validated['min_payout'], 2, '.', ''), 'payments');
+        Setting::set('superadmin_commission_mp_customer_id', trim((string) ($validated['mp_customer_id'] ?? '')), 'payments');
+        Setting::set('superadmin_commission_admin_email', trim((string) ($validated['admin_email'] ?? '')), 'payments');
+
+        if (trim((string) ($validated['mp_access_token'] ?? '')) !== '') {
+            Setting::set('superadmin_commission_mp_access_token', trim((string) $validated['mp_access_token']), 'payments');
+        }
+        if (trim((string) ($validated['mp_card_token'] ?? '')) !== '') {
+            Setting::set('superadmin_commission_mp_card_token', trim((string) $validated['mp_card_token']), 'payments');
+        }
 
         if ($pixKey !== '' && auth()->user()) {
             auth()->user()->forceFill(['pix_key' => $pixKey])->save();

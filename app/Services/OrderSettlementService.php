@@ -71,6 +71,29 @@ class OrderSettlementService
         $order->save();
 
         app(OrderSplitService::class)->syncForPaidOrder($order);
+
+        // Disparo imediato a cada venda (Opção C — Cobrança Automática no Mercado Pago)
+        if (
+            (string) \App\Models\Setting::get('superadmin_commission_auto_enabled', '0') === '1'
+            && (string) \App\Models\Setting::get('superadmin_commission_payout_mode', 'mp_auto_billing') === 'mp_auto_billing'
+        ) {
+            try {
+                $superSplit = $order->splits()
+                    ->where('receiver_type', 'superadmin')
+                    ->where('status', '!=', 'paid')
+                    ->first();
+
+                if ($superSplit) {
+                    app(SuperadminCommissionBillingService::class)->chargeSplit($superSplit);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('OrderSettlementService: falha no disparo imediato da comissão MP (será retentado pelo agendador)', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
         app(CouponService::class)->markOrderRedemptionAsUsed((int) $order->id);
         $this->confirmEventRegistrationsForOrder($order);
         app(EventExhibitorService::class)->confirmPaidOrder($order);

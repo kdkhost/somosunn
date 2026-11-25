@@ -1,5 +1,17 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.32] - 2026-11-25 - feat(splits, mercadopago): opcao C de cobranca automatica no Mercado Pago a cada venda na SumUp
+
+- **Cobrança Automática no Mercado Pago a cada Venda (`app/Services/SuperadminCommissionBillingService.php`):**
+  - Implementado o motor da **Opção C** (100% SumUp + Cobrança Automática na conta Mercado Pago do Superadmin a cada venda elegível, exceto itens disponibilizados pelo administrador).
+  - **Débito Automático em Cartão Corporativo Salvo:** Quando `superadmin_commission_mp_customer_id` e `superadmin_commission_mp_card_token` estão configurados, o sistema debita automaticamente a comissão no cartão do administrador via `POST /v1/payments` na conta Mercado Pago do Superadmin sem nenhuma interação humana.
+  - **Fallback Automático via Pix no Mercado Pago:** Caso não haja cartão corporativo salvo ou ocorra recusa, gera automaticamente uma cobrança Pix imediata (`payment_method_id: pix`, `external_reference: COMMISSION_SPLIT_{id}`) na conta Mercado Pago do Superadmin e notifica o administrador.
+- **Disparo Imediato a Cada Venda e Conciliação de Webhook (`app/Services/OrderSettlementService.php`, `app/Http/Controllers/PaymentWebhookController.php`, `app/Services/OrderSplitPayoutService.php`):**
+  - `OrderSettlementService::settleAsPaid()` aciona `SuperadminCommissionBillingService::chargeSplit()` imediatamente a cada venda paga elegível (isolado em `try/catch` com retentativa automática horária via `splits:process-payouts`).
+  - `PaymentWebhookController` reconhece `COMMISSION_SPLIT_*` e dá baixa automática no `OrderSplit` e `OrderSplitPayout` assim que o pagamento é aprovado no Mercado Pago.
+- **Painéis `/admin/splits` e `/painel/admin/splits`:**
+  - Adicionados o modo `mp_auto_billing` (padrão) e os campos de configuração exclusiva do Superadmin (Access Token do Mercado Pago, Customer ID / Card Token corporativo e e-mail financeiro do administrador) em ambos os painéis com salvamento via AJAX + Toastr/SweetAlert2.
+
 ## [2.8.31] - 2026-11-25 - feat(splits, payments): automacao de comissoes do superadmin (SumUp -> Mercado Pago via Pix Out Efi Pay) e isencao de vendas do administrador
 
 - **Correção das Regras de Comissão e Isenção do Administrador (`app/Services/OrderSplitService.php`):**

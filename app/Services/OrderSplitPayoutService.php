@@ -59,10 +59,17 @@ class OrderSplitPayoutService
     }
 
     /**
-     * Executa o repasse automático via Pix Out (Efí Pay -> chave Pix do Mercado Pago) com proteção de idempotência.
+     * Executa o repasse/cobrança automática conforme o modo configurado pelo Superadmin:
+     * - mp_auto_billing (Opção C): cobrança automática a cada venda no Mercado Pago (cartão corporativo salvo ou Pix automático).
+     * - efi_pix_out (Opção B): Pix Out automático via Efí Pay para a chave Pix do Mercado Pago.
      */
     public function processAutomaticPayout(OrderSplit $split, bool $ignoreSchedule = false): OrderSplitPayout
     {
+        $mode = trim((string) Setting::get('superadmin_commission_payout_mode', 'mp_auto_billing'));
+        if ($mode === 'mp_auto_billing' && (string) $split->receiver_type === 'superadmin') {
+            return app(SuperadminCommissionBillingService::class)->chargeSplit($split);
+        }
+
         $efi = app(EfiService::class);
 
         return DB::transaction(function () use ($split, $ignoreSchedule, $efi) {
@@ -210,9 +217,9 @@ class OrderSplitPayoutService
         ];
 
         $autoEnabled = (string) Setting::get('superadmin_commission_auto_enabled', '0') === '1';
-        $mode = trim((string) Setting::get('superadmin_commission_payout_mode', 'efi_pix_out'));
+        $mode = trim((string) Setting::get('superadmin_commission_payout_mode', 'mp_auto_billing'));
 
-        if (!$autoEnabled || $mode !== 'efi_pix_out') {
+        if (!$autoEnabled || !in_array($mode, ['efi_pix_out', 'mp_auto_billing'], true)) {
             $summary['skipped'] = true;
 
             return $summary;
@@ -322,7 +329,7 @@ class OrderSplitPayoutService
 
     private function resolveProvider(OrderSplit $split, ?OrderSplitPayout $existing, bool $isInternallySettled): string
     {
-        if ($existing && in_array((string) $existing->provider, ['manual', 'efi_pix_out', 'mercadopago_split'], true) && (string) $existing->status === 'paid') {
+        if ($existing && in_array((string) $existing->provider, ['manual', 'efi_pix_out', 'mercadopago_split', 'mp_auto_billing'], true) && (string) $existing->status === 'paid') {
             return (string) $existing->provider;
         }
 
@@ -336,10 +343,10 @@ class OrderSplitPayoutService
         }
 
         $autoEnabled = (string) Setting::get('superadmin_commission_auto_enabled', '0') === '1';
-        $mode = trim((string) Setting::get('superadmin_commission_payout_mode', 'manual'));
+        $mode = trim((string) Setting::get('superadmin_commission_payout_mode', 'mp_auto_billing'));
 
-        if ((string) $split->receiver_type === 'superadmin' && $autoEnabled && $mode === 'efi_pix_out') {
-            return 'efi_pix_out';
+        if ((string) $split->receiver_type === 'superadmin' && $autoEnabled && in_array($mode, ['efi_pix_out', 'mp_auto_billing'], true)) {
+            return $mode;
         }
 
         return $existing?->provider ?: 'manual';
@@ -351,7 +358,7 @@ class OrderSplitPayoutService
             return (string) $existing->status;
         }
 
-        if ($existing && in_array((string) $existing->provider, ['manual', 'efi_pix_out', 'mercadopago_split'], true) && (string) $existing->status === 'paid') {
+        if ($existing && in_array((string) $existing->provider, ['manual', 'efi_pix_out', 'mercadopago_split', 'mp_auto_billing'], true) && (string) $existing->status === 'paid') {
             return 'paid';
         }
 
@@ -366,6 +373,10 @@ class OrderSplitPayoutService
 
         if ($status === 'paid' && $provider === 'mercadopago_split') {
             return 'Comissao liquidada automaticamente via divisao nativa do Mercado Pago.';
+        }
+
+        if ($status === 'pending' && $provider === 'mp_auto_billing' && empty($existing?->notes)) {
+            return 'Pronto para cobranca automatica a cada venda na conta Mercado Pago do Superadmin.';
         }
 
         if ($status === 'pending' && $provider === 'efi_pix_out' && empty($existing?->notes)) {
