@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.42] - 2026-11-25 - fix(admin, layout): cabecalho e sidebar fixos de ponta a ponta (100vh) corrigindo quebra de position sticky no AdminLTE 4
+
+- **Correção Definitiva do Header Fixo e Sidebar 100vh (`public/css/adminlte4-unn.css`, `resources/views/admin/layouts/app.blade.php`):**
+  - Substituído `overflow-x: hidden` por `overflow-x: clip` em `html, body` — `overflow-x: hidden` no root desativava `position: sticky` nos navegadores, fazendo header e sidebar rolarem junto com a página e deixando espaço vazio abaixo da sidebar.
+  - Adicionada a classe oficial `fixed-header` no `<body>` do AdminLTE 4 e garantido `position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column;` na `.app-sidebar` (desktop) com rolagem interna exclusivamente no `.sidebar-wrapper`.
+
 ## [2.8.41] - 2026-11-25 - feat(admin, ux): animacoes intuitivas em tempo real ao rolar (scroll reveal bidirecional, KPIs, graficos Chart.js e barra de progresso)
 
 - **Motor Global de Animações em Tempo Real (`public/js/adminlte4-unn.js`, `public/css/adminlte4-unn.css`):**

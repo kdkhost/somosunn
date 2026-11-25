@@ -130,7 +130,7 @@
     @stack('styles')
 </head>
 
-<body class="{{ $isAdmin ? 'layout-fixed sidebar-expand-lg bg-body-tertiary' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}" data-bs-theme="{{ $siteTheme }}">
+<body class="{{ $isAdmin ? 'layout-fixed fixed-header sidebar-expand-lg bg-body-tertiary' : 'bg-slate-50 min-h-screen' }} {{ $siteTheme === 'dark' ? 'dark-mode' : '' }}" data-bs-theme="{{ $siteTheme }}">
     @include('partials.modern-preloader')
     @include('partials.help-drawer')
 
