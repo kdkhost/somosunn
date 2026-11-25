@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.40] - 2026-11-25 - fix(admin, sidebar): padronizacao completa da sidebar no padrao oficial AdminLTE 4 sem conflito de largura, setas e submenus
+
+- **Padronização Oficial da Sidebar (`public/css/adminlte4-unn.css`, `resources/views/admin/partials/sidebar.blade.php`):**
+  - Removidas sobrescritas conflitantes em `.sidebar-menu .nav-link`, `.nav-link p`, `.nav-treeview` e `.nav-arrow` que brigavam com o posicionamento nativo do AdminLTE 4 (`position: absolute` nas setas e largura `100%` dos links).
+  - Aplicadas as variáveis CSS oficiais do AdminLTE 4 (`--lte-sidebar-*`), largura padrão `250px` e altura alinhada de `3.5rem` entre `.sidebar-brand` e `.app-header`.
+  - Padronizadas as cores dos ícones em `sidebar.blade.php` para herdarem corretamente o estado ativo/hover.
+
 ## [2.8.39] - 2026-11-25 - style(admin, ui): camada visual moderna estilo React/SaaS aplicada sobre a estrutura oficial do AdminLTE 4
 
 - **Design System React/SaaS sobre AdminLTE 4 Oficial (`public/css/adminlte4-unn.css`):**

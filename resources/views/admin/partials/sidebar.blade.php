@@ -124,7 +124,7 @@
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('admin.splits.index') }}" class="nav-link {{ $is('admin.splits.*') }}">
-                                        <i class="fas fa-money-bill-wave nav-icon text-success"></i>
+                                        <i class="fas fa-money-bill-wave nav-icon"></i>
                                         <p>Contabilidade de Rateios</p>
                                     </a>
                                 </li>
@@ -407,7 +407,7 @@
                 @if(auth()->user()->isSuperAdmin())
                     <li class="nav-item {{ request()->routeIs('admin.waf.*', 'admin.security*') ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ request()->routeIs('admin.waf.*', 'admin.security*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-shield-alt text-primary"></i>
+                            <i class="nav-icon fas fa-shield-alt"></i>
                             <p>Segurança (WAF) <i class="nav-arrow fas fa-angle-right"></i></p>
                         </a>
                         <ul class="nav nav-treeview">
