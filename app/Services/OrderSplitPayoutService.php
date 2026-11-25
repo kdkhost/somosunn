@@ -334,7 +334,7 @@ class OrderSplitPayoutService
         }
 
         $mpSplitApplied = (bool) data_get($split->order?->metadata, 'mp_marketplace_split_applied', false);
-        if ($isInternallySettled && $mpSplitApplied && in_array((string) $split->receiver_type, ['superadmin', 'platform'], true)) {
+        if ($isInternallySettled && $mpSplitApplied && in_array((string) $split->receiver_type, ['seller', 'superadmin', 'platform'], true)) {
             return 'mercadopago_split';
         }
 

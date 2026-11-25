@@ -118,7 +118,7 @@ class MentorshipCheckoutController extends Controller
             $chosenGateway = $request->input('gateway_provider', 'mercadopago');
 
             if ($chosenGateway === 'sumup') {
-                if (!$this->shouldShowSumUp($effectiveTotal, 'mentorship', $this->getUserType())) {
+                if (!$this->shouldShowSumUp($effectiveTotal, 'mentorship', $this->getUserType(), $mentorship->mentor_id)) {
                     return back()->with('error', 'SumUp não disponível para esta mentoria.');
                 }
                 $gatewayProvider = 'sumup';
@@ -138,7 +138,7 @@ class MentorshipCheckoutController extends Controller
 
                 if (!($sellerMpAccount['mpEnabled'] ?? false)) {
                     // Fallback para SumUp se disponível
-                    if ($this->shouldShowSumUp($effectiveTotal, 'mentorship', $this->getUserType())) {
+                    if ($this->shouldShowSumUp($effectiveTotal, 'mentorship', $this->getUserType(), $mentorship->mentor_id)) {
                         $gatewayProvider = 'sumup';
                     } else {
                         return back()->with('error', 'Metodo de pagamento nao disponivel para esta mentoria.');

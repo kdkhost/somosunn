@@ -103,44 +103,71 @@
                 <form id="js-split-automation-form" action="{{ route('admin.splits.automation_settings') }}" method="POST">
                     @csrf
 
-                    {{-- Bloco 1: Regras Gerais --}}
+                    {{-- Bloco 1: Regra Oficial de Gateways e Divisão 70% / 10% / 10% / 10% --}}
                     <div class="unn-section-box mb-3">
-                        <div class="text-xs font-weight-bold text-uppercase text-muted mb-3">
-                            <i class="fas fa-sliders-h mr-1"></i> 1. Regras Gerais da Comissão
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3" style="gap: 8px;">
+                            <div class="text-xs font-weight-bold text-uppercase text-muted">
+                                <i class="fas fa-sliders-h mr-1"></i> 1. Regra de Gateways e Divisão do Rateio (Soma = 100%)
+                                <button type="button" class="unn-help-trigger" data-help-drawer="split_shares" title="Ver instruções"><i class="fas fa-question"></i></button>
+                            </div>
+                            <span class="badge badge-info px-2 py-1">Admin = SumUp (isento) &bull; Usuários = Somente Mercado Pago (Split 30%)</span>
                         </div>
                         <div class="row">
-                            <div class="col-md-5 mb-3 mb-md-0">
+                            <div class="col-md-5 mb-3">
                                 <label class="font-weight-bold text-sm">
                                     Modo de Liquidação
                                     <button type="button" class="unn-help-trigger" data-help-drawer="payout_mode" title="Ver instruções"><i class="fas fa-question"></i></button>
                                 </label>
                                 <select name="payout_mode" id="js-admin-payout-mode" class="form-control">
+                                    <option value="mp_routing" @selected($automation['mode'] === 'mp_routing')>Split Nativo Mercado Pago (Usuários = MP 30% | Admin = SumUp)</option>
                                     <option value="mp_auto_billing" @selected($automation['mode'] === 'mp_auto_billing')>100% SumUp + Cobrança Automática no MP (a cada venda)</option>
                                     <option value="efi_pix_out" @selected($automation['mode'] === 'efi_pix_out')>100% SumUp + Pix Automático (Efí &rarr; MP)</option>
-                                    <option value="mp_routing" @selected($automation['mode'] === 'mp_routing')>Roteamento Inteligente (Terceiros no MP)</option>
                                     <option value="manual" @selected($automation['mode'] === 'manual')>Apenas Controle (Repasse Manual)</option>
                                 </select>
                             </div>
-                            <div class="col-md-2 mb-3 mb-md-0">
+                            <div class="col-md-2 mb-3">
+                                <label class="font-weight-bold text-sm">Vendedor (%)</label>
+                                <input type="number" step="0.01" min="0" max="100" name="seller_percent" class="form-control" value="{{ $automation['seller_percent'] ?? 70 }}">
+                            </div>
+                            <div class="col-md-2 mb-3">
                                 <label class="font-weight-bold text-sm">
-                                    Comissão (%)
+                                    Dono SaaS (%)
                                     <button type="button" class="unn-help-trigger" data-help-drawer="percent" title="Ver instruções"><i class="fas fa-question"></i></button>
                                 </label>
                                 <input type="number" step="0.01" min="0" max="100" name="percent" class="form-control" value="{{ $automation['percent'] }}">
                             </div>
-                            <div class="col-md-2 mb-3 mb-md-0">
+                            <div class="col-md-3 mb-3">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="font-weight-bold text-sm">Marketing (%)</label>
+                                        <input type="number" step="0.01" min="0" max="100" name="traffic_percent" class="form-control" value="{{ $automation['traffic_percent'] ?? 10 }}">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="font-weight-bold text-sm">Admin (%)</label>
+                                        <input type="number" step="0.01" min="0" max="100" name="platform_percent" class="form-control" value="{{ $automation['platform_percent'] ?? 10 }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <label class="font-weight-bold text-sm">
-                                    Mínimo (R$)
+                                    Valor Mínimo (R$)
                                     <button type="button" class="unn-help-trigger" data-help-drawer="min_payout" title="Ver instruções"><i class="fas fa-question"></i></button>
                                 </label>
                                 <input type="number" step="0.01" min="0.01" name="min_payout" class="form-control" value="{{ number_format($automation['min_payout'], 2, '.', '') }}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-5">
                                 <label class="font-weight-bold text-sm">
                                     E-mail Financeiro Admin
                                     <button type="button" class="unn-help-trigger" data-help-drawer="admin_email" title="Ver instruções"><i class="fas fa-question"></i></button>
                                 </label>
                                 <input type="email" name="admin_email" class="form-control" value="{{ $automation['admin_email'] ?? '' }}" placeholder="financeiro@empresa.com">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="font-weight-bold text-sm">
+                                    Sua Chave Pix Mercado Pago
+                                    <button type="button" class="unn-help-trigger" data-help-drawer="pix_key" title="Ver instruções"><i class="fas fa-question"></i></button>
+                                </label>
+                                <input type="text" name="pix_key" class="form-control" value="{{ $automation['pix_key'] }}" placeholder="Chave Pix da sua conta MP">
                             </div>
                         </div>
                     </div>
@@ -461,8 +488,11 @@
                 auto_enabled: formData.get('auto_enabled') ? 1 : 0,
                 payout_mode: formData.get('payout_mode'),
                 pix_key: formData.get('pix_key'),
+                seller_percent: formData.get('seller_percent'),
+                platform_percent: formData.get('platform_percent'),
+                traffic_percent: formData.get('traffic_percent'),
                 percent: formData.get('percent'),
-                delay_days: formData.get('delay_days'),
+                delay_days: formData.get('delay_days') || 0,
                 min_payout: formData.get('min_payout'),
                 mp_access_token: formData.get('mp_access_token'),
                 mp_customer_id: formData.get('mp_customer_id'),

@@ -6,21 +6,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.UNNHelpDrawer.register({
         'splits_overview': {
-            badge: 'Visão Geral',
-            title: 'Como funciona a Automação de Comissões',
-            summary: 'O sistema calcula e cobra automaticamente sua comissão sobre todas as vendas de cursos, mentorias, eventos e produtos de terceiros, mantendo 100% isentas as vendas criadas ou divulgadas pelo administrador.',
+            badge: 'Regra Oficial da Plataforma',
+            title: 'Split Automático 70% / 30% (10% SaaS + 10% Marketing + 10% Admin)',
+            summary: 'Vendas criadas ou divulgadas pelo administrador usam a SumUp e são 100% isentas de taxa. Já todas as vendas de membros, mentores e produtores passam exclusivamente pelo Mercado Pago com split automático de 30% dividido em 3 partes iguais de 10%.',
             steps: [
-                'Escolha o Modo de Liquidação (recomendado: 100% SumUp + Cobrança Automática no Mercado Pago a cada venda).',
-                'Preencha o Access Token da sua conta Mercado Pago onde você receberá as comissões.',
-                'Opcionalmente, informe o Customer ID e Card Token do cartão corporativo do administrador para débito 100% automático sem interação humana (se ficar vazio, o sistema gera Pix automático a cada venda).',
-                'Ative a chave "Ativar envio automático sem interação humana" e clique em Salvar Automação.'
+                'Vendas do Administrador: passam pela SumUp e 100% fica com o administrador (0% de comissão).',
+                'Vendas de Usuários/Membros: o checkout bloqueia SumUp automaticamente e processa exclusivamente via Mercado Pago OAuth.',
+                'No momento da aprovação no Mercado Pago: 70% vai direto para a conta Mercado Pago do vendedor e 30% (application_fee) cai automaticamente na conta Mercado Pago da plataforma.',
+                'Os 30% são rateados e contabilizados em 3 fatias: 10% Dono do SaaS (Superadmin), 10% Marketing e 10% Administrador.'
             ],
             links: [
                 { label: 'Painel de Desenvolvedores Mercado Pago', url: 'https://www.mercadopago.com.br/developers/panel/app' },
-                { label: 'Painel SumUp (Vendas do Admin)', url: 'https://me.sumup.com/' },
+                { label: 'Documentação Split Marketplace (Mercado Pago)', url: 'https://www.mercadopago.com.br/developers/pt/docs/split-payments/landing' },
                 { label: 'Configurações de Pagamentos do Sistema', url: settingsUrl, external: false }
             ],
-            tip: 'Todas as cobranças possuem proteção contra duplicidade (idempotência) e reconciliação automática via webhook do Mercado Pago.'
+            tip: 'A soma dos 4 percentuais (Vendedor + Dono do SaaS + Marketing + Administrador) deve fechar sempre em 100%.'
+        },
+        'split_shares': {
+            badge: 'Divisão 70% / 30%',
+            title: 'Percentuais do Rateio Automático (Soma = 100%)',
+            summary: 'Define exatamente quanto cada parte recebe sobre as vendas de cursos, mentorias, eventos e produtos criados por membros/usuários.',
+            steps: [
+                'Vendedor (padrão 70%): cai automaticamente na conta Mercado Pago do membro vendedor.',
+                'Dono do SaaS / Superadmin (padrão 10%): sua fatia como criador do sistema.',
+                'Marketing (padrão 10%): fatia destinada ao gestor de tráfego/marketing configurado.',
+                'Administrador (padrão 10%): fatia do administrador da comunidade.'
+            ],
+            tip: 'A soma dos 4 campos precisa ser exatamente 100%. Vendas feitas pelo próprio administrador continuam 100% isentas.'
         },
         'payout_mode': {
             badge: 'Modo de Operação',

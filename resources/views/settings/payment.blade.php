@@ -67,7 +67,8 @@
                     <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
                         <i class="fas fa-credit-card text-blue-600"></i> SumUp
                     </h3>
-                    <p class="text-sm text-gray-600 mb-4">Caso prefira usar a SumUp como seu gateway de recebimento.</p>
+                @if(auth()->user()?->isAdmin())
+                    <p class="text-sm text-gray-600 mb-4">Caso prefira usar a SumUp como seu gateway de recebimento (exclusivo para vendas do administrador).</p>
 
                     <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4 text-sm text-blue-900">
                         <p class="font-bold mb-2">Onde pegar as credenciais da SumUp</p>
@@ -101,6 +102,14 @@
                             placeholder="MXXXXXXX">
                         <p class="text-xs text-gray-500 mt-1">Código curto da conta de lojista SumUp. Use o código da mesma conta que gerou a API Key.</p>
                     </div>
+                @else
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4 text-sm text-blue-900">
+                        <p class="font-bold mb-1"><i class="fas fa-info-circle mr-1"></i>Gateway exclusivo para membros: Mercado Pago</p>
+                        <p class="text-blue-800">
+                            Para garantir o <strong>split automático</strong> nas vendas de cursos, mentorias, eventos e produtos da comunidade, membros utilizam exclusivamente o <strong>Mercado Pago</strong> (70% cai direto na sua conta Mercado Pago e 30% é dividido automaticamente entre plataforma, marketing e gestão do sistema).
+                        </p>
+                    </div>
+                @endif
                 </div>
 
                 <div class="flex justify-end">

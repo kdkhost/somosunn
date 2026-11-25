@@ -1,5 +1,16 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.34] - 2026-11-25 - feat(payments, splits): vendas de usuarios exclusivas no Mercado Pago com split automatico 30% (10% SaaS / 10% Marketing / 10% Admin) e SumUp exclusiva do administrador
+
+- **Restrição da SumUp Exclusivamente ao Administrador (`app/Traits/SumUpIntegration.php`, `app/Http/Controllers/CheckoutController.php`, `app/Http/Controllers/MentorshipCheckoutController.php`, `app/Http/Controllers/SellerProductCheckoutController.php`, `app/Http/Controllers/GatewayAccountController.php`, `resources/views/settings/payment.blade.php`):**
+  - `shouldShowSumUp()` agora valida o vendedor (`$seller`): se o vendedor for um membro/usuário (sujeito à taxa de 30%), a SumUp é bloqueada automaticamente e o checkout utiliza **somente Mercado Pago** para split automático.
+  - Em `GatewayAccountController::update()` e `resources/views/settings/payment.blade.php`, apenas administradores podem configurar credenciais SumUp; membros configuram exclusivamente Mercado Pago com aviso transparente da divisão 70% / 30% (10% SaaS, 10% Marketing, 10% Admin).
+- **Split Automático 70% / 10% / 10% / 10% no Mercado Pago (`app/Services/Payment/MercadoPagoService.php`, `app/Services/OrderSplitService.php`, `app/Services/OrderSplitPayoutService.php`):**
+  - `MercadoPagoService` grava `mp_marketplace_split_applied = true` e `mp_application_fee_amount` nos metadados do pedido em preferências, Pix e cartão com split OAuth.
+  - `OrderSplitService` liquida automaticamente as parcelas do vendedor (70%) e do dono do SaaS (`superadmin`, 10%) como `mercadopago_split` quando o split nativo foi aplicado, mantendo 10% Marketing e 10% Administrador registrados para controle transparente de repasse.
+- **Gestão Completa dos 4 Percentuais nos Dois Painéis (`/admin/splits` e `/painel/admin/splits`):**
+  - `Admin\SplitController`, `resources/views/admin/splits/index.blade.php`, `resources/views/panel/admin/splits/index.blade.php` e a gaveta de instruções (`resources/views/partials/splits-help-registry.blade.php`) atualizados para permitir configurar os 4 percentuais (padrão 70% Vendedor / 10% Dono SaaS / 10% Marketing / 10% Admin com validação obrigatória de soma = 100%).
+
 ## [2.8.33] - 2026-11-25 - feat(admin, ux): gaveta lateral de instrucoes em cada input, reorganizacao intuitiva dos repasses e harmonia dark/light
 
 - **Gaveta Lateral Global de Instruções (`resources/views/partials/help-drawer.blade.php`):**

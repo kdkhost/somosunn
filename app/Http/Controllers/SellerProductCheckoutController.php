@@ -65,7 +65,7 @@ class SellerProductCheckoutController extends Controller
 
         // Verificar se SumUp está disponível para marketplace
         $subtotal = round((float) $totals['subtotal'], 2);
-        $sumupAvailable = $this->shouldShowSumUp($subtotal, 'marketplace', $this->getUserType());
+        $sumupAvailable = $this->shouldShowSumUp($subtotal, 'marketplace', $this->getUserType(), $sellerStore->user_id);
 
         return view('storefront.checkout', [
             'sellerStore' => $sellerStore,
@@ -136,12 +136,12 @@ class SellerProductCheckoutController extends Controller
 
         // Se escolheu SumUp, validar disponibilidade
         if ($chosenGateway === 'sumup') {
-            if (!$this->shouldShowSumUp($total, 'marketplace', $this->getUserType())) {
+            if (!$this->shouldShowSumUp($total, 'marketplace', $this->getUserType(), $sellerStore->user_id)) {
                 return back()->with('error', 'SumUp não disponível para este pedido.')->withInput();
             }
         } elseif ($total > 0 && !($gateways['mpEnabled'] ?? false)) {
             // Se MP não disponível, tentar fallback para SumUp
-            if ($this->shouldShowSumUp($total, 'marketplace', $this->getUserType())) {
+            if ($this->shouldShowSumUp($total, 'marketplace', $this->getUserType(), $sellerStore->user_id)) {
                 $chosenGateway = 'sumup';
             } else {
                 return back()->with('error', 'Mercado Pago nao configurado pelo vendedor.')->withInput();

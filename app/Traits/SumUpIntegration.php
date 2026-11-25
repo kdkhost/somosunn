@@ -8,10 +8,22 @@ use App\Models\Setting;
 trait SumUpIntegration
 {
     /**
-     * Verifica se o SumUp deve ser exibido como opção de pagamento
+     * Verifica se o SumUp deve ser exibido como opção de pagamento.
+     * Regra de negócio: apenas o administrador utiliza SumUp; vendas de usuários/membros
+     * devem usar exclusivamente o Mercado Pago para split automático de 30% (10/10/10).
      */
-    protected function shouldShowSumUp($amount = null, $productType = null, $userType = null): bool
+    protected function shouldShowSumUp($amount = null, $productType = null, $userType = null, $seller = null): bool
     {
+        if ($seller !== null) {
+            $sellerUser = $seller instanceof \App\Models\User
+                ? $seller
+                : (is_numeric($seller) ? \App\Models\User::find((int) $seller) : null);
+
+            if ($sellerUser && $sellerUser->shouldChargePlatformFee()) {
+                return false;
+            }
+        }
+
         $sumupService = app(SumUpService::class);
         
         if (!$sumupService->isEnabled()) {

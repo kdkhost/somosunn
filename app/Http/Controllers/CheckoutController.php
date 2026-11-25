@@ -51,7 +51,7 @@ class CheckoutController extends Controller
         
         // Verificar gateways disponíveis incluindo SumUp
         $availableGateways = $this->getAvailableGateways($effectiveTotal, 'course');
-        $sumupAvailable = $this->shouldShowSumUp($effectiveTotal, 'course', $this->getUserType());
+        $sumupAvailable = $this->shouldShowSumUp($effectiveTotal, 'course', $this->getUserType(), $course->user_id);
         
         // Determinar gateway preferido
         $preferredGateway = 'mercadopago';
@@ -112,7 +112,7 @@ class CheckoutController extends Controller
             $chosenGateway = $request->input('gateway_provider', 'mercadopago');
 
             if ($chosenGateway === 'sumup') {
-                $sumupAvailable = $this->shouldShowSumUp($effectiveTotal, 'course', $this->getUserType());
+                $sumupAvailable = $this->shouldShowSumUp($effectiveTotal, 'course', $this->getUserType(), $course->user_id);
                 if (!$sumupAvailable) {
                     return back()->with('error', 'SumUp não está disponível para esta compra.');
                 }
@@ -123,7 +123,7 @@ class CheckoutController extends Controller
 
                 if (!$gateways['mpEnabled']) {
                     // Se MP não está disponível, tentar fallback para SumUp
-                    $sumupAvailable = $this->shouldShowSumUp($effectiveTotal, 'course', $this->getUserType());
+                    $sumupAvailable = $this->shouldShowSumUp($effectiveTotal, 'course', $this->getUserType(), $course->user_id);
                     if ($sumupAvailable) {
                         $gatewayProvider = 'sumup';
                     } else {

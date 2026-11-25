@@ -41,6 +41,10 @@ class GatewayAccountController extends Controller
         ]);
 
         if ($provider === 'sumup') {
+            if (!Auth::user()?->isAdmin()) {
+                return back()->with('error', 'Apenas o administrador da plataforma pode utilizar SumUp. Vendas de membros utilizam exclusivamente o Mercado Pago para split automático.');
+            }
+
             $sumupAccount = GatewayAccount::firstOrNew([
                 'user_id' => Auth::id(),
                 'provider' => 'sumup',

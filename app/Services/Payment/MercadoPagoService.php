@@ -72,6 +72,12 @@ class MercadoPagoService
 
         if (!$config['is_platform'] && $calc['application_fee'] > 0) {
             $preferenceData['marketplace_fee'] = $calc['application_fee'];
+            $order->forceFill([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'mp_marketplace_split_applied' => true,
+                    'mp_application_fee_amount' => $calc['application_fee'],
+                ]),
+            ])->save();
         }
 
         $headers = $this->commonHeaders('pref-' . $order->id);
@@ -174,6 +180,12 @@ class MercadoPagoService
 
         if (!$config['is_platform'] && $calc['application_fee'] > 0) {
             $paymentData['application_fee'] = $calc['application_fee'];
+            $order->forceFill([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'mp_marketplace_split_applied' => true,
+                    'mp_application_fee_amount' => $calc['application_fee'],
+                ]),
+            ])->save();
         }
 
         $response = Http::withToken($token)
@@ -248,6 +260,12 @@ class MercadoPagoService
 
         if (!$config['is_platform'] && $calc['application_fee'] > 0) {
             $paymentData['application_fee'] = $calc['application_fee'];
+            $order->forceFill([
+                'metadata' => array_merge($order->metadata ?? [], [
+                    'mp_marketplace_split_applied' => true,
+                    'mp_application_fee_amount' => $calc['application_fee'],
+                ]),
+            ])->save();
         }
 
         $response = Http::withToken($token)

@@ -142,7 +142,9 @@ class OrderSplitService
                 : $share['type'] . ':' . ($receiverId ?? 'unassigned');
 
             $resolvedType = $this->consolidatedType($share['type'], $receiverId, $seller?->id, $revenueOwner?->id, $marketingManager?->id);
-            $isAutoPaid = $mpSplitApplied && in_array($resolvedType, ['superadmin', 'platform'], true);
+            // No split automático do Mercado Pago: 70% cai direto na conta MP do vendedor e 30% cai na conta MP dona do SaaS
+            // (dos 30%, 10% do dono do SaaS já está liquidado automaticamente; 10% marketing e 10% administrador ficam para controle de repasse)
+            $isAutoPaid = $mpSplitApplied && in_array($resolvedType, ['seller', 'superadmin'], true);
 
             if (!isset($grouped[$key])) {
                 $grouped[$key] = [

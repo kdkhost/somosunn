@@ -54,9 +54,12 @@ class SplitController extends Controller
         $splits = $query->paginate(20)->withQueryString();
 
         $automation = [
-            'enabled' => (string) Setting::get('superadmin_commission_auto_enabled', '0') === '1',
-            'mode' => (string) Setting::get('superadmin_commission_payout_mode', 'mp_auto_billing'),
+            'enabled' => (string) Setting::get('superadmin_commission_auto_enabled', '1') === '1',
+            'mode' => (string) Setting::get('superadmin_commission_payout_mode', 'mp_routing'),
             'pix_key' => (string) Setting::get('superadmin_commission_pix_key', auth()->user()?->isSuperAdmin() ? (auth()->user()->pix_key ?? '') : ''),
+            'seller_percent' => (float) Setting::get('marketplace_split_seller_percent', 70),
+            'platform_percent' => (float) Setting::get('marketplace_split_platform_percent', 10),
+            'traffic_percent' => (float) Setting::get('marketplace_split_traffic_percent', 10),
             'percent' => (float) Setting::get('marketplace_split_superadmin_percent', 10),
             'delay_days' => (int) Setting::get('superadmin_commission_payout_delay_days', 0),
             'min_payout' => (float) Setting::get('superadmin_commission_min_payout', 1.00),
@@ -85,6 +88,9 @@ class SplitController extends Controller
             'auto_enabled' => ['nullable', 'boolean'],
             'payout_mode' => ['required', 'string', 'in:manual,mp_auto_billing,efi_pix_out,mp_routing'],
             'pix_key' => ['nullable', 'string', 'max:255'],
+            'seller_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'platform_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'traffic_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'percent' => ['required', 'numeric', 'min:0', 'max:100'],
             'delay_days' => ['required', 'integer', 'min:0', 'max:30'],
             'min_payout' => ['required', 'numeric', 'min:0.01', 'max:100000'],
@@ -93,6 +99,19 @@ class SplitController extends Controller
             'mp_card_token' => ['nullable', 'string', 'max:255'],
             'admin_email' => ['nullable', 'email', 'max:255'],
         ]);
+
+        $sellerPercent = isset($validated['seller_percent']) ? (float) $validated['seller_percent'] : (float) Setting::get('marketplace_split_seller_percent', 70);
+        $platformPercent = isset($validated['platform_percent']) ? (float) $validated['platform_percent'] : (float) Setting::get('marketplace_split_platform_percent', 10);
+        $trafficPercent = isset($validated['traffic_percent']) ? (float) $validated['traffic_percent'] : (float) Setting::get('marketplace_split_traffic_percent', 10);
+        $superadminPercent = (float) $validated['percent'];
+
+        $totalPercent = round($sellerPercent + $platformPercent + $trafficPercent + $superadminPercent, 2);
+        if (abs($totalPercent - 100.0) > 0.01) {
+            return response()->json([
+                'success' => false,
+                'message' => "A soma dos percentuais do rateio deve ser exatamente 100% (atual: {$totalPercent}%).",
+            ], 422);
+        }
 
         $autoEnabled = (bool) ($validated['auto_enabled'] ?? false);
         $pixKey = trim((string) ($validated['pix_key'] ?? ''));
@@ -107,7 +126,10 @@ class SplitController extends Controller
         Setting::set('superadmin_commission_auto_enabled', $autoEnabled ? '1' : '0', 'payments');
         Setting::set('superadmin_commission_payout_mode', $validated['payout_mode'], 'payments');
         Setting::set('superadmin_commission_pix_key', $pixKey, 'payments');
-        Setting::set('marketplace_split_superadmin_percent', (string) $validated['percent'], 'payments');
+        Setting::set('marketplace_split_seller_percent', (string) $sellerPercent, 'payments');
+        Setting::set('marketplace_split_platform_percent', (string) $platformPercent, 'payments');
+        Setting::set('marketplace_split_traffic_percent', (string) $trafficPercent, 'payments');
+        Setting::set('marketplace_split_superadmin_percent', (string) $superadminPercent, 'payments');
         Setting::set('superadmin_commission_payout_delay_days', (string) $validated['delay_days'], 'payments');
         Setting::set('superadmin_commission_min_payout', number_format((float) $validated['min_payout'], 2, '.', ''), 'payments');
         Setting::set('superadmin_commission_mp_customer_id', trim((string) ($validated['mp_customer_id'] ?? '')), 'payments');
