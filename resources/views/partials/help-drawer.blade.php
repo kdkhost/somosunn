@@ -289,7 +289,16 @@
         flex-shrink: 0;
     }
 
-    /* Dark Mode harmonizado (AdminLTE .dark-mode e Tailwind .dark) */
+    /* Dark Mode harmonizado (AdminLTE 4 [data-bs-theme="dark"], .dark-mode e Tailwind .dark) */
+    [data-bs-theme="dark"] .unn-help-trigger,
+    .dark-mode .unn-help-trigger,
+    .dark .unn-help-trigger {
+        background: rgba(96, 165, 250, 0.14);
+        border-color: rgba(96, 165, 250, 0.35);
+        color: #93c5fd;
+    }
+
+    [data-bs-theme="dark"] .unn-help-drawer,
     .dark-mode .unn-help-drawer,
     .dark .unn-help-drawer {
         background: #0f172a;
@@ -534,7 +543,7 @@
         const type = (field.getAttribute('type') || '').toLowerCase();
         const name = (field.getAttribute('name') || '').toLowerCase();
         if (['hidden', 'submit', 'button', 'reset', 'search', 'radio'].includes(type)) return true;
-        if (type === 'checkbox' && field.closest('.custom-switch')) return false;
+        if (type === 'checkbox' && field.closest('.form-switch, .custom-switch')) return false;
         if (type === 'checkbox') return true;
         if (field.hasAttribute('readonly') || field.disabled) return true;
         if (['search', 'q', '_token', '_method', 'current_group', 'status', 'receiver_type'].includes(name)) return true;
@@ -570,6 +579,7 @@
             btn.type = 'button';
             btn.className = 'unn-help-trigger';
             btn.setAttribute('data-help-drawer', key);
+            btn.setAttribute('data-help-field', rawName);
             btn.setAttribute('title', 'Ver instruções passo a passo');
             btn.setAttribute('aria-label', 'Ver instruções de ' + rawName);
             btn.innerHTML = '<i class="fas fa-question"></i>';
@@ -582,11 +592,40 @@
         register: function (items) {
             Object.assign(registry, items || {});
         },
-        open: function (keyOrConfig) {
+        open: function (keyOrConfig, triggerEl) {
             if (typeof keyOrConfig === 'string') {
                 if (registry[keyOrConfig]) {
                     openDrawer(registry[keyOrConfig]);
+                    return;
                 }
+                const fieldName = triggerEl ? triggerEl.getAttribute('data-help-field') : null;
+                if (fieldName && registry[fieldName]) {
+                    openDrawer(registry[fieldName]);
+                    return;
+                }
+                // Fallback inteligente garantido: nunca deixa o clique sem resposta
+                const parentLabel = triggerEl ? triggerEl.closest('label') : null;
+                const cleanTitle = parentLabel
+                    ? (parentLabel.textContent || '').replace(/\*/g, '').trim()
+                    : (fieldName || keyOrConfig || 'Instruções do Campo');
+                const relatedField = fieldName
+                    ? document.querySelector('[name="' + CSS.escape(fieldName) + '"]')
+                    : null;
+                if (relatedField && parentLabel) {
+                    openDrawer(buildSmartFallbackConfig(relatedField, parentLabel));
+                    return;
+                }
+                openDrawer({
+                    badge: 'Guia de Configuração',
+                    title: cleanTitle || 'Instruções do Campo',
+                    summary: 'Configure este campo conforme a necessidade da sua plataforma e salve as alterações no rodapé da tela.',
+                    steps: [
+                        'Revise o valor atual informado no campo "' + (cleanTitle || 'selecionado') + '".',
+                        'Ajuste conforme o padrão desejado para o funcionamento do sistema.',
+                        'Clique em "Salvar" para aplicar as alterações.'
+                    ],
+                    tip: 'Você pode alterar esta configuração novamente a qualquer momento.'
+                });
                 return;
             }
             openDrawer(keyOrConfig);
@@ -595,28 +634,47 @@
         autoAttach: autoAttach
     };
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function runAutoAttach() {
         autoAttach(document);
-    });
+    }
 
-    document.addEventListener('pjax:complete', function () {
-        autoAttach(document);
-    });
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', runAutoAttach);
+    } else {
+        runAutoAttach();
+    }
 
+    // Garante re-anexação após carregamento completo (inclusive após unn-help-catalog.js defer)
+    window.addEventListener('load', runAutoAttach);
+
+    // Compatibilidade com PJAX (evento nativo e evento jQuery)
+    document.addEventListener('pjax:complete', runAutoAttach);
+    document.addEventListener('pjax:end', runAutoAttach);
+    if (window.jQuery) {
+        window.jQuery(document).on('pjax:end pjax:complete', runAutoAttach);
+    } else {
+        window.addEventListener('load', function () {
+            if (window.jQuery) {
+                window.jQuery(document).on('pjax:end pjax:complete', runAutoAttach);
+            }
+        });
+    }
+
+    // Fase de captura (true) garante abertura mesmo quando o botão está dentro de <label for="...">
     document.addEventListener('click', function (event) {
-        const trigger = event.target.closest('[data-help-drawer]');
+        const trigger = event.target && event.target.closest ? event.target.closest('[data-help-drawer]') : null;
         if (trigger) {
             event.preventDefault();
             event.stopPropagation();
             const key = trigger.getAttribute('data-help-drawer');
-            window.UNNHelpDrawer.open(key);
+            window.UNNHelpDrawer.open(key, trigger);
             return;
         }
 
-        if (event.target.closest('#unn-help-drawer-close') || event.target.id === 'unn-help-drawer-backdrop') {
+        if (event.target && event.target.closest && (event.target.closest('#unn-help-drawer-close') || event.target.id === 'unn-help-drawer-backdrop')) {
             closeDrawer();
         }
-    });
+    }, true);
 
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
@@ -625,4 +683,4 @@
     });
 })();
 </script>
-<script src="{{ asset('js/unn-help-catalog.js') }}?v=2.8.35" defer></script>
+<script src="{{ asset('js/unn-help-catalog.js') }}?v=2.8.47" defer></script>

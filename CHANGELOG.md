@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.47] - 2026-11-25 - fix(ux, help-drawer): correcao da abertura da gaveta de instrucoes ao clicar em qualquer icone de ajuda (captura de clique, PJAX jQuery, switches BS5 e fallback inteligente)
+
+- **Gaveta Lateral de Instruções (`resources/views/partials/help-drawer.blade.php`):**
+  - Alterado o listener de clique para fase de captura (`capture: true`), garantindo abertura imediata mesmo quando o botão `?` está dentro de `<label for="...">` sem acionar o input/checkbox associado.
+  - Adicionado suporte a `.form-switch` (Bootstrap 5) além de `.custom-switch`, vinculação ao evento `pjax:end` via jQuery (`$(document).on('pjax:end')`), re-anexação no `window.load` (após `unn-help-catalog.js`) e fallback inteligente dentro de `UNNHelpDrawer.open()` para nunca deixar um clique sem resposta.
+
 ## [2.8.46] - 2026-11-25 - feat(admin, ux): preview embutido do Preloader e Cores em tempo real, selects padronizados, hover de dimensoes/peso nos dropzones e anel animado no Voltar ao Topo
 
 - **Preview Ao Vivo Embutido no Painel (`resources/views/admin/settings/partials/appearance.blade.php`):**
