@@ -959,10 +959,14 @@ function switchMainGatewayTab(btn) {
     });
     
     // Show target pane
-    const targetId = btn.getAttribute('data-target');
+    const targetId = btn.getAttribute('data-bs-target') || btn.getAttribute('data-target');
     const targetPane = document.getElementById(targetId);
     if (targetPane) {
         targetPane.classList.add('is-active');
+        targetPane.querySelectorAll('.unn-reveal').forEach(el => el.classList.add('is-visible'));
+        if (window.UNNAdminMotion && typeof window.UNNAdminMotion.refresh === 'function') {
+            window.UNNAdminMotion.refresh(targetPane);
+        }
     }
 }
 
@@ -983,10 +987,14 @@ function switchGatewayTab(btn) {
     });
     
     // Show target pane
-    const targetId = btn.getAttribute('data-target');
+    const targetId = btn.getAttribute('data-bs-target') || btn.getAttribute('data-target');
     const targetPane = document.getElementById(targetId);
     if (targetPane) {
         targetPane.classList.add('is-active');
+        targetPane.querySelectorAll('.unn-reveal').forEach(el => el.classList.add('is-visible'));
+        if (window.UNNAdminMotion && typeof window.UNNAdminMotion.refresh === 'function') {
+            window.UNNAdminMotion.refresh(targetPane);
+        }
     }
 }
 

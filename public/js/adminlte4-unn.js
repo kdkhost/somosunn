@@ -109,8 +109,12 @@
         });
 
         targets.forEach(function (el, idx) {
-            // Não anima elementos dentro de modais ou dropdowns
-            if (el.closest('.modal, .dropdown-menu, .offcanvas')) return;
+            // Não anima elementos dentro de modais, dropdowns, offcanvas ou abas internas ocultas
+            if (el.closest('.modal, .dropdown-menu, .offcanvas, .tab-pane, .gateway-pane, .main-gateway-pane')) {
+                el.classList.remove('unn-reveal', 'unn-reveal-up');
+                el.classList.add('is-visible');
+                return;
+            }
 
             const rect = el.getBoundingClientRect();
             const isAboveFold = rect.top < window.innerHeight * 0.95;

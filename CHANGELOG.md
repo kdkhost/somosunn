@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.43] - 2026-11-25 - fix(admin, gateway): restauracao das abas e sub-abas de /admin/settings/gateway (Mercado Pago, SumUp, Efi Pro) no Bootstrap 5
+
+- **Correção da Troca de Abas em `/admin/settings/gateway` (`resources/views/admin/settings/partials/gateway.blade.php`):**
+  - Atualizadas `switchMainGatewayTab()` e `switchGatewayTab()` para ler `data-bs-target` (com fallback para `data-target`), restaurando o acesso imediato às abas **SumUp**, **Efí Pro (Pix)** e às sub-abas **Métodos**, **Cobrança**, **Checkout** e **Avançado** do Mercado Pago.
+- **Proteção Global para Cards em Abas no Scroll Reveal (`public/js/adminlte4-unn.js`):**
+  - `initScrollReveal()` agora mantém sempre visíveis os cards dentro de `.tab-pane`, `.gateway-pane` e `.main-gateway-pane`, evitando que elementos inicialmente ocultos fiquem invisíveis ao alternar abas.
+
 ## [2.8.42] - 2026-11-25 - fix(admin, layout): cabecalho e sidebar fixos de ponta a ponta (100vh) corrigindo quebra de position sticky no AdminLTE 4
 
 - **Correção Definitiva do Header Fixo e Sidebar 100vh (`public/css/adminlte4-unn.css`, `resources/views/admin/layouts/app.blade.php`):**
