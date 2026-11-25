@@ -510,13 +510,13 @@
                         $medPerc = $totalHealth > 0 ? round(($customerHealth['Média'] ?? 0) / $totalHealth * 100) : 0;
                         $lowPerc = $totalHealth > 0 ? round(($customerHealth['Baixa'] ?? 0) / $totalHealth * 100) : 0;
                     @endphp
-                    <div class="dash-vitality-card p-4 text-white position-relative">
+                    <div class="dash-vitality-card p-4 position-relative">
                         <div class="dash-vitality-orb"></div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3 position-relative" style="z-index: 2;">
                             <div>
                                 <div class="dash-vitality-eyebrow">Business Vitality</div>
-                                <div class="fs-5 fw-bold text-white">Saúde do Cliente</div>
+                                <div class="fs-5 fw-bold dash-vitality-title">Saúde do Cliente</div>
                             </div>
                             <div class="dash-vitality-icon">
                                 <i class="fas fa-heartbeat {{ $altaPerc >= 60 ? 'dash-pulse-icon' : '' }}" style="color: #10b981;"></i>
@@ -530,7 +530,7 @@
                                     <div class="fw-bolder lh-1" style="font-size: 1.35rem; color: {{ $altaPerc >= 60 ? '#10b981' : ($altaPerc >= 30 ? '#f59e0b' : '#ef4444') }};">
                                         {{ $altaPerc }}%
                                     </div>
-                                    <div style="font-size: 0.58rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">
+                                    <div class="dash-vitality-sub" style="font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.05em;">
                                         Engajados
                                     </div>
                                 </div>
@@ -539,7 +539,7 @@
                             <div class="flex-fill">
                                 <div class="mb-2">
                                     <div class="d-flex justify-content-between mb-1 small">
-                                        <span style="color: #cbd5e1; font-size: 0.74rem;"><i class="fas fa-circle me-1" style="color: #10b981; font-size: 0.55rem;"></i>Alta</span>
+                                        <span class="dash-vitality-label" style="font-size: 0.74rem;"><i class="fas fa-circle me-1" style="color: #10b981; font-size: 0.55rem;"></i>Alta</span>
                                         <span class="fw-bold" style="color: #10b981; font-size: 0.74rem;">{{ $customerHealth['Alta'] ?? 0 }}</span>
                                     </div>
                                     <div class="dash-vitality-bar">
@@ -548,7 +548,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <div class="d-flex justify-content-between mb-1 small">
-                                        <span style="color: #cbd5e1; font-size: 0.74rem;"><i class="fas fa-circle me-1" style="color: #f59e0b; font-size: 0.55rem;"></i>Média</span>
+                                        <span class="dash-vitality-label" style="font-size: 0.74rem;"><i class="fas fa-circle me-1" style="color: #f59e0b; font-size: 0.55rem;"></i>Média</span>
                                         <span class="fw-bold" style="color: #f59e0b; font-size: 0.74rem;">{{ $customerHealth['Média'] ?? 0 }}</span>
                                     </div>
                                     <div class="dash-vitality-bar">
@@ -557,7 +557,7 @@
                                 </div>
                                 <div>
                                     <div class="d-flex justify-content-between mb-1 small">
-                                        <span style="color: #cbd5e1; font-size: 0.74rem;"><i class="fas fa-circle me-1" style="color: #ef4444; font-size: 0.55rem;"></i>Baixa</span>
+                                        <span class="dash-vitality-label" style="font-size: 0.74rem;"><i class="fas fa-circle me-1" style="color: #ef4444; font-size: 0.55rem;"></i>Baixa</span>
                                         <span class="fw-bold" style="color: #ef4444; font-size: 0.74rem;">{{ $customerHealth['Baixa'] ?? 0 }}</span>
                                     </div>
                                     <div class="dash-vitality-bar">
@@ -567,8 +567,8 @@
                             </div>
                         </div>
 
-                        <div class="text-center mt-3 pt-2 position-relative" style="z-index: 2; border-top: 1px solid rgba(255,255,255,0.08);">
-                            <small style="color: #94a3b8; font-size: 0.68rem;">Atualizado em tempo real com base em planos e perfis</small>
+                        <div class="text-center mt-3 pt-2 position-relative dash-vitality-footer" style="z-index: 2;">
+                            <small class="dash-vitality-sub" style="font-size: 0.68rem;">Atualizado em tempo real com base em planos e perfis</small>
                         </div>
                     </div>
 
@@ -645,7 +645,7 @@
 
                 <div class="col-lg-4 d-flex flex-column gap-3">
                     {{-- Vitality Score Individual --}}
-                    <div class="dash-vitality-card p-4 text-white position-relative">
+                    <div class="dash-vitality-card p-4 position-relative">
                         <div class="position-absolute"
                             style="top:-18px; right:-18px; width:120px; height:120px; background: radial-gradient(circle, {{ $myHealth['color'] ?? '#10b981' }}40, transparent 70%); pointer-events:none;">
                         </div>
@@ -653,7 +653,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-3 position-relative" style="z-index: 2;">
                             <div>
                                 <div class="dash-vitality-eyebrow">Minha Reputação</div>
-                                <div class="fs-5 fw-bold text-white">Vitality Score</div>
+                                <div class="fs-5 fw-bold dash-vitality-title">Vitality Score</div>
                             </div>
                             <div class="d-flex align-items-center justify-content-center rounded-circle"
                                 style="width:42px; height:42px; background: {{ $myHealth['color'] ?? '#10b981' }}25; border: 1px solid {{ $myHealth['color'] ?? '#10b981' }}50;">
@@ -665,7 +665,7 @@
                         <div class="d-flex align-items-center gap-3 mb-3 position-relative" style="z-index: 2;">
                             <div class="flex-shrink-0 position-relative" style="width: 82px; height: 82px;">
                                 <svg viewBox="0 0 36 36" style="width: 82px; height: 82px; transform: rotate(-90deg);">
-                                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3" />
+                                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="3" />
                                     <circle cx="18" cy="18" r="15.9" fill="none"
                                         stroke="{{ $myHealth['color'] ?? '#10b981' }}" stroke-width="3"
                                         stroke-dasharray="{{ $myHealth['score'] ?? 0 }}, 100"
@@ -676,14 +676,14 @@
                                     <span class="fw-bolder" style="font-size: 1.25rem; color: {{ $myHealth['color'] ?? '#10b981' }};">
                                         {{ $myHealth['score'] ?? 0 }}
                                     </span>
-                                    <span style="font-size: 0.55rem; color: #94a3b8; text-transform: uppercase;">pts</span>
+                                    <span class="dash-vitality-sub" style="font-size: 0.55rem; text-transform: uppercase;">pts</span>
                                 </div>
                             </div>
                             <div>
                                 <div class="fw-bold fs-6" style="color: {{ $myHealth['color'] ?? '#10b981' }};">
                                     {{ $myHealth['emoji'] ?? '' }} {{ $myHealth['level'] ?? 'Inicial' }}
                                 </div>
-                                <div class="small mt-1" style="color: #cbd5e1; font-size: 0.76rem;">
+                                <div class="small mt-1 dash-vitality-sub" style="font-size: 0.76rem;">
                                     @if(($myHealth['level'] ?? '') === 'Alta')
                                         Perfil completo e plano ativo!
                                     @elseif(($myHealth['level'] ?? '') === 'Média')
@@ -696,7 +696,7 @@
                         </div>
 
                         @if(!empty($myHealthDetails))
-                            <div class="pt-3 position-relative" style="z-index: 2; border-top: 1px solid rgba(255,255,255,0.08);">
+                            <div class="pt-3 position-relative dash-vitality-footer" style="z-index: 2;">
                                 @foreach([
                                     'plano_ativo' => ['label' => 'Plano ativo', 'icon' => 'fa-crown'],
                                     'foto' => ['label' => 'Foto de perfil', 'icon' => 'fa-user-circle'],
@@ -708,7 +708,7 @@
                                 ] as $key => $item)
                                     @if(array_key_exists($key, $myHealthDetails))
                                         <div class="d-flex align-items-center justify-content-between mb-1">
-                                            <span style="font-size: 0.75rem; color: #cbd5e1;">
+                                            <span class="dash-vitality-label" style="font-size: 0.75rem;">
                                                 <i class="fas {{ $item['icon'] }} me-2" style="width: 14px;"></i>{{ $item['label'] }}
                                             </span>
                                             @if($myHealthDetails[$key])
@@ -1010,13 +1010,20 @@
             width: 100%;
         }
 
-        /* Vitality Card */
+        /* Vitality Card — 100% isolado e fiel ao tema Light / Dark */
         .dash-vitality-card {
             border-radius: 1rem;
             overflow: hidden;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0f2d4c 100%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 14px 32px -12px rgba(15, 23, 42, 0.45);
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            box-shadow: var(--unn-shadow-sm);
+        }
+        [data-bs-theme="dark"] .dash-vitality-card {
+            background: #131d31;
+            color: #f8fafc;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            box-shadow: 0 14px 32px -12px rgba(2, 6, 23, 0.5);
         }
         .dash-vitality-orb {
             position: absolute;
@@ -1024,15 +1031,45 @@
             right: -24px;
             width: 130px;
             height: 130px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.25), transparent 70%);
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.14), transparent 70%);
             pointer-events: none;
+        }
+        [data-bs-theme="dark"] .dash-vitality-orb {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.25), transparent 70%);
         }
         .dash-vitality-eyebrow {
             font-size: 0.68rem;
             font-weight: 700;
-            color: #94a3b8;
+            color: #64748b;
             letter-spacing: 0.08em;
             text-transform: uppercase;
+        }
+        [data-bs-theme="dark"] .dash-vitality-eyebrow {
+            color: #94a3b8;
+        }
+        .dash-vitality-title {
+            color: #0f172a;
+        }
+        [data-bs-theme="dark"] .dash-vitality-title {
+            color: #f8fafc;
+        }
+        .dash-vitality-label {
+            color: #334155;
+        }
+        [data-bs-theme="dark"] .dash-vitality-label {
+            color: #cbd5e1;
+        }
+        .dash-vitality-sub {
+            color: #64748b;
+        }
+        [data-bs-theme="dark"] .dash-vitality-sub {
+            color: #94a3b8;
+        }
+        .dash-vitality-footer {
+            border-top: 1px solid rgba(15, 23, 42, 0.08);
+        }
+        [data-bs-theme="dark"] .dash-vitality-footer {
+            border-top: 1px solid rgba(148, 163, 184, 0.14);
         }
         .dash-vitality-icon {
             width: 42px;
@@ -1041,14 +1078,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.32);
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.28);
         }
         .dash-vitality-bar {
             height: 5px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.08);
             overflow: hidden;
+        }
+        [data-bs-theme="dark"] .dash-vitality-bar {
+            background: rgba(255, 255, 255, 0.1);
         }
         .dash-vitality-bar > div {
             height: 100%;
@@ -1057,15 +1097,24 @@
         .dash-vitality-btn {
             padding: 0.55rem 1rem;
             border-radius: 0.7rem;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            color: #e2e8f0;
+            background: #f1f5f9;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            color: #0f172a;
             font-size: 0.78rem;
             font-weight: 600;
             text-decoration: none;
             transition: background 0.18s ease, color 0.18s ease;
         }
         .dash-vitality-btn:hover {
+            background: #e2e8f0;
+            color: #1F5EDB;
+        }
+        [data-bs-theme="dark"] .dash-vitality-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #e2e8f0;
+        }
+        [data-bs-theme="dark"] .dash-vitality-btn:hover {
             background: rgba(255, 255, 255, 0.16);
             color: #ffffff;
         }
@@ -1539,6 +1588,19 @@
                 document.addEventListener('DOMContentLoaded', initAdminDashboard);
             } else {
                 initAdminDashboard();
+            }
+
+            // Atualiza cores dos gráficos instantaneamente ao alternar Light/Dark Mode
+            if (!window.__unnDashThemeObserver) {
+                window.__unnDashThemeObserver = new MutationObserver(function (mutations) {
+                    for (const m of mutations) {
+                        if (m.attributeName === 'data-bs-theme' && document.getElementById('salesChart')) {
+                            initAdminDashboard();
+                            break;
+                        }
+                    }
+                });
+                window.__unnDashThemeObserver.observe(document.documentElement, { attributes: true });
             }
         })();
     </script>

@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.59] - 2026-11-25 - style(admin, theme): isolamento estrito Light/Dark Mode em todo o /admin e alinhamento oficial de botoes AdminLTE 4
+
+- **Isolamento Estrito de Temas (`public/css/adminlte4-unn.css`, `resources/views/admin/dashboard.blade.php`):**
+  - Blindagem completa do **Dark Mode** para eliminar qualquer vazamento claro em `.bg-body*`, `.table-light`, `.thead-light`, `.list-group-item`, `.accordion-*`, `.btn-light`, `.btn-default`, `.btn-outline-dark`, `.badge.text-bg-light`, `.dropdown-item`, `.progress`, **SweetAlert2**, **Select2** e **Summernote**.
+  - Blindagem do **Light Mode** para eliminar superfícies escuras indevidas em cards de conteúdo (incluindo *Saúde do Cliente / Business Vitality* e *Vitality Score* no dashboard, além de `.card-dark` e `.swal2-popup`), com `MutationObserver` re-renderizando os gráficos `Chart.js` automaticamente ao alternar o tema.
+- **Alinhamento Oficial AdminLTE 4 (`public/css/adminlte4-unn.css`):**
+  - Padronizados `.card-header .card-tools` (`float: none; margin-left: auto; display: inline-flex; gap: 0.45rem;`), `.card-header .btn-tool` (`32x32`), `.btn` e `.btn-group` (`inline-flex` centralizado), `.modal-header`, `.modal-footer` e `.card-footer` seguindo o padrão oficial do AdminLTE 4 / Bootstrap 5.3.
+
 ## [2.8.58] - 2026-11-25 - fix(admin, cron, ux): correcao de titulos colados em card-header, ativacao do RunInternalCron + heartbeat e rastreio real de usuarios online agora
 
 - **Títulos Colados em Cabeçalhos de Cards (`public/css/adminlte4-unn.css`):**
