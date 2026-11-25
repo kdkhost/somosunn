@@ -1214,3 +1214,100 @@ select.form-select option,
         display: none !important;
     }
 }
+
+/* ==========================================================================
+   9. Barras de Scroll Personalizadas e Padronizadas (Paleta UNN Light & Dark)
+   ========================================================================== */
+html,
+body,
+.app-main,
+.table-responsive,
+.modal-body,
+.offcanvas-body,
+.dropdown-menu,
+.unn-help-drawer-body {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(31, 94, 219, 0.45) rgba(226, 232, 240, 0.55);
+}
+
+[data-bs-theme="dark"],
+[data-bs-theme="dark"] body,
+[data-bs-theme="dark"] .app-main,
+[data-bs-theme="dark"] .table-responsive,
+[data-bs-theme="dark"] .modal-body,
+[data-bs-theme="dark"] .offcanvas-body,
+[data-bs-theme="dark"] .dropdown-menu,
+[data-bs-theme="dark"] .unn-help-drawer-body {
+    scrollbar-color: rgba(59, 130, 246, 0.52) #0b1120;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(226, 232, 240, 0.55);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(31, 94, 219, 0.58) 0%, rgba(23, 127, 214, 0.68) 100%);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #1F5EDB 0%, #177FD6 100%);
+    border: 1px solid transparent;
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: #1D3FC4;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Scrollbar Dark Mode */
+[data-bs-theme="dark"] ::-webkit-scrollbar-track,
+.dark-mode ::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.75);
+}
+
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb,
+.dark-mode ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.52) 0%, rgba(31, 94, 219, 0.68) 100%);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb:hover,
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #3b82f6 0%, #1F5EDB 100%);
+    border: 1px solid transparent;
+    background-clip: padding-box;
+}
+
+/* Scrollbar mais compacta em áreas internas */
+.table-responsive::-webkit-scrollbar,
+.dropdown-menu::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar,
+.unn-help-drawer-body::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+/* Padronização do OverlayScrollbars v2 da Sidebar na paleta UNN */
+.app-sidebar .os-scrollbar {
+    --os-size: 8px;
+    --os-padding-perpendicular: 2px;
+    --os-handle-border-radius: 999px;
+    --os-handle-bg: rgba(96, 165, 250, 0.35);
+    --os-handle-bg-hover: rgba(59, 130, 246, 0.78);
+    --os-handle-bg-active: #1F5EDB;
+}

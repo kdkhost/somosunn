@@ -1,5 +1,10 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.50] - 2026-11-25 - style(admin, ui): barras de scroll personalizadas e padronizadas na paleta UNN (Light, Dark e OverlayScrollbars da sidebar)
+
+- **Barras de Scroll Padronizadas (`public/css/adminlte4-unn.css`):**
+  - Estilizadas todas as barras de rolagem (`::-webkit-scrollbar`, `scrollbar-width/scrollbar-color` e `.app-sidebar .os-scrollbar` do OverlayScrollbars v2) com largura fina arredondada, trilha harmonizada nos modos Claro e Escuro e destaque na paleta UNN (`#1F5EDB`, `#177FD6`, `#1D3FC4`).
+
 ## [2.8.49] - 2026-11-25 - feat(admin, ux): preview do Preloader 100% dinamico (inclusive PJAX e simulacao automatica ao trocar animacao) e overlay interno translucido nos dropzones
 
 - **Preview do Preloader Totalmente Dinâmico (`resources/views/admin/settings/partials/appearance.blade.php`):**
