@@ -223,24 +223,110 @@
     </div>
 
     <!-- Preloader -->
+    @php
+        $panelPreloaderEnabled = (string) ($settings['preloader_enabled'] ?? '1') !== '0';
+        $panelPreloaderAdminEnabled = (string) ($settings['preloader_admin_enabled'] ?? '1') !== '0';
+        $panelPreloaderShowProgress = (string) ($settings['preloader_show_progress'] ?? '1') !== '0';
+        $panelPreloaderPjax = (string) ($settings['preloader_pjax_enabled'] ?? '1') !== '0';
+        $panelPreloaderStyle = $settings['preloader_style'] ?? 'orbital';
+        $panelPreloaderExit = $settings['preloader_exit_animation'] ?? 'blur';
+        $panelPreloaderDuration = (int) ($settings['preloader_duration_ms'] ?? 650);
+        $panelPreloaderText = $settings['preloader_text'] ?? 'SOMOS UNN';
+        $panelPreloaderAccent = $settings['preloader_accent_color'] ?? '#1F5EDB';
+    @endphp
     <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-8 space-y-6">
-        <div class="flex items-center gap-3 mb-2">
-            <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-                <i class="fas fa-spinner"></i>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                    <i class="fas fa-spinner"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 dark:text-white text-lg">Central do Preloader</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Modelos, animações de saída e controle independente para o painel admin.</p>
+                </div>
             </div>
-            <div>
-                <h3 class="font-bold text-slate-800 dark:text-white text-lg">Preloader</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Animação exibida enquanto o site carrega.</p>
+            <button type="button" onclick="window.UNNPreviewPreloader && window.UNNPreviewPreloader({ style: document.getElementById('panel_preloader_style')?.value, exitAnimation: document.getElementById('panel_preloader_exit')?.value, duration: 1200, text: document.getElementById('panel_preloader_text')?.value, accentColor: document.getElementById('panel_preloader_accent')?.value, showProgress: document.getElementById('panel_preloader_show_progress')?.checked })"
+                class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-sm">
+                <i class="fas fa-play mr-1"></i> Testar Preloader Agora
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <div>
+                    <label class="font-bold text-slate-700 dark:text-slate-300 block" for="preloader_enabled">Ativar no Site / Portal</label>
+                    <span class="text-xs text-slate-400">Páginas públicas e painel de membros</span>
+                </div>
+                <label for="preloader_enabled" class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="preloader_enabled" value="0">
+                    <input type="checkbox" name="preloader_enabled" id="preloader_enabled" value="1" class="sr-only peer" {{ $panelPreloaderEnabled ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <div>
+                    <label class="font-bold text-slate-700 dark:text-slate-300 block" for="preloader_admin_enabled">Ativar no Painel Admin (/admin)</label>
+                    <span class="text-xs text-slate-400">Opcional para o painel administrativo</span>
+                </div>
+                <label for="preloader_admin_enabled" class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="preloader_admin_enabled" value="0">
+                    <input type="checkbox" name="preloader_admin_enabled" id="preloader_admin_enabled" value="1" class="sr-only peer" {{ $panelPreloaderAdminEnabled ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <label class="font-bold text-slate-700 dark:text-slate-300" for="panel_preloader_show_progress">Exibir Barra de Progresso</label>
+                <label for="panel_preloader_show_progress" class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="preloader_show_progress" value="0">
+                    <input type="checkbox" name="preloader_show_progress" id="panel_preloader_show_progress" value="1" class="sr-only peer" {{ $panelPreloaderShowProgress ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <label class="font-bold text-slate-700 dark:text-slate-300" for="preloader_pjax_enabled">Ativar em Navegação PJAX</label>
+                <label for="preloader_pjax_enabled" class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="preloader_pjax_enabled" value="0">
+                    <input type="checkbox" name="preloader_pjax_enabled" id="preloader_pjax_enabled" value="1" class="sr-only peer" {{ $panelPreloaderPjax ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
             </div>
         </div>
 
-        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
-            <label class="font-bold text-slate-700 dark:text-slate-300" for="preloader_enabled">Ativar Animação de Carregamento</label>
-            <label for="preloader_enabled" class="relative inline-flex items-center cursor-pointer">
-                <input type="hidden" name="preloader_enabled" value="0">
-                <input type="checkbox" name="preloader_enabled" id="preloader_enabled" value="1" class="sr-only peer" {{ ($settings['preloader_enabled'] ?? 0) ? 'checked' : '' }}>
-                <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2" for="panel_preloader_style">Modelo do Preloader</label>
+                <select name="preloader_style" id="panel_preloader_style" class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white font-medium">
+                    <option value="orbital" {{ $panelPreloaderStyle === 'orbital' ? 'selected' : '' }}>Orbital UNN (Atual)</option>
+                    <option value="pulse" {{ $panelPreloaderStyle === 'pulse' ? 'selected' : '' }}>Pulso Neon / Halo</option>
+                    <option value="minimal" {{ $panelPreloaderStyle === 'minimal' ? 'selected' : '' }}>Minimalista Clean</option>
+                    <option value="glass" {{ $panelPreloaderStyle === 'glass' ? 'selected' : '' }}>Glassmorphism Card</option>
+                    <option value="executive" {{ $panelPreloaderStyle === 'executive' ? 'selected' : '' }}>Barra Executiva</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2" for="panel_preloader_exit">Animação de Saída</label>
+                <select name="preloader_exit_animation" id="panel_preloader_exit" class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white font-medium">
+                    <option value="blur" {{ $panelPreloaderExit === 'blur' ? 'selected' : '' }}>Blur + Expansão (Padrão)</option>
+                    <option value="fade" {{ $panelPreloaderExit === 'fade' ? 'selected' : '' }}>Fade Out Suave</option>
+                    <option value="zoom" {{ $panelPreloaderExit === 'zoom' ? 'selected' : '' }}>Zoom Out Rápido</option>
+                    <option value="slide-up" {{ $panelPreloaderExit === 'slide-up' ? 'selected' : '' }}>Cortina para Cima</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2" for="panel_preloader_duration">Tempo Mínimo (ms)</label>
+                <input type="number" name="preloader_duration_ms" id="panel_preloader_duration" min="150" max="3500" step="50" value="{{ $panelPreloaderDuration }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white font-medium">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2" for="panel_preloader_text">Texto / Legenda</label>
+                <input type="text" name="preloader_text" id="panel_preloader_text" maxlength="40" value="{{ $panelPreloaderText }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white font-medium">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2" for="panel_preloader_accent">Cor de Destaque</label>
+                <input type="text" name="preloader_accent_color" id="panel_preloader_accent" value="{{ $panelPreloaderAccent }}"
+                    class="w-full px-4 py-3 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white font-medium">
+            </div>
         </div>
 
         <div class="max-w-xs space-y-3">

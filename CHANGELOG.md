@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.45] - 2026-11-25 - feat(settings, preloader): central completa do Preloader em /admin/settings/appearance e /painel/admin/settings/appearance com 5 modelos, 4 animacoes e controle opcional para o painel admin
+
+- **Preloader Configurável com Padrão Atual Preservado (`resources/views/partials/modern-preloader.blade.php`):**
+  - Preservado o modelo atual (**Orbital UNN**) ativo por padrão sem troca nem desativação automática.
+  - Adicionados 5 modelos visuais (`orbital`, `pulse`, `minimal`, `glass`, `executive`), 4 animações de saída (`blur`, `fade`, `zoom`, `slide-up`), controle independente para o painel admin (`preloader_admin_enabled`), duração em ms (`preloader_duration_ms`), cor de destaque (`preloader_accent_color`), texto personalizado (`preloader_text`), toggle da barra de progresso (`preloader_show_progress`), toggle PJAX (`preloader_pjax_enabled`) e API `window.UNNPreviewPreloader()` para teste ao vivo em tela cheia.
+- **Interface Completa nos Dois Painéis (`resources/views/admin/settings/partials/appearance.blade.php`, `resources/views/panel/admin/settings/partials/appearance.blade.php`):**
+  - Adicionada a **Central do Preloader** com seletor visual de modelos em cards, controles de ativação separados (Site/Portal vs Painel Admin), animação de saída, duração, cor, texto, upload de logo e botão **Testar Preloader Agora**.
+
 ## [2.8.44] - 2026-11-25 - feat(admin, backups): reformulacao completa da Central de Backups (/admin/backups) no padrao AdminLTE 4 + React/SaaS
 
 - **Nova Central de Backups (`resources/views/admin/backups/index.blade.php`, `resources/views/admin/backups/partials/table.blade.php`):**
