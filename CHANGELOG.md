@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.41] - 2026-11-25 - feat(admin, ux): animacoes intuitivas em tempo real ao rolar (scroll reveal bidirecional, KPIs, graficos Chart.js e barra de progresso)
+
+- **Motor Global de Animações em Tempo Real (`public/js/adminlte4-unn.js`, `public/css/adminlte4-unn.css`):**
+  - Implementado `window.UNNAdminMotion` com **Scroll Reveal bidirecional** via `IntersectionObserver` (anima suavemente cards, KPIs e seções ao rolar para baixo e para cima, com *stagger* progressivo na entrada).
+  - Adicionada **barra de progresso de rolagem em tempo real** (`.unn-scroll-progress`) no topo da tela e elevação dinâmica da navbar `.app-header.is-scrolled`.
+  - Implementado **CountUp em tempo real** nos números e valores monetários dos KPIs (`.small-box h3` e `.info-box-number`) com `requestAnimationFrame` + `easeOutExpo`.
+  - Configurada **animação global em tempo real para gráficos Chart.js** (`easeOutQuart`, tooltips arredondados e gatilho automático ao entrar na viewport) com suporte completo a `pjax:end` e respeito a `prefers-reduced-motion`.
+
 ## [2.8.40] - 2026-11-25 - fix(admin, sidebar): padronizacao completa da sidebar no padrao oficial AdminLTE 4 sem conflito de largura, setas e submenus
 
 - **Padronização Oficial da Sidebar (`public/css/adminlte4-unn.css`, `resources/views/admin/partials/sidebar.blade.php`):**

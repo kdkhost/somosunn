@@ -937,3 +937,97 @@ label,
     right: 24px !important;
     z-index: 1045 !important;
 }
+
+/* ==========================================================================
+   8. Animações Intuitivas em Tempo Real (Scroll Reveal, Progress Bar & Micro-UX)
+   ========================================================================== */
+.unn-scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    z-index: 1060;
+    background: linear-gradient(90deg, #1F5EDB 0%, #38bdf8 55%, #1D3FC4 100%);
+    box-shadow: 0 0 10px rgba(31, 94, 219, 0.55);
+    transition: width 0.08s linear;
+    pointer-events: none;
+}
+
+/* Transição suave de conteúdo (inclui PJAX) */
+#pjax-container {
+    animation: unnPageFadeIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes unnPageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scroll Reveal bidirecional fluido */
+.unn-reveal {
+    opacity: 0;
+    transform: translateY(18px) scale(0.992);
+    transition:
+        opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+}
+
+.unn-reveal.unn-reveal-up {
+    transform: translateY(-16px) scale(0.992);
+}
+
+.unn-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Micro-interações em botões, badges e linhas de tabela */
+.btn:active {
+    transform: scale(0.97) !important;
+}
+
+.table tbody tr {
+    transition: background-color 0.16s ease, transform 0.16s ease;
+}
+
+.badge.text-bg-success .fa-check-circle,
+.badge.bg-success .fa-check-circle {
+    animation: unnPulseDot 2.4s ease-in-out infinite;
+}
+
+@keyframes unnPulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.65; transform: scale(1.12); }
+}
+
+/* Header dinâmico ao rolar a página */
+.app-header.navbar.is-scrolled {
+    box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.14);
+}
+
+[data-bs-theme="dark"] .app-header.navbar.is-scrolled {
+    box-shadow: 0 8px 26px -6px rgba(2, 6, 23, 0.55);
+}
+
+/* Respeita preferência de acessibilidade do sistema operacional */
+@media (prefers-reduced-motion: reduce) {
+    .unn-reveal,
+    .unn-reveal.unn-reveal-up,
+    #pjax-container {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+    }
+    .unn-scroll-progress {
+        display: none !important;
+    }
+}
