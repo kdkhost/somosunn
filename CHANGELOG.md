@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.53] - 2026-11-25 - fix(site, ux): centralizacao do rotulo Publicidade em x-ad-slot e anel de progresso animado no botao Voltar ao Topo do site publico
+
+- **Alinhamento do Rótulo Publicidade (`resources/views/components/ad-slot.blade.php`):**
+  - Restaurado o alinhamento central (`text-center`) do rótulo **Publicidade** no bloco de anúncio público (mantendo o título opcional do banner centralizado junto).
+- **Botão Voltar ao Topo Animado no Site Público (`resources/views/layouts/app.blade.php`):**
+  - Adicionado o mesmo anel circular SVG de progresso em tempo real (`#siteBackToTopRing`) ao redor de `#siteBackToTop`, sincronizado com a rolagem da página igual ao `/admin`.
+
 ## [2.8.52] - 2026-11-25 - feat(ads, sponsors): sistema proprio de publicidade por periodos (7/14/21/30/90/120d), aprovacao configuravel, split SaaS x Admin e rastreamento real de impressoes/cliques
 
 - **Migration Aditiva (`database/migrations/2026_11_25_000001_add_ad_monetization_fields_to_sponsor_tables.php`):**

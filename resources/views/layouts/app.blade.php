@@ -1948,10 +1948,10 @@
     <style>
         .site-back-to-top {
             position: fixed;
-            right: 1rem;
-            bottom: 6rem;
-            width: 46px;
-            height: 46px;
+            right: 1.15rem;
+            bottom: 6.2rem;
+            width: 48px;
+            height: 48px;
             border: 0;
             border-radius: 999px;
             display: inline-flex;
@@ -1963,9 +1963,34 @@
             opacity: 0;
             transform: translateY(8px);
             pointer-events: none;
+            overflow: visible;
             transition: opacity .2s ease, transform .2s ease, box-shadow .2s ease;
             background: linear-gradient(135deg, var(--unn-azul-1, #1F5EDB), var(--unn-azul-2, #177FD6), var(--unn-azul-3, #1D3FC4));
             box-shadow: 0 12px 24px rgba(31, 94, 219, .35);
+        }
+
+        .site-back-to-top .unn-btt-ring {
+            position: absolute;
+            inset: -5px;
+            width: calc(100% + 10px);
+            height: calc(100% + 10px);
+            transform: rotate(-90deg);
+            pointer-events: none;
+        }
+
+        .site-back-to-top .unn-btt-ring-track {
+            fill: none;
+            stroke: rgba(31, 94, 219, 0.22);
+            stroke-width: 3;
+        }
+
+        .site-back-to-top .unn-btt-ring-progress {
+            fill: none;
+            stroke: #38bdf8;
+            stroke-width: 3.2;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.1s linear;
+            filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.75));
         }
 
         .site-back-to-top:hover {
@@ -1981,27 +2006,42 @@
 
         @media (max-width: 768px) {
             .site-back-to-top {
-                right: .85rem;
-                bottom: 5.5rem;
-                width: 42px;
-                height: 42px;
+                right: .95rem;
+                bottom: 5.75rem;
+                width: 44px;
+                height: 44px;
             }
         }
     </style>
     <button type="button" id="siteBackToTop" class="site-back-to-top" aria-label="Voltar ao topo"
         title="Voltar ao topo">
+        <svg class="unn-btt-ring" viewBox="0 0 58 58" aria-hidden="true">
+            <circle class="unn-btt-ring-track" cx="29" cy="29" r="25"></circle>
+            <circle class="unn-btt-ring-progress" id="siteBackToTopRing" cx="29" cy="29" r="25"></circle>
+        </svg>
         <i class="fas fa-chevron-up"></i>
     </button>
     <script>
         (function () {
             const button = document.getElementById('siteBackToTop');
+            const ring = document.getElementById('siteBackToTopRing');
             if (!button) return;
 
+            const radius = 25;
+            const circumference = 2 * Math.PI * radius;
+            if (ring) {
+                ring.style.strokeDasharray = circumference + ' ' + circumference;
+                ring.style.strokeDashoffset = circumference;
+            }
+
             const onScroll = function () {
-                if (window.scrollY > 420) {
-                    button.classList.add('is-visible');
-                } else {
-                    button.classList.remove('is-visible');
+                const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+                const docHeight = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+                const progress = Math.min(1, Math.max(0, scrollY / docHeight));
+
+                button.classList.toggle('is-visible', scrollY > 240);
+                if (ring) {
+                    ring.style.strokeDashoffset = circumference * (1 - progress);
                 }
             };
 

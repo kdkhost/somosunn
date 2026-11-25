@@ -77,11 +77,13 @@
 @if($canRender)
     <div class="unn-ad-slot {{ $context === 'feed' ? 'bg-white rounded-2xl shadow-sm border border-slate-100 p-4 my-4' : 'max-w-7xl mx-auto px-4 md:px-6 my-6' }} {{ $class }}"
          data-ad-context="{{ $context }}">
-        <div class="flex items-center justify-between mb-2">
-            <span class="inline-block text-[10px] font-bold uppercase tracking-widest text-slate-400">Publicidade</span>
-            @if($ownBanner && $ownBanner->title)
-                <span class="text-[11px] font-semibold text-slate-400 truncate max-w-[260px]">{{ $ownBanner->title }}</span>
-            @endif
+        <div class="text-center mb-2">
+            <span class="inline-block text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Publicidade
+                @if($ownBanner && $ownBanner->title)
+                    <span class="mx-1 opacity-60">&bull;</span>{{ $ownBanner->title }}
+                @endif
+            </span>
         </div>
 
         <div class="w-full overflow-hidden flex justify-center items-center min-h-[90px]">
