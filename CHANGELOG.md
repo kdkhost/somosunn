@@ -1,5 +1,12 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.60] - 2026-11-25 - feat(admin, events): reformulacao visual e responsiva do formulario /admin/events/create e /admin/events/{event}/edit no padrao AdminLTE 4
+
+- **Novo Formulário de Eventos & Álbuns (`resources/views/admin/events/form.blade.php`):**
+  - Adicionado **Hero Banner** com status de publicação/modo, breadcrumb oficial e botões rápidos (*Cupons*, *WhatsApp* e *Voltar para Eventos*).
+  - Layout profissional em **2 colunas responsivas** (`col-xl-8` principal + `col-xl-4` lateral sticky no desktop) com seções organizadas: *Informações Essenciais*, *Ingressos, Promoção Relâmpago & Lotes* (3 faixas numeradas), *Localização & Mapa Interativo*, *Check-in por QR Code & Regras do Scanner*, *Imagem Principal (Capa)* e *Publicação & Visibilidade*.
+  - 100% compatível com **Light Mode** e **Dark Mode**, switches modernos Bootstrap 5, acentuação revisada e rodapé oficial com botões alinhados (*Voltar* à esquerda, *Salvar/Cadastrar* à direita).
+
 ## [2.8.59] - 2026-11-25 - style(admin, theme): isolamento estrito Light/Dark Mode em todo o /admin e alinhamento oficial de botoes AdminLTE 4
 
 - **Isolamento Estrito de Temas (`public/css/adminlte4-unn.css`, `resources/views/admin/dashboard.blade.php`):**

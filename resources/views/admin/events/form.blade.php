@@ -1,12 +1,18 @@
 @extends('admin.layouts.app')
 
+@section('title', ($event->exists ? ($event->type === 'album' ? 'Editar Álbum' : 'Editar Evento') : (request('type') === 'album' ? 'Novo Álbum' : 'Novo Evento')) . ' - Admin')
 @section('page_title', $event->exists ? ($event->type === 'album' ? 'Editar Álbum' : 'Editar Evento') : (request('type') === 'album' ? 'Novo Álbum' : 'Novo Evento'))
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('admin.events.index') }}">Eventos</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ $event->exists ? 'Editar' : 'Novo' }}</li>
+@endsection
 
 @section('content')
     @php
         $canManageGroupLink = auth()->user() && auth()->user()->hasPermission('admin.events.group_link.manage');
         $canManageEventCoupons = auth()->user() && auth()->user()->hasPermission('admin.events.coupons.view');
         $isEditableEventRecord = $event->exists && (($event->type ?? 'event') !== 'album');
+        $isAlbumMode = ($event->exists ? ($event->type === 'album') : (request('type') === 'album'));
         $activeEventTab = request('tab');
         $activeEventTab = in_array($activeEventTab, ['certificate', 'gallery', 'coupons'], true) ? $activeEventTab : 'general';
         $activeEventTab = (!$event->exists && $activeEventTab !== 'general') ? 'general' : $activeEventTab;
@@ -22,7 +28,129 @@
     @endphp
     <style>
         #legacy-general:not(.active), #legacy-certificate:not(.active), #legacy-gallery:not(.active), #legacy-coupons:not(.active) {
-            display: none !important; 
+            display: none !important;
+        }
+        .evform-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.1rem;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1F5EDB 100%);
+            color: #ffffff;
+            padding: 1.4rem 1.75rem;
+            box-shadow: 0 18px 40px -14px rgba(15, 23, 42, 0.38);
+        }
+        .evform-hero::after {
+            content: '';
+            position: absolute;
+            right: -50px;
+            top: -50px;
+            width: 220px;
+            height: 220px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(56, 189, 248, 0) 70%);
+            pointer-events: none;
+        }
+        .evform-hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            color: #f8fafc;
+        }
+        .evform-hero-btn-light {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 0.65rem;
+            font-weight: 700;
+            padding: 0.46rem 0.95rem;
+        }
+        .evform-hero-btn-light:hover {
+            background: #f8fafc;
+            color: #1F5EDB;
+        }
+        .evform-hero-btn-ghost {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            border-radius: 0.65rem;
+            font-weight: 600;
+            padding: 0.46rem 0.95rem;
+        }
+        .evform-hero-btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+        }
+        .evform-section {
+            border-radius: 0.95rem;
+            border: 1px solid var(--bs-border-color);
+            background: var(--bs-body-bg);
+            overflow: hidden;
+        }
+        .evform-section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.9rem 1.2rem;
+            background: var(--bs-tertiary-bg);
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+        .evform-section-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 0.65rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .evform-section-body {
+            padding: 1.2rem;
+        }
+        .evform-batch-row {
+            padding: 0.9rem 1rem;
+            border-radius: 0.75rem;
+            background: var(--bs-tertiary-bg);
+            border: 1px solid var(--bs-border-color);
+        }
+        .evform-batch-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--unn-azul-1);
+            margin-bottom: 0.55rem;
+        }
+        [data-bs-theme="dark"] .evform-batch-badge {
+            color: #60a5fa;
+        }
+        .evform-switch-box {
+            padding: 0.9rem 1rem;
+            border-radius: 0.75rem;
+            background: var(--bs-tertiary-bg);
+            border: 1px solid var(--bs-border-color);
+        }
+        .evform-map {
+            height: 320px;
+            border-radius: 0.75rem;
+            border: 1px solid var(--bs-border-color);
+            overflow: hidden;
+        }
+        @media (min-width: 1200px) {
+            .evform-sticky-col {
+                position: sticky;
+                top: 4.5rem;
+            }
         }
     </style>
     @push('scripts')
@@ -33,10 +161,8 @@
             if (urlTab) {
                 var $target = $('a[data-bs-toggle="tab"][href="#legacy-' + urlTab + '"]');
                 if ($target.length) {
-                    // Remove active de todas as tabs/panes primeiro
                     $('#event-tabs .nav-link').removeClass('active');
                     $('#event-tabs-content .tab-pane').removeClass('show active');
-                    // Ativa a correta
                     $target.addClass('active');
                     $('#legacy-' + urlTab).addClass('show active');
                 }
@@ -66,338 +192,535 @@
         });
     </script>
     @endpush
-    @if($event->exists && ($event->type ?? 'event') !== 'album')
-        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
-            <div class="mb-2 mb-md-0">
-                <h5 class="mb-0 fw-bold">
-                    <i class="fas fa-calendar-check text-primary me-2"></i>{{ $event->title }}
-                </h5>
+
+    {{-- HERO EXECUTIVO DO FORMULÁRIO --}}
+    <section class="evform-hero mb-4">
+        <div class="row align-items-center g-3 position-relative" style="z-index: 2;">
+            <div class="col-lg-7">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <span class="evform-hero-pill">
+                        <i class="fas {{ $isAlbumMode ? 'fa-images' : 'fa-calendar-plus' }}"></i>
+                        {{ $event->exists ? ($isAlbumMode ? 'Edição de Álbum' : 'Edição de Evento') : ($isAlbumMode ? 'Novo Álbum / Galeria' : 'Criação de Evento') }}
+                    </span>
+                    @if($event->exists)
+                        <span class="evform-hero-pill">
+                            <i class="fas {{ $event->published ? 'fa-check-circle text-success' : 'fa-pen text-warning' }}"></i>
+                            {{ $event->published ? 'Publicado' : 'Rascunho' }}
+                        </span>
+                    @endif
+                </div>
+                <h2 class="h4 fw-bold text-white mb-1">
+                    {{ $event->exists ? $event->title : ($isAlbumMode ? 'Criar Novo Álbum de Fotos' : 'Criar Novo Evento') }}
+                </h2>
+                <p class="mb-0 text-white-50 small">
+                    Preencha os detalhes, valores por lote, localização no mapa e regras de check-in por QR Code.
+                </p>
             </div>
-            <div class="d-flex flex-wrap" style="gap: 10px;">
-                @if($canManageEventCoupons)
-                    <a href="#legacy-coupons" class="btn btn-success rounded-pill elevation-1" data-event-tab-target="#coupons-tab">
-                        <i class="fas fa-ticket-alt me-2"></i>Cupons gratuitos
+            <div class="col-lg-5">
+                <div class="d-flex flex-wrap align-items-center justify-content-lg-end gap-2">
+                    @if($event->exists && ($event->type ?? 'event') !== 'album')
+                        @if($canManageEventCoupons)
+                            <a href="#legacy-coupons" class="btn evform-hero-btn-light btn-sm" data-event-tab-target="#coupons-tab">
+                                <i class="fas fa-ticket-alt me-1"></i> Cupons
+                            </a>
+                        @endif
+                        @if($canManageGroupLink)
+                            <a href="#whatsappGroupField" class="btn evform-hero-btn-ghost btn-sm">
+                                <i class="fab fa-whatsapp me-1"></i> WhatsApp
+                            </a>
+                        @endif
+                    @endif
+                    <a href="{{ route('admin.events.index') }}" class="btn evform-hero-btn-ghost btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i> Voltar para Eventos
                     </a>
-                @endif
-                @if($canManageGroupLink)
-                    <a href="#legacy-general" class="btn btn-outline-success rounded-pill elevation-1" data-bs-toggle="tab">
-                        <i class="fab fa-whatsapp me-2"></i>Link do WhatsApp
-                    </a>
-                @endif
+                </div>
             </div>
         </div>
-    @endif
+    </section>
+
     <div class="card card-primary card-outline card-tabs">
-        <div class="card-header p-0 pt-1 border-bottom-0">
-            <ul class="nav nav-tabs" id="event-tabs" role="tablist">
+        <div class="card-header p-0 pt-2 px-3 border-bottom">
+            <ul class="nav nav-tabs border-bottom-0" id="event-tabs" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link {{ $activeEventTab === 'general' ? 'active' : '' }}" id="general-tab" data-bs-toggle="tab" href="#legacy-general" role="tab"
-                        aria-controls="legacy-general" aria-selected="{{ $activeEventTab === 'general' ? 'true' : 'false' }}">Dados Gerais</a>
+                        aria-controls="legacy-general" aria-selected="{{ $activeEventTab === 'general' ? 'true' : 'false' }}">
+                        <i class="fas fa-sliders-h me-1"></i> Dados Gerais
+                    </a>
                 </li>
                 <li class="nav-item event-only-field">
                     <a class="nav-link {{ $activeEventTab === 'certificate' ? 'active' : '' }}" id="cert-tab" data-bs-toggle="tab" href="#legacy-certificate" role="tab"
-                        aria-controls="legacy-certificate" aria-selected="{{ $activeEventTab === 'certificate' ? 'true' : 'false' }}">Certificado</a>
+                        aria-controls="legacy-certificate" aria-selected="{{ $activeEventTab === 'certificate' ? 'true' : 'false' }}">
+                        <i class="fas fa-certificate me-1"></i> Certificado
+                    </a>
                 </li>
                 @if($event->exists)
-                <li class="nav-item">
-                    <a class="nav-link {{ $activeEventTab === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-bs-toggle="tab" href="#legacy-gallery" role="tab"
-                        aria-controls="legacy-gallery" aria-selected="{{ $activeEventTab === 'gallery' ? 'true' : 'false' }}">Galeria de Fotos</a>
-                </li>
-                @if($isEditableEventRecord && $canManageEventCoupons)
-                    <li class="nav-item event-only-field">
-                        <a class="nav-link {{ $activeEventTab === 'coupons' ? 'active' : '' }}" id="coupons-tab" data-bs-toggle="tab" href="#legacy-coupons" role="tab"
-                            aria-controls="legacy-coupons" aria-selected="{{ $activeEventTab === 'coupons' ? 'true' : 'false' }}">
-                            <i class="fas fa-ticket-alt me-1"></i> Cupons
+                    <li class="nav-item">
+                        <a class="nav-link {{ $activeEventTab === 'gallery' ? 'active' : '' }}" id="gallery-tab" data-bs-toggle="tab" href="#legacy-gallery" role="tab"
+                            aria-controls="legacy-gallery" aria-selected="{{ $activeEventTab === 'gallery' ? 'true' : 'false' }}">
+                            <i class="fas fa-images me-1"></i> Galeria de Fotos
                         </a>
                     </li>
-                @endif
+                    @if($isEditableEventRecord && $canManageEventCoupons)
+                        <li class="nav-item event-only-field">
+                            <a class="nav-link {{ $activeEventTab === 'coupons' ? 'active' : '' }}" id="coupons-tab" data-bs-toggle="tab" href="#legacy-coupons" role="tab"
+                                aria-controls="legacy-coupons" aria-selected="{{ $activeEventTab === 'coupons' ? 'true' : 'false' }}">
+                                <i class="fas fa-ticket-alt me-1"></i> Cupons
+                            </a>
+                        </li>
+                    @endif
                 @endif
             </ul>
         </div>
-        <div class="card-body">
+        <div class="card-body p-3 p-md-4">
             <div class="tab-content" id="event-tabs-content">
                 <!-- TAB GERAL -->
                 <div class="tab-pane {{ $activeEventTab === 'general' ? 'show active' : '' }}" id="legacy-general" role="tabpanel" aria-labelledby="general-tab">
-                    <form method="POST" enctype="multipart/form-data" autocomplete="off"
+                    <form id="eventMainForm" method="POST" enctype="multipart/form-data" autocomplete="off"
                         action="{{ $event->exists ? route('admin.events.update', $event) : route('admin.events.store') }}">
                         @csrf
                         @if($event->exists) @method('PUT') @endif
 
-                        <div class="card card-outline card-info mb-3">
-                            <div class="card-header"><h3 class="card-title fw-bold">Configurações do Registro</h3></div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-0">
-                                            <label>Tipo de Registro</label>
-                                            <select name="type" id="registryType" class="form-control">
-                                                <option value="event" {{ old('type', $event->type ?? request('type', 'event')) == 'event' ? 'selected' : '' }}>Evento Tradicional</option>
-                                                <option value="album" {{ old('type', $event->type ?? request('type', 'event')) == 'album' ? 'selected' : '' }}>Álbum Privado / Galeria</option>
+                        <div class="row g-4">
+                            {{-- COLUNA PRINCIPAL (8/12) --}}
+                            <div class="col-xl-8 d-flex flex-column gap-4">
+                                {{-- SEÇÃO 1: INFORMAÇÕES ESSENCIAIS --}}
+                                <div class="evform-section">
+                                    <div class="evform-section-head">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="evform-section-icon bg-primary-subtle text-primary">
+                                                <i class="fas fa-info-circle"></i>
+                                            </span>
+                                            <div>
+                                                <div class="fw-bold small mb-0">Informações Essenciais</div>
+                                                <div class="text-body-secondary" style="font-size: 0.74rem;">Identificação, tipo de registro, data e descrição completa</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="evform-section-body">
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="registryType">Tipo de Registro</label>
+                                                <select name="type" id="registryType" class="form-select">
+                                                    <option value="event" {{ old('type', $event->type ?? request('type', 'event')) == 'event' ? 'selected' : '' }}>Evento Tradicional</option>
+                                                    <option value="album" {{ old('type', $event->type ?? request('type', 'event')) == 'album' ? 'selected' : '' }}>Álbum Privado / Galeria</option>
+                                                </select>
+                                                <small class="text-body-secondary d-block mt-1">Álbuns não aparecem no calendário e não possuem venda de ingressos.</small>
+                                            </div>
+                                            <div class="col-md-6 event-col-expand">
+                                                <label class="form-label" for="eventSlugInput">URL Amigável (Slug)</label>
+                                                <input id="eventSlugInput" name="slug" class="form-control" value="{{ old('slug', $event->slug) }}" placeholder="ex: onde-o-network-me-levou">
+                                                <small class="text-body-secondary d-block mt-1">Deixe em branco para gerar automaticamente a partir do título.</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-md-8">
+                                                <label class="form-label" for="eventTitleInput">Título <span class="text-danger">*</span></label>
+                                                <input id="eventTitleInput" name="title" class="form-control"
+                                                    value="{{ old('title', $event->title) }}" placeholder="Digite o nome oficial do evento..." required>
+                                            </div>
+                                            <div class="col-md-4 event-only-field">
+                                                <label class="form-label" for="eventStartAtInput">Data e Hora de Início</label>
+                                                <input id="eventStartAtInput" name="start_at" type="datetime-local"
+                                                    class="form-control" value="{{ old('start_at', $event->start_at ? \Carbon\Carbon::parse($event->start_at)->format('Y-m-d\TH:i') : '') }}">
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="form-label" for="eventDescriptionLegacy">Descrição do Evento</label>
+                                            <textarea name="description" id="eventDescriptionLegacy" class="form-control" rows="6">{{ old('description', $event->description) }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- SEÇÃO 2: VALORES, PROMOÇÃO & LOTES --}}
+                                <div class="evform-section event-only-field">
+                                    <div class="evform-section-head">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="evform-section-icon bg-success-subtle text-success">
+                                                <i class="fas fa-tags"></i>
+                                            </span>
+                                            <div>
+                                                <div class="fw-bold small mb-0">Ingressos, Promoção Relâmpago &amp; Lotes</div>
+                                                <div class="text-body-secondary" style="font-size: 0.74rem;">Defina o valor padrão, oferta temporária e viradas automáticas de lote</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="evform-section-body">
+                                        <div class="row g-3 mb-4">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Preço Padrão (R$)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">R$</span>
+                                                    <input name="price" class="form-control mask-money"
+                                                        value="{{ old('price', $event->price) }}" placeholder="0,00">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Promoção Relâmpago (R$)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">R$</span>
+                                                    <input name="flash_sale_price" class="form-control mask-money"
+                                                        value="{{ old('flash_sale_price', $event->flash_sale_price) }}" placeholder="0,00">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Promoção Termina em</label>
+                                                <input name="flash_sale_ends_at" type="datetime-local" class="form-control"
+                                                    value="{{ old('flash_sale_ends_at', $event->flash_sale_ends_at ? $event->flash_sale_ends_at->format('Y-m-d\\TH:i') : '') }}">
+                                                <small class="text-body-secondary d-block mt-1">Volta ao valor normal ao expirar.</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex flex-column gap-3">
+                                            {{-- Lote 1 --}}
+                                            <div class="evform-batch-row">
+                                                <div class="evform-batch-badge"><i class="fas fa-layer-group"></i> 1º Lote</div>
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label small mb-1">Preço Lote 1</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">R$</span>
+                                                            <input name="batch_1_price" class="form-control mask-money" value="{{ old('batch_1_price', $event->batch_1_price ? number_format((float) $event->batch_1_price, 2, ',', '.') : '') }}" placeholder="0,00">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label small mb-1">Virada Lote 1 (Prazo final)</label>
+                                                        <input name="batch_1_deadline" type="datetime-local" class="form-control" value="{{ old('batch_1_deadline', $event->batch_1_deadline ? $event->batch_1_deadline->format('Y-m-d\\TH:i') : '') }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {{-- Lote 2 --}}
+                                            <div class="evform-batch-row">
+                                                <div class="evform-batch-badge"><i class="fas fa-layer-group"></i> 2º Lote</div>
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label small mb-1">Preço Lote 2</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">R$</span>
+                                                            <input name="batch_2_price" class="form-control mask-money" value="{{ old('batch_2_price', $event->batch_2_price ? number_format((float) $event->batch_2_price, 2, ',', '.') : '') }}" placeholder="0,00">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label small mb-1">Virada Lote 2 (Prazo final)</label>
+                                                        <input name="batch_2_deadline" type="datetime-local" class="form-control" value="{{ old('batch_2_deadline', $event->batch_2_deadline ? $event->batch_2_deadline->format('Y-m-d\\TH:i') : '') }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {{-- Lote 3 --}}
+                                            <div class="evform-batch-row">
+                                                <div class="evform-batch-badge"><i class="fas fa-layer-group"></i> 3º Lote</div>
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label small mb-1">Preço Lote 3</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">R$</span>
+                                                            <input name="batch_3_price" class="form-control mask-money" value="{{ old('batch_3_price', $event->batch_3_price ? number_format((float) $event->batch_3_price, 2, ',', '.') : '') }}" placeholder="0,00">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label small mb-1">Virada Lote 3 (Prazo final)</label>
+                                                        <input name="batch_3_deadline" type="datetime-local" class="form-control" value="{{ old('batch_3_deadline', $event->batch_3_deadline ? $event->batch_3_deadline->format('Y-m-d\\TH:i') : '') }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- SEÇÃO 3: LOCALIZAÇÃO E MAPA --}}
+                                <div class="evform-section event-only-field">
+                                    <div class="evform-section-head">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="evform-section-icon bg-info-subtle text-info">
+                                                <i class="fas fa-map-marked-alt"></i>
+                                            </span>
+                                            <div>
+                                                <div class="fw-bold small mb-0">Localização &amp; Mapa Interativo</div>
+                                                <div class="text-body-secondary" style="font-size: 0.74rem;">Busque o estabelecimento ou marque o ponto exato no mapa</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="evform-section-body">
+                                        <div class="row g-3">
+                                            <div class="col-lg-6">
+                                                <div class="mb-3 position-relative">
+                                                    <label class="form-label" for="locationInput">Local (Nome do Estabelecimento)</label>
+                                                    <div class="input-group">
+                                                        <input name="location" id="locationInput" class="form-control"
+                                                            value="{{ old('location', $event->location) }}"
+                                                            placeholder="Digite o nome do local ou estabelecimento..."
+                                                            autocomplete="off">
+                                                        <button type="button" class="btn btn-info text-white" id="searchVenueBtn" title="Buscar estabelecimento">
+                                                            <i class="fas fa-map-marker-alt"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div id="venueResults" class="list-group mt-1 shadow" style="position:absolute;left:0;right:0;z-index:1050;max-height:240px;overflow-y:auto;display:none;"></div>
+                                                    <small class="text-body-secondary d-block mt-1">
+                                                        <i class="fas fa-info-circle me-1"></i>
+                                                        Digite o nome e clique no pino para buscar (prioridade: seu estado).
+                                                    </small>
+                                                </div>
+
+                                                <div class="form-check form-switch mb-3">
+                                                    <input type="checkbox" class="form-check-input" id="eventOutOfState" name="event_out_of_state" value="1"
+                                                        {{ old('event_out_of_state', $event->event_out_of_state ?? false) ? 'checked' : '' }}>
+                                                    <label class="form-check-label small" for="eventOutOfState">
+                                                        <i class="fas fa-plane-departure me-1 text-body-secondary"></i>
+                                                        Evento fora do meu estado
+                                                    </label>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label" for="addressInput">Endereço Completo</label>
+                                                    <div class="input-group">
+                                                        <input name="address" id="addressInput" class="form-control"
+                                                            value="{{ old('address', $event->address) }}"
+                                                            placeholder="Rua, número, bairro, cidade - UF">
+                                                        <button type="button" class="btn btn-secondary" id="searchBtn">
+                                                            <i class="fas fa-search me-1"></i> Buscar
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row g-2">
+                                                    <div class="col-6">
+                                                        <label class="form-label small mb-1" for="latInput">Latitude</label>
+                                                        <input name="latitude" id="latInput" class="form-control form-control-sm" value="{{ old('latitude', $event->latitude) }}" readonly>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label small mb-1" for="lngInput">Longitude</label>
+                                                        <input name="longitude" id="lngInput" class="form-control form-control-sm" value="{{ old('longitude', $event->longitude) }}" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                <label class="form-label">Mapa (Clique para marcar o ponto)</label>
+                                                <div id="map" class="evform-map"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- SEÇÃO 4: VALIDAÇÃO POR QR CODE E SCANNER --}}
+                                <div class="evform-section event-only-field">
+                                    <div class="evform-section-head">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="evform-section-icon bg-warning-subtle text-warning">
+                                                <i class="fas fa-qrcode"></i>
+                                            </span>
+                                            <div>
+                                                <div class="fw-bold small mb-0">Check-in por QR Code &amp; Regras do Scanner</div>
+                                                <div class="text-body-secondary" style="font-size: 0.74rem;">Controle de ingressos, restrição geográfica e janela de leitura</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="evform-section-body">
+                                        <div class="evform-switch-box mb-3">
+                                            <div class="form-check form-switch mb-0">
+                                                <input type="checkbox" name="is_ticket_enabled" value="1" id="isTicketEnabledCheck" class="form-check-input" {{ old('is_ticket_enabled', $event->is_ticket_enabled) ? 'checked' : '' }}>
+                                                <label class="form-check-label fw-bold text-primary" for="isTicketEnabledCheck">
+                                                    <i class="fas fa-qrcode me-1"></i> Habilitar Validação de Entrada por QR Code
+                                                </label>
+                                                <small class="d-block text-body-secondary mt-1">
+                                                    Quando ativo, o sistema gera ingresso com QR Code e pontua organizador e participante após a validação.
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label" for="scannerRestrictionMode">
+                                                <i class="fas fa-map-marked-alt me-1 text-primary"></i> Restrição de localização na leitura do QR Code
+                                            </label>
+                                            <select name="scanner_restriction_mode" id="scannerRestrictionMode" class="form-select">
+                                                <option value="disabled" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'disabled' ? 'selected' : '' }}>Sem restrição de localização</option>
+                                                <option value="exact" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'exact' ? 'selected' : '' }}>Localização exata do evento</option>
+                                                <option value="radius" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'radius' ? 'selected' : '' }}>Margem de erro configurável</option>
                                             </select>
-                                            <small class="text-muted">Álbuns não aparecem no calendário e não possuem venda de ingressos.</small>
+                                            <small class="d-block text-body-secondary mt-1">Use localização exata para exigir leitura no ponto do evento ou defina uma margem em metros/km.</small>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6 event-col-expand">
-                                        <div class="form-group mb-0">
-                                            <label>URL Amigável (Slug)</label>
-                                            <input name="slug" class="form-control" value="{{ old('slug', $event->slug) }}" placeholder="ex: onde-o-network-me-levou">
-                                            <small class="text-muted">Deixe em branco para gerar automaticamente.</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="form-group mb-2"><label>Título</label><input name="title" class="form-control"
-                                value="{{ old('title', $event->title) }}" required></div>
-
-                        <div class="form-group mb-2">
-                            <label>Descrição</label>
-                            <textarea name="description" id="eventDescriptionLegacy" class="form-control" rows="6">{{ old('description', $event->description) }}</textarea>
-                        </div>
-
-                        <div class="form-group mb-2 event-only-field"><label>Início</label><input name="start_at" type="datetime-local"
-                                class="form-control" value="{{ old('start_at', $event->start_at) }}"></div>
-
-                        <div class="event-only-field">
-                            <div class="form-group mb-2"><label>Preço</label><input name="price" class="form-control mask-money"
-                                    value="{{ old('price', $event->price) }}"></div>
-                            <div class="form-group mb-2">
-                                <label>Promoção relâmpago (preço)</label>
-                                <input name="flash_sale_price" class="form-control mask-money"
-                                    value="{{ old('flash_sale_price', $event->flash_sale_price) }}" placeholder="0,00">
-                            </div>
-                            <div class="form-group mb-2">
-                                <label>Promoção relâmpago (termina em)</label>
-                                <input name="flash_sale_ends_at" type="datetime-local" class="form-control"
-                                    value="{{ old('flash_sale_ends_at', $event->flash_sale_ends_at ? $event->flash_sale_ends_at->format('Y-m-d\\TH:i') : '') }}">
-                                <small class="text-muted d-block mt-1">Quando expirar, o valor volta ao normal automaticamente.</small>
-                            </div>
-                        </div>
-                        
-                        <div class="card card-outline card-secondary my-3 event-only-field">
-                            <div class="card-header"><h3 class="card-title fw-bold">Preços por Lote</h3></div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Preço Lote 1</label>
-                                            <input name="batch_1_price" class="form-control mask-money" value="{{ old('batch_1_price', $event->batch_1_price ? number_format((float) $event->batch_1_price, 2, ',', '.') : '') }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Virada Lote 1 (Prazo final)</label>
-                                            <input name="batch_1_deadline" type="datetime-local" class="form-control" value="{{ old('batch_1_deadline', $event->batch_1_deadline ? $event->batch_1_deadline->format('Y-m-d\\TH:i') : '') }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Preço Lote 2</label>
-                                            <input name="batch_2_price" class="form-control mask-money" value="{{ old('batch_2_price', $event->batch_2_price ? number_format((float) $event->batch_2_price, 2, ',', '.') : '') }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Virada Lote 2 (Prazo final)</label>
-                                            <input name="batch_2_deadline" type="datetime-local" class="form-control" value="{{ old('batch_2_deadline', $event->batch_2_deadline ? $event->batch_2_deadline->format('Y-m-d\\TH:i') : '') }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-0">
-                                            <label>Preço Lote 3</label>
-                                            <input name="batch_3_price" class="form-control mask-money" value="{{ old('batch_3_price', $event->batch_3_price ? number_format((float) $event->batch_3_price, 2, ',', '.') : '') }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-0">
-                                            <label>Virada Lote 3 (Prazo final)</label>
-                                            <input name="batch_3_deadline" type="datetime-local" class="form-control" value="{{ old('batch_3_deadline', $event->batch_3_deadline ? $event->batch_3_deadline->format('Y-m-d\\TH:i') : '') }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group mb-2 event-only-field">
-                            <label id="coverImageLabel">{{ (!isset($event) || $event->type !== 'album' ? (request('type') !== 'album' ? 'Imagem Principal (Capa do Evento)' : 'Imagem Principal (Capa do Álbum)') : 'Imagem Principal (Capa do Álbum)') }}</label>
-                            <input type="hidden" name="remove_image" value="0">
-                            <div class="upload-box" data-max-size="5242880"
-                                data-existing-url="{{ $event->image_url ?? '' }}"
-                                data-remove-input="[name='remove_image']">
-                                <input type="file" name="image" accept="image/*" class="d-none">
-                                <div class="upload-preview mb-2"></div>
-                                <div class="upload-meta text-muted"></div>
-                                <small class="text-muted upload-help"></small>
-                                <div class="progress upload-progress progress-sm d-none mt-2">
-                                    <div class="progress-bar bg-primary" style="width:0%"></div>
-                                </div>
-                                <button type="button"
-                                    class="btn btn-xs btn-outline-danger upload-remove d-none mt-2">Remover</button>
-                            </div>
-                        </div>
-                        <div class="row event-only-field">
-                            <div class="col-md-6">
-                                <div class="form-group mb-2">
-                                    <label>Local (Nome do Estabelecimento)</label>
-                                    <div class="input-group">
-                                        <input name="location" id="locationInput" class="form-control"
-                                            value="{{ old('location', $event->location) }}"
-                                            placeholder="Digite o nome do local ou estabelecimento..."
-                                            autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-info" id="searchVenueBtn" title="Buscar estabelecimento">
-                                                <i class="fas fa-map-marker-alt"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div id="venueResults" class="list-group mt-1 shadow-sm" style="position:absolute;z-index:1050;width:calc(100% - 30px);max-height:250px;overflow-y:auto;display:none;"></div>
-                                    <small class="text-muted d-block mt-1">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        Digite o nome do local e clique em <i class="fas fa-map-marker-alt text-info"></i> para buscar. Prioridade: seu estado.
-                                    </small>
-                                </div>
-
-                                {{-- Checkbox: evento fora do estado --}}
-                                <div class="form-check mb-3">
-                                    <input type="checkbox" class="form-check-input" id="eventOutOfState" name="event_out_of_state" value="1"
-                                        {{ old('event_out_of_state', $event->event_out_of_state ?? false) ? 'checked' : '' }}>
-                                    <label class="form-check-label text-sm" for="eventOutOfState">
-                                        <i class="fas fa-plane-departure me-1 text-muted"></i>
-                                        Evento fora do meu estado
-                                    </label>
-                                </div>
-
-                                <div class="form-group mb-2"><label>Endereço Completo</label>
-                                    <div class="input-group"><input name="address" id="addressInput" class="form-control"
-                                            value="{{ old('address', $event->address) }}"
-                                            placeholder="Rua, numero, bairro, cidade - UF">
-                                        <div class="input-group-append"><button type="button" class="btn btn-secondary"
-                                                id="searchBtn"><i class="fas fa-search"></i> Buscar</button></div>
-                                    </div>
-                                </div>
-                                <div class="form-group mb-2"><label>Latitude</label><input name="latitude" id="latInput"
-                                        class="form-control" value="{{ old('latitude', $event->latitude) }}" readonly></div>
-                                <div class="form-group mb-2"><label>Longitude</label><input name="longitude" id="lngInput"
-                                        class="form-control" value="{{ old('longitude', $event->longitude) }}" readonly>
-                                </div>
-                                <input type="hidden" name="published" value="0">
-                                <div class="form-check mb-3">
-                                    <input type="checkbox" name="published" value="1" class="form-check-input" id="publishedCheck"
-                                        {{ old('published', $event->published) ? 'checked' : '' }}>
-                                    <label class="form-check-label fw-bold" for="publishedCheck">
-                                        <i class="fas fa-eye me-1 text-success"></i> Evento Publicado
-                                    </label>
-                                    <small class="d-block text-muted">Desmarque para ocultar o evento do site. Eventos sem imagem de capa ficam automaticamente como rascunho.</small>
-                                </div>
-                                @if($canManageGroupLink)
-                                    <div class="form-group mb-3">
-                                        <label class="fw-bold">
-                                            <i class="fab fa-whatsapp text-success me-1"></i> Link do grupo do WhatsApp
-                                        </label>
-                                        <input type="url" name="whatsapp_group_link" class="form-control"
-                                            value="{{ old('whatsapp_group_link', $event->whatsapp_group_link) }}"
-                                            placeholder="https://chat.whatsapp.com/...">
-                                        <small class="text-muted">O botão para entrar no grupo aparece somente após a inscrição confirmada.</small>
-                                        @error('whatsapp_group_link')<small class="text-danger d-block">{{ $message }}</small>@enderror
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="col-md-6">
-                                <label>Mapa (Clique para marcar)</label>
-                                <div id="map" style="height: 300px; border-radius: 8px; border: 1px solid #ddd;"></div>
-                            </div>
-                        </div>
-
-                        <div class="form-check mb-2 mt-4 event-only-field">
-                                    <input type="checkbox" name="is_ticket_enabled" value="1" class="form-check-input" {{ old('is_ticket_enabled', $event->is_ticket_enabled) ? 'checked' : '' }}>
-                                    <label class="form-check-label fw-bold" style="color:#007bff;"><i class="fas fa-qrcode me-1"></i> Habilitar Validação de Entrada por QR Code</label>
-                                    <small class="d-block text-muted">Quando ativo, o sistema criará um ingresso com QR Code e pontuará organizador e participante após validação.</small>
-                                </div>
-                                <div class="card card-outline card-info mb-3 event-only-field">
-                                    <div class="card-body">
-                                        <div class="form-group mb-3">
-                                            <label class="fw-bold"><i class="fas fa-map-marked-alt me-1"></i> Restricao de leitura do QR Code</label>
-                                            <select name="scanner_restriction_mode" id="scannerRestrictionMode" class="form-control">
-                                                <option value="disabled" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'disabled' ? 'selected' : '' }}>Sem restricao de localizacao</option>
-                                                <option value="exact" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'exact' ? 'selected' : '' }}>Localizacao exata do evento</option>
-                                                <option value="radius" {{ old('scanner_restriction_mode', $event->scannerRestrictionMode()) === 'radius' ? 'selected' : '' }}>Margem de erro configuravel</option>
-                                            </select>
-                                            <small class="d-block text-muted mt-1">Use localizacao exata para exigir leitura no ponto do evento ou defina uma margem de erro em metros ou km.</small>
-                                        </div>
-                                        <div id="scannerRadiusFields" class="row mb-3">
+                                        <div id="scannerRadiusFields" class="row g-3 mb-3">
                                             <div class="col-md-7">
-                                                <label>Margem permitida</label>
+                                                <label class="form-label small">Margem permitida</label>
                                                 <input type="number" step="0.1" min="0.1" name="scanner_radius_value" class="form-control"
                                                     value="{{ old('scanner_radius_value', $event->scannerFormRadiusValue()) }}" placeholder="50">
                                             </div>
                                             <div class="col-md-5">
-                                                <label>Unidade</label>
-                                                <select name="scanner_radius_unit" class="form-control">
+                                                <label class="form-label small">Unidade</label>
+                                                <select name="scanner_radius_unit" class="form-select">
                                                     <option value="m" {{ old('scanner_radius_unit', $event->scannerFormRadiusUnit()) === 'm' ? 'selected' : '' }}>Metros</option>
-                                                    <option value="km" {{ old('scanner_radius_unit', $event->scannerFormRadiusUnit()) === 'km' ? 'selected' : '' }}>Quilometros</option>
+                                                    <option value="km" {{ old('scanner_radius_unit', $event->scannerFormRadiusUnit()) === 'km' ? 'selected' : '' }}>Quilômetros</option>
                                                 </select>
                                             </div>
                                         </div>
-                                        <div id="scannerExactHint" class="alert alert-warning mb-0 d-none">
-                                            A localizacao exata exige leitura no ponto configurado para o evento, com tolerancia tecnica de ate 5 metros.
+
+                                        <div id="scannerExactHint" class="alert alert-warning mb-3 d-none">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            A localização exata exige leitura no ponto configurado para o evento, com tolerância técnica de até 5 metros.
                                         </div>
 
                                         <hr class="my-3">
-                                        <h6 class="fw-bold mb-2"><i class="fas fa-clock me-1"></i> Janela de validação do ingresso</h6>
-                                        <p class="text-muted small mb-3">
-                                            Configure quanto tempo antes do início e depois do término do evento o scanner aceita ingressos. Útil para permitir entrada antecipada e atrasados.
+
+                                        <div class="mb-2 fw-bold small">
+                                            <i class="fas fa-clock text-primary me-1"></i> Janela de validação do ingresso
+                                        </div>
+                                        <p class="text-body-secondary small mb-3">
+                                            Configure quanto tempo antes do início e depois do término o scanner aceita ingressos.
                                         </p>
-                                        <div class="row">
+
+                                        <div class="row g-3">
                                             <div class="col-md-6">
-                                                <label class="small fw-bold">
+                                                <label class="form-label small">
                                                     <i class="fas fa-door-open text-success me-1"></i> Abrir scanner antes (minutos)
                                                 </label>
                                                 <div class="input-group">
                                                     <input type="number" min="0" max="1440" step="5" name="scanner_early_minutes" class="form-control"
                                                         value="{{ old('scanner_early_minutes', $event->scanner_early_minutes ?? 0) }}" placeholder="0">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text bg-light">min</span>
-                                                    </div>
+                                                    <span class="input-group-text">min</span>
                                                 </div>
-                                                <small class="text-muted">Ex: 120 = scanner abre 2h antes do evento</small>
+                                                <small class="text-body-secondary d-block mt-1">Ex: 120 = abre 2h antes do evento</small>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="small fw-bold">
+                                                <label class="form-label small">
                                                     <i class="fas fa-hourglass-end text-warning me-1"></i> Aceitar após o fim (minutos)
                                                 </label>
                                                 <div class="input-group">
                                                     <input type="number" min="0" max="1440" step="5" name="scanner_late_minutes" class="form-control"
                                                         value="{{ old('scanner_late_minutes', $event->scanner_late_minutes ?? 0) }}" placeholder="0">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text bg-light">min</span>
-                                                    </div>
+                                                    <span class="input-group-text">min</span>
                                                 </div>
-                                                <small class="text-muted">Tolerância para atrasados após o término</small>
+                                                <small class="text-body-secondary d-block mt-1">Tolerância para atrasados após o término</small>
                                             </div>
                                         </div>
 
-                                        <div class="alert alert-secondary mt-3 mb-0">
-                                            <i class="fas fa-info-circle me-1"></i>
+                                        <div class="alert alert-info mt-3 mb-0 py-2 small">
+                                            <i class="fas fa-shield-alt me-1"></i>
                                             Toda leitura, com sucesso ou erro, fica registrada no sistema para auditoria.
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group mb-3">
-                                    <label class="fw-bold"><i class="fas fa-eye me-1"></i> Onde Exibir?</label>
-                                    <select name="visibility" class="form-control" style="border-radius: 8px;">
-                                        <option value="ambos" {{ old('visibility', $event->visibility ?? 'ambos') == 'ambos' ? 'selected' : '' }}>Ambos os locais</option>
-                                        <option value="somos_unn" {{ old('visibility', $event->visibility ?? 'ambos') == 'somos_unn' ? 'selected' : '' }}>Somente Somos UNN</option>
-                                        <option value="somos_unicas" {{ old('visibility', $event->visibility ?? 'ambos') == 'somos_unicas' ? 'selected' : '' }} style="color: #ec4899; font-weight: bold;">Somente Somos Únicas</option>
-                                    </select>
-                                </div>
+                            </div>
 
-                        <button class="btn btn-primary mt-3">Salvar</button>
+                            {{-- COLUNA LATERAL (4/12 — STICKY NO DESKTOP) --}}
+                            <div class="col-xl-4">
+                                <div class="evform-sticky-col d-flex flex-column gap-4">
+                                    {{-- CARD CAPA DO EVENTO --}}
+                                    <div class="evform-section event-only-field">
+                                        <div class="evform-section-head">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="evform-section-icon bg-primary-subtle text-primary">
+                                                    <i class="fas fa-image"></i>
+                                                </span>
+                                                <div>
+                                                    <div class="fw-bold small mb-0" id="coverImageLabel">
+                                                        {{ (!isset($event) || $event->type !== 'album' ? (request('type') !== 'album' ? 'Imagem Principal (Capa do Evento)' : 'Imagem Principal (Capa do Álbum)') : 'Imagem Principal (Capa do Álbum)') }}
+                                                    </div>
+                                                    <div class="text-body-secondary" style="font-size: 0.72rem;">Recomendado: 1200×630px (até 5MB)</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="evform-section-body">
+                                            <input type="hidden" name="remove_image" value="0">
+                                            <div class="upload-box" data-max-size="5242880"
+                                                data-existing-url="{{ $event->image_url ?? '' }}"
+                                                data-remove-input="[name='remove_image']">
+                                                <input type="file" name="image" accept="image/*" class="d-none">
+                                                <div class="upload-preview mb-2"></div>
+                                                <div class="upload-meta text-body-secondary small"></div>
+                                                <small class="text-body-secondary upload-help d-block"></small>
+                                                <div class="progress upload-progress progress-sm d-none mt-2">
+                                                    <div class="progress-bar bg-primary" style="width:0%"></div>
+                                                </div>
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-danger upload-remove d-none mt-2">
+                                                    <i class="fas fa-trash-alt me-1"></i> Remover
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- CARD PUBLICAÇÃO, VISIBILIDADE & WHATSAPP --}}
+                                    <div class="evform-section">
+                                        <div class="evform-section-head">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="evform-section-icon bg-success-subtle text-success">
+                                                    <i class="fas fa-globe-americas"></i>
+                                                </span>
+                                                <div>
+                                                    <div class="fw-bold small mb-0">Publicação &amp; Visibilidade</div>
+                                                    <div class="text-body-secondary" style="font-size: 0.72rem;">Status no site e canais de divulgação</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="evform-section-body d-flex flex-column gap-3">
+                                            <div class="evform-switch-box event-only-field">
+                                                <input type="hidden" name="published" value="0">
+                                                <div class="form-check form-switch mb-0">
+                                                    <input type="checkbox" name="published" value="1" class="form-check-input" id="publishedCheck"
+                                                        {{ old('published', $event->published) ? 'checked' : '' }}>
+                                                    <label class="form-check-label fw-bold" for="publishedCheck">
+                                                        <i class="fas fa-eye me-1 text-success"></i> Evento Publicado
+                                                    </label>
+                                                    <small class="d-block text-body-secondary mt-1">
+                                                        Desmarque para manter como rascunho. Eventos sem imagem de capa ficam automaticamente como rascunho.
+                                                    </small>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label class="form-label" for="eventVisibilitySelect">
+                                                    <i class="fas fa-layer-group me-1 text-primary"></i> Onde Exibir?
+                                                </label>
+                                                <select id="eventVisibilitySelect" name="visibility" class="form-select">
+                                                    <option value="ambos" {{ old('visibility', $event->visibility ?? 'ambos') == 'ambos' ? 'selected' : '' }}>Ambos os locais</option>
+                                                    <option value="somos_unn" {{ old('visibility', $event->visibility ?? 'ambos') == 'somos_unn' ? 'selected' : '' }}>Somente Somos UNN</option>
+                                                    <option value="somos_unicas" {{ old('visibility', $event->visibility ?? 'ambos') == 'somos_unicas' ? 'selected' : '' }}>Somente Somos Únicas</option>
+                                                </select>
+                                            </div>
+
+                                            @if($canManageGroupLink)
+                                                <div class="event-only-field" id="whatsappGroupField">
+                                                    <label class="form-label" for="whatsappGroupInput">
+                                                        <i class="fab fa-whatsapp text-success me-1"></i> Link do grupo do WhatsApp
+                                                    </label>
+                                                    <input id="whatsappGroupInput" type="url" name="whatsapp_group_link" class="form-control"
+                                                        value="{{ old('whatsapp_group_link', $event->whatsapp_group_link) }}"
+                                                        placeholder="https://chat.whatsapp.com/...">
+                                                    <small class="text-body-secondary d-block mt-1">Exibido somente após a inscrição confirmada.</small>
+                                                    @error('whatsapp_group_link')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    {{-- CARD AÇÕES DE SALVAMENTO --}}
+                                    <div class="evform-section">
+                                        <div class="evform-section-body d-flex flex-column gap-2">
+                                            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                                                <i class="fas fa-save me-2"></i> {{ $event->exists ? 'Salvar Alterações' : 'Cadastrar Evento' }}
+                                            </button>
+                                            <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary w-100">
+                                                <i class="fas fa-times me-1"></i> Cancelar
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- RODAPÉ OFICIAL DO FORMULÁRIO --}}
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-4 pt-3 border-top">
+                            <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Voltar para Eventos
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                                <i class="fas fa-save me-2"></i> {{ $event->exists ? 'Salvar Alterações' : 'Cadastrar Evento' }}
+                            </button>
+                        </div>
                     </form>
                 </div>
 
