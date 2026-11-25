@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.39] - 2026-11-25 - style(admin, ui): camada visual moderna estilo React/SaaS aplicada sobre a estrutura oficial do AdminLTE 4
+
+- **Design System React/SaaS sobre AdminLTE 4 Oficial (`public/css/adminlte4-unn.css`):**
+  - Navbar `.app-header` com efeito glassmorphism (`backdrop-filter: blur(14px)`), sombras suaves e botões arredondados.
+  - Sidebar `.app-sidebar` em gradiente escuro slate (`#0b1222 -> #0f172a`), card de perfil `.sidebar-user-panel` com efeito glass, suporte suave a `sidebar-collapse`, rotação correta do `.nav-arrow` (`rotate(90deg)`), submenus com guia vertical lateral e destaque ativo em gradiente UNN (`#1F5EDB -> #177FD6`).
+  - Cards, `.small-box` (incluindo `.bg-gradient-navy`, `.bg-maroon`, `.bg-purple`, `.bg-indigo`, `.bg-teal`, `.bg-orange`) e `.info-box` estilizados com bordas arredondadas (`1.05rem`), gradientes modernos e elevação sutil no hover.
+  - Tabelas em estilo React DataTable, abas `.nav-tabs`/`.nav-pills`, botões com gradiente UNN (incluindo `.btn-xs`), inputs com anel de foco suave, paginação moderna e dropzone `.upload-box` harmonizados em **Light Mode** e **Dark Mode (`[data-bs-theme="dark"]`)** sem cores estourando.
+
 ## [2.8.38] - 2026-11-25 - feat(admin, ui): migracao integral e limpa do painel /admin para AdminLTE 4 nativo (Bootstrap 5.3) sem residuos do AdminLTE 3
 
 - **Migração Integral do Shell `/admin` para AdminLTE 4.0.0-beta3 + Bootstrap 5.3.3 + OverlayScrollbars v2 (`resources/views/admin/layouts/app.blade.php`, `navbar.blade.php`, `sidebar.blade.php`, `footer.blade.php`, `control-sidebar.blade.php`, `quick-upload-modal.blade.php`):**
