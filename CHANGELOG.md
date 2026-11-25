@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.49] - 2026-11-25 - feat(admin, ux): preview do Preloader 100% dinamico (inclusive PJAX e simulacao automatica ao trocar animacao) e overlay interno translucido nos dropzones
+
+- **Preview do Preloader Totalmente Dinâmico (`resources/views/admin/settings/partials/appearance.blade.php`):**
+  - Compatibilizado o binding dos previews com navegação PJAX (`pjax:end`) e execução imediata.
+  - Ao trocar o modelo visual nos cards ou alterar a **Animação de Saída** no `<select>`, o palco atualiza imediatamente e reproduz a animação escolhida em tempo real.
+- **Overlay Interno nos Campos Arrasta-e-Solta (`public/css/adminlte4-unn.css`):**
+  - Reposicionado `.unn-upload-hover-card` para dentro da própria caixa (`.upload-box` / `.unn-dz-wrap`) em faixa glass translúcida no topo interno (`rgba(15, 23, 42, 0.72)` + `backdrop-filter: blur(8px)`), exibindo dimensões, peso e formato sem sair da caixa e sem ofuscar o preview da imagem.
+
 ## [2.8.48] - 2026-11-25 - fix(admin, preloader): correcao da fidelidade visual 100% do palco de preview do Preloader (variavel --unn-pre-accent-2 no :root)
 
 - **Preview do Preloader 100% Idêntico ao Real (`resources/views/partials/modern-preloader.blade.php`, `resources/views/admin/settings/partials/appearance.blade.php`):**

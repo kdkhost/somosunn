@@ -568,161 +568,195 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // 1. Preview Dinâmico em Tempo Real de Cores e Hero
-    function hexToRgba(hex, alpha) {
-        const clean = String(hex || '#000000').replace('#', '');
-        if (!/^[0-9a-fA-F]{6}$/.test(clean)) return 'rgba(0,0,0,' + alpha + ')';
-        const r = parseInt(clean.slice(0, 2), 16);
-        const g = parseInt(clean.slice(2, 4), 16);
-        const b = parseInt(clean.slice(4, 6), 16);
-        return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
-    }
+(function () {
+    function initAppearanceLivePreviews() {
+        const root = document.getElementById('preloaderLiveStage') || document.getElementById('liveBrandPreviewCard');
+        if (!root || root.dataset.unnAppearanceBound === '1') return;
+        root.dataset.unnAppearanceBound = '1';
 
-    function bindColorPair(pickerId, textId, onChange) {
-        const picker = document.getElementById(pickerId);
-        const text = document.getElementById(textId);
-        if (!picker || !text) return;
-        picker.addEventListener('input', function () {
-            text.value = picker.value;
-            if (onChange) onChange(picker.value);
-        });
-        text.addEventListener('input', function () {
-            if (/^#[0-9a-fA-F]{6}$/.test(text.value)) {
-                picker.value = text.value;
-                if (onChange) onChange(text.value);
-            }
-        });
-    }
-
-    function updateLiveBrandPreview() {
-        const title = document.getElementById('appearance_hero_title')?.value || 'Transforme sua carreira';
-        const subtitle = document.getElementById('appearance_hero_subtitle')?.value || '';
-        const gradHex = document.getElementById('appearance_bg_gradient_start')?.value || '#000000';
-        const gradOpacity = Math.min(100, Math.max(0, parseInt(document.getElementById('appearance_bg_gradient_opacity')?.value || '85', 10) || 85)) / 100;
-        const primary = document.getElementById('appearance_color_primary')?.value || '#1F5EDB';
-        const secondary = document.getElementById('appearance_color_secondary')?.value || '#64748b';
-
-        const hero = document.getElementById('liveHeroPreview');
-        if (hero) {
-            hero.style.background = 'linear-gradient(135deg, ' + hexToRgba(gradHex, gradOpacity) + ' 0%, ' + hexToRgba(primary, Math.max(0.45, gradOpacity * 0.85)) + ' 100%)';
+        // 1. Preview Dinâmico em Tempo Real de Cores e Hero
+        function hexToRgba(hex, alpha) {
+            const clean = String(hex || '#000000').replace('#', '');
+            if (!/^[0-9a-fA-F]{6}$/.test(clean)) return 'rgba(0,0,0,' + alpha + ')';
+            const r = parseInt(clean.slice(0, 2), 16);
+            const g = parseInt(clean.slice(2, 4), 16);
+            const b = parseInt(clean.slice(4, 6), 16);
+            return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
         }
-        const titleEl = document.getElementById('liveHeroTitle');
-        const subEl = document.getElementById('liveHeroSubtitle');
-        if (titleEl) titleEl.textContent = title;
-        if (subEl) subEl.textContent = subtitle;
 
-        const pBtn = document.getElementById('livePrimaryBtn');
-        const pLink = document.getElementById('livePrimaryLink');
-        const pBar = document.getElementById('livePrimaryBar');
-        const pHex = document.getElementById('livePrimaryHexLabel');
-        if (pBtn) { pBtn.style.background = primary; pBtn.style.borderColor = primary; }
-        if (pLink) pLink.style.color = primary;
-        if (pBar) pBar.style.background = primary;
-        if (pHex) pHex.textContent = primary;
-
-        const sBadge = document.getElementById('liveSecondaryBadge');
-        const sBtn = document.getElementById('liveSecondaryBtn');
-        if (sBadge) sBadge.style.background = secondary;
-        if (sBtn) sBtn.style.borderColor = secondary;
-    }
-
-    bindColorPair('appearance_bg_gradient_start_picker', 'appearance_bg_gradient_start', updateLiveBrandPreview);
-    bindColorPair('appearance_color_primary_picker', 'appearance_color_primary', updateLiveBrandPreview);
-    bindColorPair('appearance_color_secondary_picker', 'appearance_color_secondary', updateLiveBrandPreview);
-
-    ['appearance_hero_title', 'appearance_hero_subtitle', 'appearance_bg_gradient_opacity'].forEach(function (id) {
-        document.getElementById(id)?.addEventListener('input', updateLiveBrandPreview);
-    });
-    updateLiveBrandPreview();
-
-    // 2. Palco de Preview Embutido do Preloader em Tempo Real
-    const stage = document.getElementById('preloaderLiveStage');
-    const stageText = document.getElementById('preloaderStageText');
-    const stageProgress = document.getElementById('preloaderStageProgress');
-    const stageLogo = document.getElementById('preloaderStageLogo');
-
-    function syncPreloaderStage() {
-        if (!stage) return;
-        const style = document.querySelector('input[name="preloader_style"]:checked')?.value || 'orbital';
-        const exitAnim = document.getElementById('preloader_exit_animation')?.value || 'blur';
-        const text = (document.getElementById('preloader_text')?.value || 'SOMOS UNN').trim() || 'SOMOS UNN';
-        const accent = document.getElementById('preloader_accent_color')?.value || '#1F5EDB';
-        const showProgress = Boolean(document.getElementById('preloader_show_progress')?.checked);
-        const isDarkStage = stage.classList.contains('is-dark-stage');
-
-        stage.className = 'preloader-live-stage unn-style-' + style + ' unn-exit-' + exitAnim + (isDarkStage ? ' is-dark-stage' : '');
-        stage.style.setProperty('--unn-pre-accent', accent);
-        if (stageText) stageText.textContent = text;
-        if (stageProgress) stageProgress.classList.toggle('d-none', !showProgress);
-    }
-
-    const cards = document.querySelectorAll('#preloaderModelGrid .preloader-model-card');
-    cards.forEach(function (card) {
-        card.addEventListener('click', function () {
-            cards.forEach(function (c) { c.classList.remove('is-selected'); });
-            card.classList.add('is-selected');
-            setTimeout(syncPreloaderStage, 0);
-        });
-    });
-
-    bindColorPair('preloader_accent_color_picker', 'preloader_accent_color', syncPreloaderStage);
-    document.getElementById('preloader_exit_animation')?.addEventListener('change', syncPreloaderStage);
-    document.getElementById('preloader_text')?.addEventListener('input', syncPreloaderStage);
-    document.getElementById('preloader_show_progress')?.addEventListener('change', syncPreloaderStage);
-
-    document.getElementById('admin_preloader_image_input')?.addEventListener('change', function () {
-        const f = this.files && this.files[0] ? this.files[0] : null;
-        if (f && stageLogo) {
-            stageLogo.src = URL.createObjectURL(f);
-        }
-    });
-
-    document.getElementById('btnStageLight')?.addEventListener('click', function () {
-        stage?.classList.remove('is-dark-stage');
-        this.classList.add('active');
-        document.getElementById('btnStageDark')?.classList.remove('active');
-    });
-    document.getElementById('btnStageDark')?.addEventListener('click', function () {
-        stage?.classList.add('is-dark-stage');
-        this.classList.add('active');
-        document.getElementById('btnStageLight')?.classList.remove('active');
-    });
-    document.getElementById('btnStageSimulateExit')?.addEventListener('click', function () {
-        if (!stage) return;
-        syncPreloaderStage();
-        stage.classList.add('stage-exiting');
-        setTimeout(function () {
-            stage.classList.remove('stage-exiting');
-        }, 900);
-    });
-
-    const previewBtn = document.getElementById('btnPreviewPreloaderAdmin');
-    if (previewBtn) {
-        previewBtn.addEventListener('click', function () {
-            if (typeof window.UNNPreviewPreloader !== 'function') {
-                if (typeof toastr !== 'undefined') toastr.info('Salve e recarregue a página para visualizar o preloader.');
-                return;
-            }
-            const selectedStyle = document.querySelector('input[name="preloader_style"]:checked')?.value || 'orbital';
-            const exitAnimation = document.getElementById('preloader_exit_animation')?.value || 'blur';
-            const duration = Math.max(850, parseInt(document.getElementById('preloader_duration_ms')?.value || '1200', 10) || 1200);
-            const text = document.getElementById('preloader_text')?.value || 'SOMOS UNN';
-            const accentColor = document.getElementById('preloader_accent_color')?.value || '#1F5EDB';
-            const showProgress = Boolean(document.getElementById('preloader_show_progress')?.checked);
-
-            window.UNNPreviewPreloader({
-                style: selectedStyle,
-                exitAnimation: exitAnimation,
-                duration: duration,
-                text: text,
-                accentColor: accentColor,
-                showProgress: showProgress
+        function bindColorPair(pickerId, textId, onChange) {
+            const picker = document.getElementById(pickerId);
+            const text = document.getElementById(textId);
+            if (!picker || !text) return;
+            picker.addEventListener('input', function () {
+                text.value = picker.value;
+                if (onChange) onChange(picker.value);
             });
+            text.addEventListener('input', function () {
+                if (/^#[0-9a-fA-F]{6}$/.test(text.value)) {
+                    picker.value = text.value;
+                    if (onChange) onChange(text.value);
+                }
+            });
+        }
+
+        function updateLiveBrandPreview() {
+            const title = document.getElementById('appearance_hero_title')?.value || 'Transforme sua carreira';
+            const subtitle = document.getElementById('appearance_hero_subtitle')?.value || '';
+            const gradHex = document.getElementById('appearance_bg_gradient_start')?.value || '#000000';
+            const gradOpacity = Math.min(100, Math.max(0, parseInt(document.getElementById('appearance_bg_gradient_opacity')?.value || '85', 10) || 85)) / 100;
+            const primary = document.getElementById('appearance_color_primary')?.value || '#1F5EDB';
+            const secondary = document.getElementById('appearance_color_secondary')?.value || '#64748b';
+
+            const hero = document.getElementById('liveHeroPreview');
+            if (hero) {
+                hero.style.background = 'linear-gradient(135deg, ' + hexToRgba(gradHex, gradOpacity) + ' 0%, ' + hexToRgba(primary, Math.max(0.45, gradOpacity * 0.85)) + ' 100%)';
+            }
+            const titleEl = document.getElementById('liveHeroTitle');
+            const subEl = document.getElementById('liveHeroSubtitle');
+            if (titleEl) titleEl.textContent = title;
+            if (subEl) subEl.textContent = subtitle;
+
+            const pBtn = document.getElementById('livePrimaryBtn');
+            const pLink = document.getElementById('livePrimaryLink');
+            const pBar = document.getElementById('livePrimaryBar');
+            const pHex = document.getElementById('livePrimaryHexLabel');
+            if (pBtn) { pBtn.style.background = primary; pBtn.style.borderColor = primary; }
+            if (pLink) pLink.style.color = primary;
+            if (pBar) pBar.style.background = primary;
+            if (pHex) pHex.textContent = primary;
+
+            const sBadge = document.getElementById('liveSecondaryBadge');
+            const sBtn = document.getElementById('liveSecondaryBtn');
+            if (sBadge) sBadge.style.background = secondary;
+            if (sBtn) sBtn.style.borderColor = secondary;
+        }
+
+        bindColorPair('appearance_bg_gradient_start_picker', 'appearance_bg_gradient_start', updateLiveBrandPreview);
+        bindColorPair('appearance_color_primary_picker', 'appearance_color_primary', updateLiveBrandPreview);
+        bindColorPair('appearance_color_secondary_picker', 'appearance_color_secondary', updateLiveBrandPreview);
+
+        ['appearance_hero_title', 'appearance_hero_subtitle', 'appearance_bg_gradient_opacity'].forEach(function (id) {
+            document.getElementById(id)?.addEventListener('input', updateLiveBrandPreview);
         });
+        updateLiveBrandPreview();
+
+        // 2. Palco de Preview Embutido do Preloader em Tempo Real (compatível com carga direta e PJAX)
+        const stage = document.getElementById('preloaderLiveStage');
+        const stageText = document.getElementById('preloaderStageText');
+        const stageProgress = document.getElementById('preloaderStageProgress');
+        const stageLogo = document.getElementById('preloaderStageLogo');
+        let exitTimer = null;
+
+        // Inicia o palco harmonizado com o tema atual do painel
+        if (stage && (document.body.getAttribute('data-bs-theme') === 'dark' || document.body.classList.contains('dark-mode'))) {
+            stage.classList.add('is-dark-stage');
+            document.getElementById('btnStageDark')?.classList.add('active');
+            document.getElementById('btnStageLight')?.classList.remove('active');
+        }
+
+        function syncPreloaderStage() {
+            if (!stage) return;
+            const style = document.querySelector('input[name="preloader_style"]:checked')?.value || 'orbital';
+            const exitAnim = document.getElementById('preloader_exit_animation')?.value || 'blur';
+            const text = (document.getElementById('preloader_text')?.value || 'SOMOS UNN').trim() || 'SOMOS UNN';
+            const accent = document.getElementById('preloader_accent_color')?.value || '#1F5EDB';
+            const showProgress = Boolean(document.getElementById('preloader_show_progress')?.checked);
+            const isDarkStage = stage.classList.contains('is-dark-stage');
+
+            stage.className = 'preloader-live-stage unn-style-' + style + ' unn-exit-' + exitAnim + (isDarkStage ? ' is-dark-stage' : '');
+            stage.style.setProperty('--unn-pre-accent', accent);
+            stage.style.setProperty('--unn-pre-accent-2', '#29ABE2');
+            if (stageText) stageText.textContent = text;
+            if (stageProgress) stageProgress.classList.toggle('d-none', !showProgress);
+        }
+
+        function playStageExitAnimation() {
+            if (!stage) return;
+            if (exitTimer) clearTimeout(exitTimer);
+            syncPreloaderStage();
+            stage.classList.remove('stage-exiting');
+            // Força reflow para reiniciar transição CSS instantaneamente
+            void stage.offsetWidth;
+            stage.classList.add('stage-exiting');
+            exitTimer = setTimeout(function () {
+                stage.classList.remove('stage-exiting');
+            }, 850);
+        }
+
+        const cards = document.querySelectorAll('#preloaderModelGrid .preloader-model-card');
+        cards.forEach(function (card) {
+            const radio = card.querySelector('input[name="preloader_style"]');
+            const activateCard = function () {
+                if (radio) radio.checked = true;
+                cards.forEach(function (c) { c.classList.remove('is-selected'); });
+                card.classList.add('is-selected');
+                syncPreloaderStage();
+            };
+            card.addEventListener('click', activateCard);
+            if (radio) radio.addEventListener('change', activateCard);
+        });
+
+        bindColorPair('preloader_accent_color_picker', 'preloader_accent_color', syncPreloaderStage);
+        document.getElementById('preloader_exit_animation')?.addEventListener('change', playStageExitAnimation);
+        document.getElementById('preloader_text')?.addEventListener('input', syncPreloaderStage);
+        document.getElementById('preloader_show_progress')?.addEventListener('change', syncPreloaderStage);
+
+        document.getElementById('admin_preloader_image_input')?.addEventListener('change', function () {
+            const f = this.files && this.files[0] ? this.files[0] : null;
+            if (f && stageLogo) {
+                stageLogo.src = URL.createObjectURL(f);
+            }
+        });
+
+        document.getElementById('btnStageLight')?.addEventListener('click', function () {
+            stage?.classList.remove('is-dark-stage');
+            this.classList.add('active');
+            document.getElementById('btnStageDark')?.classList.remove('active');
+        });
+        document.getElementById('btnStageDark')?.addEventListener('click', function () {
+            stage?.classList.add('is-dark-stage');
+            this.classList.add('active');
+            document.getElementById('btnStageLight')?.classList.remove('active');
+        });
+        document.getElementById('btnStageSimulateExit')?.addEventListener('click', playStageExitAnimation);
+
+        const previewBtn = document.getElementById('btnPreviewPreloaderAdmin');
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function () {
+                if (typeof window.UNNPreviewPreloader !== 'function') {
+                    if (typeof toastr !== 'undefined') toastr.info('Salve e recarregue a página para visualizar o preloader.');
+                    return;
+                }
+                const selectedStyle = document.querySelector('input[name="preloader_style"]:checked')?.value || 'orbital';
+                const exitAnimation = document.getElementById('preloader_exit_animation')?.value || 'blur';
+                const duration = Math.max(850, parseInt(document.getElementById('preloader_duration_ms')?.value || '1200', 10) || 1200);
+                const text = document.getElementById('preloader_text')?.value || 'SOMOS UNN';
+                const accentColor = document.getElementById('preloader_accent_color')?.value || '#1F5EDB';
+                const showProgress = Boolean(document.getElementById('preloader_show_progress')?.checked);
+
+                window.UNNPreviewPreloader({
+                    style: selectedStyle,
+                    exitAnimation: exitAnimation,
+                    duration: duration,
+                    text: text,
+                    accentColor: accentColor,
+                    showProgress: showProgress
+                });
+            });
+        }
+
+        syncPreloaderStage();
     }
 
-    syncPreloaderStage();
-});
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAppearanceLivePreviews);
+    } else {
+        initAppearanceLivePreviews();
+    }
+    if (window.jQuery) {
+        window.jQuery(document).on('pjax:end', initAppearanceLivePreviews);
+    }
+})();
 </script>
 @endpush

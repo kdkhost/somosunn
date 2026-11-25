@@ -1060,65 +1060,59 @@ select.form-select option,
 }
 
 /* ==========================================================================
-   7.5. Hover com Detalhes de Arquivo em Todos os Campos Arrasta-e-Solta
+   7.5. Hover com Detalhes de Arquivo DENTRO do Campo Arrasta-e-Solta (Glass sutil)
    ========================================================================== */
 .upload-box,
 .unn-dz-wrap {
     position: relative;
+    overflow: hidden;
 }
 
 .unn-upload-hover-card {
     position: absolute;
-    left: 50%;
-    bottom: calc(100% + 10px);
-    transform: translateX(-50%) translateY(6px);
-    min-width: 220px;
-    max-width: 300px;
-    padding: 0.65rem 0.85rem;
-    border-radius: 0.75rem;
-    background: rgba(15, 23, 42, 0.94);
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.65rem;
+    background: rgba(15, 23, 42, 0.72);
     color: #f8fafc;
-    border: 1px solid rgba(148, 163, 184, 0.26);
-    box-shadow: 0 16px 36px -8px rgba(2, 6, 23, 0.45);
-    backdrop-filter: blur(12px);
-    font-size: 0.76rem;
-    line-height: 1.45;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    box-shadow: 0 8px 20px -6px rgba(2, 6, 23, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-size: 0.74rem;
+    line-height: 1.35;
     text-align: left;
     opacity: 0;
     visibility: hidden;
+    transform: translateY(-6px);
     pointer-events: none;
-    z-index: 1055;
-    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
-}
-
-.unn-upload-hover-card::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: rgba(15, 23, 42, 0.94);
+    z-index: 15;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
 }
 
 .upload-box:hover > .unn-upload-hover-card.has-details,
 .unn-dz-wrap:hover > .unn-upload-hover-card.has-details {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
 }
 
 .unn-upload-hover-title {
     font-weight: 700;
     color: #93c5fd;
-    margin-bottom: 0.3rem;
-    word-break: break-word;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .unn-upload-hover-grid {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.15rem 0.65rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
     color: #cbd5e1;
 }
 
