@@ -1,12 +1,20 @@
 @php
     $adsEnabledVal = (string) ($settings['ads_enabled'] ?? '0') === '1';
+    $adsOwnNetworkVal = (string) ($settings['ads_own_network_enabled'] ?? '1') !== '0';
+    $adsSponsorRequireApprovalVal = (string) ($settings['ads_sponsor_require_approval'] ?? '1') !== '0';
+    $adsSplitEnabledVal = (string) ($settings['ads_split_enabled'] ?? '0') === '1';
+    $adsSplitSaasPercent = (float) ($settings['ads_split_saas_percent'] ?? 50);
+    $adsSplitAdminPercent = round(100 - max(0, min(100, $adsSplitSaasPercent)), 2);
     $adsGlobalBannerVal = (string) ($settings['ads_global_banner_enabled'] ?? '1') !== '0';
     $adsInterFeedVal = (string) ($settings['ads_inter_feed_enabled'] ?? '0') === '1';
     $adsPubId = trim((string) ($settings['adsense_publisher_id'] ?? ''));
     $adsSlotId = trim((string) ($settings['adsense_slot_id'] ?? ''));
     $adsHtml = trim((string) ($settings['ads_code_html'] ?? ''));
     $adsFeedHtml = trim((string) ($settings['ads_inter_feed_code'] ?? ''));
-    $hasValidAdSource = ($adsPubId !== '' && $adsSlotId !== '') || $adsHtml !== '';
+    $activeOwnBannersCount = \App\Models\SponsorBanner::tableAvailable()
+        ? \App\Models\SponsorBanner::query()->where('active', true)->count()
+        : 0;
+    $hasValidAdSource = ($adsPubId !== '' && $adsSlotId !== '') || $adsHtml !== '' || ($adsOwnNetworkVal && $activeOwnBannersCount > 0);
     $adsFormat = $settings['adsense_format'] ?? 'auto';
     $adsFreq = (int) ($settings['adsense_frequency'] ?? 5);
 @endphp
@@ -114,6 +122,75 @@
 
     <hr class="my-4">
 
+    <h5 class="text-primary mb-3"><i class="fas fa-bullhorn me-2"></i> Sistema Próprio de Publicidade (Anúncios de Terceiros por Período)</h5>
+    <div class="unn-section-box mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <div class="fw-bold">Monetização direta com anunciantes (7, 14, 21, 30, 90, 120 dias...)</div>
+                <small class="text-secondary">Quando houver anúncio próprio ativo na posição, ele tem prioridade de exibição com contagem real de impressões e cliques; sem anúncio próprio, exibe AdSense/HTML como fallback.</small>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ route('admin.sponsor-plans.index') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-tags me-1"></i> Pacotes por Período
+                </a>
+                <a href="{{ route('admin.sponsor-banners.index') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-images me-1"></i> Banners &amp; Aprovações
+                    @if($activeOwnBannersCount > 0)
+                        <span class="badge rounded-pill text-bg-light ms-1">{{ $activeOwnBannersCount }}</span>
+                    @endif
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="form-check form-switch">
+                    <input type="hidden" name="ads_own_network_enabled" value="0">
+                    <input type="checkbox" class="form-check-input" id="ads_own_network_enabled" name="ads_own_network_enabled" value="1" {{ $adsOwnNetworkVal ? 'checked' : '' }}>
+                    <label class="form-check-label fw-bold" for="ads_own_network_enabled">Ativar rede própria de anúncios (prioritária)</label>
+                </div>
+                <small class="text-secondary d-block">Exibe banners pagos de terceiros dentro da vigência configurada.</small>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check form-switch">
+                    <input type="hidden" name="ads_sponsor_require_approval" value="0">
+                    <input type="checkbox" class="form-check-input" id="ads_sponsor_require_approval" name="ads_sponsor_require_approval" value="1" {{ $adsSponsorRequireApprovalVal ? 'checked' : '' }}>
+                    <label class="form-check-label fw-bold" for="ads_sponsor_require_approval">Exigir aprovação manual antes de publicar</label>
+                </div>
+                <small class="text-secondary d-block">Ativo (Sim): admin aprova antes de ir ao ar. Desativado (Não): publica automaticamente após pagamento.</small>
+            </div>
+        </div>
+
+        <hr class="my-3">
+
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <div class="form-check form-switch mb-2">
+                    <input type="hidden" name="ads_split_enabled" value="0">
+                    <input type="checkbox" class="form-check-input" id="ads_split_enabled" name="ads_split_enabled" value="1" {{ $adsSplitEnabledVal ? 'checked' : '' }}>
+                    <label class="form-check-label fw-bold" for="ads_split_enabled">Dividir lucros (Dono do SaaS &times; Admin)</label>
+                </div>
+                <small class="text-secondary d-block">Aplica divisão automática sobre vendas de publicidade/anúncios.</small>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="ads_split_saas_percent">Percentual Dono do SaaS (%)</label>
+                <div class="input-group">
+                    <input type="number" step="0.5" min="0" max="100" id="ads_split_saas_percent" name="ads_split_saas_percent" class="form-control" value="{{ $adsSplitSaasPercent }}">
+                    <span class="input-group-text">%</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="ads_split_admin_percent">Percentual Administrador (%)</label>
+                <div class="input-group">
+                    <input type="number" step="0.5" min="0" max="100" id="ads_split_admin_percent" name="ads_split_admin_percent" class="form-control" value="{{ $adsSplitAdminPercent }}" readonly>
+                    <span class="input-group-text">%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
     <h5 class="text-primary mb-3"><i class="fas fa-stream me-2"></i> Anúncios no Feed (Comunidade)</h5>
     <div class="unn-section-box">
         <div class="form-group mb-3">
@@ -194,6 +271,15 @@
                 if (window.jQuery) {
                     window.jQuery(document).on('pjax:end', function () { syncEncodedFields(document); });
                 }
+
+                // Sincroniza soma 100% entre Dono do SaaS e Administrador
+                document.addEventListener('input', function (event) {
+                    if (event.target && event.target.id === 'ads_split_saas_percent') {
+                        const saasVal = Math.max(0, Math.min(100, parseFloat(event.target.value || '0') || 0));
+                        const adminInput = document.getElementById('ads_split_admin_percent');
+                        if (adminInput) adminInput.value = (100 - saasVal).toFixed(saasVal % 1 === 0 ? 0 : 1);
+                    }
+                });
             })();
         </script>
     @endpush

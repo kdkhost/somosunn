@@ -16,6 +16,8 @@ class SponsorPlanRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
+            'duration_days' => ['required', 'integer', 'min:1', 'max:3650'],
+            'description' => ['nullable', 'string', 'max:1000'],
             'max_banners' => ['required', 'integer', 'min:0'],
             'max_events' => ['required', 'integer', 'min:0'],
             'max_leads' => ['required', 'integer', 'min:0'],

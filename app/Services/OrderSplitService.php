@@ -100,6 +100,49 @@ class OrderSplitService
         $total = (float) $order->total_amount;
         $seller = $order->seller;
 
+        // Regra dedicada para pedidos de publicidade/anúncios próprios (Split Dono do SaaS x Administrador)
+        $isSponsorAdOrder = (string) data_get($order->metadata, 'order_type', '') === 'sponsor_ad'
+            || $order->items()->where('item_type', 'sponsor_ad')->exists();
+
+        if ($isSponsorAdOrder && (string) Setting::get('ads_split_enabled', '0') === '1') {
+            $saasPct = max(0.0, min(100.0, (float) Setting::get('ads_split_saas_percent', 50)));
+            $adminPct = round(100.0 - $saasPct, 2);
+
+            $superadmin = $this->superadmin();
+            $platformOwner = $this->platformOwner();
+            $superadminPixKey = trim((string) Setting::get('superadmin_commission_pix_key', '')) ?: $superadmin?->pix_key;
+
+            $saasAmount = round($total * ($saasPct / 100), 2);
+            $adminAmount = round($total - $saasAmount, 2);
+            $splits = [];
+
+            if ($saasAmount > 0 && $superadmin) {
+                $splits[] = [
+                    'receiver_id' => $superadmin->id,
+                    'receiver_type' => 'superadmin',
+                    'percentage' => $saasPct,
+                    'amount' => $saasAmount,
+                    'pix_key' => $superadminPixKey,
+                    'auto_paid' => (bool) data_get($order->metadata, 'mp_marketplace_split_applied', false),
+                ];
+            }
+
+            if ($adminAmount > 0) {
+                $splits[] = [
+                    'receiver_id' => $platformOwner?->id,
+                    'receiver_type' => 'platform',
+                    'percentage' => $adminPct,
+                    'amount' => $adminAmount,
+                    'pix_key' => $platformOwner?->pix_key,
+                    'auto_paid' => true,
+                ];
+            }
+
+            if ($splits !== []) {
+                return $splits;
+            }
+        }
+
         if ($this->isAdminOriginatedOrder($order)) {
             $owner = $seller ?? $this->platformOwner();
 

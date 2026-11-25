@@ -1,5 +1,16 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.52] - 2026-11-25 - feat(ads, sponsors): sistema proprio de publicidade por periodos (7/14/21/30/90/120d), aprovacao configuravel, split SaaS x Admin e rastreamento real de impressoes/cliques
+
+- **Migration Aditiva (`database/migrations/2026_11_25_000001_add_ad_monetization_fields_to_sponsor_tables.php`):**
+  - Adicionados `duration_days` e `description` em `sponsor_plans`; `approval_status`, `impressions_count`, `clicks_count`, `sponsor_plan_id` e `order_id` em `sponsor_banners`.
+- **Exibição Prioritária + Rastreamento Real (`resources/views/components/ad-slot.blade.php`, `routes/public.php`, `app/Models/SponsorBanner.php`):**
+  - `<x-ad-slot>` prioriza anúncios próprios ativos e aprovados dentro da vigência (com incremento real de impressões e rota rastreada `GET /anuncio/clique/{banner}` para cliques e CTR), fazendo fallback automático para Google AdSense / HTML personalizado quando não houver banner próprio ativo.
+- **Divisão Configurável de Lucros e Aprovação (`app/Services/OrderSplitService.php`, `resources/views/admin/settings/partials/ads.blade.php`):**
+  - Adicionados switches `ads_own_network_enabled`, `ads_sponsor_require_approval` (Sim/Não) e split configurável `ads_split_enabled` + `ads_split_saas_percent` / `ads_split_admin_percent` integrado ao `OrderSplitService` para pedidos `sponsor_ad`.
+- **Formulários de Pacotes por Período e Banners (`resources/views/admin/sponsors/plans/form.blade.php`, `resources/views/admin/sponsors/banners/form.blade.php`):**
+  - Modernizados no padrão AdminLTE 4 + React/SaaS com atalhos de período (`7d`, `14d`, `21d`, `30d`, `60d`, `90d`, `120d`, `180d`, `365d`), novas posições `global_banner` e `community_feed`, controle de aprovação e KPIs reais de impressões/cliques/CTR.
+
 ## [2.8.51] - 2026-11-25 - feat(ads): sistema real de exibicao de anuncios (componente x-ad-slot, rota /ads.txt, feed da comunidade e correcao PJAX no salvamento)
 
 - **Componente Real de Anúncios (`resources/views/components/ad-slot.blade.php`):**

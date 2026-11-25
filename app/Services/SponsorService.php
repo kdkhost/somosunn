@@ -124,18 +124,17 @@ class SponsorService
 
     public function dashboardMetrics(Sponsor $sponsor): array
     {
-        $activeBanners = $sponsor->banners()
-            ->where('active', true)
-            ->count();
-
+        $banners = $sponsor->banners()->get(['id', 'active', 'impressions_count', 'clicks_count']);
+        $impressions = (int) $banners->sum('impressions_count');
+        $clicks = (int) $banners->sum('clicks_count');
         $leads = $sponsor->leads()->count();
         $eventSponsors = $sponsor->eventSponsors()->count();
-        $ctr = 0.0;
+        $ctr = $impressions > 0 ? round(($clicks / $impressions) * 100, 2) : 0.0;
 
         return [
-            'visualizacoes' => $activeBanners * 120,
-            'cliques' => $activeBanners * 12,
-            'ctr' => $activeBanners > 0 ? round(($activeBanners * 12) / max($activeBanners * 120, 1) * 100, 2) : $ctr,
+            'visualizacoes' => $impressions,
+            'cliques' => $clicks,
+            'ctr' => $ctr,
             'leads' => $leads,
             'eventos' => $eventSponsors,
             'faturas' => 0,

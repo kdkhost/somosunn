@@ -160,3 +160,16 @@ Route::get('/ads.txt', function () {
 
     return response(implode("\n", $lines) . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
 })->name('ads.txt');
+
+Route::get('/anuncio/clique/{banner}', function (\App\Models\SponsorBanner $banner) {
+    if (\Illuminate\Support\Facades\Schema::hasColumn('sponsor_banners', 'clicks_count')) {
+        $banner->increment('clicks_count');
+    }
+
+    $target = trim((string) $banner->url);
+    if ($target !== '' && preg_match('#^https?://#i', $target)) {
+        return redirect()->away($target);
+    }
+
+    return redirect()->route('home');
+})->name('ads.banner.click');
