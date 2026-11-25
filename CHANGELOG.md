@@ -1,5 +1,14 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.56] - 2026-11-25 - feat(ads, sponsors): patrocinadores e banners demo com artes SVG profissionais + reformulacao completa de /admin/sponsor-plans, /admin/sponsors e /admin/sponsor-banners
+
+- **Patrocinadores & Banners Demo (`database/seeders/SponsorDemoSeeder.php`, `public/uploads/sponsors/banners/demo-*.svg`):**
+  - Criados 4 anunciantes demo realistas (*TechPulse Cloud*, *Vértice Financeira*, *Lumina Academy* e *Norte Studio Digital*) vinculados aos pacotes de 30, 90, 120 e 365 dias, com 4 artes SVG profissionais (`1200x220`) em `global_banner` e `community_feed` (3 aprovados + 1 pendente de revisão) e métricas iniciais de impressões/cliques.
+- **Telas Modernizadas no Padrão AdminLTE 4 + React/SaaS (`resources/views/admin/sponsors/plans/index.blade.php`, `sponsors/index.blade.php`, `sponsors/banners/index.blade.php`):**
+  - `/admin/sponsor-plans`: Hero Banner, 3 KPIs `.small-box` e grid de cards modernos com valor total, valor por dia, badge *Mais Popular* / *VIP*, benefícios e ações rápidas.
+  - `/admin/sponsors`: tabela moderna com avatar de iniciais, pacote contratado, vigência com contagem de dias restantes e status em badges pill BS5.
+  - `/admin/sponsor-banners`: 4 KPIs reais (Impressões, Cliques, CTR Médio, Pendentes de Aprovação) e tabela com preview miniatura do criativo, posição, performance individual e status de aprovação.
+
 ## [2.8.55] - 2026-11-25 - feat(admin, users): reformulacao completa da Gestao de Usuarios (/admin/users) no padrao AdminLTE 4 + React/SaaS com filtros Server-Side em tempo real
 
 - **Nova Gestão de Usuários (`resources/views/admin/users/index.blade.php`, `app/Http/Controllers/Admin/UserController.php`):**

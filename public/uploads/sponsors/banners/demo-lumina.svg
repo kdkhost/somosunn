@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 220" width="1200" height="220">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b0764"/>
+      <stop offset="55%" stop-color="#6d28d9"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="220" rx="18" fill="url(#bg3)"/>
+  <circle cx="1070" cy="45" r="135" fill="#f5d0fe" fill-opacity="0.14"/>
+  <rect x="44" y="42" width="152" height="30" rx="15" fill="#ffffff" fill-opacity="0.16"/>
+  <text x="120" y="62" text-anchor="middle" fill="#e9d5ff" font-family="Inter,Segoe UI,sans-serif" font-size="13" font-weight="700" letter-spacing="1.3">LUMINA ACADEMY</text>
+  <text x="44" y="118" fill="#ffffff" font-family="Inter,Segoe UI,sans-serif" font-size="34" font-weight="800">Formação Executiva em Liderança &amp; IA</text>
+  <text x="44" y="156" fill="#ede9fe" font-family="Inter,Segoe UI,sans-serif" font-size="18" font-weight="500">Turmas abertas com certificado internacional e condição especial para a comunidade.</text>
+  <rect x="935" y="80" width="215" height="58" rx="29" fill="#ffffff"/>
+  <text x="1042" y="116" text-anchor="middle" fill="#6d28d9" font-family="Inter,Segoe UI,sans-serif" font-size="17" font-weight="800">Garantir Bolsa</text>
+</svg>
