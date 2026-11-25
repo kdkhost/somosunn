@@ -124,16 +124,28 @@ class DashboardController extends Controller
                     $cronHeartbeat = $lastInternalRun;
                 }
             }
+            if (!$cronHeartbeat) {
+                try {
+                    if (Schema::hasTable('scheduled_tasks')) {
+                        $lastTaskRun = \App\Models\ScheduledTask::max('last_run_at');
+                        if ($lastTaskRun) {
+                            $cronHeartbeat = \Carbon\Carbon::parse($lastTaskRun);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                }
+            }
+
             $cronActive = false;
             $cronLastRun = null;
 
             if ($cronHeartbeat) {
                 if ($cronHeartbeat instanceof \Carbon\Carbon || $cronHeartbeat instanceof \DateTimeInterface) {
-                    $cronActive = $cronHeartbeat->diffInSeconds(now()) < 300;
+                    $cronActive = abs(now()->timestamp - $cronHeartbeat->getTimestamp()) < 300;
                     $cronLastRun = $cronHeartbeat->format('H:i:s');
                 } else {
                     $ts = is_numeric($cronHeartbeat) ? (int) $cronHeartbeat : strtotime((string) $cronHeartbeat);
-                    $cronActive = $ts && (time() - $ts) < 300;
+                    $cronActive = $ts && abs(time() - $ts) < 300;
                     $cronLastRun = $ts ? date('H:i:s', $ts) : null;
                 }
             }

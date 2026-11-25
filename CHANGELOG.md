@@ -1,5 +1,11 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.63] - 2026-11-25 - fix(admin, cron): fallback persistente em scheduled_tasks para monitoramento do Cron imune a cache:clear
+
+- **Detecção Resiliente do Cron (`app/Http/Controllers/Admin/DashboardController.php`, `app/Console/Kernel.php`):**
+  - Adicionado fallback automático para `ScheduledTask::max('last_run_at')` quando o cache `cron_heartbeat` é limpo (ex: após deploys/cache:clear) e comparação absoluta de timestamp (`abs(now()->timestamp - $ts) < 300`), evitando falsos negativos de "Cron inativo".
+  - Evitada execução duplicada de `cron:heartbeat` no `Console\Kernel` quando já existe tarefa ativa cadastrada em `scheduled_tasks`.
+
 ## [2.8.62] - 2026-11-25 - fix(admin, layout, calendar): sidebar e cabecalho 100% fixos, correcao definitiva de botoes no card-header, FullCalendar Dark/Light global e Feriados Nacionais do Brasil
 
 - **Header e Sidebar Fixos de Verdade (`public/css/adminlte4-unn.css`):**

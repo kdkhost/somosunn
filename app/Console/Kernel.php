@@ -77,8 +77,16 @@ class Kernel extends ConsoleKernel
             Log::error('Erro ao carregar scheduler central do banco: ' . $e->getMessage());
         }
 
-        // Heartbeat de monitoramento do Cron interno
-        $schedule->command('cron:heartbeat')->everyMinute();
+        // Heartbeat de monitoramento do Cron interno (evita duplicar se já existe em scheduled_tasks)
+        $hasDbHeartbeat = false;
+        try {
+            $hasDbHeartbeat = Schema::hasTable('scheduled_tasks')
+                && ScheduledTask::query()->where('active', true)->where('command', 'cron:heartbeat')->exists();
+        } catch (\Throwable $e) {
+        }
+        if (!$hasDbHeartbeat) {
+            $schedule->command('cron:heartbeat')->everyMinute();
+        }
 
         // Limpeza diária automática de novos cadastros não validados
         $schedule->command('members:cleanup-unverified')->dailyAt('03:00');
