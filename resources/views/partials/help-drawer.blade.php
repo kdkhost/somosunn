@@ -462,6 +462,53 @@
         els.drawer.setAttribute('aria-hidden', 'true');
     }
 
+    function findLabelForField(field) {
+        if (!field) return null;
+
+        if (field.id) {
+            const explicitLabel = document.querySelector('label[for="' + CSS.escape(field.id) + '"]');
+            if (explicitLabel) return explicitLabel;
+        }
+
+        const container = field.closest('.form-group, div');
+        if (container) {
+            const directLabel = container.querySelector(':scope > label');
+            if (directLabel) return directLabel;
+
+            const parentContainer = container.parentElement;
+            if (parentContainer) {
+                const parentLabel = parentContainer.querySelector(':scope > label');
+                if (parentLabel) return parentLabel;
+            }
+        }
+
+        return null;
+    }
+
+    function autoAttach(root) {
+        const scope = root || document;
+        const fields = scope.querySelectorAll('input[name]:not([type="hidden"]), select[name], textarea[name]');
+
+        fields.forEach(function (field) {
+            const rawName = (field.getAttribute('name') || '').replace(/\[\]$/, '').trim();
+            if (!rawName || !registry[rawName]) return;
+
+            const label = findLabelForField(field);
+            if (!label) return;
+            if (label.querySelector('.unn-help-trigger')) return;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'unn-help-trigger';
+            btn.setAttribute('data-help-drawer', rawName);
+            btn.setAttribute('title', 'Ver instruções passo a passo');
+            btn.setAttribute('aria-label', 'Ver instruções de ' + rawName);
+            btn.innerHTML = '<i class="fas fa-question"></i>';
+
+            label.appendChild(btn);
+        });
+    }
+
     window.UNNHelpDrawer = {
         register: function (items) {
             Object.assign(registry, items || {});
@@ -475,8 +522,17 @@
             }
             openDrawer(keyOrConfig);
         },
-        close: closeDrawer
+        close: closeDrawer,
+        autoAttach: autoAttach
     };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        autoAttach(document);
+    });
+
+    document.addEventListener('pjax:complete', function () {
+        autoAttach(document);
+    });
 
     document.addEventListener('click', function (event) {
         const trigger = event.target.closest('[data-help-drawer]');
@@ -500,3 +556,4 @@
     });
 })();
 </script>
+<script src="{{ asset('js/unn-help-catalog.js') }}?v=2.8.35" defer></script>

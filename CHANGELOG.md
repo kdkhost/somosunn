@@ -1,5 +1,14 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.35] - 2026-11-25 - feat(ux, settings): gaveta global de instrucoes automatica em todo o sistema e alternancia dinamica Sandbox/Producao no select
+
+- **Gaveta Lateral de Instruções Global e Automática (`resources/views/partials/help-drawer.blade.php`, `public/js/unn-help-catalog.js`):**
+  - Implementado o motor `UNNHelpDrawer.autoAttach()` que detecta automaticamente os campos nos formulários de todo o sistema (`/admin` e `/painel`, incluindo navegações PJAX) e injeta o botão ícone `?` ao lado de cada `<label>`.
+  - Criado o catálogo global em português brasileiro (`public/js/unn-help-catalog.js`) com explicações práticas, passo a passo numerado e links diretos para credenciais de Mercado Pago (Sandbox/Produção/OAuth/Webhook), SumUp, Efí Pay, Login Social (Google/Facebook/LinkedIn), SMTP, Armazenamento S3/R2, SEO/Analytics/Meta Pixel, reCAPTCHA v3 e Redes Sociais.
+- **Alternância Dinâmica Sandbox / Produção via `<select>` nos Dois Painéis (`resources/views/admin/settings/partials/gateway.blade.php`, `resources/views/panel/admin/settings/partials/gateway.blade.php`):**
+  - Substituído o controle oculto do Mercado Pago por `<select name="mercadopago_env">` visível e padronizado que alterna dinamicamente os campos de Sandbox (`TEST-...`) e Produção (`APP_USR-...`).
+  - Adicionada alternância dinâmica de indicador de ambiente e placeholders no `<select name="sumup_env">` nos dois painéis.
+
 ## [2.8.34] - 2026-11-25 - feat(payments, splits): vendas de usuarios exclusivas no Mercado Pago com split automatico 30% (10% SaaS / 10% Marketing / 10% Admin) e SumUp exclusiva do administrador
 
 - **Restrição da SumUp Exclusivamente ao Administrador (`app/Traits/SumUpIntegration.php`, `app/Http/Controllers/CheckoutController.php`, `app/Http/Controllers/MentorshipCheckoutController.php`, `app/Http/Controllers/SellerProductCheckoutController.php`, `app/Http/Controllers/GatewayAccountController.php`, `resources/views/settings/payment.blade.php`):**

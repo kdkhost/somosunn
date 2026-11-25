@@ -170,22 +170,11 @@
     {{-- MP > AUTH --}}
     <div id="mp-auth" class="mp-subpanel space-y-5">
         <div class="gw-card">
-            <label class="gw-label">Ambiente</label>
-            <div class="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl">
-                <button type="button" id="env-btn-sandbox" onclick="gwSwitchEnv('sandbox')"
-                    class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2
-                           {{ $mpEnv !== 'production' ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-sm' : 'text-slate-500' }}">
-                    <i class="fas fa-flask text-xs"></i> Sandbox
-                </button>
-                <button type="button" id="env-btn-production" onclick="gwSwitchEnv('production')"
-                    class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2
-                           {{ $mpEnv === 'production' ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500' }}">
-                    <i class="fas fa-rocket text-xs"></i> Produção
-                </button>
-            </div>
-            <select name="mercadopago_env" id="mercadopago_env_select" class="hidden">
-                <option value="sandbox" {{ $mpEnv !== 'production' ? 'selected' : '' }}>sandbox</option>
-                <option value="production" {{ $mpEnv === 'production' ? 'selected' : '' }}>production</option>
+            <label class="gw-label" for="mercadopago_env_select">Ambiente Mercado Pago</label>
+            <select name="mercadopago_env" id="mercadopago_env_select" onchange="gwSwitchEnv(this.value)"
+                class="gw-select w-full px-4 py-3 rounded-xl text-sm font-semibold">
+                <option value="sandbox" {{ $mpEnv !== 'production' ? 'selected' : '' }}>Sandbox (Testes)</option>
+                <option value="production" {{ $mpEnv === 'production' ? 'selected' : '' }}>Produção (Real)</option>
             </select>
         </div>
 
@@ -559,11 +548,14 @@
         </div>
 
         <div class="gw-card">
-            <label class="gw-label">Ambiente SumUp</label>
-            <select name="sumup_env" class="gw-select w-full px-4 py-3 rounded-xl text-sm font-semibold">
+            <label class="gw-label" for="panel_sumup_env">Ambiente SumUp</label>
+            <select name="sumup_env" id="panel_sumup_env" onchange="gwSyncSumUpEnv(this.value)" class="gw-select w-full px-4 py-3 rounded-xl text-sm font-semibold">
                 <option value="sandbox" {{ ($settings['sumup_env'] ?? 'sandbox') === 'sandbox' ? 'selected' : '' }}>Sandbox (Testes)</option>
                 <option value="production" {{ ($settings['sumup_env'] ?? '') === 'production' ? 'selected' : '' }}>Produção (Real)</option>
             </select>
+            <p id="panel_sumup_env_hint" class="mt-2 text-xs font-semibold {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' }}">
+                {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'Modo Produção ativo — cobranças reais na SumUp do administrador.' : 'Modo Sandbox ativo — utilize chaves de teste da SumUp.' }}
+            </p>
         </div>
 
         <div class="gw-card">
@@ -1014,22 +1006,40 @@
     // ENV SWITCH
     window.gwSwitchEnv = function(env) {
         const isSandbox = env === 'sandbox';
-        document.getElementById('env-sandbox-fields').classList.toggle('hidden', !isSandbox);
-        document.getElementById('env-production-fields').classList.toggle('hidden', isSandbox);
-        document.getElementById('mercadopago_env_select').value = env;
+        document.getElementById('env-sandbox-fields')?.classList.toggle('hidden', !isSandbox);
+        document.getElementById('env-production-fields')?.classList.toggle('hidden', isSandbox);
+        const sel = document.getElementById('mercadopago_env_select');
+        if (sel) sel.value = env;
 
         const sb = document.getElementById('env-btn-sandbox');
         const pr = document.getElementById('env-btn-production');
-        if (isSandbox) {
-            sb.classList.add('bg-white', 'dark:bg-slate-800', 'text-amber-600', 'dark:text-amber-400', 'shadow-sm');
-            sb.classList.remove('text-slate-500');
-            pr.classList.remove('bg-white', 'dark:bg-slate-800', 'text-emerald-600', 'dark:text-emerald-400', 'shadow-sm');
-            pr.classList.add('text-slate-500');
-        } else {
-            pr.classList.add('bg-white', 'dark:bg-slate-800', 'text-emerald-600', 'dark:text-emerald-400', 'shadow-sm');
-            pr.classList.remove('text-slate-500');
-            sb.classList.remove('bg-white', 'dark:bg-slate-800', 'text-amber-600', 'dark:text-amber-400', 'shadow-sm');
-            sb.classList.add('text-slate-500');
+        if (sb && pr) {
+            if (isSandbox) {
+                sb.classList.add('bg-white', 'dark:bg-slate-800', 'text-amber-600', 'dark:text-amber-400', 'shadow-sm');
+                sb.classList.remove('text-slate-500');
+                pr.classList.remove('bg-white', 'dark:bg-slate-800', 'text-emerald-600', 'dark:text-emerald-400', 'shadow-sm');
+                pr.classList.add('text-slate-500');
+            } else {
+                pr.classList.add('bg-white', 'dark:bg-slate-800', 'text-emerald-600', 'dark:text-emerald-400', 'shadow-sm');
+                pr.classList.remove('text-slate-500');
+                sb.classList.remove('bg-white', 'dark:bg-slate-800', 'text-amber-600', 'dark:text-amber-400', 'shadow-sm');
+                sb.classList.add('text-slate-500');
+            }
+        }
+    };
+
+    window.gwSyncSumUpEnv = function(env) {
+        const isProd = env === 'production';
+        const hint = document.getElementById('panel_sumup_env_hint');
+        const keyInput = document.getElementById('sumup_api_key_field');
+        if (hint) {
+            hint.textContent = isProd
+                ? 'Modo Produção ativo — cobranças reais na SumUp do administrador.'
+                : 'Modo Sandbox ativo — utilize chaves de teste da SumUp.';
+            hint.className = 'mt-2 text-xs font-semibold ' + (isProd ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400');
+        }
+        if (keyInput) {
+            keyInput.placeholder = isProd ? 'sup_sk_xxxxxxxx' : 'sup_sk_test_xxxxxxxx';
         }
     };
 

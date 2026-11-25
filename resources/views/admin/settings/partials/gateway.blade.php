@@ -109,13 +109,14 @@
                 <div class="card card-outline card-primary gateway-section">
                     <div class="card-header"><h3 class="card-title font-weight-bold"><i class="fas fa-key mr-2"></i>Ambiente e chaves</h3></div>
                     <div class="card-body">
-                        <div class="mb-4">
-                            <button type="button" class="btn btn-outline-warning mr-2 {{ $mpEnv !== 'production' ? 'active' : '' }}" id="gatewayEnvBtnSandbox" onclick="setGatewayEnvironment('sandbox')">Sandbox</button>
-                            <button type="button" class="btn btn-outline-success {{ $mpEnv === 'production' ? 'active' : '' }}" id="gatewayEnvBtnProduction" onclick="setGatewayEnvironment('production')">Producao</button>
-                            <select class="d-none" name="mercadopago_env" id="mercadopago_env">
-                                <option value="sandbox" {{ $mpEnv !== 'production' ? 'selected' : '' }}>sandbox</option>
-                                <option value="production" {{ $mpEnv === 'production' ? 'selected' : '' }}>production</option>
-                            </select>
+                        <div class="row mb-4">
+                            <div class="col-md-6 form-group mb-0">
+                                <label class="text-uppercase text-muted small font-weight-bold" for="mercadopago_env">Ambiente Mercado Pago</label>
+                                <select class="form-control" name="mercadopago_env" id="mercadopago_env" onchange="setGatewayEnvironment(this.value)">
+                                    <option value="sandbox" {{ $mpEnv !== 'production' ? 'selected' : '' }}>Sandbox (Testes)</option>
+                                    <option value="production" {{ $mpEnv === 'production' ? 'selected' : '' }}>Produção (Real)</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div id="gatewayEnvSandboxPanel" class="{{ $mpEnv === 'production' ? 'd-none' : '' }}">
@@ -450,13 +451,19 @@
             </div>
 
             {{-- Ambiente --}}
-            <div class="row mb-4">
+            <div class="row mb-4 align-items-end">
                 <div class="col-md-6">
-                    <label class="text-uppercase text-muted small font-weight-bold">Ambiente</label>
-                    <select name="sumup_env" class="form-control">
+                    <label class="text-uppercase text-muted small font-weight-bold" for="admin_sumup_env">Ambiente SumUp</label>
+                    <select name="sumup_env" id="admin_sumup_env" class="form-control" onchange="syncAdminSumUpEnv(this.value)">
                         <option value="sandbox" {{ ($settings['sumup_env'] ?? 'sandbox') === 'sandbox' ? 'selected' : '' }}>Sandbox (Testes)</option>
                         <option value="production" {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'selected' : '' }}>Produção (Real)</option>
                     </select>
+                </div>
+                <div class="col-md-6 mt-2 mt-md-0">
+                    <div id="admin_sumup_env_badge" class="alert {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'alert-success' : 'alert-warning' }} py-2 px-3 mb-0 small font-weight-bold">
+                        <i class="fas {{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'fa-rocket' : 'fa-flask' }} mr-1"></i>
+                        <span id="admin_sumup_env_text">{{ ($settings['sumup_env'] ?? 'sandbox') === 'production' ? 'Modo Produção ativo — cobranças reais na SumUp do administrador.' : 'Modo Sandbox ativo — utilize chaves de teste da SumUp.' }}</span>
+                    </div>
                 </div>
             </div>
 
@@ -985,22 +992,42 @@ function setGatewayEnvironment(env) {
     const productionBtn = document.getElementById('gatewayEnvBtnProduction');
     
     if (env === 'sandbox') {
-        sandboxBtn.classList.add('active');
-        productionBtn.classList.remove('active');
-        document.getElementById('gatewayEnvSandboxPanel').classList.remove('d-none');
-        document.getElementById('gatewayEnvProductionPanel').classList.add('d-none');
+        if (sandboxBtn) sandboxBtn.classList.add('active');
+        if (productionBtn) productionBtn.classList.remove('active');
+        document.getElementById('gatewayEnvSandboxPanel')?.classList.remove('d-none');
+        document.getElementById('gatewayEnvProductionPanel')?.classList.add('d-none');
     } else {
-        productionBtn.classList.add('active');
-        sandboxBtn.classList.remove('active');
-        document.getElementById('gatewayEnvProductionPanel').classList.remove('d-none');
-        document.getElementById('gatewayEnvSandboxPanel').classList.add('d-none');
+        if (productionBtn) productionBtn.classList.add('active');
+        if (sandboxBtn) sandboxBtn.classList.remove('active');
+        document.getElementById('gatewayEnvProductionPanel')?.classList.remove('d-none');
+        document.getElementById('gatewayEnvSandboxPanel')?.classList.add('d-none');
     }
     
     // Update select
-    document.getElementById('mercadopago_env').value = env;
+    const envSelect = document.getElementById('mercadopago_env');
+    if (envSelect) envSelect.value = env;
     
     // Update badges
-    updateGatewayBadges();
+    if (typeof updateGatewayBadges === 'function') updateGatewayBadges();
+}
+
+function syncAdminSumUpEnv(env) {
+    const isProd = env === 'production';
+    const badge = document.getElementById('admin_sumup_env_badge');
+    const text = document.getElementById('admin_sumup_env_text');
+    const keyInput = document.getElementById('sumup_api_key');
+    if (badge) {
+        badge.classList.toggle('alert-success', isProd);
+        badge.classList.toggle('alert-warning', !isProd);
+    }
+    if (text) {
+        text.textContent = isProd
+            ? 'Modo Produção ativo — cobranças reais na SumUp do administrador.'
+            : 'Modo Sandbox ativo — utilize chaves de teste da SumUp.';
+    }
+    if (keyInput) {
+        keyInput.placeholder = isProd ? 'sup_sk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' : 'sup_sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+    }
 }
 
 function toggleGatewaySecret(fieldId, btn) {
