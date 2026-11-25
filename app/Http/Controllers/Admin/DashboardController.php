@@ -71,8 +71,15 @@ class DashboardController extends Controller
         return self::$schemaCache[$key] = Schema::hasColumn($table, $column);
     }
 
-    public function systemHealth()
+    public function systemHealth(Request $request)
     {
+        if ($request->boolean('fresh')) {
+            Cache::forget('system_health_payload_v4');
+            Cache::forget('system_health_online_recent');
+            Cache::forget('system_health_pending_orders');
+            Cache::forget('system_health_queue_pending');
+        }
+
         return response()->json(Cache::remember('system_health_payload_v4', 60, function (): array {
             $basePath = base_path();
             $accountPath = dirname($basePath);
@@ -111,6 +118,12 @@ class DashboardController extends Controller
             }
 
             $cronHeartbeat = Cache::get('cron_heartbeat');
+            if (!$cronHeartbeat) {
+                $lastInternalRun = (int) Cache::get('internal_cron:last_run_at', 0);
+                if ($lastInternalRun > 0) {
+                    $cronHeartbeat = $lastInternalRun;
+                }
+            }
             $cronActive = false;
             $cronLastRun = null;
 

@@ -1400,7 +1400,7 @@
                     }
 
                     // 6. Saúde do Sistema (AJAX)
-                    function loadSystemHealth() {
+                    function loadSystemHealth(forceFresh = false) {
                         const container = document.getElementById('system-health-body');
                         const refreshBtn = document.getElementById('btn-refresh-health');
                         const icon = refreshBtn ? refreshBtn.querySelector('i') : null;
@@ -1408,7 +1408,9 @@
 
                         if (icon) icon.classList.add('fa-spin');
 
-                        fetch(@json(route('admin.dashboard.system-health')), {
+                        const healthUrl = @json(route('admin.dashboard.system-health')) + (forceFresh ? '?fresh=1' : '');
+
+                        fetch(healthUrl, {
                             headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
                         })
                         .then(r => r.json())
@@ -1522,11 +1524,13 @@
                         });
                     }
 
-                    loadSystemHealth();
+                    loadSystemHealth(false);
                     const refreshBtn = document.getElementById('btn-refresh-health');
                     if (refreshBtn && !refreshBtn.dataset.bound) {
                         refreshBtn.dataset.bound = '1';
-                        refreshBtn.addEventListener('click', loadSystemHealth);
+                        refreshBtn.addEventListener('click', function () {
+                            loadSystemHealth(true);
+                        });
                     }
                 @endif
             }

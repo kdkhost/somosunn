@@ -1,5 +1,14 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.58] - 2026-11-25 - fix(admin, cron, ux): correcao de titulos colados em card-header, ativacao do RunInternalCron + heartbeat e rastreio real de usuarios online agora
+
+- **Títulos Colados em Cabeçalhos de Cards (`public/css/adminlte4-unn.css`):**
+  - Removido o `float: left` legado do AdminLTE em `.card-header .card-title` (`float: none !important; display: block;`), eliminando definitivamente textos colados entre título e subtítulo em todos os cards do painel `/admin`.
+- **Cron Interno Ativo & Monitorado (`app/Http/Kernel.php`, `app/Http/Middleware/RunInternalCron.php`, `app/Console/Kernel.php`, `app/Console/Commands/CronHeartbeat.php`, `app/Http/Controllers/Admin/DashboardController.php`):**
+  - Registrado `RunInternalCron` nos grupos `web` e `web.public`, agendado `cron:heartbeat` a cada minuto em `Console\Kernel` (TTL de 10 minutos), liberada a execução em acessos GET administrativos (sem travar a resposta via `terminate()`) e adicionado suporte a `?fresh=1` no botão *Atualizar* de *Saúde do Sistema*.
+- **Usuários Online Agora em Tempo Real (`app/Http/Middleware/LogUserActivity.php`, `database/migrations/2026_11_25_150000_add_last_activity_at_to_users_table.php`):**
+  - Adicionada migration segura para `users.last_activity_at` e atualização leve com throttle de 60s em cache para todo usuário autenticado, corrigindo o indicador `Online agora` no dashboard.
+
 ## [2.8.57] - 2026-11-25 - feat(admin, dashboard): reformulacao visual completa da pagina principal /admin no padrao executivo AdminLTE 4 + React/SaaS
 
 - **Novo Dashboard Executivo (`resources/views/admin/dashboard.blade.php`):**

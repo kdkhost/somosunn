@@ -355,10 +355,13 @@ body.sidebar-collapse .app-sidebar:not(:hover) .sidebar-user-panel .user-info {
 }
 
 .card-header .card-title {
+    float: none !important;
+    display: block;
     margin: 0;
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: -0.01em;
+    line-height: 1.35;
 }
 
 .card-body {

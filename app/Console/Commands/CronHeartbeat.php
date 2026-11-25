@@ -13,7 +13,7 @@ class CronHeartbeat extends Command
 
     public function handle(): int
     {
-        Cache::put('cron_heartbeat', now(), 120);
+        Cache::put('cron_heartbeat', now(), 600);
         $this->info('Heartbeat atualizado em ' . now()->format('d/m/Y H:i:s'));
 
         return self::SUCCESS;

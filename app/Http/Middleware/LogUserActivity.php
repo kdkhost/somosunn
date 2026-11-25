@@ -21,6 +21,9 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Models\ActivityLog;
 
 class LogUserActivity
@@ -36,8 +39,14 @@ class LogUserActivity
         'painel/admin/logs/clear',
     ];
 
+    private static ?bool $hasLastActivityColumn = null;
+
     public function handle(Request $request, Closure $next)
     {
+        if (Auth::check()) {
+            $this->touchLastActivity((int) Auth::id());
+        }
+
         $response = $next($request);
 
         // Apenas para usuarios autenticados e em metodos modificadores
@@ -130,5 +139,30 @@ class LogUserActivity
             return 'Limpou o histórico de logs de atividade.';
 
         return 'O usuário realizou uma operação no sistema.';
+    }
+
+    private function touchLastActivity(int $userId): void
+    {
+        try {
+            if (self::$hasLastActivityColumn === null) {
+                self::$hasLastActivityColumn = Cache::remember(
+                    'schema:users_has_last_activity_at',
+                    3600,
+                    static fn () => Schema::hasColumn('users', 'last_activity_at')
+                );
+            }
+
+            if (!self::$hasLastActivityColumn) {
+                return;
+            }
+
+            if (Cache::add("user_last_activity_touch:{$userId}", 1, 60)) {
+                DB::table('users')
+                    ->where('id', $userId)
+                    ->update(['last_activity_at' => now()]);
+            }
+        } catch (\Throwable $e) {
+            // Fail-safe: nunca interromper a requisição por falha ao registrar atividade online
+        }
     }
 }

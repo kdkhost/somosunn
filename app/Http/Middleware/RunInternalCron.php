@@ -38,7 +38,7 @@ class RunInternalCron
                 return;
             }
 
-            if ($request->is('admin*') || $request->is('api*')) {
+            if ($request->is('api*') || $request->is('admin/dashboard/system-health') || $request->is('admin/dashboard/stats')) {
                 return;
             }
 
@@ -67,7 +67,9 @@ class RunInternalCron
             }
 
             try {
-                Cache::put('internal_cron:last_run_at', time(), $minInterval * 2);
+                $now = now();
+                Cache::put('internal_cron:last_run_at', $now->timestamp, max(600, $minInterval * 5));
+                Cache::put('cron_heartbeat', $now, 600);
                 Artisan::call('schedule:run', ['--no-interaction' => true]);
             } finally {
                 $lock->release();

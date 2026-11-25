@@ -53,6 +53,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\TrackVisitor::class,
             \App\Http\Middleware\LogUserActivity::class,
             \App\Http\Middleware\EnsureLgpdConsent::class,
+            \App\Http\Middleware\RunInternalCron::class,
             // Pass-through observador para o AnomalyDetectorService.
             \App\Http\Middleware\AnomalyDetectorMiddleware::class,
         ],
@@ -70,6 +71,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\SecurityHeadersMiddleware::class,
             \App\Http\Middleware\TrackReferralLink::class,
             \App\Http\Middleware\TrackVisitor::class,
+            \App\Http\Middleware\RunInternalCron::class,
         ],
         'webhook' => [
             \App\Http\Middleware\AdvancedRateLimitMiddleware::class,

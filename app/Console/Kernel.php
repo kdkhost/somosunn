@@ -77,6 +77,9 @@ class Kernel extends ConsoleKernel
             Log::error('Erro ao carregar scheduler central do banco: ' . $e->getMessage());
         }
 
+        // Heartbeat de monitoramento do Cron interno
+        $schedule->command('cron:heartbeat')->everyMinute();
+
         // Limpeza diária automática de novos cadastros não validados
         $schedule->command('members:cleanup-unverified')->dailyAt('03:00');
 
