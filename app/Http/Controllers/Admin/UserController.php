@@ -50,6 +50,8 @@ class UserController extends Controller
         $totalUsers = (clone $query)->count();
         $totalAdmins = (clone $query)->whereIn('role', ['admin', 'superadmin'])->count();
         $totalMembers = $totalUsers - $totalAdmins;
+        $totalPendingEmail = (clone $query)->whereNull('email_verified_at')->count();
+        $totalNewToday = (clone $query)->whereDate('created_at', today())->count();
 
         // Otimização: paginação SSR + eager loading para DataTables Server-Side sem carregar toda a base em memória
         $users = $query->with(['plan'])->withCount([
@@ -68,7 +70,9 @@ class UserController extends Controller
             'createdAt',
             'totalUsers',
             'totalAdmins',
-            'totalMembers'
+            'totalMembers',
+            'totalPendingEmail',
+            'totalNewToday'
         ));
     }
 
@@ -87,6 +91,8 @@ class UserController extends Controller
         $search = $dtSearch !== '' ? $dtSearch : $filterSearch;
         $registered = trim((string) $request->input('registered', ''));
         $createdAt = trim((string) $request->input('created_at', ''));
+        $roleFilter = trim((string) $request->input('role_filter', 'all'));
+        $verifiedFilter = trim((string) $request->input('verified_filter', 'all'));
 
         $baseQuery = User::query();
         if (!$this->isSuperadmin()) {
@@ -102,6 +108,21 @@ class UserController extends Controller
         $recordsTotal = (clone $baseQuery)->count();
 
         $query = clone $baseQuery;
+
+        if ($roleFilter === 'superadmin' && $this->isSuperadmin()) {
+            $query->where('role', 'superadmin');
+        } elseif ($roleFilter === 'admin') {
+            $query->whereIn('role', ['admin', 'superadmin']);
+        } elseif ($roleFilter === 'member') {
+            $query->whereNotIn('role', ['admin', 'superadmin']);
+        }
+
+        if ($verifiedFilter === 'verified') {
+            $query->whereNotNull('email_verified_at');
+        } elseif ($verifiedFilter === 'pending') {
+            $query->whereNull('email_verified_at');
+        }
+
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
@@ -125,7 +146,7 @@ class UserController extends Controller
         ];
         $orderBy = $orderColumns[$orderColIdx] ?? 'id';
 
-        $rows = $query->withCount([
+        $rows = $query->with(['plan'])->withCount([
             'eventRegistrations as total_tickets_count' => function ($q) {
                 $q->whereIn('status', [\App\Models\EventRegistration::STATUS_PAID, \App\Models\EventRegistration::STATUS_CONFIRMED]);
             },
@@ -145,24 +166,37 @@ class UserController extends Controller
 
         $data = $rows->map(function (User $user) use ($marketingUserId, $currentUser, $impersonating): array {
             $verified = $user->hasVerifiedEmail();
-            $emailBadge = '<span class="badge d-block mt-1 ' . ($verified ? 'badge-success' : 'badge-warning') . '" style="width:max-content;">'
-                . '<i class="fas ' . ($verified ? 'fa-check-circle' : 'fa-exclamation-circle') . ' mr-1"></i>'
-                . ($verified ? 'E-mail validado' : 'E-mail pendente')
+            $initial = mb_strtoupper(mb_substr(trim((string) $user->name) ?: 'U', 0, 1));
+            $avatarHtml = $user->photo
+                ? '<img src="' . e(asset($user->photo)) . '" alt="" class="users-avatar-img" loading="lazy" decoding="async">'
+                : '<span class="users-avatar-fallback">' . e($initial) . '</span>';
+            $planBadge = $user->plan ? '<small class="text-secondary d-block" style="font-size:0.74rem;"><i class="fas fa-crown text-warning me-1"></i>' . e($user->plan->name) . '</small>' : '';
+
+            $nameHtml = '<div class="d-flex align-items-center gap-2">'
+                . $avatarHtml
+                . '<div class="min-w-0">'
+                . '<div class="fw-bold text-truncate" style="max-width:220px;">' . e($user->name) . '</div>'
+                . $planBadge
+                . '</div></div>';
+
+            $emailBadge = '<span class="badge rounded-pill d-inline-flex align-items-center mt-1 ' . ($verified ? 'text-bg-success' : 'text-bg-warning') . '" style="font-size:10.5px;">'
+                . '<i class="fas ' . ($verified ? 'fa-check-circle' : 'fa-exclamation-circle') . ' me-1"></i>'
+                . ($verified ? 'Validado' : 'Pendente')
                 . '</span>';
 
             if ($user->role === 'superadmin') {
-                $roleHtml = '<span class="badge badge-danger px-3 py-2" style="font-size:11px;"><i class="fas fa-crown mr-1" style="font-size:9px;"></i>Super Admin</span>';
+                $roleHtml = '<span class="badge rounded-pill text-bg-danger px-3 py-1" style="font-size:11px;"><i class="fas fa-crown me-1" style="font-size:9px;"></i>Super Admin</span>';
             } elseif ($user->role === 'admin') {
-                $roleHtml = '<span class="badge badge-warning px-3 py-2" style="font-size:11px;"><i class="fas fa-user-shield mr-1" style="font-size:9px;"></i>Admin</span>';
+                $roleHtml = '<span class="badge rounded-pill text-bg-warning px-3 py-1" style="font-size:11px;"><i class="fas fa-user-shield me-1" style="font-size:9px;"></i>Admin</span>';
             } else {
-                $roleHtml = '<span class="badge badge-secondary px-3 py-2" style="font-size:11px;"><i class="fas fa-user mr-1" style="font-size:9px;"></i>Membro</span>';
+                $roleHtml = '<span class="badge rounded-pill text-bg-secondary px-3 py-1" style="font-size:11px;"><i class="fas fa-user me-1" style="font-size:9px;"></i>Membro</span>';
             }
 
-            $levelHtml = '<span class="badge badge-light border px-2 py-1">' . e(ucfirst($user->level ?? 'Iniciante')) . '</span>';
-            $ticketsHtml = '<span class="badge badge-info px-2 py-1"><i class="fas fa-ticket-alt mr-1" style="font-size:9px;"></i>'
+            $levelHtml = '<span class="badge rounded-pill text-bg-light border px-2 py-1">' . e(ucfirst($user->level ?? 'Iniciante')) . '</span>';
+            $ticketsHtml = '<span class="badge rounded-pill text-bg-info px-2 py-1"><i class="fas fa-ticket-alt me-1" style="font-size:9px;"></i>'
                 . (int) $user->checked_in_tickets_count . ' / ' . (int) $user->total_tickets_count . '</span>';
 
-            $actions = '<div class="d-inline-flex" style="gap:4px;">';
+            $actions = '<div class="d-inline-flex gap-1">';
             if ($currentUser && $currentUser->isAdmin() && $user->id !== $currentUser->id && !$impersonating) {
                 if (!$user->isAdmin() || $currentUser->role === 'superadmin') {
                     $actions .= '<a href="' . e(route('admin.users.impersonate', $user)) . '" class="btn btn-sm btn-outline-warning rounded-pill px-2" title="Acessar como usuário" data-pjax="false"><i class="fas fa-user-secret"></i></a>';
@@ -171,7 +205,7 @@ class UserController extends Controller
             if ($currentUser && $currentUser->isAdmin()) {
                 $isMarketing = $marketingUserId === (int) $user->id;
                 $actions .= '<button type="button" class="btn btn-sm rounded-pill px-2 btn-toggle-marketing ' . ($isMarketing ? 'btn-success' : 'btn-outline-info') . '"'
-                    . ' title="' . ($isMarketing ? 'Remover como Responsavel de Marketing' : 'Definir como Responsavel de Marketing') . '"'
+                    . ' title="' . ($isMarketing ? 'Remover como Responsável de Marketing' : 'Definir como Responsável de Marketing') . '"'
                     . ' data-url="' . e(route('admin.users.marketing-manager', $user)) . '"'
                     . ' data-user-name="' . e($user->name) . '"'
                     . ' data-has-pix="' . (filled($user->pix_key) ? '1' : '0') . '"'
@@ -189,8 +223,8 @@ class UserController extends Controller
             $actions .= '</div>';
 
             return [
-                'name' => '<span class="font-weight-bold text-sm">' . e($user->name) . '</span>',
-                'email' => '<span class="text-muted text-sm">' . e($user->email) . '</span>' . $emailBadge,
+                'name' => $nameHtml,
+                'email' => '<span class="text-secondary small d-block">' . e($user->email) . '</span>' . $emailBadge,
                 'role' => $roleHtml,
                 'level' => $levelHtml,
                 'tickets' => $ticketsHtml,

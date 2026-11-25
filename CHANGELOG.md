@@ -1,5 +1,13 @@
 # CHANGELOG - SOMOS UNN
 
+## [2.8.55] - 2026-11-25 - feat(admin, users): reformulacao completa da Gestao de Usuarios (/admin/users) no padrao AdminLTE 4 + React/SaaS com filtros Server-Side em tempo real
+
+- **Nova Gestão de Usuários (`resources/views/admin/users/index.blade.php`, `app/Http/Controllers/Admin/UserController.php`):**
+  - Adicionado Hero Banner moderno com contadores rápidos (Novos Hoje, Responsável de Marketing ativo) e atalhos.
+  - 4 KPI Cards oficiais `.small-box` clicáveis (Total de Usuários, Membros, Administradores e E-mails Pendentes) com animação CountUp.
+  - Toolbar estilo React integrada ao DataTables Server-Side: abas *Segmented Control* por papel (`Todos`, `Membros`, `Admins`, `Super Admins`), filtro de validação de e-mail (`Todos`, `Validados`, `Pendentes`), busca instantânea com debounce e seletor de itens por página.
+  - Avatares/iniciais em gradiente UNN, plano ativo e badges pill Bootstrap 5 tanto na renderização inicial quanto nas respostas AJAX de `Admin\UserController::data()`.
+
 ## [2.8.54] - 2026-11-25 - feat(ads, seed): criacao e populacao dos 8 Pacotes de Publicidade por periodo (7, 14, 21, 30, 60, 90, 120 e 365 dias)
 
 - **Seeder de Pacotes de Publicidade (`database/seeders/SponsorPlanSeeder.php`):**

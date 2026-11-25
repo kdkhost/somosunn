@@ -1,7 +1,136 @@
 @extends('admin.layouts.app')
 
-@section('page_title', 'Usuários')
-@section('breadcrumb')<li class="breadcrumb-item active">Usuários</li>@endsection
+@section('title', 'Usuários - Admin')
+@section('page_title', 'Gestão de Usuários')
+@section('breadcrumb')
+    <li class="breadcrumb-item active" aria-current="page">Usuários</li>
+@endsection
+
+@push('styles')
+    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/responsive.bootstrap4.min.css') }}">
+    <style>
+        .users-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.1rem;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1F5EDB 100%);
+            color: #ffffff;
+            padding: 1.5rem 1.75rem;
+            box-shadow: 0 18px 40px -12px rgba(15, 23, 42, 0.35);
+        }
+        .users-hero::after {
+            content: '';
+            position: absolute;
+            right: -50px;
+            top: -50px;
+            width: 220px;
+            height: 220px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(56, 189, 248, 0) 70%);
+            pointer-events: none;
+        }
+        .users-hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.36rem 0.78rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #f8fafc;
+            backdrop-filter: blur(8px);
+        }
+        .users-hero-btn-light {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 0.7rem;
+            font-weight: 700;
+            padding: 0.52rem 1.05rem;
+            box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.35);
+        }
+        .users-hero-btn-light:hover {
+            background: #f8fafc;
+            color: #1F5EDB;
+            transform: translateY(-1px);
+        }
+        .users-hero-btn-ghost {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            border-radius: 0.7rem;
+            font-weight: 600;
+            padding: 0.52rem 1rem;
+        }
+        .users-hero-btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+        }
+        .users-segmented {
+            display: inline-flex;
+            flex-wrap: wrap;
+            padding: 0.25rem;
+            border-radius: 0.75rem;
+            background: var(--bs-tertiary-bg);
+            border: 1px solid var(--bs-border-color);
+            gap: 0.2rem;
+        }
+        .users-segmented .btn {
+            border: 0;
+            border-radius: 0.55rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.38rem 0.8rem;
+            color: var(--bs-secondary-color);
+            background: transparent;
+        }
+        .users-segmented .btn.is-active {
+            background: var(--unn-gradient);
+            color: #ffffff;
+            box-shadow: 0 4px 12px -3px rgba(31, 94, 219, 0.45);
+        }
+        .users-avatar-img,
+        .users-avatar-fallback {
+            width: 38px;
+            height: 38px;
+            border-radius: 999px;
+            flex-shrink: 0;
+        }
+        .users-avatar-img {
+            object-fit: cover;
+            border: 2px solid rgba(31, 94, 219, 0.25);
+        }
+        .users-avatar-fallback {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.88rem;
+            color: #ffffff;
+            background: linear-gradient(135deg, #1F5EDB 0%, #177FD6 100%);
+        }
+        #example1_wrapper .dataTables_filter,
+        #example1_wrapper .dataTables_length {
+            display: none !important;
+        }
+        #example1_wrapper .dataTables_paginate {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.85rem 1.25rem;
+        }
+        #example1_wrapper .dataTables_info {
+            padding: 0.95rem 1.25rem;
+            color: var(--bs-secondary-color);
+            font-size: 0.82rem;
+        }
+        .users-kpi-clickable {
+            cursor: pointer;
+        }
+    </style>
+@endpush
 
 @section('content')
     @php
@@ -11,94 +140,154 @@
         $createdAtLabel = !empty($createdAt) ? \Carbon\Carbon::parse($createdAt)->format('d/m/Y') : null;
     @endphp
 
-    {{-- KPI Cards --}}
-    <div class="row mb-4">
-        <div class="col-lg-4 col-sm-6">
-            <div class="info-box shadow-sm elevation-1">
-                <span class="info-box-icon bg-gradient-primary elevation-1"><i class="fas fa-users"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text fw-bold">Total de Usuários</span>
-                    <span class="info-box-number">{{ $totalUsers }}</span>
-                    <span class="progress-description text-xs">Cadastrados na plataforma</span>
+    {{-- Hero Banner Moderno --}}
+    <div class="users-hero mb-4">
+        <div class="row align-items-center g-3 position-relative" style="z-index: 2;">
+            <div class="col-lg-7">
+                <div class="text-uppercase fw-bold mb-1" style="font-size: 0.72rem; letter-spacing: 0.14em; color: #93c5fd;">
+                    <i class="fas fa-users-gear me-1"></i> Diretório &amp; Acessos • SOMOS UNN
                 </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6">
-            <div class="info-box shadow-sm elevation-1">
-                <span class="info-box-icon bg-gradient-danger elevation-1"><i class="fas fa-user-shield"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text fw-bold">Administradores</span>
-                    <span class="info-box-number text-danger">{{ $totalAdmins }}</span>
-                    <span class="progress-description text-xs">Admin e Super Admin</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-12">
-            <div class="info-box shadow-sm elevation-1">
-                <span class="info-box-icon bg-gradient-success elevation-1"><i class="fas fa-user-graduate"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text fw-bold">Membros</span>
-                    <span class="info-box-number text-success">{{ $totalMembers }}</span>
-                    <span class="progress-description text-xs">Usuários regulares</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Responsavel de Marketing --}}
-    <div class="card card-outline card-info shadow-sm mb-4">
-        <div class="card-header border-0 py-2">
-            <h3 class="card-title fw-bold text-info" style="font-size: 0.95rem;">
-                <i class="fas fa-bullhorn me-2"></i> Responsavel de Marketing da Plataforma
-            </h3>
-        </div>
-        <div class="card-body py-3">
-            @if($marketingUser)
-                <div class="d-flex align-items-center justify-content-between flex-wrap">
-                    <div>
-                        <span class="badge text-bg-success px-3 py-2 me-2" style="font-size: 11px;">
-                            <i class="fas fa-check-circle me-1"></i> Ativo
-                        </span>
-                        <strong>{{ $marketingUser->name }}</strong>
-                        <span class="text-muted ms-2">({{ $marketingUser->email }})</span>
-                    </div>
-                    <small class="text-muted">Recebe 10% de cada venda concluida (split "traffic")</small>
-                </div>
-            @else
-                <p class="text-muted mb-0 small">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Nenhum usuario designado. Clique no icone <i class="fas fa-bullhorn text-info"></i> ao lado de um usuario para definir o responsavel.
+                <h2 class="h4 fw-bold text-white mb-2">Usuários, Papéis &amp; Permissões</h2>
+                <p class="mb-3 text-white-50" style="max-width: 640px; font-size: 0.9rem;">
+                    Filtre por papel ou validação de e-mail em tempo real, valide contas manualmente, supervisione acessos e gerencie o responsável de marketing.
                 </p>
-            @endif
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="users-hero-pill">
+                        <i class="fas fa-user-plus text-info"></i>
+                        Hoje: {{ $totalNewToday ?? 0 }} novo(s)
+                    </span>
+                    <span class="users-hero-pill">
+                        <i class="fas fa-bullhorn text-warning"></i>
+                        Marketing: {{ $marketingUser ? $marketingUser->name : 'Não definido' }}
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-5 d-flex flex-wrap justify-content-lg-end gap-2">
+                @if(!$isNewUsersTodayView)
+                    <a href="{{ route('admin.users.index', ['registered' => 'today']) }}" class="btn users-hero-btn-ghost" data-pjax="true">
+                        <i class="fas fa-calendar-day me-1"></i> Novos Hoje ({{ $totalNewToday ?? 0 }})
+                    </a>
+                @else
+                    <a href="{{ route('admin.users.index') }}" class="btn users-hero-btn-ghost" data-pjax="true">
+                        <i class="fas fa-rotate-left me-1"></i> Ver Todos
+                    </a>
+                @endif
+                <a href="{{ route('admin.users.create') }}" class="btn users-hero-btn-light" data-pjax="true">
+                    <i class="fas fa-user-plus me-2 text-primary"></i> Novo Usuário
+                </a>
+            </div>
         </div>
     </div>
 
-    @if($isNewUsersTodayView || $createdAtLabel)
-        <div class="alert alert-primary shadow-sm d-flex flex-wrap align-items-center justify-content-between mb-4">
-            <div class="pe-3">
-                <strong><i class="fas fa-user-clock me-2"></i>Filtro ativo:</strong>
-                @if($isNewUsersTodayView)
-                    exibindo apenas os novos usuários cadastrados hoje.
+    {{-- 4 KPI Cards (AdminLTE 4 .small-box com animação CountUp) --}}
+    <div class="row g-3 mb-2">
+        <div class="col-xl-3 col-sm-6">
+            <div class="small-box bg-primary users-kpi-clickable" onclick="window.setUsersRoleFilter('all')">
+                <div class="inner">
+                    <h3>{{ $totalUsers }}</h3>
+                    <p>Total de Usuários</p>
+                </div>
+                <div class="icon"><i class="fas fa-users"></i></div>
+                <div class="small-box-footer"><span>Clique para ver todos</span></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <div class="small-box bg-success users-kpi-clickable" onclick="window.setUsersRoleFilter('member')">
+                <div class="inner">
+                    <h3>{{ $totalMembers }}</h3>
+                    <p>Membros</p>
+                </div>
+                <div class="icon"><i class="fas fa-user-graduate"></i></div>
+                <div class="small-box-footer"><span>Filtrar membros</span></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <div class="small-box bg-danger users-kpi-clickable" onclick="window.setUsersRoleFilter('admin')">
+                <div class="inner">
+                    <h3>{{ $totalAdmins }}</h3>
+                    <p>Administradores</p>
+                </div>
+                <div class="icon"><i class="fas fa-user-shield"></i></div>
+                <div class="small-box-footer"><span>Filtrar admins</span></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <div class="small-box bg-warning users-kpi-clickable" onclick="window.setUsersVerifiedFilter('pending')">
+                <div class="inner">
+                    <h3>{{ $totalPendingEmail ?? 0 }}</h3>
+                    <p>E-mails Pendentes</p>
+                </div>
+                <div class="icon"><i class="fas fa-envelope-open-text"></i></div>
+                <div class="small-box-footer"><span>Filtrar pendentes</span></div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Responsável de Marketing --}}
+    <div class="unn-section-box mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <span class="users-avatar-fallback" style="background: linear-gradient(135deg, #0284c7, #0ea5e9);">
+                <i class="fas fa-bullhorn"></i>
+            </span>
+            <div>
+                <div class="fw-bold small text-uppercase text-secondary">Responsável de Marketing (Split 10% Tráfego)</div>
+                @if($marketingUser)
+                    <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
+                        <span class="badge rounded-pill text-bg-success"><i class="fas fa-check-circle me-1"></i>Ativo</span>
+                        <strong>{{ $marketingUser->name }}</strong>
+                        <span class="text-secondary small">({{ $marketingUser->email }})</span>
+                    </div>
                 @else
-                    exibindo apenas os usuários cadastrados em {{ $createdAtLabel }}.
+                    <div class="text-secondary small mt-1">
+                        Nenhum usuário designado. Clique no ícone <i class="fas fa-bullhorn text-info"></i> na linha de um usuário para definir.
+                    </div>
                 @endif
             </div>
-            <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                <i class="fas fa-times me-1"></i> Limpar filtro
-            </a>
         </div>
-    @endif
-
-    {{-- Tabela principal --}}
-    <div class="card card-outline card-primary shadow-sm">
-        <div class="card-header border-0">
-            <h3 class="card-title fw-bold">
-                <i class="fas fa-users-cog me-2 text-primary"></i>Gerenciar Usuários
-            </h3>
-            <div class="card-tools">
-                <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 elevation-1" data-pjax="true">
-                    <i class="fas fa-plus me-1"></i> Novo Usuário
+        @if($isNewUsersTodayView || $createdAtLabel)
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge rounded-pill text-bg-primary px-3 py-2">
+                    <i class="fas fa-filter me-1"></i>
+                    {{ $isNewUsersTodayView ? 'Somente cadastrados hoje' : 'Cadastrados em ' . $createdAtLabel }}
+                </span>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill" data-pjax="true">
+                    <i class="fas fa-times me-1"></i> Limpar
                 </a>
+            </div>
+        @endif
+    </div>
+
+    {{-- Tabela Principal com Toolbar React --}}
+    <div class="card card-outline card-primary">
+        <div class="card-header">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <div class="users-segmented" id="usersRoleTabs">
+                    <button type="button" class="btn is-active" data-role-filter="all">Todos</button>
+                    <button type="button" class="btn" data-role-filter="member">Membros</button>
+                    <button type="button" class="btn" data-role-filter="admin">Admins</button>
+                    @if(auth()->user()?->role === 'superadmin')
+                        <button type="button" class="btn" data-role-filter="superadmin">Super Admins</button>
+                    @endif
+                </div>
+
+                <select id="usersVerifiedFilter" class="form-select form-select-sm" style="width: 175px;">
+                    <option value="all">Todos os e-mails</option>
+                    <option value="verified">E-mails validados</option>
+                    <option value="pending">E-mails pendentes</option>
+                </select>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <div class="input-group input-group-sm" style="width: 240px;">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" id="usersSearchInput" class="form-control" value="{{ $search ?? '' }}" placeholder="Buscar nome, e-mail ou ID...">
+                </div>
+                <select id="usersPageLength" class="form-select form-select-sm" style="width: 92px;" title="Itens por página">
+                    <option value="15" selected>15 / pág</option>
+                    <option value="30">30 / pág</option>
+                    <option value="50">50 / pág</option>
+                    <option value="100">100 / pág</option>
+                </select>
             </div>
         </div>
 
@@ -106,54 +295,64 @@
             <div class="table-responsive">
                 <table id="example1" class="table table-hover align-middle mb-0">
                     <thead>
-                        <tr class="bg-light">
-                            <th class="border-0 ps-4">Nome</th>
-                            <th class="border-0">E-mail</th>
-                            <th class="border-0 text-center">Papel</th>
-                            <th class="border-0 text-center">Nível</th>
-                            <th class="border-0 text-center">Ingressos</th>
-                            <th class="border-0 text-center" style="width:160px;">Ações</th>
+                        <tr>
+                            <th class="ps-4">Usuário</th>
+                            <th>E-mail &amp; Status</th>
+                            <th class="text-center">Papel</th>
+                            <th class="text-center">Nível</th>
+                            <th class="text-center">Ingressos</th>
+                            <th class="text-center" style="width: 195px;">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($users as $user)
+                        @foreach($users as $user)
+                            @php
+                                $initial = mb_strtoupper(mb_substr(trim((string) $user->name) ?: 'U', 0, 1));
+                            @endphp
                             <tr>
                                 <td class="ps-4">
-                                    <span class="fw-bold text-sm">{{ $user->name }}</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if($user->photo)
+                                            <img src="{{ asset($user->photo) }}" alt="" class="users-avatar-img" loading="lazy" decoding="async">
+                                        @else
+                                            <span class="users-avatar-fallback">{{ $initial }}</span>
+                                        @endif
+                                        <div class="min-w-0">
+                                            <div class="fw-bold text-truncate" style="max-width: 220px;">{{ $user->name }}</div>
+                                            @if($user->plan)
+                                                <small class="text-secondary d-block" style="font-size: 0.74rem;">
+                                                    <i class="fas fa-crown text-warning me-1"></i>{{ $user->plan->name }}
+                                                </small>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
-                                    <span class="text-muted text-sm">{{ $user->email }}</span>
-                                    <span class="badge d-block mt-1 {{ $user->hasVerifiedEmail() ? 'text-bg-success' : 'text-bg-warning' }}" style="width:max-content;">
+                                    <span class="text-secondary small d-block">{{ $user->email }}</span>
+                                    <span class="badge rounded-pill d-inline-flex align-items-center mt-1 {{ $user->hasVerifiedEmail() ? 'text-bg-success' : 'text-bg-warning' }}" style="font-size: 10.5px;">
                                         <i class="fas {{ $user->hasVerifiedEmail() ? 'fa-check-circle' : 'fa-exclamation-circle' }} me-1"></i>
-                                        {{ $user->hasVerifiedEmail() ? 'E-mail validado' : 'E-mail pendente' }}
+                                        {{ $user->hasVerifiedEmail() ? 'Validado' : 'Pendente' }}
                                     </span>
                                 </td>
                                 <td class="text-center">
                                     @if($user->role === 'superadmin')
-                                        <span class="badge text-bg-danger px-3 py-2" style="font-size:11px;">
-                                            <i class="fas fa-crown me-1" style="font-size:9px;"></i>Super Admin
-                                        </span>
+                                        <span class="badge rounded-pill text-bg-danger px-3 py-1" style="font-size: 11px;"><i class="fas fa-crown me-1" style="font-size: 9px;"></i>Super Admin</span>
                                     @elseif($user->role === 'admin')
-                                        <span class="badge text-bg-warning px-3 py-2" style="font-size:11px;">
-                                            <i class="fas fa-user-shield me-1" style="font-size:9px;"></i>Admin
-                                        </span>
+                                        <span class="badge rounded-pill text-bg-warning px-3 py-1" style="font-size: 11px;"><i class="fas fa-user-shield me-1" style="font-size: 9px;"></i>Admin</span>
                                     @else
-                                        <span class="badge text-bg-secondary px-3 py-2" style="font-size:11px;">
-                                            <i class="fas fa-user me-1" style="font-size:9px;"></i>Membro
-                                        </span>
+                                        <span class="badge rounded-pill text-bg-secondary px-3 py-1" style="font-size: 11px;"><i class="fas fa-user me-1" style="font-size: 9px;"></i>Membro</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge text-bg-light border px-2 py-1">{{ ucfirst($user->level ?? 'Iniciante') }}</span>
+                                    <span class="badge rounded-pill text-bg-light border px-2 py-1">{{ ucfirst($user->level ?? 'Iniciante') }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge text-bg-info px-2 py-1">
-                                        <i class="fas fa-ticket-alt me-1" style="font-size:9px;"></i>
-                                        {{ $user->checked_in_tickets_count }} / {{ $user->total_tickets_count }}
+                                    <span class="badge rounded-pill text-bg-info px-2 py-1">
+                                        <i class="fas fa-ticket-alt me-1" style="font-size: 9px;"></i>{{ $user->checked_in_tickets_count }} / {{ $user->total_tickets_count }}
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-inline-flex" style="gap:4px;">
+                                    <div class="d-inline-flex gap-1">
                                         @if(auth()->user()->isAdmin() && $user->id !== auth()->id() && !session()->has('impersonator_id'))
                                             @if(!$user->isAdmin() || auth()->user()->role === 'superadmin')
                                                 <a href="{{ route('admin.users.impersonate', $user) }}" class="btn btn-sm btn-outline-warning rounded-pill px-2"
@@ -163,7 +362,7 @@
                                         @if(auth()->user()->isAdmin())
                                             <button type="button"
                                                 class="btn btn-sm rounded-pill px-2 btn-toggle-marketing {{ $marketingUserId === $user->id ? 'btn-success' : 'btn-outline-info' }}"
-                                                title="{{ $marketingUserId === $user->id ? 'Remover como Responsavel de Marketing' : 'Definir como Responsavel de Marketing' }}"
+                                                title="{{ $marketingUserId === $user->id ? 'Remover como Responsável de Marketing' : 'Definir como Responsável de Marketing' }}"
                                                 data-url="{{ route('admin.users.marketing-manager', $user) }}"
                                                 data-user-name="{{ $user->name }}"
                                                 data-has-pix="{{ filled($user->pix_key) ? '1' : '0' }}"
@@ -181,7 +380,7 @@
                                         @endif
                                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary rounded-pill px-2" title="Editar"
                                             data-pjax="true"><i class="fas fa-edit"></i></a>
-                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-2 btn-delete" title="Excluir"
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2 btn-delete" title="Excluir"
                                             data-action="{{ route('admin.users.destroy', $user) }}"><i class="fas fa-trash"></i></button>
                                     </div>
                                 </td>
@@ -190,43 +389,11 @@
                     </tbody>
                 </table>
             </div>
-            <div class="card-footer bg-white border-top py-3">
-                <div class="d-flex justify-content-between align-items-center flex-wrap">
-                    <div class="text-muted text-sm">
-                        Total na consulta: <b>{{ number_format($totalUsers, 0, ',', '.') }}</b> usuários.
-                    </div>
-                    <div>
-                        <a href="{{ route('admin.users.create') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-pjax="true">
-                            <i class="fas fa-plus me-1"></i> Novo Usuário
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 @endsection
 
-@push('styles')
-    <!-- DataTables Local -->
-    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ cdn_asset('assets/admin/datatables/responsive.bootstrap4.min.css') }}">
-    <style>
-        .align-middle td { vertical-align: middle !important; }
-        #example1_wrapper .dataTables_paginate {
-            display: flex;
-            justify-content: center;
-            padding: 0.75rem;
-        }
-        #example1_wrapper .dataTables_info {
-            margin: 0.95rem 0 0 0.75rem;
-            color: #6c757d;
-            font-size: 0.875rem;
-        }
-    </style>
-@endpush
-
 @push('scripts')
-    <!-- DataTables Server-Side Local -->
     <script src="{{ cdn_asset('assets/admin/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ cdn_asset('assets/admin/datatables/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ cdn_asset('assets/admin/datatables/dataTables.responsive.min.js') }}"></script>
@@ -234,121 +401,147 @@
 
     <script>
         $(function () {
-            $("#example1").DataTable({
-                "processing": true,
-                "serverSide": true,
-                "deferLoading": {{ (int) $totalUsers }},
-                "ajax": {
-                    "url": @json(route('admin.users.data')),
-                    "data": function (d) {
-                        d.search_filter = @json($search ?? '');
+            let activeRoleFilter = 'all';
+            let activeVerifiedFilter = 'all';
+            let searchTimer = null;
+
+            const table = $("#example1").DataTable({
+                processing: true,
+                serverSide: true,
+                deferLoading: {{ (int) $totalUsers }},
+                ajax: {
+                    url: @json(route('admin.users.data')),
+                    data: function (d) {
+                        d.search_filter = $('#usersSearchInput').val() || '';
                         d.registered = @json($registered ?? '');
                         d.created_at = @json($createdAt ?? '');
+                        d.role_filter = activeRoleFilter;
+                        d.verified_filter = activeVerifiedFilter;
                     }
                 },
-                "columns": [
-                    { "data": "name" },
-                    { "data": "email" },
-                    { "data": "role", "className": "text-center" },
-                    { "data": "level", "className": "text-center" },
-                    { "data": "tickets", "className": "text-center" },
-                    { "data": "actions", "orderable": false, "searchable": false, "className": "text-center" }
+                columns: [
+                    { data: 'name', className: 'ps-4' },
+                    { data: 'email' },
+                    { data: 'role', className: 'text-center' },
+                    { data: 'level', className: 'text-center' },
+                    { data: 'tickets', className: 'text-center' },
+                    { data: 'actions', orderable: false, searchable: false, className: 'text-center' }
                 ],
-                "responsive": true,
-                "lengthChange": true,
-                "autoWidth": false,
-                "pageLength": 15,
-                "order": [[0, "asc"]],
-                "language": {
-                    "url": "{{ cdn_asset('assets/admin/datatables/pt-BR.json') }}",
-                    "emptyTable": "Nenhum usuário encontrado."
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                pageLength: 15,
+                order: [[0, 'asc']],
+                language: {
+                    url: "{{ cdn_asset('assets/admin/datatables/pt-BR.json') }}",
+                    emptyTable: "Nenhum usuário encontrado para os filtros aplicados."
                 }
+            });
+
+            window.setUsersRoleFilter = function (role) {
+                activeRoleFilter = role || 'all';
+                $('#usersRoleTabs .btn').removeClass('is-active');
+                $('#usersRoleTabs .btn[data-role-filter="' + activeRoleFilter + '"]').addClass('is-active');
+                table.ajax.reload();
+            };
+
+            window.setUsersVerifiedFilter = function (val) {
+                activeVerifiedFilter = val || 'all';
+                $('#usersVerifiedFilter').val(activeVerifiedFilter);
+                table.ajax.reload();
+            };
+
+            $('#usersRoleTabs').on('click', '.btn', function () {
+                window.setUsersRoleFilter($(this).data('role-filter'));
+            });
+
+            $('#usersVerifiedFilter').on('change', function () {
+                activeVerifiedFilter = $(this).val() || 'all';
+                table.ajax.reload();
+            });
+
+            $('#usersPageLength').on('change', function () {
+                table.page.len(parseInt($(this).val(), 10) || 15).draw();
+            });
+
+            $('#usersSearchInput').on('input', function () {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(function () {
+                    table.ajax.reload();
+                }, 260);
             });
 
             // Marketing Manager toggle
-            $(document).on('click', '.btn-toggle-marketing', function () {
-                var btn = $(this);
-                var url = btn.data('url');
-                var userName = btn.data('user-name');
-                var isCurrent = btn.data('is-current') === 1 || btn.data('is-current') === '1';
-                var action = isCurrent ? 'unset' : 'set';
-                var requiresPix = !isCurrent && String(btn.data('has-pix')) !== '1';
+            $(document).off('click.unnMarketing', '.btn-toggle-marketing').on('click.unnMarketing', '.btn-toggle-marketing', function () {
+                const btn = $(this);
+                const url = btn.data('url');
+                const userName = btn.data('user-name');
+                const isCurrent = btn.data('is-current') === 1 || btn.data('is-current') === '1';
+                const action = isCurrent ? 'unset' : 'set';
+                const requiresPix = !isCurrent && String(btn.data('has-pix')) !== '1';
 
-                var confirmText = isCurrent
-                    ? 'Remover ' + userName + ' como Responsavel de Marketing?'
-                    : 'Definir ' + userName + ' como Responsavel de Marketing? Um email e uma notificacao serao enviados.';
+                const confirmText = isCurrent
+                    ? 'Remover ' + userName + ' como Responsável de Marketing?'
+                    : 'Definir ' + userName + ' como Responsável de Marketing? Um e-mail e uma notificação serão enviados.';
 
-                if (typeof Swal !== 'undefined') {
-                    var options = {
-                        title: isCurrent ? 'Remover Responsavel?' : 'Definir Responsavel?',
-                        text: confirmText,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: isCurrent ? 'Sim, remover' : 'Sim, definir',
-                        cancelButtonText: 'Cancelar',
-                        confirmButtonColor: isCurrent ? '#dc3545' : '#17a2b8',
+                const options = {
+                    title: isCurrent ? 'Remover Responsável?' : 'Definir Responsável?',
+                    text: confirmText,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: isCurrent ? 'Sim, remover' : 'Sim, definir',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: isCurrent ? '#dc2626' : '#1F5EDB',
+                    reverseButtons: true
+                };
+
+                if (requiresPix) {
+                    options.input = 'text';
+                    options.inputLabel = 'Chave PIX obrigatória para recebimentos';
+                    options.inputPlaceholder = 'E-mail, CPF, telefone ou chave aleatória';
+                    options.inputValidator = function (value) {
+                        return value && value.trim() ? null : 'Informe a chave PIX.';
                     };
-                    if (requiresPix) {
-                        options.input = 'text';
-                        options.inputLabel = 'Chave PIX obrigatória para recebimentos';
-                        options.inputPlaceholder = 'E-mail, CPF, telefone ou chave aleatória';
-                        options.inputValidator = function (value) {
-                            return value && value.trim() ? null : 'Informe a chave PIX.';
-                        };
-                    }
-                    Swal.fire(options).then(function (result) {
-                        if (!result.isConfirmed) return;
-                        performToggle(result.value || '');
-                    });
                 }
 
-                function performToggle(pixKey) {
+                Swal.fire(options).then(function (result) {
+                    if (!result.isConfirmed) return;
                     $.ajax({
                         url: url,
                         method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            action: action,
-                            pix_key: pixKey,
-                        },
+                        data: { _token: '{{ csrf_token() }}', action: action, pix_key: result.value || '' },
                     }).done(function (resp) {
-                        if (typeof toastr !== 'undefined') {
-                            toastr.success(resp.message || 'Atualizado.');
-                        }
-                        setTimeout(function () { location.reload(); }, 800);
+                        toastr.success(resp.message || 'Atualizado.');
+                        setTimeout(function () { location.reload(); }, 700);
                     }).fail(function (xhr) {
-                        var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Erro ao atualizar.';
-                        if (typeof toastr !== 'undefined') toastr.error(msg);
+                        toastr.error((xhr.responseJSON && xhr.responseJSON.message) || 'Erro ao atualizar.');
                     });
-                }
+                });
             });
 
-            $(document).on('click', '.btn-verify-email', function () {
-                var button = $(this);
-                var execute = function () {
+            // Verificação manual de e-mail
+            $(document).off('click.unnVerifyEmail', '.btn-verify-email').on('click.unnVerifyEmail', '.btn-verify-email', function () {
+                const button = $(this);
+                Swal.fire({
+                    title: 'Validar e-mail manualmente?',
+                    text: 'O membro poderá realizar compras e acessar recursos sem abrir o link de confirmação.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, validar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#10b981',
+                    reverseButtons: true
+                }).then(function (result) {
+                    if (!result.isConfirmed) return;
                     $.post(button.data('url'), { _token: '{{ csrf_token() }}' })
                         .done(function (response) {
-                            if (typeof toastr !== 'undefined') toastr.success(response.message);
-                            setTimeout(function () { window.location.reload(); }, 500);
+                            toastr.success(response.message || 'E-mail validado com sucesso.');
+                            table.ajax.reload(null, false);
                         })
                         .fail(function (xhr) {
-                            var message = xhr.responseJSON && xhr.responseJSON.message
-                                ? xhr.responseJSON.message
-                                : 'Não foi possível validar o e-mail.';
-                            if (typeof toastr !== 'undefined') toastr.error(message);
+                            toastr.error((xhr.responseJSON && xhr.responseJSON.message) || 'Não foi possível validar o e-mail.');
                         });
-                };
-
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        title: 'Validar e-mail?',
-                        text: 'O membro poderá realizar compras sem abrir o link de confirmação.',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Sim, validar',
-                        cancelButtonText: 'Cancelar'
-                    }).then(function (result) { if (result.isConfirmed) execute(); });
-                }
+                });
             });
         });
     </script>
